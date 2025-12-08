@@ -4,7 +4,7 @@ Description: This template exposes API to invoke Amazon Bedrock Mistral LLM usin
 
 Globals:
   Function:
-    Runtime: java17
+    Runtime: java25
     MemorySize: 3008
     Timeout: 120
 

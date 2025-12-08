@@ -4,7 +4,7 @@ Description: This template exposes API to create and confirm user in Amazon Cogn
 
 Globals:
   Function:
-    Runtime: java21
+    Runtime: java25
     Timeout: 29
     Environment: 
       Variables:

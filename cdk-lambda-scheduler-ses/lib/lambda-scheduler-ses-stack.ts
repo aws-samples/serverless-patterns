@@ -34,11 +34,11 @@ export class CdkLambdaSchedulerSesStack extends cdk.Stack {
     role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLogsFullAccess'));
 
     const fn = new lambda.Function(this, 'SchedulerFunction', {
-      runtime: lambda.Runtime.PYTHON_3_11,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'eventbridge_scheduler.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../scheduler_function'), {
         bundling: { 
-          image: lambda.Runtime.PYTHON_3_11.bundlingImage,
+          image: lambda.Runtime.PYTHON_3_14.bundlingImage,
           command: [
             'bash', '-c',
             'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output'

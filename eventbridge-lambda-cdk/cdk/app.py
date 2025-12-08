@@ -24,7 +24,7 @@ class EventBridgeLambdaStack(Stack):
             code=lambda_.InlineCode(handler_code),
             handler="index.main",
             timeout=Duration.seconds(10),
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
         )
 
         # Set Lambda Logs Retention and Removal Policy

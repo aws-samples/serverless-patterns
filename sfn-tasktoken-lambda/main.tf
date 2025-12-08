@@ -79,7 +79,7 @@ resource "aws_sqs_queue" "sqs_queue" {
 resource "aws_lambda_function" "callback_lambda" {
   function_name = "callback-lambda"
   handler       = "index.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   role          = aws_iam_role.lambda_execution_role.arn
   timeout       = 25
   # Lambda function code

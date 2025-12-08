@@ -93,7 +93,7 @@ Resources:
       FunctionName: GetFunction
       Handler: lambda_function.lambda_handler
       CodeUri: src/lambda_function.zip
-      Runtime: python3.13
+      Runtime: python3.14
 
 
   MySNSTopic:

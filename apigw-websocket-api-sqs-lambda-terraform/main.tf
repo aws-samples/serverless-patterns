@@ -98,7 +98,7 @@ resource "aws_lambda_function" "lambda_sqs_websocket_response" {
     s3_bucket                      = aws_s3_bucket.lambda_bucket.id
     s3_key                         = aws_s3_object.lambda.key
     source_code_hash               = data.archive_file.lambda_source.output_base64sha256
-    runtime                        = "python3.8"
+    runtime                        = "python3.14"
     handler                        = "app.lambda_handler"
     role                           = aws_iam_role.lambda_execution.arn
     timeout                        = 15

@@ -23,7 +23,7 @@ class ApigwHttpApiLambdaStack(Stack):
         # The source code is in './src' directory
         lambda_fn = lambda_.Function(
             self, "MyFunction",
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="index.handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
             environment={

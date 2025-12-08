@@ -59,7 +59,7 @@ export class ApiGwHttpLambdaDocumentDbStack extends cdk.Stack {
 
     // Lambda function which is conncted to the DocumentDb
     const LambdaToDocumentDB = new NodejsFunction(this, 'LambdaToDocumentDB', {
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       timeout: cdk.Duration.seconds(300),
       entry: path.join(__dirname, '../lambda/app.ts'),

@@ -15,7 +15,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: lambda-translate
-      Runtime: python3.9
+      Runtime: python3.14
       Handler: index.lambda_handler
       CodeUri: src/
       MemorySize: 128

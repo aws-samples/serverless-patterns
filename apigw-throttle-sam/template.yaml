@@ -6,7 +6,7 @@ Globals:
     Timeout: 3
     MemorySize: 128
     Tracing: Active
-    Runtime: python3.9
+    Runtime: python3.14
     Handler: app.lambda_handler
   Api:
     TracingEnabled: true

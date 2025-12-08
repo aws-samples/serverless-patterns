@@ -90,7 +90,7 @@ module "aws_lambda" {
   lambda_name    = "${local.prefix}-lambda-${random_id.seed.hex}"
   lambda_handler = "lambdaFirehoseLogger.lambdaFirehoseLogger"
   lambda_file    = "./assets/lambda/lambdaFirehoseLogger.py"
-  lambda_runtime = "python3.13"
+  lambda_runtime = "python3.14"
   env_variables  = {
     "FIREHOSE_STREAM_NAME" : "${local.prefix}-stream-${random_id.seed.hex}"
   }

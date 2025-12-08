@@ -32,7 +32,7 @@ Resources:
       Handler: function.handler
       PackageType: "Zip"
       Tracing: Active
-      Runtime: "nodejs16.x"
+      Runtime: "nodejs24.x"
       Environment:
         Variables:
           DatabaseTable: !Ref DynamoDBTable
@@ -314,7 +314,8 @@ Resources:
     Properties:
       ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${API}/stages/dev
       WebACLArn: !GetAtt  APIWebACL.Arn
-      
+    DependsOn: APIdevStage
+
 Outputs:
   CloudfrontDomain:
     Value: !GetAtt CloudFront.DomainName

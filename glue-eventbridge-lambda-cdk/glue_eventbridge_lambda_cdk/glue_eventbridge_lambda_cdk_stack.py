@@ -23,7 +23,7 @@ class GlueEventBridgeLambda(Stack):
         # Create Lambda function
         lambda_fn = _lambda.Function(
             self, "LambdaFunctionFromEventBridge",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="lambdaFunctionFromEventBridge.handler",
             code=_lambda.Code.from_asset("lambda_fns"),
         )

@@ -42,7 +42,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Events:
         EventBridgeTrigger:
           Type: CloudWatchEvent

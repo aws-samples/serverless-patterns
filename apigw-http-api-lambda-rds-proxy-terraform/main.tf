@@ -101,7 +101,7 @@ resource "aws_lambda_function" "rds_proxy_function" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda.key
 
-  runtime = "python3.7"
+  runtime = "python3.14"
   handler = "app.lambda_handler"
 
   source_code_hash = data.archive_file.lambda_source.output_base64sha256

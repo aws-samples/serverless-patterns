@@ -97,7 +97,7 @@ Resources:
     Type: AWS::Serverless::Function 
     Properties:
       Handler: process-email.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       CodeUri: src/
 
 # Create AWS Lambda resoure based policy to allow SES to invoke Lambda

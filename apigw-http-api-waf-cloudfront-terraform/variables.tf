@@ -40,7 +40,7 @@ variable "secret_rotation_lambda_memory" {
 
 variable "function_runtime" {
   type = string
-  default = "python3.12"
+  default = "python3.14"
 }
 
 variable "min_ttl" {

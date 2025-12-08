@@ -59,7 +59,7 @@ class S3SqsLambdaBedrockS3CdkPythonStack(Stack):
         # Create Lambda function
         function = lambda_.Function(
         self, "lambda_function",
-        runtime=lambda_.Runtime.PYTHON_3_9,
+        runtime=lambda_.Runtime.PYTHON_3_14,
         handler="index.lambda_handler",
         code=lambda_.Code.from_asset("lambda"),
         timeout=cdk.Duration.seconds(300),

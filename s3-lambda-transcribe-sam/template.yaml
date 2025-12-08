@@ -14,7 +14,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.14
       Environment:
         Variables:
           OUTPUT_BUCKET: !Ref OutputBucket

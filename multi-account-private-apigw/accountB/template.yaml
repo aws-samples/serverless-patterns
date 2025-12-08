@@ -52,7 +52,7 @@ Resources:
     Properties:
       FunctionName: !Sub Lambda-${AWS::StackName}
       Handler: index.lambda_handler
-      Runtime: python3.13
+      Runtime: python3.14
       InlineCode: |
         import json
         def lambda_handler(event, context):

@@ -15,7 +15,7 @@ resource "aws_lambda_function" "translate_text" {
   function_name    = var.function_name
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.lambda_handler"
-  runtime         = "python3.13"
+  runtime         = "python3.14"
   memory_size     = 128
   timeout         = 10
 

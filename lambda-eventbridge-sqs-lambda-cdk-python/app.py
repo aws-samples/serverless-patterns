@@ -42,7 +42,7 @@ class LambdaEventBridgeSQSLambda(Stack):
         lambda_function = lambda_.Function(
             self,
             "EventGenerator",
-            runtime=lambda_.Runtime.PYTHON_3_11,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="eventsGenerator.lambda_handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
             timeout=Duration.minutes(1),
@@ -107,7 +107,7 @@ class LambdaEventBridgeSQSLambda(Stack):
             lambda_function_props=lambda_.FunctionProps(
                 handler="eventProcessor.lambda_handler",
                 code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),                
-                runtime=lambda_.Runtime.PYTHON_3_11,
+                runtime=lambda_.Runtime.PYTHON_3_14,
                 function_name=preference+'-processor',                           
             ),
             existing_queue_obj= queue,

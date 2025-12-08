@@ -32,7 +32,7 @@ export class AwsDynamodbLambdaSchedulerLambdaSampleStack extends cdk.Stack {
      * Lambda Dynamo Stream Subscriber Creation
      */
     const eventBridgeProducerLambda = new lambda.Function(this, 'ProducerLambdaHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,      // execution environment
+      runtime: lambda.Runtime.NODEJS_24_X,      // execution environment
       code: lambda.Code.fromAsset('lambdas'),  // code loaded from the "lambdas" directory
       handler: 'dynamo_stream_handler.handler',                // file is "dynamo_stream_handler", function is "handler"
       environment: {
@@ -48,7 +48,7 @@ export class AwsDynamodbLambdaSchedulerLambdaSampleStack extends cdk.Stack {
      *  This function will create schedule at a given time
      */
     const eventBridgeConsumerLambda = new lambda.Function(this, 'ConsumerLambdaHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,      // execution environment
+      runtime: lambda.Runtime.NODEJS_24_X,      // execution environment
       code: lambda.Code.fromAsset('lambdas'),  // code loaded from the "lambdas" directory
       handler: 'event_schedule_handler.handler',                // file is "event_schedule_handler", function is "handler"
       environment: {
