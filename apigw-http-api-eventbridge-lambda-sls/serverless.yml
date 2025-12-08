@@ -9,7 +9,7 @@ provider:
   name: aws
 
   # common configuration for all Lambda functions in this stack
-  runtime: nodejs20.x
+  Runtime: nodejs24.x
   architecture: arm64 # use Graviton for running all Lambda functions
 
   # override the default stage (dev) to be `prod`, or you can use the `--stage` CLI option

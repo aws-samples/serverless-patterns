@@ -25,7 +25,7 @@ export class PipesFromDynamoStack extends cdk.Stack {
     // the Lambda function that creates three sample orders for testing
     const sampleOrderCreationFunction = new lambda.Function(this, 'sampleOrderCreationFunction', {
       functionName: 'sampleOrderCreationFunction',
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset('lib/lambda'),
       handler: 'sampleOrderCreationFunction.handler',
       environment: {

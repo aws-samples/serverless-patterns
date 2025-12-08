@@ -154,7 +154,7 @@ class BedrockKendraStack(Stack):
         # Lambda function for initiating data source sync
         data_source_sync_lambda = lambda_.Function(
             self, "DataSourceSyncLambda",
-            runtime=lambda_.Runtime.PYTHON_3_12,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset("src/dataSourceSync"),
             handler="dataSourceSyncLambda.lambda_handler",
             timeout=Duration.minutes(15),
@@ -203,7 +203,7 @@ class BedrockKendraStack(Stack):
         # Lambda function for invoking Bedrock
         invoke_bedrock_lambda = lambda_.Function(
             self, "InvokeBedrockLambda",
-            runtime=lambda_.Runtime.PYTHON_3_12,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset("src/invokeBedrockLambda"),
             handler="invokeBedrockLambda.lambda_handler",
             timeout=Duration.seconds(120),

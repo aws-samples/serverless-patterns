@@ -15,7 +15,7 @@ class LambdaLayerXRayStackStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Change pillow arn to latest version in your region. See https://github.com/keithrozario/Klayers/tree/master/deployments/python3.8/arns
+        # Change pillow arn to latest version in your region. See https://github.com/keithrozario/Klayers/tree/master/deployments/python3.14/arns
         layerpillow = lambda_.LayerVersion.from_layer_version_arn(self, 'pillowlayerversion', 'Your_Region_Pillow_ARN')
 
          # --------------------------------------------------------

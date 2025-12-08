@@ -110,7 +110,7 @@ resource "aws_lambda_function" "process_user_created_lambda" {
 
   source_code_hash = data.archive_file.process_user_created_function_zip_file.output_base64sha256
 
-  runtime = "nodejs20.x"
+  runtime = "nodejs24.x"
 
   environment {
     variables = {
@@ -181,7 +181,7 @@ resource "aws_lambda_function" "email_customer_lambda" {
 
   source_code_hash = data.archive_file.email_customer_function_zip_file.output_base64sha256
 
-  runtime = "nodejs20.x"
+  runtime = "nodejs24.x"
 }
 
 # Rule to match schedules for users and attach our email customer lambda

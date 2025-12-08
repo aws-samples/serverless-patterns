@@ -55,7 +55,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Architectures:
       - x86_64
       Events:
@@ -75,4 +75,4 @@ Resources:
 Outputs:
   UsagePlanApi:
     Description: API Gateway endpoint URL for Prod stage for usage API
-    Value: !Sub "https://${UsagePlanAPI}.execute-api.${AWS::Region}.amazonaws.com/${UsagePlanAPIProdStage}/plantest"
+    Value: !Sub "https://${UsagePlanAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${UsagePlanAPIProdStage}/plantest"

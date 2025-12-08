@@ -141,7 +141,7 @@ Resources:
       Handler: PeriodicReplication.lambda_handler
       Role: !GetAtt SnapshotLambdaRole.Arn
       CodeUri: src/PeriodicReplication.py
-      Runtime: python3.13
+      Runtime: python3.14
       Timeout: 900
 
   #

@@ -18,7 +18,7 @@ Resources:
     Properties:
       CodeUri: lambda/
       Handler: lambda_function.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.14
       ReservedConcurrentExecutions: 0
       Timeout: 600
       

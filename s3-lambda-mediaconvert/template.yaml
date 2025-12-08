@@ -5,7 +5,7 @@ Description: Serverless patterns - Service to Service description (uksb-1tthgi81
 # Comment on each global 
 Globals:
   Function:
-    Runtime: python3.9
+    Runtime: python3.14
     Timeout: 120
 
 # Comment each resource section to explain usage

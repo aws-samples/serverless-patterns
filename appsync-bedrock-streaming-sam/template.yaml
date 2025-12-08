@@ -14,7 +14,7 @@ Resources:
         - ResourceName: BedrockFunction
       CodeUri: src/Function
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 256
       Timeout: 30
       Tracing: Active

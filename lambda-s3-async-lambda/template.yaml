@@ -24,7 +24,7 @@ Resources:
       FunctionName: SendPayloadFunction
       CodeUri: sendPayloadFunction/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Environment:
         Variables:
@@ -50,7 +50,7 @@ Resources:
       FunctionName: !Ref AsyncLambdaFunctionName
       CodeUri: asynchronousFunction/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Policies:
         - S3ReadPolicy:

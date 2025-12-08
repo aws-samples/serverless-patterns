@@ -18,7 +18,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Policies:
         - Version: '2012-10-17'
           Statement:
@@ -60,4 +60,4 @@ Outputs:
     Value: !Ref BedrockLambdaFunction
   BedrockRestApi:
     Description: "API Gateway endpoint URL for the v1 stage of the Bedrock Rest API"
-    Value: !Sub "https://${BedrockRestApi}.execute-api.${AWS::Region}.amazonaws.com/v1/bedrock_test"
+    Value: !Sub "https://${BedrockRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v1/bedrock_test"

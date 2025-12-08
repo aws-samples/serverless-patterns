@@ -249,7 +249,7 @@ Resources:
               except Exception as e:
                   cfnresponse.send(event, context, cfnresponse.FAILED, {}, str(e))
       Handler: index.handler
-      Runtime: python3.12
+      Runtime: python3.14
       Role: !GetAtt LambdaExecutionRole.Arn
   LambdaExecutionRole:
     Type: AWS::IAM::Role

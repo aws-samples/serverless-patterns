@@ -51,7 +51,7 @@ public class KinesisLambdaDdbCdkJavaStack extends Stack {
         .code(Code.fromAsset("lambda-code"))
         .handler("index.lambda_handler")
         .timeout(Duration.minutes(0.5))
-        .runtime(Runtime.PYTHON_3_11)
+        .runtime(Runtime.PYTHON_3_14)
         .role(lambdaRole)
         .build();
 

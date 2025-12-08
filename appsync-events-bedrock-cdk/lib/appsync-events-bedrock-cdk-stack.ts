@@ -46,7 +46,7 @@ export class AppsyncEventsBedrockCdkStack extends cdk.Stack {
     const lambda = new NodejsFunction(this, 'Chat', {
       entry: "src/chat.ts",
       timeout: cdk.Duration.seconds(30),
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       memorySize: 2048,
       environment: {
         REGION: this.region,

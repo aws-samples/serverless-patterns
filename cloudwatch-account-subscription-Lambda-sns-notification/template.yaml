@@ -57,7 +57,7 @@ Resources:
     Properties:
       FunctionName: !Ref LambdaFunctionName
       Handler: index.lambda_handler
-      Runtime: python3.13
+      Runtime: python3.14
       CodeUri: notification-lambda/
       Environment:
         Variables:
