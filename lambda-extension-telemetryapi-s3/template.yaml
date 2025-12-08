@@ -17,7 +17,7 @@ Resources:
     Properties:
       CodeUri: sampleappsrc/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Architectures:
         - arm64
       Layers: 
@@ -35,7 +35,7 @@ Resources:
       Description: Layer containing extension(s)
       ContentUri: extensionsrc/
       CompatibleRuntimes:
-        - python3.10
+        - python3.14
       RetentionPolicy: Delete  
     Metadata:
       BuildMethod: makefile     

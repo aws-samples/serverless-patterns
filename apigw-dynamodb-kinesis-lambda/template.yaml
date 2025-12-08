@@ -22,7 +22,7 @@ Resources:
     Properties:
       FunctionName: LambdaConsumer
       Handler: lambda_function.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       CodeUri: src/
       Policies: 
       - KinesisStreamReadPolicy:

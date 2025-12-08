@@ -143,7 +143,7 @@ class CdkMomoStack(Stack):
         # The source code is in './lambda' directory
         lambda_function = lambda_.Function(
             self, "LambdaFunction",
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="start_step_function.handler",
             code=lambda_.Code.from_asset(path.join(dirname, "lambda")),
         )

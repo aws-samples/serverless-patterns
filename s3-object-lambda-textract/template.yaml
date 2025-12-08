@@ -50,7 +50,7 @@ Resources:
     Properties:
       CodeUri: app/
       Handler: app.handler
-      Runtime: python3.11
+      Runtime: python3.14
       MemorySize: 1024
       # The function needs permission to call back to the S3 Object Lambda Access Point with the WriteGetObjectResponse.
       Policies:

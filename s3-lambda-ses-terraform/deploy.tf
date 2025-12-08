@@ -68,7 +68,7 @@ resource "aws_s3_bucket" "newbucket" {
 resource "aws_lambda_layer_version" "lambda_layer" {
   filename   = "src/urlshortner.zip"
   layer_name = "pyshortner"
-  compatible_runtimes = ["python3.9"]
+  compatible_runtimes = ["python3.14"]
 }
 
 # Creating Lambda resource
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "test_lambda" {
   function_name    = "${var.function_name}-${random_id.rng.hex}"
   role             = aws_iam_role.lambda_iam.arn
   handler          = "emailSender.lambda_handler"
-  runtime          = "python3.9"
+  runtime          = "python3.14"
   timeout          = var.timeout
   filename         = "${data.archive_file.zip.output_path}"
   source_code_hash = "${data.archive_file.zip.output_base64sha256}"

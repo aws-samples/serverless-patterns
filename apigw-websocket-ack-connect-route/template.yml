@@ -6,7 +6,7 @@ Description: An Amazon API Gateway WebSocket API and an AWS Lambda function.
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.12
+    Runtime: python3.14
     MemorySize: 128
     Timeout: 15
 

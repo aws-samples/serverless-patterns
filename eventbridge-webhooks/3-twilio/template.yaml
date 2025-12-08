@@ -56,7 +56,7 @@ Resources:
         ] # Append the stack UUID
       CodeUri: ./src
       Handler: app.lambda_handler
-      Runtime: python3.13
+      Runtime: python3.14
       ReservedConcurrentExecutions: 10
       Environment:
         Variables:

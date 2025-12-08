@@ -38,7 +38,7 @@ class CwlogsLambdaSnsSqsStack(Stack):
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
         )
         subscribed_lambda = _lambda.Function(self, "SubscribedFunction",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset("src/lambda"),
             handler="index.lambda_handler",
             timeout=Duration.seconds(2),

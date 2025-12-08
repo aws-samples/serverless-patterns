@@ -80,7 +80,7 @@ pip install boto3 -t lambda_layer_x_ray_stack/layers/boto3/python
 
 4. Each bucket name has to be globally unique so update the source and resized bucket names by replacing < your-name > with your name and any random digits in the lambda_layer_x_ray_stack_stack.py file. 
 
-5. Update the pillow arn in the lambda_layer_x_ray_stack_stack.py file to the latest version in your region. See [Klayers](https://github.com/keithrozario/Klayers/tree/master/deployments/python3.8/arns) and select your region and the latest pillow package version arn.
+5. Update the pillow arn in the lambda_layer_x_ray_stack_stack.py file to the latest version in your region. See [Klayers](https://github.com/keithrozario/Klayers/tree/master/deployments/python3.14/arns) and select your region and the latest pillow package version arn.
 
 ```
 layerpillow = lambda_.LayerVersion.from_layer_version_arn(self, 'pillowlayerversion', 'Your_Region_Pillow_ARN')

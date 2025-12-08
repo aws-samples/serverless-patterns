@@ -38,7 +38,7 @@ Resources:
       Description: Lambda to be invoked by the SQS Queue
       CodeUri: SQSLambdaFunction
       Handler: com.example.sqsfunction.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       Timeout: 30

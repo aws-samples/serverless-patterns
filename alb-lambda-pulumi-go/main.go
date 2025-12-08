@@ -100,7 +100,7 @@ func main() {
 			return err
 		}
 		fn, err := lambda.NewFunction(ctx, "fn", &lambda.FunctionArgs{
-			Runtime: pulumi.String("nodejs18.x"),
+			Runtime: pulumi.String("nodejs24.x"),
 			Handler: pulumi.String("index.handler"),
 			Role:    lambdaRole.Arn,
 			Code:    pulumi.NewFileArchive("./lambda"),

@@ -13,7 +13,7 @@ class BasicAuthorizerConstruct extends Construct {
             handler: 'index.handler',
             functionName: 'basic-authorizer',
             architecture: lambda.Architecture.ARM_64,
-            runtime: lambda.Runtime.NODEJS_18_X
+            runtime: lambda.Runtime.NODEJS_24_X
         });
 
         // API Gateway Lambda Authorizer
@@ -30,7 +30,7 @@ class BasicAuthorizerConstruct extends Construct {
             handler: 'index.handler',
             functionName: 'basic-authorizer-protected-resource',
             architecture: lambda.Architecture.ARM_64,
-            runtime: lambda.Runtime.NODEJS_18_X
+            runtime: lambda.Runtime.NODEJS_24_X
         });
 
         // The API Gateway REST API

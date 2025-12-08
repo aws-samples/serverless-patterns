@@ -7,7 +7,7 @@ custom:
 
 provider:
   name: aws
-  runtime: python3.9
+  runtime: python3.14
   iam:
     role:
       statements:

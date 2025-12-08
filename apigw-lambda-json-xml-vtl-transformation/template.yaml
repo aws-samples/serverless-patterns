@@ -87,7 +87,7 @@ Resources:
       Description: Lambda to be invoked by the API Gateway
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Timeout: 3
       MemorySize: 128
       Events:

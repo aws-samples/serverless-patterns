@@ -4,7 +4,7 @@ Description: Event driven Amazon MQ for ActiveMQ message processing using AWS La
 
 Globals:
   Function:
-    Runtime: java21
+    Runtime: java25
     MemorySize: 512
 
 Parameters:

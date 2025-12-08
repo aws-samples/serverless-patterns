@@ -2,7 +2,7 @@ service: sls-${self:custom.name}-sfp
 
 provider:
   name: aws
-  runtime: python3.11
+  runtime: python3.14
   stage: ${opt:stage, 'dev'}
   region: us-east-1
   deploymentBucket:

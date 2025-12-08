@@ -1,0 +1,366 @@
+{
+    "eventSourceArn": "arn:aws:rds:us-west-2:664251831272:cluster:lambdaeventsourcedocumentdbcluster",
+    "eventSource": "aws:docdb",
+    "events": [
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054b0000000a010000000a0000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060683,
+                        "i": 10
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-1"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-1",
+                    "Firstname": "Josephine",
+                    "Lastname": "Darakjy",
+                    "Street": "4 B Blue Ridge Blvd",
+                    "City": "Brighton",
+                    "County": "Livingston",
+                    "State": "MI",
+                    "Zip": "48116",
+                    "HomePhone": "810-292-9388",
+                    "CellPhone": "810-374-9840",
+                    "Email": "josephine_darakjy@darakjy.org",
+                    "Company": "\"Chanay, Jeffrey A Esq\"",
+                    "Website": "http://www.chanayjeffreyaesq.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000201000000020000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 2
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-2"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-2",
+                    "Firstname": "Art",
+                    "Lastname": "Venere",
+                    "Street": "8 W Cerritos Ave #54",
+                    "City": "Bridgeport",
+                    "County": "Gloucester",
+                    "State": "NJ",
+                    "Zip": "8014",
+                    "HomePhone": "856-636-8749",
+                    "CellPhone": "856-264-4130",
+                    "Email": "art@venere.org",
+                    "Company": "\"Chemel, James L Cpa\"",
+                    "Website": "http://www.chemeljameslcpa.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000301000000030000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 3
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-3"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-3",
+                    "Firstname": "Lenna",
+                    "Lastname": "Paprocki",
+                    "Street": "639 Main St",
+                    "City": "Anchorage",
+                    "County": "Anchorage",
+                    "State": "AK",
+                    "Zip": "99501",
+                    "HomePhone": "907-385-4412",
+                    "CellPhone": "907-921-2010",
+                    "Email": "lpaprocki@hotmail.com",
+                    "Company": "Feltz Printing Service",
+                    "Website": "http://www.feltzprintingservice.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000401000000040000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 4
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-4"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-4",
+                    "Firstname": "Donette",
+                    "Lastname": "Foller",
+                    "Street": "34 Center St",
+                    "City": "Hamilton",
+                    "County": "Butler",
+                    "State": "OH",
+                    "Zip": "45011",
+                    "HomePhone": "513-570-1893",
+                    "CellPhone": "513-549-4561",
+                    "Email": "donette.foller@cox.net",
+                    "Company": "Printing Dimensions",
+                    "Website": "http://www.printingdimensions.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000501000000050000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 5
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-5"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-5",
+                    "Firstname": "Simona",
+                    "Lastname": "Morasca",
+                    "Street": "3 Mcauley Dr",
+                    "City": "Ashland",
+                    "County": "Ashland",
+                    "State": "OH",
+                    "Zip": "44805",
+                    "HomePhone": "419-503-2484",
+                    "CellPhone": "419-800-6759",
+                    "Email": "simona@morasca.com",
+                    "Company": "\"Chapman, Ross E Esq\"",
+                    "Website": "http://www.chapmanrosseesq.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000601000000060000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 6
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-6"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-6",
+                    "Firstname": "Mitsue",
+                    "Lastname": "Tollner",
+                    "Street": "7 Eads St",
+                    "City": "Chicago",
+                    "County": "Cook",
+                    "State": "IL",
+                    "Zip": "60632",
+                    "HomePhone": "773-573-6914",
+                    "CellPhone": "773-924-8565",
+                    "Email": "mitsue_tollner@yahoo.com",
+                    "Company": "Morlong Associates",
+                    "Website": "http://www.morlongassociates.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000701000000070000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 7
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-7"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-7",
+                    "Firstname": "Leota",
+                    "Lastname": "Dilliard",
+                    "Street": "7 W Jackson Blvd",
+                    "City": "San Jose",
+                    "County": "Santa Clara",
+                    "State": "CA",
+                    "Zip": "95111",
+                    "HomePhone": "408-752-3500",
+                    "CellPhone": "408-813-1105",
+                    "Email": "leota@hotmail.com",
+                    "Company": "Commercial Press",
+                    "Website": "http://www.commercialpress.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000801000000080000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 8
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-8"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-8",
+                    "Firstname": "Sage",
+                    "Lastname": "Wieser",
+                    "Street": "5 Boston Ave #88",
+                    "City": "Sioux Falls",
+                    "County": "Minnehaha",
+                    "State": "SD",
+                    "Zip": "57105",
+                    "HomePhone": "605-414-2147",
+                    "CellPhone": "605-794-4895",
+                    "Email": "sage_wieser@cox.net",
+                    "Company": "Truhlar And Truhlar Attys",
+                    "Website": "http://www.truhlarandtruhlarattys.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000901000000090000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 9
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-9"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-9",
+                    "Firstname": "Kris",
+                    "Lastname": "Marrier",
+                    "Street": "228 Runamuck Pl #2808",
+                    "City": "Baltimore",
+                    "County": "Baltimore City",
+                    "State": "MD",
+                    "Zip": "21224",
+                    "HomePhone": "410-655-8723",
+                    "CellPhone": "410-804-4694",
+                    "Email": "kris@gmail.com",
+                    "Company": "\"King, Christopher A Esq\"",
+                    "Website": "http://www.kingchristopheraesq.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        },
+        {
+            "event": {
+                "_id": {
+                    "_data": "0164ad054c0000000a010000000a0000503c"
+                },
+                "clusterTime": {
+                    "$timestamp": {
+                        "t": 1689060684,
+                        "i": 10
+                    }
+                },
+                "documentKey": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-10"
+                },
+                "fullDocument": {
+                    "_id": "TestMessage11-07-11-2023-07-07-47-10",
+                    "Firstname": "Minna",
+                    "Lastname": "Amigon",
+                    "Street": "2371 Jerrold Ave",
+                    "City": "Kulpsville",
+                    "County": "Montgomery",
+                    "State": "PA",
+                    "Zip": "19443",
+                    "HomePhone": "215-874-1229",
+                    "CellPhone": "215-422-8694",
+                    "Email": "minna_amigon@yahoo.com",
+                    "Company": "\"Dorl, James J Esq\"",
+                    "Website": "http://www.dorljamesjesq.com"
+                },
+                "ns": {
+                    "db": "DocumentDBStreamsLambdaTriggerDB",
+                    "coll": "Customer"
+                },
+                "operationType": "insert"
+            }
+        }
+    ]
+}

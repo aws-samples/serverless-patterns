@@ -19,7 +19,7 @@ class KinesisLambdaStack(Stack):
             self, 'LambdaConsumerNoFilter',
             handler='lambda_function.handler',
             code=lambda_.Code.from_asset('data_stream_processor/consumer'),
-            runtime=lambda_.Runtime.PYTHON_3_11,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             timeout=Duration.seconds(30)
         )
         kinesis_stream.grant_read(consumer_func_no_filter)
@@ -37,7 +37,7 @@ class KinesisLambdaStack(Stack):
             self, 'LambdaConsumerFailStatus',
             handler='lambda_function.handler',
             code=lambda_.Code.from_asset('data_stream_processor/consumer'),
-            runtime=lambda_.Runtime.PYTHON_3_11,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             timeout=Duration.seconds(30)
         )
         kinesis_stream.grant_read(consumer_func_fail)
@@ -62,7 +62,7 @@ class KinesisLambdaStack(Stack):
             self, 'LambdaConsumerNotOkStatus',
             handler='lambda_function.handler',
             code=lambda_.Code.from_asset('data_stream_processor/consumer'),
-            runtime=lambda_.Runtime.PYTHON_3_11,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             timeout=Duration.seconds(30)
         )
         kinesis_stream.grant_read(consumer_func_not_ok)
@@ -87,7 +87,7 @@ class KinesisLambdaStack(Stack):
             self, 'LambdaConsumerWarnValue',
             handler='lambda_function.handler',
             code=lambda_.Code.from_asset('data_stream_processor/consumer'),
-            runtime=lambda_.Runtime.PYTHON_3_11,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             timeout=Duration.seconds(30)
         )
         kinesis_stream.grant_read(consumer_func_warn_value)
@@ -116,7 +116,7 @@ class KinesisLambdaStack(Stack):
             self, 'LambdaConsumerWarnLessValue',
             handler='lambda_function.handler',
             code=lambda_.Code.from_asset('data_stream_processor/consumer'),
-            runtime=lambda_.Runtime.PYTHON_3_11,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             timeout=Duration.seconds(30)
         )
         kinesis_stream.grant_read(consumer_func_warn_less_than_value)

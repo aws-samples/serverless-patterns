@@ -62,7 +62,7 @@ Resources:
       Description: Lambda to be invoked by API Gateway for authorization
       CodeUri: lambda/authorizer/
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Timeout: 3
       MemorySize: 128
       Role: !GetAtt AuthorizerLambdaExecutionRole.Arn
@@ -78,7 +78,7 @@ Resources:
       FunctionName: KinesisHandlerFunction
       Description: Lambda to consumer from kinesis data stream
       CodeUri: lambda/kinesis-handler/
-      Runtime: python3.10
+      Runtime: python3.14
       Handler: index.lambda_handler
       MemorySize: 128
       Layers:

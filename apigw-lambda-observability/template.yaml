@@ -6,7 +6,7 @@ Description: Serverless patterns - API Gateway/Lambda with observability (uksb-1
 Globals:
   # Default values for the Lambda function configuration
   Function:
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     MemorySize: 128
     Timeout: 100
     Tracing: Active

@@ -29,7 +29,7 @@ class LambdaConstruct(Construct):
 
         # Create lambda function.
         self.lambda_function = lambda_.Function(self, "LambdaFunction",
-            runtime=lambda_.Runtime.PYTHON_3_12,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="lambda_function.lambda_handler",
             role=lambda_execution_role,
             code=lambda_.Code.from_asset("src/lambda.zip")

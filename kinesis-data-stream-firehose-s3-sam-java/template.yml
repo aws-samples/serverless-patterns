@@ -4,7 +4,7 @@ Description: AWS-SAM-kinesis (uksb-1tthgi812) (tag:kinesis-data-stream-firehose-
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 3072
     Timeout: 25
 

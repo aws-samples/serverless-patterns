@@ -86,7 +86,7 @@ export class KvsRekognitionStack extends Stack {
     });
 
     const processingLambda = new lambda.Function(this, 'processing-lambda', {
-      runtime: Runtime.PYTHON_3_9,
+      runtime: Runtime.PYTHON_3_14,
       handler: 'index.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, 'lambda/'))
     });

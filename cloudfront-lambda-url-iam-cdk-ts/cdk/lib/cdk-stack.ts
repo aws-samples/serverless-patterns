@@ -14,7 +14,7 @@ export class CdkStack extends cdk.Stack {
         const simpleLambda = new lambdaNode.NodejsFunction(this, 'simpleLambda', {
             entry: 'lambda/handler.ts',
             handler: 'handler',
-            runtime: lambda.Runtime.NODEJS_18_X,
+            runtime: lambda.Runtime.NODEJS_24_X,
             functionName: 'simpleLambda'
         });
 

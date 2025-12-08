@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - simple HTTP API to Lambda function using python3.9 (uksb-1tthgi812) (tag:apigw-http-api-lambda-python)
+Description: Serverless patterns - simple HTTP API to Lambda function using python3.14 (uksb-1tthgi812) (tag:apigw-http-api-lambda-python)
 
 Resources:
   # Lambda function
@@ -15,7 +15,7 @@ Resources:
       InlineCode: |
         def handler(event, context):
             return {'body': 'Hello World! This is the HTTP API', 'statusCode': 200}
-      Runtime: python3.9
+      Runtime: python3.14
 
 Outputs:
   HttpApiEndpoint:

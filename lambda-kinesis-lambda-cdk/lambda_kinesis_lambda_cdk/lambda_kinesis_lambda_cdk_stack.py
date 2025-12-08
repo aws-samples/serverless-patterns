@@ -20,7 +20,7 @@ class LambdaKinesisLambdaCdkStack(Stack):
         producer_lambda = _lambda.Function(
             self, 
             id='ProducerLambdaCdk',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src/producer'),
             handler='lambda_function.handler',
             environment={
@@ -35,7 +35,7 @@ class LambdaKinesisLambdaCdkStack(Stack):
         consumer_lambda = _lambda.Function(
             self, 
             id='ConsumerLambdaCdk',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src/consumer'),
             handler='lambda_function.handler',
         )
