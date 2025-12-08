@@ -38,7 +38,7 @@ class IotSqsLambdaCdkStack(Stack):
         iot_sqs_lambda = _lambda.Function(
             self, 
             id='IotSqsLambdaCdk',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='lambda_function.handler',
         )

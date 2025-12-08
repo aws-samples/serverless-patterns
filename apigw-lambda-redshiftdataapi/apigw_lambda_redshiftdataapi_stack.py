@@ -88,7 +88,7 @@ class ApigwRedshiftDataApi(Stack):
         lambda_function = _lambda.Function(
             self,
             "RedshiftApiLambda",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="index.lambda_handler",
             code=_lambda.InlineCode(
                 """

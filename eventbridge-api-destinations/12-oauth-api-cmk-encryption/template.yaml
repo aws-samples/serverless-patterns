@@ -1,0 +1,173 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Create an API Destination in EventBridge with OAuth Credentials using Customer Managed Key (CMK) encryption
+
+Parameters:
+  ExternalAPIURL:
+    Type: String
+    Description: Enter External API URL
+    Default: '<>'
+  ExternalAuthEndpoint:
+    Type: String
+    Description: Enter Authorization Endpoint
+    Default: '<>'
+  ExternalAuthAPIClientID:
+    Type: String
+    Description: Enter OAuth Client ID
+    Default: '<>'
+  ExternalAuthAPIClientSecret:
+    Type: String
+    NoEcho: True
+    Description: Enter OAuth Client Secret
+    Default: '<>'
+  CMKKeyARN:
+    Type: String
+    Description: Enter CMK Key arn
+    Default: '<>'
+
+
+Resources:
+  # Event Bus Resource
+  # This will create an Event Bus named 'ExternalOAuthEventBus'
+  # The Event Bus will be used to publish events that will trigger the API Destination
+  # The Event Bus will be used to route events to the API Destination
+  MyEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: "ExternalOAuthEventBus"
+  # Connection secret in Secrets Manager
+  # This will create a secret in Secrets Manager to store the OAuth credentials    
+  ConnectionSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: "ExternalOAuthCredentials"
+      Description: "OAuth connection credential secret"   
+      SecretString: !Sub >-
+        {"ClientID": "${ExternalAuthAPIClientID}", "ClientSecret": "${ExternalAuthAPIClientSecret}"}      
+  # Connection Resource
+  # This will create a connection in EventBridge with OAuth Client Credentials
+  # The connection will use the OAuth credentials stored in the Secrets Manager secret created above
+  # The connection will use the CMK Key for encryption
+  # The connection will be used to invoke the API Destination with OAuth credentials
+  MyConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: 'OAUTH_CLIENT_CREDENTIALS'
+      Description: 'My connection with an OAuth2 credentials using Customer Managed Key (CMK) encryption'
+      KmsKeyIdentifier: !Ref CMKKeyARN
+      AuthParameters:
+        OAuthParameters: 
+          AuthorizationEndpoint: !Ref ExternalAuthEndpoint
+          ClientParameters: 
+            ClientID: '{{resolve:secretsmanager:ExternalOAuthCredentials:SecretString:ClientID}}'
+            ClientSecret: '{{resolve:secretsmanager:ExternalOAuthCredentials:SecretString:ClientSecret}}'
+          HttpMethod: 'POST'
+          OAuthHttpParameters: 
+            HeaderParameters:
+              - Key: 'Content_Type'
+                Value: 'application/x-www-form-urlencoded'
+                IsValueSecret: false
+            BodyParameters:
+              - Key: 'grant_type'
+                Value: 'client_credentials'
+                IsValueSecret: true         
+    DependsOn: ConnectionSecret
+              
+  # API Destination Resource
+  # This will create an API Destination in EventBridge
+  # The API Destination will use the connection created above
+  # The API Destination will invoke the external API endpoint with OAuth credentials
+  # The API Destination will use the CMK Key for encryption
+  # The API Destination will be used to route events from the Event Bus to the external API
+  MyApiDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: 'ExternalApiDestination'
+      ConnectionArn: !GetAtt MyConnection.Arn
+      InvocationEndpoint: !Ref ExternalAPIURL
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 10
+  # EventBridge Target Role
+  # This will create a role that EventBridge can assume to invoke the API Destination
+  # The role will have permissions to invoke the API Destination and access the Secrets Manager secret
+  # The role will be used by EventBridge to invoke the API Destination with OAuth credentials    
+  EventBridgeTargetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - sts:AssumeRole      
+      Policies:
+        - PolicyName: AllowAPIdestinationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 'events:InvokeApiDestination'
+                Resource: !GetAtt MyApiDestination.Arn
+              - Effect: Allow
+                Action:
+                  - secretsmanager:CreateSecret
+                  - secretsmanager:UpdateSecret
+                  - secretsmanager:DescribeSecret
+                  - secretsmanager:DeleteSecret
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:PutSecretValue
+                Resource:
+                  - arn:aws:secretsmanager:*:*:secret:events!connection/*               
+                
+  MyDLQueue: 
+    Type: AWS::SQS::Queue
+  # Rule to trigger the API Destination
+  # This will create a rule that triggers the API Destination when an event is published to the Event Bus
+  # The rule will filter events based on the source and detail-type
+  # The rule will use the API Destination as the target
+  EventRule: 
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: "EventRule"
+      State: "ENABLED"
+      EventBusName: !Ref MyEventBus
+      EventPattern: 
+        source:
+          - "com.demo-event-bus.cmk"
+        detail-type:
+          - "demo-event-type"
+      Targets: 
+        - Arn: !GetAtt MyApiDestination.Arn
+          RoleArn: !GetAtt EventBridgeTargetRole.Arn
+          Id: "MyAPIdestination"
+          InputPath: "$.detail.responsePayload"
+          DeadLetterConfig:
+            Arn: !GetAtt MyDLQueue.Arn
+
+Outputs:
+  MyEventBusName:
+    Description: Application EventBus Name
+    Value: !Ref MyEventBus
+
+  MyEventBusArn:
+    Description: Application EventBus ARN
+    Value: !GetAtt MyEventBus.Arn
+
+  MyConnectionName:
+    Value: !Ref MyConnection
+  MyConnectionArn:
+    Value: !GetAtt MyConnection.Arn        
+
+  MyApiDestinationName:
+    Value: !Ref MyApiDestination
+  MyApiDestinationArn:
+    Value: !GetAtt MyApiDestination.Arn
+
+  EventBridgeTargetRoleArn:
+    Value: !GetAtt EventBridgeTargetRole.Arn
+
+  MyDLQueue:
+    Value: !GetAtt MyDLQueue.Arn

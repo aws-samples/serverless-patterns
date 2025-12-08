@@ -32,7 +32,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: lambda-start-detect-document-text-textract
-      Runtime: python3.13
+      Runtime: python3.14
       Handler: src/lambda-start-detect-document-text-textract.lambda_handler
       MemorySize: 128
       Timeout: 10

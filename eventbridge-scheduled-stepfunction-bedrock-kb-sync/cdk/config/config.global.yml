@@ -1,0 +1,30 @@
+intermediate_bucket_name: multi-modal-knowledge-base
+embedding_model_id: amazon.titan-embed-text-v2:0
+kb_role_name: kb-execution-role
+kb_chunk_max_size: 500
+kb_chunk_overlap_percentage: 20
+oss_vector_collection_name: kb-collection
+oss_vector_index_name: kb-index
+amazon.titan-embed-text-v2:0:
+  settings:
+    index:
+      knn: true
+      knn.algo_param.ef_search: 512
+  mappings:
+    properties:
+      bedrock-knowledge-base-default-vector:
+        type: knn_vector
+        dimension: 1024
+        method:
+          name: hnsw
+          engine: faiss
+          parameters:
+            ef_construction: 512
+            m: 16
+          space_type: l2
+      AMAZON_BEDROCK_METADATA:
+        type: text
+        index: false
+      AMAZON_BEDROCK_TEXT_CHUNK:
+        type: text
+        index: true

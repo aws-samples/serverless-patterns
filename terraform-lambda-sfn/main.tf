@@ -99,7 +99,7 @@ module "lambda_function" {
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
   handler       = "LambdaFunction.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   publish       = true
 
   source_path = "${path.module}/src"

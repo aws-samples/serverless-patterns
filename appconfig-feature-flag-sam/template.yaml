@@ -128,7 +128,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       

@@ -77,7 +77,7 @@ resource "aws_lambda_function" "generate_presigned_url" {
   function_name = "${lower(var.prefix)}-generate-presigned-url"
   role          = aws_iam_role.lambda_role.arn
   handler       = "generate_presigned_url.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   timeout       = 30
   environment {
     variables = {
@@ -90,7 +90,7 @@ resource "aws_lambda_function" "process_s3_event" {
   function_name = "${lower(var.prefix)}-process-s3-event"
   role          = aws_iam_role.lambda_role.arn
   handler       = "process_s3_event.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   timeout       = 60
   environment {
     variables = {

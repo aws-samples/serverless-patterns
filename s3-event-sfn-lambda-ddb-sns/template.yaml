@@ -111,7 +111,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Runtime: python3.11
+      Runtime: python3.14
       Environment:
         Variables:
           TableName: !Ref DynamoDBTable

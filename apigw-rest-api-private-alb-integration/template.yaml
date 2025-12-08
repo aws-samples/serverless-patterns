@@ -91,7 +91,7 @@ Resources:
       Description: "AWS Lambda target for ALB"
       FunctionName: "ALBTargetLambda"
       Handler: "index.lambda_handler"
-      Runtime: "python3.11"
+      Runtime: "python3.14"
       Architectures: 
         - "x86_64"
       MemorySize: 128

@@ -15,7 +15,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: healthscribe_integration.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       Architectures:
         - arm64
       Timeout: 60

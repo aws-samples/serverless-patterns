@@ -1,4 +1,4 @@
-#!/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11
+#!/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.14
 
 import sys
 import json

@@ -4,7 +4,7 @@ Description: AWS-SAM-APIGW-Lambda-SnapStart (uksb-1tthgi812) (tag:apigw-lambda-s
 
 Globals:
   Function:
-    Runtime: java17
+    Runtime: java25
     MemorySize: 2048
     Timeout: 29
 

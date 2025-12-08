@@ -36,7 +36,7 @@ Resources:
         - Stack ${AWS::StackName} Function ${ResourceName}
         - ResourceName: StreamFunction
       Handler: handler.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Architectures: ["arm64"]
       Timeout: 60
       MemorySize: 1024

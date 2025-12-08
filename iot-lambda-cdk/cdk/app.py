@@ -26,7 +26,7 @@ class IoTLambdaStack(Stack):
             code=_lambda.InlineCode(handler_code),
             handler="index.main",
             timeout=Duration.seconds(10),
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
         )
 
         # Set Lambda Logs Retention and Removal Policy

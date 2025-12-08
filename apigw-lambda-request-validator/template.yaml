@@ -7,7 +7,7 @@ Description: >
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     MemorySize: 128
     Timeout: 15
 

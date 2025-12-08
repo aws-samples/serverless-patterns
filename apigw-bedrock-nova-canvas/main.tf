@@ -17,7 +17,7 @@ resource "random_string" "suffix" {
 resource "aws_lambda_layer_version" "pillow_layer" {
   filename            = "pillow.zip"  # Make sure this zip file exists in your terraform directory
   layer_name         = "pillow_layer"
-  compatible_runtimes = ["python3.11"]
+  compatible_runtimes = ["python3.14"]
   description        = "Pillow library layer for image processing"
 }
 
@@ -36,7 +36,7 @@ resource "aws_iam_policy" "invoke_model_policy" {
         ]
         Effect = "Allow"
         Resource = [
-          "arn:aws:bedrock:${data.aws_region.current.name}::foundation-model/amazon.nova-canvas-v1:0"
+          "arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.nova-canvas-v1:0"
         ]
       },
     ]
@@ -45,7 +45,7 @@ resource "aws_iam_policy" "invoke_model_policy" {
 
 # S3 bucket for storing images
 resource "aws_s3_bucket" "image_bucket" {
-  bucket = "${lower(var.prefix)}-image-bucket-${random_string.suffix.result}"
+  bucket        = "${lower(var.prefix)}-image-bucket-${random_string.suffix.result}"
   force_destroy = true
 }
 
@@ -53,7 +53,7 @@ resource "aws_s3_bucket" "image_bucket" {
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${lower(var.prefix)}-invoke-bedrock"
   retention_in_days = 14
-  
+
   lifecycle {
     prevent_destroy = false
   }
@@ -61,11 +61,11 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 
 # Lambda function
 resource "aws_lambda_function" "invoke_bedrock_function" {
-  filename      = "index.zip"  # Replace with your Lambda code zip file
+  filename      = "index.zip" # Replace with your Lambda code zip file
   function_name = "${lower(var.prefix)}-invoke-bedrock"
   role          = aws_iam_role.lambda_role.arn
   handler       = "index.handler"
-  runtime       = "python3.11"
+  runtime       = "python3.14"
   timeout       = 30
 
   layers = [
@@ -146,7 +146,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 # API Gateway Deployment
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.bedrock_api.id
-  
+
   depends_on = [
     aws_api_gateway_integration.lambda_integration
   ]
@@ -176,12 +176,12 @@ output "lambda_function" {
 
 output "api_endpoint" {
   description = "The API Gateway endpoint URL "
-  value = "${aws_api_gateway_stage.api_stage.invoke_url}/image_gen"
+  value       = "${aws_api_gateway_stage.api_stage.invoke_url}/image_gen"
 }
 
 output "s3_image_bucket" {
   description = "The Output S3 bucket is "
-  value = aws_s3_bucket.image_bucket.id
+  value       = aws_s3_bucket.image_bucket.id
 }
 
 # Data source for current region

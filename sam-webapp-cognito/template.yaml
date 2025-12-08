@@ -179,7 +179,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Events:
         HttpApi:
           Type: HttpApi

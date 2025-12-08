@@ -13,12 +13,13 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   NodejsVersion:
     Type: String
-    Description: Choose the version of Nodejs version 18, 20 or 22.
+    Description: Choose the version of Nodejs version.
     AllowedValues:
       - nodejs18.x
       - nodejs20.x
       - nodejs22.x
-    Default: nodejs18.x
+      - nodejs24.x
+    Default: nodejs24.x
   MSKKafkaVersion:
     Type: String
     Default: 3.5.1
@@ -397,6 +398,8 @@ Resources:
                 echo "nvm install 20" >> nodejs_installer.sh
             elif [ "$NODEJS_VERSION" == "nodejs22.x" ]; then
                 echo "nvm install 22" >> nodejs_installer.sh
+            elif [ "$NODEJS_VERSION" == "nodejs24.x" ]; then
+                echo "nvm install 22" >> nodejs_installer.sh
             else
                 echo "nvm install 18" >> nodejs_installer.sh
             fi
@@ -685,6 +688,8 @@ Resources:
             elif [ "$NODEJS_VERSION" == "nodejs20.x" ]; then
                 echo "nvm install 20" >> nodejs_installer.sh
             elif [ "$NODEJS_VERSION" == "nodejs22.x" ]; then
+                echo "nvm install 22" >> nodejs_installer.sh
+            elif [ "$NODEJS_VERSION" == "nodejs24.x" ]; then
                 echo "nvm install 22" >> nodejs_installer.sh
             else
                 echo "nvm install 18" >> nodejs_installer.sh

@@ -26,7 +26,7 @@ resource "aws_lambda_function" "mq_consumer" {
   function_name = "MQConsumer"
   role          = aws_iam_role.lambda_exec.arn
   handler       = "app.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   timeout       = 3
   environment {
     variables = {

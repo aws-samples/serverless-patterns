@@ -44,7 +44,7 @@ Resources:
         - ResourceName: PutItemsFunction
       CodeUri: cmd/functions/PutItemsFunction
       Handler: bootstrap
-      Runtime: provided.al2023
+      Runtime: provided.al2023023
       MemorySize: 128
       Timeout: 30
       Tracing: Active

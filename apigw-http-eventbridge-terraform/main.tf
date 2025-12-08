@@ -182,7 +182,7 @@ resource "aws_lambda_function" "MyLambdaFunction" {
   source_code_hash = filebase64sha256(data.archive_file.LambdaZipFile.output_path)
   role             = aws_iam_role.LambdaRole.arn
   handler          = "LambdaFunction.lambda_handler"
-  runtime          = "python3.9"
+  runtime          = "python3.14"
   layers           = ["arn:aws:lambda:${data.aws_region.current.name}:017000801446:layer:AWSLambdaPowertoolsPython:15"]
 }
 

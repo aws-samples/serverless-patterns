@@ -99,7 +99,7 @@ resource "aws_lambda_function" "vl_function_primary" {
   function_name    = "vl-function-primary"
   role            = aws_iam_role.lambda_role.arn
   handler         = "app.lambda_handler"
-  runtime         = "python3.13"
+  runtime         = "python3.14"
   architectures   = ["x86_64"]
   source_code_hash = filebase64sha256("primary.zip")
 }
@@ -109,7 +109,7 @@ resource "aws_lambda_function" "vl_function_secondary" {
   function_name    = "vl-function-secondary"
   role            = aws_iam_role.lambda_role.arn
   handler         = "app.lambda_handler"
-  runtime         = "python3.13"
+  runtime         = "python3.14"
   architectures   = ["x86_64"]
   source_code_hash = filebase64sha256("secondary.zip")
 }
@@ -119,7 +119,7 @@ resource "aws_lambda_function" "demo_lambda" {
   function_name    = "demo-lambda"
   role            = aws_iam_role.lambda_role.arn
   handler         = "app.lambda_handler"
-  runtime         = "python3.13"
+  runtime         = "python3.14"
   architectures   = ["x86_64"]
   source_code_hash = filebase64sha256("demolambda.zip")
 
