@@ -24,7 +24,7 @@ class SqsLambdaCdkStack(Stack):
         # The source code is in './lambda' directory
         lambda_function = _lambda.Function(
             self, "MyLambdaFunction",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="get_messages.handler",
             code=_lambda.Code.from_asset("lambda"),
         )

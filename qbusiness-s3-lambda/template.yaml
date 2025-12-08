@@ -184,7 +184,7 @@ Resources:
         - ResourceName: DataSourceSyncLambda
       CodeUri: src/dataSourceSync/
       Handler: dataSourceSyncLambda.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       MemorySize: 1024
       Timeout: 900
       Tracing: Active

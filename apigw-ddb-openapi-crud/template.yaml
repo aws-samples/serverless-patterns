@@ -73,4 +73,4 @@ Resources:
 Outputs:
   CrudApiUrl:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${CrudAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${CrudAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

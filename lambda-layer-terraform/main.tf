@@ -43,7 +43,7 @@ data "archive_file" "layer_zip" {
 resource "aws_lambda_layer_version" "this" {
   filename            = data.archive_file.layer_zip.output_path
   layer_name          = "mysql-connector-python"
-  compatible_runtimes = ["python3.8"]
+  compatible_runtimes = ["python3.14"]
 
   source_code_hash = data.archive_file.layer_zip.output_base64sha256
 }
@@ -59,7 +59,7 @@ resource "aws_lambda_function" "with_layer" {
   filename         = data.archive_file.lambda_function.output_path
   role             = aws_iam_role.this.arn
   handler          = "app.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.14"
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
 
   layers = [
@@ -72,6 +72,6 @@ resource "aws_lambda_function" "without_layer" {
   filename         = data.archive_file.lambda_function.output_path
   role             = aws_iam_role.this.arn
   handler          = "app.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.14"
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
 }

@@ -42,7 +42,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Events:
         EventBridgeTrigger:
           Type: CloudWatchEvent
@@ -54,4 +54,4 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: "HTTP API endpoint URL"
-    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"

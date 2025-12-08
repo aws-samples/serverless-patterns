@@ -63,7 +63,7 @@ Resources:
     Properties:
       CodeUri: src/DDBStreamFunction
       Handler: app.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Architectures: ["arm64"]
       Timeout: 30
       MemorySize: 1024

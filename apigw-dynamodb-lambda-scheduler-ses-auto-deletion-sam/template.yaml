@@ -80,7 +80,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${AWS::StackName}-scheduler-lambda"
       Handler: scheduleHandler.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.14
       CodeUri: src/
       Environment:
         Variables:
@@ -137,4 +137,4 @@ Resources:
 
 Outputs:
   apiGatewayInvokeURL:
-    Value: !Sub https://${APIGateway}.execute-api.${AWS::Region}.amazonaws.com/v1
+    Value: !Sub https://${APIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v1

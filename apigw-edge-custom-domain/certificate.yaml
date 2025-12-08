@@ -23,7 +23,7 @@ Resources:
     Properties:
       CodeUri: sam-custom-resources/GetZoneId
       Handler: GetZoneId.handler
-      Runtime: python3.11
+      Runtime: python3.14
       Policies:
         - AmazonRoute53ReadOnlyAccess
   GetZoneId:

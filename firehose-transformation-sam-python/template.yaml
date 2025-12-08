@@ -22,7 +22,7 @@ Resources:
     Properties:
       FunctionName: 'KDFTransformationFunction'
       Handler: 'app.handler'
-      Runtime: 'python3.11'
+      Runtime: 'python3.14'
       CodeUri: 'src/'
       Timeout: 60
 

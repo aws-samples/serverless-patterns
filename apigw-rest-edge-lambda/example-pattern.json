@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys an Amazon API Gateway REST Edge-Optimized API with a Lambda integration.",
-      "The AWS Lambda function is written in Python3.9. The function returns a small message and a status code to the caller."
+      "The AWS Lambda function is written in python3.14. The function returns a small message and a status code to the caller."
     ]
   },
   "gitHub": {

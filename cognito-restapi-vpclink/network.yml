@@ -85,7 +85,7 @@ Resources:
       Description: Look up info from NLB
       Handler: index.handler
       MemorySize: 128
-      Runtime: python3.6
+      Runtime: python3.14
       Timeout: 30
       Tags:
         Name: !Sub '${AWS::StackName} - Function to get additional data from NLB'  
@@ -119,7 +119,7 @@ Resources:
       Description: Create custom security group with NLB IP addresses as source
       Handler: index.lambda_handler
       MemorySize: 128
-      Runtime: python3.6
+      Runtime: python3.14
       Timeout: 30
       Tags:
         Name: !Sub '${AWS::StackName} - Function to create custom security group'

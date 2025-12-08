@@ -105,7 +105,7 @@ class OpensearchServerlessStack(Stack):
             self,
             "build_os_client_and_bulk_ingest_logevents_handler",
             function_name="build_os_client_and_bulk_ingest_logevents_handler",
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset(
                 "lambda/build_os_client_and_bulk_ingest_logevents_handler"
             ),

@@ -57,7 +57,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         RootGet:
           Type: Api
@@ -70,4 +70,4 @@ Outputs:
   # API endpoint for testing
   ApiEndpoint:
     Description: "API endpoint URL"
-    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod

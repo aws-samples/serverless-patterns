@@ -20,7 +20,7 @@ Resources:
       Handler: index.handler
       FunctionName: DocumentEmbedding
       Description: Lambda function to generate embeddings for uploaded documents
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Timeout: 10
       MemorySize: 128
       Role: !GetAtt DocumentEmbeddingFunctionExecutionRole.Arn

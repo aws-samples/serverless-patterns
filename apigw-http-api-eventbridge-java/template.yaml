@@ -42,7 +42,7 @@ Resources:
     Properties:
       CodeUri: TriggeredLambda/
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       Timeout: 30
@@ -61,4 +61,4 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: "HTTP API endpoint URL"
-    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
