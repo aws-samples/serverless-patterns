@@ -44,13 +44,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      MethodSettings:
-        - ResourcePath: '/*'
-          HttpMethod: '*'
-          LoggingLevel: INFO
-          DataTraceEnabled: true
-          MetricsEnabled: true
-      TracingEnabled: true
       DefinitionBody:
         openapi: 3.0.1
         info:
