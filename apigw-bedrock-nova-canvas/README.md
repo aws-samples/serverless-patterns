@@ -22,8 +22,6 @@ Important: this application uses various AWS services and there are costs associ
 
 For this pattern, you would need access only to Amazon Nova Canvas foundation model (Model ID: amazon.nova-canvas-v1:0) in us-east-1 region, since the pattern uses us-east-1 region by default.
 
-You must request access to the model before you can use it. If you try to use the model before you have requested access to it, you will receive an error message.
-
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
