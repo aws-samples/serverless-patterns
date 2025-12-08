@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway Rest API to Lambda to Bedrock with response streaming",
+  "title": "Response streaming with Amazon API Gateway Rest API and AWS Lambda",
   "description": "Creates an API Gateway REST API and Python Lambda function that provides a streaming response from the LLMs in Amazon Bedrock.",
   "language": "Python",
   "level": "200",
@@ -7,9 +7,8 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to use an Amazon API Gateway REST API with response streaming to a Python Lambda function. This template includes an response streaming-enabled Amazon API Gateway REST API that invokes a Python Lambda function, which uses Lambda Web Adaptor with Fast API to enable response streaming.",
-      "To enable response streaming with a Python Lambda function, we use [Lambda Web Adaptor](https://aws.amazon.com/blogs/compute/using-response-streaming-with-aws-lambda-web-adapter-to-optimize-performance/) and [Fast API](https://github.com/awslabs/aws-lambda-web-adapter/tree/main/examples/fastapi-response-streaming-zip).",
-      "This pattern deploys an API Gateway REST API and Python Lambda function which calls Bedrock, that is end-to-end enabled for response streaming"
+      "This pattern demonstrates how to use an Amazon API Gateway REST API with response streaming to a AWS Lambda Python function.",
+      "To enable response streaming with a Lambda Python function, we use [Lambda Web Adapter](https://aws.amazon.com/blogs/compute/using-response-streaming-with-aws-lambda-web-adapter-to-optimize-performance/) and [Fast API](https://github.com/awslabs/aws-lambda-web-adapter/tree/main/examples/fastapi-response-streaming-zip)."
     ]
   },
   "gitHub": {
@@ -27,7 +26,7 @@
         "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/response-transfer-mode.html"
       },
       {
-        "text": "AWS Lambda response streaming with Python and Lambda Web Adaptor",
+        "text": "AWS Lambda response streaming with Python and Lambda Web Adapter",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
       },
       {

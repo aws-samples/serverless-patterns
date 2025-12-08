@@ -2,8 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: |
   A sample SAM template for streaming Bedrock responses with Lambda Response Streaming and Lambda Web Adapter.
-  This template includes an response streaming enabled Amazon API Gateway REST API that invokes a python Lambda function
-  that uses Lambda Web Adaptor with Fast API to enable response streaming.
+  This template includes an response streaming enabled Amazon API Gateway REST API that invokes an AWS Lambda Python function
+  that uses Lambda Web Adapter with Fast API to enable response streaming.
 
 Resources:
   StreamingFunction:
@@ -28,7 +28,10 @@ Resources:
           - Effect: Allow
             Action:
               - bedrock:InvokeModelWithResponseStream #Lambda function permission to call Bedrock with response streaming
-            Resource: '*'
+            Resource:
+              - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0'
+              - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/global.anthropic.claude-sonnet-4-5-20250929-v1:0'
+              - !Sub 'arn:aws:bedrock:::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0'
       Events: #connects the Lambda function to the API Gateway StreamingAPI
         StreamingApi:
           Type: Api
