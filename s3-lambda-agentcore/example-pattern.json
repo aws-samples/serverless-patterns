@@ -1,0 +1,59 @@
+{
+  "title": "This pattern creates a Lambda function to invoke an AgentCore agent when an object is uploaded to the S3 bucket.",
+  "description": "This pattern creates an S3 bucket, which triggers an AWS Lambda, which invokes an agent in AgentCore.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "S3 will invoke the Lambda function when an object is created or updated. It will pass metadata about the new object in the event argument of the Lambda invocation.",
+      "The lambda function will invoke the agent and pass a uri for the s3 file.",
+      "The agent will categorize the file as architecture, runbook, or other and identify some metadata. Then it will send the results back to the Lambda function as JSON.",
+      "The Lambda function will write the metadata to the S3 output bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-agentcore",
+      "templateURL": "serverless-patterns/s3-lambda-agentcore",
+      "projectFolder": "s3-lambda-agentcore",
+      "templateFile": "s3-lambda-agentcore/deploy.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Trigger AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+      },
+      {
+        "test": "Invoke an AgentCore Runtime agent",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-invoke-agent.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Geoffrey Burdett",
+      "bio": "Sr. Solutions Architect at AWS",
+      "image": "http://www.geoffreyburdett.com.s3-website-us-east-1.amazonaws.com/images/headshot.jpeg",
+      "linkedin": "geoffreyburdett"
+    }
+  ]
+}
