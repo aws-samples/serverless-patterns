@@ -21,7 +21,7 @@ class LambdaSqsCdkStack(Stack):
         # Create Lambda function
         lambda_fn = _lambda.Function(
             self, "LambdaFunctionToSqs",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="sendSqsMessage.handler",
             code=_lambda.Code.from_asset("lambda_fns"),
         )

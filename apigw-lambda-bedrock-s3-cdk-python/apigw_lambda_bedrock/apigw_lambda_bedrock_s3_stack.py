@@ -39,7 +39,7 @@ class ApigwLambdaBedrockS3Stack(Stack):
         boto_layer = _lambda.LayerVersion.from_layer_version_arn(self, "Boto3Layer", 'arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p311-boto3:5')
         # Create the Lambda function and attach the layer
         lambda_function = _lambda.Function(self, "MyFunction",
-            runtime=_lambda.Runtime.PYTHON_3_11,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="index.handler",
             code=_lambda.Code.from_asset("./function_code"),
             layers=[PIL_layer,boto_layer],

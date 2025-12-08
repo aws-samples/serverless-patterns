@@ -160,7 +160,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Environment:
         Variables:
           KENDRA_INDEX_ID: !Ref KendraIndex

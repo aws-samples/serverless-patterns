@@ -133,7 +133,7 @@ export class NormalizerStack extends cdk.Stack {
 
     // Create AWS Lambda function that writes three sample messages to the queue to easily test the pipe
     const sourceLambda = new lambda.Function(this, 'NormalizerSampleDataCreatorLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset('lib/lambda'),
       handler: 'normalizerSampleDataCreator.handler',
       environment: {

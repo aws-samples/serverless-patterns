@@ -99,7 +99,7 @@ class ApigwLambdaSagemakerJumpstartendpointStack(Stack):
         self,
         "InvokeSagemakerEndpointLambda",
         function_name="InvokeSagemakerEndpointLambda",
-        runtime=_lambda.Runtime.PYTHON_3_9,
+        runtime=_lambda.Runtime.PYTHON_3_14,
         handler="InvokeSagemakerEndpointLambda.lambda_handler",
         code=_lambda.Code.from_asset("lambda"),
         environment={

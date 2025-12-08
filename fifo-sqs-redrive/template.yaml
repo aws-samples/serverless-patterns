@@ -45,7 +45,7 @@ Resources:
     Properties:
       CodeUri: originalmessage/
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       FunctionName: MyOriginalQueueFunction
       Policies:
         - SQSPollerPolicy:
@@ -65,7 +65,7 @@ Resources:
     Properties:
       CodeUri: redrivenmessage/
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       FunctionName: ReProcessQueueFunction
       Policies:
         - SQSPollerPolicy:

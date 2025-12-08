@@ -29,7 +29,7 @@ variable "customer_ddb_table_name" {
 ####################### Lambda Common ########################
 variable "lambda_runtime" {
   type    = string
-  default = "nodejs18.x"
+  default = "nodejs24.x"
 }
 
 variable "lambda_handler" {
@@ -40,7 +40,7 @@ variable "lambda_handler" {
 variable "compatible_runtimes" {
   description = "A list of Runtimes this layer is compatible with. Up to 5 runtimes can be specified."
   type        = list(string)
-  default     = ["nodejs18.x"]
+  default     = ["nodejs24.x"]
 }
 
 variable "default_log_level" {

@@ -5,7 +5,7 @@ Description: Serverless patterns - Lambda with Bedrock response streaming (uksb-
 # Global values that are applied to all applicable resources in this template
 Globals:
   Function:
-    Runtime: nodejs18.x
+    Runtime: nodejs24.x
     MemorySize: 512
     Timeout: 30
     Layers:

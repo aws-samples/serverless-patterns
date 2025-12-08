@@ -145,5 +145,5 @@ Resources:
 Outputs:
   APIEndpoint:
     Description: "API Gateway WebSocket endpoint URL"
-    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${ApiStageName}"
 

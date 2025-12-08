@@ -16,7 +16,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 128
       Timeout: 100
       Description: A simple example of sending an SMS with Pinpoint

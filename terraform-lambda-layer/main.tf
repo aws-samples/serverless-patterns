@@ -13,7 +13,7 @@ module "lambda_function" {
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
   handler       = "app.lambda_handler"
-  runtime       = "python3.8"
+  runtime       = "python3.14"
   publish       = true
 
   source_path = "${path.module}/src/app.py"
@@ -40,9 +40,9 @@ module "lambda_layer" {
 
   layer_name          = "${random_pet.this.id}-layer"
   description         = "My amazing lambda layer (pip install)"
-  compatible_runtimes = ["python3.8"]
+  compatible_runtimes = ["python3.14"]
 
-  runtime = "python3.8" # Runtime is required for "pip install" to work
+  runtime = "python3.14" # Runtime is required for "pip install" to work
 
   source_path = [
     {

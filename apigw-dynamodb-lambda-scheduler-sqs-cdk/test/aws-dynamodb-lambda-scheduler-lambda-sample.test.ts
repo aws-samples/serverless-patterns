@@ -30,7 +30,7 @@ describe('SQS Test Functions', () => {
 
         template.hasResourceProperties('AWS::Lambda::Function', {
             Handler: 'dynamo_stream_handler.handler',
-            Runtime: 'nodejs18.x',
+            Runtime: 'nodejs24.x',
             Code: {
                 S3Bucket: {
                     'Fn::Sub': Match.anyValue()
@@ -60,7 +60,7 @@ describe('SQS Test Functions', () => {
 
         template.hasResourceProperties('AWS::Lambda::Function', {
             Handler: 'event_schedule_handler.handler',
-            Runtime: 'nodejs18.x',
+            Runtime: 'nodejs24.x',
             Code: {
                 S3Bucket: {
                     'Fn::Sub': Match.anyValue()

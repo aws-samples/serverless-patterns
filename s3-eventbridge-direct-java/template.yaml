@@ -34,7 +34,7 @@ Resources:
     Properties:
       CodeUri: MyFunction/
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       MemorySize: 512
       Timeout: 30
       Policies:

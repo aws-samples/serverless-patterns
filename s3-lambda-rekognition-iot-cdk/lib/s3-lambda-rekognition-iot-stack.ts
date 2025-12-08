@@ -17,7 +17,7 @@ export class PPEIoTViolations extends Stack {
 
 
   const lambdaFunction = new lambda.Function(this, 'lambdaFunction', {
-    runtime: lambda.Runtime.PYTHON_3_9,
+    runtime: lambda.Runtime.PYTHON_3_14,
     code: lambda.Code.fromAsset(path.join(__dirname,'ppeDetectionFunction/')),
     handler: 'lambda_function.lambda_handler',
     environment: {

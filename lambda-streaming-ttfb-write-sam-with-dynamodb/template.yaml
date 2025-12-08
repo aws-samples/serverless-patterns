@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: src/data-dump/
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Timeout: 30
       MemorySize: 512
       AutoPublishAlias: live
@@ -27,7 +27,7 @@ Resources:
     Properties:
       CodeUri: src/streaming-function/
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Timeout: 30
       MemorySize: 512
       AutoPublishAlias: live

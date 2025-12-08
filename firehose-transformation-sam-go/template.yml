@@ -17,7 +17,7 @@ Resources:
     Properties:
       CodeUri: cmd/functions/data-transformation/
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
       MemorySize: 128
       Timeout: 10
       Tracing: Active

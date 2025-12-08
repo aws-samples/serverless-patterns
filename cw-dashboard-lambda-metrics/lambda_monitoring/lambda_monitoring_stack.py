@@ -38,7 +38,7 @@ class LambdaMonitoringStack(Stack):
                             self, 
                             "MyFunction",
                             entry="./src_lambda/",  # required
-                            runtime=aws_lambda.Runtime.PYTHON_3_9,  # required
+                            runtime=aws_lambda.Runtime.PYTHON_3_14,  # required
                             index="handler.py",  # optional, defaults to 'index.py'
                             handler="lambda_handler",
                             role=lambda_role,

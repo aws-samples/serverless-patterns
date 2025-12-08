@@ -31,7 +31,7 @@ class IotKinesisLambdaCdkStack(Stack):
         iot_kinesis_lambda = _lambda.Function(
             self, 
             id='IotKinesisLambdaCdk',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='lambda_function.handler',
         )

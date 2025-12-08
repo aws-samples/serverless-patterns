@@ -15,7 +15,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: healthscribe_integration.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       Architectures:
         - arm64
       Timeout: 60
@@ -101,7 +101,7 @@ Outputs:
     Value: !Ref ClinicalNotesGenerationLambdaFunction
   GenerateClinicalNotesAPI:
     Description: API Gateway endpoint URL for the dev stage of the Generate Content API
-    Value: !Sub https://${GenerateClinicalNotesAPI}.execute-api.${AWS::Region}.amazonaws.com/dev/generate_clinical_notes/
+    Value: !Sub https://${GenerateClinicalNotesAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/generate_clinical_notes/
   TranscribeNotesBucket:
     Description: S3 Bucket for storing transcribe notes
     Value: !Ref TranscribeNotesBucket

@@ -45,7 +45,7 @@ class EventBridgeRemoveOnetimeSchedulesCdkPythonStack(Stack):
         scheduler_role.add_to_policy(scheduler_events_policy)
 
         scheduled_event_remover_lambda = _lambda.Function(self, "scheduledEventRemoverLambda",
-                                                 runtime=_lambda.Runtime.PYTHON_3_9,
+                                                 runtime=_lambda.Runtime.PYTHON_3_14,
                                                  handler="scheduled_event_remover_lambda.lambda_handler",
                                                  code=_lambda.Code.from_asset("lambda"),
                                                  environment={'TOPIC_ARN': my_sns_topic.topic_arn},

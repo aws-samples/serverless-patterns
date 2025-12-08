@@ -99,7 +99,7 @@ resource "aws_lambda_function" "sqs_lambda_demo_function" {
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip_file.output_path)
   role = aws_iam_role.sqs_lambda_demo_functionrole.arn
   handler = "app.lambda_handler"
-  runtime = "python3.9"
+  runtime = "python3.14"
   layers = ["arn:aws:lambda:${data.aws_region.current.name}:017000801446:layer:AWSLambdaPowertoolsPython:13"]
   environment {
     variables = {

@@ -7,7 +7,6 @@ import base64
 import hmac
 import hashlib
 from functools import reduce
-from cgi import parse_header
 import boto3
 import botocore
 import botocore.session
@@ -18,7 +17,7 @@ client = botocore.session.get_session().create_client('secretsmanager')
 cache_config = SecretCacheConfig()
 cache = SecretCache(config=cache_config, client=client)
 
-github_webhook_secret_arn = os.environ.get('TWILIO_WEBHOOK_SECRET_ARN')
+twilio_webhook_secret_arn = os.environ.get('TWILIO_WEBHOOK_SECRET_ARN')
 event_bus_name = os.environ.get('EVENT_BUS_NAME', 'default')
 
 event_bridge_client = boto3.client('events')
@@ -114,7 +113,7 @@ def contains_valid_signature(payload_object, url, event_signature):
     """Check for the payload signature
        Twilio documentation: https://www.twilio.com/docs/usage/webhooks/webhooks-security#validating-signatures-from-twilio
     """
-    secret = cache.get_secret_string(github_webhook_secret_arn)
+    secret = cache.get_secret_string(twilio_webhook_secret_arn)
     payload_bytes = get_payload_bytes(
         url=url,
         payload_object=payload_object
@@ -166,7 +165,7 @@ def get_content_type(headers):
 
     if raw_content_type is None:
         return None
-    content_type, _ = parse_header(raw_content_type)
+    content_type = raw_content_type.split(';')[0].strip()
     return content_type
 
 

@@ -31,7 +31,7 @@ Parameters:
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.13
+    Runtime: python3.14
     MemorySize: 128
     Timeout: 30
 
@@ -74,8 +74,8 @@ Resources:
 Outputs:
   ApiBasePath:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   RdsProxyApiPath:
     Description: "API Gateway endpoint URL for rds proxy function"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"

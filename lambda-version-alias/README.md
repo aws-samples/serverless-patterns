@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 This pattern deploys a Lambda function with an alias "dev" associated with the latest version of the function. 
-The function is written in python3.9 and returns a small message. 
+The function is written in Python and returns a small message. 
 The inline code is written in the template
 
 ## Testing

@@ -18,7 +18,7 @@ export class NodeEsmStack extends cdk.Stack {
     const helloESMLambda: NodejsFunction = new NodejsFunction(this, "hello-esm-ts", {
       handler: 'handler',
       entry: join(__dirname, '../src/hello-world.ts'),
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       memorySize: 512,
       tracing: Tracing.ACTIVE,
       architecture: Architecture.X86_64,
