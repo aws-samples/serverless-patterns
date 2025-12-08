@@ -1,18 +1,18 @@
 {
-  "title": "Order Processing Workflow with Lambda Durable Functions",
-  "description": "Production-ready 17-step order processing workflow using Lambda Durable Functions with automatic checkpointing, long-running waits, and state persistence",
+  "title": "Order Processing with AWS Lambda durable functions",
+  "description": "Order processing workflow using Lambda durable functions with automatic checkpointing, long-running waits, and state persistence",
   "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates a production-ready order processing workflow with 17 steps using Lambda Durable Functions.",
+      "This pattern demonstrates an order processing workflow using Lambda durable functions.",
       "The workflow includes validation, payment processing, fraud checks, credit checks (for high-value orders), inventory management, and shipping coordination.",
       "Durable execution enables long-running waits (5 minutes for warehouse processing, 3 minutes for carrier pickup) without consuming compute resources.",
       "Each step is automatically checkpointed, allowing the workflow to survive interruptions and resume from the last successful step.",
       "The pattern uses a dual-function architecture: async durable function for order processing and sync non-durable function for real-time status queries.",
-      "Order state is persisted in DynamoDB with real-time status updates throughout the 17-step workflow."
+      "Order state is persisted in Amazon DynamoDB with real-time status updates throughout the 17-step workflow."
     ]
   },
   "gitHub": {
@@ -26,7 +26,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Durable Functions Documentation",
+        "text": "Lambda durable functions Documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -41,21 +41,17 @@
   },
   "deploy": {
     "text": [
-      "Note: Lambda Durable Functions are currently available in us-east-2 (Ohio) region only.",
+      "Note: Lambda durable functions are currently available in us-east-2 (Ohio) region only.",
       "cd src && npm install && cd ..",
       "sam build",
       "sam deploy --guided --region us-east-2"
     ]
   },
   "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
+    "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>sam delete --region us-east-2</code>."
-    ]
+    "text": ["Delete the stack: <code>sam delete --region us-east-2</code>."]
   },
   "authors": [
     {
