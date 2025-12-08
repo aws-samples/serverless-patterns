@@ -22,7 +22,7 @@ export class DemoStack extends Stack {
     const commonLambdaProps: Partial<NodejsFunctionProps> = {
       architecture: Architecture.ARM_64,
       loggingFormat: LoggingFormat.JSON,
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       memorySize: 256,
     };
 

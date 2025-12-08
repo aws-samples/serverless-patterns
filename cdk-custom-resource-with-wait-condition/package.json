@@ -10,17 +10,17 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.2",
-    "@types/node": "24.10.0",
-    "aws-cdk": "2.1031.1",
-    "esbuild": "^0.25.12",
+    "@tsconfig/node24": "^24.0.3",
+    "@types/node": "24.10.1",
+    "aws-cdk": "2.1033.0",
+    "esbuild": "^0.27.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "@aws-sdk/client-sfn": "^3.922.0",
-    "@types/aws-lambda": "^8.10.157",
-    "aws-cdk-lib": "2.222.0",
-    "constructs": "^10.4.2"
+    "@aws-sdk/client-sfn": "^3.946.0",
+    "@types/aws-lambda": "^8.10.159",
+    "aws-cdk-lib": "2.232.1",
+    "constructs": "^10.4.3"
   }
 }

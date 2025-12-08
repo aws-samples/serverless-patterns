@@ -7,19 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "AWS Lambda functions have a 15-minute execution timeout, limiting CloudFormation custom resources to short-running",
-      "operations. This pattern extends custom resource execution time to 12 hours using CloudFormation Wait Conditions.",
-      "The architecture uses four components working together: A Custom Resource Handler Lambda receives CloudFormation",
-      "lifecycle events and immediately starts a Step Function execution, then returns success to prevent timeouts.",
-      "The Step Function orchestrates the long-running process with built-in retry mechanisms and error handling.",
-      "When the process completes, a Completion Signal Handler Lambda sends success or failure signals to a Wait",
-      "Condition Handle URL. The Wait Condition blocks CloudFormation stack completion until receiving the signal.",
-      "This decouples custom resource lifecycle management from process execution, enabling asynchronous processing",
-      "with proper CloudFormation integration. The Step Function provides visual workflow monitoring and state management",
-      "while the Wait Condition ensures stack operations complete only after the long-running process finishes.",
-      "The pattern deploys two Lambda functions, one Step Function, a Wait Condition Handle, and a Wait Condition.",
-      "Use cases include database migrations, complex infrastructure provisioning, and third-party system integrations",
-      "that exceed Lambda's 15-minute limit."
+      "AWS Lambda functions have a 15-minute execution timeout, limiting CloudFormation custom resources to short-running operations. This pattern extends custom resource execution time to 12 hours using CloudFormation Wait Conditions. The architecture uses four components working together: A Custom Resource Handler Lambda receives CloudFormation lifecycle events and immediately starts a Step Function execution, then returns success to prevent timeouts. The Step Function orchestrates the long-running process with built-in retry mechanisms and error handling. When the process completes, a Completion Signal Handler Lambda sends success or failure signals to a Wait Condition Handle URL. The Wait Condition blocks CloudFormation stack completion until receiving the signal.",
+      "This decouples custom resource lifecycle management from process execution, enabling asynchronous processing with proper CloudFormation integration. The Step Function provides visual workflow monitoring and state management while the Wait Condition ensures stack operations complete only after the long-running process finishes. The pattern deploys two Lambda functions, one Step Function, a Wait Condition Handle, and a Wait Condition.",
+      "Use cases include database migrations, complex infrastructure provisioning, and third-party system integrations that exceed Lambda's 15-minute limit."
     ]
   },
   "gitHub": {
