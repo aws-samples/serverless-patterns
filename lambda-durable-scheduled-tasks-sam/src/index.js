@@ -9,22 +9,14 @@ const TABLE_NAME = process.env.TABLE_NAME;
 /**
  * Multi-Day Scheduled Task Orchestration
  * 
- * This durable function demonstrates a 7-day workflow with scheduled checkpoints.
- * Use case: Daily data processing and report generation
- * 
- * Workflow:
- * - Day 1: Initialize and collect data
- * - Day 2-6: Process daily batches
- * - Day 7: Generate final report
+ * This durable function demonstrates a multi-day workflow with scheduled waits
+ * and automatic checkpointing using AWS Lambda durable functions.
  */
 exports.handler = withDurableExecution(async (event, context) => {
   
   // Generate task ID from timestamp for deterministic IDs
   const taskId = event.taskId || `TASK-${Date.now()}`;
-  const config = event.config || {
-    reportType: 'weekly',
-    dataSource: 'analytics'
-  };
+  const config = event.config || {};
   
   console.log(`Starting scheduled task orchestration: ${taskId}`);
   
@@ -45,121 +37,80 @@ exports.handler = withDurableExecution(async (event, context) => {
       return { taskId, initialized: true };
     });
     
-    // Day 1: Data Collection
-    const day1Result = await context.step('day1-collect-data', async () => {
-      console.log('Day 1: Collecting initial data...');
-      
-      // Simulate data collection
-      const dataCollected = {
-        records: Math.floor(Math.random() * 10000) + 5000,
-        timestamp: new Date().toISOString()
-      };
+    // Step 1: Initial processing
+    await context.step('step1-process', async () => {
+      console.log('Step 1: Processing...');
       
       await docClient.send(new UpdateCommand({
         TableName: TABLE_NAME,
         Key: { taskId },
-        UpdateExpression: 'SET #status = :status, currentDay = :day, #progress = list_append(if_not_exists(#progress, :empty), :item)',
-        ExpressionAttributeNames: {
-          '#status': 'status',
-          '#progress': 'progress'
-        },
-        ExpressionAttributeValues: {
-          ':status': 'DAY_1_COMPLETE',
-          ':day': 1,
-          ':empty': [],
-          ':item': [{
-            day: 1,
-            action: 'Data Collection',
-            result: dataCollected,
-            completedAt: new Date().toISOString()
-          }]
-        }
-      }));
-      
-      return dataCollected;
-    });
-    
-    // Wait 1 minute (Day 1 -> Day 2)
-    // Change to { hours: 24 } for real 24-hour intervals
-    console.log('Waiting 1 minute until Day 2...');
-    await context.wait({ minutes: 1 });
-    
-    // Days 2-6: Daily Processing
-    const dailyResults = [];
-    for (let day = 2; day <= 6; day++) {
-      const dayResult = await context.step(`day${day}-process-batch`, async () => {
-        console.log(`Day ${day}: Processing daily batch...`);
-        
-        const batchResult = {
-          day,
-          recordsProcessed: Math.floor(Math.random() * 1000) + 500,
-          timestamp: new Date().toISOString()
-        };
-        
-        await docClient.send(new UpdateCommand({
-          TableName: TABLE_NAME,
-          Key: { taskId },
-          UpdateExpression: 'SET #status = :status, currentDay = :day, #progress = list_append(#progress, :item)',
-          ExpressionAttributeNames: {
-            '#status': 'status',
-            '#progress': 'progress'
-          },
-          ExpressionAttributeValues: {
-            ':status': `DAY_${day}_COMPLETE`,
-            ':day': day,
-            ':item': [{
-              day,
-              action: 'Batch Processing',
-              result: batchResult,
-              completedAt: new Date().toISOString()
-            }]
-          }
-        }));
-        
-        return batchResult;
-      });
-      
-      dailyResults.push(dayResult);
-      
-      // Wait 1 minute before next day (except after Day 6)
-      // Change to { hours: 24 } for real 24-hour intervals
-      if (day < 6) {
-        console.log(`Waiting 1 minute until Day ${day + 1}...`);
-        await context.wait({ minutes: 1 });
-      }
-    }
-    
-    // Wait 1 minute (Day 6 -> Day 7)
-    // Change to { hours: 24 } for real 24-hour intervals
-    console.log('Waiting 1 minute until Day 7...');
-    await context.wait({ minutes: 1 });
-    
-    // Day 7: Generate Final Report
-    const finalReport = await context.step('day7-generate-report', async () => {
-      console.log('Day 7: Generating final report...');
-      
-      const report = {
-        taskId,
-        status: 'Report completed',
-        completedDays: 7,
-        generatedAt: new Date().toISOString()
-      };
-      
-      await docClient.send(new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { taskId },
-        UpdateExpression: 'SET #status = :status, currentDay = :day, finalReport = :report',
+        UpdateExpression: 'SET #status = :status, currentDay = :day',
         ExpressionAttributeNames: {
           '#status': 'status'
         },
         ExpressionAttributeValues: {
-          ':status': 'REPORT_GENERATED',
-          ':day': 7,
-          ':report': report
+          ':status': 'STEP_1_COMPLETE',
+          ':day': 1
         }
       }));
       
-      return report;
+      return { step: 1, completed: true };
+    });
+    
+    // Wait 1 minute (change to { hours: 24 } for real 24-hour intervals)
+    console.log('Waiting 1 minute until next step...');
+    await context.wait({ minutes: 1 });
+    
+    // Steps 2-6: Intermediate processing with waits
+    for (let step = 2; step <= 6; step++) {
+      await context.step(`step${step}-process`, async () => {
+        console.log(`Step ${step}: Processing...`);
+        
+        await docClient.send(new UpdateCommand({
+          TableName: TABLE_NAME,
+          Key: { taskId },
+          UpdateExpression: 'SET #status = :status, currentDay = :day',
+          ExpressionAttributeNames: {
+            '#status': 'status'
+          },
+          ExpressionAttributeValues: {
+            ':status': `STEP_${step}_COMPLETE`,
+            ':day': step
+          }
+        }));
+        
+        return { step, completed: true };
+      });
+      
+      // Wait between steps (except after last step)
+      if (step < 6) {
+        console.log(`Waiting 1 minute until step ${step + 1}...`);
+        await context.wait({ minutes: 1 });
+      }
+    }
+    
+    // Wait before final step
+    console.log('Waiting 1 minute until final step...');
+    await context.wait({ minutes: 1 });
+    
+    // Final step: Complete workflow
+    const finalResult = await context.step('final-step', async () => {
+      console.log('Final step: Completing workflow...');
+      
+      await docClient.send(new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: { taskId },
+        UpdateExpression: 'SET #status = :status, currentDay = :day',
+        ExpressionAttributeNames: {
+          '#status': 'status'
+        },
+        ExpressionAttributeValues: {
+          ':status': 'FINAL_STEP_COMPLETE',
+          ':day': 7
+        }
+      }));
+      
+      return { step: 7, completed: true };
     });
     
     // Complete task
@@ -189,7 +140,7 @@ exports.handler = withDurableExecution(async (event, context) => {
       body: JSON.stringify({
         taskId,
         status: 'COMPLETED',
-        report: finalReport
+        result: finalResult
       })
     };
     
