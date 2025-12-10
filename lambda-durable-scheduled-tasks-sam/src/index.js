@@ -10,12 +10,12 @@ const TABLE_NAME = process.env.TABLE_NAME;
  * Multi-Day Scheduled Task Orchestration
  * 
  * This durable function demonstrates a 7-day workflow with scheduled checkpoints.
- * Use case: Daily report generation, data processing, and notifications
+ * Use case: Daily data processing and report generation
  * 
  * Workflow:
  * - Day 1: Initialize and collect data
  * - Day 2-6: Process daily batches
- * - Day 7: Generate final report and cleanup
+ * - Day 7: Generate final report
  */
 exports.handler = withDurableExecution(async (event, context) => {
   
@@ -23,8 +23,7 @@ exports.handler = withDurableExecution(async (event, context) => {
   const taskId = event.taskId || `TASK-${Date.now()}`;
   const config = event.config || {
     reportType: 'weekly',
-    dataSource: 'analytics',
-    notifyEmail: 'admin@example.com'
+    dataSource: 'analytics'
   };
   
   console.log(`Starting scheduled task orchestration: ${taskId}`);
@@ -53,7 +52,6 @@ exports.handler = withDurableExecution(async (event, context) => {
       // Simulate data collection
       const dataCollected = {
         records: Math.floor(Math.random() * 10000) + 5000,
-        sources: ['database', 'api', 'files'],
         timestamp: new Date().toISOString()
       };
       
@@ -94,9 +92,7 @@ exports.handler = withDurableExecution(async (event, context) => {
         
         const batchResult = {
           day,
-          recordsProcessed: Math.floor(Math.random() * 2000) + 1000,
-          errors: Math.floor(Math.random() * 10),
-          duration: Math.floor(Math.random() * 300) + 60,
+          recordsProcessed: Math.floor(Math.random() * 1000) + 500,
           timestamp: new Date().toISOString()
         };
         
@@ -142,108 +138,48 @@ exports.handler = withDurableExecution(async (event, context) => {
     const finalReport = await context.step('day7-generate-report', async () => {
       console.log('Day 7: Generating final report...');
       
-      const totalRecords = day1Result.records + dailyResults.reduce((sum, r) => sum + r.recordsProcessed, 0);
-      const totalErrors = dailyResults.reduce((sum, r) => sum + r.errors, 0);
-      
       const report = {
         taskId,
-        reportType: config.reportType,
-        summary: {
-          totalDays: 7,
-          totalRecordsProcessed: totalRecords,
-          totalErrors,
-          successRate: ((totalRecords - totalErrors) / totalRecords * 100).toFixed(2) + '%'
-        },
-        dailyBreakdown: [
-          { day: 1, type: 'collection', records: day1Result.records },
-          ...dailyResults.map(r => ({ day: r.day, type: 'processing', records: r.recordsProcessed, errors: r.errors }))
-        ],
+        status: 'Report completed',
+        completedDays: 7,
         generatedAt: new Date().toISOString()
       };
       
       await docClient.send(new UpdateCommand({
         TableName: TABLE_NAME,
         Key: { taskId },
-        UpdateExpression: 'SET #status = :status, currentDay = :day, finalReport = :report, #progress = list_append(#progress, :item)',
+        UpdateExpression: 'SET #status = :status, currentDay = :day, finalReport = :report',
         ExpressionAttributeNames: {
-          '#status': 'status',
-          '#progress': 'progress'
+          '#status': 'status'
         },
         ExpressionAttributeValues: {
           ':status': 'REPORT_GENERATED',
           ':day': 7,
-          ':report': report,
-          ':item': [{
-            day: 7,
-            action: 'Report Generation',
-            result: { reportGenerated: true },
-            completedAt: new Date().toISOString()
-          }]
+          ':report': report
         }
       }));
       
       return report;
     });
     
-    // Send Notification
-    await context.step('send-notification', async () => {
-      console.log('Sending completion notification...');
-      
-      // Integrate with SNS/SES for email notifications
-      const notification = {
-        to: config.notifyEmail,
-        subject: `Weekly Report Complete: ${taskId}`,
-        body: `Your ${config.reportType} report has been generated.\n\nSummary:\n${JSON.stringify(finalReport.summary, null, 2)}`
-      };
+    // Complete task
+    await context.step('complete-task', async () => {
+      console.log('Completing task...');
       
       await docClient.send(new UpdateCommand({
         TableName: TABLE_NAME,
         Key: { taskId },
-        UpdateExpression: 'SET #status = :status, notificationSent = :notification, #progress = list_append(#progress, :item)',
+        UpdateExpression: 'SET #status = :status, completedAt = :completedAt',
         ExpressionAttributeNames: {
-          '#status': 'status',
-          '#progress': 'progress'
-        },
-        ExpressionAttributeValues: {
-          ':status': 'NOTIFICATION_SENT',
-          ':notification': notification,
-          ':item': [{
-            day: 7,
-            action: 'Notification',
-            result: { sent: true },
-            completedAt: new Date().toISOString()
-          }]
-        }
-      }));
-      
-      return notification;
-    });
-    
-    // Cleanup
-    await context.step('cleanup', async () => {
-      console.log('Performing cleanup...');
-      
-      await docClient.send(new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { taskId },
-        UpdateExpression: 'SET #status = :status, completedAt = :completedAt, #progress = list_append(#progress, :item)',
-        ExpressionAttributeNames: {
-          '#status': 'status',
-          '#progress': 'progress'
+          '#status': 'status'
         },
         ExpressionAttributeValues: {
           ':status': 'COMPLETED',
-          ':completedAt': new Date().toISOString(),
-          ':item': [{
-            day: 7,
-            action: 'Cleanup',
-            result: { cleaned: true },
-            completedAt: new Date().toISOString()
-          }]
+          ':completedAt': new Date().toISOString()
         }
       }));
       
-      return { cleaned: true };
+      return { completed: true };
     });
     
     console.log(`Task ${taskId} completed successfully`);

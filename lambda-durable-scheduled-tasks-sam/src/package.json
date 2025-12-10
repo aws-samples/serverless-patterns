@@ -1,7 +1,7 @@
 {
   "name": "lambda-durable-scheduled-tasks",
   "version": "1.0.0",
-  "description": "Multi-day scheduled task orchestration with Lambda Durable Functions",
+  "description": "Multi-day scheduled task orchestration with AWS Lambda durable functions",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

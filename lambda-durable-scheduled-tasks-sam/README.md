@@ -1,8 +1,8 @@
-# Multi-Day Scheduled Task Orchestration with Lambda Durable Functions
+# Multi-Day Scheduled Task Orchestration with AWS Lambda durable functions
 
-This pattern demonstrates a 7-day workflow with scheduled checkpoints using AWS Lambda Durable Functions. The workflow handles daily data collection, batch processing, report generation, and notifications with automatic checkpointing and state persistence across long-running operations.
+This pattern demonstrates multi-day workflows with scheduled waits using AWS Lambda durable functions, showcasing automatic checkpointing and zero compute cost during wait periods.
 
-**Important:** Lambda Durable Functions are currently available in the **us-east-2 (Ohio)** region only.
+**Important:** Check regional availability for AWS Lambda durable functions before deployment.
 
 ## Architecture
 
@@ -14,52 +14,19 @@ The solution uses a streamlined architecture:
 - **DynamoDB**: Stores task state and progress for real-time monitoring
 - **API Gateway**: RESTful API for task creation, status queries, and management
 
-### Scheduled Task Workflow (7 Days)
+### Workflow Concept
 
-The workflow consists of multiple steps organized across 7 days:
+The pattern demonstrates a multi-day workflow with scheduled waits between steps. Each step is automatically checkpointed, and the function incurs no compute charges during wait periods.
 
-**Day 1: Data Collection**
-- Initialize task and configuration
-- Collect data from multiple sources (database, API, files)
-- Store initial dataset metadata
 
-**Days 2-6: Daily Batch Processing**
-- Process daily batches of records
-- Track errors and processing metrics
-- Update progress after each day
-- *Wait 24 hours between each day (no compute cost during waits)*
 
-**Day 7: Report Generation & Completion**
-- Generate comprehensive final report
-- Calculate summary statistics
-- Send notification email
-- Perform cleanup operations
 
-Each step is automatically checkpointed, allowing the workflow to resume from the last successful step if interrupted.
-
-## Key Features
-
-- ✅ **Long-Running Execution** - 7-day workflow with zero compute cost during waits
-- ✅ **Automatic Checkpointing** - Each step is checkpointed automatically
-- ✅ **Failure Recovery** - Resumes from last checkpoint on failure
-- ✅ **Progress Tracking** - Real-time progress monitoring via API
-- ✅ **State Persistence** - Task status stored in DynamoDB
-- ✅ **Scheduled Waits** - 24-hour waits between days with no charges
-
-## Use Cases
-
-This pattern is ideal for:
-- **Weekly/Monthly Report Generation** - Automated periodic reporting
-- **Multi-Day Data Processing** - Large dataset processing with daily batches
-- **Scheduled Backups** - Daily backup orchestration with verification
-- **Compliance Workflows** - Multi-day audit and compliance checks
-- **ETL Pipelines** - Extract, transform, load operations with scheduled intervals
 
 ## Prerequisites
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
-* [Node.js 18+](https://nodejs.org/) installed
+* [Node.js 24+](https://nodejs.org/) installed
 
 ## Deployment
 
@@ -78,18 +45,11 @@ This pattern is ideal for:
    sam build
    ```
 
-4. Deploy the application (must use us-east-2 region):
+4. Deploy the application:
    ```bash
-   sam deploy --guided --region us-east-2
+   sam deploy --guided
    ```
-   
-   During the guided deployment:
-   - Stack Name: `lambda-durable-scheduled-tasks`
-   - AWS Region: `us-east-2`
-   - Confirm changes: `N`
-   - Allow SAM CLI IAM role creation: `Y`
-   - Disable rollback: `N`
-   - Save arguments to config file: `Y`
+
 
 5. Note the `TaskApiEndpoint` from the outputs.
 
@@ -102,7 +62,6 @@ Retrieve your API endpoint from the CloudFormation stack:
 ```bash
 aws cloudformation describe-stacks \
   --stack-name lambda-durable-scheduled-tasks \
-  --region us-east-2 \
   --query 'Stacks[0].Outputs[?OutputKey==`TaskApiEndpoint`].OutputValue' \
   --output text
 ```
@@ -114,7 +73,6 @@ Create a new scheduled task with custom configuration:
 ```bash
 API_ENDPOINT=$(aws cloudformation describe-stacks \
   --stack-name lambda-durable-scheduled-tasks \
-  --region us-east-2 \
   --query 'Stacks[0].Outputs[?OutputKey==`TaskApiEndpoint`].OutputValue' \
   --output text)
 
@@ -228,7 +186,6 @@ View CloudWatch logs for detailed execution information:
 
 ```bash
 aws logs tail /aws/lambda/lambda-durable-scheduled-tasks-ScheduledTask \
-  --region us-east-2 \
   --follow
 ```
 
@@ -346,65 +303,33 @@ Delete all tasks from DynamoDB
 
 ## Task Status Values
 
-- `INITIALIZED` - Task created and initialized
-- `DAY_1_COMPLETE` - Data collection completed
-- `DAY_2_COMPLETE` through `DAY_6_COMPLETE` - Daily batch processing completed
-- `REPORT_GENERATED` - Final report generated
-- `NOTIFICATION_SENT` - Notification email sent
-- `COMPLETED` - Task fully completed
-- `FAILED` - Task failed with error
+Tasks progress through various states from `INITIALIZED` to `COMPLETED` or `FAILED`, with intermediate checkpoints automatically saved.
 
-## Dashboard
 
-A web-based dashboard is included for monitoring tasks in real-time:
 
-1. Open `dashboard.html` in your browser
-2. Enter your API endpoint
-3. View all tasks with progress tracking
-4. Monitor daily workflow progression
-5. Delete all tasks when needed
 
-Features:
-- Real-time task monitoring
-- Progress visualization
-- Auto-refresh every 30 seconds
-- Task statistics and metrics
-- Delete all tasks functionality
-
-## Cost Optimization
-
-This pattern demonstrates significant cost savings:
-
-**Traditional Approach (Polling):**
-- 7 days × 24 hours × 60 minutes = 10,080 Lambda invocations
-- Each invocation: ~100ms at 128MB = $0.0000002083 per invocation
-- Total cost: ~$2.10 per task
-
-**Durable Functions Approach:**
-- ~10 Lambda invocations (one per step)
-- Wait states: $0 (no compute charges)
-- Total cost: ~$0.002 per task
-
-**Savings: 99.9% cost reduction**
 
 ## Cleanup
 
 Delete the CloudFormation stack:
 
 ```bash
-sam delete --stack-name lambda-durable-scheduled-tasks --region us-east-2
+sam delete --stack-name lambda-durable-scheduled-tasks
 ```
 
 ## Learn More
 
-- [Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [AWS Lambda durable functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [JavaScript/TypeScript SDK](https://github.com/aws/aws-durable-execution-sdk-js)
 - [AWS Blog Post](https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/)
 
-## Security
-
-See [CONTRIBUTING](../../../CONTRIBUTING.md#security-issue-notifications) for more information.
 
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
+
+---
+
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0

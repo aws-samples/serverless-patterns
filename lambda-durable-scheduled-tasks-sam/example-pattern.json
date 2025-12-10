@@ -1,17 +1,15 @@
 {
-  "title": "Multi-Day Scheduled Task Orchestration with Lambda Durable Functions",
-  "description": "Demonstrates a 7-day workflow with scheduled checkpoints for daily report generation, data processing, and notifications using Lambda Durable Functions.",
+  "title": "Multi-Day Scheduled Task Orchestration with AWS Lambda durable functions",
+  "description": "Demonstrates a 7-day workflow with scheduled checkpoints using AWS Lambda durable functions.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern implements a multi-day scheduled task orchestration using AWS Lambda Durable Functions. The workflow spans 7 days with automatic checkpointing, demonstrating how to build long-running workflows with scheduled intervals and zero compute cost during wait periods.",
-      "The solution uses a streamlined architecture: a durable function handles the 7-day orchestration with automatic checkpointing, while a unified task management function provides listing, status queries, and deletion operations via API Gateway.",
-      "Day 1 collects initial data from multiple sources. Days 2-6 process daily batches with 24-hour waits between each day. Day 7 generates a comprehensive report, sends notifications, and performs cleanup. Each step is automatically checkpointed for resilience.",
-      "The pattern includes a web-based dashboard for real-time monitoring of all tasks with progress tracking, statistics, and management capabilities.",
-      "The pattern demonstrates significant cost savings: traditional polling would require 10,080 Lambda invocations over 7 days, while durable functions need only ~10 invocations with $0 cost during wait states - a 99.9% cost reduction."
+      "This pattern demonstrates a 7-day workflow using AWS Lambda durable functions with automatic checkpointing and zero compute cost during wait periods.",
+      "Day 1 collects data, Days 2-6 process daily batches with 24-hour waits, and Day 7 generates a final report. Each step is automatically checkpointed.",
+      "AWS Lambda durable functions eliminate compute charges during wait states, providing significant cost savings compared to traditional polling approaches."
     ]
   },
   "gitHub": {
@@ -25,15 +23,15 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Durable Functions Documentation",
+        "text": "AWS Lambda durable functions Documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
-        "text": "JavaScript/TypeScript SDK for Durable Functions",
+        "text": "JavaScript/TypeScript SDK for durable functions",
         "link": "https://github.com/aws/aws-durable-execution-sdk-js"
       },
       {
-        "text": "AWS Blog: Build multi-step applications with Lambda Durable Functions",
+        "text": "AWS Blog: Build multi-step applications with AWS Lambda durable functions",
         "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
       }
     ]
@@ -41,7 +39,7 @@
   "deploy": {
     "text": [
       "sam build",
-      "sam deploy --guided --region us-east-2"
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -51,7 +49,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete --stack-name lambda-durable-scheduled-tasks --region us-east-2</code>."
+      "Delete the stack: <code>sam delete --stack-name lambda-durable-scheduled-tasks</code>."
     ]
   },
   "authors": [
@@ -59,7 +57,7 @@
       "name": "Abhishek Agawane",
       "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
       "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
-      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+      "linkedin": "agawabhi"
     }
   ]
 }
