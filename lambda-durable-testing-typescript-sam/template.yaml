@@ -4,7 +4,7 @@ Description: Durable Functions Testing Validation Project
 
 Globals:
   Function:
-    Runtime: nodejs22.x
+    Runtime: nodejs24.x
     Architectures:
       - arm64
     Timeout: 30

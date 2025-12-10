@@ -1,13 +1,13 @@
 {
-  "title": "Testing AWS Lambda Durable Functions in TypeScript",
-  "description": "Comprehensive testing strategies for AWS Lambda Durable Functions using local and cloud test runners with TypeScript",
+  "title": "Testing AWS Lambda durable functions in TypeScript",
+  "description": "Comprehensive testing strategies for AWS Lambda durable functions using local and cloud test runners with TypeScript",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates comprehensive testing strategies for AWS Lambda Durable Functions using the Durable Execution SDK testing library.",
+      "This pattern demonstrates comprehensive testing strategies for AWS Lambda durable functions using the Durable Execution SDK testing library.",
       "It includes five key testing scenarios: basic workflows with wait operations, retry logic validation, callback testing for external events, parallel operations testing, and nested function composition.",
       "The pattern uses LocalDurableTestRunner for fast local testing with time-skipping and CloudDurableTestRunner for integration testing against deployed functions.",
       "All tests demonstrate best practices including operation inspection, mock external dependencies, callback simulation, and function registration for nested workflows."
@@ -24,7 +24,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Durable Functions Documentation",
+        "text": "AWS Lambda durable functions Documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -36,7 +36,7 @@
         "link": "https://www.npmjs.com/package/@aws/durable-execution-sdk-js-testing"
       },
       {
-        "text": "Testing AWS Lambda Durable Functions in TypeScript (Blog Post)",
+        "text": "Testing AWS Lambda durable functions in TypeScript (Blog Post)",
         "link": "https://dev.to/aws/testing-aws-lambda-durable-functions-in-typescript-5bj2"
       }
     ]
@@ -62,12 +62,12 @@
       "name": "Abhishek Agawane",
       "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
       "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
-      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+      "linkedin": "agawabhi"
     },
     {
       "name": "Eric Johnson",
       "bio": "Principal Developer Advocate for Serverless Applications at AWS and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead.",
-      "linkedin": "https://www.linkedin.com/in/singledigit/"
+      "linkedin": "singledigit"
     }
   ]
 }
