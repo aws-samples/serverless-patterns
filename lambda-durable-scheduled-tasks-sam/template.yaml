@@ -3,8 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Multi-Day Scheduled Task Orchestration with AWS Lambda durable functions
   
-  This pattern demonstrates a 7-day workflow with scheduled checkpoints for
-  daily report generation, data processing, and notifications.
+  This pattern demonstrates a multi-day workflow with scheduled waits and
+  automatic checkpointing using AWS Lambda durable functions.
 
 Globals:
   Function:
@@ -192,4 +192,4 @@ Outputs:
     Value: !Sub |
       curl -X POST ${TaskApi}.execute-api.${AWS::Region}.amazonaws.com/prod/tasks \
         -H "Content-Type: application/json" \
-        -d '{"config":{"reportType":"weekly","dataSource":"analytics","notifyEmail":"admin@example.com"}}'
+        -d '{"config":{}}'
