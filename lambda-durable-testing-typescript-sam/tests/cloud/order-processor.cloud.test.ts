@@ -4,7 +4,6 @@ describe('Order Processor - Cloud Integration Tests', () => {
   it('should execute in AWS', async () => {
     const runner = new CloudDurableTestRunner({
       functionName: 'df-test-examples-OrderProcessorFunction-7G4n6adUSHKl:$LATEST',
-      region: 'us-east-1',
     });
 
     const execution = await runner.run({ payload: {} });
