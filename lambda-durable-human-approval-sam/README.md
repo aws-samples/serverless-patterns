@@ -1,8 +1,8 @@
-# Human-in-the-Loop Approval Workflow with Lambda Durable Functions
+# Human-in-the-Loop Approval Workflow with AWS Lambda durable functions
 
-This pattern demonstrates a human-in-the-loop approval workflow using AWS Lambda Durable Functions. The workflow pauses execution for up to 24 hours while waiting for human approval via email, automatically handling timeouts and resuming when decisions are received.
+This pattern demonstrates a human-in-the-loop approval workflow using AWS Lambda durable functions. The workflow pauses execution for up to 24 hours while waiting for human approval via email, automatically handling timeouts and resuming when decisions are received.
 
-**Important:** Lambda Durable Functions are currently available in the **us-east-2 (Ohio)** region only.
+**Important:** Lambda durable functions have limited regional availability. Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for current regional support.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-hitl-approval-sam
 
@@ -10,13 +10,13 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ![Architecture Diagram](architecture.png)
 
-The pattern uses Lambda Durable Functions to implement a cost-effective approval workflow that can wait up to 24 hours without incurring compute charges during the wait period.
+The pattern uses Lambda durable functions to implement a cost-effective approval workflow that can wait up to 24 hours without incurring compute charges during the wait period.
 
 ### Workflow Steps
 
-1. **User submits approval request** via API Gateway
+1. **User submits approval request** via Amazon API Gateway
 2. **Durable Function validates request** and creates a callback
-3. **UUID mapping stored in DynamoDB** (callback ID → UUID)
+3. **UUID mapping stored in Amazon DynamoDB** (callback ID → UUID)
 4. **Email notification sent via SNS** with approve/reject links
 5. **Function pauses execution** (no compute charges during wait)
 6. **Approver clicks link** in email
@@ -57,16 +57,11 @@ The pattern uses Lambda Durable Functions to implement a cost-effective approval
    sam deploy --guided --region us-east-2
    ```
    
-   During the guided deployment:
-   - Stack Name: `lambda-durable-hitl-approval`
-   - AWS Region: `us-east-2`
-   - Parameter ApproverEmail: `your-email@example.com`
-   - Confirm changes: `N`
-   - Allow SAM CLI IAM role creation: `Y`
-   - Disable rollback: `N`
-   - Save arguments to config file: `Y`
+   During the guided deployment, provide the required values:
+   - **ApproverEmail**: Enter your email address to receive approval notifications
+   - Allow SAM CLI to create IAM roles when prompted
 
-4. **Confirm SNS subscription**: Check your email and click the confirmation link from AWS SNS
+4. **Confirm SNS subscription**: Check your email and click the confirmation link from Amazon SNS
 
 5. Note the `ApiEndpoint` from the outputs
 
@@ -101,24 +96,9 @@ You'll receive an email with:
 
 ### Click Approve or Reject
 
-Click one of the links in the email. You'll see a confirmation page with:
-- ✓ or ✗ icon
-- "Request Approved!" or "Request Rejected!" message
-- Confirmation that the workflow has been notified
+Click one of the links in the email. You'll see a confirmation page that displays a checkmark or X icon along with either a "Request Approved!" or "Request Rejected!" message. The page will also confirm that the workflow has been notified of your decision.
 
-### Monitor the Workflow
 
-```bash
-# View durable function logs
-aws logs tail /aws/lambda/lambda-durable-hitl-approval-ApprovalFunction-XXXXX \
-  --follow \
-  --region us-east-2
-```
-
-Look for:
-- `Starting approval workflow for request: REQ-001`
-- `Approval request sent. UUID: <uuid>`
-- `Approval workflow completed: approved` (or `rejected`)
 
 ## How It Works
 
@@ -173,22 +153,12 @@ def lambda_handler(event, context):
     )
 ```
 
-### Cost Efficiency
-
-**Traditional Lambda approach:**
-- Cannot wait more than 15 minutes (Lambda max timeout)
-- Would need Step Functions or polling mechanism
-- Complex state management
-
-**Durable Functions approach:**
-- Wait up to 24 hours
-- No compute charges during wait
-- Simple, clean code
-- Automatic state management
 
 ## Configuration
 
 ### Adjust Timeout Duration
+
+To change the timeout duration, you need to update both the Lambda function configuration and the callback configuration:
 
 Modify in `template.yaml`:
 
@@ -202,6 +172,8 @@ And in `src/lambda_function.py`:
 ```python
 config=CallbackConfig(timeout=Duration.from_hours(24))
 ```
+
+Both values must match: `ExecutionTimeout` sets the maximum runtime for the durable function, while `CallbackConfig.timeout` sets how long the callback will wait before timing out.
 
 ### Change Email Address
 
@@ -237,14 +209,7 @@ aws logs tail /aws/lambda/lambda-durable-hitl-approv-CallbackHandlerFunction-XXX
   --follow
 ```
 
-### DynamoDB Table
 
-Check the callback mappings:
-```bash
-aws dynamodb scan \
-  --table-name lambda-durable-hitl-approval-callbacks \
-  --region us-east-2
-```
 
 ## Cleanup
 
@@ -255,7 +220,7 @@ sam delete --stack-name lambda-durable-hitl-approval --region us-east-2
 
 ## Learn More
 
-- [Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [Lambda durable functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Durable Execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-python)
 - [Callback Operations](https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html)
 - [SendDurableExecutionCallbackSuccess API](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/send_durable_execution_callback_success.html)
