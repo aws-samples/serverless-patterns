@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "jest --testPathIgnorePatterns=cloud",
-    "test:cloud": "AWS_PROFILE=private jest tests/cloud",
+    "test:cloud": "AWS_REGION=us-east-2 node --experimental-vm-modules node_modules/jest/bin/jest.js tests/cloud",
     "test:all": "jest",
     "test:watch": "jest --watch --testPathIgnorePatterns=cloud",
     "test:coverage": "jest --coverage --testPathIgnorePatterns=cloud"
