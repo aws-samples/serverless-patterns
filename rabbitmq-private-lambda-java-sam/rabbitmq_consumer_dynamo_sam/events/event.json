@@ -1,6 +1,6 @@
 {
     "eventSource": "aws:rmq",
-    "eventSourceArn": "arn:aws:mq:us-west-2:664251831272:broker:ib-rabbitmq-broker:b-22450561-3f76-4004-813d-392346f054fe",
+    "eventSourceArn": "arn:aws:mq:us-west-2:123456789012:broker:ib-rabbitmq-broker:b-22450561-3f76-4004-813d-392346f054fe",
     "rmqMessagesByQueue": {
         "LambdaRabbitMQQueue::/": [
             {
