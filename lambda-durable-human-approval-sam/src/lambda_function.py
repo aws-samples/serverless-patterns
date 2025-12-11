@@ -12,7 +12,7 @@ table = dynamodb.Table(os.environ['CALLBACK_TABLE_NAME'])
 
 @durable_execution
 def lambda_handler(event, context: DurableContext):
-    """Human-in-the-Loop Approval Pattern using Durable Functions"""
+    """Human-in-the-Loop Approval Pattern using Lambda durable functions"""
     
     # Parse input
     body = event.get('body')

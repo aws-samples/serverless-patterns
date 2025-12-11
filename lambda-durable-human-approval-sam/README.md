@@ -2,7 +2,7 @@
 
 This pattern demonstrates a human-in-the-loop approval workflow using AWS Lambda durable functions. The workflow pauses execution for up to 24 hours while waiting for human approval via email, automatically handling timeouts and resuming when decisions are received.
 
-**Important:** Lambda durable functions have limited regional availability. Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for current regional support.
+**Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-hitl-approval-sam
 

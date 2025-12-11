@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Human-in-the-Loop Approval Pattern using Lambda Durable Functions
+Description: Human-in-the-Loop Approval Pattern using AWS Lambda durable functions
 
 Parameters:
   ApproverEmail:
