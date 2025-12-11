@@ -7,7 +7,7 @@ This project contains source code and supporting files for a serverless applicat
 - activemq_consumer_dynamo_sam/activemq_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (Apache ActiveMQ) messages and write them to an Amazon DynamoDB table
 - activemq_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (ActiveMQ cluster)
 - activemq_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
-- ActiveMQAndClientEC2.yaml - An AWS CloudFormation template file that can be used to deploy an Amazon MQ (Apache ActiveMQ) cluster and also deploy an EC2 machine with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
+- ActiveMQAndClientEC2.yaml - An AWS CloudFormation template file that can be used to deploy an Amazon MQ (Apache ActiveMQ) cluster and also deploy an EC2 instance with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
 - activemq_queue_browser.sh - A shell script that can be used to connect to the Amazon MQ (Apache ActiveMQ) brokers using the activemq command-line tool
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -16,24 +16,24 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 
-## Run the AWS CloudFormation template to create the Amazon MQ (Apache ActiveMQ) Cluster and Client EC2 machine
+## Run the AWS CloudFormation template to create the Amazon MQ (Apache ActiveMQ) Cluster and Client EC2 instance
 
-* [Run the AWS CloudFormation template using the file ActiveMQAndClientEC2.yaml] - You can go to the AWS CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the AWS CloudFormation stack to be created. This AWS CloudFormation template will create an Amazon MQ (Apache ActiveMQ) cluster. It will also create an EC2 machine that you can use as a client.
+* [Run the AWS CloudFormation template using the file ActiveMQAndClientEC2.yaml] - You can go to the AWS CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the AWS CloudFormation stack to be created. This AWS CloudFormation template will create an Amazon MQ (Apache ActiveMQ) cluster. It will also create an EC2 instance that you can use as a client.
 
-* [Connect to the EC2 machine] - Once the AWS CloudFormation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab. In case you are using SSM Instance connect, you are not initially placed in the home directory. If you connect as ssm-user, you need to sudo su to ec2-user for this to work.
+* [Connect to the EC2 instance] - Once the AWS CloudFormation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab. In case you are using SSM Instance connect, you are not initially placed in the home directory. If you connect as ssm-user, you need to sudo su to ec2-user for this to work.
 Note: You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running post creation.
 
 ## Pre-requisites to Deploy the sample Lambda function
 
-The EC2 machine that was created by running the AWS CloudFormation template has all the software that will be needed to deploy the Lambda function.
+The EC2 instance that was created by running the AWS CloudFormation template has all the software that will be needed to deploy the Lambda function.
 
 The AWS SAM CLI is a serverless tool for building and testing Lambda applications.
 
-* Java - On the EC2 machine, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
-* Maven - On the EC2 machine, we have installed Maven (https://maven.apache.org/install.html)
+* Java - On the EC2 instance, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
+* Maven - On the EC2 instance, we have installed Maven (https://maven.apache.org/install.html)
 * AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
-We have also cloned the Github repository for serverless-patterns on the EC2 machine already by running the below command
+We have also cloned the Github repository for serverless-patterns on the EC2 instance already by running the below command
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns.git
     ```
@@ -94,7 +94,7 @@ The sam deploy command will package and deploy your application to AWS, with a s
 * **Parameter Subnet1**: The first of the three private subnets where the Amazon MQ (Apache ActiveMQ) cluster is deployed
 * **Parameter Subnet2**: The second of the three private subnets where the Amazon MQ (Apache ActiveMQ) cluster is deployed
 * **Parameter Subnet3**: The third of the three private subnets where the Amazon MQ (Apache ActiveMQ) cluster is deployed
-* **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 machine that was created by the AWS CloudFormation template
+* **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 instance that was created by the AWS CloudFormation template
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
 * **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
 * **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails
@@ -111,7 +111,7 @@ You should get a message "Successfully created/updated stack - <StackName> in <R
 
 Once the lambda function is deployed, send some messages to the Amazon MQ (Apache ActiveMQ) cluster on the queue that have been configured on the lambda function's event listener.
 
-For your convenience, a Java program and a shell script has been created on the EC2 machine that was provisioned using AWS CloudFormation.
+For your convenience, a Java program and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
 
 ```
 cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
