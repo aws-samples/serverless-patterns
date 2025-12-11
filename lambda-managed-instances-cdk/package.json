@@ -1,0 +1,24 @@
+{
+  "name": "lambda-managed-instances-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "lambda-managed-instances-cdk": "bin/app.js"
+  },
+  "scripts": {
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.159",
+    "@types/node": "^25.0.0",
+    "aws-cdk": "2.1034.0",
+    "esbuild": "^0.27.1",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.232.1",
+    "constructs": "^10.4.4",
+    "@aws-lambda-powertools/logger": "^2.30.0"
+  }
+}
