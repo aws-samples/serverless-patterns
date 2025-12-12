@@ -1,6 +1,7 @@
-# AWS Service 1 to AWS Service 2
+# AWS REST API Gateway to private Load Balancer through VPC Link V2
 
 This pattern deploys an Amazon API Gateway REST with a VPC Link V2 integration. The new feature of November 2025 now allows REST APIs to be integrated directly with ALBs through a VPC Link V2 integration (without having to use a NLB in the middle). I aslo allows HTTP APIs to integrate with a Network Load Balancer through the same VPC Link V2. 
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-restapi-vpclink-v2
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
