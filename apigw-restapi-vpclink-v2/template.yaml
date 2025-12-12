@@ -4,11 +4,11 @@ Parameters:
   LoadBalancerArn:
     Description: The ARN of the private ALB or NLB used with the VPC Link
     Type: String
-  LoadBalancerDnsName:
-    Description: the integration URI (DNS Name of the LoadBalancer for HTTP port 80 requests - or the DNS Name of the Certificate used on the SSL Listener port 443)
+  IntegrationUri:
+    Description: the integration URI (for SSL/HTTPS requests, the DNS Name of the Certificate used on the SSL Listener port 443)
     Type: String 
   VpcId:
-    Description: ID of an existing Virtual Private Cloud (VPC).
+    Description: Select the ID of the Virtual Private Cloud (VPC) used on the Load Balancer
     Type: AWS::EC2::VPC::Id
   PrivateSubnetIds:
     Description: Select at least 2 existing private subnets which are also used on the Load Balancer
@@ -53,7 +53,7 @@ Resources:
                 connectionId: !Ref VpcLinkV2
                 httpMethod: ANY
                 type: http_proxy
-                uri: !Ref LoadBalancerDnsName
+                uri: !Ref IntegrationUri
                 integrationTarget: !Ref LoadBalancerArn
               responses:
                 "200":

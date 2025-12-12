@@ -1,8 +1,7 @@
 # AWS Service 1 to AWS Service 2
 
-This pattern << explain usage >>
-
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+This pattern deploys an Amazon API Gateway REST with a VPC Link V2 integration. The new feature of November 2025 now allows REST APIs to be integrated directly with ALBs through a VPC Link V2 integration (without having to use a NLB in the middle). I aslo allows HTTP APIs to integrate with a Network Load Balancer through the same VPC Link V2. 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-restapi-vpclink-v2
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -38,11 +37,33 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Explain how the service interaction works.
+    The VPC Link V2 now supports both Network Load Balancer and Application Load Balancers, and can be used for both REST APIs and HTTP APIs.
+
+    **For REST APIs :**
+    When using HTTPS/SSL over port 443, the integration URI in the REST API resource should match the DNS name covered by the certificate on the listener.
+    For instance, if my ALB has the DNS Name "internal-alb-abcd.eu-west-1.elb.amazonaws.com" and has an HTTPS listener on port 443 using the certificate with DNS Name "*.hello.world.com" - the integration URI should be "https://slay.hello.world.com" or match any subdomain of "*.hello.world.com". This is true for both ALB and NLBs.
+    The integration URI is only used for the SSL handshake, it will also define the value of the Host Header. 
+
+    However, for request made on port 80 over HTTP/TCP, any URI can be used in the REST API integration, as the VPC Link will always point to the Load Balancer under the hood.
+    For instance, if my ALB has the DNS Name "internal-alb-abcd.eu-west-1.elb.amazonaws.com" and has an HTTP listener on port 80 - the integration URI could be "http://internal-alb-abcd.eu-west-1.elb.amazonaws.com" or "http://my.name.is.alice.com", any value will work. The integration URI will be used to define the Host Header.
+
+     **For HTTP APIs :**
+     It is not possible to define an integration URI so the above does not apply.
+
+     The template will also create a Security Group for the VPC Link. Its inbound rule do not matter as no traffic will be sent inbound to the VPC Link, only the outbound rule need to allow access to the Load Balancer. In this template, by default the outbound rule is open to all.
+    
 
 ## Testing
 
-Provide steps to trigger the integration and show what should be observed if successful.
+When deploying the template, you will be prompted the enter the below parameters:
+  * LoadBalancerArn: The ARN of the private ALB or NLB used with the VPC Link
+  * IntegrationUri: the integration URI as described above
+  * VpcId: ID of the Virtual Private Cloud (VPC) where the Load Balancer resides
+  * PrivateSubnetIds: 2 existing private subnets which are also used on the Load Balancer
+
+The template can take a few minutes to create because of the VPC Link resource.
+
+Once it is deployed, the output will show the REST API Gateway invocation URL.
 
 ## Cleanup
  

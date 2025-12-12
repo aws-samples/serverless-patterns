@@ -1,15 +1,17 @@
 {
-  "title": "Step Functions to Athena",
-  "description": "Create a Step Functions workflow to query Amazon Athena.",
+  "title": "AWS REST API Gateway with VPC Link V2",
+  "description": "Create a REST API with a VPC Link V2 integration and an Application Load Balancer or Network Load Balancer",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway REST with a VPC Link V2 integration and a Load Balancer",
-      "The new feature of November 2025 now allows REST APIs to be integrated directly with ALBs through a VPC Link V2 integration",
-      "The VPC Link V2 now supports both Network Load Balancer and Application Load Balancers, and can be used for both REST APIs and HTTP APIs"
+      "This pattern deploys an Amazon API Gateway REST with a VPC Link V2 integration which will then point to a private Load Balancer.",
+      "The new feature of November 2025 now allows REST APIs to be integrated directly with ALBs through a VPC Link V2 integration (without having to use a NLB in the middle).",
+      "The VPC Link V2 now supports both Network Load Balancer and Application Load Balancers, and can be used for both REST APIs and HTTP APIs.",
+      "When using HTTPS/SSL over port 443, the integration URI should match the DNS name covered by the certificate on the listener.",
+      "For request made on port 80 over HTTP/TCP, any URI can be used in the REST API integration, as the VPC Link will always point to the Load Balancer under the hood."
     ]
   },
   "gitHub": {
@@ -23,12 +25,8 @@
   "resources": {
     "bullets": [
       {
-        "text": "Call Athena with Step Functions",
-        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
-      },
-      {
-        "text": "Amazon Athena - Serverless Interactive Query Service",
-        "link": "https://aws.amazon.com/athena/"
+        "text": "Build scalable REST APIs using Amazon API Gateway private integration with Application Load Balancer",
+        "link": "https://aws.amazon.com/blogs/compute/build-scalable-rest-apis-using-amazon-api-gateway-private-integration-with-application-load-balancer/"
       }
     ]
   },
