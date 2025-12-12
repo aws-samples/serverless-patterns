@@ -51,6 +51,8 @@ Important: this application uses various AWS services and there are costs associ
      It is not possible to define an integration URI so the above does not apply.
 
      The template will also create a Security Group for the VPC Link. Its inbound rule do not matter as no traffic will be sent inbound to the VPC Link, only the outbound rule need to allow access to the Load Balancer. In this template, by default the outbound rule is open to all.
+
+     The API also has a test resource called "mock" which is a simple 200 response. 
     
 
 ## Testing
