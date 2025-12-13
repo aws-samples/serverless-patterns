@@ -2,11 +2,11 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const { S3 } = require("aws-sdk");
+const { S3Client, WriteGetObjectResponseCommand } = require("@aws-sdk/client-s3");
 const axios = require("axios").default;  // Promise-based HTTP requests
 const sharp = require("sharp"); // Used for image resizing
 
-const s3 = new S3();
+const s3 = new S3Client();
 
 exports.handler = async (event) => {
   // Output the event details to CloudWatch Logs.
@@ -30,9 +30,9 @@ exports.handler = async (event) => {
   const params = {
     RequestRoute: outputRoute,
     RequestToken: outputToken,
-    Body: resized,
+    Body: await resized.toBuffer(),
   };
-  await s3.writeGetObjectResponse(params).promise();
+  await s3.send(new WriteGetObjectResponseCommand(params));
 
   // Exit the Lambda function.
   return { statusCode: 200 };
