@@ -1,0 +1,56 @@
+{
+  "title": "Lambda Durable Functions Example",
+  "description": "Create a durable lambda function using Typescript.",
+  "language": "Typescript",
+  "level": "300",
+  "framework": "Bash",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a durable lambda using Typescript.  The Lambda and all resources are deployed using the AWS CLI with bash."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durablefunction-typescript",
+      "templateURL": "serverless-patterns/lambda-durablefunction-typescript",
+      "projectFolder": "lambda-durablefunction-typescript",
+      "templateFile": "lambda-durablefunction-typescript/FraudDetection-Lambda/src/index.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create a durable function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "./deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See readme for instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See readme for instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joe Losinski",
+      "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4",
+      "bio": "AWS Senior Solutions Architect and Serverless Enthusiast.",
+      "linkedin": "https://www.linkedin.com/in/joelosinski/"
+    }
+  ]
+}
