@@ -1,0 +1,10 @@
+{
+  "name": "hello-world-managed-instances",
+  "version": "1.0.0",
+  "description": "Hello World Lambda function for Managed Instances",
+  "main": "hello-world.mjs",
+  "type": "module",
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.30.0"
+  }
+}
