@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern demonstrates how to use an Amazon API Gateway REST API with response streaming to a AWS Lambda Python function.",
-      "To enable response streaming with a Lambda Python function, we use [Lambda Web Adapter](https://aws.amazon.com/blogs/compute/using-response-streaming-with-aws-lambda-web-adapter-to-optimize-performance/) and [Fast API](https://github.com/awslabs/aws-lambda-web-adapter/tree/main/examples/fastapi-response-streaming-zip)."
+      "To enable response streaming with a Lambda Python function, we use Lambda Web Adapter and Fast API."
     ]
   },
   "gitHub": {

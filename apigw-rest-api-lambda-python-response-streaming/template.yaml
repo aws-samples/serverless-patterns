@@ -42,6 +42,9 @@ Resources:
 
   StreamingApi:
     Type: AWS::Serverless::Api
+    Description: |
+      Please note: This API does not include authentication and should not be used in production.
+      For securing API Gateway APIs, refer to other serverless patterns for authentication methods.
     Properties:
       StageName: prod
       DefinitionBody:
