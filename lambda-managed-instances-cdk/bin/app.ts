@@ -4,7 +4,7 @@ import { DemoStack } from '../lib/demo-stack';
 
 const app = new App();
 new DemoStack(app, 'LambdaManagedInstancesDemo', {
-  stackName: 'lambda-managed-instances',
+  stackName: 'lambda-managed-instances-cdk',
   env: { 
     account: process.env.CDK_DEFAULT_ACCOUNT, 
     region: process.env.CDK_DEFAULT_REGION 

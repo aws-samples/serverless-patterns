@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-FUNCTION_NAME="hello-world-managed-instances"
+FUNCTION_NAME="hello-world-managed-instances-cdk"
 PROFILE=${1:-default}
 EVENT_FILE="events/hello-world.json"
 
@@ -53,7 +53,7 @@ fi
 echo -e "${BLUE}Test 2: Recent CloudWatch logs${NC}"
 echo "Fetching recent logs from CloudWatch..."
 
-LOG_GROUP="/aws/lambda/$FUNCTION_NAME"
+LOG_GROUP="/demo/lambda/$FUNCTION_NAME"
 START_TIME=$(date -v-5M +%s)000
 
 aws logs filter-log-events \

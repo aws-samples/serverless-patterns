@@ -58,6 +58,13 @@ The Lambda function is a simple Hello World implementation that:
 - Uses AWS Lambda PowerTools for efficient event logging
 - Demonstrates minimal Lambda function structure using the Handler type
 
+### CloudWatch Log Group
+The pattern includes a dedicated CloudWatch log group with:
+- **Custom log group name**: `/demo/lambda/hello-world-managed-instances-cdk`
+- **Retention period**: 2 weeks (14 days) to manage storage costs
+- **Automatic cleanup**: Configured with `RemovalPolicy.DESTROY` to be deleted when the stack is destroyed
+- **Direct integration**: The Lambda function is configured to use this specific log group
+
 ## Testing
 
 After deployment, you can test the Lambda function using AWS CLI or AWS Console.
@@ -67,7 +74,7 @@ After deployment, you can test the Lambda function using AWS CLI or AWS Console.
 1. **Basic function invocation**:
    ```bash
    aws lambda invoke \
-     --function-name hello-world-managed-instances \
+     --function-name hello-world-managed-instances-cdk \
      --payload file://events/hello-world.json \
      --cli-binary-format raw-in-base64-out \
      response.json
@@ -81,7 +88,7 @@ After deployment, you can test the Lambda function using AWS CLI or AWS Console.
 3. **Custom name invocation**:
    ```bash
    echo '{"name":"Lambda Managed Instances"}' | aws lambda invoke \
-     --function-name hello-world-managed-instances \
+     --function-name hello-world-managed-instances-cdk \
      --payload file:///dev/stdin \
      --cli-binary-format raw-in-base64-out \
      custom-response.json
@@ -90,14 +97,14 @@ After deployment, you can test the Lambda function using AWS CLI or AWS Console.
 4. **View CloudWatch logs**:
    ```bash
    aws logs filter-log-events \
-     --log-group-name /aws/lambda/hello-world-managed-instances \
+     --log-group-name /demo/lambda/hello-world-managed-instances-cdk \
      --start-time $(date -d '5 minutes ago' +%s)000
    ```
 
 ### AWS Console Testing
 
 1. Navigate to the Lambda service in the AWS Console
-2. Find the function named `hello-world-managed-instances`
+2. Find the function named `hello-world-managed-instances-cdk`
 3. Create a test event using the payload from `events/hello-world.json` or create a custom payload:
    ```json
    {
@@ -119,9 +126,11 @@ The function returns a JSON response with the following structure:
 ### Monitoring and Observability
 
 Monitor the function execution through:
-- **CloudWatch Logs**: Detailed execution logs with event and response data
+- **CloudWatch Logs**: Detailed execution logs with event and response data in the dedicated log group
 - **Lambda Metrics**: Function performance and invocation statistics
 - **CloudWatch Metrics**: Custom metrics and alarms for monitoring
+
+The stack outputs include the log group name for easy reference when setting up monitoring dashboards or log analysis tools.
 
 ## Inspecting Lambda Managed Instances Infrastructure
 
@@ -130,7 +139,7 @@ Lambda Managed Instances provision EC2 instances behind the scenes to provide pr
 ### View Capacity Provider Details
 
 ```bash
-aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider
+aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider-cdk
 ```
 
 This shows:
@@ -143,7 +152,7 @@ This shows:
 
 ```bash
 aws ec2 describe-instances \
-  --filters "Name=tag:aws:lambda:capacity-provider,Values=arn:aws:lambda:*:capacity-provider:lambda-capacity-provider" \
+  --filters "Name=tag:aws:lambda:capacity-provider,Values=arn:aws:lambda:*:capacity-provider:lambda-capacity-provider-cdk" \
   --query 'Reservations[*].Instances[*].[InstanceId,InstanceType,State.Name,LaunchTime,SubnetId,PrivateIpAddress]' \
   --output table
 ```
@@ -184,7 +193,7 @@ This stack will deploy to your default AWS region. Before deploying, please veri
     ```
 1. Confirm the stack has been deleted by checking the AWS CloudFormation console or running:
     ```bash
-    aws cloudformation describe-stacks --stack-name lambda-managed-instances
+    aws cloudformation describe-stacks --stack-name lambda-managed-instances-cdk
     ```
 
 ----
