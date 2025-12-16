@@ -278,6 +278,7 @@ resource "aws_lambda_function" "hello_world" {
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   memory_size      = 2048
   publish          = true
+  publish_to       = "LATEST_PUBLISHED"
 
   description = "Simple Hello World Lambda function on Managed Instances"
 
@@ -296,14 +297,6 @@ resource "aws_lambda_function" "hello_world" {
     aws_cloudwatch_log_group.lambda_logs,
     aws_lambda_capacity_provider.lambda_capacity_provider,
   ]
-}
-
-# Lambda alias for LATEST_PUBLISHED
-resource "aws_lambda_alias" "live" {
-  name             = "live"
-  description      = "Alias pointing to the latest published version"
-  function_name    = aws_lambda_function.hello_world.function_name
-  function_version = aws_lambda_function.hello_world.version
 }
 
 # CloudWatch Log Group for Lambda function

@@ -7,7 +7,6 @@ set -e
 
 # Configuration
 FUNCTION_NAME="hello-world-managed-instances-tf"
-FUNCTION_ALIAS="live"
 PROFILE=${1:-default}
 EVENT_FILE="events/hello-world.json"
 
@@ -19,7 +18,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}=== Testing Hello World Lambda Function on Managed Instances (Terraform) ===${NC}"
-echo -e "${YELLOW}Function: ${FUNCTION_NAME}:${FUNCTION_ALIAS}${NC}"
+echo -e "${YELLOW}Function: ${FUNCTION_NAME}${NC}"
 echo -e "${YELLOW}Profile: ${PROFILE}${NC}"
 echo ""
 
@@ -34,7 +33,7 @@ echo -e "${BLUE}Test 1: Basic invocation with sample event${NC}"
 echo "Invoking function with event from $EVENT_FILE..."
 
 aws lambda invoke \
-    --function-name "$FUNCTION_NAME:$FUNCTION_ALIAS" \
+    --function-name "$FUNCTION_NAME" \
     --payload file://"$EVENT_FILE" \
     --cli-binary-format raw-in-base64-out \
     --profile "$PROFILE" \
@@ -107,7 +106,7 @@ echo "3. View CloudWatch logs:"
 echo "   aws logs filter-log-events --log-group-name $LOG_GROUP --start-time \$(date -d '10 minutes ago' +%s)000 --profile $PROFILE"
 echo ""
 echo "4. Custom invocation:"
-echo "   echo '{\"name\":\"Your Name\"}' | aws lambda invoke --function-name $FUNCTION_NAME:$FUNCTION_ALIAS --payload file:///dev/stdin --cli-binary-format raw-in-base64-out --profile $PROFILE output.json"
+echo "   echo '{\"name\":\"Your Name\"}' | aws lambda invoke --function-name $FUNCTION_NAME --payload file:///dev/stdin --cli-binary-format raw-in-base64-out --profile $PROFILE output.json"
 echo ""
 echo "5. View capacity provider details:"
 echo "   aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --profile $PROFILE"
