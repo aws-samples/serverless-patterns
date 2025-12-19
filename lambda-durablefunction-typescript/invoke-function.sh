@@ -38,16 +38,12 @@ echo "   Vendor: $VENDOR"
 echo "   Initial Score: $SCORE"
 echo ""
 
-# GET THE LATEST PUBLISHED VERSION ARN
-echo "🔍 Getting latest function version..."
-FUNCTION_ARN=$(aws lambda list-versions-by-function \
-    --function-name $FUNCTION_NAME \
-    --region $REGION \
-    --query 'Versions[?Version!=`$LATEST`] | [-1].FunctionArn' \
-    --output text)
+# GET THE FUNCTION ARN
+echo "🔍 Getting function arn..."
+FUNCTION_ARN="arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$FUNCTION_NAME"
 
 if [ -z "$FUNCTION_ARN" ] || [ "$FUNCTION_ARN" = "None" ]; then
-    echo "❌ No published version found. Please run ./deploy.sh first."
+    echo "❌ Lambda function was not found. Please run ./deploy-sam.sh first."
     exit 1
 fi
 
@@ -66,50 +62,43 @@ PAYLOAD=$(cat <<EOF
 EOF
 )
 
+
 echo "🚀 Invoking durable function..."
 echo ""
 
 # INVOKE THE FUNCTION
-# Note: AWS CLI v2 automatically handles payload encoding, no need to base64 encode
 INVOKE_OUTPUT=$(aws lambda invoke \
-    --function-name "$FUNCTION_ARN" \
+    --function-name "$FUNCTION_ARN:\$LATEST" \
     --payload "$PAYLOAD" \
     --region $REGION \
-    /dev/stdout 2>&1)
+    response.json 2>&1)
 
 echo ""
 echo "✅ Function invoked successfully!"
 echo ""
 
-# EXTRACT DURABLE EXECUTION ARN FROM OUTPUT (it's in the response headers)
-DURABLE_EXECUTION_ARN=$(echo "$INVOKE_OUTPUT" | grep -o 'arn:aws:lambda:[^:]*:[^:]*:function:[^/]*/durable-execution/[^/]*/[a-zA-Z0-9-]*' | head -1)
+# EXTRACT DURABLE EXECUTION ARN FROM OUTPUT
+DURABLE_EXECUTION_ARN=$(echo "$INVOKE_OUTPUT" | jq -r '.DurableExecutionArn // empty' 2>/dev/null)
 
-# DISPLAY RESPONSE PAYLOAD (filter out the ARN line)
-echo "📊 Response Payload:"
-echo "$INVOKE_OUTPUT" | grep -v "arn:aws:lambda" | jq '.' 2>/dev/null || echo "$INVOKE_OUTPUT" | grep -v "arn:aws:lambda"
+# DISPLAY RESPONSE PAYLOAD
+echo "📊 Response:"
+echo "$INVOKE_OUTPUT"
 echo ""
+
+if [ -f "response.json" ]; then
+    echo "📄 Response file content:"
+    cat response.json
+    echo ""
+    rm -f response.json
+fi
 
 if [ ! -z "$DURABLE_EXECUTION_ARN" ]; then
     echo "🔗 Durable Execution ARN:"
     echo "   $DURABLE_EXECUTION_ARN"
     echo ""
-    echo "📝 Useful Commands:"
-    echo ""
-    echo "   # Get execution details:"
-    echo "   aws durable-lambda get-durable-execution \\"
-    echo "     --durable-execution-arn '$DURABLE_EXECUTION_ARN' \\"
-    echo "     --region $REGION"
-    echo ""
-    echo "   # Get execution history:"
-    echo "   aws durable-lambda get-durable-execution-history \\"
-    echo "     --durable-execution-arn '$DURABLE_EXECUTION_ARN' \\"
-    echo "     --region $REGION \\"
-    echo "     --include-execution-data"
-    echo ""
-    echo "   # List all executions:"
-    echo "   aws durable-lambda list-durable-executions-by-function \\"
-    echo "     --function-name $FUNCTION_NAME \\"
-    echo "     --region $REGION"
+    echo "📝 Durable Execution ARN (for monitoring):"
+    echo "   This execution can be monitored through CloudWatch logs"
+    echo "   Note: Use custom durable-lambda CLI if available for detailed execution info"
     echo ""
 fi
 

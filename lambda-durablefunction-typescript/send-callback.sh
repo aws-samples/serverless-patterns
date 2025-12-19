@@ -65,11 +65,10 @@ EOF
 )
     
     # SEND FAILURE CALLBACK
-    aws durable-lambda send-durable-execution-callback-failure \
+    aws lambda send-durable-execution-callback-failure \
       --callback-id "$CALLBACK_ID" \
       --error "$ERROR_OBJECT" \
-      --region $REGION \
-      --cli-binary-format raw-in-base64-out
+      --region $REGION 
     
     echo "✅ Failure callback sent!"
     echo "📋 Error Type: $ERROR_TYPE"

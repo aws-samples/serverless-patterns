@@ -1,13 +1,13 @@
 {
-  "title": "Lambda Durable Functions Example",
-  "description": "Create a durable lambda function using Typescript.",
+  "title": "Lambda Durable Functions with Amazon Bedrock AgentCore",
+  "description": "Create a durable lambda function using Typescript that interacts with Amazon Bedrock AgentCore.",
   "language": "Typescript",
   "level": "300",
   "framework": "Bash",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to create a durable lambda using Typescript.  The Lambda and all resources are deployed using the AWS CLI with bash."
+      "This sample project demonstrates how to create a durable lambda using Typescript that can interact with agents hosted in Amazon Bedrock AgentCore.  View the README.md for details on how to deploy and use."
     ]
   },
   "gitHub": {
