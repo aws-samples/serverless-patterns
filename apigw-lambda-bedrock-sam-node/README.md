@@ -13,12 +13,6 @@ This sample project demonstrates how to deploy Amazon API Gateway REST API with 
 - [Maven 3.8.6 or above](https://maven.apache.org/download.cgi) installed
 
 
-## Prerequisites
-
-- AWS CLI installed and configured
-- AWS SAM CLI installed
-- Node.js 24.x or later
-- Access to Amazon Bedrock models
 
 ## Deployment Instructions
 
