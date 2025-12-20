@@ -10,7 +10,6 @@ This sample project demonstrates how to deploy Amazon API Gateway REST API with 
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 - [Node 24 or above](https://nodejs.org/en/download) installed
-- [Maven 3.8.6 or above](https://maven.apache.org/download.cgi) installed
 
 
 
@@ -58,12 +57,11 @@ The SAM template deploys two APIs following the same architecture - one with res
 
 1. **Amazon API Gateway**: Receives the HTTP POST request containing the user prompt.
 
-2. **AWS Lambda**: The API Gateway triggers the Lambda functions which use either `InvokeModelWithResponseStreamCommand` or `InvokeModelCommand` to call Bedrock for streaming and non-streaming use cases.
+2. **AWS Lambda**: The API Gateway invokes the Lambda functions which use either `InvokeModelWithResponseStreamCommand` or `InvokeModelCommand` to call Bedrock for streaming and non-streaming use cases.
 
 3. **Amazon Bedrock**: Based on the given prompt, generates the content and streams/ returns the response to the respective Lambda functions.
 
 4. **Response**: The API Gateway either streams the responses back to the client (Fig. 1) or returns the whole response together.
-
 
 ## Testing
 
