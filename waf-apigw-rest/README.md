@@ -42,7 +42,7 @@ The application will only accept requests from countries that are in the country
 
 ## Testing
 
-Deploy the app then go the the provided web address. If you are in the US you will get a 200 response from the backend Lambda funtion. If you are in any other country, you will get a 403 response from the WAF. Change the country codes in the array and redploy to see different results.
+Deploy the app then go the the provided web address. If you are in the US you will get a 200 response from the backend Lambda function. If you are in any other country, you will get a 403 response from the WAF. Change the country codes in the array and redeploy to see different results.
 
 ## Cleanup
  
