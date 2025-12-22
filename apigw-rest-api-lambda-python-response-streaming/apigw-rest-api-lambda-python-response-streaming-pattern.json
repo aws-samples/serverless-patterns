@@ -1,69 +1,99 @@
 {
-  "title": "Response streaming with Amazon API Gateway Rest API and AWS Lambda",
-  "description": "Creates an API Gateway REST API and Python Lambda function that provides a streaming response from the LLMs in Amazon Bedrock.",
-  "language": "Python",
-  "level": "200",
-  "framework": "AWS SAM",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "This pattern demonstrates how to use an Amazon API Gateway REST API with response streaming to a AWS Lambda Python function.",
-      "To enable response streaming with a Lambda Python function, we use Lambda Web Adapter and Fast API."
-    ]
-  },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-restapi-lambda-python-response-streaming",
-      "templateURL": "serverless-patterns/apigw-restapi-lambda-python-response-streaming",
-      "projectFolder": "apigw-restapi-lambda-python-response-streaming",
-      "templateFile": "template.yaml"
+    "title": "Response streaming with Amazon API Gateway Rest API and AWS Lambda",
+    "description": "Creates an API Gateway REST API and Python Lambda function that provides a streaming response from the LLMs in Amazon Bedrock.",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to use an Amazon API Gateway REST API with response streaming to a AWS Lambda Python function.",
+            "To enable response streaming with a Lambda Python function, we use Lambda Web Adapter and Fast API."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-restapi-lambda-python-response-streaming",
+            "templateURL": "serverless-patterns/apigw-rest-api-lambda-python-response-streaming",
+            "projectFolder": "apigw-rest-api-lambda-python-response-streaming",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Responsive APIs with Amazon API Gateway REST API",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/response-transfer-mode.html"
+            },
+            {
+                "text": "AWS Lambda response streaming with Python and Lambda Web Adapter",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
+            },
+            {
+                "text": "Building responsive APIs with Amazon API Gateway response streaming",
+                "link": "https://aws.amazon.com/blogs/compute/building-responsive-apis-with-amazon-api-gateway-response-streaming/"
+            },
+            {
+                "text": "Using response streaming with AWS Lambda Web Adapter to optimize performance",
+                "link": "https://aws.amazon.com/blogs/compute/using-response-streaming-with-aws-lambda-web-adapter-to-optimize-performance/"
+            },
+            {
+                "text": "FastAPI Response Streaming",
+                "link": "https://github.com/awslabs/aws-lambda-web-adapter/tree/main/examples/fastapi-response-streaming-zip"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Yusuf Mayet",
+            "image": "https://d2908q01vomqb2.cloudfront.net/9e6a55b6b4563e652a23be9d623ca5055c356940/2021/11/24/Yusuf-mayet-aws.jpg",
+            "bio": "I am a Solutions Architect at AWS, where I help customers realise that true transformation lies at the intersection of Cloud, DevOps cultural practices, Agile principles, modular and scalable architectures, and efficient team structures.",
+            "linkedin": "yusufmayet"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        }
     }
-  },
-  "resources": {
-    "bullets": [
-      {
-        "text": "Responsive APIs with Amazon API Gateway REST API",
-        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/response-transfer-mode.html"
-      },
-      {
-        "text": "AWS Lambda response streaming with Python and Lambda Web Adapter",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
-      },
-      {
-        "text": "Building responsive APIs with Amazon API Gateway response streaming",
-        "link": "https://aws.amazon.com/blogs/compute/building-responsive-apis-with-amazon-api-gateway-response-streaming/"
-      },
-      {
-        "text": "Using response streaming with AWS Lambda Web Adapter to optimize performance",
-        "link": "https://aws.amazon.com/blogs/compute/using-response-streaming-with-aws-lambda-web-adapter-to-optimize-performance/"
-      },
-      {
-        "text": "FastAPI Response Streaming",
-        "link": "https://github.com/awslabs/aws-lambda-web-adapter/tree/main/examples/fastapi-response-streaming-zip"
-      }
-    ]
-  },
-  "deploy": {
-    "text": [
-      "sam deploy"
-    ]
-  },
-  "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
-  },
-  "cleanup": {
-    "text": [
-      "Delete the stack: <code>sam delete</code>."
-    ]
-  },
-  "authors": [
-    {
-      "name": "Yusuf Mayet",
-      "image": "https://d2908q01vomqb2.cloudfront.net/9e6a55b6b4563e652a23be9d623ca5055c356940/2021/11/24/Yusuf-mayet-aws.jpg",
-      "bio": "I am a Solutions Architect at AWS, where I help customers realise that true transformation lies at the intersection of Cloud, DevOps cultural practices, Agile principles, modular and scalable architectures, and efficient team structures.",
-      "linkedin": "yusufmayet"
-    }
-  ]
 }
