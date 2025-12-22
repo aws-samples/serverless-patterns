@@ -47,7 +47,7 @@ Resources:
       DeletionProtectionEnabled: false
       Tags:
         - Key: project
-          Value: "apigw-lambda-dsql"
+          Value: "apigw-lambda-dsql"  
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

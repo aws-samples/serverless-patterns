@@ -2,7 +2,7 @@
 
  Amazon Aurora DSQL is the fastest serverless, distributed SQL database with active-active high availability and multi-Region strong consistency. Aurora DSQL enables you to build always available applications with virtually unlimited scalability, the highest availability, and zero infrastructure management. It is designed to make scaling and resilience effortless for your applications and offers the fastest distributed SQL reads and writes.
 
-This pattern deploys a API Gateway REST API, Lambda function and an Aurora DSQL PostgreSQL cluster.
+This pattern deploys a API Gateway REST API, Lambda function and an Aurora DSQL PostgreSQL cluster. The Lambda function uses Aurora DSQL Connectors for Python that simplify IAM authorization for customers using standard PostgreSQL drivers to connect to Aurora DSQL clusters. 
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-lambda-dsql)
 
