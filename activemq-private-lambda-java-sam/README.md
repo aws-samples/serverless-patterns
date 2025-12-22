@@ -1,6 +1,6 @@
 # Java AWS Lambda ActiveMQ (in private subnets) consumer, using AWS SAM
 
-This pattern is an example of a Lambda function written in Java that consumes messages from Amazon MQ (Apache ActiveMQ). The pattern demonstrates how a SAM project can be configured to deploy an AWS Lambda function written in Java with an Amazon MQ (Apache ActiveMQ) event trigger. The pattern demonstrates how Amazon MQ (Apache ActiveMQ) messages can be parsed in an AWS Lambda function and the parsed content output to an Amazon DynamoDB table. The pattern provides an AWS CloudFormation template to install and set-up an Amazon MQ (Apache ActiveMQ) cluster inside private subnets in an Amazon VPC. The CloudFormation template also installs an Amazon EC2 instance with tools necessary to configure the Amazon MQ (Apache ActiveMQ) cluster to generate Amazon MQ (Apache ActiveMQ) messages and configuration needed by a Java producer that can generate the Amazon MQ (Apache ActiveMQ) messages.
+This pattern is an example of a Lambda function written in Java that consumes messages from Amazon MQ (Apache ActiveMQ), located in an private subnet. The function parses the ActiveMQ messages and stores the results in an Amazon DynamoDB table. The pattern provides an AWS CloudFormation template to install and set-up an Amazon MQ (Apache ActiveMQ) cluster inside private subnets in an Amazon VPC. The CloudFormation template also launches an Amazon EC2 instance with tools necessary to configure the Amazon MQ (Apache ActiveMQ) cluster and generate Amazon MQ (Apache ActiveMQ) messages.
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
@@ -20,20 +20,20 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Run the AWS CloudFormation template using the file ActiveMQAndClientEC2.yaml] - You can go to the AWS CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the AWS CloudFormation stack to be created. This AWS CloudFormation template will create an Amazon MQ (Apache ActiveMQ) cluster. It will also create an EC2 instance that you can use as a client.
 
-* [Connect to the EC2 instance] - Once the AWS CloudFormation stack is created, you can go to the EC2 console and log into the machine using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab. In case you are using SSM Instance connect, you are not initially placed in the home directory. If you connect as ssm-user, you need to sudo su to ec2-user for this to work.
+* [Connect to the EC2 instance] - Once the AWS CloudFormation stack is created, you can go to the EC2 console and log into the instance using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab. In case you are using SSM Instance connect, you are not initially placed in the home directory. If you connect as ssm-user, you need to sudo su to ec2-user for this to work.
 Note: You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running post creation.
 
 ## Pre-requisites to Deploy the sample Lambda function
 
-The EC2 instance that was created by running the AWS CloudFormation template has all the software that will be needed to deploy the Lambda function.
+The EC2 instance created by the AWS CloudFormation template has all the software required to deploy the Lambda function.
 
 The AWS SAM CLI is a serverless tool for building and testing Lambda applications.
 
-* Java - On the EC2 instance, we have installed the version of Java that you selected. We have installed Amazon Corrretto JDK of the version that you had selected at the time of specifying the input parameters in the Cloudformation template. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
-* Maven - On the EC2 instance, we have installed Maven (https://maven.apache.org/install.html)
-* AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+* Java - On the EC2 instance, we installed the version of Java and Amazon Corretto JDK you selected at deployment. At the time of publishing this pattern, only Java versions 11, 17 and 21 are supported by AWS SAM
+* Maven - On the EC2 instance, we installed Maven (https://maven.apache.org/install.html)
+* AWS SAM CLI - We installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
-We have also cloned the Github repository for serverless-patterns on the EC2 instance already by running the below command
+We cloned the serverless-patterns Github repository on the EC2 instance already by running the below command
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns.git
     ```
@@ -140,11 +140,11 @@ Sent out one message - Number 10 at time = 1760937987919
 
 Once the messages have been sent, check Amazon CloudWatch logs and you should see messages for the Amazon CloudWatch Log Group with the name of the deployed Lambda function.
 
-When you run the above script, it sends messages with JSON records to the Amazon MQ (Apache ActiveMQ) cluster on the queue on which the lambda function is listening on. The lambda function listens on the published Amazon MQ (Apache ActiveMQ) messages on the queue.
+When you run the above script, it sends messages with JSON records to the Amazon MQ (Apache ActiveMQ) cluster on the queue on which the lambda function is listening on. The Lambda function listens on the published Amazon MQ (Apache ActiveMQ) messages on the queue.
 
-The lambda code parses the Amazon MQ (Apache ActiveMQ) messages and outputs the fields in the messages to Amazon CloudWatch logs
+The Lambda function code parses the Amazon MQ (Apache ActiveMQ) messages and outputs the fields in the messages to Amazon CloudWatch logs
 
-The lambda function also inputs each record into an Amazon DynamoDB table called ActiveMQDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file)
+The Lambda function also inputs each record into an Amazon DynamoDB table called ActiveMQDynamoDBTableJava (if you did not modify the default name in the sam template.yaml file)
 
 You can go to the Amazon DynamoDB console and view the records.
 

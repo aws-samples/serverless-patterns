@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class HandlerSQSTest {
 	private static final String mqEventJson = "{\n"
 			+ "    \"eventSource\": \"aws:mq\",\n"
-			+ "    \"eventSourceArn\": \"arn:aws:mq:us-west-2:664251831272:broker:ib-activemq-broker:b-aeb08c0d-6e46-412a-ad45-1507816242b0\",\n"
+			+ "    \"eventSourceArn\": \"arn:aws:mq:us-west-2:123456789012:broker:ib-activemq-broker:b-aeb08c0d-6e46-412a-ad45-1507816242b0\",\n"
 			+ "    \"messages\": [\n"
 			+ "        {\n"
 			+ "            \"messageID\": \"ID:ip-10-192-10-195.us-west-2.compute.internal-33249-1687328148123-1:1:1:1:1\",\n"

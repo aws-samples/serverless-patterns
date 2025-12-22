@@ -27,7 +27,7 @@ class DynamoDBUpdaterTest {
 	
 	private static final String mqEventJson = "{\n"
 			+ "    \"eventSource\": \"aws:rmq\",\n"
-			+ "    \"eventSourceArn\": \"arn:aws:mq:us-west-2:664251831272:broker:ib-rabbitmq-broker:b-22450561-3f76-4004-813d-392346f054fe\",\n"
+			+ "    \"eventSourceArn\": \"arn:aws:mq:us-west-2:123456789012:broker:ib-rabbitmq-broker:b-22450561-3f76-4004-813d-392346f054fe\",\n"
 			+ "    \"rmqMessagesByQueue\": {\n"
 			+ "        \"LambdaRabbitMQQueue::/\": [\n"
 			+ "            {\n"
