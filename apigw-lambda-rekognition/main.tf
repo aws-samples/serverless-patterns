@@ -145,8 +145,14 @@ resource "aws_lambda_permission" "allow_api_gateway" {
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on  = [aws_api_gateway_integration.integration]
   rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = "dev"
 }
+
+resource "aws_api_gateway_stage" "stage" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  stage_name    = "dev"
+}
+
 output "api_id" {
   description = "The ID of the API Gateway REST API"
   value       = aws_api_gateway_rest_api.api.id
