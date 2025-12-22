@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Order Processing Workflow using AWS Lambda Durable Functions (uksb-1tthgi812) (tag:lambda-durable-order-processing-sam)
+
+Globals:
+  Function:
+    Timeout: 900
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        ORDERS_TABLE: !Ref OrdersTable
+
+Resources:
+  # DynamoDB Table for Orders
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-orders'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # Order Processing Durable Function
+  OrderProcessingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Timeout: 120
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 86400  # 24 hours
+        RetentionPeriodInDays: 7
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:CheckpointDurableExecution
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-OrderProcessingFunction-*'
+
+  # Order Status Function (Non-Durable)
+  OrderStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: status.handler
+      Timeout: 30
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+
+  # API Gateway
+  OrderApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /orders:
+            post:
+              responses:
+                '202':
+                  description: Order accepted
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OrderProcessingFunction.Arn}:live/invocations'
+                requestParameters:
+                  integration.request.header.X-Amz-Invocation-Type: "'Event'"
+                requestTemplates:
+                  application/json: |
+                    #set($orderId = "order-$context.requestTimeEpoch")
+                    {
+                      "orderId": "$orderId",
+                      "body": $input.json('$')
+                    }
+                responses:
+                  default:
+                    statusCode: '202'
+                    responseTemplates:
+                      application/json: |
+                        #set($orderId = "order-$context.requestTimeEpoch")
+                        {
+                          "message": "Order processing initiated",
+                          "orderId": "$orderId"
+                        }
+                passthroughBehavior: never
+          /orders/{orderId}:
+            get:
+              parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                '200':
+                  description: Order status
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OrderStatusFunction.Arn}/invocations'
+                passthroughBehavior: when_no_match
+
+  # Lambda Permissions for API Gateway
+  OrderProcessingFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OrderProcessingFunction.Alias
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OrderApi}/*/POST/orders'
+
+  OrderStatusFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OrderStatusFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OrderApi}/*/GET/orders/*'
+
+Outputs:
+  OrderApiEndpoint:
+    Description: API Gateway endpoint URL for order processing
+    Value: !Sub 'https://${OrderApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
+  OrderProcessingFunctionArn:
+    Description: Order Processing Durable Function ARN
+    Value: !GetAtt OrderProcessingFunction.Arn
+  
+  OrdersTableName:
+    Description: DynamoDB table name for orders
+    Value: !Ref OrdersTable

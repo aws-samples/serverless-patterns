@@ -1,0 +1,16 @@
+# SAM Build Artifacts
+.aws-sam/
+samconfig.toml
+*.zip
+
+# Node
+node_modules/
+*.log
+
+# Temporary Files
+checkpoint-policy.json
+DEPLOYMENT.md
+
+# OS
+.DS_Store
+Thumbs.db
