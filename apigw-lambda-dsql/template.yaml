@@ -27,7 +27,7 @@ Resources:
         - Statement:
             - Effect: Allow
               Action:
-                - dsql:DbConnectAdmin
+                - dsql:DbConnectAdmin #IAM action dsql:DbConnectAdmin required to connect to the cluster.
               Resource:
                 - !Sub arn:${AWS::Partition}:dsql:${AWS::Region}:${AWS::AccountId}:cluster/${DSQL}
       Environment: # Function environment variables
@@ -42,7 +42,7 @@ Resources:
             Method: get
 
   DSQL:
-    Type: AWS::DSQL::Cluster
+    Type: AWS::DSQL::Cluster #Creates a single-Region DSQL cluster
     Properties:
       DeletionProtectionEnabled: false
       Tags:
