@@ -104,6 +104,8 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
     lambda_function_arn = aws_lambda_function.process_s3_event.arn
     events              = ["s3:ObjectCreated:*"]
   }
+
+  depends_on = [aws_lambda_permission.allow_s3]
 }
 resource "aws_lambda_permission" "allow_s3" {
   statement_id  = "${lower(var.prefix)}-allow-s3-invoke-lambda"
