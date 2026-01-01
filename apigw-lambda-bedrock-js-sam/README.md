@@ -124,9 +124,8 @@ curl -d '{"prompt": "Please write 5 lines on Solar Systems"}' -H 'Content-Type: 
 The API returns a response with generated content. Such as (Your output may vary): 
 
 ```
-"{\"completion\":\" Here are a few key things about Amazon Web Services (AWS):\\n\\n- AWS is a cloud computing platform that provides services like compute power, storage, databases, analytics, etc on demand over the internet. It operates data centers around the world that customers can access.\\n\\n- Some of the most popular AWS services are EC2 (virtual servers), S3 (cloud storage), Lambda (serverless computing), CloudFront (content delivery network), Route 53 (DNS service), and many more. \\n\\n- AWS was first launched in 2006 and has grown to be the largest cloud provider in the world. Many big companies like Netflix, Airbnb, Expedia rely on AWS for their infrastructure.\\n\\n- Customers pay only for the services they use without any upfront costs. This makes AWS attractive for startups and companies that want flexibility and don't want to manage their own hardware.\\n\\n- AWS offers high availability, scalability, security and reliability at a fraction of the\",\"stop_reason\":\"max_tokens\",\"stop\":null}"
+{"model":"claude-sonnet-4-5-20250929","id":"msg_bdrk_01S1Rn7gPy3cdRt9aFWf255a","type":"message","role":"assistant","content":[{"type":"text","text":"# Five Facts About Solar Systems\n\n1. **Our Solar System** formed approximately 4.6 billion years ago from a giant rotating cloud of gas and dust called the solar nebula.\n\n2. **The Sun** contains 99.8% of the Solar System's total mass and provides the gravitational force that keeps all planets in orbit.\n\n3. **Eight planets** orbit our Sun in elliptical paths, divided into rocky terrestrial planets (Mercury, Venus, Earth, Mars) and gas/ice giants (Jupiter, Saturn, Uranus, Neptune).\n\n4. **Beyond Neptune** lies the Kuiper Belt, home to dwarf planets like Pluto and countless icy bodies left over from the Solar System's formation.\n\n5. **Scientists estimate** there are billions of other solar systems in our Milky Way galaxy alone, many potentially harboring planets in habitable zones."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":16,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":192}}
 ```
-
 
 ## Cleanup
 
@@ -135,7 +134,7 @@ The API returns a response with generated content. Such as (Your output may vary
 ```bash
 sam delete
 ```
-2. Delete the Lambda layer version using the `delete_lambda_layer.sh` script. You may have to give execution permission to the file. You will need to pass the Lambda layer name and the version in the inpout when requested:
+2. Delete the Lambda layer version using the `delete_lambda_layer.sh` script. You may have to give execution permission to the file. You will need to pass the Lambda layer name and the version in the input when requested:
 ```bash
 ./delete_lambda_layer.sh
 ```
