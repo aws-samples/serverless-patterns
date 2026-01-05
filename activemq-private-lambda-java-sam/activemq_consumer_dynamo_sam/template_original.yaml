@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   activemq_event_consumer_function
 
-  Sample SAM Template for activemq-consumer-with-sam
+  Sample SAM Template for activemq-consumer-with-sam (uksb-1tthgi812) (tag:activemq-private-lambda-java-sam)
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
