@@ -4,7 +4,7 @@ This Terraform template deploys a complete serverless integration pattern connec
 
 ### Prerequisites:
 * An existing VPC with private subnets
-* Private subnets must have internet access (via NAT Gateway or Internet Gateway) to pull container images from Docker Hub
+* Private subnets must have internet access (via NAT Gateway) to pull container images from Docker Hub
 
 ### Deployed resources:
 * Security Groups for ALB and ECS tasks
@@ -61,18 +61,25 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern allows integration of public REST API Gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it. It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link V2.
+This pattern demonstrates secure integration between a public REST API Gateway endpoint and a private Application Load Balancer with an ECS Fargate cluster. Traffic flows through VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet.
 
-The integration uses the `--integration-target` parameter with AWS CLI to properly configure the REST API Gateway with VPC Link V2, as this feature is not yet fully supported in the Terraform AWS provider.
+The integration uses the `--integration-target` parameter with AWS CLI (via Terraform null_resource) to properly configure the REST API Gateway with VPC Link V2, as this feature requires explicit ALB ARN specification. The ALB distributes traffic to ECS Fargate tasks running in private subnets.
 
 ## Testing
 
-The stack creates and outputs the REST API endpoint. Open a browser and try out the generated API endpoint. You should see the Nginx home page.
-Or, run the below command with the appropriate API endpoint. You should get a 200 response code.
+The stack outputs the REST API endpoint. Test it by accessing any path through the API:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo
+curl https://<API-ENDPOINT>/index.html
 ```
+
+You should see the nginx welcome page HTML. To check just the status code:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" https://<API-ENDPOINT>/index.html ; echo
+```
+
+Expected response: **200**
 
 ## Cleanup
  
@@ -91,6 +98,6 @@ curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo
     terraform show
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
