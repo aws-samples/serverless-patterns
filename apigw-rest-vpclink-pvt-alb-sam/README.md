@@ -1,17 +1,17 @@
 # REST API Gateway to Private HTTP Endpoint via VPC Link V2
 
-This AWS SAM template deploys the following resources. It requires a VPC id and private subnet ids as inputs. It is assumed that the VPC and subnets already exist and are configured with the required network routes (internet gateway for private subnets to pull container images).
+This AWS SAM template deploys a REST API Gateway with VPC Link V2 integration to a private Application Load Balancer and ECS Fargate cluster. The API definition is provided via an external OpenAPI specification file (api.yaml).
 
 ### Prerequisites:
 * An existing VPC with private subnets
-* Private subnets must have internet access (via NAT Gateway or Internet Gateway) to pull container images from Docker Hub
+* Private subnets must have internet access (via NAT Gateway) to pull container images from Docker Hub
 
 ### Deployed resources:
 * Security Groups for ALB and ECS tasks
 * ECS Fargate cluster with service and task definitions
 * Private Application Load Balancer with listener and target group
 * VPC Link V2 connecting API Gateway to the private ALB
-* REST API Gateway with proxy integration to the ALB
+* REST API Gateway (AWS::Serverless::Api) with proxy integration to the ALB
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-vpclink-pvt-alb-sam/
 
@@ -53,18 +53,25 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern allows integration of public REST API Gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it. It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link V2.
+This pattern demonstrates secure integration between a public REST API Gateway endpoint and a private Application Load Balancer with an ECS Fargate cluster. The pattern uses AWS::Serverless::Api resource with an external OpenAPI definition (api.yaml) that leverages AWS::Include transform to support CloudFormation intrinsic functions.
 
-The integration uses CloudFormation's native support for VPC Link V2 with REST API Gateway.
+Traffic flows through VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet. The ALB distributes traffic to ECS Fargate tasks running in private subnets.
 
 ## Testing
 
-The stack creates and outputs the REST API endpoint. Open a browser and try out the generated API endpoint. You should see the Nginx home page.
-Or, run the below command with the appropriate API endpoint. You should get a 200 response code.
+The stack outputs the REST API endpoint. Test it by accessing any path through the API:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo
+curl https://<API-ENDPOINT>/index.html
 ```
+
+You should see the nginx welcome page HTML. To check just the status code:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" https://<API-ENDPOINT>/index.html ; echo
+```
+
+Expected response: **200**
 
 ## Cleanup
  
@@ -77,6 +84,6 @@ curl -s -o /dev/null -w "%{http_code}" <API endpoint> ; echo
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

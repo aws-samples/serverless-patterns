@@ -200,63 +200,29 @@ Resources:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
 
-  # REST API Gateway
+  # REST API Gateway using SAM
   RestApi:
-    Type: AWS::ApiGateway::RestApi
+    Type: AWS::Serverless::Api
     Properties:
       Name: rest-api-vpclink-demo
+      StageName: prod
       Description: REST API with VPC Link V2 to private ALB
       EndpointConfiguration:
-        Types:
-          - REGIONAL
-
-  # API Gateway Resource (proxy)
-  ProxyResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref RestApi
-      ParentId: !GetAtt RestApi.RootResourceId
-      PathPart: '{proxy+}'
-
-  # API Gateway Method (ANY)
-  ProxyMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref RestApi
-      ResourceId: !Ref ProxyResource
-      HttpMethod: ANY
-      AuthorizationType: NONE
-      RequestParameters:
-        method.request.path.proxy: true
-      Integration:
-        Type: HTTP_PROXY
-        IntegrationHttpMethod: ANY
-        Uri: !Sub 'http://${PrivateALB.DNSName}/{proxy}'
-        ConnectionType: VPC_LINK
-        ConnectionId: !Ref VpcLink
-        RequestParameters:
-          integration.request.path.proxy: method.request.path.proxy
-
-  # API Gateway Deployment
-  ApiDeployment:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-      - ProxyMethod
-    Properties:
-      RestApiId: !Ref RestApi
-
-  # API Gateway Stage
-  ApiStage:
-    Type: AWS::ApiGateway::Stage
-    Properties:
-      RestApiId: !Ref RestApi
-      DeploymentId: !Ref ApiDeployment
-      StageName: prod
+        Type: REGIONAL
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ./api.yaml
 
 Outputs:
   RestApiEndpoint:
     Description: REST API Gateway Endpoint URL
     Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
+  RestApiId:
+    Description: REST API Gateway ID
+    Value: !Ref RestApi
   
   VpcLinkId:
     Description: VPC Link V2 ID
