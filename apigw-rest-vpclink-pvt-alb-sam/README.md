@@ -1,6 +1,8 @@
-# REST API Gateway to Private HTTP Endpoint via VPC Link V2
+# REST Amazon API Gateway to Private HTTP Endpoint via Amazon VPC Link V2
 
-This AWS SAM template deploys a REST API Gateway with VPC Link V2 integration to a private Application Load Balancer and ECS Fargate cluster. The API definition is provided via an external OpenAPI specification file (api.yaml).
+This pattern demonstrates direct integration between REST API Gateway and a private Application Load Balancer using VPC Link V2. Previously, connecting REST API Gateway to a private ALB required VPC Link V1 with an intermediary Network Load Balancer, adding complexity and cost. VPC Link V2 eliminates this requirement, enabling direct ALB integration for simplified architecture and reduced operational overhead.
+
+This AWS SAM template deploys a REST API Gateway with Amazon VPC Link V2 integration to a private Amazon Application Load Balancer and Amazon ECS Fargate cluster. The API definition is provided via an external OpenAPI specification file (api.yaml).
 
 ### Prerequisites:
 * An existing VPC with private subnets
@@ -10,7 +12,7 @@ This AWS SAM template deploys a REST API Gateway with VPC Link V2 integration to
 * Security Groups for ALB and ECS tasks
 * ECS Fargate cluster with service and task definitions
 * Private Application Load Balancer with listener and target group
-* VPC Link V2 connecting API Gateway to the private ALB
+* Amazon VPC Link V2 connecting API Gateway to the private ALB
 * REST API Gateway (AWS::Serverless::Api) with proxy integration to the ALB
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-vpclink-pvt-alb-sam/
@@ -36,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern. You will be prompted for the VPC ID and private subnet IDs:
     ```
-    sam deploy --guided
+    sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
     ```
 4. During the prompts:
     * Enter a stack name
@@ -55,7 +57,7 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern demonstrates secure integration between a public REST API Gateway endpoint and a private Application Load Balancer with an ECS Fargate cluster. The pattern uses AWS::Serverless::Api resource with an external OpenAPI definition (api.yaml) that leverages AWS::Include transform to support CloudFormation intrinsic functions.
 
-Traffic flows through VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet. The ALB distributes traffic to ECS Fargate tasks running in private subnets.
+Traffic flows through Amazon VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet. The ALB distributes traffic to ECS Fargate tasks running in private subnets.
 
 ## Testing
 
@@ -84,6 +86,6 @@ Expected response: **200**
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

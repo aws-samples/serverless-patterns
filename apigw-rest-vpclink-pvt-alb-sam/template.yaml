@@ -219,23 +219,3 @@ Outputs:
   RestApiEndpoint:
     Description: REST API Gateway Endpoint URL
     Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
-  
-  RestApiId:
-    Description: REST API Gateway ID
-    Value: !Ref RestApi
-  
-  VpcLinkId:
-    Description: VPC Link V2 ID
-    Value: !Ref VpcLink
-  
-  ALBDnsName:
-    Description: Private ALB DNS name
-    Value: !GetAtt PrivateALB.DNSName
-  
-  ECSClusterName:
-    Description: ECS cluster name
-    Value: !Ref ECSCluster
-  
-  ECSServiceName:
-    Description: ECS service name
-    Value: !GetAtt ECSService.Name
