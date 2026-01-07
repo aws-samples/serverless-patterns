@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Event-driven data pipeline with Lambda Durable Functions, SQS Event Source Mapping, and invoke chaining'
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 512
+    Runtime: python3.14
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name
+
+Resources:
+  # SQS Queue for incoming data processing requests
+  DataProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${Environment}-data-processing-queue'
+      VisibilityTimeout: 960
+      MessageRetentionPeriod: 1209600
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DataProcessingDLQ.Arn
+        maxReceiveCount: 3
+
+  # Dead Letter Queue
+  DataProcessingDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${Environment}-data-processing-dlq'
+
+  # DynamoDB table for storing processed data
+  ProcessedDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${Environment}-processed-data'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: execution_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: execution_id
+          KeyType: HASH
+
+  # Main Durable Function (orchestrates the pipeline with direct ESM)
+  DurableFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: python3.14
+    Properties:
+      FunctionName: !Sub '${Environment}-durable-data-pipeline'
+      Runtime: python3.14
+      Handler: handler.lambda_handler
+      CodeUri: src/durable_pipeline/
+      Timeout: 900
+      DurableConfig:
+        ExecutionTimeout: 10
+        RetentionPeriodInDays: 1
+      Policies:
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecutions
+                - lambda:GetDurableExecutionState
+              Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Environment}-durable-data-pipeline'
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: 
+                - !GetAtt ValidationFunction.Arn
+                - !GetAtt TransformationFunction.Arn
+                - !GetAtt StorageFunction.Arn
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:Query
+                - dynamodb:Scan
+              Resource: !GetAtt ProcessedDataTable.Arn
+      AutoPublishAlias: prod
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt DataProcessingQueue.Arn
+            BatchSize: 5
+            MaximumBatchingWindowInSeconds: 10
+      Environment:
+        Variables:
+          VALIDATION_FUNCTION_ARN: !GetAtt ValidationFunction.Arn
+          TRANSFORMATION_FUNCTION_ARN: !GetAtt TransformationFunction.Arn
+          STORAGE_FUNCTION_ARN: !GetAtt StorageFunction.Arn
+          PROCESSED_DATA_TABLE: !Ref ProcessedDataTable
+          ENVIRONMENT: !Ref Environment
+
+  # Data Validation Function
+  ValidationFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: python3.14
+    Properties:
+      FunctionName: !Sub '${Environment}-data-validator'
+      CodeUri: src/validation/
+      Handler: handler.lambda_handler
+
+  # Data Transformation Function
+  TransformationFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: python3.14
+    Properties:
+      FunctionName: !Sub '${Environment}-data-transformer'
+      CodeUri: src/transformation/
+      Handler: handler.lambda_handler
+
+  # Data Storage Function
+  StorageFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: python3.14
+    Properties:
+      FunctionName: !Sub '${Environment}-data-storage'
+      CodeUri: src/storage/
+      Handler: handler.lambda_handler
+      Environment:
+        Variables:
+          PROCESSED_DATA_TABLE: !Ref ProcessedDataTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProcessedDataTable
+
+Outputs:
+  DataProcessingQueueUrl:
+    Description: 'SQS Queue URL for data processing requests'
+    Value: !Ref DataProcessingQueue
+
+  ProcessedDataTable:
+    Description: 'DynamoDB Table for processed data'
+    Value: !Ref ProcessedDataTable
+
+  DurableFunctionArn:
+    Description: 'Durable Function ARN'
+    Value: !GetAtt DurableFunction.Arn
