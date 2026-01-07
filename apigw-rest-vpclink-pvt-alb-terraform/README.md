@@ -1,6 +1,8 @@
-# REST API Gateway to Private HTTP Endpoint via VPC Link V2
+# REST Amazon API Gateway to Private HTTP Endpoint via Amazon VPC Link V2
 
-This Terraform template deploys a complete serverless integration pattern connecting a public REST API Gateway to a private ECS Fargate cluster via VPC Link V2.
+This pattern demonstrates direct integration between REST API Gateway and a private Application Load Balancer using VPC Link V2. Previously, connecting REST API Gateway to a private ALB required VPC Link V1 with an intermediary Network Load Balancer, adding complexity and cost. VPC Link V2 eliminates this requirement, enabling direct ALB integration for simplified architecture and reduced operational overhead.
+
+This Terraform template deploys a REST API Gateway with Amazon VPC Link V2 integration to a private Amazon Application Load Balancer and Amazon ECS Fargate cluster.
 
 ### Prerequisites:
 * An existing VPC with private subnets
@@ -10,7 +12,7 @@ This Terraform template deploys a complete serverless integration pattern connec
 * Security Groups for ALB and ECS tasks
 * ECS Fargate cluster with service and task definitions
 * Private Application Load Balancer with listener and target group
-* VPC Link V2 connecting API Gateway to the private ALB
+* Amazon VPC Link V2 connecting API Gateway to the private ALB
 * REST API Gateway with proxy integration to the ALB
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-vpclink-pvt-alb-terraform/
@@ -61,9 +63,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates secure integration between a public REST API Gateway endpoint and a private Application Load Balancer with an ECS Fargate cluster. Traffic flows through VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet.
+This pattern demonstrates secure integration between a public REST API Gateway endpoint and a private Application Load Balancer with an ECS Fargate cluster. Traffic flows through Amazon VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet.
 
-The integration uses the `--integration-target` parameter with AWS CLI (via Terraform null_resource) to properly configure the REST API Gateway with VPC Link V2, as this feature requires explicit ALB ARN specification. The ALB distributes traffic to ECS Fargate tasks running in private subnets.
+The integration uses the `--integration-target` parameter with AWS CLI (via Terraform null_resource) to properly configure the REST API Gateway with Amazon VPC Link V2, as this feature requires explicit ALB ARN specification. The ALB distributes traffic to ECS Fargate tasks running in private subnets.
 
 ## Testing
 
@@ -98,6 +100,6 @@ Expected response: **200**
     terraform show
     ```
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
