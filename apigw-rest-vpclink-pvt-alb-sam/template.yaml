@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: REST API Gateway to Private ALB and ECS Fargate via VPC Link V2
+Description: REST API Gateway to Private ALB and ECS Fargate via VPC Link V2 (uksb-1tthgi812) (tag:apigw-rest-vpclink-pvt-alb-sam)
 
 Parameters:
   VpcId:
