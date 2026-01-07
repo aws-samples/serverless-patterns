@@ -48,10 +48,10 @@ Important: this application uses various AWS services and there are costs associ
 1. Make a POST request to the API using the following cURL command:
 
     ```
-    curl --location 'https://<api-id>.execute-api.<region>.amazonaws.com/dev/generate-presigned-url' --header 'Content-Type: text/plain' --data '{"object_name": "image.png", "content_type": "image/png"}'
+    curl --location "$(terraform output -raw api_gateway_endpoint_url)" --header 'Content-Type: text/plain' --data '{"object_name": "image.png", "content_type": "image/png"}'
     ```
 
-    Note: Replace 'api-id' with the generated API ID from Terraform, 'region' with the region where the API is deployed (refer to the Terraform Outputs section) 'object_name' with your desired name for the S3 object and 'content_type' with the content type of the image, for ex, png or jpeg
+    Note: Replace 'object_name' with your desired name for the S3 object and 'content_type' with the content type of the image, for ex, png or jpeg
 
 1. Get the pre-signed URL from the previous step and use the following cURL command to upload the object in S3:
 

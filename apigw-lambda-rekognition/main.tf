@@ -187,3 +187,7 @@ output "lambda_process_s3_event_log_group" {
   description = "The name of the CloudWatch log group for the process_s3_event Lambda function"
   value       = aws_cloudwatch_log_group.lambda_log_group[1].name
 }
+output "api_gateway_endpoint_url" {
+  description = "The URL of the API Gateway endpoint for generating presigned URLs"
+  value       = "${aws_api_gateway_stage.stage.invoke_url}/${aws_api_gateway_resource.resource.path_part}"
+}
