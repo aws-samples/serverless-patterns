@@ -1,5 +1,5 @@
 {
-  "title": "Custom resource with wait condition",
+  "title": "CDK custom resource with wait condition",
   "description": "Use AWS CloudFormation Wait Conditions for long-running custom resources up to 12 hours",
   "language": "TypeScript",
   "level": "200",

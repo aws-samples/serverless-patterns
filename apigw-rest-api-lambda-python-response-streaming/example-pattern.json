@@ -65,35 +65,5 @@
             "bio": "I am a Solutions Architect at AWS, where I help customers realise that true transformation lies at the intersection of Cloud, DevOps cultural practices, Agile principles, modular and scalable architectures, and efficient team structures.",
             "linkedin": "yusufmayet"
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 20,
-            "y": 50,
-            "service": "apigw",
-            "label": "API Gateway REST API"
-        },
-        "icon2": {
-            "x": 50,
-            "y": 50,
-            "service": "lambda",
-            "label": "AWS Lambda"
-        },
-        "icon3": {
-            "x": 80,
-            "y": 50,
-            "service": "bedrock",
-            "label": "Amazon Bedrock"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2",
-            "label": ""
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3",
-            "label": ""
-        }
-    }
+    ]
 }
