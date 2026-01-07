@@ -1,8 +1,8 @@
-# REST Amazon API Gateway to Private HTTP Endpoint via Amazon VPC Link V2
+# Amazon API Gateway REST API to Private HTTP Endpoint via Amazon VPC Link V2
 
-This pattern demonstrates direct integration between REST API Gateway and a private Application Load Balancer using VPC Link V2. Previously, connecting REST API Gateway to a private ALB required VPC Link V1 with an intermediary Network Load Balancer, adding complexity and cost. VPC Link V2 eliminates this requirement, enabling direct ALB integration for simplified architecture and reduced operational overhead.
+This pattern demonstrates direct integration between API Gateway REST API and a private Application Load Balancer using VPC link V2. Previously, connecting REST API Gateway to a private ALB required VPC link V1 with an intermediary Network Load Balancer, adding complexity and cost. VPC Link V2 eliminates this requirement, enabling direct ALB integration for simplified architecture and reduced operational overhead.
 
-This AWS SAM template deploys a REST API Gateway with Amazon VPC Link V2 integration to a private Amazon Application Load Balancer and Amazon ECS Fargate cluster. The API definition is provided via an external OpenAPI specification file (api.yaml).
+This AWS SAM template deploys a REST API Gateway with Amazon VPC link V2 integration to a private Amazon Application Load Balancer and Amazon ECS Fargate cluster. The API definition is provided via an external OpenAPI specification file (api.yaml).
 
 ### Prerequisites:
 * An existing VPC with private subnets
@@ -12,8 +12,8 @@ This AWS SAM template deploys a REST API Gateway with Amazon VPC Link V2 integra
 * Security Groups for ALB and ECS tasks
 * ECS Fargate cluster with service and task definitions
 * Private Application Load Balancer with listener and target group
-* Amazon VPC Link V2 connecting API Gateway to the private ALB
-* REST API Gateway (AWS::Serverless::Api) with proxy integration to the ALB
+* Amazon VPC link V2 connecting API Gateway to the private ALB
+* API Gateway REST API (AWS::Serverless::Api) with proxy integration to the ALB
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-vpclink-pvt-alb-sam/
 
