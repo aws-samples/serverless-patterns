@@ -648,6 +648,22 @@ Outputs:
   VPCId:
     Description: 'VPC ID for the Products VPC'
     Value: !Ref ProductsVPC
+  
+  PrivateSubnet1Id:
+    Description: 'Private Subnet 1 ID'
+    Value: !Ref PrivateSubnet1
+
+  PrivateSubnet2Id:
+    Description: 'Private Subnet 2 ID'
+    Value: !Ref PrivateSubnet2
+
+  ALBSecurityGroupId:
+    Description: 'ALB Security Group ID'
+    Value: !Ref ALBSecurityGroup
+
+  ECSSecurityGroupId:
+    Description: 'ECS Security Group ID'
+    Value: !Ref ECSSecurityGroup
 
   APIEndpoint:
     Description: 'API endpoint URL for testing (via API Gateway default endpoint)'

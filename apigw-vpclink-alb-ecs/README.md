@@ -68,7 +68,7 @@ This sample project demonstrates how API Gateway connects to Application Load Ba
    - Enter a stack name
    - Enter the desired AWS Region e.g. `us-east-1`.
    - Enter VpcCidr - keep the default value
-   - Enter ECRImageURI - Replace with your ECR URI e.g. <account-id>.dkr.ecr.<your-region>.amazonaws.com/products-api:latest
+   - Enter ECRImageURI - Replace with your ECR URI from the previous step. e.g. <account-id>.dkr.ecr.<your-region>.amazonaws.com/products-api:latest
    - Allow SAM CLI to create IAM roles with the required permissions.
    - Keep default values to the rest of the parameters.
 
@@ -99,9 +99,9 @@ curl -X GET <InternalALBEndpoint>
 Expected Response:
 This request will timeout and you will not get any response. This is an internal ALB endpoint. Hence, this is not accessible over public internet.
 
-2. Launch an EC2 instance in one of the private subnets within the same VPC
+2. [Launch an EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance) in one of the private subnets within the same VPC. Refer the `sam deploy` output for the VPC, subnet and security group details.
 
-3. SSH into the instance
+3. [Connect to your EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-connect-to-instance)
 
 4. Install curl if not available:
 
@@ -187,10 +187,19 @@ Expected Response:
 
 ## Cleanup
 
-1. To delete the resources deployed to your AWS account via AWS SAM, run the following command:
+1. Delete the EC2 instance created for testing.
+
+2. To delete the resources deployed to your AWS account via AWS SAM, run the following command:
 
 ```bash
 sam delete
+```
+
+3. Delete the ECR repository. Ensure that you are deleting the correct repository.
+
+
+```bash
+aws ecr delete-repository --repository-name products-api --region <your-region> --force
 ```
 
 ---
