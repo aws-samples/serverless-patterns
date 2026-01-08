@@ -1,5 +1,5 @@
 {
-  "title": "Human-in-the-Loop Approval Workflow with Lambda durable functions",
+  "title": "AWS Lambda durable functions Human-in-the-Loop Approval Workflow",
   "description": "Approval workflow that pauses execution while waiting for human decisions, with automatic timeout handling and callback-based resumption",
   "language": "Python",
   "level": "300",
