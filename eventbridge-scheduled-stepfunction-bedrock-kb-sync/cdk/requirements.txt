@@ -219,7 +219,7 @@ typing-extensions==4.13.2
     #   jsii
     #   pylint
     #   rich
-urllib3==2.6.0
+urllib3==2.6.3
     # via
     #   botocore
     #   requests
