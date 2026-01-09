@@ -158,13 +158,13 @@ Resources:
       HttpMethod: GET
       AuthorizationType: NONE
       RequestParameters:
-        method.request.header.x-tenant-id: false  # Optional parameter
+        method.request.header.tenant-id: false  # Optional parameter
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CounterStandardFunction.Arn}/invocations"
         RequestParameters:
-          integration.request.header.X-Amz-Tenant-Id: method.request.header.x-tenant-id
+          integration.request.header.X-Amz-Tenant-Id: method.request.header.tenant-id
       MethodResponses:
         - StatusCode: 200
           ResponseModels:

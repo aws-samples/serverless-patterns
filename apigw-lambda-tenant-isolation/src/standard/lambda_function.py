@@ -33,11 +33,13 @@ def lambda_handler(event, context):
         headers = event.get('headers', {}) or {}
         # API Gateway may pass headers in different cases, so check both
         tenant_id_from_header = (
-            headers.get('x-tenant-id') or 
-            headers.get('X-Tenant-Id') or 
-            headers.get('X-TENANT-ID')
+            headers.get('tenant-id') or 
+            headers.get('Tenant-Id') or 
+            headers.get('TENANT-ID')
         )
         
+        logger.info(f"Received header: {headers}")
+
         # Log the incoming request with tenant information
         logger.info(f"Processing standard request - Method: {event.get('httpMethod', 'UNKNOWN')}, Path: {event.get('path', 'UNKNOWN')}, Tenant Header: {tenant_id_from_header}")
         
@@ -69,8 +71,7 @@ def lambda_handler(event, context):
         # Prepare response body - showing the received tenant header but no isolation
         response_body = {
             'counter': counter,
-            'tenant_id_received': tenant_id_from_header,  # Show what tenant was requested
-            'tenant_id': None,  # But no actual tenant isolation
+            'tenant_id': tenant_id_from_header,  # Show what tenant was requested
             'isolation_enabled': False,
             'message': f'Counter incremented successfully - SHARED across all tenants! (Received tenant: {tenant_id_from_header or "none"})',
             'warning': 'This function does NOT provide tenant isolation - all tenants share the same counter!'

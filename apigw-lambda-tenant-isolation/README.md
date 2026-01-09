@@ -9,7 +9,7 @@ This sample project demonstrates tenant isolation mode of AWS Lambda functions b
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 - [Python 3.14 or above](https://www.python.org/downloads/) installed
-- [Maven 3.8.6 or above](https://maven.apache.org/download.cgi) installed
+
 
 ## Deployment Instructions
 
@@ -74,7 +74,7 @@ STANDARD_URL="https://your-api-id.execute-api.region.amazonaws.com/dev/standard"
 BlueTenant request:
 
 ```bash
-curl -H "x-tenant-id: BlueTenant" "$STANDARD_URL"
+curl -H "tenant-id: BlueTenant" "$STANDARD_URL"
 ```
 
 Response:
@@ -82,8 +82,7 @@ Response:
 ```bash
 {
   "counter": 1,
-  "tenant_id_received": "BlueTenant",
-  "tenant_id": null,
+  "tenant_id": "BlueTenant",
   "isolation_enabled": false,
   "message": "Counter incremented successfully - SHARED across all tenants! (Received tenant: BlueTenant)",
   "warning": "This function does NOT provide tenant isolation - all tenants share the same counter!"
@@ -101,8 +100,7 @@ Response:
 ```bash
 {
   "counter": 2,
-  "tenant_id_received": "RedTenant",
-  "tenant_id": null,
+  "tenant_id": "RedTenant",
   "isolation_enabled": false,
   "message": "Counter incremented successfully - SHARED across all tenants! (Received tenant: RedTenant)",
   "warning": "This function does NOT provide tenant isolation - all tenants share the same counter!"
@@ -120,8 +118,7 @@ Response:
 ```bash
 {
   "counter": 3,
-  "tenant_id_received": "GreenTenant",
-  "tenant_id": null,
+  "tenant_id": "GreenTenant",
   "isolation_enabled": false,
   "message": "Counter incremented successfully - SHARED across all tenants! (Received tenant: GreenTenant)",
   "warning": "This function does NOT provide tenant isolation - all tenants share the same counter!"
