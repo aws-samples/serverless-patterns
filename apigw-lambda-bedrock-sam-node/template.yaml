@@ -4,7 +4,7 @@
 
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: SAM Template for Amazon API Gateway response streaming with AWS Lambda proxy integration
+Description: SAM Template for Amazon API Gateway response streaming with AWS Lambda proxy integration (uksb-1tthgi812) (tag:apigw-lambda-bedrock-sam-node)
 Resources:
   # CloudWatch Log Group for API Gateway Access Logs
   ApiGatewayAccessLogs:
