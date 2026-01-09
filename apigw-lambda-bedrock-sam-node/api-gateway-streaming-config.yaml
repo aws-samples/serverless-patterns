@@ -1,0 +1,35 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+openapi: "3.0.1"
+info:
+  title: "streaming-api"
+  version: "1.0.0"
+paths:
+  /ask:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: "The message to send to the Bedrock model"
+              required:
+                - message
+      responses:
+        "200":
+          description: "Streaming response from Bedrock model"
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: "Newline-delimited JSON objects representing streaming events"
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${StreamingResponseFunction.Arn}/response-streaming-invocations"
+        httpMethod: "POST"
+        responseTransferMode: "STREAM"
+        type: "aws_proxy"
