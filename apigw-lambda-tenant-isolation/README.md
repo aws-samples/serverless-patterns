@@ -1,4 +1,4 @@
-# Multi-tenant API with AWS Lambda functions tenant isolation
+# Multi-tenant API with AWS Lambda tenant isolation
 
 This sample project demonstrates tenant isolation mode of AWS Lambda functions by comparing two Lambda functions - one with tenant isolation enabled and one without. The demonstration uses in-memory counters to visually show how tenant isolation provides separate execution environments for different tenants.
 
@@ -29,7 +29,7 @@ This sample project demonstrates tenant isolation mode of AWS Lambda functions b
 
    ```bash
    sam build
-   sam deploy --guided
+   sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
    ```
 
 4. During the prompts:
@@ -45,13 +45,13 @@ This sample project demonstrates tenant isolation mode of AWS Lambda functions b
 
 ## How it works
 
-The SAM template deploys two Lambda functions - one tenant isolation mode enabled and another disabled.
+The SAM template deploys two Lambda functions - one with tenant isolation mode enabled, and another with tenant mode disabled.
 
 ![End to End Architecture](diagram/architecture.png)
 
 Here's a breakdown of the steps:
 
-1. **Standard AWS Lambda Function**: Receives tenant headers (`x-tenant-id`) but shares execution environment across all tenants. The counter variable when increased for one tenant, it impacts the other tenant (demonstrates the limitation)
+1. **Standard AWS Lambda Function**: Receives tenant headers (`x-tenant-id`) but shares execution environment across all tenants. The counter variable, when increased for one tenant, impacts the other tenants (demonstrates the limitation)
 
 2. **Tenant-Isolated AWS Lambda Function**: Maintains separate execution environments per tenant using AWS Lambda tenant isolation mode (demonstrates the solution)
 
