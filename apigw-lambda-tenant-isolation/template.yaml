@@ -4,7 +4,7 @@ Description: >
   Lambda Tenant Isolation Demo
   
   Demonstration project showcasing AWS Lambda's tenant isolation feature
-  with two Lambda functions - one with tenant isolation enabled and one without.
+  with two Lambda functions - one with tenant isolation enabled and one without. (uksb-1tthgi812) (tag:apigw-lambda-tenant-isolation)
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
