@@ -24,7 +24,7 @@ Resources:
     Properties:
       Description: Lambda function to retrieve Secrets Manager secret
       CodeUri: src/
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Handler: app.handler
       MemorySize: 128
       Timeout: 15

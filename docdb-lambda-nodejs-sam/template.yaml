@@ -113,7 +113,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: DocDBLambda
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Handler: index.handler
       Policies:
         - AWSLambdaBasicExecutionRole

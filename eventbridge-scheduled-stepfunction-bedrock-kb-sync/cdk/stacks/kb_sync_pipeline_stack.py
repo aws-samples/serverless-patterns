@@ -16,7 +16,7 @@ from aws_cdk import aws_stepfunctions_tasks as tasks
 from constructs import Construct
 from cdk_nag import NagSuppressions
 
-LAMBDA_RUNTIME = _lambda.Runtime.PYTHON_3_13
+LAMBDA_RUNTIME = _lambda.Runtime.PYTHON_3_14
 STACK_RESOURCE_PREFIX = "KbSyncPipeline"
 
 

@@ -35,7 +35,7 @@ Resources:
     Properties:
       CodeUri: sam-custom-resources/GetSSMCertificate
       Handler: GetSSMCertificate.handler
-      Runtime: python3.11
+      Runtime: python3.14
       Policies:
         - AmazonSSMReadOnlyAccess
         - AmazonRoute53ReadOnlyAccess
@@ -71,7 +71,7 @@ Resources:
       FunctionName: !Sub "${Env}-${ApiName}"
       CodeUri: sample-app/hello_world
       Handler: app.handler
-      Runtime: python3.11
+      Runtime: python3.14
       Events:
         Api:
           Type: Api

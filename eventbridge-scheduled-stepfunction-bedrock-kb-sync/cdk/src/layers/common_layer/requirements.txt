@@ -26,7 +26,7 @@ jmespath==1.0.1
     #   botocore
 python-dateutil==2.9.0.post0
     # via botocore
-requests==2.32.3
+requests==2.32.4
     # via -r requirements.in
 s3transfer==0.11.2
     # via boto3
@@ -36,7 +36,7 @@ six==1.17.0
     # via python-dateutil
 typing-extensions==4.12.2
     # via aws-lambda-powertools
-urllib3==1.26.20
+urllib3==2.6.3
     # via
     #   botocore
     #   requests

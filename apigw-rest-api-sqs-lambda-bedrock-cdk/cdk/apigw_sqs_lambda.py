@@ -200,7 +200,7 @@ class ApigwSqsLambdaStack(Stack):
             self,
             "SqsHandlerFunction",
             
-            runtime=lambdafun.Runtime.PYTHON_3_9,
+            runtime=lambdafun.Runtime.PYTHON_3_14,
             handler="lambda_function.lambda_handler",
             code=lambdafun.Code.from_asset("../src/invoke-model"
                                           ),

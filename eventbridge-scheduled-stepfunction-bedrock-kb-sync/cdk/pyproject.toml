@@ -49,7 +49,7 @@ extra_paths = [
 "src/layers",
 "src/layers/common_layer",
 "src/layers/common_layer/common",
-".venv/lib/python3.9/site-packages"
+".venv/lib/python3.14/site-packages"
 ]
 sys.path.extend(extra_paths)
 """
@@ -72,7 +72,7 @@ pythonpath = [
   "src/layers",
   "src/layers/common_layer",
   "src/layers/common_layer/common",
-  ".venv/lib/python3.9/site-packages",
+  ".venv/lib/python3.14/site-packages",
 ]
 markers = ["target_account"]
 testpaths = ["tests"]

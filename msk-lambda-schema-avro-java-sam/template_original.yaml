@@ -26,7 +26,7 @@ Resources:
     Properties:
       CodeUri: kafka_event_consumer_function
       Handler: com.amazonaws.services.lambda.samples.events.msk.AvroKafkaHandler::handleRequest
-      Runtime: java21
+      Runtime: java25
       Architectures:
         - x86_64
       MemorySize: 512
@@ -128,7 +128,7 @@ Resources:
     Properties:
       CodeUri: kafka_event_producer_function
       Handler: com.amazonaws.services.lambda.samples.events.msk.AvroProducerHandler::handleRequest
-      Runtime: java21
+      Runtime: java25
       Timeout: 300
       Architectures:
         - x86_64

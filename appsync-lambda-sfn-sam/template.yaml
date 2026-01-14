@@ -185,7 +185,7 @@ Resources:
       CodeUri: src/lambda/
       Handler: app.lambda_handler
       Role: !GetAtt lambdaStepFunctionRole.Arn
-      Runtime: python3.8
+      Runtime: python3.14
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref SamStepFunctionStateMachine

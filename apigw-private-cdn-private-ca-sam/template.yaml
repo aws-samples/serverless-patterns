@@ -103,7 +103,7 @@ Resources:
   PythonLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: python3.13
+      Runtime: python3.14
       Handler: index.lambda_handler
       InlineCode: |
         def lambda_handler(event, context):
@@ -192,7 +192,7 @@ Resources:
   APITestingLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: python3.13
+      Runtime: python3.14
       Handler: index.lambda_handler
       VpcConfig:
         SecurityGroupIds: !Ref ApiVPCESecurityGroup

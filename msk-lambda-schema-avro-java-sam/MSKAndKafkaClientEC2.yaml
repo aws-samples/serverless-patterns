@@ -356,8 +356,10 @@ Resources:
                     sudo yum install java-17-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java21" ]; then
                     sudo yum install java-21-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java25" ]; then
+                    sudo yum install java-25-amazon-corretto-devel -y
                 else
-                    sudo yum install java-21-amazon-corretto-devel -y
+                    sudo yum install java-25-amazon-corretto-devel -y
                 fi
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -480,7 +482,7 @@ Resources:
             done
 
             cd /home/ec2-user
-            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "ln -s /usr/bin/python3.14 /usr/bin/python3" -s /bin/sh ec2-user
             su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
             su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
 
@@ -652,8 +654,10 @@ Resources:
                     sudo yum install java-17-amazon-corretto-devel -y
                 elif [ "$JAVA_VERSION" == "java21" ]; then
                     sudo yum install java-21-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java25" ]; then
+                    sudo yum install java-25-amazon-corretto-devel -y
                 else
-                    sudo yum install java-21-amazon-corretto-devel -y
+                    sudo yum install java-25-amazon-corretto-devel -y
                 fi
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
@@ -776,7 +780,7 @@ Resources:
             done
 
             cd /home/ec2-user
-            su -c "ln -s /usr/bin/python3.8 /usr/bin/python3" -s /bin/sh ec2-user
+            su -c "ln -s /usr/bin/python3.14 /usr/bin/python3" -s /bin/sh ec2-user
             su -c "pip3 install boto3 --user" -s /bin/sh ec2-user
             su -c "pip3 install kafka-python --user" -s /bin/sh ec2-user
 

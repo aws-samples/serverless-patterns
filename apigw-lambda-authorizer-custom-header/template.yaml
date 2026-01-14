@@ -3,7 +3,7 @@ Description: Serverless Pattern - Amazon API Gateway using Lambda Authorizer and
 Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
-    Runtime: nodejs18.x
+    Runtime: nodejs24.x
 Resources:
   # REST API
   AppApi:

@@ -4,7 +4,7 @@ Description: aws-lambda-sns-sqs-lambda (uksb-1tthgi812) (tag:lambda-sns-sqs-lamb
 
 Globals:
   Function:
-    Runtime: java21
+    Runtime: java25
     MemorySize: 512
     Timeout: 25
 

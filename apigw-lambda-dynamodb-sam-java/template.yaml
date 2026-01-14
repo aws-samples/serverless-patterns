@@ -4,7 +4,7 @@ Description: AWS-SAM-APIGW-Lambda-DDB (uksb-1tthgi812) (tag:apigw-lambda-dynamod
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 3008
     Timeout: 25
 

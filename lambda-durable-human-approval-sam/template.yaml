@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Human-in-the-Loop Approval Pattern using AWS Lambda durable functions
+
+Parameters:
+  ApproverEmail:
+    Type: String
+    Description: Email address to receive approval notifications
+
+Resources:
+  # DynamoDB Table for Callback Mapping
+  CallbackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-callbacks'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: uuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: uuid
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # SNS Topic for Notifications
+  ApprovalTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref ApproverEmail
+
+  # Callback Handler Function
+  CallbackHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: callback_handler.lambda_handler
+      Runtime: python3.14
+      Timeout: 30
+      Environment:
+        Variables:
+          CALLBACK_TABLE_NAME: !Ref CallbackTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CallbackTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:SendDurableExecutionCallbackSuccess
+            Resource: '*'
+
+  # Durable Function
+  ApprovalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.14
+      Timeout: 120
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 86400  # 24 hours - showcases durable functions benefit
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          APPROVAL_TOPIC_ARN: !Ref ApprovalTopic
+          CALLBACK_TABLE_NAME: !Ref CallbackTable
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt ApprovalTopic.TopicName
+        - DynamoDBWritePolicy:
+            TableName: !Ref CallbackTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:CheckpointDurableExecution
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-ApprovalFunction-*'
+
+  # IAM Role for API Gateway to call Lambda service API
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaDurableCallbackPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:SendDurableExecutionCallbackSuccess
+                  - lambda:SendDurableExecutionCallbackFailure
+                Resource: '*'
+
+  # Lambda Permission for API Gateway
+  ApprovalFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApprovalFunction.Alias
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApprovalApi}/*/POST/requests'
+
+  CallbackHandlerInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CallbackHandlerFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApprovalApi}/*/*/{uuid}'
+
+  # API Gateway
+  ApprovalApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /requests:
+            post:
+              responses:
+                '202':
+                  description: Request accepted
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApprovalFunction.Arn}:live/invocations'
+                requestParameters:
+                  integration.request.header.X-Amz-Invocation-Type: "'Event'"
+                responses:
+                  default:
+                    statusCode: '202'
+                    responseTemplates:
+                      application/json: '{"message": "Request accepted"}'
+                passthroughBehavior: when_no_match
+          
+          /{decision}/{uuid}:
+            get:
+              parameters:
+                - name: decision
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: uuid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                '200':
+                  description: Callback processed
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CallbackHandlerFunction.Arn}/invocations'
+                passthroughBehavior: when_no_match
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
+  ApprovalFunctionArn:
+    Description: Durable Function ARN
+    Value: !GetAtt ApprovalFunction.Arn

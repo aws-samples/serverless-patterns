@@ -45,7 +45,7 @@ resource "aws_sns_topic" "sns_topic" {
 resource "aws_lambda_function" "sns_lambda" {
   function_name = "sns-lambda"
   handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   role          = aws_iam_role.lambda_execution_role.arn
   filename      = "lambda_function_payload.zip"
   source_code_hash = filebase64sha256("lambda_function_payload.zip")

@@ -22,7 +22,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: lambda_function4.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         ApiEvent:
           Type: Api

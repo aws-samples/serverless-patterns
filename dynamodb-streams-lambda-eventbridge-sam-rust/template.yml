@@ -38,7 +38,7 @@ Resources:
       MemorySize: 512
       Architectures: ["arm64"]
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
       Timeout: 6
       CodeUri: .
       Policies:

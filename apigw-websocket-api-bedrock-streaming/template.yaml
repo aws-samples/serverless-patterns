@@ -6,7 +6,7 @@ Description: An Amazon API Gateway WebSocket API and an AWS Lambda function.
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.11
+    Runtime: python3.14
     MemorySize: 128
     Timeout: 300
 
@@ -265,7 +265,7 @@ Resources:
         S3Bucket: !GetAtt BedrockBoto3Zip.Bucket
         S3Key: !GetAtt BedrockBoto3Zip.Key
       CompatibleRuntimes:
-        - python3.10
+        - python3.14
 
 Outputs:
   OnConnectLambdaFunctionArn:

@@ -21,7 +21,7 @@ class CloudfrontOacLambdaUrlNodejsCdkConstruct extends Construct {
             handler: 'index.handler',
             functionName: NAME,
             architecture: lambda.Architecture.ARM_64,
-            runtime: lambda.Runtime.NODEJS_20_X
+            runtime: lambda.Runtime.NODEJS_24_X
         });
 
         const functionUrl = lambdaFunction.addFunctionUrl({

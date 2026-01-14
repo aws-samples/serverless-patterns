@@ -35,7 +35,7 @@ Resources:
       Handler: code.lambda_handler
       MemorySize: 128
       Timeout: 3
-      Runtime: python3.13
+      Runtime: python3.14
       Tracing: Active
       Environment:
         Variables:

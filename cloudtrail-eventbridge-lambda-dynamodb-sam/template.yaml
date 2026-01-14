@@ -17,7 +17,7 @@ Resources:
       Handler: function.lambda_handler
       PackageType: "Zip"
       Tracing: Active
-      Runtime: "python3.12"
+      Runtime: "python3.14"
       Environment:
         Variables:
           DynamoDBTable: !Ref DynamoDBTable

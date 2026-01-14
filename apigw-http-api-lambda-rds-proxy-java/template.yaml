@@ -30,7 +30,7 @@ Parameters:
 # Global values that are applied to all applicable resources in this template
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 3072
     Timeout: 30
 

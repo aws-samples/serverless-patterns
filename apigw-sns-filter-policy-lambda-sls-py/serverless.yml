@@ -7,7 +7,7 @@ provider:
   logs:
     restApi:
       role: !Ref ApiCWLRole.Arn
-  runtime: python3.11
+  runtime: python3.14
   memorySize: 128
   stage: ${opt:stage, 'dev'}
   region: us-east-1

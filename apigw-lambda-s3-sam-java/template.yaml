@@ -4,7 +4,7 @@ Description: This template exposes API to to retrieve Amazon S3 pre-signed URL t
 
 Globals:
   Function:
-    Runtime: java21
+    Runtime: java25
     MemorySize: 3008
     Timeout: 120
 

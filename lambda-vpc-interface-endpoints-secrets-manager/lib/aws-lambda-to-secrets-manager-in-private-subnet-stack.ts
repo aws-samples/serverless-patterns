@@ -32,7 +32,7 @@ export class AwsLambdaPrivSubnetStack extends cdk.Stack {
       index: 'handler.py',
       handler: 'lambda_handler',
       functionName: 'LambdaFunctionPrivate',
-      runtime: Runtime.PYTHON_3_9,
+      runtime: Runtime.PYTHON_3_14,
       memorySize: 128,
       securityGroups: [lambdaSecurityGroup],
       vpc: privateLambdaVPC,

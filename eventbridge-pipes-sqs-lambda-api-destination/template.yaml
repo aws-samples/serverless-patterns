@@ -24,7 +24,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-Enrichment-lambda
       CodeUri: src/
       Handler: enrichment.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Timeout: 15
       Architectures:
@@ -137,7 +137,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-lambdaToDynamoDB
       CodeUri: src/
       Handler: lambdaToDynamoDB.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
