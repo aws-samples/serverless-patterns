@@ -14,7 +14,7 @@ Resources:
       #Name: APIGWStepFunctionExpressSync
       DefinitionUri: statemachine/stateMachine.asl.json
       DefinitionSubstitutions:
-        ModelId: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-text-v14
+        ModelId: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-r-v1:0
       Role:
         Fn::GetAtt: [ StatesMachineExecutionRole, Arn ]
       Type: EXPRESS
@@ -32,7 +32,7 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join [ "/", [ "stepfunctions", StateMachineExpressSync]]
-       
+
 ##########################################################################
 #   REST API                                                             #
 ##########################################################################
@@ -73,7 +73,6 @@ Resources:
               Action: "states:StartSyncExecution"
               Resource: !GetAtt StateMachineExpressSync.Arn
 
- 
   StatesMachineExecutionRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -103,7 +102,7 @@ Resources:
                   - "logs:PutResourcePolicy"
                   - "logs:DescribeResourcePolicies"
                   - "logs:DescribeLogGroups"
-                Resource: "*"         
+                Resource: "*"
         - PolicyName: BedrockAccess
           PolicyDocument:
             Version: "2012-10-17"
@@ -111,7 +110,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - "bedrock:InvokeModel"
-                Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-text-v14                           
+                Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-r-v1:0
 
 ##########################################################################
 #   Outputs                                                              #
@@ -120,5 +119,3 @@ Outputs:
   PromptChainApi:
     Description: "Sync WF API endpoint"
     Value: !Sub "https://${RestApiforSyncWF}.execute-api.${AWS::Region}.amazonaws.com/dev"
-
-
