@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0.0"
+      version = "~> 6"
     }
     random = {
       source  = "hashicorp/random"
@@ -28,9 +28,13 @@ resource "aws_s3_bucket" "lambda_bucket" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_acl" "private_bucket" {
+resource "aws_s3_bucket_public_access_block" "lambda_bucket" {
   bucket = aws_s3_bucket.lambda_bucket.id
-  acl    = "private"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 data "archive_file" "lambda_zip" {
