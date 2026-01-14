@@ -50,7 +50,7 @@ export class ContentFilterStack extends cdk.Stack {
 
     // AWS Lambda function that writes to the SourceStream to easily test the pipe
     const sourceLambda = new lambda.Function(this, 'ContentFilterTestLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset('lib/lambda'),
       handler: 'contentFilterSampleDataCreator.handler',
       environment: {

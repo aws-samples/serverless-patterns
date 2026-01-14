@@ -4,7 +4,7 @@ Description: sqs-lambda-dynamodb (uksb-1tthgi812) (tag:sqs-lambda-dynamodb-sam-j
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 512
     Timeout: 25
 

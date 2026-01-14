@@ -20,7 +20,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: producer/
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Handler: producer-function.lambda_handler
       Environment:
         Variables:
@@ -34,7 +34,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: consumer/
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Handler: consumer-function.lambda_handler
       Policies: 
       - KinesisStreamReadPolicy:

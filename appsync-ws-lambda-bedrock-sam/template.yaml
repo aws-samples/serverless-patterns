@@ -57,7 +57,7 @@ Resources:
     Properties:
       CodeUri: ./lambda_function/
       Handler: app.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Timeout: 30
       Environment:
         Variables:

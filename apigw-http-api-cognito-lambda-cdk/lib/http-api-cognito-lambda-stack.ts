@@ -26,14 +26,14 @@ export class HttpApiCognitoLambdaStack extends Stack {
 
     // Unprotected Accessible Lambda
     const unprotectedFn = new NodejsFunction(this, 'unprotectedFn', {
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '/../resources/unprotected-fn.ts'),
       handler: 'handler'
     })
 
     // Protected Accessible Lambda
     const protectedFn = new NodejsFunction(this, 'protectedFn', {
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '/../resources/protected-fn.ts'),
       handler: 'handler'
     })

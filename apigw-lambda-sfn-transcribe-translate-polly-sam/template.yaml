@@ -54,7 +54,7 @@ Resources:
     Properties:
       Handler: src/transcribeLaunch.handler
       FunctionName: "translator-dev-transcribeLaunch"
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -65,7 +65,7 @@ Resources:
     Properties:
       Handler: src/transcribeCheck.handler
       FunctionName: "translator-dev-transcribeCheck"
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -76,7 +76,7 @@ Resources:
     Properties:
       Handler: src/translate.handler
       FunctionName: "translator-dev-translate"
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -87,7 +87,7 @@ Resources:
     Properties:
       Handler: src/speech.handler
       FunctionName: "translator-dev-speech"
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       MemorySize: 128
@@ -126,7 +126,7 @@ Resources:
                 !Ref CapstoneWebSocketApi,
                 ".execute-api.",
                 !Ref "AWS::Region",
-                ".amazonaws.com/dev",
+                ".${AWS::URLSuffix}/dev",
               ],
             ]
           statemachine_arn: !Ref Orchestrator
@@ -134,7 +134,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: "translator-dev-authorizer"
-      Runtime: "nodejs22.x"
+      Runtime: "nodejs24.x"
       Timeout: 300
       MemorySize: 1024
       Handler: index.handler
@@ -398,7 +398,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: !Sub "states.${AWS::Region}.amazonaws.com"
+              Service: !Sub "states.${AWS::Region}.${AWS::URLSuffix}"
             Action: "sts:AssumeRole"
       Policies:
         - PolicyName: stepfn

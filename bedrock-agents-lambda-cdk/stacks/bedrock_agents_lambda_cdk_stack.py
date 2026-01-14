@@ -25,7 +25,7 @@ class BedrockAgentsLambdaCdkStack(Stack):
         # Lambda Function
         ISS_lambda_function = aws_lambda.Function(
             self, 'ISSLocationLambda',
-            runtime=aws_lambda.Runtime.PYTHON_3_12,
+            runtime=aws_lambda.Runtime.PYTHON_3_14,
             code=aws_lambda.Code.from_asset('lambda'),
             handler='bedrock_agents_lambda.lambda_handler',
             function_name="ISSLocationLambda", 

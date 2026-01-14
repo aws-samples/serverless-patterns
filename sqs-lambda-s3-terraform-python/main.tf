@@ -25,7 +25,7 @@ resource "aws_lambda_function" "event-processor" {
   filename         = data.archive_file.lambda_handler_zip_file.output_path
   source_code_hash = filebase64sha256(data.archive_file.lambda_handler_zip_file.output_path)
   handler          = "handler.lambda_handler"
-  runtime          = "python3.12"
+  runtime          = "python3.14"
   role             = aws_iam_role.event-processor-exec-role.arn
   environment {
     variables = {

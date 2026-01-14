@@ -71,7 +71,7 @@ You should see a response such as the below:
 ```
 ***** Begin sam local invoke response *****
 
-Invoking com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest (java11)                                                           
+Invoking com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest (java25)                                                           
 Local image is up-to-date                                                                                                                              
 Using local image: public.ecr.aws/lambda/java:11-rapid-x86_64.                                                                                         
                                                                                                                                                        

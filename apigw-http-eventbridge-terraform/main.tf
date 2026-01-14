@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 6"
     }
   }
 
@@ -54,7 +54,7 @@ resource "aws_iam_policy" "APIGWPolicy" {
       "Action" : [
         "events:PutEvents"
       ],
-      "Resource" : "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:event-bus/default"
+      "Resource" : "arn:aws:events:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:event-bus/default"
     }
   ]
 }
@@ -97,7 +97,7 @@ resource "aws_iam_policy" "LambdaPolicy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource" : "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.MyLambdaFunction.function_name}:*:*"
+      "Resource" : "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${aws_lambda_function.MyLambdaFunction.function_name}:*:*"
     }
   ]
 }
@@ -182,8 +182,8 @@ resource "aws_lambda_function" "MyLambdaFunction" {
   source_code_hash = filebase64sha256(data.archive_file.LambdaZipFile.output_path)
   role             = aws_iam_role.LambdaRole.arn
   handler          = "LambdaFunction.lambda_handler"
-  runtime          = "python3.9"
-  layers           = ["arn:aws:lambda:${data.aws_region.current.name}:017000801446:layer:AWSLambdaPowertoolsPython:15"]
+  runtime          = "python3.14"
+  layers           = ["arn:aws:lambda:${data.aws_region.current.region}:017000801446:layer:AWSLambdaPowertoolsPython:15"]
 }
 
 # Allow the EventBridge rule created to invoke the Lambda function

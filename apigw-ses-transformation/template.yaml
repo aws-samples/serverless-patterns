@@ -186,4 +186,4 @@ Resources:
 Outputs:
   ApiEndpoint: 
     Description: "API Gateway endpoint URL for Email API"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"

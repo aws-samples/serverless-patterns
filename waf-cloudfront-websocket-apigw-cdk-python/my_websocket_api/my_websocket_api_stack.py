@@ -42,7 +42,7 @@ class MyWebsocketApiStack(Stack):
         # Create Lambda function for WebSocket handler
         handler = _lambda.Function(
             self, "WebSocketHandler",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="index.handler",
             code=_lambda.Code.from_asset("lambda"),
             role=lambda_role,

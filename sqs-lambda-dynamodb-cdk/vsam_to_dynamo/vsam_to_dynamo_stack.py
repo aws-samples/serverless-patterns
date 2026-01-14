@@ -36,7 +36,7 @@ class VsamToDynamoStack(Stack):
         # The source code is in './src' directory
         lambda_fn = _lambda.Function(
             self, "SQSToDynamoFunction",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="insertRecord.handler",
             code=_lambda.Code.from_asset("lambda_fns"),
         )

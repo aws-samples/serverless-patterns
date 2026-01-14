@@ -16,7 +16,7 @@ Resources:
     Properties:
       FunctionName: TransformationJavaFunction
       Handler: com.example.DataTransformer::handleRequest
-      Runtime: java11
+      Runtime: java25
       CodeUri: target/dataTransformer.zip
       Timeout: 90
   

@@ -1,0 +1,20 @@
+{
+  "name": "lambda-streaming-response",
+  "version": "1.0.0",
+  "description": "AWS Lambda function that streams responses",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "streaming"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.485.0"
+  }
+}

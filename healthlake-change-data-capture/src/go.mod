@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.229
 	github.com/bix-digital/golang-fhir-models/fhir-models v0.0.0-20220829092912-860eb0b78446
 	github.com/segmentio/ksuid v1.0.4
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.1
 	gopkg.in/DataDog/dd-trace-go.v1 v1.48.0
 )
 

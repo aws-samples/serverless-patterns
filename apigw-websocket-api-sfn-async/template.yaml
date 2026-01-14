@@ -104,7 +104,7 @@ Resources:
             Type: Task
             Resource: arn:aws:states:::apigateway:invoke
             Parameters:
-              ApiEndpoint: !Sub "${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com"
+              ApiEndpoint: !Sub "${WebSocketApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
               Method: POST
               Stage: !Sub "${ApiStageName}"
               Path.$: "States.Format('/@connections/{}', $.ConnectionID)"
@@ -167,5 +167,5 @@ Resources:
 Outputs:
   APIEndpoint:
     Description: "API Gateway WebSocket endpoint URL"
-    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${ApiStageName}"
 

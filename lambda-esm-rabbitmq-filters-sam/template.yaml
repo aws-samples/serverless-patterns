@@ -7,7 +7,7 @@ Globals:
     CodeUri: src/
     Handler: app.lambda_handler
     Timeout: 3
-    Runtime: python3.9
+    Runtime: python3.14
     Architectures:
       - arm64
 
@@ -40,7 +40,7 @@ Resources:
       LayerName: rabbit-layer
       ContentUri: dependencies/
       CompatibleRuntimes:
-        - python3.9
+        - python3.14
 
   #RabbitMQ writter - it will help with testing
   MQHelper:
