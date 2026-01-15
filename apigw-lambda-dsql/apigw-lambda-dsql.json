@@ -33,6 +33,10 @@
             {
                 "text": "Amazon Aurora DSQL samples",
                 "link": "https://github.com/aws-samples/aurora-dsql-samples/tree/main/python"
+            },
+            {
+                "text": "Connectors for Aurora DSQL",
+                "link": "https://aws.amazon.com/about-aws/whats-new/2025/11/aurora-dsql-python-node-js-jdbc-connectors-iam/"
             }
         ]
     },
