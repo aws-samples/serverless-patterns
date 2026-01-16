@@ -1,0 +1,68 @@
+{
+  "title": "Amazon CloudFront signed cookies with Amazon Cognito authentication using Python CDK",
+  "description": "This pattern demonstrates how to implement Amazon CloudFront signed cookies for private S3 content access with Amazon Cognito user authentication using AWS CDK with Python.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a secure content delivery solution using CloudFront signed cookies. Users authenticate through Amazon Cognito via API Gateway Lambda functions.",
+      "Upon successful login, the Lambda function generates CloudFront signed cookies that grant time-limited access to private S3 content behind the CloudFront distribution.",
+      "The CloudFront distribution uses Origin Access Control (OAC) to securely access private S3 content. Public content is accessible without authentication, while private content requires valid signed cookies.",
+      "The signed cookies use RSA key pairs, with the private key stored securely in AWS Secrets Manager and the public key configured in a CloudFront Key Group."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-s3-signed-cookies-cognito",
+      "templateURL": "serverless-patterns/cloudfront-s3-signed-cookies-cognito",
+      "projectFolder": "cloudfront-s3-signed-cookies-cognito",
+      "templateFile": "cloudfront-s3-signed-cookies-cognito/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Serving private content with signed URLs and signed cookies",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html"
+      },
+      {
+        "text": "Using CloudFront signed cookies",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-cookies.html"
+      },
+      {
+        "text": "Amazon Cognito User Pools",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html"
+      },
+      {
+        "text": "Restricting access to Amazon S3 content by using an origin access control",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matia Rasetina",
+      "image": "",
+      "bio": "Senior Software Engineer @ Elixirr Digital",
+      "linkedin": "https://www.linkedin.com/in/matiarasetina/",
+      "twitter": ""
+    }
+  ]
+}
