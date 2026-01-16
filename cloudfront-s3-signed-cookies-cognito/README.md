@@ -18,15 +18,15 @@ Important: this application uses various AWS services and there are costs associ
     ``` 
     git clone https://github.com/aws-samples/serverless-patterns
     ```
-1. Change directory to the pattern directory:
+2. Change directory to the pattern directory:
     ```
     cd cloudfront-s3-signed-cookies-cognito
     ```
-1. Create a virtual environment for Python:
+3. Create a virtual environment for Python:
     ```bash
     python3 -m venv .venv
     ```
-1. Activate the virtual environment:
+4. Activate the virtual environment:
     ```bash
     source .venv/bin/activate
     ```
@@ -34,19 +34,19 @@ Important: this application uses various AWS services and there are costs associ
     ```bash
     .venv\Scripts\activate.bat
     ```
-1. Install the required dependencies:
+5. Install the required dependencies:
     ```bash
     pip install -r requirements.txt
     ```
-1. Bootstrap your AWS account for CDK (if you haven't done so already):
+6. Bootstrap your AWS account for CDK (if you haven't done so already):
     ```bash
     cdk bootstrap
     ```
-1. Deploy the stack:
+7. Deploy the stack:
     ```bash
     cdk deploy
     ```
-1. Note the outputs from the CDK deployment. These contain the API endpoints, CloudFront distribution URL, and other important resource information.
+Note the outputs from the CDK deployment. These contain the API endpoints, CloudFront distribution URL, and other important resource information.
 
 ## How it works
 
