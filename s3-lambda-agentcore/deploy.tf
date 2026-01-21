@@ -67,14 +67,16 @@ statement {
     effect    = "Allow"
     resources = ["*"]
   }
-  statement {
-    actions = [
-      "bedrock:InvokeModel",
-      "bedrock:InvokeModelWithResponseStream"
-    ]
-    effect    = "Allow"
-    resources = ["*"]
-  }
+statement {
+  actions = [
+    "bedrock:InvokeModel",
+    "bedrock:InvokeModelWithResponseStream"
+  ]
+  effect    = "Allow"
+  resources = [
+    "arn:aws:bedrock:${local.region}::foundation-model/amazon.nova-pro-v1"
+  ]
+}
   statement {
     actions = [
       "s3:GetObject",
