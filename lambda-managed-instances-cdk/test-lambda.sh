@@ -68,16 +68,18 @@ echo -e "${BLUE}Test 3: Lambda Managed Instances (EC2 instances)${NC}"
 echo "Checking capacity provider and associated EC2 instances..."
 
 echo -e "${YELLOW}Capacity Provider Details:${NC}"
-aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --query 'CapacityProvider.[CapacityProviderArn,State,InstanceRequirements.Architectures[0],CapacityProviderScalingConfig.ScalingMode]' --output table --profile "$PROFILE"
+aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider-cdk --query 'CapacityProvider.[CapacityProviderArn,State,InstanceRequirements.Architectures[0],CapacityProviderScalingConfig.ScalingMode]' --output table --profile "$PROFILE"
 
 echo -e "${YELLOW}EC2 Instances provisioned for Lambda Managed Instances:${NC}"
 # Get subnet IDs from capacity provider
-SUBNET_IDS=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --query 'CapacityProvider.VpcConfig.SubnetIds' --output text --profile "$PROFILE" | tr '\t' ',')
-SECURITY_GROUP_ID=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --query 'CapacityProvider.VpcConfig.SecurityGroupIds[0]' --output text --profile "$PROFILE")
+SUBNET_IDS=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider-cdk --query 'CapacityProvider.VpcConfig.SubnetIds' --output text --profile "$PROFILE" | tr '\t' ',')
+SECURITY_GROUP_ID=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider-cdk --query 'CapacityProvider.VpcConfig.SecurityGroupIds[0]' --output text --profile "$PROFILE")
 
 # List EC2 instances tagged with this capacity provider
 # Get the capacity provider ARN dynamically
-CAPACITY_PROVIDER_ARN=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --query 'CapacityProvider.CapacityProviderArn' --output text --profile "$PROFILE")
+REGION=$(aws configure get region --profile "$PROFILE")
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --profile "$PROFILE")
+CAPACITY_PROVIDER_ARN="arn:aws:lambda:${REGION}:${ACCOUNT_ID}:capacity-provider:lambda-capacity-provider-cdk"
 aws ec2 describe-instances \
     --filters "Name=tag:aws:lambda:capacity-provider,Values=$CAPACITY_PROVIDER_ARN" \
     --query 'Reservations[*].Instances[*].[InstanceId,InstanceType,State.Name,LaunchTime,SubnetId,PrivateIpAddress]' \
@@ -110,10 +112,10 @@ echo "4. Custom invocation:"
 echo "   echo '{\"name\":\"Your Name\"}' | aws lambda invoke --function-name $FUNCTION_NAME --payload file:///dev/stdin --cli-binary-format raw-in-base64-out --profile $PROFILE output.json"
 echo ""
 echo "5. View capacity provider details:"
-echo "   aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --profile $PROFILE"
+echo "   aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider-cdk --profile $PROFILE"
 echo ""
 echo "6. List EC2 instances for managed instances:"
-echo "   aws ec2 describe-instances --filters \"Name=tag:aws:lambda:capacity-provider,Values=arn:aws:lambda:*:capacity-provider:lambda-capacity-provider\" --profile $PROFILE"
+echo "   aws ec2 describe-instances --filters \"Name=tag:aws:lambda:capacity-provider,Values=arn:aws:lambda:*:capacity-provider:lambda-capacity-provider-cdk\" --profile $PROFILE"
 
 # Cleanup temporary files
 rm -f response.json
