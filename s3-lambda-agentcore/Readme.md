@@ -1,5 +1,5 @@
 # Amazon S3 to AWS Lambda to Amazon Bedrock AgentCore
-This pattern creates a Lambda function to invoke an agent in AgentCore Runtime when an object is uploaded to the S3 bucket.
+This pattern creates an AWS Lambda function to invoke an agent in AgentCore Runtime when an object is uploaded to the Amazon S3 bucket.
 
 This Terraform template creates 2 S3 buckets (input and output), an AWS Lambda Function, and an agent in AgentCore Runtime.
 
