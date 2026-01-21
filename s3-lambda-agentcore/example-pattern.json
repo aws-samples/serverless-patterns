@@ -1,5 +1,5 @@
 {
-  "title": "This pattern creates a Lambda function to invoke an AgentCore agent when an object is uploaded to the S3 bucket.",
+  "title": "Amazon S3 to AWS Lambda to Amazon Bedrock AgentCore.",
   "description": "This pattern creates an S3 bucket, which triggers an AWS Lambda, which invokes an agent in AgentCore.",
   "language": "Python",
   "level": "200",
