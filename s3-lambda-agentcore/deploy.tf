@@ -47,15 +47,18 @@ data "aws_iam_policy_document" "agentcore_permissions_policy" {
     effect    = "Allow"
     resources = [aws_ecr_repository.agentcore_repo.arn]
   }
-  statement {
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-    effect    = "Allow"
-    resources = ["*"]
-  }
+statement {
+  actions = [
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents",
+  ]
+  effect    = "Allow"
+  resources = [
+    "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/bedrock-agentcore/*",
+    "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/bedrock-agentcore/*:log-stream:*"
+  ]
+}
   statement {
     actions = [
       "xray:PutTraceSegments",
