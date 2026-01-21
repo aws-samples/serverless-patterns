@@ -13,6 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) (Terraform) installed
+* [Docker](https://docs.docker.com/get-docker/) installed and running (required for building the agent container image)
 
 ## Deployment Instructions
 
