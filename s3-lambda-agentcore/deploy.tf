@@ -78,13 +78,22 @@ statement {
   ]
 }
   statement {
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket"
-    ]
-    effect    = "Allow"
-    resources = ["*"]
-  }
+  actions = [
+    "s3:GetObject"
+  ]
+  effect    = "Allow"
+  resources = [
+    "${aws_s3_bucket.input_bucket.arn}/*"
+  ]
+}
+statement {
+  actions = [
+    "s3:ListBucket"
+  ]
+  effect    = "Allow"
+  resources = [
+    aws_s3_bucket.input_bucket.arn
+  ]
 }
 
 resource "aws_iam_role" "agentcore_role" {
