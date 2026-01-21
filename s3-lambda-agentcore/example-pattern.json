@@ -28,7 +28,7 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
       },
       {
-        "test": "Invoke an AgentCore Runtime agent",
+        "text": "Invoke an AgentCore Runtime agent",
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-invoke-agent.html"
       }
     ]
