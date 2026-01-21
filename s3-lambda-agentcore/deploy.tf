@@ -191,17 +191,43 @@ data "aws_iam_policy_document" "lambda_permissions_policy" {
     effect    = "Allow"
     resources = ["*"]
   }
-  statement {
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "s3:*",
-      "bedrock-agentcore:*"
-    ]
-    effect    = "Allow"
-    resources = ["*"]
-  }
+statement {
+  actions = [
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents"
+  ]
+  effect    = "Allow"
+  resources = [
+    "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${aws_lambda_function.s3_agent_lambda_function.function_name}:*"
+  ]
+}
+statement {
+  actions = [
+    "s3:GetObject"
+  ]
+  effect    = "Allow"
+  resources = [
+    "${aws_s3_bucket.input_bucket.arn}/*"
+  ]
+}
+statement {
+  actions = [
+    "s3:PutObject"
+  ]
+  effect    = "Allow"
+  resources = [
+    "${aws_s3_bucket.output_bucket.arn}/*"
+  ]
+}
+statement {
+  actions = [
+    "bedrock-agentcore:InvokeAgentRuntime"
+  ]
+  effect    = "Allow"
+  resources = [
+    aws_bedrockagentcore_agent_runtime.agentcore_runtime.agent_runtime_arn
+  ]
 }
 
 resource "aws_iam_role" "lambda_role" {
