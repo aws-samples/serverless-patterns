@@ -1,6 +1,6 @@
 {
   "title": "Amazon S3 to AWS Lambda to Amazon Bedrock AgentCore.",
-  "description": "This pattern creates an S3 bucket, which triggers an AWS Lambda, which invokes an agent in AgentCore.",
+  "description": "This pattern creates an Amazon S3 bucket, which triggers an AWS Lambda function, which invokes an agent in Amazon Bedrock AgentCore.",
   "language": "Python",
   "level": "200",
   "framework": "Terraform",
