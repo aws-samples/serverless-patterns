@@ -76,7 +76,8 @@ SUBNET_IDS=$(aws lambda get-capacity-provider --capacity-provider-name lambda-ca
 SECURITY_GROUP_ID=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --query 'CapacityProvider.VpcConfig.SecurityGroupIds[0]' --output text --profile "$PROFILE")
 
 # List EC2 instances tagged with this capacity provider
-CAPACITY_PROVIDER_ARN="arn:aws:lambda:us-west-2:220537809147:capacity-provider:lambda-capacity-provider"
+# Get the capacity provider ARN dynamically
+CAPACITY_PROVIDER_ARN=$(aws lambda get-capacity-provider --capacity-provider-name lambda-capacity-provider --query 'CapacityProvider.CapacityProviderArn' --output text --profile "$PROFILE")
 aws ec2 describe-instances \
     --filters "Name=tag:aws:lambda:capacity-provider,Values=$CAPACITY_PROVIDER_ARN" \
     --query 'Reservations[*].Instances[*].[InstanceId,InstanceType,State.Name,LaunchTime,SubnetId,PrivateIpAddress]' \
