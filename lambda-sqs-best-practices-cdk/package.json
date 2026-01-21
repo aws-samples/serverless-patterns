@@ -1,0 +1,28 @@
+{
+  "name": "lambda-sqs-best-practices-cdk",
+  "version": "1.0.0",
+  "bin": {
+    "lambda-sqs-best-practices-cdk": "bin/lambda-sqs-best-practices-cdk.js"
+  },
+  "scripts": {
+    "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
+    "cdk": "cdk",
+    "test:success": "node scripts/send-success-messages.js",
+    "test:dlq": "node scripts/test-with-dlq.js",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.110.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.110.0",
+    "aws-sdk": "^2.1490.0",
+    "constructs": "^10.3.0",
+    "@aws-sdk/client-sqs": "^3.x"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

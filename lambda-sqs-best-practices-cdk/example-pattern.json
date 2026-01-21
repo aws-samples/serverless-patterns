@@ -1,0 +1,98 @@
+{
+  "title": "Lambda SQS best practices with Powertools",
+  "description": "Creates a Lambda function with SQS trigger implementing best practices using AWS Lambda Powertools, including structured logging, metrics, and tracing",
+  "language": "nodejs",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to implement a Lambda function with SQS trigger using AWS best practices. It includes AWS Lambda Powertools for structured logging, metrics, and tracing, along with proper error handling and dead-letter queue configuration.",
+      "The pattern implements message validation, batch processing with partial failures, and comprehensive operational monitoring through CloudWatch dashboards.",
+      "The implementation includes load testing capabilities to verify the system's behavior under different scenarios including invalid messages and error conditions.",
+      "This pattern deploys an SQS Queue, Dead Letter Queue, Lambda function, CloudWatch Dashboard, and necessary IAM roles and permissions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sqs-best-practices-cdk",
+      "templateURL": "serverless-patterns/lambda-sqs-best-practices-cdk",
+      "projectFolder": "lambda-sqs-best-practices-cdk",
+      "templateFile": "lib/lambda-sqs-best-practices-cdk-stack.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Powertools for Node.js",
+        "link": "https://www.npmjs.com/org/aws-lambda-powertools"
+      },
+      {
+        "text": "AWS Lambda with SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      },
+      {
+        "text": "SQS Dead Letter Queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      },
+      {
+        "text": "Lambda Function Scaling with SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-scaling.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "git clone https://github.com/aws-samples/serverless-patterns",
+      "cd serverless-patterns/lambda-sqs-best-practices-cdk",
+      "Install cdk dependencies",
+      "npm install",
+      "Install lambda dependencies",
+      "cd lambda",
+      "npm install",
+      "cd .."
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "After deployment, you can test the pattern using the included load test script:",
+      "export QUEUE_URL=$(aws cloudformation describe-stacks --stack-name LambdaSqsBestPracticesCdkStack --query 'Stacks[0].Outputs[?OutputKey==`QueueUrl`].OutputValue' --output text)",
+      "export AWS_REGION=us-east-1  # or your AWS region",
+      "npm run test          # Sends 100 messages",
+      "npm run test:small    # Sends 50 messages",
+      "npm run test:medium   # Sends 200 messages",
+      "npm run test:large    # Sends 500 messages",
+      "Monitor the results in the CloudWatch Dashboard created by the stack."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shubham More",
+      "image": "https://avatars.githubusercontent.com/u/150242047?s=400&u=aaa2db07529d3e1e82ec59daacb05b6abc7c3a5f&v=4",
+      "bio": "Cloud Support Engineer II - SVLS",
+      "linkedin": "shubham-more-1b6aa185"
+    },
+    {
+      "name": "Umang Aggarwal",
+      "image": "https://avatars.githubusercontent.com/u/75968399?v=4&size=64",
+      "bio": "Cloud Support Engineer II - SVLS",
+      "linkedin": "umangaggarwal"
+    },
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Sr. Application Architect",
+      "linkedin": "https://www.linkedin.com/in/vaibhavjainv/"
+     },
+     {
+      "name": "Adam Wagner",
+      "bio": "AWS - Principal Serverless Solutions Architect",
+      "linkedin": "https://www.linkedin.com/in/adam-wagner-4bb412/"
+     }
+  ]
+}
