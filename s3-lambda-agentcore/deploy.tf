@@ -47,18 +47,18 @@ data "aws_iam_policy_document" "agentcore_permissions_policy" {
     effect    = "Allow"
     resources = [aws_ecr_repository.agentcore_repo.arn]
   }
-statement {
-  actions = [
-    "logs:CreateLogGroup",
-    "logs:CreateLogStream",
-    "logs:PutLogEvents",
-  ]
-  effect    = "Allow"
-  resources = [
-    "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/bedrock-agentcore/*",
-    "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/bedrock-agentcore/*:log-stream:*"
-  ]
-}
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    effect    = "Allow"
+    resources = [
+      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/bedrock-agentcore/*",
+      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/bedrock-agentcore/*:log-stream:*"
+    ]
+  }
   statement {
     actions = [
       "xray:PutTraceSegments",
@@ -67,33 +67,36 @@ statement {
     effect    = "Allow"
     resources = ["*"]
   }
-statement {
-  actions = [
-    "bedrock:InvokeModel",
-    "bedrock:InvokeModelWithResponseStream"
-  ]
-  effect    = "Allow"
-  resources = [
-    "arn:aws:bedrock:${local.region}::foundation-model/amazon.nova-pro-v1"
-  ]
-}
   statement {
-  actions = [
-    "s3:GetObject"
-  ]
-  effect    = "Allow"
-  resources = [
-    "${aws_s3_bucket.input_bucket.arn}/*"
-  ]
-}
-statement {
-  actions = [
-    "s3:ListBucket"
-  ]
-  effect    = "Allow"
-  resources = [
-    aws_s3_bucket.input_bucket.arn
-  ]
+    actions = [
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream"
+    ]
+    effect    = "Allow"
+    resources = [
+      "arn:aws:bedrock:*::foundation-model/amazon.nova-pro-v1",
+      "arn:aws:bedrock:*::foundation-model/amazon.nova-pro-v1:0",
+      "arn:aws:bedrock:${local.region}:${local.account_id}:inference-profile/*"
+    ]
+  }
+  statement {
+    actions = [
+      "s3:GetObject"
+    ]
+    effect    = "Allow"
+    resources = [
+      "${aws_s3_bucket.input_bucket.arn}/*"
+    ]
+  }
+  statement {
+    actions = [
+      "s3:ListBucket"
+    ]
+    effect    = "Allow"
+    resources = [
+      aws_s3_bucket.input_bucket.arn
+    ]
+  }
 }
 
 resource "aws_iam_role" "agentcore_role" {
@@ -187,47 +190,45 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 
 data "aws_iam_policy_document" "lambda_permissions_policy" {
   statement {
-    actions   = ["ecr:GetAuthorizationToken"]
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
     effect    = "Allow"
-    resources = ["*"]
+    resources = [
+      "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${aws_lambda_function.s3_agent_lambda_function.function_name}:*"
+    ]
   }
-statement {
-  actions = [
-    "logs:CreateLogGroup",
-    "logs:CreateLogStream",
-    "logs:PutLogEvents"
-  ]
-  effect    = "Allow"
-  resources = [
-    "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${aws_lambda_function.s3_agent_lambda_function.function_name}:*"
-  ]
-}
-statement {
-  actions = [
-    "s3:GetObject"
-  ]
-  effect    = "Allow"
-  resources = [
-    "${aws_s3_bucket.input_bucket.arn}/*"
-  ]
-}
-statement {
-  actions = [
-    "s3:PutObject"
-  ]
-  effect    = "Allow"
-  resources = [
-    "${aws_s3_bucket.output_bucket.arn}/*"
-  ]
-}
-statement {
-  actions = [
-    "bedrock-agentcore:InvokeAgentRuntime"
-  ]
-  effect    = "Allow"
-  resources = [
-    aws_bedrockagentcore_agent_runtime.agentcore_runtime.agent_runtime_arn
-  ]
+  statement {
+    actions = [
+      "s3:GetObject"
+    ]
+    effect    = "Allow"
+    resources = [
+      "${aws_s3_bucket.input_bucket.arn}/*"
+    ]
+  }
+  statement {
+    actions = [
+      "s3:PutObject"
+    ]
+    effect    = "Allow"
+    resources = [
+      "${aws_s3_bucket.output_bucket.arn}/*"
+    ]
+  }
+  statement {
+    actions = [
+      "bedrock-agentcore:InvokeAgentRuntime"
+    ]
+    effect    = "Allow"
+    resources = [
+      aws_bedrockagentcore_agent_runtime.agentcore_runtime.agent_runtime_arn,
+      "${aws_bedrockagentcore_agent_runtime.agentcore_runtime.agent_runtime_arn}/*"
+    ]
+  }
+  depends_on = [aws_bedrockagentcore_agent_runtime.agentcore_runtime]
 }
 
 resource "aws_iam_role" "lambda_role" {

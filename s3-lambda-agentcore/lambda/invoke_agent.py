@@ -102,8 +102,3 @@ def lambda_handler(event,context):
             'output': f"s3://{output_bucket}/{output_key}"
         })
     }
-
-
-    # This code is provided on best effort basis.
-    # Kindly note this code is not tested on edge cases these may create issues if you deploy it over production environment.
-    # Use this code for referene purpose only.
