@@ -129,7 +129,6 @@ resource "aws_iam_policy" "scheduler_ec2_policy" {
 
 resource "aws_iam_role" "scheduler-ec2-role" {
   name = "scheduler-ec2-role"
-  managed_policy_arns = [aws_iam_policy.scheduler_ec2_policy.arn]
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -144,4 +143,9 @@ resource "aws_iam_role" "scheduler-ec2-role" {
       },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "scheduler_ec2_policy_attachment" {
+  role       = aws_iam_role.scheduler-ec2-role.name
+  policy_arn = aws_iam_policy.scheduler_ec2_policy.arn
 }
