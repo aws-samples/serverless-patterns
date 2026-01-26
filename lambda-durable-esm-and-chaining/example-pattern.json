@@ -1,9 +1,9 @@
 {
     "title": "Event-Driven Data Pipeline with Lambda Durable Functions",
-    "description": "This serverless pattern demonstrates how to build an event-driven data processing pipeline using AWS Lambda Durable Functions with direct SQS Event Source Mapping and Lambda invoke chaining.",
+    "description": "This serverless pattern demonstrates building an event-driven pipeline using AWS Lambda Durable Functions with direct SQS Event Source Mapping",
     "language": "Python",
     "level": "200",
-    "framework": "SAM",
+    "framework": "AWS SAM",
     "services": ["sqs","lambda", "dynamoDB"],
     "introBox": {
       "headline": "How it works",
