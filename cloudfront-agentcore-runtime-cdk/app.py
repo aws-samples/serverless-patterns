@@ -8,13 +8,13 @@ from infra.cloudfront_stack import CloudFrontStack
 
 app = cdk.App()
 
-agentcore_stack = AgentcoreStack(app, "AgentcoreStack",
+agentcore_stack = AgentcoreStack(app, "AgentCoreAgentsStack",
     env=cdk.Environment(region=os.environ.get("CDK_DEFAULT_REGION", "us-west-2")),
     cross_region_references=True
 )
 
-cloudfront_stack = CloudFrontStack(app, "AgentcoreCloudFrontStack",
-    env=cdk.Environment(region="us-east-1"),
+cloudfront_stack = CloudFrontStack(app, "CloudFrontToAgentCoreStack",
+    env=cdk.Environment(region=os.environ.get("CDK_DEFAULT_REGION", "us-west-2")),
     cross_region_references=True,
     a2a_agent_runtime_arn=agentcore_stack.a2a_agent_runtime_arn,
     http_agent_runtime_arn=agentcore_stack.http_agent_runtime_arn,

@@ -45,13 +45,7 @@ Important: this application uses various AWS services and there are costs associ
     pip3 install -r requirements.txt
     ```
 
-4. Bootstrap CDK (if not already done):
-
-    ```shell
-    cdk bootstrap aws://<account-id>/us-west-2 aws://<account-id>/us-east-1
-    ```
-
-5. Deploy the stacks:
+4. Deploy the stacks:
 
     ```shell
     cdk deploy --all
@@ -110,6 +104,11 @@ This pattern creates:
 
     ```shell
     python test_a2a.py
+    ```
+
+    You can also use tools like [A2A Inspector](https://a2a-inspector.vercel.app/) with the agent card URL:
+    ```
+    https://<distribution-id>.cloudfront.net/a2a/
     ```
 
 5. Test HTTP protocol:
