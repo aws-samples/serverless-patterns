@@ -1,0 +1,24 @@
+{
+  "name": "lambda-durable-function-chaining-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "lambda-durable-function-chaining-cdk": "bin/lambda-durable-function-chaining-cdk.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/jest": "^30",
+    "@types/node": "^24.10.1",
+    "aws-cdk": "2.1104.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-lambda-python-alpha": "^2.236.0-alpha.0",
+    "aws-cdk-lib": "^2.236.0",
+    "constructs": "^10.0.0"
+  }
+}
