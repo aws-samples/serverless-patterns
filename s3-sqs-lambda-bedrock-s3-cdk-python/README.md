@@ -12,10 +12,6 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/cli.html)
 * [Python, pip, virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html) installed
 
-## Prerequisite
-Amazon Bedrock users need to request access to models before they are available for use. If you want to add additional models for text, chat, and image generation, you need to request access to models in Amazon Bedrock. For this pattern need access to 'Titan Text G1 - Express' model. Please refer to the link below for instruction:
-[Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
-
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
