@@ -15,16 +15,16 @@ data "aws_caller_identity" "current" {}
 
 data "archive_file" "LambdaZipFile" {
   type        = "zip"
-  source_file = "${path.module}/src/main"
+  source_file = "${path.module}/src/bootstrap"
   output_path = "${path.module}/eventbridge_go_function.zip"
 }
 
 resource "aws_lambda_function" "eventbridge_function" {
   function_name = "EventBridgeScheduleTarget"
   filename      = data.archive_file.LambdaZipFile.output_path
-  handler       = "main"
+  handler       = "bootstrap"
   role          = aws_iam_role.iam_for_lambda.arn
-  runtime       = "go1.x"
+  runtime       = "provided.al2023"
   memory_size   = 128
   timeout       = 30
 }
