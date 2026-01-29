@@ -1,12 +1,12 @@
 # Hello World on AWS Lambda Managed Instances
 
-This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using AWS CDK. Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions.
+This pattern demonstrates how to deploy a simple Hello World Lambda function running on AWS Lambda Managed Instances using AWS CDK. AWS Lambda Managed Instances enables you to run Lambda functions on EC2 instances while maintaining Lambda's operational simplicity. It fully manages infrastructure tasks including instance lifecycle, OS and runtime patching, routing, load balancing, and auto scaling.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-managed-instances-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-**Note**: Lambda Managed Instances provision EC2 instances that are **NOT eligible for the AWS Free Tier**. These instances will incur charges immediately upon deployment, regardless of your Free Tier status.
+**Note**: AWS Lambda Managed Instances provision EC2 instances that are **NOT eligible for the AWS Free Tier**. These instances will incur charges immediately upon deployment, regardless of your Free Tier status.
 
 ## Requirements
 
@@ -40,30 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates the deployment of a simple Lambda function on Lambda Managed Instances:
-
-### Lambda Managed Instances
-[Lambda Managed Instances](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html) provide:
-- Predictable performance with pre-warmed execution environments
-- Reduced cold start latency
-- Consistent execution characteristics
-- Better resource utilization for frequently invoked functions
-
-The underlying EC2 infrastructure can be inspected using AWS CLI commands to understand how managed instances work (see "Inspecting Lambda Managed Instances Infrastructure" section below).
-
-### Hello World Function
-The Lambda function is a simple Hello World implementation that:
-- Accepts an event with a name parameter
-- Returns a JSON response with a greeting message
-- Uses AWS Lambda PowerTools for efficient event logging
-- Demonstrates minimal Lambda function structure using the Handler type
-
-### Amazon CloudWatch Log Group
-The pattern includes a dedicated CloudWatch log group with:
-- **Custom log group name**: `/demo/lambda/hello-world-managed-instances-cdk`
-- **Retention period**: 2 weeks (14 days) to manage storage costs
-- **Automatic cleanup**: Configured with `RemovalPolicy.DESTROY` to be deleted when the stack is destroyed
-- **Direct integration**: The Lambda function is configured to use this specific log group
+This pattern creates a capacity provider with VPC and security group configuration, then deploys a Node.js Lambda function (ARM64 architecture) that is associated with the capacity provider to run on managed EC2 instances. The function accepts an event with a name parameter and returns a greeting message, with execution logs captured in a dedicated CloudWatch log group.
 
 ## Testing
 
@@ -132,9 +109,9 @@ Monitor the function execution through:
 
 The stack outputs include the log group name for easy reference when setting up monitoring dashboards or log analysis tools.
 
-## Inspecting Lambda Managed Instances Infrastructure
+## Inspecting AWS Lambda Managed Instances Infrastructure
 
-Lambda Managed Instances provision EC2 instances behind the scenes to provide predictable performance. You can inspect this infrastructure using AWS CLI commands:
+AWS Lambda Managed Instances provision EC2 instances behind the scenes to run your Lambda functions. You can inspect this infrastructure using AWS CLI commands:
 
 ### View Capacity Provider Details
 
@@ -163,7 +140,7 @@ This displays:
 - Launch times and subnet distribution
 - Private IP addresses within the VPC
 
-**Note**: For a complete list of supported EC2 instance types for Lambda Managed Instances and their pricing, see the [AWS Lambda Pricing page](https://aws.amazon.com/lambda/pricing/).
+**Note**: For a complete list of supported EC2 instance types for AWS Lambda Managed Instances and their pricing, see the [AWS Lambda Pricing page](https://aws.amazon.com/lambda/pricing/).
 
 ### Understanding Instance Behavior
 
@@ -183,7 +160,7 @@ The included test script (`./test-lambda.sh`) automatically inspects both the ca
 
 ## Regional Availability
 
-This stack will deploy to your default AWS region. Before deploying, please verify that Lambda Managed Instances feature is available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official [Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html).
+This stack will deploy to your default AWS region. Before deploying, please verify that AWS Lambda Managed Instances feature is available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official [AWS Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html).
 
 ## Cleanup
  

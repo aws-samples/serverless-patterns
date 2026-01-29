@@ -7,8 +7,8 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to deploy a simple Hello World AWS Lambda function running on Lambda Managed Instances using AWS CDK.",
-      "Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions by pre-warming execution environments.",
+      "This pattern demonstrates how to deploy a simple Hello World AWS Lambda function running on AWS Lambda Managed Instances using AWS CDK.",
+      "AWS Lambda Managed Instances enables you to run Lambda functions on EC2 instances while maintaining Lambda's operational simplicity. It fully manages infrastructure tasks including instance lifecycle, OS and runtime patching, routing, load balancing, and auto scaling.",
       "The Hello World function accepts an event with a name parameter and returns a simple JSON response with a greeting message."
     ]
   },
