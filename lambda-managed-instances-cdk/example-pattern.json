@@ -1,13 +1,13 @@
 {
-  "title": "Lambda Hello World on Lambda Managed Instances",
-  "description": "Deploy a simple Hello World Lambda function on Lambda Managed Instances using AWS CDK",
+  "title": "Hello World on AWS Lambda Managed Instances",
+  "description": "Deploy a simple Hello World AWS Lambda function on Lambda Managed Instances using AWS CDK",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using AWS CDK.",
+      "This pattern demonstrates how to deploy a simple Hello World AWS Lambda function running on Lambda Managed Instances using AWS CDK.",
       "Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions by pre-warming execution environments.",
       "The Hello World function accepts an event with a name parameter and returns a simple JSON response with a greeting message."
     ]
@@ -23,7 +23,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Managed Instances documentation",
+        "text": "AWS Lambda Managed Instances documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
       },
       {

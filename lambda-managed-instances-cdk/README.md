@@ -1,4 +1,4 @@
-# Lambda Hello World on Lambda Managed Instances
+# Hello World on AWS Lambda Managed Instances
 
 This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using AWS CDK. Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions.
 
@@ -58,7 +58,7 @@ The Lambda function is a simple Hello World implementation that:
 - Uses AWS Lambda PowerTools for efficient event logging
 - Demonstrates minimal Lambda function structure using the Handler type
 
-### CloudWatch Log Group
+### Amazon CloudWatch Log Group
 The pattern includes a dedicated CloudWatch log group with:
 - **Custom log group name**: `/demo/lambda/hello-world-managed-instances-cdk`
 - **Retention period**: 2 weeks (14 days) to manage storage costs
@@ -197,6 +197,6 @@ This stack will deploy to your default AWS region. Before deploying, please veri
     ```
 
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
