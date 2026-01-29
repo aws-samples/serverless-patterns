@@ -1,14 +1,14 @@
 {
-  "title": "Lambda Hello World on Lambda Managed Instances (Terraform)",
-  "description": "Deploy a simple Hello World Lambda function on Lambda Managed Instances using Terraform",
+  "title": "Hello World on AWS Lambda Managed Instances (Terraform)",
+  "description": "Deploy a simple Hello World AWS Lambda function on Lambda Managed Instances using Terraform",
   "language": "JavaScript",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using Terraform.",
-      "Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions by pre-warming execution environments.",
+      "This pattern demonstrates how to deploy a simple Hello World AWS Lambda function running on AWS Lambda Managed Instances using Terraform.",
+      "AWS Lambda Managed Instances enables you to run Lambda functions on EC2 instances while maintaining Lambda's operational simplicity. It fully manages infrastructure tasks including instance lifecycle, OS and runtime patching, routing, load balancing, and auto scaling.",
       "The Hello World function uses ES modules (ESM) and accepts an event with a name parameter and returns a simple JSON response with a greeting message.",
       "The Terraform configuration creates a complete VPC infrastructure with public and private subnets, NAT gateways, and automatically associates the Lambda function with a capacity provider for managed instances."
     ]
@@ -24,7 +24,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Managed Instances documentation",
+        "text": "AWS Lambda Managed Instances documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
       },
       {

@@ -1,12 +1,12 @@
-# Lambda Hello World on Lambda Managed Instances (Terraform)
+# Hello World on AWS Lambda Managed Instances (Terraform)
 
-This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using Terraform. Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions.
+This pattern demonstrates how to deploy a simple Hello World Lambda function running on AWS Lambda Managed Instances using Terraform. AWS Lambda Managed Instances enables you to run Lambda functions on EC2 instances while maintaining Lambda's operational simplicity. It fully manages infrastructure tasks including instance lifecycle, OS and runtime patching, routing, load balancing, and auto scaling.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-managed-instances-tf
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-**Note**: Lambda Managed Instances provision EC2 instances that are **NOT eligible for the AWS Free Tier**. These instances will incur charges immediately upon deployment, regardless of your Free Tier status.
+**Note**: AWS Lambda Managed Instances provision EC2 instances that are **NOT eligible for the AWS Free Tier**. These instances will incur charges immediately upon deployment, regardless of your Free Tier status.
 
 ## Requirements
 
@@ -58,38 +58,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates the deployment of a simple Lambda function on Lambda Managed Instances:
-
-### Lambda Managed Instances
-[Lambda Managed Instances](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html) provide:
-- Predictable performance with pre-warmed execution environments
-- Reduced cold start latency
-- Consistent execution characteristics
-- Better resource utilization for frequently invoked functions
-
-The underlying EC2 infrastructure can be inspected using AWS CLI commands to understand how managed instances work (see "Inspecting Lambda Managed Instances Infrastructure" section below).
-
-### Hello World Function
-The Lambda function is a simple Hello World implementation that:
-- Accepts an event with a name parameter
-- Returns a JSON response with a greeting message
-- Uses AWS Lambda PowerTools for efficient event logging
-- Uses ES modules (ESM) with `.mjs` extension for modern JavaScript syntax
-- Demonstrates minimal Lambda function structure
-
-### Infrastructure Components
-The Terraform configuration creates:
-- **VPC**: Custom VPC with public and private subnets across multiple AZs
-- **NAT Gateways**: For outbound internet access from private subnets
-- **Security Group**: Controls network access for managed instances
-- **Lambda Function**: Hello World function with ARM64 architecture
-- **Capacity Provider**: Lambda managed instances configuration
-- **IAM Roles**: Proper permissions for Lambda execution and capacity provider operations
-- **CloudWatch Logs**: Function execution logging
-
-
-
-
+This pattern creates a capacity provider with VPC and security group configuration, then deploys a Node.js Lambda function (ARM64 architecture) that is associated with the capacity provider to run on managed EC2 instances. The Terraform configuration provisions a complete VPC infrastructure with public and private subnets across multiple availability zones, NAT gateways for outbound connectivity, and all necessary IAM roles and permissions.
 
 ## Testing
 
@@ -156,9 +125,9 @@ Monitor the function execution through:
 - **Lambda Metrics**: Function performance and invocation statistics
 - **CloudWatch Metrics**: Custom metrics and alarms for monitoring
 
-## Inspecting Lambda Managed Instances Infrastructure
+## Inspecting AWS Lambda Managed Instances Infrastructure
 
-Lambda Managed Instances provision EC2 instances behind the scenes to provide predictable performance. You can inspect this infrastructure using AWS CLI commands:
+AWS Lambda Managed Instances provision EC2 instances behind the scenes to run your Lambda functions. You can inspect this infrastructure using AWS CLI commands:
 
 ### View Capacity Provider Details
 
@@ -187,7 +156,7 @@ This displays:
 - Launch times and subnet distribution
 - Private IP addresses within the VPC
 
-**Note**: For a complete list of supported EC2 instance types for Lambda Managed Instances and their pricing, see the [AWS Lambda Pricing page](https://aws.amazon.com/lambda/pricing/).
+**Note**: For a complete list of supported EC2 instance types for AWS Lambda Managed Instances and their pricing, see the [AWS Lambda Pricing page](https://aws.amazon.com/lambda/pricing/).
 
 ### Understanding Instance Behavior
 
@@ -207,7 +176,7 @@ The included test script (`./test-lambda.sh`) automatically inspects both the ca
 
 ## Regional Availability
 
-This stack will deploy to your default AWS region or the region specified in the `aws_region` variable. Before deploying, please verify that Lambda Managed Instances feature is available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official [Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html).
+This stack will deploy to your default AWS region or the region specified in the `aws_region` variable. Before deploying, please verify that AWS Lambda Managed Instances feature is available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official [AWS Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html).
 
 ## Customization
 
@@ -232,6 +201,6 @@ terraform apply -var="aws_region=us-east-1"
 1. Confirm the resources have been deleted by checking the AWS Console.
 
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
