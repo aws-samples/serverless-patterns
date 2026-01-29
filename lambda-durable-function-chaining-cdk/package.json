@@ -17,7 +17,8 @@
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-lambda-python-alpha": "^2.236.0-alpha.0",
+    "@aws-sdk/client-lambda": "^3.978.0",
+    "@aws/durable-execution-sdk-js": "^1.0.2",
     "aws-cdk-lib": "^2.236.0",
     "constructs": "^10.0.0"
   }
