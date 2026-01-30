@@ -12,7 +12,7 @@ from constructs import Construct
 
 class CloudFrontStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, a2a_agent_runtime_arn: str, http_agent_runtime_arn: str, mcp_agent_runtime_arn: str, agent_runtime_region: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, a2a_agent_runtime_arn: str, http_agent_runtime_arn: str, mcp_agent_runtime_arn: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         a2a_encoded_arn = Fn.join("", Fn.split(":", Fn.join("%3A", Fn.split(":", a2a_agent_runtime_arn))))
@@ -25,19 +25,19 @@ class CloudFrontStack(Stack):
         mcp_encoded_arn = Fn.join("", Fn.split("/", Fn.join("%2F", Fn.split("/", mcp_encoded_arn))))
 
         a2a_agentcore_origin = origins.HttpOrigin(
-            f"bedrock-agentcore.{agent_runtime_region}.amazonaws.com",
+            f"bedrock-agentcore.{self.region}.amazonaws.com",
             origin_path=Fn.join("", ["/runtimes/", a2a_encoded_arn, "/invocations"]),
             protocol_policy=cloudfront.OriginProtocolPolicy.HTTPS_ONLY
         )
 
         http_agentcore_origin = origins.HttpOrigin(
-            f"bedrock-agentcore.{agent_runtime_region}.amazonaws.com",
+            f"bedrock-agentcore.{self.region}.amazonaws.com",
             origin_path=Fn.join("", ["/runtimes/", http_encoded_arn]),
             protocol_policy=cloudfront.OriginProtocolPolicy.HTTPS_ONLY
         )
 
         mcp_agentcore_origin = origins.HttpOrigin(
-            f"bedrock-agentcore.{agent_runtime_region}.amazonaws.com",
+            f"bedrock-agentcore.{self.region}.amazonaws.com",
             origin_path=Fn.join("", ["/runtimes/", mcp_encoded_arn]),
             protocol_policy=cloudfront.OriginProtocolPolicy.HTTPS_ONLY
         )

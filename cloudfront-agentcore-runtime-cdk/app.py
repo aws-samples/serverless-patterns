@@ -20,8 +20,7 @@ cloudfront_stack = CloudFrontStack(app, "CloudFrontToAgentCoreStack",
     cross_region_references=True,
     a2a_agent_runtime_arn=agentcore_stack.a2a_agent_runtime_arn,
     http_agent_runtime_arn=agentcore_stack.http_agent_runtime_arn,
-    mcp_agent_runtime_arn=agentcore_stack.mcp_agent_runtime_arn,
-    agent_runtime_region=region
+    mcp_agent_runtime_arn=agentcore_stack.mcp_agent_runtime_arn
 )
 cloudfront_stack.add_dependency(agentcore_stack)
 
