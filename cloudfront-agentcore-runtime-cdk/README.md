@@ -132,7 +132,7 @@ cd ..
 ./scripts/update_a2a_cloudfront_url.sh
 ```
 
-This configures the A2A agent to advertise the CloudFront URL in its agent card (`/.well-known/agent-card.json`). This is required when using tools like [A2A Inspector](https://a2a-inspector.vercel.app/) or other A2A-compatible clients that rely on the agent card for endpoint discovery.
+This configures the A2A agent to advertise the CloudFront URL in its agent card (`/.well-known/agent-card.json`). This is required when using A2A-compatible clients that rely on the agent card for endpoint discovery.
 
 ## Cleanup
 
