@@ -17,6 +17,7 @@
     "typescript": "~5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.978.0",
     "@aws-sdk/client-lambda": "^3.978.0",
     "@aws/durable-execution-sdk-js": "^1.0.2",
     "aws-cdk-lib": "^2.236.0",

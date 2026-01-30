@@ -28,28 +28,33 @@ export class LambdaDurableFunctionChainingCdkStack extends cdk.Stack {
     const authorizePaymentFunction = new nodejs.NodejsFunction(this, "AuthorizePaymentFunction", {
       runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, "functions", "authorizePayment", "index.ts"),
+      timeout: cdk.Duration.seconds(30),
     });
 
-    validateOrderFunction.addEnvironment("ALLOCATE_INVENTORY_FUNCTION", authorizePaymentFunction.functionName);
+    validateOrderFunction.addEnvironment("AUTHORIZE_PAYMENT_FUNCTION", authorizePaymentFunction.functionName);
     authorizePaymentFunction.grantInvoke(validateOrderFunction);
 
     const allocateInventoryFunction = new nodejs.NodejsFunction(this, "AllocateInventoryFunction", {
       runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, "functions", "allocateInventory", "index.ts"),
+      environment: {
+        PRODUCT_CATALOG_TABLE: productCatalogTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
     });
 
-    validateOrderFunction.addEnvironment("AUTHORIZE_PAYMENT_FUNCTION", allocateInventoryFunction.functionName);
+    validateOrderFunction.addEnvironment("ALLOCATE_INVENTORY_FUNCTION", allocateInventoryFunction.functionName);
     allocateInventoryFunction.grantInvoke(validateOrderFunction);
 
     const fulfillOrderFunction = new nodejs.NodejsFunction(this, "FulfillOrderFunction", {
       runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, "functions", "fulfillOrder", "index.ts"),
+      timeout: cdk.Duration.seconds(30),
     });
 
     validateOrderFunction.addEnvironment("FULFILL_ORDER_FUNCTION", fulfillOrderFunction.functionName);
     fulfillOrderFunction.grantInvoke(validateOrderFunction);
 
-    productCatalogTable.grantReadWriteData(validateOrderFunction);
-    productCatalogTable.grantWriteData(allocateInventoryFunction);
+    productCatalogTable.grantReadData(allocateInventoryFunction);
   }
 }
