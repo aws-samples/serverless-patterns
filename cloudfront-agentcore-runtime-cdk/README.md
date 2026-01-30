@@ -71,7 +71,7 @@ This pattern creates:
 
 ## Testing
 
-1. Get Pool ID and Client ID from the CDK outputs after running the `cdk deploy` command. Look for `UserPoolId` and `UserPoolClientId` in the outputs.
+1. Get Pool ID, Client ID, and CloudFront URL from the CDK outputs after running the `cdk deploy` command. Look for `UserPoolId`, `UserPoolClientId`, and `DistributionUrl` in the outputs.
 
 2. Get a bearer token:
 
@@ -122,6 +122,17 @@ This pattern creates:
     ```shell
     python test_mcp.py
     ```
+
+## Optional: Update A2A Agent Card URL
+
+If you want A2A clients to discover your agent via CloudFront instead of the direct AgentCore Runtime URL, run this script after deployment:
+
+```shell
+cd ..
+./scripts/update_a2a_cloudfront_url.sh
+```
+
+This configures the A2A agent to advertise the CloudFront URL in its agent card (`/.well-known/agent-card.json`). This is required when using tools like [A2A Inspector](https://a2a-inspector.vercel.app/) or other A2A-compatible clients that rely on the agent card for endpoint discovery.
 
 ## Cleanup
 

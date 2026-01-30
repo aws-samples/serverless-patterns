@@ -171,9 +171,5 @@ class AgentcoreStack(Stack):
         self.http_agent_runtime_arn = http_agent_runtime.attr_agent_runtime_arn
         self.mcp_agent_runtime_arn = mcp_agent_runtime.attr_agent_runtime_arn
 
-        CfnOutput(self, "A2aAgentRuntimeArn", value=a2a_agent_runtime.attr_agent_runtime_arn)
-        CfnOutput(self, "HttpAgentRuntimeArn", value=http_agent_runtime.attr_agent_runtime_arn)
-        CfnOutput(self, "McpAgentRuntimeArn", value=mcp_agent_runtime.attr_agent_runtime_arn)
         CfnOutput(self, "UserPoolId", value=user_pool.user_pool_id)
         CfnOutput(self, "UserPoolClientId", value=user_pool_client.user_pool_client_id)
-        CfnOutput(self, "CognitoDiscoveryUrl", value=f"https://cognito-idp.{self.region}.amazonaws.com/{user_pool.user_pool_id}/.well-known/openid-configuration")

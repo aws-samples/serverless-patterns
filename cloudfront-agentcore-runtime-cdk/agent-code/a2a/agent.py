@@ -8,7 +8,7 @@ from fastapi import FastAPI
 
 logging.basicConfig(level=logging.INFO)
 
-runtime_url = os.environ.get('AGENTCORE_RUNTIME_URL', 'http://127.0.0.1:9000/')
+runtime_url = os.environ.get('CLOUDFRONT_URL', os.environ.get('AGENTCORE_RUNTIME_URL', 'http://127.0.0.1:9000/'))
 
 strands_agent = Agent(
     name="Test Agent",
