@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "aws-sdk": "2.1000.0"
+    "aws-sdk": "2.1693.0"
   },
   "name": "producer",
   "version": "1.0.0",
