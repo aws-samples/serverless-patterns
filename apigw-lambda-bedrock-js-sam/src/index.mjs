@@ -9,18 +9,25 @@ export const handler = async (event) => {
   //console.log(prompt)
   //const prompt = 'Write a text to be posted on my social media channels about how Amazon Bedrock works';
   const body = {
-        'prompt': "\n\nHuman:" + prompt + "\n\nAssistant:",
-        "temperature": 0.5,
-        "top_p": 1,
-        "top_k": 250,
-        "max_tokens_to_sample": 200,
-        "stop_sequences": ["\n\nHuman:"]
-    }
+    anthropic_version: "bedrock-2023-05-31",
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            "type": "text",
+            "text": prompt
+          }
+        ],
+      },
+    ],
+    max_tokens: 200
+  };
   const input = {
     body: JSON.stringify(body),
     contentType: "application/json",
     accept: "application/json",
-    modelId: "anthropic.claude-v2",
+    modelId: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
   };
   const command = new InvokeModelCommand(input);
   const res = await client.send(command);
@@ -29,7 +36,7 @@ export const handler = async (event) => {
   //console.log(JSON.stringify(stringifiedResponse));
   const response = {
     statusCode: 200,
-    body: JSON.stringify(stringifiedResponse),
+    body: stringifiedResponse,
   };
   return response;
 };
