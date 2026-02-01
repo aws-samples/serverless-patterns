@@ -4,7 +4,7 @@ This pattern demonstrates a human-in-the-loop approval workflow using AWS Lambda
 
 **Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-hitl-approval-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-human-approval-sam
 
 ## Architecture
 
@@ -44,7 +44,7 @@ The pattern uses Lambda durable functions to implement a cost-effective approval
 
 1. Navigate to the pattern directory:
    ```bash
-   cd lambda-durable-hitl-approval-sam
+   cd lambda-durable-human-approval-sam
    ```
 
 2. Build the SAM application:
@@ -197,14 +197,14 @@ sam deploy --parameter-overrides ApproverEmail=new-email@example.com
 
 Monitor the durable function:
 ```bash
-aws logs tail /aws/lambda/lambda-durable-hitl-approval-ApprovalFunction-XXXXX \
+aws logs tail /aws/lambda/lambda-durable-human-approval-ApprovalFunction \
   --region us-east-2 \
   --follow
 ```
 
 Monitor the callback handler:
 ```bash
-aws logs tail /aws/lambda/lambda-durable-hitl-approv-CallbackHandlerFunction-XXXXX \
+aws logs tail /aws/lambda/lambda-durable-human-approval-CallbackHandlerFunction \
   --region us-east-2 \
   --follow
 ```
@@ -214,7 +214,7 @@ aws logs tail /aws/lambda/lambda-durable-hitl-approv-CallbackHandlerFunction-XXX
 ## Cleanup
 
 ```bash
-sam delete --stack-name lambda-durable-hitl-approval --region us-east-2
+sam delete --stack-name lambda-durable-human-approval --region us-east-2
 ```
 
 
