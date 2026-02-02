@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda Tenant Isolation Demo
+
+Resources:
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: tenant-isolation-queue
+      VisibilityTimeout: 300
+
+  TenantIsolatedFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TenantIsolatedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: tenant-isolated-processor
+      CodeUri: tenant-isolated-processor/
+      Handler: index.handler
+      Runtime: python3.12
+      Timeout: 120
+      Role: !GetAtt TenantIsolatedFunctionRole.Arn
+      TenancyConfig:
+        TenantIsolationMode: PER_TENANT
+
+  SQSProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: sqs-processor
+      CodeUri: sqs-processor/
+      Handler: index.handler
+      Runtime: python3.12
+      Timeout: 60
+      Environment:
+        Variables:
+          TENANT_ISOLATED_FUNCTION_NAME: !Ref TenantIsolatedFunction
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource: !GetAtt TenantIsolatedFunction.Arn
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ProcessingQueue.Arn
+            BatchSize: 10
+
+Outputs:
+  QueueUrl:
+    Value: !Ref ProcessingQueue
+  QueueArn:
+    Value: !GetAtt ProcessingQueue.Arn
+  TenantIsolatedFunctionArn:
+    Value: !GetAtt TenantIsolatedFunction.Arn
+  SQSProcessorFunctionArn:
+    Value: !GetAtt SQSProcessorFunction.Arn
