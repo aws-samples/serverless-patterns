@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for LLM-powered API with AppSync and Lambda
+
+Parameters:
+  ModelId:
+    Type: String
+    Default: anthropic.claude-3-sonnet-20240229-v1:0
+    Description: Bedrock model ID
+  BedrockRegion:
+    Type: String
+    Default: eu-west-2
+    Description: AWS region
+
+Resources:
+  # AppSync API
+  GraphQLAPI:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: LLMPoweredAPI
+      AuthenticationType: API_KEY
+
+  # AppSync API Key
+  GraphQLAPIKey:
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt GraphQLAPI.ApiId
+
+  # AppSync Schema
+  GraphQLSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt GraphQLAPI.ApiId
+      Definition: |
+        type Query {
+          hello: String
+        }
+        
+        type Mutation {
+          invokeModel(input: String!): String!
+        }
+        
+        type Subscription {
+          onModelResponse: String
+            @aws_subscribe(mutations: ["invokeModel"])
+        }
+        
+        schema {
+          query: Query
+          mutation: Mutation
+          subscription: Subscription
+        }
+
+  # Lambda Function
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./lambda_function/
+      Handler: app.handler
+      Runtime: nodejs24.x
+      Timeout: 30
+      Environment:
+        Variables:
+          MODEL_ID: !Ref ModelId
+          BEDROCK_REGION: !Ref BedrockRegion
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: '*'
+
+  # AppSync DataSource (Lambda)
+  LambdaDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GraphQLAPI.ApiId
+      Name: LambdaDataSource
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncServiceRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt LambdaFunction.Arn
+
+  # AppSync Resolver
+  InvokeModelResolver:
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !GetAtt GraphQLAPI.ApiId
+      TypeName: Mutation
+      FieldName: invokeModel
+      DataSourceName: !GetAtt LambdaDataSource.Name
+
+  # IAM Role for AppSync
+  AppSyncServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt LambdaFunction.Arn
+
+Outputs:
+  GraphQLAPIURL:
+    Description: The URL of the GraphQL API
+    Value: !GetAtt GraphQLAPI.GraphQLUrl
+  GraphQLAPIKey:
+    Description: The API Key for the GraphQL API
+    Value: !GetAtt GraphQLAPIKey.ApiKey

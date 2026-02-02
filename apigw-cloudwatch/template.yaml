@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - AWS WAF to Amazon API Gateway REST
+Description: Serverless patterns - AWS WAF to Amazon API Gateway REST (uksb-1tthgi812) (tag:apigw-cloudwatch)
 
 Resources:
   # Log group
@@ -42,7 +42,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         RootGet:
           Type: Api
@@ -55,7 +55,7 @@ Outputs:
   # API endpoint for testing
   ApiEndpoint:
     Description: API endpoint URL
-    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+    Value: !Sub https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod
   LogGroupName:
     Description: Name of the log group
     Value: !Ref MyLogGroup

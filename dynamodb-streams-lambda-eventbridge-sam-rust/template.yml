@@ -1,5 +1,6 @@
 Transform: AWS::Serverless-2016-10-31
 
+Description: (uksb-1tthgi812) (tag:dynamodb-streams-lambda-eventbridge-sam-rust)
 Resources:
 ##########################################################################
 #   DynamoDB                                                             #
@@ -37,9 +38,9 @@ Resources:
       MemorySize: 512
       Architectures: ["arm64"]
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
       Timeout: 6
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - EventBridgePutEventsPolicy:
             EventBusName: !Ref MyBus
@@ -62,6 +63,9 @@ Resources:
           BUS_NAME: !Ref MyBus
           RUST_BACKTRACE: 1
           RUST_LOG: info
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
   MyFunctionLogGroup:
     Type: AWS::Logs::LogGroup

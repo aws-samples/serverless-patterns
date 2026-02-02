@@ -1,4 +1,4 @@
-# AWS serverless patterns
+# AWS Serverless Patterns Collection
 
 This repo contains serverless patterns showing how to integrate services using infrastructure-as-code (IaC). You can use these patterns to help develop your own projects quickly.
 
@@ -6,10 +6,6 @@ This repo contains serverless patterns showing how to integrate services using i
 - To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-## Requirements
-
-* AWS CLI already configured with Administrator permission
 
 ## Deployment Instructions
 
@@ -27,7 +23,11 @@ git clone https://github.com/aws-samples/serverless-patterns
 
 Each subdirectory contains additional installation and usage instructions.
 
+## Ownership
+
+This project is owned, managed, and maintained by the **AWS Sererless Developer Advocacy team**.
+
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

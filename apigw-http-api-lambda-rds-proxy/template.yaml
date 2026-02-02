@@ -1,6 +1,7 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-http-api-lambda-rds-proxy)
   apigw-http-api-lambda-rds-proxy
 
   Sample SAM Template for apigw-http-api-lambda-rds-proxy
@@ -30,7 +31,7 @@ Parameters:
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: python3.9
+    Runtime: python3.14
     MemorySize: 128
     Timeout: 30
 
@@ -73,8 +74,8 @@ Resources:
 Outputs:
   ApiBasePath:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   RdsProxyApiPath:
     Description: "API Gateway endpoint URL for rds proxy function"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"

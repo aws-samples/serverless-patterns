@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: Setup ALB, Cognito and Lambda integration using AWS SAM template
+Description: Setup ALB, Cognito and Lambda integration using AWS SAM template (uksb-1tthgi812) (tag:alb-cognito-lambda)
 
 Parameters:
   VpcId:
@@ -64,7 +64,7 @@ Resources:
       FunctionName: "ALBLambda"
       Description: An Application Load Balancer Lambda Target that returns regional metrics
       Handler: index.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.14
       Role: !GetAtt "MyLambdaFunctionPermission.Arn"
       Layers:
         - !Ref LambdaLayerARN

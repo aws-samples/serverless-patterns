@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Description: >
+  (uksb-1tthgi812) (tag:eventbridge-sns-lambda)
   Eventbridge-sns-lambda
 
   Sample SAM Template for 
@@ -36,7 +37,7 @@ Resources:
     Type: AWS::Serverless::Function #https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
     Properties:
       FunctionName: LambdaFunction
-      Runtime: python3.8
+      Runtime: python3.14
       Handler: app.lambda_handler
       CodeUri: ./src
       Events:

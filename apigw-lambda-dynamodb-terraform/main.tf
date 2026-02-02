@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0.0"
+      version = "~> 5.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -56,9 +56,13 @@ resource "aws_s3_bucket" "lambda_bucket" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_acl" "private_bucket" {
+resource "aws_s3_bucket_public_access_block" "private_bucket" {
   bucket = aws_s3_bucket.lambda_bucket.id
-  acl    = "private"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 data "archive_file" "lambda_zip" {
@@ -85,7 +89,7 @@ resource "aws_lambda_function" "apigw_lambda_ddb" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.this.key
 
-  runtime = "python3.8"
+  runtime = "python3.14"
   handler = "app.lambda_handler"
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256

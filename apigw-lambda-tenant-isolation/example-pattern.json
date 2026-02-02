@@ -1,0 +1,59 @@
+{
+  "title": "Multi-tenant API with AWS Lambda functions tenant isolation",
+  "description": "This sample project demonstrates tenant isolation mode of AWS Lambda functions.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon API Gateway receives the HTTP GET request with tenant id in the header x-tenant-id.",
+      "The API Gateway triggers either the standard or the tenant isolated Lambda functions depending on the URI.",
+      "Observe the counter variable value between standard and tenant isolation mode enabled Lambda functions are you invoke the APIs for different tenant."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-tenant-isolation",
+      "templateURL": "serverless-patterns/apigw-lambda-tenant-isolation",
+      "projectFolder": "apigw-lambda-tenant-isolation",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda tenant isolation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
+      },
+      {
+        "text": "AWS Blog - Building multi-tenant SaaS applications with AWS Lambda’s new tenant isolation mode",
+        "link": "https://aws.amazon.com/blogs/compute/building-multi-tenant-saas-applications-with-aws-lambdas-new-tenant-isolation-mode/"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/biswanath-mukherjee.jpg",
+      "bio": "I am a Sr. Solutions Architect working at AWS India. I help strategic global enterprise customer to architect their workload to run on AWS.",
+      "linkedin": "biswanathmukherjee"
+    }   
+  ]
+}

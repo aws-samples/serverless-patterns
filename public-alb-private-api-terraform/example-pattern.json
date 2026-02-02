@@ -1,0 +1,59 @@
+{
+    "title": "Cross Account Private API Access via Public Application Load Balancer",
+    "description": "Create ",
+    "language": "HCL",
+    "level": "200",
+    "framework": "Terraform",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample pattern allows users from one account to access their Private REST APIs present in another account over the internet.",
+        "This facilitates abstraction of network resources (like load balancers, virtual private clouds, endpoints) & application resources (like lambda, api gateway) into separate individual management accounts."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/",
+        "templateURL": "serverless-patterns/public-alb-private-api-terraform",
+        "projectFolder": "public-alb-private-api-terraform",
+        "templateFile": "public-alb-private-api-terraform/main.tf"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Tutorial: How to invoke a Private API",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-api-test-invoke-url.html"
+        },
+        {
+          "text": "Tutorial: How to access Private API in another account",
+          "link": "https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-private-cross-account-vpce/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "terraform init",
+        "terraform apply"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "terraform destroy",
+        "terraform show"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Abhishek Agawane",
+        "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+        "bio": "I am a Cloud Support Engineer (Serverless) at AWS",
+        "linkedin": "https://www.linkedin.com/in/agawabhi/"
+      }
+    ]
+  }

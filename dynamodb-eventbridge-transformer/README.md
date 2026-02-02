@@ -1,6 +1,6 @@
-# Amazon DynamoDB to Amazon EventBridge using Amazon Eventbridge Pipes
+# Amazon DynamoDB to Amazon EventBridge using Amazon Eventbridge Pipes to unmarshall
 
-This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified event to an EventBridge bus.
+This pattern takes a change data capture event from DynamoDB, removes the data type descriptors and sends the simplified ('unmarshalled') event to an EventBridge bus.
 
 The key components of this architecture are DynamoDB as source and EventBridge as target, connected by a pipe.
 
@@ -40,9 +40,11 @@ Important: this application uses various AWS services and there are costs associ
     cdk bootstrap --profile test 1111111111/us-east-1
    ```
 1. From the command line, use AWS CDK to deploy the AWS resources for the pattern:
-    ```
-    npm run build && cdk deploy 
-    ```
+   ```bash
+   npm run build
+   cdk deploy
+   ```
+
 1. During the prompts:
     * Enter the desired AWS Region
     

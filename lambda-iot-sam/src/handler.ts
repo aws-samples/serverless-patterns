@@ -1,6 +1,6 @@
-import IotData from "aws-sdk/clients/iotdata";
+import { IoTDataPlane } from "@aws-sdk/client-iot-data-plane";
 
-const iotdata = new IotData({ endpoint: process.env.IOT_DATA_ENDPOINT })
+const iotdata = new IoTDataPlane({ endpoint: process.env.IOT_DATA_ENDPOINT })
 
 export const handler: any = async (event: any): Promise<any> => {
   const params = {
@@ -11,5 +11,5 @@ export const handler: any = async (event: any): Promise<any> => {
       detail: "world"
     })
   };
-  await iotdata.publish(params).promise();
+  await iotdata.publish(params);
 };

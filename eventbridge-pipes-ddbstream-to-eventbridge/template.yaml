@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to connect DynamoDB Stream to EventBridge
+Description: Template to connect DynamoDB Stream to EventBridge (uksb-1tthgi812) (tag:eventbridge-pipes-ddbstream-to-eventbridge)
 
 Resources:
 
@@ -55,7 +55,10 @@ Resources:
                   - "dynamodb:GetRecords"
                   - "dynamodb:GetShardIterator"
                   - "dynamodb:ListStreams"
-                Resource: !GetAtt DynamoDBUsersTable.StreamArn
+                  - "sqs:SendMessage"
+                Resource: 
+                  - !GetAtt DynamoDBUsersTable.StreamArn
+                  - !GetAtt PipeDLQueue.Arn
         - PolicyName: TargetPolicy
           PolicyDocument:
             Version: 2012-10-17

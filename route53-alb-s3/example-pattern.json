@@ -1,0 +1,66 @@
+{
+  "title": "Internal static website hosting using Amazon Route53, ALB and Amazon S3",
+  "description": "This pattern hosts an internal static website on an Amazon S3 bucket that can only be accessed from private network.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template deploys a Route53 hosted zone, an Application Load Balancer (ALB), a VPC Endpoint and a S3 bucket.",
+      "The private website URL will be exposed via the Route 53 private hosted zone. This URL is accessible from within the VPC."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/route53-alb-s3",
+      "templateURL": "serverless-patterns/route53-alb-s3",
+      "projectFolder": "route53-alb-s3",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Hosting Internal HTTPS Static Websites with ALB, S3, and PrivateLink",
+        "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/hosting-internal-https-static-websites-with-alb-s3-and-privatelink/"
+      },
+      {
+        "text": "AWS PrivateLink for Amazon S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/privatelink-interface-endpoints.html"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the content of the S3 bucket: <code>aws s3 rm s3://{WebsiteBucket} --recursive</code>",
+      "Delete the stack: <code>sam delete</code>.",
+      "Delete the newly created CloudShell environment."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "linkedin": "biswanathmukherjee"
+    },
+    {
+      "name": "Rakshith Rao",
+      "image": "https://rao.sh/assets/img/profile_pic.png",
+      "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+      "linkedin": "rakshithrao"
+    }
+  ]
+}

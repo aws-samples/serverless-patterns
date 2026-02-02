@@ -1,6 +1,6 @@
 Transform: AWS::Serverless-2016-10-31
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Sample SAM Template for StepFunction ECS Integration
+Description: Sample SAM Template for StepFunction ECS Integration (uksb-1tthgi812) (tag:sfn-ecs-sam)
 
 Parameters:
   ECSCluster:

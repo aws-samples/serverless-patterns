@@ -1,0 +1,18 @@
+openapi: "3.0.1"
+info:
+  title: "HTTP API proxy to Restaurant API"
+  version: "1.0"
+paths:
+  /restaurant:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /restaurant"
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "1.0"
+        type: "http_proxy"
+        httpMethod: "ANY"
+        uri:
+          Fn::GetAtt: [AppsyncGraphQLApi, GraphQLUrl]
+        connectionType: "INTERNET"
+x-amazon-apigateway-importexport-version: "1.0"

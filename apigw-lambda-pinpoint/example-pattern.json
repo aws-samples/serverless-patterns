@@ -3,7 +3,7 @@
   "description": "Validate phone number and send SMS from Pinpoint via API Gateway and Lambda",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -48,7 +48,7 @@
   "authors": [
     {
       "name": "Sahil Malhotra",
-      "image": "link-to-your-photo.jpg",
+      "image": "https://drive.google.com/file/d/1h1WM-m_gKNdeEKsBLcy3byJun2R6d28o/view",
       "bio": "Serverless enthusiast",
       "linkedin": "https://www.linkedin.com/in/smalhotraa/",
       "twitter": "twitter-handle"

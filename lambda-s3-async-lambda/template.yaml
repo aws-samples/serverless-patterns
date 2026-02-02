@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-s3-async-lambda)
   Lambda function that calls asynchronous Lambda function
 
   Transfer the payload through S3 bucket as an object when the payload size is larger than asynchronous lambda function invocation payload quota.
@@ -23,7 +24,7 @@ Resources:
       FunctionName: SendPayloadFunction
       CodeUri: sendPayloadFunction/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Environment:
         Variables:
@@ -49,7 +50,7 @@ Resources:
       FunctionName: !Ref AsyncLambdaFunctionName
       CodeUri: asynchronousFunction/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Policies:
         - S3ReadPolicy:

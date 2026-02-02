@@ -11,20 +11,15 @@ def lambda_handler(event, context):
     print(event)
     event_body = json.loads(event['body'])
     
-    
-    app_id = event_body["pinpoint_app_id"]
+    app_id = os.environ.get("PINPOINT_APP_ID")
     
     destination_number = event_body["destination_number"]
-    print(destination_number)
     
-    message = event_body["message"]
-    print(message)
+    message = "Your OTP is 1234"
     
-    origination_number = event_body["origination_number"]
-    print(origination_number)
+    origination_number = ""
     
-    message_type = event_body["message_type"]
-    print(message_type)
+    message_type = "TRANSACTIONAL"
     
 
     response = dict()

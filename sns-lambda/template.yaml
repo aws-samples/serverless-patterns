@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - SNS to Lambda
+Description: Serverless patterns - SNS to Lambda (uksb-1tthgi812) (tag:sns-lambda)
 
 Resources:
   # Define the SNS topic
@@ -25,7 +25,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs24.x
       Timeout: 3
       MemorySize: 128
 

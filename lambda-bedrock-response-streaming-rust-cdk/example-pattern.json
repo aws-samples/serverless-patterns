@@ -1,0 +1,67 @@
+{
+  "title": "AWS Lambda and Amazon Bedrock Response Streaming with Rust",
+  "description": "Create a Lambda function URL that streams a response from an Amazon Bedrock LLM.",
+  "language": "Rust",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern exposes a public Lambda Function URL (FURL) endpoint where requests can be made.",
+      "When a request is made to the FURL, the Lambda function initiates a streaming request to Amazon Bedrock",
+      "using the ConverseStream API. This allows the response from the LLM in Bedrock to start streaming back",
+      "to the Lambda function as soon as generation begins, without waiting for the entire response to be ready."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-response-streaming-rust-cdk",
+      "templateURL": "serverless-patterns/lambda-bedrock-response-streaming-rust-cdk",
+      "projectFolder": "lambda-bedrock-response-streaming-rust-cdk",
+      "templateFile": "cdk/lib/bedrock-streamer-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "Cloud Development Kit",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/home.html"
+      },
+      {
+        "text": "AWS SDK for Rust",
+        "link": "https://aws.amazon.com/sdk-for-rust/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Phil Callister",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/phil-callister.jpg",
+      "bio": "I'm an Enterprise Solutions Architect at AWS, with a focus on Financial Services. As a passionate builder, I enjoy helping customers create innovative solutions to achieve their business objectives.",
+      "linkedin": "https://www.linkedin.com/in/philcallister/"
+    }
+  ]
+}

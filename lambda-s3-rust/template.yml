@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Creates a Lambda function that writes to an S3 bucket
+Description: Creates a Lambda function that writes to an S3 bucket (uksb-1tthgi812) (tag:lambda-s3-rust)
 
 
 Globals:
@@ -8,7 +8,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 29
     Environment:
       Variables:
@@ -28,10 +28,13 @@ Resources:
   PutObjectFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Environment:
         Variables:
           BUCKET_NAME: !Ref DestinationBucket
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref DestinationBucket
+    Metadata:
+      BuildMethod: rust-cargolambda
+

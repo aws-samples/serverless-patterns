@@ -1,0 +1,65 @@
+{
+  "title": "Lambda Function URL",
+  "description": "Create a Lambda Function URL.",
+  "language": "TypeScript",
+  "level": "100",
+  "framework": "Serverless Framework",
+    "services": {
+        "from": "lambda"
+    },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a dedicated, public HTTPS endpoint for your Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-function-url-sls",
+      "templateURL": "serverless-patterns/lambda-function-url-sls",
+      "projectFolder": "lambda-function-url-sls",
+      "templateFile": "lambda-function-url-sls/serverless.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Creating and managing Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html"
+      },
+      {
+        "text": "Announcing AWS Lambda Function URLs: Built-in HTTPS Endpoints for Single-Function Microservices",
+        "link": "https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/"
+      },
+      {
+        "text": "AWS Lambda Function URLs with Serverless Framework",
+        "link": "https://www.serverless.com/blog/aws-lambda-function-urls-with-serverless-framework"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sls deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sls remove</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Wayne Greeley",
+      "image": "",
+      "bio": "AWS Community Builder",
+      "linkedin": "",
+      "twitter": ""
+    }
+  ]
+}
+

@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Failover example
+Description: Failover example (uksb-1tthgi812) (tag:apigw-route53-failover)
 Globals:
   Function:
     Timeout: 3
     Tracing: Active
-    Runtime: python3.9
+    Runtime: python3.14
     Handler: app.lambda_handler
     Architectures:
       - arm64
@@ -39,7 +39,7 @@ Resources:
         - EndpointType: REGIONAL
           CertificateArn: !Ref CertArn
 
-  RestApiMapping: #Create a maooing to a REST API
+  RestApiMapping: #Create a mapping to a REST API
     Type: AWS::ApiGatewayV2::ApiMapping
     Properties: 
       ApiId: !Ref RestApiGateway
@@ -93,4 +93,4 @@ Resources:
 Outputs:
   HelloWorldApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

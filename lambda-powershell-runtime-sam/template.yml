@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Demo to explore how the PowerShell custom runtime and a Lambda function work.
+Description: Demo to explore how the PowerShell custom runtime and a Lambda function work. (uksb-1tthgi812) (tag:lambda-powershell-runtime-sam)
 ##########################################################################
 #  Parameters & Globals                                                  #
 ##########################################################################
@@ -18,7 +18,7 @@ Resources:
     Properties:
       Description: PowerShell-Lambda-Runtime Demo Function
       CodeUri: function/
-      Runtime: provided.al2
+      Runtime: provided.al2023
       Handler: examplehandler.ps1::handler
       MemorySize: 1024
       Timeout: 100
@@ -35,7 +35,7 @@ Resources:
       Description: Lambda Layer containing PowerShell
       ContentUri: powershell-runtime
       CompatibleRuntimes:
-        - provided.al2
+        - provided.al2023
       RetentionPolicy: Delete
     Metadata:
       BuildMethod: makefile

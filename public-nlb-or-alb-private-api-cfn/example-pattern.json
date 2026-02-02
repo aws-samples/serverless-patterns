@@ -1,0 +1,57 @@
+{
+    "title": "Same/Cross Account Private API Access via Public Load Balancer",
+    "description": "Create ",
+    "language": "HCL",
+    "level": "200",
+    "framework": "Serverless",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This sample pattern allows users from one account to access their Private REST APIs present in same/cross account over the internet.",
+        "This facilitates abstraction of network resources (like load balancers, virtual private clouds, endpoints) & application resources (like lambda, api gateway) into separate individual management accounts."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/",
+        "templateURL": "serverless-patterns/public-nlb-or-alb-private-api-cfn",
+        "projectFolder": "public-nlb-or-alb-private-api-cfn",
+        "templateFile": "public-nlb-or-alb-private-api-cfn/template.yaml"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Tutorial: How to invoke a Private API",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-api-test-invoke-url.html"
+        },
+        {
+          "text": "Tutorial: How to access Private API in another account",
+          "link": "https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-private-cross-account-vpce/"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam deploy --guided"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "sam delete --stack-name <stackname>"
+      ]
+    },
+    "authors": [
+      {
+        "name": "Shivam Rajawat",
+        "image": "https://drive.google.com/file/d/1q872K5V1RKFHCrkwGSssWNeIwug6ZLxO/view",
+        "bio": "I am a Cloud Support Engineer (Serverless) at AWS",
+        "linkedin": "shivam-rajawat-a42b68124"
+      }
+    ]
+  }

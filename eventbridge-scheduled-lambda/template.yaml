@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Create a Lambda function that logs something to the console from a cron job in EventBridge
+Description: Create a Lambda function that logs something to the console from a cron job in EventBridge (uksb-1tthgi812) (tag:eventbridge-scheduled-lambda)
 
 Resources:
   ScheduledFunction:
@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.14
       MemorySize: 128
             
       Events:

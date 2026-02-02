@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - SAM Template for private APIs with Lambda proxy integration.
+Description: Serverless patterns - SAM Template for private APIs with Lambda proxy integration. (uksb-1tthgi812) (tag:apigw-private-lambda)
 
 Parameters:
   VpcEndpoint:
@@ -22,7 +22,7 @@ Resources:
         "body": json.dumps({
           "message" : "Hello this is the private API"}),
         }
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         APIRoot:
           Type: Api 

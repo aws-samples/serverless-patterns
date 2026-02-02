@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Throttling example
+Description: Throttling example (uksb-1tthgi812) (tag:apigw-throttle-sam)
 Globals:
   Function:
     Timeout: 3
     MemorySize: 128
     Tracing: Active
-    Runtime: python3.9
+    Runtime: python3.14
     Handler: app.lambda_handler
   Api:
     TracingEnabled: true
@@ -79,4 +79,4 @@ Resources:
 Outputs:
   ThrottlingApiUrl:
     Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ThrottlingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ThrottlingApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

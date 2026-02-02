@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway REST API with Mock integration
+Description: Serverless patterns - Amazon API Gateway REST API with Mock integration (uksb-1tthgi812) (tag:apigw-rest-api-mock-integration)
 
 Resources:
   
@@ -50,4 +50,4 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"

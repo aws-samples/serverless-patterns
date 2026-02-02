@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Creates a Lambda function that writes to an S3 bucket
+Description: Creates a Lambda function that writes to an S3 bucket (uksb-1tthgi812) (tag:lambda-s3)
 Parameters:
   DestinationBucketName:
     Type: String
@@ -16,7 +16,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.14
       MemorySize: 128
       Environment:
         Variables:

@@ -1,0 +1,1 @@
+This is a sample file 3. This file will be used to test transfer of a file from Amazon S3 bucket to remote SFTP server using AWS Transfer Family Connectoraws s3 cp.

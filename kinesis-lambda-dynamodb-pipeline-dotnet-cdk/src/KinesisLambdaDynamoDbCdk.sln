@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinesisLambdaDynamoDbCdk", "KinesisLambdaDynamoDbCdk\KinesisLambdaDynamoDbCdk.csproj", "{4643415E-700B-481D-B952-7B8B067A02A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LambdaFunctions", "LambdaFunctions", "{235C9FA2-8184-482E-A72F-425DEAB815F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataProcessFunction", "DataProcessFunction", "{C085343F-7948-47DA-9F12-C2B126577FA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataProcessFunction", "LambdaFunctions\DataProcessFunction\src\DataProcessFunction.csproj", "{84D60F1B-1CDE-4134-8946-EFDDA35EFE4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataProcessFunction.Tests", "LambdaFunctions\DataProcessFunction\test\DataProcessFunction.Tests.csproj", "{1E05AB22-8898-43D9-8FC5-68D123A7A536}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4643415E-700B-481D-B952-7B8B067A02A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4643415E-700B-481D-B952-7B8B067A02A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4643415E-700B-481D-B952-7B8B067A02A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4643415E-700B-481D-B952-7B8B067A02A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84D60F1B-1CDE-4134-8946-EFDDA35EFE4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D60F1B-1CDE-4134-8946-EFDDA35EFE4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84D60F1B-1CDE-4134-8946-EFDDA35EFE4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84D60F1B-1CDE-4134-8946-EFDDA35EFE4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E05AB22-8898-43D9-8FC5-68D123A7A536}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E05AB22-8898-43D9-8FC5-68D123A7A536}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E05AB22-8898-43D9-8FC5-68D123A7A536}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E05AB22-8898-43D9-8FC5-68D123A7A536}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C085343F-7948-47DA-9F12-C2B126577FA7} = {235C9FA2-8184-482E-A72F-425DEAB815F9}
+		{84D60F1B-1CDE-4134-8946-EFDDA35EFE4A} = {C085343F-7948-47DA-9F12-C2B126577FA7}
+		{1E05AB22-8898-43D9-8FC5-68D123A7A536} = {C085343F-7948-47DA-9F12-C2B126577FA7}
+	EndGlobalSection
+EndGlobal

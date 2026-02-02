@@ -1,0 +1,62 @@
+{
+  "title": "Amazon S3 to AWS Fargate",
+  "description": "Trigger an AWS Fargate Task when a file is uploaded to S3",
+  "language": "Typescript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to trigger an AWS Fargate task when an object is uploaded to Amazon S3.",
+      "This pattern is commonly implemented with an AWS Lambda function, but this is not always possible:",
+      " - Processing > 15 min",
+      " - Docker image > 10G",
+      " - GPU required",
+      "Thanks to EventBridge, S3 events can be used to trigger an ECS/Fargate task."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-fargate-cdk",
+      "templateURL": "serverless-patterns/s3-eventbridge-fargate-cdk",
+      "projectFolder": "s3-eventbridge-fargate-cdk",
+      "templateFile": "src/s3-trigger-fargate-task-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using EventBridge to handle S3 events",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html"
+      },
+      {
+        "text": "ECS Task as a target for EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html#targets-specifics-ecs-task"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install && cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jerome Van Der Linden",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/jerome-van-der-linden.jpg",
+      "bio": "Jerome is a Solutions Architect Builder at AWS. Passionate about building stuff using the AWS services, and especially the serverless ones.",
+      "linkedin": "jeromevdl",
+      "twitter": "jeromevdl"
+    }
+  ]
+}

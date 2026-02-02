@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"aws-cdk": "2.136.0"
+	},
+	"Transform": "AWS::Serverless-2016-10-31"
+}

@@ -6,7 +6,7 @@
     "architectureURL": "apigw-sns-sqs-lambda-arch-diagram.png",
     "videoId": "",
     "level":"100",
-    "framework": "CDK",
+    "framework": "AWS CDK",
     "services": {
       "from": "apigw",
       "to": "sns, sqs and lambda"
@@ -19,7 +19,10 @@
     },
     "deploy": {
       "text": [
-        "cd cdk && npm run build && npm install && cdk deploy"
+        "cd cdk
+        npm run build
+        npm install
+        cdk deploy"
       ]
     },
     "gitHub": {

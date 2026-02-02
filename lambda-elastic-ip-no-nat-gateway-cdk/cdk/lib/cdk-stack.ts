@@ -45,7 +45,7 @@ export class LambdaElasticIpStack extends cdk.Stack {
             securityGroups: [securityGroup],
             allowPublicSubnet: true,
             vpcSubnets: { subnets: [publicSubnet] },
-            runtime: cdk.aws_lambda.Runtime.NODEJS_18_X,
+            runtime: cdk.aws_lambda.Runtime.NODEJS_24_X,
             entry: 'src/lambdas/vin-api-lambda.ts',
         });
 
@@ -72,7 +72,7 @@ export class LambdaElasticIpStack extends cdk.Stack {
             environment: {
                 ELASTIC_IP_ALLOCATION_ID: elasticIP.attrAllocationId,
             },
-            runtime: cdk.aws_lambda.Runtime.NODEJS_18_X,
+            runtime: cdk.aws_lambda.Runtime.NODEJS_24_X,
             entry: 'src/lambdas/associate-lambda-elastic-ip-cr.ts',
         });
 

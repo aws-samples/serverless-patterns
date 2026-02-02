@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Automated EBS Snapshot Creation on EC2 Shutdown using EventBridge
+
+Parameters:
+  VolumeId:
+    Type: String
+    Description: EBS Volume ID to snapshot (e.g., vol-0abcd123456ef7890)
+    AllowedPattern: ^vol-[0-9a-f]{8,17}$
+    ConstraintDescription: Must be a valid EBS Volume ID
+  
+  InstanceId:
+    Type: String
+    Description: EC2 Instance ID to monitor (e.g., i-0abcd123456ef7890)
+    AllowedPattern: ^i-[0-9a-f]{8,17}$
+    ConstraintDescription: Must be a valid EC2 Instance ID
+
+Resources:
+  SnapshotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CreateSnapshotPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ec2:CreateSnapshot
+                Resource: '*'
+
+  EC2ShutdownSnapshotRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Create EBS snapshot when EC2 instance shuts down
+      EventPattern:
+        source:
+          - aws.ec2
+        detail-type:
+          - EC2 Instance State-change Notification
+        detail:
+          state:
+            - shutting-down
+            - stopping
+          instance-id:
+            - !Ref InstanceId
+      State: ENABLED
+      Targets:
+        - Arn: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:target/create-snapshot'
+          Id: EBSSnapshotTarget
+          RoleArn: !GetAtt SnapshotRole.Arn
+          Input: !Sub '"${VolumeId}"'
+            
+
+Outputs:
+  EventRuleArn:
+    Description: EventBridge Rule ARN
+    Value: !GetAtt EC2ShutdownSnapshotRule.Arn
+  
+  VolumeId:
+    Description: EBS Volume being snapshotted
+    Value: !Ref VolumeId
+    
+  InstanceId:
+    Description: EC2 Instance being monitored
+    Value: !Ref InstanceId

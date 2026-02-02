@@ -1,0 +1,62 @@
+{
+    "title": "Amazon API Gateway HTTP API with Cognito JWT and AWS Lambda integration",
+    "description": "This pattern creates an Amazon Gateway API (v2) and two Lambda functions protected by JwtAuthorizer and Cognito for user management.",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern creates an Amazon API Gateway HTTP API with JWTAuthorizer and Cognito as user management. It integrates with one unprotected Lambda and one protected Lambda.."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-cognito-lambda-cdk",
+        "templateURL": "serverless-patterns/apigw-http-api-cognito-lambda-cdk",
+        "projectFolder": "apigw-http-api-cognito-lambda-cdk",
+        "templateFile": "lib/http-api-cognito-lambda-stack.ts"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Working with the AWS CDK in TypeScript",
+          "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+        },
+        {
+          "text": "Working with HTTP APIs",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+        },
+        {
+          "text": "Building Lambda functions with TypeScript",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-typescript.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": [
+        "Deploy the stack: <code>cdk deploy</code>."
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Philippe Wanner",
+        "image": "https://media.licdn.com/dms/image/C4E03AQEX8VlCZ5oP2A/profile-displayphoto-shrink_200_200/0/1658749477233?e=1718236800&v=beta&t=CiLmp0EgKzD9_ysQAug0Zw4AAwFU9bIdT8D2jDsw4X8",
+        "bio": "Philippe is a Senior Specialist Solutions Architect at Amazon Web Services based in Zurich, Switzerland. His role is to spread the migration and modernization best practices for large organisations.",
+        "linkedin": "philippe-wanner",
+        "twitter": ""
+      }
+    ]
+  }
+  

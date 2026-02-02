@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-http-api-lambda-rds-proxy-java)
   apigw-http-api-lambda-rds-proxy-java
 
   Sample SAM Template for apigw-http-api-lambda-rds-proxy-java
@@ -29,7 +30,7 @@ Parameters:
 # Global values that are applied to all applicable resources in this template
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 3072
     Timeout: 30
 
@@ -72,8 +73,8 @@ Resources:
 Outputs:
   ApiBasePath:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   RdsProxyApiPath:
     Description: "API Gateway endpoint URL for rds proxy function"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"

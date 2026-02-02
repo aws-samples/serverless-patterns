@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:appsync-lambda-sfn-sam)
   appsync-lambda-stepfunctions-sam
 
   SAM Template for invoking a step functions from a lambda resolver using appsync
@@ -184,7 +185,7 @@ Resources:
       CodeUri: src/lambda/
       Handler: app.lambda_handler
       Role: !GetAtt lambdaStepFunctionRole.Arn
-      Runtime: python3.8
+      Runtime: python3.14
       Environment:
         Variables:
           STATE_MACHINE_ARN: !Ref SamStepFunctionStateMachine

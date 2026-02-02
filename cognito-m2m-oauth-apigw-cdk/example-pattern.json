@@ -1,0 +1,45 @@
+{
+    "title": "Cognito Machine-to-Machine (M2M) OAuth 2.0 Authentication Using Custom Scopes with Amazon API Gateway",
+    "description": "This pattern demonstrates how to implement machine-to-machine (M2M) authentication using AWS Cognito, OAuth 2.0, API Gateway, and AWS Lambda. It showcases the integration of Cognito as the authentication provider, allowing requests to be authorized based on custom scopes defined in OAuth 2.0",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Get OAuth 2.0 access tokens from Cognito User Pool and use them to access API Gateway resources"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-m2m-oauth-apigw-cdk",
+        "templateURL": "serverless-patterns/cognito-m2m-oauth-apigw-cdk",
+        "projectFolder": "cognito-m2m-oauth-apigw-cdk",
+        "templateFile": "src/lib/cdk-cognito-oauth-authorizer-stack.ts"
+      }
+    },
+    "deploy": {
+      "text": [
+        "cdk deploy"
+      ]
+    },
+    "testing": {
+      "text": [
+        "See the Github repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "text": [
+        "Delete the stack: <code>cdk delete</code>."
+      ]
+    },
+    "authors": [
+      {
+        "name": "Rushi Patel",
+        "image": "https://www.devxushi.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fmy1.fcdd96b0.JPG&w=3840&q=75",
+        "bio": "Software Enginner at Cancer Research UK, passionate about event-driven architectures and Serverless.",
+        "linkedin": "rushi-patel-78924612a"
+      }
+    ]
+  }
+  

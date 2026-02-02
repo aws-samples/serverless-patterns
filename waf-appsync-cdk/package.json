@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-appsync-alpha": "^2.52.0-alpha.0",
-    "aws-cdk-lib": "2.80.0",
+    "aws-cdk-lib": "^2.185.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }

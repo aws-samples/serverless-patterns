@@ -1,0 +1,224 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Automated Serverless Messaging Redrive (uksb-1tthgi812) (tag:serverless-message-processing)
+
+Parameters:
+  ProcessorMemorySize:
+    Type: Number
+    Default: 128
+    Description: |
+      Memory allocation for the ProcessMessages Lambda function (MB).
+      Default of 128 MB is suitable for demo purposes.
+      For production workloads, consider:
+      - Using AWS Lambda Power Tuning tool to determine optimal memory settings
+      - Testing with your specific workload characteristics
+      - Monitoring performance metrics and costs
+    MinValue: 128
+    MaxValue: 10240
+    
+  DecisionMakerMemorySize:
+    Type: Number
+    Default: 128
+    Description: |
+      Memory allocation for the ProcessMessages Lambda function (MB).
+      Default of 128 MB is suitable for demo purposes.
+      For production workloads, consider:
+      - Using AWS Lambda Power Tuning tool to determine optimal memory settings
+      - Testing with your specific workload characteristics
+      - Monitoring performance metrics and costs
+    MinValue: 128
+    MaxValue: 10240
+
+  LambdaTimeout:
+    Type: Number
+    Default: 29
+    Description: |
+      Timeout for the Lambda functions (seconds).
+      Consider increasing this value if:
+      - Processing takes longer than expected
+      - External API calls are involved
+      - Complex data transformations are needed
+      Note: Maximum value is 900 seconds (15 minutes)
+    MinValue: 1
+    MaxValue: 900
+
+  
+
+Resources:
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: SQS API
+          version: '1.0'
+        schemes:
+          - https
+        paths:
+          /message:
+            post:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                '200':
+                  description: OK
+                  schema:
+                    type: object
+              x-amazon-apigateway-integration:
+                credentials: !GetAtt ApiGatewayRole.Arn
+                type: aws
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:sqs:path/${AWS::AccountId}/${MainQueue.QueueName}"
+                httpMethod: POST
+                responses:
+                  default:
+                    statusCode: "200"
+                requestParameters:
+                  integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+                requestTemplates:
+                  application/json: |
+                    Action=SendMessage&MessageBody=$input.body
+                passthroughBehavior: never
+                integrationResponses:
+                  '200':
+                    statusCode: '200'
+                    responseTemplates:
+                      application/json: |
+                        {
+                          "message": "Message sent successfully",
+                          "messageId": "$input.path('$.SendMessageResponse.SendMessageResult.MessageId')"
+                        }
+
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiGatewaySQSPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt MainQueue.Arn
+
+  MainQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AutomatedDLQ.Arn
+        maxReceiveCount: 3
+      VisibilityTimeout: 30
+      MessageRetentionPeriod: 345600  
+      ReceiveMessageWaitTimeSeconds: 20 
+
+  AutomatedDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 345600 
+
+
+  FatalDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600 
+
+  ProcessMessages:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.14
+      CodeUri: ./functions/processor/
+      MemorySize: !Ref ProcessorMemorySize
+      Timeout: !Ref LambdaTimeout
+
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MainQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+      Environment:
+        Variables:
+          MAIN_QUEUE_URL: !Ref MainQueue
+          FATAL_DLQ_URL: !Ref FatalDLQ
+
+  DecisionMaker:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.14
+      CodeUri: ./functions/decision_maker/
+      MemorySize: !Ref DecisionMakerMemorySize
+      Timeout: !Ref LambdaTimeout
+
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AutomatedDLQ.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt FatalDLQ.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt FatalDLQ.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MainQueue.QueueName
+      Environment:
+        Variables:
+          MAIN_QUEUE_URL: !Ref MainQueue
+          FATAL_DLQ_URL: !Ref FatalDLQ
+
+  
+  # CloudWatch Log Groups
+  ProcessMessagesLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ProcessMessages}"
+      RetentionInDays: 14
+
+  DecisionMakerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${DecisionMaker}"
+      RetentionInDays: 14
+
+ 
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/message"
+
+  MainQueueUrl:
+    Description: URL of the main SQS queue
+    Value: !Ref MainQueue
+
+  MainQueueArn:
+    Description: ARN of the main SQS queue
+    Value: !GetAtt MainQueue.Arn
+
+  AutomatedDLQUrl:
+    Description: URL of the automated DLQ
+    Value: !Ref AutomatedDLQ
+
+  FatalDLQUrl:
+    Description: URL of the fatal DLQ
+    Value: !Ref FatalDLQ

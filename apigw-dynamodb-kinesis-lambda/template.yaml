@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An Amazon API Gateway REST API that integrates with an Amazon DynamoDB table.
+Description: An Amazon API Gateway REST API that integrates with an Amazon DynamoDB table. (uksb-1tthgi812) (tag:apigw-dynamodb-kinesis-lambda)
 Parameters:
   AppName:
     Type: String
@@ -22,7 +22,7 @@ Resources:
     Properties:
       FunctionName: LambdaConsumer
       Handler: lambda_function.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       CodeUri: src/
       Policies: 
       - KinesisStreamReadPolicy:
@@ -134,7 +134,7 @@ Outputs:
   ApiRootUrl:
     Description: Root Url of the API
     Value: !Sub 
-      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/${StageName}'
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}'
       - ApiId: !Ref Api
   LambdaFunction:
     Description: Lambda Function ARN

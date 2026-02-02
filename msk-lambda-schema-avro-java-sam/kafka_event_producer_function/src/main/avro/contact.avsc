@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "Contact",
+  "namespace": "com.amazonaws.services.lambda.samples.events.msk",
+  "fields": [
+    {"name": "firstname", "type": ["null", "string"], "default": null},
+    {"name": "lastname", "type": ["null", "string"], "default": null},
+    {"name": "company", "type": ["null", "string"], "default": null},
+    {"name": "street", "type": ["null", "string"], "default": null},
+    {"name": "city", "type": ["null", "string"], "default": null},
+    {"name": "county", "type": ["null", "string"], "default": null},
+    {"name": "state", "type": ["null", "string"], "default": null},
+    {"name": "zip", "type": ["null", "string"], "default": null},
+    {"name": "homePhone", "type": ["null", "string"], "default": null},
+    {"name": "cellPhone", "type": ["null", "string"], "default": null},
+    {"name": "email", "type": ["null", "string"], "default": null},
+    {"name": "website", "type": ["null", "string"], "default": null}
+  ]
+}

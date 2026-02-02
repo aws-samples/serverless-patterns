@@ -55,7 +55,7 @@ export class EventBridgePipesSplitterPattern extends cdk.Stack {
     // function used to split the order into seperate events.
     const splitterFunc: NodejsFunction = new NodejsFunction(this, 'lambda-function-splitter', {
       memorySize: 1024,
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src', 'splitter.ts'),
     });

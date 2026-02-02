@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon DynamoDB
+Description: Serverless patterns - Amazon API Gateway to AWS Lambda to Amazon DynamoDB (uksb-1tthgi812) (tag:apigw-lambda-dynamodb)
 Resources:
   LambdaFunction:
     Type: AWS::Serverless::Function
@@ -8,7 +8,7 @@ Resources:
     Properties:
       FunctionName: WeatherFunction
       Handler: index.lambda_handler
-      Runtime: python3.7
+      Runtime: python3.14
       CodeUri: src/
       Policies:
         DynamoDBCrudPolicy:
@@ -26,4 +26,4 @@ Resources:
 Outputs:
   EndpointUrl:
     Description: 'HTTP REST endpoint URL'
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod'

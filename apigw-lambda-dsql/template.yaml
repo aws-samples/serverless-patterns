@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway, AWS Lambda and Amazon Aurora DSQL
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: python3.14
+    MemorySize: 128
+    Timeout: 3
+    LoggingConfig:
+      LogGroup: !Sub /aws/lambda/${AWS::StackName}
+      LogFormat: JSON
+    Architectures:
+      - arm64
+    Tags:
+      project: "apigw-lambda-dsql"  
+    
+Resources:
+  UsersFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: app.lambda_handler
+      Policies: # Creates an IAM Role that defines the services the function can access and which actions the function can perform
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dsql:DbConnectAdmin
+              Resource:
+                - !Sub arn:${AWS::Partition}:dsql:${AWS::Region}:${AWS::AccountId}:cluster/${DSQL}
+      Environment: # Function environment variables
+        Variables:
+          REGION: !Sub ${AWS::Region}
+          cluster_endpoint: !Sub ${DSQL}.dsql.${AWS::Region}.on.aws
+      Events:
+        Users:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users
+            Method: get
+
+  DSQL:
+    Type: AWS::DSQL::Cluster
+    Properties:
+      DeletionProtectionEnabled: false
+      Tags:
+        - Key: project
+          Value: "apigw-lambda-dsql"
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  UsersApi:
+    Description: API Gateway endpoint URL for Prod stage for Users function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/"

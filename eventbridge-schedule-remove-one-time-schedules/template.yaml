@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Pattern that will remove one-time schedules based on a given expiry time
+Description: Pattern that will remove one-time schedules based on a given expiry time (uksb-1tthgi812) (tag:eventbridge-schedule-remove-one-time-schedules)
 
 Resources:
   # Queue to hold schedules to remove, Lambda will process them in batches of 10
@@ -23,7 +23,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: find-schedules.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17
@@ -59,7 +59,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: process-schedule-batch.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17

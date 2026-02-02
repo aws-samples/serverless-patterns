@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An Amazon API Gateway WebSocket API and SQS with a AWS Lambda function.
+Description: An Amazon API Gateway WebSocket API and SQS with a AWS Lambda function. (uksb-1tthgi812) (tag:apigw-websocket-api-sqs-lambda-java)
 
 Resources:
   APIGWWebsocketSQSLambda:
@@ -72,7 +72,7 @@ Resources:
     Properties:
       CodeUri: SQSWebsocketResponse
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       MemorySize: 512
       Timeout: 30
       Architectures:

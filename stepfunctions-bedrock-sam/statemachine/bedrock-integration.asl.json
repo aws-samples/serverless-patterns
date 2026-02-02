@@ -1,0 +1,39 @@
+{
+  "Comment": "This state machine demonstrates the integration with Amazon Bedrock Anthropic Claude Sonnet 4.5",
+  "StartAt": "Bedrock InvokeModel",
+  "States": {
+    "Bedrock InvokeModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:invokeModel",
+      "Parameters": {
+        "ModelId": "${ModelId}",
+        "Body": {
+          "anthropic_version": "bedrock-2023-05-31",
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text.$": "$.prompt"
+                }
+              ]
+            }
+          ],
+          "max_tokens": 200
+        }
+      },
+        "Retry": [
+          {
+              "ErrorEquals": [
+                  "States.TaskFailed"
+              ],
+              "IntervalSeconds": 20,
+              "MaxAttempts": 5,
+              "BackoffRate": 10
+          }
+      ],
+      "End": true
+    }
+  }
+}

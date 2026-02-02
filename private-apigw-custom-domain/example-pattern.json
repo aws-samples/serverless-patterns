@@ -1,0 +1,58 @@
+{
+  "title": "Private Amazon API Gateway with private custom domain name",
+  "description": "Create a Private API Gateway with a private custom domain name, configure access based on VPC endpoint, and set up DNS routing using Amazon Route 53 private hosted zone.",
+  "language": "",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This AWS SAM template demonstrates how to create a private Amazon API Gateway with a private custom domain mame, configure secure access based on a specific VPC endpoint, and route traffic through Route 53 in a private hosted zone.",
+      "Private custom domain name is only accessible from a VPC endpoint, which is mapped to a stage in private Amazon API Gateway. A custom domain name is configured with an SSL/TLS certificate to provide secure access, and an associated Route 53 A-Alias record ensures that traffic is routed to the API.",
+      "As prerequisites for this pattern, you must have:"
+      "* A DNS name of execute-api VPC endpoint",
+      "* A custom domain name that you would like to create (e.g. private.mydomain.com)",
+      "* A valid certificate in ACM (Amazon Certificate Manager) in the same Region as Private Amazon API Gateway, that covers the namespace of the domain you would like to use (i.e. *.mydomain.com).",
+      "* A Route 53 Private Hosted Zone ID that has the domain name you would like to use (e.g. mydomain.com).",
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/private-apigw-custom-domain",
+      "templateURL": "serverless-patterns/private-apigw-custom-domain",
+      "projectFolder": "private-apigw-custom-domain",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Custom domain names for private APIs in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-custom-domains.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+       "Deploy the stack: <code>sam deploy --guided</code>
+    ]
+  },
+  "testing": {
+    "text": [
+       "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Usama Ali Khan",
+      "image": "https://media.licdn.com/dms/image/v2/D4E03AQHcLMpZ1LV9UQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1685892371158?e=1737590400&v=beta&t=RaPZkIgm7m3thW4PyKSQNn_w9fMbYBeu5PPrQ6K4vBU",
+      "bio": "Usama is a Technical Account Manager at Amazon Web Services.",
+      "linkedin": "usama-ali-khan"
+    }
+  ]
+}

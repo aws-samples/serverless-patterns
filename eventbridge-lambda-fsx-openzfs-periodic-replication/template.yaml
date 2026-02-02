@@ -1,0 +1,213 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  (uksb-1tthgi812) (tag:eventbridge-lambda-fsx-openzfs-periodic-replication)
+  Configure periodic replication schedule for your Amazon FSx for OpenZFS file system volumes.
+
+Parameters:
+  SourceVolumeID:
+    Description: Amazon FSx for OpenZFS Source Volume ID
+    Type: String
+    AllowedPattern: "^fsvol-[A-Za-z0-9]+"
+
+  TargetVolumeID:
+    Description: Amazon FSx for OpenZFS Target Volume ID
+    Type: String
+    AllowedPattern: "^fsvol-[A-Za-z0-9]+"
+
+  # Schedule for creating snapshot and calling CopySnapshotAndUpdateVolume API
+  CronSchedule:
+    Description: CRON schedule for snapshots (default every 6 hours)
+    Type: String
+    Default: "0 0/6 * * ? *"
+
+  # Value of snapshot Name (shows in Name column in snapshots list in console)
+  SnapshotName:
+    Description: The name of snapshots starts with (shown in FSx console)
+    Type: String
+    Default: "fsx_scheduled_snapshot"
+    AllowedPattern: "^[a-zA-Z0-9_:.-]{1,179}$"
+
+  # CopySnapshotAndUpdateVolume - "Options" parameter.
+  # Comma (,) separated values such as "DELETE_INTERMEDIATE_SNAPSHOTS,DELETE_INTERMEDIATE_DATA,DELETE_CLONED_VOLUMES"
+  Options:
+    Description: Options parameter value for the CopySnapshotAndUpdateVolume API
+    Type: String
+
+  # CopySnapshotAndUpdateVolume - "CopyStrategy" parameter.
+  # example = INCREMENTAL_COPY or FULL_COPY
+  CopyStrategy:
+    Description: CopyStrategy parameter value for the CopySnapshotAndUpdateVolume API
+    Type: String
+    Default: INCREMENTAL_COPY
+
+  # Email for notifications
+  Email:
+    Description: Email for CopySnapshotAndUpdateVolume notifications
+    Type: String
+
+  # If customer wants notification for successful snapshots
+  SuccessNotification:
+    Description: Do you want to be notified for successful replication initiation? For failures, you will always be notified
+    Type: String
+    AllowedValues:
+      - "Yes"
+      - "No"
+    Default: "Yes"
+
+  # Number of days of snapshots you want to retain
+  RetainDays:
+    Description: Number of days to retain custom-scheduled snapshots
+    Type: Number
+    Default: 7
+
+Resources:
+  #
+  # SNS topic to notify
+  #
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${AWS::StackName}-notification
+      TopicName: !Sub ${AWS::StackName}-notification
+      Subscription:
+      - Endpoint: !Ref Email
+        Protocol: "email"
+
+  #
+  # Lambda Execution Role
+  #
+  SnapshotLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub Lambda-Role-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: !Sub SnapshotLambda-Policy-${AWS::StackName}
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+          - Effect: Allow
+            Action:
+            - fsx:CreateSnapshot
+            - fsx:DescribeSnapshots
+            - fsx:DescribeVolumes
+            - fsx:DeleteSnapshot
+            - fsx:TagResource
+            - fsx:ListTagsForResource
+            - fsx:CopySnapshotAndUpdateVolume
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - sns:Publish
+            Resource: !GetAtt SNSTopic.TopicArn
+
+  LatestPythonSDK:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: Boto3-SDK-layer-latest
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - python3.14
+        - python3.14
+
+  #
+  # Lambda function
+  #
+  SnapshotLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Lambda
+      Description: Lambda function that creates the snapshot and makes CopySnapshotAndUpdateVolume API call.
+      Environment:
+        Variables:
+          SRC_VOLUME_ID: !Ref SourceVolumeID
+          DEST_VOLUME_ID: !Ref TargetVolumeID
+          OPTIONS: !Ref Options
+          COPY_STRATEGY: !Ref CopyStrategy
+          SNS_TOPIC_ARN: !GetAtt SNSTopic.TopicArn
+          SUCCESS_NOTIFICATION: !Ref SuccessNotification
+          SNAPSHOT_NAME: !Ref SnapshotName
+          SNAPSHOT_TAG_VALUE: !Sub ${AWS::StackName}_${SourceVolumeID}
+          SNAPSHOT_RETAIN_DAYS: !Ref RetainDays
+      Handler: PeriodicReplication.lambda_handler
+      Role: !GetAtt SnapshotLambdaRole.Arn
+      Layers:
+        - !Ref LatestPythonSDK
+      CodeUri: src/
+      Runtime: python3.14
+      Timeout: 900
+
+  #
+  # EventBridge Scheduler Role
+  #
+  FSxEventBridgeSchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: FSxEventBridgeSchedulerRolePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource:
+                  - !GetAtt SnapshotLambda.Arn
+
+  #
+  # EventBridge Scheduler to trigger a Lambda function
+  #
+  FSxEventBridgeScheduler:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub ${AWS::StackName}-Scheduler
+      ScheduleExpression: !Sub 'cron(${CronSchedule})'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt SnapshotLambda.Arn
+        RoleArn: !GetAtt FSxEventBridgeSchedulerRole.Arn
+
+#
+# Stack output section
+#
+Outputs:
+  SNSTopic:
+    Description: SNS Topic
+    Value: !Ref 'SNSTopic'
+  EventBridgeSchedulerRole:
+    Description: EventBridge Scheduler Role
+    Value: !GetAtt FSxEventBridgeSchedulerRole.Arn
+  EventBridgeScheduler:
+    Description: EventBridge Scheduler
+    Value: !GetAtt FSxEventBridgeScheduler.Arn
+  LambdaExecutionRole:
+    Description: Lambda Execution Role
+    Value: !GetAtt SnapshotLambdaRole.Arn
+  LambdaFunction:
+    Description: Lambda Function
+    Value: !GetAtt SnapshotLambda.Arn

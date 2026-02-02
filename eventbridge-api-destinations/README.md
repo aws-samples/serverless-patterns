@@ -23,6 +23,13 @@ Important: this application uses various AWS services and there are costs associ
 * To run example #7, an account with [DataDog](hhttps://www.datadoghq.com). Follow the instructions to [Add an API key or client token](https://docs.datadoghq.com/account_management/api-app-keys/#add-an-api-key-or-client-token) and note the api key.
 * To run example #9, an account with [Shopify](https://www.shopify.com/). Follow the instructions to [Create an app and configure Admin API Access scopes](https://shopify.dev/apps/auth/admin-app-access-tokens#step-1-create-and-install-the-app). Make sure to note the Admin Key.
 * To run example #10, an account with [Stripe](https://dashboard.stripe.com/login). Follow the instructions to [Set up your development environment](https://stripe.com/docs/development/quickstart) and note the api key.
+* To run example #11, an account with [Salesforce](https://login.salesforce.com/). Follow the Prerequisites to [Create an app and configure security token](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-tutorial-salesforce.html). Make sure to note the Authorization endpoint, Client ID, Client Secret and OAuth Http Parameters Key.
+* To run example #12, please have the below things with you:
+    - HTTPS API endpoint url that you can invoke as the target of an event bus rule. Which uses the scope of 'myapi.example.com/domestic.read' to allow the request.
+    - Oauth Authorization Endpoint to get the auth token along with OAuth Client ID,OAuth Client Secret
+      In our deployment we'll use cognito /oauth2/token endpoint (https://tfc-m2m-managed-login-domain.auth.eu-west-1.amazoncognito.com/oauth2/token)
+    - CMK Key in your AWS KMS Service and get the arn of that CMK key
+
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
@@ -43,6 +50,8 @@ Important: this application uses various AWS services and there are costs associ
 - To run the Datadog API Destination example, cd to `7-datadog`.
 - To run the Shopify API Destination example, cd to `9-shopify`.
 - To run the Stripe API Destination example, cd to `10-stripe`.
+- To run the API Destination with OAuth credentials example, cd to `11-oauth-api`.
+- To run the API Destination with OAuth credentials using CMK encryption example, cd to `12-oauth-api-cmk-encryption`. And then follow the README.md file instructions.
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided
@@ -70,9 +79,11 @@ aws events put-events --entries file://testEvent.json
 7. For the freshdesk example use the testEvent.json within the 6-freshdesk directory
 8. For the datadog example use the testEvent.json within the 7-datadog directory
 9. For the shopify example use the testEvent.json within the 9-shopify directory
-10. For the shopify example use the testEvent.json within the 10-stripe directory
+10. For the stripe example use the testEvent.json within the 10-stripe directory
+11. For the OAuth example use the testEvent.json within the 11-oauth-api directory
+12. For the OAuth with cmk encryption example use the testEvent.json within the 12-oauth-api-cmk-encryption
 ```
-aws events put-events --entries file://3-sumologic/testEvent.json
+aws events put-events --entries file://testEvent.json
 ```
 
 ## Cleanup

@@ -38,7 +38,8 @@ Important: this application uses various AWS services and there are costs associ
    ```
 5. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/cdk-stack.ts` file:
    ```bash
-   npm run build && cdk deploy
+   npm run build
+   cdk deploy
    ```
 
 ## How it works

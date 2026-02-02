@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Systems Manager Automation to AWS lambda
+Description: AWS Systems Manager Automation to AWS lambda (uksb-1tthgi812) (tag:systems-manager-automation-to-stepfunctions)
 
 Resources:
 
@@ -86,7 +86,7 @@ Resources:
     Properties:
       Handler: create-snapshot-lamda-function.handler
       CodeUri: ./src
-      Runtime: python3.8
+      Runtime: python3.14
       Timeout: 60
       ReservedConcurrentExecutions: 5
       Policies:
@@ -103,7 +103,7 @@ Resources:
     Properties:
       Handler: get-snapshot-status-lamda-function.handler
       CodeUri: ./src
-      Runtime: python3.8
+      Runtime: python3.14
       Timeout: 60
       ReservedConcurrentExecutions: 5
       Policies:
@@ -120,7 +120,7 @@ Resources:
     Properties:
       Handler: iterate.handler
       CodeUri: ./src
-      Runtime: nodejs14.x
+      Runtime: nodejs24.x
       Timeout: 60
       ReservedConcurrentExecutions: 5
 

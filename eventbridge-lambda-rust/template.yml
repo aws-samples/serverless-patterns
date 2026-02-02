@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - EventBridge to Lambda
+Description: Serverless patterns - EventBridge to Lambda (uksb-1tthgi812) (tag:eventbridge-lambda-rust)
 
 Globals:
   Function:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 30
     Environment:
       Variables:
@@ -22,7 +22,7 @@ Resources:
     Type: AWS::Serverless::Function
     Description: Invoked by EventBridge rule
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Events:
         Trigger:
           Type: EventBridgeRule 
@@ -31,10 +31,13 @@ Resources:
               source:
                 - custom.myApp
               detail-type:
-                - transaction                
+                - transaction
               detail:
                 location:
                   - "prefix": "EUR-"
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 Outputs:
   ConsumerFunction:

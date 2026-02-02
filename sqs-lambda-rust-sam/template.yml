@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - SQS to Lambda
+Description: Serverless patterns - SQS to Lambda (uksb-1tthgi812) (tag:sqs-lambda-rust-sam)
 
 Globals:
   Function:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 30
     Environment:
       Variables:
@@ -27,13 +27,15 @@ Resources:
   QueueConsumerFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Events:
         MySQSEvent:
           Type: SQS
           Properties:
             Queue: !GetAtt MySqsQueue.Arn
             BatchSize: 10
+    Metadata:
+      BuildMethod: rust-cargolambda
 
 Outputs:
   QueueConsumerFunction:

@@ -3,7 +3,8 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: > 
+Description: >
+  (uksb-1tthgi812) (tag:apigw-websocket-api-connection-dynamodb)
   Serverless patterns - Amazon API Gateway WebSocket API connection
   tracking using AWS Service integration type and Amazon DynamoDB
 
@@ -45,7 +46,7 @@ Resources:
   DefaultRouteFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs14.x
+      Runtime: nodejs24.x
       Handler: index.handler
       InlineCode: 'exports.handler = async (event) => {return {statusCode: 200, body: JSON.stringify(event)}}'
 
@@ -249,7 +250,7 @@ Resources:
 Outputs:
   APIEndpoint:
     Description: "API Gateway WebSocket endpoint URL"
-    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${ApiStageName}"
 
   SessionsTable:
     Description: "DynamoDB sessions table for WebSocket API connection ID tracking"

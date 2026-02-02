@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-
+  (uksb-1tthgi812) (tag:apigw-rest-api-batch-sam)
 Resources:
 ##########################################################################
 #   API GATEWAY ROLE WITH PERMISSIONS TO INVOKE BATCH                    #
@@ -233,4 +233,4 @@ Outputs:
     Value: !Select [0, !Split [":", !Select [1, !Split ['/', !Ref JobDefinition]]]] 
   ApiEndpoint: 
     Description: "API Gateway endpoint URL for Prod stage for Product api"
-    Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+    Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"

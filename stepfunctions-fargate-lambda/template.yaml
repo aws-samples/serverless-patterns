@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda or Fargate (uksb-1tthgi812) (tag:stepfunctions-fargate-lambda)
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.14
+      Architectures:
+        - arm64
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: ./statemachine.asl.json
+      DefinitionSubstitutions:
+        Cluster: !GetAtt Cluster.Arn
+        TaskDefinition: !Ref TaskDefinition
+        LambdaFunction: !GetAtt LambdaFunction.Arn
+        Subnet1: !GetAtt VPC.Outputs.Subnet1
+        Subnet2: !GetAtt VPC.Outputs.Subnet2
+        SecurityGroup: !GetAtt VPC.Outputs.SG
+      Events:
+        BucketEBRule:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - aws.s3
+              detail:
+                bucket:
+                  name:
+                    - !Ref S3Bucket
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref LambdaFunction
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ecs:RunTask
+              Resource: !Ref TaskDefinition
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - !GetAtt ECSTaskRole.Arn
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - events:PutTargets
+                - events:PutRule
+                - events:DescribeRule
+              Resource: !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForECSTaskRule
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ecs:StopTasks
+                - ecs:DescribeTasks
+              Resource: "*"
+  
+  VPC:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./vpc.yaml
+
+  ECRRepo:
+    Type: AWS::ECR::Repository
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties: 
+      CapacityProviders: 
+        - FARGATE
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: StepFunctionFargateTask
+      Cpu: 1024
+      Memory: 8192
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      TaskRoleArn: !Ref ECSTaskRole
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+      ContainerDefinitions:
+        - Name: StepFunctionFargateTask1
+          Cpu: 1024
+          Memory: 8192
+          Image: !Sub
+            - ${RepoUrl}:latest
+            - RepoUrl: !GetAtt ECRRepo.RepositoryUri
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: containerlog
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /StepFunctionFargateTask
+
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
+
+Outputs:
+  RepositoryUrl:
+    Description: URL of the repo
+    Value: !GetAtt ECRRepo.RepositoryUri
+  BucketName:
+    Description: Name of source bucket
+    Value: !Ref S3Bucket

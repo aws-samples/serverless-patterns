@@ -1,0 +1,9 @@
+@BedrockAgentsApiProxy_HostAddress = http://localhost:5176
+
+GET {{BedrockAgentsApiProxy_HostAddress}}/health/
+Accept: application/json
+
+POST {{BedrockAgentsApiProxy_HostAddress}}/message/
+Accept: application/json
+
+###

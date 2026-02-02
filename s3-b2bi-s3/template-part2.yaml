@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09' 
+Transform: AWS::Serverless-2016-10-31
+Description: This is part 2 of a 2 part template to demonstrate how AWS B2B Data Interchange can transform EDI Files into JSON as per the transformation logic. This is part 1 of the template.
+
+# Get the required input parameters
+Parameters:
+  BusinessName:
+    Type: String
+    Description: Please enter the business name
+  Email:
+    Type: String
+    Description: Please enter email id
+    AllowedPattern: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$
+    ConstraintDescription: You should enter a valid email    
+  Phone:
+    Type: String
+    Description: Please enter phone number
+  EDI214InputBucketName:
+    Type: String
+    Description: Please enter the name of the input bucket
+  EDI214OutputBucketName:
+    Type: String
+    Description: Please enter the name of the output bucket
+  MyProfileId:
+    Type: String
+    Description: Please enter the id of the profile
+  MyTransformerId:
+    Type: String
+    Description: Please enter the id of the transformer
+
+ 
+Resources:
+  # Create create a trading capability
+  MyTradingCapability: 
+    Type: AWS::B2BI::Capability
+    Properties:
+      Configuration: 
+        Edi: 
+          InputLocation: 
+            BucketName: !Sub "${EDI214InputBucketName}"
+            Key: input
+          OutputLocation: 
+            BucketName: !Sub "${EDI214OutputBucketName}"
+            Key: output
+          TransformerId: !Sub "${MyTransformerId}"
+          Type: 
+            X12Details: 
+              TransactionSet: X12_214
+              Version: VERSION_4010
+      Name: EDI214-AWSNewBlog
+      Type: edi
+
+  # Create a B2BI Partnership
+  MyPartner: 
+    Type: AWS::B2BI::Partnership
+    Properties:
+      Capabilities: 
+        - !Ref MyTradingCapability
+      Email: !Sub "${Email}"
+      Name: MyPartner
+      Phone: !Sub "${Phone}"
+      ProfileId: !Sub "${MyProfileId}"
+
+
+# Output the TradingCapability and Partner
+Outputs:
+  MyTradingCapability:
+    Value: !Ref MyTradingCapability
+  MyPartner:
+    Value: !Ref MyPartner
+

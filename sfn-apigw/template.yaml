@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:sfn-apigw)
   A Step Functions Standard Workflow that invokes a Lambda function via a API Gateway REST APIs integration
 
 Resources:
@@ -13,7 +14,7 @@ Resources:
       DefinitionUri: statemachine/stateMachine.asl.json
       DefinitionSubstitutions:
          DefaultPath: '/'
-         APIEndPoint: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+         APIEndPoint: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
       Role:
         Fn::GetAtt: [ StatesExecutionRole, Arn ]
       Logging:
@@ -31,7 +32,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs24.x
       Events:
         Api:
           Type: Api
@@ -88,4 +89,4 @@ Outputs:
     Description: StateMachinetoAPIGW Arn
   WebEndpoint:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

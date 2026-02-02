@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:appconfig-feature-flag-sam)
   sam-appconfig
 
   Sample SAM Template for sam-appconfig
@@ -127,7 +128,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambdaHandler
-      Runtime: nodejs16.x
+      Runtime: nodejs24.x
       Architectures:
         - x86_64
       
@@ -182,7 +183,7 @@ Outputs:
   HttpApiUrl:
     Description: URL of your API endpoint
     Value:
-      Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/'
+      Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
   HttpApiId:
     Description: Api id of HttpApi
     Value:

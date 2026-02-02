@@ -1,0 +1,61 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Travel Service API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/flights/search": {
+      "post": {
+        "summary": "Search for available flights",
+        "description": "Search for available flights based on the provided search criteria",
+        "operationId": "searchFlights",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "origin": { "type": "string" },
+                  "destination": { "type": "string" },
+                  "departureDate": { "type": "string", "format": "date" },
+                  "returnDate": { "type": "string", "format": "date" },
+                  "passengers": { "type": "integer", "minimum": 1 }
+                },
+                "required": ["origin", "destination", "departureDate", "passengers"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "flights": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "flightNumber": { "type": "string" },
+                          "airline": { "type": "string" },
+                          "departureTime": { "type": "string", "format": "date-time" },
+                          "arrivalTime": { "type": "string", "format": "date-time" },
+                          "price": { "type": "number" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

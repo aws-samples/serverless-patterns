@@ -1,0 +1,55 @@
+{
+	"title": "AWS Lambda to Amazon EventBridge",
+	"description": "This pattern creates a Lambda function that publishes an event to EventBridge.",
+	"language": "",
+	"level": "200",
+	"framework": "Terraform",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This demonstrates a lambda function that publishes events to an EventBridge"
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge-terraform",
+			"templateURL": "serverless-patterns/lambda-eventbridge-terraform",
+			"projectFolder": "lambda-eventbridge-terraform",
+			"templateFile": "lambda-eventbridge-terraform/main.tf"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "Integrating Amazon EventBridge into your serverless applications",
+				"link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+			},
+			{
+				"text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+				"link": "https://serverlessland.com/learn/eventbridge"
+			}
+		]
+	},
+	"deploy": {
+		"text": [
+			"terraform init",
+			"terraform apply"
+		]
+	},
+	"testing": {
+		"text": [
+			"See the README in the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"terraform destroy",
+			"terraform show"
+		]
+	},
+	"authors": [{
+	  "name": "Stephen Monaghan",
+	  "image": "",
+	  "bio": "Solutions Architect, AWS",
+	  "linkedin": "https://www.linkedin.com/in/stephen-monaghan-61873194/"
+	}]
+}

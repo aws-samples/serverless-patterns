@@ -45,7 +45,7 @@ class FirehoseTransformationCdkStack(Stack):
         transformation_lambda = lambda_.Function(
             self, 
             id='TransformationLambdaCdk',
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset('src'),
             handler='lambda_function.lambda_handler',
             role=lambda_role,

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream
+Description: A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream (uksb-1tthgi812) (tag:lambda-kinesis-lambda)
 Parameters:
   KinesisStreamName:
     Type: String
@@ -20,7 +20,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: producer/
-      Runtime: python3.9
+      Runtime: python3.14
       Handler: producer-function.lambda_handler
       Environment:
         Variables:
@@ -34,7 +34,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: consumer/
-      Runtime: python3.9
+      Runtime: python3.14
       Handler: consumer-function.lambda_handler
       Policies: 
       - KinesisStreamReadPolicy:

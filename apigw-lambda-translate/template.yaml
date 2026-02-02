@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An Amazon REST API gateway integrated with a AWS Lambda function that calls AWS Translate service to translate given text into specified language.
+Description: An Amazon REST API gateway integrated with a AWS Lambda function that calls AWS Translate service to translate given text into specified language. (uksb-1tthgi812) (tag:apigw-lambda-translate)
 Resources:
   # API Gateway REST API
   ApiGatewayApi:
@@ -15,7 +15,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: lambda-translate
-      Runtime: python3.9
+      Runtime: python3.14
       Handler: index.lambda_handler
       CodeUri: src/
       MemorySize: 128
@@ -33,4 +33,4 @@ Resources:
 Outputs:
   RestApiEndpoint:
     Description: "The endpoint for the REST API Gateway"
-    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/"

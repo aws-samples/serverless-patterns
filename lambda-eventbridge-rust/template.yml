@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Lambda to EventBridge
+Description: Serverless patterns - Lambda to EventBridge (uksb-1tthgi812) (tag:lambda-eventbridge-rust)
 
 Parameters:
   EventBusName:
@@ -13,7 +13,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 30
     Environment:
       Variables:
@@ -27,13 +27,15 @@ Resources:
   PublisherFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - EventBridgePutEventsPolicy:
             EventBusName: !Ref EventBusName
       Environment:
         Variables:
           EVENT_BUS_NAME: !Ref EventBusName
+    Metadata:
+      BuildMethod: rust-cargolambda
 
 Outputs:
   PublisherFunction:

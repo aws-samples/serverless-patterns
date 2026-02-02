@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Lambda to SQS
+Description: Serverless patterns - Lambda to SQS (uksb-1tthgi812) (tag:lambda-sqs-java)
 
 Resources:
   # Define the SQS topic
@@ -13,7 +13,7 @@ Resources:
     Properties:
       CodeUri: QueuePublisherFunction/
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       Timeout: 30

@@ -1,0 +1,16 @@
+{
+    "name": "hello_world",
+    "version": "1.0.0",
+    "description": "hello world sample for NodeJS",
+    "main": "app.js",
+    "repository": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-lambda-node",
+    "author": "SAM CLI",
+    "license": "MIT",
+    "dependencies": {
+      "axios": ">=1.12.2"
+    },
+    "devDependencies": {
+      "chai": "^6.0.1",
+      "mocha": "^11.7.2"
+    }
+  }

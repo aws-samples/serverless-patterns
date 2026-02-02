@@ -1,0 +1,23 @@
+# Testing artifacts
+tests/
+*.test.ts
+*.test.js
+jest.config.js
+coverage/
+
+# Development files
+node_modules/
+.git/
+.gitignore
+README.md
+
+# Build artifacts
+dist/
+.aws-sam/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store

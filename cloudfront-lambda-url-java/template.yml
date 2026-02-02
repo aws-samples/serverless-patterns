@@ -1,13 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Description: (uksb-1tthgi812) (tag:cloudfront-lambda-url-java)
 Resources:
   LambdaFunction:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: LambdaFunction/
       Handler: com.example.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       Timeout: 30

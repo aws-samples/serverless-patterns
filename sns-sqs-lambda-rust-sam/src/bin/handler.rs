@@ -24,7 +24,7 @@ pub async fn function_handler(event: LambdaEvent<SqsEvent>) -> Result<(), Error>
     for record in event.payload.records.into_iter() {
         tasks.push(tokio::spawn(async move {
             if let Some(body) = &record.body {
-                let sns_message = serde_json::from_str::<SnsMessage>(&body).unwrap();
+                let sns_message = serde_json::from_str::<SnsMessage>(body).unwrap();
                 let sns_message = sns_message.message;
                 let request = serde_json::from_str::<MyStruct>(&sns_message);
                 if let Ok(request) = request {

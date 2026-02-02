@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for EventBridge rule, SQS FIFO queues and EventBridge pipe setup
+
+Resources:
+
+  # EventBridge Rule IAM Role
+  EventBridgeRuleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowSQSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource: !GetAtt InputFifoQueue.Arn
+
+  # Input FIFO Queue
+  InputFifoQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: input-queue.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+
+  # Output FIFO Queue
+  OutputFifoQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: output-queue.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+
+  # EventBridge Rule
+  CustomEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Rule to match events from my-custom-app"
+      EventPattern:
+        source:
+          - "my-custom-app"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt InputFifoQueue.Arn
+          Id: "SendToInputQueue"
+          SqsParameters:
+            MessageGroupId: "DEFAULT"
+          RoleArn: !GetAtt EventBridgeRuleRole.Arn
+
+  # EventBridge Pipe
+  CustomEventPipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: "custom-event-pipe"
+      RoleArn: !GetAtt PipeRole.Arn
+      Source: !GetAtt InputFifoQueue.Arn
+      Target: !GetAtt OutputFifoQueue.Arn
+      TargetParameters:
+        SqsQueueParameters:
+          MessageGroupId: "$.body.detail.accountId"
+
+  # EventBridge Pipe IAM Role
+  PipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: pipes.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: PipeSourcePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource: !GetAtt InputFifoQueue.Arn
+        - PolicyName: PipeTargetPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource: !GetAtt OutputFifoQueue.Arn
+
+Outputs:
+
+  OutputQueueURL:
+    Description: "URL of the output FIFO queue"
+    Value: !Ref OutputFifoQueue
+

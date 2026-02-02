@@ -1,0 +1,58 @@
+{
+  "title": "Lambda Function sending SNS notification when a new S3 Bucket is created",
+  "description": "Notify users when a new S3 Bucket is created using Lambda and SNS",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to invoke a notify users when a new S3 bucket is created. The EventBridge rule detects S3 bucket creation events and triggers a Lambda function. This Lambda function further processes the event details and sends a notification to an SNS topic. This enables automated monitoring and notification of new S3 Bucket creations."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-s3-lambda",
+      "templateURL": "serverless-patterns/eventbridge-s3-lambda",
+      "projectFolder": "eventbridge-s3-lambda",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Events from AWS services",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html"
+      },
+      {
+        "text": "How can I publish a message to an Amazon SNS topic using a Lambda function?",
+        "link": "https://repost.aws/knowledge-center/sns-topic-lambda"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "image": "https://media.licdn.com/dms/image/D5603AQF_QwVjCkS_UQ/profile-displayphoto-shrink_200_200/0/1670929520771?e=1724284800&v=beta&t=FFJJko4OO8h1tCFrxMyneTyRPAKmyEmIaDOYOeTaFEk",
+      "bio": "Cloud Support Engineer at AWS",
+      "linkedin": "archana-venkat-9b80b7184"
+    }
+  ]
+}

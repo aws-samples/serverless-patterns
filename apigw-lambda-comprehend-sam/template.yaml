@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-lambda-comprehend-sam)
   sentiment-analysis
 
   Sample SAM template for sentiment analysis with AWS Lambda and Amazon Comprehend
@@ -22,7 +23,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Architectures:
         - arm64
       Policies:
@@ -39,4 +40,4 @@ Resources:
 Outputs:
   SentimentAnalysisAPI:
     Description: "API Gateway endpoint URL for the dev stage of the Detect Sentiment API"
-    Value: !Sub "https://${DetectSentimentApi}.execute-api.${AWS::Region}.amazonaws.com/dev/detect_sentiment/"
+    Value: !Sub "https://${DetectSentimentApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/detect_sentiment/"

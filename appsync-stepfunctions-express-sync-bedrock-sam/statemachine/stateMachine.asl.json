@@ -1,0 +1,50 @@
+{
+  "Comment": "An example of using Bedrock to chain prompts and their responses together.",
+  "StartAt": "Invoke model with first prompt",
+  "States": {
+    "Invoke model with first prompt": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:invokeModel",
+      "Parameters": {
+        "ModelId": "cohere.command-text-v14",
+        "Body": {
+          "prompt.$": "$.prompt_one",
+          "max_tokens": 2000
+        },
+        "ContentType": "application/json",
+        "Accept": "*/*"
+      },
+      "Next": "Add first result to conversation history",
+      "ResultPath": "$.result_one",
+      "ResultSelector": {
+        "result_one.$": "$.Body.generations[0].text"
+      }
+    },
+    "Add first result to conversation history": {
+      "Type": "Pass",
+      "Next": "Invoke model with second prompt",
+      "Parameters": {
+        "convo_one.$": "States.Format('{}',$.result_one.result_one)"
+      },
+      "ResultPath": "$.convo_one"
+    },
+    "Invoke model with second prompt": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:invokeModel",
+      "Parameters": {
+        "ModelId": "cohere.command-text-v14",
+        "Body": {
+          "prompt.$": "States.Format('{}\n{}','Human: Now write a short story based on the following. Assistant:', $.convo_one.convo_one)",
+          "max_tokens": 1000
+        },
+        "ContentType": "application/json",
+        "Accept": "*/*"
+      },
+      "ResultSelector": {
+        "result_two.$": "$.Body.generations[0].text"
+      },
+      "ResultPath": "$.result_two",
+      "End": true
+    }
+  }
+}

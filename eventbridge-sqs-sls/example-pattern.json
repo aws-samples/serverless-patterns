@@ -1,0 +1,66 @@
+{
+    "title": "EventBridge to SQS",
+    "description": "Create an EventBridge rule that invokes an SQS queue.",
+    "language": "",
+    "architectureURL": "",
+    "videoId": "",
+    "level": "100",
+    "framework": "Serverless Framework",
+    "services": {
+        "from": "eventbridge",
+        "to": "sqs"
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This template deploys an SQS queue that is triggered by an EventBridge rule. ",
+            "The SQS queue policy provides the permission for EventBridge to send messages to the SQS queue.",
+            "",
+            "In this example, the EventBridge rule specified in `serverless.yml` filters the events based upon the criteria in the `EventPattern` section. ",
+            "When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see \"Example event payload from EventBridge to SQS\" in the README) to the SQS queue."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sqs-sls",
+            "templateURL": "serverless-patterns/eventbridge-sqs-sls",
+            "projectFolder": "eventbridge-sqs-sls",
+            "templateFile": "serverless.yml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+                "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+            },
+            {
+                "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+                "link": "https://serverlessland.com/learn/eventbridge"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>serverless deploy --verbose</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>serverless remove --verbose</code>."
+        ]
+    },
+    "authors": [
+        {
+            "headline": "Presented by Dmitry Gulin, Modernization Architect, AWS",
+            "name": "Dmitry Gulin",
+            "bio": "Dmitry is a modernization architect for Professional Services at Amazon Web Services based in the US.",
+            "imageURL": "https://www.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a?s=200"
+        }
+    ]
+}

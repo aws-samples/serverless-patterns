@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: A endpoint hosted by an API Gateway which invokes SQS, consumed by lambda function and persisted in a dynamoDB table.
+Description: A endpoint hosted by an API Gateway which invokes SQS, consumed by lambda function and persisted in a dynamoDB table. (uksb-1tthgi812) (tag:apigw-sqs-lambda-ddb)
 
 Resources:
   ##########################################################################
@@ -13,10 +13,37 @@ Resources:
         DestinationArn: !GetAtt ApiGatewayAccessLogs.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
       DefinitionBody:
-        "Fn::Transform":
-          Name: "AWS::Include"
-          Parameters:
-            Location: "api.yaml"
+        openapi: "3.0.1"
+        info:
+          title: "Http Api"
+          version: "2023-06-25 17:32:29UTC"
+        paths:
+          /submit:
+            post:
+              responses:
+                default:
+                  description: "Response for POST /"
+              x-amazon-apigateway-integration:
+                type: "aws_proxy"
+                integrationSubtype: "SQS-SendMessage"
+                credentials:
+                  Fn::GetAtt: [ApiGatewayRole, Arn]
+                connectionType: "INTERNET"
+                payloadFormatVersion: "1.0"
+                requestParameters:
+                  MessageBody: "$request.body"
+                  QueueUrl:
+                    Ref: BufferingQueue
+
+        x-amazon-apigateway-cors:
+          allowMethods:
+            - "*"
+          maxAge: 0
+          allowCredentials: false
+          allowOrigins:
+            - "*"
+        x-amazon-apigateway-importexport-version: "1.0"
+
       Auth:
         DefaultAuthorizer: AuthorizerFunction
         Authorizers:
@@ -57,7 +84,7 @@ Resources:
       Description: Lambda to be invoked by the SQS Queue
       CodeUri: lambda/sqs-handler/
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Timeout: 3
       MemorySize: 128
       Role: !GetAtt SqsHandlerLambdaExecutionRole.Arn
@@ -82,7 +109,7 @@ Resources:
       Description: Lambda to be invoked by API Gateway for authorization
       CodeUri: lambda/authorizer/
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Timeout: 3
       MemorySize: 128
       Role: !GetAtt AuthorizerLambdaExecutionRole.Arn
@@ -271,4 +298,4 @@ Resources:
 Outputs:
   HttpApiEndpoint:
     Description: "Http API endpoint"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"

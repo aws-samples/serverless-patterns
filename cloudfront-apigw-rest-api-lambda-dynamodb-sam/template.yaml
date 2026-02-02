@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless Webform Sample
+Description: Serverless Webform Sample (uksb-1tthgi812) (tag:cloudfront-apigw-rest-api-lambda-dynamodb-sam)
 
 Parameters:
   HTTPGetFloodRateParam:
@@ -32,7 +32,7 @@ Resources:
       Handler: function.handler
       PackageType: "Zip"
       Tracing: Active
-      Runtime: "nodejs16.x"
+      Runtime: "nodejs24.x"
       Environment:
         Variables:
           DatabaseTable: !Ref DynamoDBTable
@@ -78,12 +78,12 @@ Resources:
         WebACLId: !GetAtt CloudFrontWebACL.Arn
         Origins:
           - Id: s3
-            DomainName: !Join [ "", [ !Ref S3Bucket, ".s3.amazonaws.com" ] ]
+            DomainName: !Join [ "", [ !Ref S3Bucket, ".s3.${AWS::URLSuffix}" ] ]
             S3OriginConfig:
               OriginAccessIdentity:
                 !Join [ "", [ "origin-access-identity/cloudfront/", !Ref CloudFrontOriginAccessIdentity ] ]
           - Id: api
-            DomainName: !Sub "${API}.execute-api.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub "${API}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
             OriginPath: /dev
             OriginCustomHeaders: 
               - HeaderName: "X-Origin-Verify"
@@ -314,7 +314,8 @@ Resources:
     Properties:
       ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${API}/stages/dev
       WebACLArn: !GetAtt  APIWebACL.Arn
-      
+    DependsOn: APIdevStage
+
 Outputs:
   CloudfrontDomain:
     Value: !GetAtt CloudFront.DomainName

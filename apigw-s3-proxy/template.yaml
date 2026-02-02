@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless patterns - Amazon API Gateway REST API with S3 integration
+Description: Serverless patterns - Amazon API Gateway REST API with S3 integration (uksb-1tthgi812) (tag:apigw-s3-proxy)
 
 Resources:
   
@@ -23,7 +23,7 @@ Resources:
     Properties:
       RestApiId: !Ref AppApi
       ParentId: !Ref ResourceFolder
-      PathPart: '{item}'
+      PathPart: '{item+}'
 
   RootMethodGet:
     Type: AWS::ApiGateway::Method
@@ -146,4 +146,4 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/{folder}/{item+}"

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: A rest endpoint hosted by an API Gateway which invokes Kinesis data stream, consumed by lambda function and persisted in a dynamoDB table.
+Description: A rest endpoint hosted by an API Gateway which invokes Kinesis data stream, consumed by lambda function and persisted in a dynamoDB table. (uksb-1tthgi812) (tag:apigw-kinesis-lambda-ddb)
 
 Resources:
   ##########################################################################
@@ -62,7 +62,7 @@ Resources:
       Description: Lambda to be invoked by API Gateway for authorization
       CodeUri: lambda/authorizer/
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Timeout: 3
       MemorySize: 128
       Role: !GetAtt AuthorizerLambdaExecutionRole.Arn
@@ -78,7 +78,7 @@ Resources:
       FunctionName: KinesisHandlerFunction
       Description: Lambda to consumer from kinesis data stream
       CodeUri: lambda/kinesis-handler/
-      Runtime: python3.10
+      Runtime: python3.14
       Handler: index.lambda_handler
       MemorySize: 128
       Layers:
@@ -246,4 +246,4 @@ Resources:
 Outputs:
   RestApiEndpoint:
     Description: "Rest API endpoint"
-    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"

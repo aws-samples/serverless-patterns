@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:apigw-rest-api-eventbridge-sam)
   Serverless patterns - REST API Gateway to EventBridge
 
 Resources:
@@ -122,7 +123,7 @@ Resources:
 Outputs:
   ApiEndpoint: 
     Description: "API Gateway endpoint URL for Prod stage for Product api"
-    Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+    Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
 
 
 

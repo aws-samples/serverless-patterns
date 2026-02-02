@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An Application Load Balancer and an AWS Lambda function.
+Description: An Application Load Balancer and an AWS Lambda function. (uksb-1tthgi812) (tag:alb-lambda-rust)
 
 Parameters:
   VpcId:
@@ -14,7 +14,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 29
     Environment:
       Variables:
@@ -28,11 +28,13 @@ Resources:
   MyLambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
       Tags:
         name: !Ref AWS::StackName
+    Metadata:
+      BuildMethod: rust-cargolambda
 
   MyLambdaFunctionPermission:
     Type: AWS::Lambda::Permission

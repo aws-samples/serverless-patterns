@@ -1,0 +1,5 @@
+aws-cdk-lib==2.148.0
+constructs>=10.0.0,<11.0.0
+opensearch-py
+crhelper
+boto3

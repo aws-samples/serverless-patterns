@@ -1,0 +1,44 @@
+{
+    "title": "Process Amazon SQS records with AWS Lambda (Python)",
+    "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda.",
+    "language": "python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "The AWS SAM template deploys an AWS Lambda function, an Amazon SQS queue, a dead-letter SQS queue, and the IAM permissions required to run the application. Lambda polls the SQS queue and invokes the Lambda function when new messages are available."
+      ]
+    },
+    "AWS": "",
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-python-sam",
+        "templateURL": "serverless-patterns/sqs-lambda-python-sam",
+        "projectFolder": "sqs-lambda-python-sam"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Using Lambda with Amazon SQS",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el"
+        },
+        {
+          "text": "Introducing an enhanced local IDE experience for AWS Lambda developers",
+          "link": "https://aws.amazon.com/blogs/compute/introducing-an-enhanced-local-ide-experience-for-aws-lambda-developers?trk=2dd77e51-cb93-4970-a61a-5993781e5576&sc_channel=el"
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["sam build", "sam deploy --guided"]
+    },
+    "testing": {
+      "text": ["See the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>sam delete</code>."]
+    },
+    "contributor": "content/contributors/jrwood.json"
+}
+  

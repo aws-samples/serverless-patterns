@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: An AWS Serverless Pattern to demonstrate integration of AppSync, Lambda and Kendra.
+Description: An AWS Serverless Pattern to demonstrate integration of AppSync, Lambda and Kendra. (uksb-1tthgi812) (tag:appsync-lambda-kendra)
 
 Resources:
 
@@ -160,7 +160,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Environment:
         Variables:
           KENDRA_INDEX_ID: !Ref KendraIndex

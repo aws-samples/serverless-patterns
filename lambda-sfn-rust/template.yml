@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:lambda-sfn-rust)
   Async invoke a StepFunctions state machine from a Lambda function
 
 Globals:
@@ -8,7 +9,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 30
     Environment:
       Variables:
@@ -22,13 +23,16 @@ Resources:
   LambdaProxy:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - StepFunctionsExecutionPolicy:
             StateMachineName: !GetAtt StateMachine.Name
       Environment:
         Variables:
           STATE_MACHINE_ARN: !GetAtt StateMachine.Arn
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 ##########################################################################
 #   STEP FUNCTION                                                        #
 ##########################################################################

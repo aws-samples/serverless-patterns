@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API and an AWS Lambda function.
+Description: An Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API and an AWS Lambda function. (uksb-1tthgi812) (tag:cloudfront-lambda-url-rust)
 
 # Global values that are applied to all applicable resources in this template
 Globals:
@@ -8,7 +8,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 29
     Environment:
       Variables:
@@ -23,9 +23,12 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       FunctionUrlConfig:
         AuthType: NONE
+    Metadata:
+      BuildMethod: rust-cargolambda
+
 
 # ##########################################################################
 # #  CloudFront::CachePolicy                                               #

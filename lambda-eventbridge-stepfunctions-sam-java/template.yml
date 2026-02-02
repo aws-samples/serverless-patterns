@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: lambda-eventbridge-stepfunctions
+Description: lambda-eventbridge-stepfunctions (uksb-1tthgi812) (tag:lambda-eventbridge-stepfunctions-sam-java)
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 512
     Timeout: 25
 

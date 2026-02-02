@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Template to enrich Amazon EventBridge Pipes data 
+Description: Template to enrich Amazon EventBridge Pipes data  (uksb-1tthgi812) (tag:eventbridge-pipes-sqs-lambda-api-destination)
 
 Resources:
   #Source SQS
@@ -24,7 +24,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-Enrichment-lambda
       CodeUri: src/
       Handler: enrichment.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Timeout: 15
       Architectures:
@@ -61,7 +61,7 @@ Resources:
     Properties:
       Name: !Sub ${AWS::StackName}-api-destinations
       ConnectionArn: !GetAtt TargetConnection.Arn
-      InvocationEndpoint: !Sub "https://${TargetApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      InvocationEndpoint: !Sub "https://${TargetApiGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"
       HttpMethod: POST 
       InvocationRateLimitPerSecond: 10
       
@@ -137,7 +137,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-lambdaToDynamoDB
       CodeUri: src/
       Handler: lambdaToDynamoDB.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 3008
       Timeout: 30
       Tracing: Active

@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS AppConfig integration with Lambda extensions
+Description: AWS AppConfig integration with Lambda extensions (uksb-1tthgi812) (tag:appconfig-lambda-rust)
 
 Globals:
   Function:
     MemorySize: 256
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2
+    Runtime: provided.al2023
     Timeout: 29
     Environment:
       Variables:
@@ -76,7 +76,7 @@ Resources:
   PutObjectFunction:
     Type: AWS::Serverless::Function 
     Properties:
-      CodeUri: ./build/handler
+      CodeUri: .
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: '2012-10-17'
@@ -94,4 +94,6 @@ Resources:
           AWS_APPCONFIG_PROFILE: MyTestProfile
           AWS_APPCONFIG_EXTENSION_HTTP_PORT: 2772
       Layers:
-        - arn:aws:lambda:eu-central-1:066940009817:layer:AWS-AppConfig-Extension-Arm64:2
+        - arn:aws:lambda:eu-central-1:066940009817:layer:AWS-AppConfig-Extension-Arm64:101
+    Metadata:
+      BuildMethod: rust-cargolambda

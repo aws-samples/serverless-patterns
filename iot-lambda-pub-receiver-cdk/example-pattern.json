@@ -1,0 +1,60 @@
+{
+  "title": "AWS Lambda to Amazon IoT Core to AWS Lambda",
+  "description": "Create a Lambda function publishing into an IoT topic, triggering an action calling another Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Lambda Function to publish messages into AWS IoT Core topic and get a rule triggered by a condition to process relevant messages into another Lambda. This pattern is leveraging CloudWatch logs to ease the debugging and visibility into the processed messages.",
+      "The function are written in Python and the infrastructure is described with AWS CDKv2 in Typescript. The patterns also shows an effective way to manage Python dependencies through Docker built image and requiements.txt file.",
+      "This pattern deploys 2 Lambda functions, 1 IoT rule and action, 3 log groups."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
+      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
+      "projectFolder": "iot-lambda-pub-receiver-cdk",
+      "templateFile": "lambda-iot-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS IoT Core - Getting started with AWS IoT Core tutorials",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-gs.html"
+      },
+      {
+        "text": "AWS IoT Core action resources",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-action-resources.html"
+      },
+      {
+        "test": "Building Lambda with Python",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html"
+      },
+      {
+        "text": "Working with the AWS CDK in TypeScript",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Philippe Wanner",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/philippe-wanner.jpg",
+      "bio": "Philippe is a Senior Specialist Solutions Architect at Amazon Web Services based in Zurich, Switzerland. His role is to spread the migration and modernization best practices for large organisations.",
+      "linkedin": "philippe-wanner"
+    }
+  ]
+}

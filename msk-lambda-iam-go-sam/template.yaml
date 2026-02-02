@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
+  (uksb-1tthgi812) (tag:msk-lambda-iam-go-sam)
   lambda-msk-consumer-go
   
   Sample SAM Template for lambda-msk-consumer-go
@@ -18,7 +19,7 @@ Resources:
     Properties:
       CodeUri: HandlerKafka/
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
       Architectures:
         - x86_64
       Events:
