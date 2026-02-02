@@ -9,7 +9,7 @@
     "text": [
       "This pattern demonstrates how to use Amazon S3 as a failed-event destination for AWS Lambda asynchronous invocations.",
       "A Lambda function implements business logic with success and failure scenarios.",
-      "When Lambda fails during asynchronous invocation, AWS automatically captures the failed event to S3 for analysis.",
+      "When the Lambda function fails during asynchronous invocation, AWS automatically captures the failed event to S3 for analysis.",
       "Amazon Athena with AWS Glue enables SQL-based analytics on failed events to identify error patterns and gain insights.",
       "The pattern uses AWS CLI with --invocation-type Event to demonstrate asynchronous invocation.",
       "Important: Lambda destinations only work with asynchronous invocations (S3, SNS, EventBridge) and stream-based sources (Kinesis, DynamoDB Streams, SQS). They do not trigger for synchronous invocations."
