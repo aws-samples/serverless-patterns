@@ -29,7 +29,7 @@ export class PatternStack extends cdk.Stack {
     // Note: S3Destination automatically grants only necessary write permissions (PutObject)
     // to the Lambda function for failed event delivery
     const processorFunction = new lambda.Function(this, 'ProcessorFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_LATEST,
       handler: 'processor.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       timeout: cdk.Duration.seconds(30),
