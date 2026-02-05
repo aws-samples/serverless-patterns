@@ -1,0 +1,69 @@
+{
+  "Comment": "Synchronous ECS Task Execution - Step Functions polls until task completes",
+  "StartAt": "Run ECS Task (Sync)",
+  "States": {
+    "Run ECS Task (Sync)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "Cluster": "${ECSCluster}",
+        "TaskDefinition": "${TaskDefinition}",
+        "LaunchType": "FARGATE",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "${Subnet1}",
+              "${Subnet2}"
+            ],
+            "SecurityGroups": [
+              "${SecurityGroup}"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "python-sync-container",
+              "Environment": [
+                {
+                  "Name": "MESSAGE",
+                  "Value.$": "$.message"
+                },
+                {
+                  "Name": "PROCESSING_TIME",
+                  "Value.$": "States.Format('{}', $.processingTime)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "Next": "Task Completed Successfully",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Task Failed",
+          "ResultPath": "$.error"
+        }
+      ]
+    },
+    "Task Completed Successfully": {
+      "Type": "Pass",
+      "Parameters": {
+        "status": "completed",
+        "pattern": "synchronous",
+        "message": "ECS task completed successfully",
+        "input.$": "$"
+      },
+      "End": true
+    },
+    "Task Failed": {
+      "Type": "Fail",
+      "Error": "ECSTaskFailed",
+      "Cause": "The ECS task failed to complete successfully"
+    }
+  }
+}
