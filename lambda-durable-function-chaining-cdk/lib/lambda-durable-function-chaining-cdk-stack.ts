@@ -1,8 +1,8 @@
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as nodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as cdk from "aws-cdk-lib/core";
 import { Construct } from "constructs";
-import * as nodejs from "aws-cdk-lib/aws-lambda-nodejs";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import path from "path";
 
 export class LambdaDurableFunctionChainingCdkStack extends cdk.Stack {
@@ -28,11 +28,15 @@ export class LambdaDurableFunctionChainingCdkStack extends cdk.Stack {
     const authorizePaymentFunction = new nodejs.NodejsFunction(this, "AuthorizePaymentFunction", {
       runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, "functions", "authorizePayment", "index.ts"),
+      environment: {
+        PRODUCT_CATALOG_TABLE: productCatalogTable.tableName,
+      },
       timeout: cdk.Duration.seconds(30),
     });
 
     validateOrderFunction.addEnvironment("AUTHORIZE_PAYMENT_FUNCTION", authorizePaymentFunction.functionName);
     authorizePaymentFunction.grantInvoke(validateOrderFunction);
+    productCatalogTable.grantReadData(authorizePaymentFunction);
 
     const allocateInventoryFunction = new nodejs.NodejsFunction(this, "AllocateInventoryFunction", {
       runtime: lambda.Runtime.NODEJS_24_X,
@@ -55,6 +59,15 @@ export class LambdaDurableFunctionChainingCdkStack extends cdk.Stack {
     validateOrderFunction.addEnvironment("FULFILL_ORDER_FUNCTION", fulfillOrderFunction.functionName);
     fulfillOrderFunction.grantInvoke(validateOrderFunction);
 
-    productCatalogTable.grantReadData(allocateInventoryFunction);
+    productCatalogTable.grantReadWriteData(allocateInventoryFunction);
+
+    // Outputs
+    new cdk.CfnOutput(this, "ProductCatalogTableName", {
+      value: productCatalogTable.tableName,
+    });
+
+    new cdk.CfnOutput(this, "ValidateOrderFunctionName", {
+      value: validateOrderFunction.functionName,
+    })
   }
 }

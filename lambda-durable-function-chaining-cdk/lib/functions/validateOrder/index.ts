@@ -1,5 +1,5 @@
+import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { DurableContext, withDurableExecution } from "@aws/durable-execution-sdk-js";
-import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 
 interface Order {
   orderId: string;
@@ -7,7 +7,6 @@ interface Order {
   items: {
     productId: string;
     quantity: number;
-    unitPrice: number;
   }[];
   shippingAddress: string;
   billingAddress: string;
@@ -16,14 +15,12 @@ interface Order {
     cardNumber: number;
     cardBrand: "Visa" | "Mastercard" | "Amex";
   };
-  orderTotal: number;
-  orderTimestamp: string;
 }
 
 const lambdaClient = new LambdaClient();
 
 export const handler = withDurableExecution(async (event: Order, context: DurableContext) => {
-  const { orderId, items, shippingAddress, billingAddress, paymentMethod, orderTotal } = event;
+  const { orderId, items, shippingAddress, billingAddress, paymentMethod } = event;
 
   const validation = await context.step("validate-order", async () => {
     // Mock order validation logic
@@ -46,12 +43,6 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
     // Validate payment method
     if (!paymentMethod || !paymentMethod.cardNumber) {
       errors.push("Invalid payment method");
-    }
-
-    // Validate order total
-    const calculatedTotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    if (Math.abs(calculatedTotal - orderTotal) > 0.01) {
-      errors.push("Order total mismatch");
     }
 
     return {
@@ -78,8 +69,8 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
         Payload: JSON.stringify({
           orderId,
           customerId: event.customerId,
+          items,
           paymentMethod,
-          amount: orderTotal,
         }),
       }),
     );
@@ -93,6 +84,7 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
       orderId,
       status: "payment_declined",
       reason: authorization.reason,
+      amount: authorization.amount,
       timestamp: new Date().toISOString(),
     };
   }
@@ -103,7 +95,7 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
         FunctionName: process.env.ALLOCATE_INVENTORY_FUNCTION,
         Payload: JSON.stringify({
           orderId,
-          items,
+          items: authorization.items,
         }),
       }),
     );
@@ -118,6 +110,7 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
       status: "inventory_unavailable",
       reason: allocation.reason,
       productId: allocation.productId,
+      orderTotal: authorization.amount,
       timestamp: new Date().toISOString(),
     };
   }
@@ -129,7 +122,7 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
         Payload: JSON.stringify({
           orderId,
           customerId: event.customerId,
-          items,
+          items: authorization.items,
           shippingAddress,
           allocations: allocation.allocations,
         }),
@@ -137,6 +130,31 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
     );
 
     const payload = JSON.parse(new TextDecoder().decode(response.Payload));
+    
+    // If fulfillment fails, restore inventory
+    if (payload.status === "failed") {
+      await context.step("restore-inventory", async () => {
+        await lambdaClient.send(
+          new InvokeCommand({
+            FunctionName: process.env.ALLOCATE_INVENTORY_FUNCTION,
+            Payload: JSON.stringify({
+              orderId,
+              items: authorization.items,
+              restore: true,
+            }),
+          }),
+        );
+      });
+      
+      return {
+        orderId,
+        status: "fulfillment_failed",
+        reason: payload.reason,
+        orderTotal: authorization.amount,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    
     return payload;
   });
 
@@ -144,7 +162,8 @@ export const handler = withDurableExecution(async (event: Order, context: Durabl
     orderId,
     customerId: event.customerId,
     status: "completed",
-    orderTotal,
+    orderTotal: authorization.amount,
+    items: authorization.items,
     validation,
     payment: {
       authorizationId: authorization.authorizationId,

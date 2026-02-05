@@ -1,19 +1,59 @@
+import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+
 interface PaymentEvent {
   orderId: string;
   customerId: string;
+  items: {
+    productId: string;
+    quantity: number;
+  }[];
   paymentMethod: {
     type: "credit" | "debit";
     cardNumber: string;
     cardBrand: "Visa" | "Mastercard" | "Amex";
   };
-  amount: number;
 }
+
+const dynamoClient = new DynamoDBClient();
 
 export async function handler(event: PaymentEvent) {
   console.log("Authorizing payment for order:", event.orderId);
 
-  // Mock payment authorization logic
-  const { paymentMethod, amount, orderId, customerId } = event;
+  const { paymentMethod, orderId, customerId, items } = event;
+
+  // Fetch pricing from DynamoDB and calculate total
+  let amount = 0;
+  const itemsWithPricing = [];
+
+  for (const item of items) {
+    const result = await dynamoClient.send(
+      new GetItemCommand({
+        TableName: process.env.PRODUCT_CATALOG_TABLE,
+        Key: { productId: { S: item.productId } },
+      }),
+    );
+
+    if (!result.Item) {
+      return {
+        orderId,
+        status: "declined",
+        reason: "product_not_found",
+        productId: item.productId,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const price = parseFloat(result.Item.price.N!);
+    const itemTotal = price * item.quantity;
+    amount += itemTotal;
+
+    itemsWithPricing.push({
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice: price,
+      itemTotal,
+    });
+  }
 
   // Simulate payment gateway call
   const authorizationId = `AUTH-${Date.now()}-${crypto.randomUUID()}`;
@@ -24,6 +64,7 @@ export async function handler(event: PaymentEvent) {
       orderId,
       status: "declined",
       reason: "amount_exceeds_limit",
+      amount,
       timestamp: new Date().toISOString(),
     };
   }
@@ -37,6 +78,7 @@ export async function handler(event: PaymentEvent) {
     status: "authorized",
     authorizationId,
     amount,
+    items: itemsWithPricing,
     cardBrand: paymentMethod.cardBrand,
     lastFourDigits,
     timestamp: new Date().toISOString(),

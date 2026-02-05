@@ -1,4 +1,4 @@
-import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 
 interface InventoryEvent {
   orderId: string;
@@ -6,7 +6,9 @@ interface InventoryEvent {
     productId: string;
     quantity: number;
     unitPrice: number;
+    itemTotal: number;
   }[];
+  restore?: boolean;
 }
 
 const dynamoClient = new DynamoDBClient();
@@ -14,7 +16,34 @@ const dynamoClient = new DynamoDBClient();
 export async function handler(event: InventoryEvent) {
   console.log("Allocating inventory for order:", event.orderId);
 
-  const { orderId, items } = event;
+  const { orderId, items, restore } = event;
+  
+  // If restore flag is set, add inventory back
+  if (restore) {
+    console.log("Restoring inventory for order:", orderId);
+    
+    for (const item of items) {
+      const { productId, quantity } = item;
+      
+      await dynamoClient.send(
+        new UpdateItemCommand({
+          TableName: process.env.PRODUCT_CATALOG_TABLE,
+          Key: { productId: { S: productId } },
+          UpdateExpression: "SET stockLevel = stockLevel + :quantity",
+          ExpressionAttributeValues: {
+            ":quantity": { N: String(quantity) },
+          },
+        }),
+      );
+    }
+    
+    return {
+      orderId,
+      status: "restored",
+      timestamp: new Date().toISOString(),
+    };
+  }
+  
   const allocations = [];
 
   for (const item of items) {
@@ -54,6 +83,18 @@ export async function handler(event: InventoryEvent) {
     }
 
     const allocationId = `ALLOC-${productId}-${crypto.randomUUID()}`;
+
+    // Update stock level in DynamoDB
+    await dynamoClient.send(
+      new UpdateItemCommand({
+        TableName: process.env.PRODUCT_CATALOG_TABLE,
+        Key: { productId: { S: productId } },
+        UpdateExpression: "SET stockLevel = :newStock",
+        ExpressionAttributeValues: {
+          ":newStock": { N: String(stockLevel - quantity) },
+        },
+      }),
+    );
 
     allocations.push({
       allocationId,

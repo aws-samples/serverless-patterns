@@ -5,6 +5,7 @@ interface FulfillmentEvent {
     productId: string;
     quantity: number;
     unitPrice: number;
+    itemTotal: number;
   }[];
   shippingAddress: string;
   allocations: {
@@ -29,13 +30,19 @@ export async function handler(event: FulfillmentEvent) {
   const estimatedDeliveryDays = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000 * 5) + 3;
   const estimatedDeliveryDate = new Date(Date.now() + estimatedDeliveryDays * 24 * 60 * 60 * 1000);
 
-  const shipments = allocations.map((allocation) => ({
-    shipmentId: `SHIP-${allocation.warehouseLocation}-${crypto.randomUUID()}`,
-    warehouseLocation: allocation.warehouseLocation,
-    productId: allocation.productId,
-    quantity: allocation.quantity,
-    status: "preparing",
-  }));
+  // Create shipments with pricing information
+  const shipments = allocations.map((allocation) => {
+    const item = items.find(i => i.productId === allocation.productId);
+    return {
+      shipmentId: `SHIP-${allocation.warehouseLocation}-${crypto.randomUUID()}`,
+      warehouseLocation: allocation.warehouseLocation,
+      productId: allocation.productId,
+      quantity: allocation.quantity,
+      unitPrice: item?.unitPrice || 0,
+      itemTotal: item?.itemTotal || 0,
+      status: "preparing",
+    };
+  });
 
   // Mock order fulfillment details
   return {
