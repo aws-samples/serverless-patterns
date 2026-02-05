@@ -1,0 +1,21 @@
+{
+  "name": "lambda-durable-rest-api",
+  "version": "1.0.0",
+  "description": "Lambda Durable Function - REST API Call with Node.js",
+  "type": "module",
+  "main": "app.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws/durable-execution-sdk-js": "^1.0.0"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "durable",
+    "rest-api"
+  ],
+  "author": "",
+  "license": "MIT-0"
+}
