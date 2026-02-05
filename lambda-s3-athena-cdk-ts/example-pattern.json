@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda with Amazon S3 Failed-Event Destination and Amazon Athena Analytics",
+  "title": "AWS Lambda Failed-Event Destination and Amazon Athena Analytics",
   "description": "Capture AWS Lambda failed events to Amazon S3 and analyze them with Amazon Athena for error insights and patterns using asynchronous invocations.",
   "language": "TypeScript",
   "level": "200",

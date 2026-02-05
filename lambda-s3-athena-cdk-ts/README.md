@@ -199,6 +199,8 @@ The AWS Glue Data Catalog is required for Amazon Athena to query Amazon S3 data,
 ### Query Failed Events with Amazon Athena
 
 1. Open the Amazon Athena console to run queries.
+    * You will need to setup a query result location in Amazon S3 if you've never run a query before
+    * This can be changed later in the settings
 
 2. Query to count failed events by error type:
 
