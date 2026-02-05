@@ -6,6 +6,22 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 **Important:** This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
+## Security Note
+
+This pattern is designed for learning and demonstration purposes. The IAM roles and security group use permissive configurations to simplify deployment and focus on the integration patterns:
+
+- **Security Group**: Allows all outbound traffic (required for pulling Docker images and calling AWS APIs)
+- **IAM Roles**: Use wildcard (`*`) resources for ECS task management and Step Functions callbacks
+
+**For production use**, you should:
+- Restrict security group egress to specific AWS service endpoints using VPC endpoints
+- Scope IAM policies to specific resources (task definitions, state machines)
+- Implement least privilege access based on your security requirements
+- Consider using AWS PrivateLink for service-to-service communication
+- Enable VPC Flow Logs for network traffic monitoring
+
+Deploy this pattern in a non-production AWS account or isolated environment for testing.
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
