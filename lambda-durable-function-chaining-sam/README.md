@@ -105,7 +105,7 @@ If the orchestrator fails after Step 2 completes:
 2. Invoke the workflow:
     ```bash
     aws lambda invoke \
-      --function-name "arn:aws:lambda:us-east-1:945972242554:function:durable-orchestrator:live" \
+      --function-name "$DURABLE_FUNCTION_ARN" \
       --payload '{"id": "test-123", "name": "demo", "value": 5}' \
       --cli-binary-format raw-in-base64-out \
       response.json
