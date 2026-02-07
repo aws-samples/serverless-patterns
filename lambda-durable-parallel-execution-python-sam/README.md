@@ -1,4 +1,4 @@
-# Parallel Execution of Math Operations with AWS Lambda Durable Functions
+# Parallel Execution of Math Operations with AWS Lambda durable functions
 
 This pattern demonstrates parallel execution of mathematical operations using AWS Lambda durable functions. The workflow executes addition, subtraction, multiplication, and division operations concurrently, showcasing the power of parallel execution in durable functions.
 
@@ -37,7 +37,7 @@ graph LR
 ### Workflow Steps
 
 1. **User invokes Lambda function** with two numbers (num1 and num2)
-2. **Durable Function validates input** and prepares operations
+2. **Durable Function parses input**, defaulting to 0 for missing values
 3. **Four operations execute in parallel**:
    - Addition: num1 + num2
    - Subtraction: num1 - num2
@@ -159,7 +159,7 @@ sam delete --stack-name <stack-name>
 
 ## Learn More
 
-- [Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [AWS Lambda durable functions documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Durable Execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-python)
 - [Parallel Execution](https://github.com/aws/aws-durable-execution-sdk-python/blob/main/docs/core/parallel.md)
 - [Retry Strategies](https://github.com/aws/aws-durable-execution-sdk-python/blob/main/docs/advanced/error-handling.md#retry-strategies)

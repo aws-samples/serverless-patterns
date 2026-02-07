@@ -1,6 +1,6 @@
 {
-  "title": "Parallel Execution of Math Operations with AWS Lambda Durable Functions",
-  "description": "Demonstrates parallel execution of mathematical operations using Lambda durable functions with batch result collection and error handling",
+  "title": "Parallel execution of operations with AWS Lambda durable functions",
+  "description": "Demonstrates parallel execution of operations using Lambda durable functions with batch result collection and error handling",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -26,7 +26,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Durable Functions Documentation",
+        "text": "AWS Lambda durable functions documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -64,13 +64,13 @@
       "name": "Anup Rajpara",
       "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
       "bio": "Anup is a Sr. Technical Account Manager at Amazon Web Services. He is passionate about serverless & event-driven architectures.",
-      "linkedin": "anup-rajpara-developer/"
+      "linkedin": "anup-rajpara-developer"
     },
     {
       "name": "Sahil Bhimjiani",
       "image": "https://drive.google.com/file/d/1E2p7S5UtU36x6Sk1xPS3XnSGJyIUoqK7/view?usp=drivesdk",
       "bio": "Sahil Bhimjiani is a Solutions Architect at Amazon Web Services.",
-      "linkedin": "https://www.linkedin.com/in/sahil9701/"
+      "linkedin": "sahil9701"
     }
   ]
 }
