@@ -1,4 +1,4 @@
-# Function Chaining with AWS Lambda Durable Functions
+# Function chaining with AWS Lambda durable functions
 
 This pattern demonstrates the **function chaining** workflow pattern using AWS Lambda durable functions. A durable orchestrator chains three Lambda functions sequentially, with automatic checkpointing after each step for fault tolerance.
 
@@ -64,9 +64,9 @@ flowchart LR
 
 The orchestrator uses `context.invoke()` to chain 3 Lambda functions with automatic checkpointing.
 
-### What are Lambda Durable Functions?
+### What are AWS Lambda durable functions?
 
-Lambda durable functions enable resilient, long-running workflows with automatic state management. Key capabilities:
+Lambda durable functions enable you to build resilient, long-running workflows with automatic state management. Key capabilities:
 
 - **Checkpoint/Replay**: Each `context.invoke()` creates a checkpoint. If the function fails, it replays from the beginning but skips completed steps using stored results.
 - **Fault Tolerance**: Workflows automatically recover from failures without re-executing completed work.

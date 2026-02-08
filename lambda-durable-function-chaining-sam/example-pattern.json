@@ -1,5 +1,5 @@
 {
-  "title": "Function Chaining with AWS Lambda Durable Functions",
+  "title": "Function chaining with AWS Lambda durable functions",
   "description": "Demonstrates the function chaining pattern using Lambda durable functions with automatic checkpointing and fault-tolerant sequential execution",
   "language": "Python",
   "level": "200",
@@ -58,7 +58,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: `sam delete`"
+      "Delete the stack: <code>sam delete</code>"
     ]
   },
   "authors": [
@@ -66,7 +66,7 @@
       "name": "Sahil Bhimjiani",
       "image": "https://drive.google.com/file/d/1E2p7S5UtU36x6Sk1xPS3XnSGJyIUoqK7/view?usp=drivesdk",
       "bio": "Sahil Bhimjiani is a Solutions Architect at Amazon Web Services.",
-      "linkedin": "https://www.linkedin.com/in/sahil9701/"
+      "linkedin": "sahil9701"
     },
     {
       "name": "Anup Rajpara",
