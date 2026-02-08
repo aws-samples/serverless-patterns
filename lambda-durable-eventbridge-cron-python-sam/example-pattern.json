@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge Cron to Durable Lambda Function",
+  "title": "EventBridge Cron to durable Lambda function",
   "description": "Create a durable Lambda function triggered by EventBridge on a cron schedule using AWS SAM.",
   "language": "Python",
   "level": "200",
@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to create a durable Lambda function that is triggered by EventBridge on a cron schedule. The Lambda function uses the AWS Durable Execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.",
+      "This sample project demonstrates how to create a durable Lambda function that is triggered by EventBridge on a cron schedule. The Lambda function uses the AWS durable Execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.",
       "The durable execution pattern allows Lambda functions to span multiple invocations while maintaining state. When the function calls context.wait(), it suspends execution and creates a checkpoint. A subsequent invocation resumes from the checkpoint without re-executing previous steps.",
-      "This pattern deploys a Lambda function with Python 3.14 runtime, an EventBridge rule with cron schedule, and uses function versioning to ensure the cron trigger targets a published version rather than $LATEST."
+      "This pattern deploys a durable Lambda function with Python 3.14 runtime, an EventBridge rule with cron schedule, and uses function versioning to ensure the cron trigger targets a published version rather than $LATEST."
     ]
   },
   "gitHub": {
@@ -23,16 +23,16 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Durable Execution SDK for Python",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-execution.html"
+        "text": "AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
-        "text": "EventBridge Rules and Schedules",
-        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
+        "text": "Invoking AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html"
       },
       {
-        "text": "Lambda Function Versioning and Aliases",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html"
+        "text": "AWS durable execution SDK for Python",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-python"
       }
     ]
   },
