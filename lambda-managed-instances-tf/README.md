@@ -63,7 +63,7 @@ The Lambda function is a simple Hello World implementation that:
 - Uses Python's standard logging library for event logging
 - Demonstrates minimal Lambda function structure using Python type hints
 
-### CloudWatch Log Group
+### Amazon CloudWatch Log Group
 
 The pattern includes a dedicated CloudWatch log group with:
 - **Custom log group name**: `/demo/lambda/hello-world-managed-instances-tf`
