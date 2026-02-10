@@ -1,5 +1,5 @@
 {
-  "title": "Lambda Hello World on Lambda Managed Instances (Terraform)",
+  "title": "AWS Lambda Hello World on AWS Lambda Managed Instances (Terraform)",
   "description": "Deploy a simple Hello World Lambda function on Lambda Managed Instances using Terraform",
   "language": "Python",
   "level": "200",
