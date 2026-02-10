@@ -1,4 +1,4 @@
-# Lambda Hello World on Lambda Managed Instances (Terraform)
+# AWS Lambda Hello World on AWS Lambda Managed Instances (Terraform)
 
 This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using Terraform. Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions.
 
