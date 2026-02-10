@@ -51,7 +51,7 @@ flowchart LR
     E -->|checkpoint| B
     B --> F[Output]
     
-    subgraph Durable Function
+    subgraph Lambda durable function
         B
     end
     

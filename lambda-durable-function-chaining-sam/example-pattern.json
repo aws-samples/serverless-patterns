@@ -3,7 +3,7 @@
   "description": "Demonstrates the function chaining pattern using Lambda durable functions with automatic checkpointing and fault-tolerant sequential execution",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -49,10 +49,10 @@
   "testing": {
     "text": [
       "Get the orchestrator alias ARN from stack outputs:",
-      "DURABLE_FUNCTION_ARN=$(aws cloudformation describe-stacks --stack-name durable-function-chaining --query 'Stacks[0].Outputs[?OutputKey==`OrchestratorAliasArn`].OutputValue' --output text)",
+      "<code>DURABLE_FUNCTION_ARN=$(aws cloudformation describe-stacks --stack-name durable-function-chaining --query 'Stacks[0].Outputs[?OutputKey==`OrchestratorAliasArn`].OutputValue' --output text)</code>",
       "Invoke the workflow:",
-      "aws lambda invoke --function-name \"$DURABLE_FUNCTION_ARN\" --payload '{\"id\": \"test-123\", \"name\": \"demo\", \"value\": 5}' --cli-binary-format raw-in-base64-out response.json",
-      "cat response.json",
+      "<code>aws lambda invoke --function-name \"$DURABLE_FUNCTION_ARN\" --payload '{\"id\": \"test-123\", \"name\": \"demo\", \"value\": 5}' --cli-binary-format raw-in-base64-out response.json</code>",
+      "<code>cat response.json</code>",
       "Expected output shows value transformation: 5 → +10 (step1) → ×2 (step2) → +5 (step3) = 35"
     ]
   },
