@@ -1,0 +1,74 @@
+{
+    "title": "Hello World on AWS Lambda Managed Instances",
+    "description": "Deploy a simple Hello World AWS Lambda function on Lambda Managed Instances using AWS CDK",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to deploy a simple Hello World AWS Lambda function running on AWS Lambda Managed Instances using AWS CDK.",
+            "AWS Lambda Managed Instances enables you to run Lambda functions on EC2 instances while maintaining Lambda's operational simplicity. It fully manages infrastructure tasks including instance lifecycle, OS and runtime patching, routing, load balancing, and auto scaling.",
+            "The Hello World function accepts an event with a name parameter and returns a simple JSON response with a greeting message."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-cdk",
+            "templateURL": "serverless-patterns/lambda-managed-instances-cdk",
+            "projectFolder": "lambda-managed-instances-cdk",
+            "templateFile": "lib/demo-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Lambda Managed Instances documentation",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
+            },
+            {
+                "text": "AWS Lambda Pricing (supported instance types)",
+                "link": "https://aws.amazon.com/lambda/pricing/"
+            },
+            {
+                "text": "AWS Lambda Developer Guide",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/"
+            },
+            {
+                "text": "AWS CDK Developer Guide",
+                "link": "https://docs.aws.amazon.com/cdk/latest/guide/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "npm install",
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Dmitry Gulin",
+            "bio": "Senior Delivery Consultant, AWS.",
+            "linkedin": "dmitry-gulin"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda Managed Instance"
+        }
+    }
+}
