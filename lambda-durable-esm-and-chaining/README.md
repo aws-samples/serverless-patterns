@@ -65,12 +65,13 @@ The pattern showcases two key Durable Functions capabilities:
    aws sqs send-message \
      --queue-url <QUEUE_URL> \
      --message-body '{"data_source": "test.csv", "processing_type": "standard"}'
+     --region <REPLACE_REGION>
    ```
 
 4. **Verify successful processing**:
    ```bash
    # Check if data was processed and stored in DynamoDB
-   aws dynamodb scan --table-name <PROCESSED_DATA_TABLE> --query 'Items[*]'
+   aws dynamodb scan --table-name <PROCESSED_DATA_TABLE> --query 'Items[*]' --region <REPLACE_REGION>
    ```
    
    **Success indicators:**
