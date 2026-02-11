@@ -28,9 +28,10 @@ def lambda_handler(event, context: DurableContext):
     amount = body.get('amount', 0)
     description = body.get('description', 'No description')
     
-    # Get API Gateway URL from environment or construct it
-    region = os.environ.get('AWS_REGION', 'us-east-2')
-    api_base_url = f"https://w8a9tempjb.execute-api.{region}.amazonaws.com/prod"
+    # Get API Gateway URL from environment variable
+    api_base_url = os.environ.get('API_BASE_URL')
+    if not api_base_url:
+        raise ValueError("API_BASE_URL environment variable is not set")
     
     print(f"Starting approval workflow for request: {request_id}")
     print(f"API Base URL: {api_base_url}")
