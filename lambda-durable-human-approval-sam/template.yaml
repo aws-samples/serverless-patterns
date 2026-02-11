@@ -68,6 +68,7 @@ Resources:
         Variables:
           APPROVAL_TOPIC_ARN: !Ref ApprovalTopic
           CALLBACK_TABLE_NAME: !Ref CallbackTable
+          API_BASE_URL: !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
       Policies:
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt ApprovalTopic.TopicName
