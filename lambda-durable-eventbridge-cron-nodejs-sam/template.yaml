@@ -1,0 +1,90 @@
+#AWS SAM template to deploy the durable function with EventBridge schedule
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Durable Function with EventBridge Hourly Schedule
+
+Resources:
+  # Main Durable Orchestrator Function
+  DurableOrchestratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DurableOrchestratorFunction
+      CodeUri: ./durable-orchestrator
+      Handler: index.handler
+      Timeout: 900
+      MemorySize: 512
+      Runtime: nodejs24.x
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      AutoPublishAlias: prod
+      Environment:
+        Variables:
+          DURABLE_EXECUTION_ENABLED: "true"
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref DataProcessorFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref NotificationServiceFunction
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+      Events:
+        FiveMinuteSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: "rate(5 minutes)"
+            Description: Trigger durable function every 5 minutes
+            Enabled: true
+
+  # Data Processor Function
+  DataProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DataProcessorFunction
+      CodeUri: ./data-processor
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Timeout: 300
+      MemorySize: 256
+
+  # Notification Service Function
+  NotificationServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: NotificationServiceFunction
+      CodeUri: ./notification-service
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Timeout: 300
+      MemorySize: 256
+
+  # CloudWatch Log Groups
+  DurableOrchestratorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${DurableOrchestratorFunction}"
+      RetentionInDays: 7
+
+  DataProcessorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${DataProcessorFunction}"
+      RetentionInDays: 7
+
+  NotificationServiceLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${NotificationServiceFunction}"
+      RetentionInDays: 7
+
+Outputs:
+  DurableOrchestratorFunctionArn:
+    Description: ARN of the Durable Orchestrator Function
+    Value: !GetAtt DurableOrchestratorFunction.Arn
+
+  DataProcessorFunctionArn:
+    Description: ARN of the Data Processor Function
+    Value: !GetAtt DataProcessorFunction.Arn
+
+  NotificationServiceFunctionArn:
+    Description: ARN of the Notification Service Function
+    Value: !GetAtt NotificationServiceFunction.Arn

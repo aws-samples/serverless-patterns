@@ -1,0 +1,63 @@
+{
+  "title": "EventBridge Cron to durable Lambda function",
+  "description": "Create a durable Lambda function triggered by EventBridge on a cron schedule using AWS SAM.",
+  "language": "Nodejs",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a durable Lambda function that is triggered by EventBridge on a cron schedule. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.",
+      "The durable execution pattern allows Lambda functions to span multiple invocations while maintaining state. When the function calls context.wait(), it suspends execution and creates a checkpoint. A subsequent invocation resumes from the checkpoint without re-executing previous steps.",
+      "This pattern deploys a durable Lambda function with Nodejs 24 runtime, an EventBridge rule with cron schedule, and uses function versioning to ensure the cron trigger targets a published version rather than $LATEST."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-eventbridge-cron-nodejs-sam",
+      "templateURL": "serverless-patterns/lambda-durable-eventbridge-cron-nodejs-sam",
+      "projectFolder": "lambda-durable-eventbridge-cron-nodejs-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Invoking AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html"
+      },
+      {
+        "text": "AWS durable execution SDK for Nodejs",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-js"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anusha Ganapuram",
+      "image": "https://avatars.githubusercontent.com/u/58950933",
+      "bio": "Technical Account Manager at AWS with deep expertise in serverless and event-driven solutions. Passionate about building scalable, secure and distributed applications that help organizations modernize their infrastructure and accelerate innovation.",
+      "linkedin": "anushaganapuram"
+    }
+  ]
+}
