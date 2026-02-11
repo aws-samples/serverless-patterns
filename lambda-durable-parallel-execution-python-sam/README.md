@@ -37,7 +37,7 @@ graph LR
 ### Workflow Steps
 
 1. **User invokes Lambda function** with two numbers (num1 and num2)
-2. **Lambda durable function parses input**, defaulting to 0 for missing values
+2. **Lambda durable functions parses input**, defaulting to 0 for missing values
 3. **Four operations execute in parallel**:
    - Addition: num1 + num2
    - Subtraction: num1 - num2
