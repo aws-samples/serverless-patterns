@@ -1,0 +1,68 @@
+{
+  "title": "Webhook Receiver with AWS Lambda Durable Functions",
+  "description": "Receive and process webhooks durably with automatic checkpointing using Lambda Durable Functions and Python",
+  "language": "Python",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates a serverless webhook receiver using AWS Lambda Durable Functions with Python.",
+      "The pattern receives webhook events via API Gateway, processes them through multiple checkpointed steps, and provides status query capabilities.",
+      "Each processing step is automatically checkpointed, allowing the workflow to resume from the last successful step if interrupted.",
+      "Webhook events and processing state are persisted in DynamoDB with automatic TTL cleanup after 7 days."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-webhook-sam-python",
+      "templateURL": "serverless-patterns/lambda-durable-webhook-sam-python",
+      "projectFolder": "lambda-durable-webhook-sam-python",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Durable Execution SDK for Python",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-python"
+      },
+      {
+        "text": "AWS SAM Documentation",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/"
+      },
+      {
+        "text": "API Gateway HTTP API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete --stack-name lambda-durable-webhook"
+    ]
+  },
+  "authors": [
+    {
+      "name": "AWS Serverless Patterns",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/aws.png",
+      "bio": "AWS Serverless Patterns Collection",
+      "linkedin": "aws"
+    }
+  ]
+}
