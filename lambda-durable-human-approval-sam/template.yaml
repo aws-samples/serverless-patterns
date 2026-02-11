@@ -68,7 +68,7 @@ Resources:
         Variables:
           APPROVAL_TOPIC_ARN: !Ref ApprovalTopic
           CALLBACK_TABLE_NAME: !Ref CallbackTable
-          API_BASE_URL: !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+          API_GATEWAY_PARAM: !Sub '/${AWS::StackName}/api-gateway-url'
       Policies:
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt ApprovalTopic.TopicName
@@ -79,6 +79,10 @@ Resources:
             Action:
               - lambda:CheckpointDurableExecution
             Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-ApprovalFunction-*'
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/api-gateway-url'
 
   # IAM Role for API Gateway to call Lambda service API
   ApiGatewayRole:
@@ -166,6 +170,16 @@ Resources:
                 httpMethod: POST
                 uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CallbackHandlerFunction.Arn}/invocations'
                 passthroughBehavior: when_no_match
+
+  # Store API Gateway URL in Parameter Store
+  ApiGatewayUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AWS::StackName}/api-gateway-url'
+      Type: String
+      Value: !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+      Description: 'API Gateway URL for the approval workflow'
+    DependsOn: ApprovalApi
 
 Outputs:
   ApiEndpoint:
