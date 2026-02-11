@@ -42,7 +42,7 @@ cdk-nag==2.35.76
     # via -r requirements.in
 certifi==2025.1.31
     # via requests
-cffi==1.17.1
+cffi==2.0.0
     # via cryptography
 charset-normalizer==3.4.1
     # via requests
@@ -57,7 +57,7 @@ constructs==10.4.2
     #   cdk-nag
 coverage==7.8.0
     # via pytest-cov
-cryptography==44.0.2
+cryptography==46.0.5
     # via moto
 dill==0.4.0
     # via pylint
@@ -216,10 +216,11 @@ typing-extensions==4.13.2
     #   aws-lambda-powertools
     #   black
     #   cattrs
+    #   cryptography
     #   jsii
     #   pylint
     #   rich
-urllib3==2.6.3
+urllib3==1.26.20
     # via
     #   botocore
     #   requests
