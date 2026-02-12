@@ -1,4 +1,4 @@
-import * as cdk from "@aws-cdk/core";
+import * as cdk from "aws-cdk-lib";
 import { ApiStack } from "./api/index";
 import { buildSync } from "esbuild";
 import path from "path";
@@ -13,7 +13,7 @@ buildSync({
   outfile: path.join(__dirname, "api", "dist", "index.js"),
   platform: "node",
   sourcemap: true,
-  target: "node14.2",
+  target: "node22",
 });
 
 const app = new cdk.App();
