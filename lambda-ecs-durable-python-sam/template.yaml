@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Step Functions to ECS with Python - Demonstrates sync and callback patterns
+  Lambda Durable Functions to ECS with Python - Demonstrates durable execution patterns with ECS tasks
 
 Parameters:
   VpcCIDR:
@@ -113,6 +113,21 @@ Resources:
       LogGroupName: !Sub /ecs/${AWS::StackName}
       RetentionInDays: 7
 
+  # DynamoDB Table for Callback Pattern
+  CallbackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-callbacks
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: executionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: executionId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
   # ECS Task Execution Role
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
@@ -139,16 +154,15 @@ Resources:
               Service: ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: StepFunctionsCallback
+        - PolicyName: DynamoDBCallback
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
-                  - states:SendTaskSuccess
-                  - states:SendTaskFailure
-                  - states:SendTaskHeartbeat
-                Resource: '*'
+                  - dynamodb:UpdateItem
+                  - dynamodb:PutItem
+                Resource: !GetAtt CallbackTable.Arn
 
   # ECS Task Definition for Sync Pattern
   SyncTaskDefinition:
@@ -233,19 +247,21 @@ Resources:
               from datetime import datetime
               
               def main():
-                  task_token = os.environ.get('TASK_TOKEN')
+                  execution_id = os.environ.get('EXECUTION_ID')
+                  callback_table = os.environ.get('CALLBACK_TABLE')
                   message = os.environ.get('MESSAGE', 'No message provided')
                   processing_time = int(os.environ.get('PROCESSING_TIME', '5'))
                   
-                  if not task_token:
-                      print("[CALLBACK] ERROR: No task token provided!")
+                  if not execution_id or not callback_table:
+                      print("[CALLBACK] ERROR: Missing execution ID or callback table!")
                       return
                   
-                  sfn_client = boto3.client('stepfunctions')
+                  dynamodb = boto3.resource('dynamodb')
+                  table = dynamodb.Table(callback_table)
                   
                   try:
                       print(f"[CALLBACK] Starting processing: {message}")
-                      print(f"[CALLBACK] Task token: {task_token[:20]}...")
+                      print(f"[CALLBACK] Execution ID: {execution_id}")
                       print(f"[CALLBACK] Will process for {processing_time} seconds")
                       
                       # Simulate processing
@@ -258,22 +274,37 @@ Resources:
                           "timestamp": datetime.utcnow().isoformat() + "Z"
                       }
                       
-                      print(f"[CALLBACK] Sending success callback")
-                      sfn_client.send_task_success(
-                          taskToken=task_token,
-                          output=json.dumps(result)
+                      print(f"[CALLBACK] Sending callback to DynamoDB")
+                      table.update_item(
+                          Key={'executionId': execution_id},
+                          UpdateExpression='SET #status = :status, #result = :result',
+                          ExpressionAttributeNames={
+                              '#status': 'status',
+                              '#result': 'result'
+                          },
+                          ExpressionAttributeValues={
+                              ':status': 'COMPLETED',
+                              ':result': json.dumps(result)
+                          }
                       )
-                      print(f"[CALLBACK] Success callback sent!")
+                      print(f"[CALLBACK] Callback sent successfully!")
                       
                   except Exception as e:
                       print(f"[CALLBACK] ERROR: {str(e)}")
                       try:
-                          sfn_client.send_task_failure(
-                              taskToken=task_token,
-                              error='ProcessingError',
-                              cause=str(e)
+                          table.update_item(
+                              Key={'executionId': execution_id},
+                              UpdateExpression='SET #status = :status, #error = :error',
+                              ExpressionAttributeNames={
+                                  '#status': 'status',
+                                  '#error': 'error'
+                              },
+                              ExpressionAttributeValues={
+                                  ':status': 'FAILED',
+                                  ':error': str(e)
+                              }
                           )
-                          print(f"[CALLBACK] Failure callback sent")
+                          print(f"[CALLBACK] Error callback sent")
                       except Exception as callback_error:
                           print(f"[CALLBACK] Failed to send callback: {str(callback_error)}")
               
@@ -287,79 +318,111 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: callback
 
-  # Step Functions Role
-  StepFunctionsRole:
-    Type: AWS::IAM::Role
+  # Lambda Function for Sync Pattern (Durable)
+  SyncLambdaFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src
+      DockerTag: python3.13-v1
     Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: states.amazonaws.com
-            Action: sts:AssumeRole
+      FunctionName: !Sub ${AWS::StackName}-sync-function
+      PackageType: Image
+      ImageConfig:
+        Command:
+          - sync_handler.lambda_handler
+      Timeout: 900  # 15 minutes (max Lambda timeout)
+      MemorySize: 256
+      DurableConfig:
+        ExecutionTimeout: 3600  # 1 hour for durable execution
+      Environment:
+        Variables:
+          ECS_CLUSTER: !Ref ECSCluster
+          TASK_DEFINITION: !Ref SyncTaskDefinition
+          SUBNET_1: !Ref PublicSubnet1
+          SUBNET_2: !Ref PublicSubnet2
+          SECURITY_GROUP: !Ref ECSSecurityGroup
       Policies:
-        - PolicyName: ECSTaskExecution
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ecs:RunTask
-                  - ecs:StopTask
-                  - ecs:DescribeTasks
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - iam:PassRole
-                Resource:
-                  - !GetAtt ECSTaskExecutionRole.Arn
-                  - !GetAtt ECSTaskRole.Arn
-              - Effect: Allow
-                Action:
-                  - events:PutTargets
-                  - events:PutRule
-                  - events:DescribeRule
-                Resource: '*'
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ecs:RunTask
+                - ecs:DescribeTasks
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - !GetAtt ECSTaskRole.Arn
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecutions
+                - lambda:GetDurableExecutionState
+              Resource: '*'
 
-  # Synchronous Pattern State Machine
-  SyncStateMachine:
-    Type: AWS::Serverless::StateMachine
+  # Lambda Function for Callback Pattern (Durable)
+  CallbackLambdaFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src
+      DockerTag: python3.13-v1
     Properties:
-      Name: !Sub ${AWS::StackName}-sync-pattern
-      Type: STANDARD
-      Role: !GetAtt StepFunctionsRole.Arn
-      DefinitionUri: statemachine/sync-pattern.asl.json
-      DefinitionSubstitutions:
-        ECSCluster: !Ref ECSCluster
-        TaskDefinition: !Ref SyncTaskDefinition
-        Subnet1: !Ref PublicSubnet1
-        Subnet2: !Ref PublicSubnet2
-        SecurityGroup: !Ref ECSSecurityGroup
-
-  # Callback Pattern State Machine
-  CallbackStateMachine:
-    Type: AWS::Serverless::StateMachine
-    Properties:
-      Name: !Sub ${AWS::StackName}-callback-pattern
-      Type: STANDARD
-      Role: !GetAtt StepFunctionsRole.Arn
-      DefinitionUri: statemachine/callback-pattern.asl.json
-      DefinitionSubstitutions:
-        ECSCluster: !Ref ECSCluster
-        TaskDefinition: !Ref CallbackTaskDefinition
-        Subnet1: !Ref PublicSubnet1
-        Subnet2: !Ref PublicSubnet2
-        SecurityGroup: !Ref ECSSecurityGroup
+      FunctionName: !Sub ${AWS::StackName}-callback-function
+      PackageType: Image
+      ImageConfig:
+        Command:
+          - callback_handler.lambda_handler
+      Timeout: 60
+      MemorySize: 256
+      DurableConfig:
+        ExecutionTimeout: 3600  # 1 hour for durable execution
+      Environment:
+        Variables:
+          ECS_CLUSTER: !Ref ECSCluster
+          TASK_DEFINITION: !Ref CallbackTaskDefinition
+          SUBNET_1: !Ref PublicSubnet1
+          SUBNET_2: !Ref PublicSubnet2
+          SECURITY_GROUP: !Ref ECSSecurityGroup
+          CALLBACK_TABLE: !Ref CallbackTable
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ecs:RunTask
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - !GetAtt ECSTaskRole.Arn
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+              Resource: !GetAtt CallbackTable.Arn
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecutions
+                - lambda:GetDurableExecutionState
+              Resource: '*'
 
 Outputs:
-  SyncStateMachineArn:
-    Description: ARN of the Synchronous Pattern State Machine
-    Value: !Ref SyncStateMachine
+  SyncLambdaFunctionArn:
+    Description: ARN of the Synchronous Pattern Lambda Function
+    Value: !GetAtt SyncLambdaFunction.Arn
 
-  CallbackStateMachineArn:
-    Description: ARN of the Callback Pattern State Machine
-    Value: !Ref CallbackStateMachine
+  CallbackLambdaFunctionArn:
+    Description: ARN of the Callback Pattern Lambda Function
+    Value: !GetAtt CallbackLambdaFunction.Arn
+
+  CallbackTableName:
+    Description: DynamoDB table for callback tracking
+    Value: !Ref CallbackTable
 
   ECSClusterName:
     Description: Name of the ECS Cluster
