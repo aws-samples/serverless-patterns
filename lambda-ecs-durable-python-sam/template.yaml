@@ -1,0 +1,441 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda Durable Functions to ECS with Python - Demonstrates durable execution patterns with ECS tasks
+
+Parameters:
+  VpcCIDR:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for VPC
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-subnet-1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-subnet-2
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  # Security Group
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ECS tasks
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-ecs-sg
+
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ${AWS::StackName}-cluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  # CloudWatch Log Group
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+      RetentionInDays: 7
+
+  # DynamoDB Table for Callback Pattern
+  CallbackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-callbacks
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: executionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: executionId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # ECS Task Execution Role
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  # ECS Task Role (for callback pattern)
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DynamoDBCallback
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:UpdateItem
+                  - dynamodb:PutItem
+                Resource: !GetAtt CallbackTable.Arn
+
+  # ECS Task Definition for Sync Pattern
+  SyncTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-sync-task
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: python-sync-container
+          Image: public.ecr.aws/docker/library/python:3.11-slim
+          Essential: true
+          Command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --quiet boto3 && python3 << 'EOF'
+              import os
+              import time
+              import json
+              from datetime import datetime
+              
+              def main():
+                  message = os.environ.get('MESSAGE', 'No message provided')
+                  processing_time = int(os.environ.get('PROCESSING_TIME', '5'))
+                  
+                  print(f"[SYNC] Starting processing: {message}")
+                  print(f"[SYNC] Will process for {processing_time} seconds")
+                  
+                  # Simulate processing
+                  time.sleep(processing_time)
+                  
+                  result = {
+                      "status": "success",
+                      "message": f"Processed: {message}",
+                      "processingTime": processing_time,
+                      "timestamp": datetime.utcnow().isoformat() + "Z"
+                  }
+                  
+                  print(f"[SYNC] Completed: {json.dumps(result)}")
+                  return result
+              
+              if __name__ == "__main__":
+                  main()
+              EOF
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: sync
+
+  # ECS Task Definition for Callback Pattern
+  CallbackTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-callback-task
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt ECSTaskRole.Arn
+      ContainerDefinitions:
+        - Name: python-callback-container
+          Image: public.ecr.aws/docker/library/python:3.11-slim
+          Essential: true
+          Command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --quiet boto3 && python3 << 'EOF'
+              import os
+              import boto3
+              import json
+              import time
+              from datetime import datetime
+              
+              def main():
+                  execution_id = os.environ.get('EXECUTION_ID')
+                  callback_table = os.environ.get('CALLBACK_TABLE')
+                  message = os.environ.get('MESSAGE', 'No message provided')
+                  processing_time = int(os.environ.get('PROCESSING_TIME', '5'))
+                  
+                  if not execution_id or not callback_table:
+                      print("[CALLBACK] ERROR: Missing execution ID or callback table!")
+                      return
+                  
+                  dynamodb = boto3.resource('dynamodb')
+                  table = dynamodb.Table(callback_table)
+                  
+                  try:
+                      print(f"[CALLBACK] Starting processing: {message}")
+                      print(f"[CALLBACK] Execution ID: {execution_id}")
+                      print(f"[CALLBACK] Will process for {processing_time} seconds")
+                      
+                      # Simulate processing
+                      time.sleep(processing_time)
+                      
+                      result = {
+                          "status": "success",
+                          "message": f"Processed: {message}",
+                          "processingTime": processing_time,
+                          "timestamp": datetime.utcnow().isoformat() + "Z"
+                      }
+                      
+                      print(f"[CALLBACK] Sending callback to DynamoDB")
+                      table.update_item(
+                          Key={'executionId': execution_id},
+                          UpdateExpression='SET #status = :status, #result = :result',
+                          ExpressionAttributeNames={
+                              '#status': 'status',
+                              '#result': 'result'
+                          },
+                          ExpressionAttributeValues={
+                              ':status': 'COMPLETED',
+                              ':result': json.dumps(result)
+                          }
+                      )
+                      print(f"[CALLBACK] Callback sent successfully!")
+                      
+                  except Exception as e:
+                      print(f"[CALLBACK] ERROR: {str(e)}")
+                      try:
+                          table.update_item(
+                              Key={'executionId': execution_id},
+                              UpdateExpression='SET #status = :status, #error = :error',
+                              ExpressionAttributeNames={
+                                  '#status': 'status',
+                                  '#error': 'error'
+                              },
+                              ExpressionAttributeValues={
+                                  ':status': 'FAILED',
+                                  ':error': str(e)
+                              }
+                          )
+                          print(f"[CALLBACK] Error callback sent")
+                      except Exception as callback_error:
+                          print(f"[CALLBACK] Failed to send callback: {str(callback_error)}")
+              
+              if __name__ == "__main__":
+                  main()
+              EOF
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: callback
+
+  # Lambda Function for Sync Pattern (Durable)
+  SyncLambdaFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src
+      DockerTag: python3.13-v1
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-sync-function
+      PackageType: Image
+      ImageConfig:
+        Command:
+          - sync_handler.lambda_handler
+      Timeout: 900  # 15 minutes (max Lambda timeout)
+      MemorySize: 256
+      DurableConfig:
+        ExecutionTimeout: 3600  # 1 hour for durable execution
+      Environment:
+        Variables:
+          ECS_CLUSTER: !Ref ECSCluster
+          TASK_DEFINITION: !Ref SyncTaskDefinition
+          SUBNET_1: !Ref PublicSubnet1
+          SUBNET_2: !Ref PublicSubnet2
+          SECURITY_GROUP: !Ref ECSSecurityGroup
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ecs:RunTask
+                - ecs:DescribeTasks
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - !GetAtt ECSTaskRole.Arn
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecutions
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+
+  # Lambda Function for Callback Pattern (Durable)
+  CallbackLambdaFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./src
+      DockerTag: python3.13-v1
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-callback-function
+      PackageType: Image
+      ImageConfig:
+        Command:
+          - callback_handler.lambda_handler
+      Timeout: 60
+      MemorySize: 256
+      DurableConfig:
+        ExecutionTimeout: 3600  # 1 hour for durable execution
+      Environment:
+        Variables:
+          ECS_CLUSTER: !Ref ECSCluster
+          TASK_DEFINITION: !Ref CallbackTaskDefinition
+          SUBNET_1: !Ref PublicSubnet1
+          SUBNET_2: !Ref PublicSubnet2
+          SECURITY_GROUP: !Ref ECSSecurityGroup
+          CALLBACK_TABLE: !Ref CallbackTable
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ecs:RunTask
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - !GetAtt ECSTaskRole.Arn
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+              Resource: !GetAtt CallbackTable.Arn
+            - Effect: Allow
+              Action:
+                - lambda:CheckpointDurableExecutions
+                - lambda:GetDurableExecutionState
+              Resource: '*'
+
+Outputs:
+  SyncLambdaFunctionArn:
+    Description: ARN of the Synchronous Pattern Lambda Function
+    Value: !GetAtt SyncLambdaFunction.Arn
+
+  CallbackLambdaFunctionArn:
+    Description: ARN of the Callback Pattern Lambda Function
+    Value: !GetAtt CallbackLambdaFunction.Arn
+
+  CallbackTableName:
+    Description: DynamoDB table for callback tracking
+    Value: !Ref CallbackTable
+
+  ECSClusterName:
+    Description: Name of the ECS Cluster
+    Value: !Ref ECSCluster
+
+  SyncTaskDefinitionArn:
+    Description: ARN of the Sync Task Definition
+    Value: !Ref SyncTaskDefinition
+
+  CallbackTaskDefinitionArn:
+    Description: ARN of the Callback Task Definition
+    Value: !Ref CallbackTaskDefinition
+
+  LogGroupName:
+    Description: CloudWatch Log Group for ECS tasks
+    Value: !Ref ECSLogGroup
