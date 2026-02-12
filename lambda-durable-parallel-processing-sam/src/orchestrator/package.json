@@ -1,0 +1,23 @@
+{
+  "name": "parallel-processor-orchestrator",
+  "version": "1.0.0",
+  "description": "Durable Lambda orchestrator with parallel processing",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.700.0",
+    "@aws/durable-execution-sdk-js": "^1.0.2"
+  },
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "durable",
+    "parallel",
+    "orchestration"
+  ],
+  "author": "",
+  "license": "MIT-0"
+}

@@ -1,0 +1,67 @@
+{
+  "title": "Parallel Processing with AWS Lambda Durable Functions",
+  "description": "Order processing workflow using Lambda durable functions with parallel execution of multiple validation steps including inventory, payment, shipping, and tax calculations",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates parallel processing using Lambda durable functions to execute multiple independent operations concurrently.",
+      "The workflow validates orders by running four worker functions in parallel: inventory check, payment validation, shipping calculation, and tax calculation.",
+      "Parallel execution reduces total processing time from ~575ms (sequential) to ~200ms (parallel), achieving a 2.9x speedup.",
+      "Each parallel task is automatically checkpointed, allowing the workflow to survive interruptions and resume from the last successful step.",
+      "The pattern uses a five-function architecture: one durable orchestrator and four non-durable worker functions.",
+      "All validation results are aggregated and validated before calculating final order totals and confirming the order."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-parallel-processing-sam",
+      "templateURL": "serverless-patterns/lambda-durable-parallel-processing-sam",
+      "projectFolder": "lambda-durable-parallel-processing-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda durable functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Durable Execution SDK for JavaScript",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-js"
+      },
+      {
+        "text": "Parallel Processing with Durable Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-parallel.html"
+      },
+      {
+        "text": "AWS Blog: Build multi-step applications with Lambda durable functions",
+        "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Note: Lambda durable functions are currently available in us-east-2 (Ohio) region only.",
+      "cd src/orchestrator && npm install && cd ../..",
+      "sam build",
+      "sam deploy --guided --region us-east-2"
+    ]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete --region us-east-2</code>."]
+  },
+  "authors": [
+    {
+      "name": "Sasidharan Ramasamy",
+      "bio": "Technical Account Manager @ AWS with over 10 years of industry experience",
+      "linkedin": "https://www.linkedin.com/in/sasidharan-ramasamy/"
+    }
+  ]
+}
