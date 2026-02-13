@@ -1,7 +1,10 @@
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
-const polly = new AWS.Polly();
-const uuidv1 = require('uuidv1');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { PollyClient, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { GetObjectCommand } = require('@aws-sdk/client-s3');
+const { randomUUID } = require('crypto');
+const s3 = new S3Client({});
+const polly = new PollyClient({});
 
 
 module.exports.handler = async (event, context) => {
@@ -62,21 +65,28 @@ module.exports.handler = async (event, context) => {
 
     console.log(speechParams)
 
-    const response = await polly.synthesizeSpeech(speechParams).promise();
+    const response = await polly.send(new SynthesizeSpeechCommand(speechParams));
     let audioStream = response.AudioStream;
-    let key = uuidv1();
+    
+    const chunks = [];
+    for await (const chunk of audioStream) {
+        chunks.push(chunk);
+    }
+    const audioBuffer = Buffer.concat(chunks);
+    
+    let key = randomUUID();
     let params = {
       Bucket: outputBucket,
       Key: key + '.mp3',
-      Body: audioStream
+      Body: audioBuffer
     };
 
-    const s3Response = await s3.putObject(params).promise();
+    const s3Response = await s3.send(new PutObjectCommand(params));
     let s3params = {
         Bucket: outputBucket,
         Key: key + '.mp3',
       };
-    let url = s3.getSignedUrl("getObject", s3params);
+    let url = await getSignedUrl(s3, new GetObjectCommand(s3params));
     console.log(url);
     return { url, outputBucket, key: key + '.mp3' };
 }

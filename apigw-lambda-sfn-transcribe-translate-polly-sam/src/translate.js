@@ -1,6 +1,7 @@
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
-const translate = new AWS.Translate();
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { TranslateClient, TranslateTextCommand } = require('@aws-sdk/client-translate');
+const s3 = new S3Client({});
+const translate = new TranslateClient({});
 
 
 module.exports.handler = async (event, context) => {
@@ -102,8 +103,8 @@ module.exports.handler = async (event, context) => {
         }
     }
 
-    const s3Body = await s3.getObject(params).promise()
-    const transcribedOutput = s3Body.Body.toString('utf-8');
+    const s3Body = await s3.send(new GetObjectCommand(params))
+    const transcribedOutput = await s3Body.Body.transformToString();
     console.log(transcribedOutput)
     const originalText = JSON.parse(transcribedOutput).results.transcripts[0].transcript;
     let translateParams = {
@@ -111,7 +112,7 @@ module.exports.handler = async (event, context) => {
         SourceLanguageCode: sourceLanguageCode,
         TargetLanguageCode: targetLanguageCode
       }
-    const translatedResponse = await translate.translateText(translateParams).promise();
+    const translatedResponse = await translate.send(new TranslateTextCommand(translateParams));
     const translatedText = translatedResponse.TranslatedText
     console.log(translatedText)
     return { translatedText, outputBucket, outputLanguageCode }

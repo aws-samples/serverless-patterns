@@ -111,7 +111,7 @@ Resources:
   InvokerLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: "nodejs16.x"
+      Runtime: "nodejs22.x"
       FunctionName: "translator-dev-invokeTranslator"
       Timeout: 300
       MemorySize: 1024
