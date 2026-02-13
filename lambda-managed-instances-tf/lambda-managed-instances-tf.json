@@ -1,0 +1,80 @@
+{
+  "title": "AWS Lambda Hello World on AWS Lambda Managed Instances (Terraform)",
+  "description": "Deploy a simple Hello World Lambda function on Lambda Managed Instances using Terraform",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to deploy a simple Hello World Lambda function running on Lambda Managed Instances using Terraform.",
+      "Lambda Managed Instances provide predictable performance and reduced cold starts for your Lambda functions by pre-warming execution environments.",
+      "The Hello World function accepts an event with a name parameter and returns a simple JSON response with a greeting message.",
+      "The Terraform implementation includes a complete VPC setup with private subnets, NAT gateways, and proper security groups for Lambda Managed Instances."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-tf",
+      "templateURL": "serverless-patterns/lambda-managed-instances-tf",
+      "projectFolder": "lambda-managed-instances-tf",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Managed Instances documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
+      },
+      {
+        "text": "AWS Lambda Pricing (supported instance types)",
+        "link": "https://aws.amazon.com/lambda/pricing/"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/"
+      },
+      {
+        "text": "Terraform AWS Provider Documentation",
+        "link": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs"
+      },
+      {
+        "text": "Terraform Lambda Function Resource",
+        "link": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matt Boland",
+      "bio": "Sr. Solutions Architect, AWS.",
+      "linkedin": "matt-boland"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda Managed Instances"
+    }
+  }
+}
