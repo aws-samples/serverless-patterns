@@ -1,0 +1,232 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda Durable Functions with Human-in-the-Loop (HITL) Pattern
+  
+  This pattern demonstrates how to pause Lambda execution, wait for human approval,
+  and resume using the AWS Lambda Durable Functions SDK with Python 3.13.
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 512
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+
+Parameters:
+  ApprovalTimeoutSeconds:
+    Type: Number
+    Default: 300
+    Description: Default timeout for approval requests in seconds (5 minutes)
+    MinValue: 60
+    MaxValue: 86400
+
+Resources:
+  # DynamoDB Table for storing approval requests
+  ApprovalRequestsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-ApprovalRequests'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: approval_id
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: approval_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: StatusIndex
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: created_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Pattern
+          Value: lambda-durable-hitl
+
+  # SNS Topic for approval notifications
+  ApprovalNotificationsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub '${AWS::StackName}-ApprovalNotifications'
+      DisplayName: Approval Notifications
+      Tags:
+        - Key: Pattern
+          Value: lambda-durable-hitl
+
+  # IAM Role for Workflow Lambda
+  WorkflowLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: WorkflowLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt ApprovalRequestsTable.Arn
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Ref ApprovalNotificationsTopic
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+              - Effect: Allow
+                Action:
+                  - lambda:CheckpointDurableExecutions
+                  - lambda:GetDurableExecutionState
+                Resource: '*'
+      Tags:
+        - Key: Pattern
+          Value: lambda-durable-hitl
+
+  # Workflow Lambda Function (Durable Execution)
+  WorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-Workflow'
+      PackageType: Image
+      ImageUri: workflow:latest
+      Role: !GetAtt WorkflowLambdaRole.Arn
+      Timeout: 900
+      MemorySize: 512
+      DurableConfig:
+        ExecutionTimeout: 3600
+      Environment:
+        Variables:
+          APPROVALS_TABLE_NAME: !Ref ApprovalRequestsTable
+          SNS_TOPIC_ARN: !Ref ApprovalNotificationsTopic
+          APPROVAL_TIMEOUT_SECONDS: !Ref ApprovalTimeoutSeconds
+      Tags:
+        Pattern: lambda-durable-hitl
+    Metadata:
+      DockerTag: latest
+      DockerContext: ./src
+      Dockerfile: workflow/Dockerfile
+
+  # IAM Role for Approval API Lambda
+  ApprovalApiLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ApprovalApiLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                Resource:
+                  - !GetAtt ApprovalRequestsTable.Arn
+                  - !Sub '${ApprovalRequestsTable.Arn}/index/*'
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+      Tags:
+        - Key: Pattern
+          Value: lambda-durable-hitl
+
+  # Approval API Lambda Function
+  ApprovalApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-ApprovalApi'
+      PackageType: Image
+      ImageUri: approval_api:latest
+      Role: !GetAtt ApprovalApiLambdaRole.Arn
+      Environment:
+        Variables:
+          APPROVALS_TABLE_NAME: !Ref ApprovalRequestsTable
+      Tags:
+        Pattern: lambda-durable-hitl
+    Metadata:
+      DockerTag: latest
+      DockerContext: ./src
+      Dockerfile: approval_api/Dockerfile
+
+Outputs:
+  ApprovalRequestsTableName:
+    Description: DynamoDB table name for approval requests
+    Value: !Ref ApprovalRequestsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-ApprovalRequestsTableName'
+
+  ApprovalNotificationsTopicArn:
+    Description: SNS topic ARN for approval notifications
+    Value: !Ref ApprovalNotificationsTopic
+    Export:
+      Name: !Sub '${AWS::StackName}-ApprovalNotificationsTopicArn'
+
+  WorkflowFunctionArn:
+    Description: Workflow Lambda function ARN
+    Value: !GetAtt WorkflowFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-WorkflowFunctionArn'
+
+  WorkflowFunctionName:
+    Description: Workflow Lambda function name
+    Value: !Ref WorkflowFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-WorkflowFunctionName'
+
+  ApprovalApiFunctionArn:
+    Description: Approval API Lambda function ARN
+    Value: !GetAtt ApprovalApiFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-ApprovalApiFunctionArn'
+
+  ApprovalApiFunctionName:
+    Description: Approval API Lambda function name
+    Value: !Ref ApprovalApiFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-ApprovalApiFunctionName'
+
+  StackName:
+    Description: CloudFormation stack name
+    Value: !Ref AWS::StackName
+    Export:
+      Name: !Sub '${AWS::StackName}-StackName'
