@@ -4,64 +4,119 @@
     "language": "Python",
     "level": "200",
     "framework": "AWS SAM",
-    "services": ["sqs","lambda", "dynamoDB"],
+    "services": [
+        "sqs",
+        "lambda",
+        "dynamoDB"
+    ],
     "introBox": {
-      "headline": "How it works",
-      "text": [
-        "This pattern demonstrates an event-driven data processing pipeline using AWS Lambda Durable Functions with direct SQS Event Source Mapping. When a message arrives in the SQS queue, it directly triggers the durable function (no intermediary Lambda needed). The durable function then orchestrates a series of specialized processing steps using Lambda invoke chaining - first validating the incoming data, then transforming it (converting data_source to uppercase), and finally storing the processed results in DynamoDB. Throughout this process, the durable function automatically creates checkpoints, enabling fault-tolerant execution that can recover from failures without losing progress. The entire pipeline operates within the 15-minute ESM execution limit, making it ideal for reliable batch processing workflows."
-      ]
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates an event-driven data processing pipeline using AWS Lambda Durable Functions with direct SQS Event Source Mapping. When a message arrives in the SQS queue, it directly triggers the durable function (no intermediary Lambda needed). The durable function then orchestrates a series of specialized processing steps using Lambda invoke chaining, first validating the incoming data, then transforming it , and finally storing the processed results in DynamoDB. Throughout this process, the durable function automatically creates checkpoints, enabling fault-tolerant execution that can recover from failures without losing progress. The entire pipeline operates within the 15-minute ESM execution limit, making it ideal for reliable batch processing workflows."
+        ]
     },
     "testing": {
-      "headline": "Testing",
-      "text": [
-        "See the GitHub repo for detailed testing instructions."
-      ]
+        "headline": "Testing",
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
     },
     "cleanup": {
-      "headline": "Cleanup",
-      "text": [
-        "Delete the stack: <code>sam delete</code>."
-      ]
+        "headline": "Cleanup",
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
     },
     "deploy": {
-      "text": [
-        "sam build",
-        "sam deploy --guided"
-      ]
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
     },
     "gitHub": {
-      "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-esm-and-chaining",
-        "templateURL":"serverles-patterns/lambda-durable-esm-and-chaining",
-        "templateFile": "template.yaml",
-        "projectFolder": "lambda-durable-esm-and-chaining"
-      }
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-esm-and-chaining",
+            "templateURL": "serverles-patterns/lambda-durable-esm-and-chaining",
+            "templateFile": "template.yaml",
+            "projectFolder": "lambda-durable-esm-and-chaining"
+        }
     },
     "resources": {
-      "headline": "Additional resources",
-      "bullets": [
-        {
-          "text": "AWS Lambda Durable Functions Documentation",
-          "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
-        },
-        {
-          "text": "Event Source Mappings with Durable Functions",
-          "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking-esm.html"
-        },
-        {
-          "text": "Durbale Function Lambda Invoke Chaining",
-          "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-examples.html#durable-examples-chained-invocations"
-        }
-      ]
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "AWS Lambda Durable Functions Documentation",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+            },
+            {
+                "text": "Event Source Mappings with Durable Functions",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking-esm.html"
+            },
+            {
+                "text": "Durbale Function Lambda Invoke Chaining",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-examples.html#durable-examples-chained-invocations"
+            }
+        ]
     },
-     "authors": [
+    "authors": [
         {
-          "name": "Sahithi Ginjupalli",
-          "image": "https://drive.google.com/file/d/1YcKYuGz3LfzSxiwb2lWJfpyi49SbvOSr/view?usp=sharing",
-          "bio": "Cloud Engineer at AWS with a passion for diving deep into cloud and AI services to build innovative serverless applications.",
-          "linkedin": "ginjupalli-sahithi-37460a18b",
-          "twitter": ""
+            "name": "Sahithi Ginjupalli",
+            "image": "https://drive.google.com/file/d/1YcKYuGz3LfzSxiwb2lWJfpyi49SbvOSr/view?usp=sharing",
+            "bio": "Cloud Engineer at AWS with a passion for diving deep into cloud and AI services to build innovative serverless applications.",
+            "linkedin": "ginjupalli-sahithi-37460a18b",
+            "twitter": ""
         }
-      ]
-  }
-  
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "sqs",
+            "label": "SQS Queue"
+        },
+        "icon2": {
+            "x": 60,
+            "y": 50,
+            "service": "lambda",
+            "label": "Lambda Durable Function"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Event Source Mapping"
+        },
+        "icon3": {
+            "x": 90,
+            "y": 10,
+            "service": "lambda",
+            "label": ""
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "lambda",
+            "label": ""
+        },
+        "icon5": {
+            "x": 90,
+            "y": 90,
+            "service": "lambda",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": ""
+        },
+        "line3": {
+            "from": "icon2",
+            "to": "icon4",
+            "label": "Chained Invocation"
+        },
+        "line4": {
+            "from": "icon2",
+            "to": "icon5",
+            "label": ""
+        }
+    }
+}
