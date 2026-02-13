@@ -1,0 +1,86 @@
+{
+  "title": "Lambda Durable Functions with Human-in-the-Loop",
+  "description": "Demonstrates AWS Lambda Durable Functions with human approval workflow using Python 3.13, DynamoDB, and SNS",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to pause Lambda execution, wait for human approval, and resume using the AWS Lambda Durable Functions SDK.",
+      "The Workflow Lambda creates an approval request in DynamoDB and polls for decisions using durable waits (no compute charges during waits).",
+      "An SNS notification is sent to approvers, who can submit their decision via the Approval API Lambda function.",
+      "The Workflow Lambda detects the decision during polling and resumes execution with the approval result.",
+      "The pattern includes timeout handling, status tracking, and a complete audit trail of all approval decisions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-hitl-python-sam",
+      "templateURL": "serverless-patterns/lambda-durable-hitl-python-sam",
+      "projectFolder": "lambda-durable-hitl-python-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "AWS SAM Documentation",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/"
+      },
+      {
+        "text": "DynamoDB Best Practices",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html"
+      },
+      {
+        "text": "Amazon SNS Documentation",
+        "link": "https://docs.aws.amazon.com/sns/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions.",
+      "Test the approval workflow using AWS CLI:",
+      "1. Publish Lambda version: aws lambda publish-version --function-name <WorkflowFunction>",
+      "2. Invoke workflow: aws lambda invoke --function-name <WorkflowFunction>:<version> --invocation-type Event --payload '{...}' response.json",
+      "3. List approvals: aws dynamodb scan --table-name <ApprovalsTable>",
+      "4. Submit decision: aws lambda invoke --function-name <ApprovalApiFunction> --payload '{\"action\":\"decide\",...}' response.json"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "AWS Serverless Patterns",
+      "bio": "AWS Serverless Patterns collection"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "name": "lambda",
+      "label": "AWS Lambda (Durable Functions)"
+    },
+    "icon2": {
+      "name": "dynamodb",
+      "label": "Amazon DynamoDB"
+    },
+    "icon3": {
+      "name": "sns",
+      "label": "Amazon SNS"
+    }
+  }
+}
