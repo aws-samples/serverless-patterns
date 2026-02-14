@@ -2,11 +2,14 @@ import json
 import os
 import base64
 import time
+from urllib.request import urlopen
 from typing import Any, Dict, Tuple
 
 import boto3
 from botocore.exceptions import ClientError
 from aws_lambda_powertools import Logger
+import jwt
+from jwt import InvalidTokenError
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.backends import default_backend
@@ -28,9 +31,11 @@ KEY_PAIR_ID = os.environ.get('KEY_PAIR_ID', '')
 COOKIE_TTL_SECONDS = int(os.environ.get('COOKIE_TTL_SECONDS', '600'))
 COOKIE_DOMAIN = os.environ.get('COOKIE_DOMAIN', '')
 COOKIE_SAME_SITE = os.environ.get('COOKIE_SAME_SITE', 'None')
+COGNITO_REGION = os.environ.get('COGNITO_REGION', os.environ.get('AWS_REGION', ''))
 
 # Cache for the private key
 _private_key_cache: Dict[str, Any] = {}
+_jwks_cache: Dict[str, Any] = {}
 
 
 def get_private_key():
@@ -110,6 +115,25 @@ def get_cors_headers() -> Dict[str, str]:
     }
 
 
+def get_cookie_settings(is_cloudfront: bool = False) -> str:
+    """Generate cookie settings based on environment."""
+    is_https_origin = ALLOWED_ORIGIN.startswith('https://')
+    attrs = ["HttpOnly", "Path=/"]
+
+    if is_cloudfront or is_https_origin:
+        attrs.append("Secure")
+
+    if is_cloudfront and COOKIE_SAME_SITE:
+        attrs.append(f"SameSite={COOKIE_SAME_SITE}")
+    else:
+        attrs.append("SameSite=None" if is_https_origin else "SameSite=Lax")
+
+    if is_cloudfront and COOKIE_DOMAIN:
+        attrs.append(f"Domain={COOKIE_DOMAIN}")
+
+    return "; ".join(attrs)
+
+
 @logger.inject_lambda_context(log_event=True)
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     request_id = context.aws_request_id
@@ -172,12 +196,6 @@ def log_in_user(email: str, password: str) -> Dict[str, Any]:
         user_email = user_info.get('email', email)
         user_full_name = user_info.get('name', '')
         
-        # For local development, remove Secure attribute if using http://localhost
-        if not ALLOWED_ORIGIN.startswith('https://'):
-            cookie_settings = "HttpOnly; Path=/; SameSite=Lax"
-        else:
-            cookie_settings = "HttpOnly; Secure; Path=/; SameSite=None"
-        
         logger.info("Authentication successful", extra={
             "email": user_email,
             "full_name": user_full_name,
@@ -197,13 +215,10 @@ def log_in_user(email: str, password: str) -> Dict[str, Any]:
                 )
                 
                 # Build cookie attributes
-                cf_cookie_attrs = ["HttpOnly", "Secure", "Path=/"]
-                if COOKIE_SAME_SITE:
-                    cf_cookie_attrs.append(f"SameSite={COOKIE_SAME_SITE}")
-                if COOKIE_DOMAIN:
-                    cf_cookie_attrs.append(f"Domain={COOKIE_DOMAIN}")
-                cf_cookie_attrs.append(f"Max-Age={COOKIE_TTL_SECONDS}")
-                cf_cookie_settings = "; ".join(cf_cookie_attrs)
+                cf_cookie_settings = (
+                    f"{get_cookie_settings(is_cloudfront=True)}; "
+                    f"Max-Age={COOKIE_TTL_SECONDS}"
+                )
                 
                 cf_cookies = [
                     f"{policy_cookie}; {cf_cookie_settings}",
@@ -220,11 +235,7 @@ def log_in_user(email: str, password: str) -> Dict[str, Any]:
                 # Continue without CF cookies
         
         # Build Cognito token cookies
-        # For local development, remove Secure attribute if using http://localhost
-        if not ALLOWED_ORIGIN.startswith('https://'):
-            cookie_settings = "HttpOnly; Path=/; SameSite=Lax"
-        else:
-            cookie_settings = "HttpOnly; Secure; Path=/; SameSite=None"
+        cookie_settings = get_cookie_settings()
         
         cognito_cookies = [
             f"accessToken={access_token}; {cookie_settings}; Max-Age={expires_in}",
@@ -309,32 +320,76 @@ def log_in_user(email: str, password: str) -> Dict[str, Any]:
 
 def decode_id_token(id_token):
     """
-    Decode the ID token to extract user information.
-    Note: This is a basic decode without signature verification for simplicity.
-    In production, you should verify the signature.
+    Decode and verify the ID token to extract user information.
+
+    Verifies signature against Cognito JWKS and validates issuer and audience.
     """
     try:
-        # Split the token into header, payload, and signature
-        parts = id_token.split('.')
-        if len(parts) != 3:
+        if not COGNITO_REGION:
+            logger.error("Unable to verify JWT: missing Cognito region")
+            return {}
+
+        jwks = get_jwks()
+        unverified_header = jwt.get_unverified_header(id_token)
+        key_id = unverified_header.get("kid")
+
+        if not key_id:
+            logger.warning("Failed to decode ID token: missing key id in header")
+            return {}
+
+        matching_key = next(
+            (jwk for jwk in jwks.get("keys", []) if jwk.get("kid") == key_id),
+            None,
+        )
+
+        if not matching_key:
+            logger.warning("Failed to decode ID token: no matching JWKS key", extra={"kid": key_id})
+            return {}
+
+        issuer = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{USER_POOL_ID}"
+        claims = jwt.decode(
+            id_token,
+            jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(matching_key)),
+            algorithms=["RS256"],
+            audience=USER_POOL_CLIENT_ID,
+            issuer=issuer,
+        )
+
+        if claims.get("token_use") != "id":
+            logger.warning("Failed to decode ID token: invalid token_use", extra={"token_use": claims.get("token_use")})
             return {}
         
-        # Decode the payload (second part)
-        payload = parts[1]
-        # Add padding if needed
-        payload += '=' * (4 - len(payload) % 4)
-        
-        # Decode base64
-        decoded_bytes = base64.urlsafe_b64decode(payload)
-        decoded_str = decoded_bytes.decode('utf-8')
-        
-        # Parse JSON
-        claims = json.loads(decoded_str)
-        
         return claims
-        
-    except Exception as e:
+
+    except (InvalidTokenError, ValueError, KeyError) as e:
         logger.warning("Failed to decode ID token", extra={
             "error": str(e)
         })
         return {}
+
+
+def get_jwks() -> Dict[str, Any]:
+    """Retrieve and cache Cognito JWKS for JWT signature verification."""
+    if "keys" in _jwks_cache:
+        return _jwks_cache
+
+    if not COGNITO_REGION:
+        raise ValueError("Missing Cognito region for JWKS retrieval")
+
+    jwks_url = (
+        f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/"
+        f"{USER_POOL_ID}/.well-known/jwks.json"
+    )
+
+    try:
+        with urlopen(jwks_url, timeout=5) as response:
+            jwks = json.loads(response.read().decode("utf-8"))
+
+        if not isinstance(jwks, dict) or "keys" not in jwks:
+            raise ValueError("Invalid JWKS document")
+
+        _jwks_cache.update(jwks)
+        return _jwks_cache
+    except Exception as e:
+        logger.error("Failed to fetch JWKS", extra={"error": str(e), "jwks_url": jwks_url})
+        raise

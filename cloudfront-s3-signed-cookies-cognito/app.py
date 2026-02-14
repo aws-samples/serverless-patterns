@@ -278,7 +278,7 @@ class CloudFrontSignedCookiesStack(Stack):
                         "bash",
                         "-lc",
                         "pip install --platform manylinux2014_x86_64 --only-binary=:all: --no-cache-dir --upgrade "
-                        "-t /asset-output aws-lambda-powertools 'cryptography>=41' "
+                        "-t /asset-output aws-lambda-powertools 'cryptography>=41' 'PyJWT[crypto]>=2.11.0' "
                         "&& cp -au . /asset-output"
                     ],
                 },
@@ -292,6 +292,7 @@ class CloudFrontSignedCookiesStack(Stack):
                 "PRIVATE_KEY_SECRET_ARN": private_key_secret.secret_arn,
                 "CLOUDFRONT_DOMAIN": distribution.distribution_domain_name,
                 "KEY_PAIR_ID": cf_public_key.public_key_id,
+                "COGNITO_REGION": self.region,
                 "COOKIE_TTL_SECONDS": str(cookie_ttl_seconds),
                 "COOKIE_DOMAIN": cookie_domain,
                 "COOKIE_SAME_SITE": same_site,
