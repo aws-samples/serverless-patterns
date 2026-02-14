@@ -26,7 +26,7 @@ class CloudFrontSignedCookiesStack(Stack):
 
         # ============================================================
         # Context Variables / Configuration
-        # ============================================================
+        # Important to mention that wildcards should only be used for development purposes
         allowed_cors_origin = self.node.try_get_context("allowed_cors_origin") or "*"
         cookie_domain = self.node.try_get_context("cookie_domain") or ""
         same_site = self.node.try_get_context("same_site") or "None"
@@ -42,7 +42,7 @@ class CloudFrontSignedCookiesStack(Stack):
             auto_verify=cognito.AutoVerifiedAttrs(email=True),
             sign_in_aliases=cognito.SignInAliases(email=True),
             self_sign_up_enabled=True,
-            password_policy=cognito.PasswordPolicy(
+            password_policy=cognito.PasswordPolicy( # Enable symbol requirement and increase minimum length to 12 characters for non dev/test environments
                 min_length=8,
                 require_lowercase=True,
                 require_uppercase=True,
@@ -223,12 +223,19 @@ class CloudFrontSignedCookiesStack(Stack):
         # ============================================================
         # Lambdas
         # ============================================================
-        # IAM Policy for Lambda functions to access Cognito
-        cognito_policy = iam.PolicyStatement(
+        # IAM Policies for Lambda functions to access Cognito
+        register_cognito_policy = iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             actions=[
                 "cognito-idp:SignUp",
                 "cognito-idp:AdminConfirmSignUp",
+            ],
+            resources=[user_pool.user_pool_arn],
+        )
+
+        login_cognito_policy = iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=[
                 "cognito-idp:InitiateAuth",
             ],
             resources=[user_pool.user_pool_arn],
@@ -255,7 +262,7 @@ class CloudFrontSignedCookiesStack(Stack):
             },
             timeout=Duration.seconds(30),
         )
-        register_lambda.add_to_role_policy(cognito_policy)
+        register_lambda.add_to_role_policy(register_cognito_policy)
 
         # Login User Lambda Function
         login_lambda = _lambda.Function(
@@ -292,7 +299,7 @@ class CloudFrontSignedCookiesStack(Stack):
             timeout=Duration.seconds(30),
             memory_size=256,
         )
-        login_lambda.add_to_role_policy(cognito_policy)
+        login_lambda.add_to_role_policy(login_cognito_policy)
         private_key_secret.grant_read(login_lambda)
 
         # ============================================================
@@ -356,9 +363,16 @@ class CloudFrontSignedCookiesStack(Stack):
 
         CfnOutput(
             self,
-            "DistributionUrl",
+            "CLOUDFRONT_DOMAIN",
             description="CloudFront Distribution URL",
             value=f"https://{distribution.distribution_domain_name}",
+        )
+
+        CfnOutput(
+            self,
+            "BUCKET_NAME",
+            description="S3 Bucket Name",
+            value=private_assets_bucket.bucket_name,
         )
 
 app = App()

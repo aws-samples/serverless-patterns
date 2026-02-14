@@ -11,6 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed and configured 
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Python 3.9+](https://www.python.org/downloads/) installed
+* [Docker] required during the building process
 
 ## Deployment Instructions
 
@@ -116,10 +117,10 @@ The response will include Cognito tokens and set CloudFront signed cookies.
 
 ```bash
 # Upload public content
-aws s3 cp test-public.html s3://{BUCKET_NAME}/index.html
+aws s3 cp test/public_content.html s3://{BUCKET_NAME}/index.html
 
 # Upload private content
-aws s3 cp test-private.html s3://{BUCKET_NAME}/private/secret.html
+aws s3 cp test/private_content.html s3://{BUCKET_NAME}/private/secret.html
 ```
 
 ### 4. Access public content (no authentication required)
