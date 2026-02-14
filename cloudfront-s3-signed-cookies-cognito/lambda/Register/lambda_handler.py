@@ -97,7 +97,7 @@ def register_user(email: str, password: str, name: str) -> Dict[str, Any]:
         )
         
         # Auto confirm the user (for development purposes)
-        # In production, you might want to use email verification
+        # For production environments it is highly recommended to always use email verification
         cognito_client.admin_confirm_sign_up(
             UserPoolId=USER_POOL_ID,
             Username=email
