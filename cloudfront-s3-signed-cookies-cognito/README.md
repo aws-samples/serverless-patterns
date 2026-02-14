@@ -90,7 +90,7 @@ This pattern creates a secure content delivery solution using CloudFront signed 
 ### 1. Register a new user
 
 ```bash
-curl -X POST https://{API_ID}.execute-api.{REGION}.amazonaws.com/v1/register \
+curl -X POST https://{API_ENDPOINT}/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -102,7 +102,7 @@ curl -X POST https://{API_ID}.execute-api.{REGION}.amazonaws.com/v1/register \
 ### 2. Login and receive signed cookies
 
 ```bash
-curl -X POST https://{API_ID}.execute-api.{REGION}.amazonaws.com/v1/login \
+curl -X POST https://{API_ENDPOINT}/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{

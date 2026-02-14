@@ -342,7 +342,7 @@ class CloudFrontSignedCookiesStack(Stack):
 
         CfnOutput(
             self,
-            "ApiEndpoint",
+            "API_ENDPOINT",
             description="API Gateway Endpoint URL",
             value=api.url,
             export_name=f"{construct_id}-ApiEndpoint",
