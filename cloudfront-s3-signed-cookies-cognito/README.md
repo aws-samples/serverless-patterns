@@ -111,32 +111,41 @@ curl -X POST https://{API_ID}.execute-api.{REGION}.amazonaws.com/v1/login \
   }'
 ```
 
-The response will include Cognito tokens and set CloudFront signed cookies.
+The response includes Cognito tokens and CloudFront signed cookies (`CloudFront-Policy`, `CloudFront-Signature`, `CloudFront-Key-Pair-Id`).
 
 ### 3. Upload test content to S3
 
 ```bash
 # Upload public content
-aws s3 cp test/public_content.html s3://{BUCKET_NAME}/index.html
+aws s3 cp test/public_content.html s3://{BUCKET_NAME}/public_content.html
 
 # Upload private content
-aws s3 cp test/private_content.html s3://{BUCKET_NAME}/private/secret.html
+aws s3 cp test/private_content.html s3://{BUCKET_NAME}/private/private_content.html
 ```
 
 ### 4. Access public content (no authentication required)
 
 ```bash
-curl https://{CLOUDFRONT_DOMAIN}/index.html
+curl https://{CLOUDFRONT_DOMAIN}/public_content.html
 ```
 
 ### 5. Access private content (requires signed cookies)
 
 ```bash
 # Without cookies (should fail)
-curl https://{CLOUDFRONT_DOMAIN}/private/secret.html
+curl https://{CLOUDFRONT_DOMAIN}/private/private_content.html
+```
 
-# With cookies from login (should succeed)
-curl -b cookies.txt https://{CLOUDFRONT_DOMAIN}/private/secret.html
+Following commands will extract the signed cookies from the response and use them to access private content:
+
+```bash
+# Extract CloudFront signed cookie values from cookies.txt
+CF_POLICY=$(awk -F'\t' '$6=="CloudFront-Policy"{print $7; exit}' cookies.txt)
+CF_SIG=$(awk -F'\t' '$6=="CloudFront-Signature"{print $7; exit}' cookies.txt)
+CF_KID=$(awk -F'\t' '$6=="CloudFront-Key-Pair-Id"{print $7; exit}' cookies.txt)
+
+curl -H "Cookie: CloudFront-Policy=$CF_POLICY; CloudFront-Signature=$CF_SIG; CloudFront-Key-Pair-Id=$CF_KID" \
+  https://{CLOUDFRONT_DOMAIN}/private/private_content.html
 ```
 
 ## Configuration
