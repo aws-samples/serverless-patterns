@@ -80,6 +80,7 @@ Optional event parameters:
 - The Lambda function has a 15-minute maximum timeout. If the download and upload combined take longer than that, the function will be killed mid-stream and the multipart upload will be left incomplete. Consider setting an [S3 lifecycle rule](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpu-abort-incomplete-mpu-lifecycle-config.html) on the target bucket to auto-clean incomplete multipart uploads.
 - The `download_filename` should be a flat filename (e.g. `file.zip`). If it contains slashes (e.g. `path/to/file.zip`), the temporary file path in `/tmp` will include subdirectories that may not exist, causing a write failure.
 - The maximum downloadable file size is limited by the 15-minute Lambda timeout, not by S3 (which supports up to 5 TB via multipart upload with 10,000 parts). In practice, Lambda can usually download roughly 55-110 GB in 15 minutes depending on network speed between Lambda and the source URL, so your mileage may vary. At the default chunk size of 512 MB, the 10,000 parts limit allows up to ~5 TB.
+- This pattern always uses multipart upload, even for small files. For files under 5 MB, this results in 3 PUT requests (CreateMultipartUpload + UploadPart + CompleteMultipartUpload) instead of a single PutObject call. The cost difference in that case is negligible (fractions of a cent), but can compound if done often enough.
 
 ## Cleanup
 
