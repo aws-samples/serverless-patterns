@@ -1,0 +1,60 @@
+{
+  "title": "Lambda S3 Download",
+  "description": "A Lambda function that downloads a file from a URL and uploads it to S3 using multipart upload with SHA256 checksums.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function that streams a file from a URL and uploads it to an S3 bucket using multipart upload.",
+      "The file is downloaded in configurable chunks (default 128 MB, clamped between 5 MB and 5 GB) and written to /tmp before being uploaded as individual parts. Each chunk is cleaned up from /tmp after upload, allowing the function to handle files larger than Lambda's memory or ephemeral storage limits.",
+      "SHA256 checksums are calculated for each part and verified on completion. If any step fails, the multipart upload is automatically aborted to avoid orphaned parts."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-download",
+      "templateURL": "serverless-patterns/lambda-s3-download",
+      "projectFolder": "lambda-s3-download",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "S3 Multipart Upload Overview",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html"
+      },
+      {
+        "text": "AWS Lambda - Configuring Ephemeral Storage",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-ephemeral-storage.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Robert Meyer",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-robert-meyer.jpg",
+      "bio": "Robert is a Partner Solutions Architect with AWS in EMEA.",
+      "linkedin": "https://www.linkedin.com/in/robert-meyer-phd-6a114a58/",
+      "twitter": "@robl_on_tour"
+    }
+  ]
+}

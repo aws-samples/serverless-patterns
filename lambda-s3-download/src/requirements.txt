@@ -1,0 +1,6 @@
+boto3
+json
+os
+Path
+requests
+
