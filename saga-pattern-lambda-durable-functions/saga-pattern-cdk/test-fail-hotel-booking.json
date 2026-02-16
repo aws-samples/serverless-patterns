@@ -1,0 +1,9 @@
+{
+  "passengerName": "David Martinez",
+  "departure": "DFW",
+  "destination": "BOS",
+  "flightPrice": 420.00,
+  "guestName": "David Martinez",
+  "hotelName": "Boston Harbor Hotel",
+  "failBookHotel": true
+}
