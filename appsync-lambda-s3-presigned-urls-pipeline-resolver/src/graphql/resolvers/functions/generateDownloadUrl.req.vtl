@@ -1,0 +1,20 @@
+## Only invoke Lambda if attachmentKey exists
+#if($ctx.prev.result.attachmentKey)
+{
+  "version": "2018-05-29",
+  "operation": "Invoke",
+  "payload": {
+    "operation": "generateDownloadUrl",
+    "attachmentKey": $util.toJson($ctx.prev.result.attachmentKey)
+  }
+}
+#else
+## Pass through without invoking Lambda
+{
+  "version": "2018-05-29",
+  "operation": "Invoke",
+  "payload": {
+    "operation": "skip"
+  }
+}
+#end
