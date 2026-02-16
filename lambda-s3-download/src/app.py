@@ -3,6 +3,7 @@ import boto3
 import json
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 def lambda_handler(event, context):
@@ -11,11 +12,11 @@ def lambda_handler(event, context):
     target_bucket_region = event.get("target_bucket_region", os.environ.get("AWS_REGION"))
     
     download_url = event["download_url"]
-    download_filename = event["download_filename"]
+    download_filename = event.get("download_filename", urlparse(download_url).path.split("/")[-1])
 
     # Cap chunk size under 5 GB to be inside S3 max part size and not exhaust max Lambda memory
     # Floor chunk size at 5 MB to fit the S3 minimum part size
-    chunk_size_mb = min(max(int(event.get("chunk_size_mb", 128)), 5), 5120)
+    chunk_size_mb = min(max(int(event.get("chunk_size_mb", 512)), 5), 5120)
 
     # open a multipart s3 upload request.
     s3 = boto3.client("s3", region_name = target_bucket_region)
