@@ -44,22 +44,15 @@
     ]
   },
   "deploy": {
-    "text": [
-      "sam build",
-      "sam deploy --guided"
-    ]
+    "text": ["sam build", "sam deploy --guided"]
   },
   "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
+    "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>sam delete</code>."
-    ]
+    "text": ["Delete the stack: <code>sam delete</code>."]
   },
-"authors": [
+  "authors": [
     {
       "name": "Anup Rajpara",
       "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
