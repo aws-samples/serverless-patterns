@@ -1,6 +1,6 @@
-# Human in the Loop with Lambda Durable Functions
+# Human in the Loop with Lambda durable functions
 
-This pattern demonstrates how to integrate human review or approval processes into workflows using AWS Lambda Durable Functions. The workflow sends email notifications via Simple Notification Service (SNS) and waits for human approval through callback links, suspending execution until the decision is made.
+This pattern demonstrates how to integrate human review or approval processes into workflows using AWS Lambda durable functions. The workflow sends email notifications via Simple Notification Service (SNS) and waits for human approval through callback links, suspending execution until the decision is made.
 
 **Important**: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -1,6 +1,6 @@
-# Saga Pattern with Lambda Durable Functions
+# Saga Pattern with Lambda durable functions
 
-This pattern demonstrates how to implement the Saga pattern for distributed transactions using AWS Lambda Durable Functions. The example implements a travel booking system that coordinates flight, hotel, and car reservations with automatic compensating transactions (rollbacks) on failure.
+This pattern demonstrates how to implement the Saga pattern for distributed transactions using AWS Lambda durable functions. The example implements a travel booking system that coordinates flight, hotel, and car reservations with automatic compensating transactions (rollbacks) on failure.
 
 Durable functions are regular Lambda functions that allow you to write sequential code in your preferred programming language. They track progress, automatically retry on failures, and suspend execution for up to one year at defined points, without paying for idle compute during waits.
 

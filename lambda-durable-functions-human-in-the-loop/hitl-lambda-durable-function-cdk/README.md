@@ -1,6 +1,6 @@
 # Human in the Loop - CDK Implementation
 
-This directory contains the AWS CDK implementation of the Human-in-the-Loop pattern using Lambda Durable Functions.
+This directory contains the AWS CDK implementation of the Human-in-the-Loop pattern using Lambda durable functions.
 
 ## What's Included
 

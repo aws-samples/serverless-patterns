@@ -1,6 +1,6 @@
-# Saga Pattern with Lambda Durable Functions
+# Saga Pattern with Lambda durable functions
 
-This CDK project implements the saga pattern for distributed transactions using AWS Lambda Durable Functions. It demonstrates how to coordinate multiple microservices (flight, hotel, and car rental) with automatic rollback capabilities when any step fails.
+This CDK project implements the saga pattern for distributed transactions using AWS Lambda durable functions. It demonstrates how to coordinate multiple microservices (flight, hotel, and car rental) with automatic rollback capabilities when any step fails.
 
 ## Architecture Overview
 
@@ -15,7 +15,7 @@ If any step fails, the orchestrator automatically executes compensating transact
 
 ### Lambda Functions
 
-**Saga Orchestrator (Durable Function)**
+**Saga Orchestrator (durable function)**
 - Coordinates the entire workflow across all three services
 - Manages state and execution history
 - Automatically triggers rollback on failure
