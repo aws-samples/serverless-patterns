@@ -1,0 +1,29 @@
+{
+  "app": "python3 app.py",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "requirements*.txt",
+      "source.bat",
+      "**/*.pyc",
+      "**/__pycache__",
+      ".git",
+      ".venv",
+      "*.pem"
+    ]
+  },
+  "context": {
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/core:stackRelativeExports": true,
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/core:enablePartitionLiterals": true,
+    "allowed_cors_origin": "*",
+    "cookie_domain": "",
+    "same_site": "None",
+    "cookie_ttl_seconds": "600"
+  }
+}
