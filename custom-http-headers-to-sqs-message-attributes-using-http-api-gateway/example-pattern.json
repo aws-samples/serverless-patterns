@@ -1,0 +1,51 @@
+{
+  "title": "HTTP API Gateway to SQS for passing custom http headers as message attributes.",
+  "description": "HTTP API Gateway to SQS for passing custom http headers as message attributes.",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern enables you to pass custom HTTP headers as message attributes when sending messages from HTTP API Gateway to an SQS queue. The headers can be configured either as static values or dynamically passed from the incoming request headers. In the default configuration, the message attribute name is set as 'MessageAttribute1' which maps to the header name 'header1' in the integration request mapping. You can customize these message attribute, header names and static values, according to your requirements by updating the requestParameters section in the SqsIntegration configuration within your SAM template. You can set the name for API Gateway and the SQS queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/custom-http-headers-to-sqs-message-attributes-using-http-api-gateway",
+      "templateURL": "serverless-patterns/custom-http-headers-to-sqs-message-attributes-using-http-api-gateway",
+      "projectFolder": "custom-http-headers-to-sqs-message-attributes-using-http-api-gateway",
+      "templateFile": "custom-http-headers-to-sqs-message-attributes-using-http-api-gateway/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "HTTP API Gateway to SQS for passing custom http headers as message attributes.",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Annangarachari R",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQHDdhBrpBtWsg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1651409742725?e=1759363200&v=beta&t=7-EnqmtXjWlH2uA8oSMCwnLfFFvlWtf42-aC8NSZukw",
+      "bio": "Serverless Enthusiast",
+      "linkedin": "https://www.linkedin.com/in/annangarachari-r/",
+    }
+  ]
+}
