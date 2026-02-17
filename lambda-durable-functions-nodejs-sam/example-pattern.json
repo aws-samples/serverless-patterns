@@ -1,0 +1,63 @@
+{
+  "title": "AWS Lambda Durable Functions with Node.js",
+  "description": "Demonstrates AWS Lambda Durable Functions using Node.js with automatic checkpointing, durable waits, and fault tolerance for long-running workflows.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates AWS Lambda Durable Functions using Node.js to build resilient, long-running workflows that can execute for up to one year.",
+      "The orchestrator function uses the @aws/durable-execution-sdk-js to implement checkpointed steps with context.step(), durable waits with context.wait(), and automatic recovery from failures.",
+      "The workflow validates input, invokes an enrichment Lambda function, waits 2 seconds (without compute charges), and finalizes the order processing."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-functions-nodejs-sam",
+      "templateURL": "serverless-patterns/lambda-durable-functions-nodejs-sam",
+      "projectFolder": "lambda-durable-functions-nodejs-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Durable Execution SDK for JavaScript",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-js"
+      },
+      {
+        "text": "AWS SAM Documentation",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete --stack-name durable-functions-demo"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sangeetha S",
+      "image": "",
+      "bio": "Technical Account Manager @ AWS",
+      "linkedin": "sangita-sethumadhavan"
+    }
+  ]
+}

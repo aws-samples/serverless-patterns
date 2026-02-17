@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Lambda Durable Functions - Node.js Order Processing Demo
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 900
+    MemorySize: 512
+    Architectures:
+      - x86_64
+    LoggingConfig:
+      LogFormat: JSON
+      ApplicationLogLevel: INFO
+      SystemLogLevel: INFO
+
+Resources:
+  # IAM Role for Lambda Functions
+  LambdaDurableExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-LambdaDurableExecutionRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaInvokePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+        - PolicyName: DurableExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:StartExecution
+                  - states:DescribeExecution
+                  - states:StopExecution
+                  - states:GetExecutionHistory
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+
+  # Enrichment Lambda Function (Simple, Non-Durable)
+  OrderEnricherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-OrderEnricher'
+      CodeUri: src/enrichment/
+      Handler: index.handler
+      Description: Simple order enrichment service
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Orchestrator Lambda Function (Durable)
+  DurableOrderProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-DurableOrderProcessor'
+      CodeUri: src/orchestrator/
+      Handler: index.handler
+      Description: Node.js Durable Order Processor with structured logging
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Environment:
+        Variables:
+          ENRICHMENT_FUNCTION_ARN: !GetAtt OrderEnricherFunction.Arn
+      DurableConfig:
+        ExecutionTimeout: 120
+        RetentionPeriodInDays: 7
+      AutoPublishAlias: prod
+
+Outputs:
+  DurableOrderProcessorArn:
+    Description: ARN of the Durable Order Processor Function (use with :prod alias)
+    Value: !Sub '${DurableOrderProcessorFunction.Arn}:prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-DurableOrderProcessorArn'
+
+  OrderEnricherArn:
+    Description: ARN of the Order Enricher Function
+    Value: !GetAtt OrderEnricherFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-OrderEnricherArn'
+
+  TestCommand:
+    Description: Command to test the durable function
+    Value: !Sub |
+      aws lambda invoke \
+        --function-name ${DurableOrderProcessorFunction.Arn}:prod \
+        --payload '{"orderId":"ORDER-123","nodejsLambdaArn":"${OrderEnricherFunction.Arn}"}' \
+        --cli-binary-format raw-in-base64-out \
+        response.json && cat response.json | jq .
+
+  LogsCommand:
+    Description: Command to view logs
+    Value: !Sub 'aws logs tail /aws/lambda/${DurableOrderProcessorFunction} --follow'
