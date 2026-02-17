@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Function chaining with AWS Lambda durable functions
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.14
+    MemorySize: 512
+
+Resources:
+  # Worker Functions
+  Step1AddFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: step1-add
+      CodeUri: src/step1_add/
+      Handler: app.lambda_handler
+
+  Step2TransformFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: step2-transform
+      CodeUri: src/step2_transform/
+      Handler: app.lambda_handler
+
+  Step3FinalizeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: step3-finalize
+      CodeUri: src/step3_finalize/
+      Handler: app.lambda_handler
+
+  # Durable Orchestrator Function
+  OrchestratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: durable-orchestrator
+      CodeUri: src/orchestrator/
+      Handler: app.lambda_handler
+      Timeout: 900
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          STEP1_FUNCTION_ARN: !Sub ${Step1AddFunction.Arn}:$LATEST
+          STEP2_FUNCTION_ARN: !Sub ${Step2TransformFunction.Arn}:$LATEST
+          STEP3_FUNCTION_ARN: !Sub ${Step3FinalizeFunction.Arn}:$LATEST
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource:
+                - !Sub ${Step1AddFunction.Arn}:*
+                - !Sub ${Step2TransformFunction.Arn}:*
+                - !Sub ${Step3FinalizeFunction.Arn}:*
+                - !GetAtt Step1AddFunction.Arn
+                - !GetAtt Step2TransformFunction.Arn
+                - !GetAtt Step3FinalizeFunction.Arn
+
+Outputs:
+  OrchestratorAliasArn:
+    Description: Orchestrator function Alias ARN (use this for invocations)
+    Value: !Ref OrchestratorFunction.Alias
+  Step1FunctionArn:
+    Value: !GetAtt Step1AddFunction.Arn
+  Step2FunctionArn:
+    Value: !GetAtt Step2TransformFunction.Arn
+  Step3FunctionArn:
+    Value: !GetAtt Step3FinalizeFunction.Arn

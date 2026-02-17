@@ -1,0 +1,108 @@
+{
+    "title": "Function chaining with AWS Lambda durable functions",
+    "description": "Demonstrates the function chaining pattern using Lambda durable functions with automatic checkpointing and fault-tolerant sequential execution",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates the function chaining pattern using Lambda durable functions.",
+            "A durable orchestrator function chains three Lambda functions sequentially using context.invoke().",
+            "Each invocation creates an automatic checkpoint, enabling the workflow to resume from the last successful step after failures.",
+            "Step 1 (Add) initializes data and adds 10 to the input value.",
+            "Step 2 (Transform) doubles the value and transforms the name to uppercase.",
+            "Step 3 (Finalize) adds 5 to the value and sets the completion status.",
+            "The pattern showcases fault-tolerant workflow orchestration without managing state infrastructure."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-function-chaining-sam",
+            "templateURL": "serverless-patterns/lambda-durable-function-chaining-sam",
+            "projectFolder": "lambda-durable-function-chaining-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Lambda durable functions Documentation",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+            },
+            {
+                "text": "Durable Execution SDK for Python",
+                "link": "https://github.com/aws/aws-durable-execution-sdk-python"
+            },
+            {
+                "text": "AWS Blog: Build multi-step applications with Lambda durable functions",
+                "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Get the orchestrator alias ARN from stack outputs:",
+            "<code>DURABLE_FUNCTION_ARN=$(aws cloudformation describe-stacks --stack-name durable-function-chaining --query 'Stacks[0].Outputs[?OutputKey==`OrchestratorAliasArn`].OutputValue' --output text)</code>",
+            "Invoke the workflow:",
+            "<code>aws lambda invoke --function-name \"$DURABLE_FUNCTION_ARN\" --payload '{\"id\": \"test-123\", \"name\": \"demo\", \"value\": 5}' --cli-binary-format raw-in-base64-out response.json</code>",
+            "<code>cat response.json</code>",
+            "Expected output shows value transformation: 5 → +10 (step1) → ×2 (step2) → +5 (step3) = 35"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Sahil Bhimjiani",
+            "image": "https://drive.google.com/file/d/1E2p7S5UtU36x6Sk1xPS3XnSGJyIUoqK7/view?usp=drivesdk",
+            "bio": "Sahil Bhimjiani is a Solutions Architect at Amazon Web Services.",
+            "linkedin": "sahil9701"
+        },
+        {
+            "name": "Anup Rajpara",
+            "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
+            "bio": "Anup is a Sr. Technical Account Manager at Amazon Web Services. He is passionate about serverless & event-driven architectures.",
+            "linkedin": "anup-rajpara-developer/"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 25,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda durable functions"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 25,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 65,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": ""
+        },
+        "line2": {
+            "from": "icon1",
+            "to": "icon3",
+            "label": ""
+        }
+    }
+}
