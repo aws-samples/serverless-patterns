@@ -1,0 +1,64 @@
+{
+  "title": "Lambda Durable Function - REST API Call (Node.js)",
+  "description": "A Lambda function that calls an external REST API using AWS Durable Execution SDK for automatic retries and state management.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates AWS Lambda Durable Execution for calling external REST APIs.",
+      "Uses the withDurableExecution wrapper to mark the Lambda handler as a durable workflow.",
+      "Uses context.step() to make the REST API call automatically retryable.",
+      "AWS automatically handles failures, retries, and state persistence without external services."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-rest-api-sam-js",
+      "templateURL": "serverless-patterns/lambda-durable-rest-api-sam-js",
+      "projectFolder": "lambda-durable-rest-api-sam-js",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Durable Execution",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Node.js Fetch API",
+        "link": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Theophilus Ajayi",
+      "image": "https://drive.google.com/file/d/1hUrUxWk2JqDTbPhl0DgUeUVd2uFWnAby/view?usp=drivesdk",
+      "bio": "Technical Account Manager @ AWS",
+      "linkedin": "tolutheo"
+    }
+  ]
+}
