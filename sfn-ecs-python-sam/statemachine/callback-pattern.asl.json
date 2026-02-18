@@ -1,0 +1,87 @@
+{
+  "Comment": "Callback ECS Task Execution - Task sends callback when complete",
+  "StartAt": "Run ECS Task (Callback)",
+  "States": {
+    "Run ECS Task (Callback)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.waitForTaskToken",
+      "Parameters": {
+        "Cluster": "${ECSCluster}",
+        "TaskDefinition": "${TaskDefinition}",
+        "LaunchType": "FARGATE",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "${Subnet1}",
+              "${Subnet2}"
+            ],
+            "SecurityGroups": [
+              "${SecurityGroup}"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "python-callback-container",
+              "Environment": [
+                {
+                  "Name": "TASK_TOKEN",
+                  "Value.$": "$$.Task.Token"
+                },
+                {
+                  "Name": "MESSAGE",
+                  "Value.$": "$.message"
+                },
+                {
+                  "Name": "PROCESSING_TIME",
+                  "Value.$": "States.Format('{}', $.processingTime)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "TimeoutSeconds": 300,
+      "HeartbeatSeconds": 60,
+      "Next": "Callback Received Successfully",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.Timeout"
+          ],
+          "Next": "Task Timed Out",
+          "ResultPath": "$.error"
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Task Failed",
+          "ResultPath": "$.error"
+        }
+      ]
+    },
+    "Callback Received Successfully": {
+      "Type": "Pass",
+      "Parameters": {
+        "status": "completed",
+        "pattern": "callback",
+        "message": "ECS task sent callback successfully",
+        "result.$": "$"
+      },
+      "End": true
+    },
+    "Task Timed Out": {
+      "Type": "Fail",
+      "Error": "TaskTimeout",
+      "Cause": "The ECS task did not send a callback within the timeout period"
+    },
+    "Task Failed": {
+      "Type": "Fail",
+      "Error": "ECSTaskFailed",
+      "Cause": "The ECS task failed or sent a failure callback"
+    }
+  }
+}
