@@ -1,0 +1,3 @@
+# Avro serialization
+fastavro>=1.8.0
+avro>=1.11.0
