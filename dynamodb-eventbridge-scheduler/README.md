@@ -1,4 +1,4 @@
-# Dynamic EventBridge Scheduler from DynamoDB Streams
+# Dynamic Amazon EventBridge Scheduler from Amazon DynamoDB Streams
 
 This pattern demonstrates how to dynamically create, update, and delete Amazon EventBridge Scheduler schedules based on changes in a DynamoDB table using DynamoDB Streams.
 
@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd dynamodb-eventbridge-scheduler
+    cd serverless-patterns/dynamodb-eventbridge-scheduler
     ```
 3. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -87,7 +87,7 @@ EventBridge Scheduler invokes TargetLambdaFunction at scheduled time
 
 ### Verify Auto-Created Test Schedule
 
-After deployment, a test schedule is automatically created that fires 2 minutes later:
+After deployment, a test schedule is automatically created that fires 5 minutes later (UTC time):
 
 1. Check if the schedule was created:
 ```bash
@@ -97,11 +97,14 @@ aws scheduler get-schedule --name auto-test-schedule
 2. View the schedule in EventBridge Console:
    - Navigate to EventBridge → Scheduler → Schedules
    - Look for `auto-test-schedule`
+   - Note the "Next invocation" time (displayed in your local timezone)
 
-3. After 2 minutes, check the Target Lambda logs:
+3. After 5 minutes, check the Target Lambda logs:
 ```bash
 aws logs tail /aws/lambda/ScheduledTaskExecutor --follow
 ```
+
+**Note:** All schedule times use UTC timezone. EventBridge Scheduler expressions use the format `at(YYYY-MM-DDTHH:MM:SS)` in UTC.
 
 ### Create Your Own Schedule
 
@@ -112,16 +115,21 @@ aws cloudformation describe-stacks --stack-name <your-stack-name> \
   --output text
 ```
 
-2. Insert a new schedule (set time to a few minutes in the future):
+2. Insert a new schedule (set time to a few minutes in the future in UTC):
 ```bash
 aws dynamodb put-item \
   --table-name ScheduleConfigs \
   --item '{
     "scheduleId": {"S": "my-test-schedule"},
-    "scheduleExpression": {"S": "at(2026-02-12T15:30:00)"},
+    "scheduleExpression": {"S": "at(2026-02-12T20:00:00)"},
     "payload": {"S": "{\"message\": \"Hello from my schedule\"}"},
     "enabled": {"BOOL": true}
   }'
+```
+
+**Important:** The time must be in UTC and in the future. To get current UTC time:
+```bash
+date -u +"%Y-%m-%dT%H:%M:%S"
 ```
 
 3. Verify the schedule was created:
@@ -141,8 +149,10 @@ aws dynamodb update-item \
   --table-name ScheduleConfigs \
   --key '{"scheduleId": {"S": "my-test-schedule"}}' \
   --update-expression "SET scheduleExpression = :expr" \
-  --expression-attribute-values '{":expr": {"S": "at(2026-02-12T16:00:00)"}}'
+  --expression-attribute-values '{":expr": {"S": "at(2026-02-12T21:00:00)"}}'
 ```
+
+**Note:** Time must be in UTC and in the future.
 
 ### Delete a Schedule
 

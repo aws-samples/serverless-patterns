@@ -1,9 +1,9 @@
 {
-  "title": "Dynamic EventBridge Scheduler from DynamoDB Streams",
+  "title": "Dynamic Amazon EventBridge Scheduler from Amazon DynamoDB Streams",
   "description": "Automatically create, update, and delete EventBridge Scheduler schedules based on DynamoDB table changes using DynamoDB Streams.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -60,11 +60,9 @@
   },
   "authors": [
     {
-      "name": "Your Name",
-      "image": "",
-      "bio": "Solutions Architect @ AWS",
-      "linkedin": "",
-      "twitter": ""
+      "name": "Luigi Napoleone Capasso",
+      "bio": "Technical Account Manager @ AWS",
+      "linkedin": ""
     }
   ],
   "patternArch": {
