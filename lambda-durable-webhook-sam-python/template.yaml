@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Webhook Receiver Pattern using AWS Lambda Durable Functions with Python
+
+Parameters:
+  WebhookSecret:
+    Type: String
+    Description: Secret key for HMAC signature validation (optional)
+    Default: ''
+    NoEcho: true
+
+Resources:
+  WebhookEventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-webhook-events'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: executionToken
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: executionToken
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: TimestampIndex
+          KeySchema:
+            - AttributeName: timestamp
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  WebhookValidatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: webhook_validator.lambda_handler
+      Runtime: python3.13
+      Timeout: 10
+      Environment:
+        Variables:
+          WEBHOOK_SECRET: !Ref WebhookSecret
+          PROCESSOR_FUNCTION_NAME: !Ref WebhookProcessorFunction.Alias
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: 
+              - !GetAtt WebhookProcessorFunction.Arn
+              - !Sub '${WebhookProcessorFunction.Arn}:*'
+      Events:
+        WebhookPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebhookApi
+            Path: /webhook
+            Method: POST
+
+  WebhookProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: webhook_processor.lambda_handler
+      Runtime: python3.13
+      Timeout: 120
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          EVENTS_TABLE_NAME: !Ref WebhookEventsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WebhookEventsTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:CheckpointDurableExecution
+              - lambda:GetDurableExecutionState
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-WebhookProcessorFunction-*'
+
+  StatusQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: status_query.lambda_handler
+      Runtime: python3.13
+      Timeout: 30
+      Environment:
+        Variables:
+          EVENTS_TABLE_NAME: !Ref WebhookEventsTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref WebhookEventsTable
+      Events:
+        StatusGet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebhookApi
+            Path: /status/{executionToken}
+            Method: GET
+
+  WebhookApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+
+Outputs:
+  WebhookEndpoint:
+    Description: Webhook receiver endpoint URL
+    Value: !Sub 'https://${WebhookApi}.execute-api.${AWS::Region}.amazonaws.com/prod/webhook'
+  
+  StatusEndpoint:
+    Description: Status query endpoint URL
+    Value: !Sub 'https://${WebhookApi}.execute-api.${AWS::Region}.amazonaws.com/prod/status'
+  
+  WebhookProcessorFunctionArn:
+    Description: Webhook Processor Durable Function ARN
+    Value: !GetAtt WebhookProcessorFunction.Arn
+  
+  EventsTableName:
+    Description: DynamoDB table name
+    Value: !Ref WebhookEventsTable
