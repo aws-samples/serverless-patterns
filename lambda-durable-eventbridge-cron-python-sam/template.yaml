@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Durable Lambda function triggered by an EventBridge cron schedule every 1 minute
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 256
+    Runtime: python3.14
+
+Resources:
+  # Durable Lambda function — publishes a new version on each deploy
+  DurableCronFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: src/
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 7
+      Description: Durable execution Lambda triggered every minute by EventBridge
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*
+
+  # EventBridge rule — every minute cron schedule
+  HourlyCronRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Triggers the durable Lambda function every minute
+      ScheduleExpression: cron(* * * * ? *)
+      State: ENABLED
+      Targets:
+        - Arn: !Ref DurableCronFunction.Alias
+          Id: DurableCronFunctionTarget
+
+  # Permission for EventBridge to invoke the published alias
+  HourlyCronRulePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DurableCronFunction.Alias
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt HourlyCronRule.Arn
+
+Outputs:
+  DurableCronFunctionAliasArn:
+    Description: ARN of the live alias (published version)
+    Value: !Ref DurableCronFunction.Alias
+  PublishedVersion:
+    Description: Latest published version number
+    Value: !Ref DurableCronFunction.Version
+  DurableCronFunctionName:
+    Description: Name of the durable cron Lambda function
+    Value: !Ref DurableCronFunction
+  HourlyCronRuleArn:
+    Description: ARN of the EventBridge every-minute cron rule
+    Value: !GetAtt HourlyCronRule.Arn
