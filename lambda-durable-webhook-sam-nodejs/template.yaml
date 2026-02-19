@@ -1,0 +1,247 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Webhook Receiver Pattern using AWS Lambda durable functions with Python - NodeJS version'
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 512
+    Runtime: nodejs24.x
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name
+  WebhookSecret:
+    Type: String
+    Default: ''
+    Description: Secret key for HMAC signature validation (optional)
+    NoEcho: true
+
+Resources:
+  # DynamoDB table for storing webhook execution events
+  WebhookEventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${Environment}-webhook-events'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: executionToken
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: executionToken
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      GlobalSecondaryIndexes:
+        - IndexName: TimestampIndex
+          KeySchema:
+            - AttributeName: timestamp
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  # Webhook Validator Function
+  WebhookValidatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-webhook-validator'
+      CodeUri: src/webhook_validator/
+      Handler: index.handler
+
+  # Main Webhook Processor Lambda durable function
+  WebhookProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-webhook-processor'
+      CodeUri: src/webhook_processor/
+      Handler: index.handler
+      Timeout: 900
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 7
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - lambda:CheckpointDurableExecutions
+              - lambda:GetDurableExecutionState
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Environment}-webhook-processor'
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource: 
+              - !GetAtt WebhookValidatorFunction.Arn
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:Query
+              - dynamodb:Scan
+            Resource: 
+              - !GetAtt WebhookEventsTable.Arn
+              - !Sub '${WebhookEventsTable.Arn}/index/*'
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          WEBHOOK_VALIDATOR_FUNCTION_ARN: !GetAtt WebhookValidatorFunction.Arn
+          EVENTS_TABLE_NAME: !Ref WebhookEventsTable
+          ENVIRONMENT: !Ref Environment
+          WEBHOOK_SECRET: !Ref WebhookSecret
+
+  # API Gateway Method for Webhook (Asynchronous Invocation)
+  WebhookMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref WebhookApi
+      ResourceId: !Ref WebhookResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebhookProcessorFunction.Arn}:live/invocations'
+        RequestParameters:
+          integration.request.header.X-Amz-Invocation-Type: "'Event'"
+        RequestTemplates:
+          application/json: |
+            #set($executionToken = $context.requestId)
+            {
+              "body": "$util.escapeJavaScript($input.body)",
+              "executionToken": "$executionToken"
+            }
+        IntegrationResponses:
+          - StatusCode: 202
+            ResponseTemplates:
+              application/json: |
+                {
+                  "message": "Webhook accepted for processing",
+                  "executionToken": "$context.requestId"
+                }
+      MethodResponses:
+        - StatusCode: 202
+
+  # API Gateway Resource for Webhook
+  WebhookResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref WebhookApi
+      ParentId: !GetAtt WebhookApi.RootResourceId
+      PathPart: webhook
+
+  # Lambda Permission for API Gateway
+  WebhookLambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: WebhookProcessorFunctionAliaslive
+    Properties:
+      FunctionName: !Sub '${WebhookProcessorFunction.Arn}:live'
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebhookApi}/*/*'
+
+  # Status Query Function (without Events - using manual API Gateway)
+  StatusQueryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${Environment}-status-query'
+      CodeUri: src/status_query/
+      Handler: index.handler
+      Timeout: 30
+      Environment:
+        Variables:
+          EVENTS_TABLE_NAME: !Ref WebhookEventsTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref WebhookEventsTable
+
+  # API Gateway Resource for Status Query
+  StatusResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref WebhookApi
+      ParentId: !GetAtt WebhookApi.RootResourceId
+      PathPart: status
+
+  # API Gateway Resource for Status Token
+  StatusTokenResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref WebhookApi
+      ParentId: !Ref StatusResource
+      PathPart: '{executionToken}'
+
+  # API Gateway Method for Status Query
+  StatusQueryMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref WebhookApi
+      ResourceId: !Ref StatusTokenResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${StatusQueryFunction.Arn}/invocations'
+      MethodResponses:
+        - StatusCode: 200
+
+  # Lambda Permission for Status Query
+  StatusQueryLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt StatusQueryFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebhookApi}/*/*'
+
+  # API Gateway REST API
+  WebhookApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${Environment}-webhook-api'
+      Description: 'Webhook API for durable functions'
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # API Gateway Stage  
+  WebhookApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref WebhookApi
+      DeploymentId: !Ref WebhookApiDeployment
+      StageName: prod
+      Description: 'Production stage with executionToken'
+
+  # API Gateway Deployment (depends on all methods)
+  WebhookApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - WebhookMethod
+      - StatusQueryMethod
+    Properties:
+      RestApiId: !Ref WebhookApi
+      Description: !Sub 'Production stage ${AWS::StackName}'
+
+Outputs:
+  WebhookApiUrl:
+    Description: 'API Gateway endpoint URL for webhook'
+    Value: !Sub 'https://${WebhookApi}.execute-api.${AWS::Region}.amazonaws.com/prod/webhook'
+
+  StatusQueryApiUrl:
+    Description: 'API Gateway endpoint URL for status queries'
+    Value: !Sub 'https://${WebhookApi}.execute-api.${AWS::Region}.amazonaws.com/prod/status/{executionToken}'
+
+  WebhookEventsTable:
+    Description: 'DynamoDB Table for webhook events'
+    Value: !Ref WebhookEventsTable
+
+  WebhookProcessorFunctionArn:
+    Description: 'Webhook Processor Lambda durable function ARN'
+    Value: !GetAtt WebhookProcessorFunction.Arn
