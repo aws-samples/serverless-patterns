@@ -1,6 +1,6 @@
 # Lambda Tenant Isolation with SQS
 
-This pattern demonstrate AWS Lambda's tenant isolation feature in Multi-tenant application.
+This pattern demonstrate AWS Lambda's tenant isolation feature in Multi-tenant application. It uses single SQS for multi-tenant applucation and isolating messages using messagegroupid and invoking isolated lambda enviornments. 
 
 ## Key Features
 
@@ -37,7 +37,6 @@ SQS Queue → SQS Processor Lambda → Tenant-Isolated Lambda
 
 ```json
 {
-  "customer-id": "tenant-123",
   "data": "your payload here"
 }
 ```
@@ -56,7 +55,7 @@ Send a message to the SQS queue:
 ```bash
 aws sqs send-message \
   --queue-url <QUEUE_URL> \
-  --message-body '{"customer-id": "tenant-123", "data": "test payload"}'
+  --message-body '{"data": "test payload"}'
 ```
 
 
