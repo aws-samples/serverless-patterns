@@ -45,17 +45,17 @@
   },
   "deploy": {
     "text": [
-      "Note: Lambda durable functions are currently available in us-east-2 (Ohio) region only.",
+      "Note: Lambda durable functions are available in multiple AWS regions.",
       "cd src/orchestrator && npm install && cd ../..",
       "sam build",
-      "sam deploy --guided --region us-east-2"
+      "sam deploy --guided"
     ]
   },
   "testing": {
     "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete --region us-east-2</code>."]
+    "text": ["Delete the stack: <code>sam delete</code>."]
   },
   "authors": [
     {

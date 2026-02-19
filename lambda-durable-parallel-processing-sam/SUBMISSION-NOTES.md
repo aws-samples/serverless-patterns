@@ -72,7 +72,7 @@ The pattern includes 4 test scenarios:
 
 ## Deployment Requirements
 
-- **Region**: us-east-2 (Ohio) - Lambda durable functions requirement
+- **Region**: Multiple regions supported - Lambda durable functions available
 - **Runtime**: Node.js 22.x
 - **Framework**: AWS SAM
 - **Dependencies**: @aws/durable-execution-sdk-js v1.0.2+
