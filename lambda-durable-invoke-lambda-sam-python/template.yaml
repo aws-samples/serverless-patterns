@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless pattern - Lambda Durable Function invoking another Lambda Function (Python).
+  Demonstrates how a durable Lambda function can use context.invoke() to call a standard
+  Lambda function as a checkpointed step in its workflow.
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+
+Resources:
+  # Standard Lambda function that processes sample values
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: processor_function.lambda_handler
+      Runtime: python3.14
+      CodeUri: src/
+
+  # Durable Lambda function that orchestrates the workflow
+  DurableLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: durable_lambda_function.lambda_handler
+      Runtime: python3.14
+      CodeUri: src/
+      Timeout: 600
+      DurableConfig:
+        ExecutionTimeout: 600
+        RetentionPeriodInDays: 7
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          PROCESSOR_FUNCTION_NAME: !Ref ProcessorFunction
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ProcessorFunction
+
+Outputs:
+  DurableLambdaFunctionArn:
+    Description: ARN of the durable Lambda function
+    Value: !GetAtt DurableLambdaFunction.Arn
+  DurableLambdaFunctionAliasArn:
+    Description: Alias ARN of the durable Lambda function (use this for invocations)
+    Value: !Ref DurableLambdaFunction.Alias
+  ProcessorFunctionArn:
+    Description: ARN of the processor Lambda function
+    Value: !GetAtt ProcessorFunction.Arn
