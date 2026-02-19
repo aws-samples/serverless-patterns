@@ -1,0 +1,11 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and customize as needed
+
+# AWS region for deployment
+aws_region = "us-east-1"
+
+# Environment name for tagging
+environment = "demo"
+
+# Project name for resource naming
+project_name = "lambda-managed-instances"
