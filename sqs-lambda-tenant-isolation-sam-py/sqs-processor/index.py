@@ -24,6 +24,6 @@ def handler(event, context):
             TenantId=message_group_id
         )
         
-        print(f"Invoked tenant-isolated function for message group: {message_group_id}")
+        print(f"Invoked tenant-isolated function for messagegroup: {message_group_id}")
     
     return {'statusCode': 200}
