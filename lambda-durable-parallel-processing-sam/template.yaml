@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Lambda durable functions - Parallel Processing Demo with Node.js
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 900
+    MemorySize: 512
+    Architectures:
+      - x86_64
+    LoggingConfig:
+      LogFormat: JSON
+      ApplicationLogLevel: INFO
+      SystemLogLevel: INFO
+
+Resources:
+  # IAM Role for Lambda Functions
+  LambdaDurableExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-LambdaDurableExecutionRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaInvokePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+        - PolicyName: DurableExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:CheckpointDurableExecution
+                  - lambda:GetDurableExecutionState
+                Resource: '*'
+
+  # Worker Lambda Functions (Simple, Non-Durable)
+  
+  # Worker 1: Inventory Check
+  InventoryCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-InventoryCheck'
+      CodeUri: src/workers/inventory/
+      Handler: index.handler
+      Description: Check inventory availability for products
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Worker 2: Payment Validation
+  PaymentValidationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-PaymentValidation'
+      CodeUri: src/workers/payment/
+      Handler: index.handler
+      Description: Validate payment information
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Worker 3: Shipping Calculation
+  ShippingCalculationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-ShippingCalculation'
+      CodeUri: src/workers/shipping/
+      Handler: index.handler
+      Description: Calculate shipping costs and delivery time
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Worker 4: Tax Calculation
+  TaxCalculationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-TaxCalculation'
+      CodeUri: src/workers/tax/
+      Handler: index.handler
+      Description: Calculate taxes based on location
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Orchestrator Lambda Function (Durable with Parallel Processing)
+  ParallelProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-ParallelProcessor'
+      CodeUri: src/orchestrator/
+      Handler: index.handler
+      Description: Durable orchestrator with parallel processing capabilities
+      Role: !GetAtt LambdaDurableExecutionRole.Arn
+      Environment:
+        Variables:
+          INVENTORY_FUNCTION_ARN: !GetAtt InventoryCheckFunction.Arn
+          PAYMENT_FUNCTION_ARN: !GetAtt PaymentValidationFunction.Arn
+          SHIPPING_FUNCTION_ARN: !GetAtt ShippingCalculationFunction.Arn
+          TAX_FUNCTION_ARN: !GetAtt TaxCalculationFunction.Arn
+      DurableConfig:
+        ExecutionTimeout: 300
+        RetentionPeriodInDays: 7
+      AutoPublishAlias: prod
+
+Outputs:
+  ParallelProcessorArn:
+    Description: ARN of the Parallel Processor Function (use with :prod alias)
+    Value: !Sub '${ParallelProcessorFunction.Arn}:prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-ParallelProcessorArn'
+
+  InventoryCheckArn:
+    Description: ARN of the Inventory Check Function
+    Value: !GetAtt InventoryCheckFunction.Arn
+
+  PaymentValidationArn:
+    Description: ARN of the Payment Validation Function
+    Value: !GetAtt PaymentValidationFunction.Arn
+
+  ShippingCalculationArn:
+    Description: ARN of the Shipping Calculation Function
+    Value: !GetAtt ShippingCalculationFunction.Arn
+
+  TaxCalculationArn:
+    Description: ARN of the Tax Calculation Function
+    Value: !GetAtt TaxCalculationFunction.Arn
+
+  TestCommand:
+    Description: Command to test the parallel processing function
+    Value: !Sub |
+      aws lambda invoke \
+        --function-name ${ParallelProcessorFunction.Arn}:prod \
+        --payload '{"orderId":"ORD-12345","items":[{"productId":"PROD-001","quantity":2,"price":29.99},{"productId":"PROD-002","quantity":1,"price":49.99}],"customer":{"id":"CUST-789","address":{"state":"CA","zipCode":"94102"},"paymentMethod":"credit_card"}}' \
+        --cli-binary-format raw-in-base64-out \
+        response.json && cat response.json | jq .
+
+  LogsCommand:
+    Description: Command to view orchestrator logs
+    Value: !Sub 'aws logs tail /aws/lambda/${ParallelProcessorFunction} --follow'
