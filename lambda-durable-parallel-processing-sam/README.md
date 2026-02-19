@@ -1,6 +1,6 @@
-# Parallel Processing with AWS Lambda Durable Functions
+# Parallel Processing with AWS Lambda durable functions
 
-This pattern demonstrates parallel processing using AWS Lambda Durable Functions to execute multiple independent validation operations concurrently. The workflow processes orders by running inventory checks, payment validation, shipping calculations, and tax calculations in parallel, significantly reducing total processing time.
+This pattern demonstrates parallel processing using AWS Lambda durable functions to execute multiple independent validation operations concurrently. The workflow processes orders by running inventory checks, payment validation, shipping calculations, and tax calculations in parallel, significantly reducing total processing time.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-parallel-processing-sam
 
@@ -41,7 +41,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 6. During the prompts:
     * Enter a stack name
-    * Enter your preferred AWS Region (Lambda Durable Functions is available in multiple regions)
+    * Enter your preferred AWS Region (Lambda durable functions is available in multiple regions)
     * Allow SAM CLI to create IAM roles with the required permissions (CAPABILITY_IAM and CAPABILITY_NAMED_IAM).
     * Keep default values for other parameters
 
@@ -51,7 +51,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## How it works
 
-This pattern uses AWS Lambda Durable Functions to orchestrate parallel execution of multiple worker functions:
+This pattern uses AWS Lambda durable functions to orchestrate parallel execution of multiple worker functions:
 
 ### Architecture
 
@@ -348,13 +348,13 @@ Parallel execution completed
 
 ## Documentation
 
-- [Lambda Durable Functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Durable Execution SDK for JavaScript](https://github.com/aws/aws-durable-execution-sdk-js)
 - [Parallel Processing Patterns](https://docs.aws.amazon.com/lambda/latest/dg/durable-parallel.html)
 - [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
 
 ---
 
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

@@ -1,5 +1,5 @@
 {
-  "title": "Parallel Processing with AWS Lambda Durable Functions",
+  "title": "Parallel Processing with AWS Lambda durable functions",
   "description": "Order processing workflow using Lambda durable functions with parallel execution of multiple validation steps including inventory, payment, shipping, and tax calculations",
   "language": "Node.js",
   "level": "300",

@@ -2,7 +2,7 @@
 
 ## Pattern Overview
 
-This serverless pattern demonstrates **parallel processing** using AWS Lambda Durable Functions. It showcases how to execute multiple independent operations concurrently to significantly reduce total processing time.
+This serverless pattern demonstrates **parallel processing** using AWS Lambda durable functions. It showcases how to execute multiple independent operations concurrently to significantly reduce total processing time.
 
 ## What Makes This Pattern Unique
 
@@ -72,7 +72,7 @@ The pattern includes 4 test scenarios:
 
 ## Deployment Requirements
 
-- **Region**: us-east-2 (Ohio) - Lambda Durable Functions requirement
+- **Region**: us-east-2 (Ohio) - Lambda durable functions requirement
 - **Runtime**: Node.js 22.x
 - **Framework**: AWS SAM
 - **Dependencies**: @aws/durable-execution-sdk-js v1.0.2+
