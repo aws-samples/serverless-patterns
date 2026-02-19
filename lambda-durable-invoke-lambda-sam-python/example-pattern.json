@@ -1,6 +1,6 @@
 {
   "title": "Lambda Durable Function invoking Lambda Function",
-  "description": "A durable Lambda function that invokes a standard Lambda function using context.invoke() with automatic checkpointing.",
+  "description": "Lambda durable function invokes a standard Lambda function using context.invoke() with automatic checkpointing.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
