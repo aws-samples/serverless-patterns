@@ -1,0 +1,106 @@
+{
+    "title": "AWS Lambda Failed-Event Destination and Amazon Athena Analytics",
+    "description": "Capture AWS Lambda failed events to Amazon S3 and analyze them with Amazon Athena for error insights and patterns using asynchronous invocations.",
+    "language": "TypeScript",
+    "level": "200",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern demonstrates how to use Amazon S3 as a failed-event destination for AWS Lambda asynchronous invocations.",
+            "A Lambda function implements business logic with success and failure scenarios.",
+            "When the Lambda function fails during asynchronous invocation, AWS automatically captures the failed event to S3 for analysis.",
+            "Amazon Athena with AWS Glue enables SQL-based analytics on failed events to identify error patterns and gain insights.",
+            "The pattern uses AWS CLI with --invocation-type Event to demonstrate asynchronous invocation.",
+            "Important: Lambda destinations only work with asynchronous invocations (S3, SNS, EventBridge) and stream-based sources (Kinesis, DynamoDB Streams, SQS). They do not trigger for synchronous invocations."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-athena-cdk-ts",
+            "templateURL": "serverless-patterns/lambda-s3-athena-cdk-ts",
+            "projectFolder": "lambda-s3-athena-cdk-ts",
+            "templateFile": "lib/pattern-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Lambda S3 Failed-Event Destination Announcement",
+                "link": "https://aws.amazon.com/about-aws/whats-new/2024/11/aws-lambda-s3-failed-event-destination-stream-event-sources/"
+            },
+            {
+                "text": "AWS Lambda Destinations Documentation",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-async-destinations"
+            },
+            {
+                "text": "Amazon Athena Documentation",
+                "link": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html"
+            },
+            {
+                "text": "AWS Glue Data Catalog",
+                "link": "https://docs.aws.amazon.com/glue/latest/dg/catalog-and-crawler.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "Clone the repository: <code>git clone https://github.com/aws-samples/serverless-patterns</code>",
+            "Change directory: <code>cd lambda-s3-athena-cdk-ts</code>",
+            "Install dependencies: <code>npm install</code>",
+            "Deploy the CDK stack: <code>cdk deploy</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Get Lambda function name: <code>FUNCTION_NAME=$(aws cloudformation describe-stacks --stack-name LambdaS3AthenaCdkStack --query 'Stacks[0].Outputs[?OutputKey==`LambdaFunctionName`].OutputValue' --output text)</code>",
+            "Test successful request: <code>aws lambda invoke --function-name $FUNCTION_NAME --invocation-type Event --payload '{\"action\": \"process\", \"value\": 10}' response.json</code>",
+            "Test failed request: <code>aws lambda invoke --function-name $FUNCTION_NAME --invocation-type Event --payload '{\"action\": \"process\", \"value\": -5}' response.json</code>",
+            "Verify failed events in S3: <code>aws s3 ls s3://$(aws cloudformation describe-stacks --stack-name LambdaS3AthenaCdkStack --query 'Stacks[0].Outputs[?OutputKey==`FailedEventsBucketName`].OutputValue' --output text)/ --recursive</code>",
+            "Query errors with Athena: <code>SELECT responsepayload.errortype, COUNT(*) FROM failed_events GROUP BY responsepayload.errortype;</code>"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Marco Jahn",
+            "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
+            "bio": "Senior Solutions Architect, Amazon Web Services",
+            "linkedin": "marcojahn"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 55,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "athena",
+            "label": "Amazon Athena"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Failed-event destination"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "analyze"
+        }
+    }
+}

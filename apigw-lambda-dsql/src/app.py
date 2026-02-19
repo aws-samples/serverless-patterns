@@ -1,36 +1,22 @@
-#Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+    #Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #SPDX-License-Identifier: MIT-0
 
 import json
-import boto3
-import psycopg2
-import psycopg2.extensions
+import aurora_dsql_psycopg2 as dsql
 import os
 
 cluster_endpoint = os.environ['cluster_endpoint']
 region = os.environ['AWS_REGION']
 
-client = boto3.client("dsql", region_name=region)
-
 def lambda_handler(event, context):
-    # Generate a fresh password token for each connection, to ensure the token is not expired when the connection is established
-    password_token = client.generate_db_connect_admin_auth_token(cluster_endpoint, region)
-
-    conn_params = {
-        "dbname": "postgres",
-        "user": "admin",
-        "host": cluster_endpoint,
-        "port": "5432",
-        "sslmode": "require",
-        "password": password_token
+    config = {
+        'host': cluster_endpoint,
+        'region': region,
+        'user': "admin",
     }
 
-     # Use the more efficient connection method if it's supported.
-    if psycopg2.extensions.libpq_version() >= 170000:
-        conn_params["sslnegotiation"] = "direct"
-
-     # Make a connection to the cluster
-    conn = psycopg2.connect(**conn_params)
+    # Make a connection to the cluster
+    conn = dsql.connect(**config)
 
     try:
         with conn.cursor() as cur:
