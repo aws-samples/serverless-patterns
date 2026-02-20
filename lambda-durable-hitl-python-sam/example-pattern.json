@@ -65,8 +65,8 @@
   },
   "authors": [
     {
-      "name": "Mian Tariq",
-      "bio": "Cloud Solutions Architect"
+      "name": "AWS Serverless Patterns",
+      "bio": "AWS Serverless Patterns collection"
     }
   ],
   "patternArch": {
