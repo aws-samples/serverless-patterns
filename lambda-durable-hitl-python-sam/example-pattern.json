@@ -1,13 +1,13 @@
 {
   "title": "Lambda Durable Functions with Human-in-the-Loop",
-  "description": "Demonstrates AWS Lambda Durable Functions with human approval workflow using Python 3.13, DynamoDB, and SNS",
+  "description": "Demonstrates Lambda durable functions with human approval workflow using Python 3.13, DynamoDB, and SNS",
   "language": "Python",
   "level": "300",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to pause Lambda execution, wait for human approval, and resume using the AWS Lambda Durable Functions SDK.",
+      "This pattern demonstrates how to pause Lambda execution, wait for human approval, and resume using the Lambda durable functions SDK.",
       "The Workflow Lambda creates an approval request in DynamoDB and polls for decisions using durable waits (no compute charges during waits).",
       "An SNS notification is sent to approvers, who can submit their decision via the Approval API Lambda function.",
       "The Workflow Lambda detects the decision during polling and resumes execution with the approval result.",
@@ -25,7 +25,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Durable Functions Documentation",
+        "text": "Lambda Durable Functions Documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -65,14 +65,14 @@
   },
   "authors": [
     {
-      "name": "AWS Serverless Patterns",
-      "bio": "AWS Serverless Patterns collection"
+      "name": "Mian Tariq",
+      "bio": "Cloud Solutions Architect"
     }
   ],
   "patternArch": {
     "icon1": {
       "name": "lambda",
-      "label": "AWS Lambda (Durable Functions)"
+      "label": "Lambda Durable Functions"
     },
     "icon2": {
       "name": "dynamodb",

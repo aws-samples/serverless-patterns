@@ -1,10 +1,10 @@
 # Lambda Durable Functions with Human-in-the-Loop (HITL) Pattern
 
-This pattern demonstrates how to implement AWS Lambda Durable Functions with Human-in-the-Loop capabilities using Python 3.13 and the AWS Durable Execution SDK. The pattern showcases how Lambda functions can pause execution, wait for human approval, and resume based on human decisions while maintaining state across the pause/resume cycle.
+This pattern demonstrates how to implement Lambda durable functions with Human-in-the-Loop capabilities using Python 3.13 and the AWS Durable Execution SDK. The pattern showcases how Lambda functions can pause execution, wait for human approval, and resume based on human decisions while maintaining state across the pause/resume cycle.
 
 ## Overview
 
-This serverless pattern enables workflows that require human decision-making by pausing Lambda execution, notifying approvers, and resuming based on their decisions. The pattern uses AWS Lambda Durable Functions to maintain execution state across pauses and resumes, making it ideal for approval workflows, content moderation, and any process requiring human judgment.
+This serverless pattern enables workflows that require human decision-making by pausing Lambda execution, notifying approvers, and resuming based on their decisions. The pattern uses Lambda durable functions to maintain execution state across pauses and resumes, making it ideal for approval workflows, content moderation, and any process requiring human judgment.
 
 **Key Features:**
 - Durable execution with checkpointed steps (no re-execution on replay)
@@ -73,7 +73,7 @@ This serverless pattern enables workflows that require human decision-making by 
 
 ### Components
 
-1. **Workflow Lambda** (`src/workflow/`): Orchestrates the approval workflow using AWS Lambda Durable Functions SDK. It creates approval requests, polls DynamoDB for decisions using durable waits (no compute charges), sends notifications, and completes when a decision is made. Uses `@durable_execution` and `@durable_step` decorators for checkpointing.
+1. **Workflow Lambda** (`src/workflow/`): Orchestrates the approval workflow using Lambda durable functions SDK. It creates approval requests, polls DynamoDB for decisions using durable waits (no compute charges), sends notifications, and completes when a decision is made. Uses `@durable_execution` and `@durable_step` decorators for checkpointing.
 
 2. **Approval API Lambda** (`src/approval_api/`): Processes approval/rejection decisions. It validates requests, updates the approval status in DynamoDB, allowing the workflow to detect the decision and resume.
 
@@ -494,7 +494,7 @@ Estimated cost for 1,000 approval requests per month: < $1 USD
 
 ## Additional Resources
 
-- [AWS Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
 - [DynamoDB Best Practices](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html)
 - [SNS Documentation](https://docs.aws.amazon.com/sns/)

@@ -4,7 +4,7 @@ Description: >
   Lambda Durable Functions with Human-in-the-Loop (HITL) Pattern
   
   This pattern demonstrates how to pause Lambda execution, wait for human approval,
-  and resume using the AWS Lambda Durable Functions SDK with Python 3.13.
+  and resume using the Lambda durable functions SDK with Python 3.13.
 
 Globals:
   Function:
@@ -105,7 +105,7 @@ Resources:
                 Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
               - Effect: Allow
                 Action:
-                  - lambda:CheckpointDurableExecutions
+                  - lambda:CheckpointDurableExecution
                   - lambda:GetDurableExecutionState
                 Resource: '*'
       Tags:
@@ -166,6 +166,11 @@ Resources:
                 Action:
                   - lambda:InvokeFunction
                 Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+              - Effect: Allow
+                Action:
+                  - lambda:SendDurableExecutionCallbackSuccess
+                  - lambda:SendDurableExecutionCallbackFailure
+                Resource: '*'
       Tags:
         - Key: Pattern
           Value: lambda-durable-hitl

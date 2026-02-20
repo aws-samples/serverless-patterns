@@ -2,8 +2,8 @@
 boto3>=1.34.0
 botocore>=1.34.0
 
+# AWS Lambda durable functions SDK
+aws-durable-execution-sdk-python>=0.1.0
+
 # Data validation and parsing
 pydantic>=2.5.0
-
-# Note: AWS Lambda Durable Functions SDK is not yet available
-# This pattern demonstrates the concept using standard Lambda features

@@ -146,62 +146,110 @@ def validate_approval_request(approval: ApprovalRequest) -> Tuple[bool, Optional
 
 
 def invoke_durable_callback(
-    callback_token: str,
+    callback_id: str,
     decision: Decision,
     comments: Optional[str] = None
 ) -> Tuple[bool, Optional[str]]:
     """
-    Invoke the durable execution callback to resume the workflow.
+    Complete the callback to resume the workflow.
     
-    This function calls the AWS Lambda Durable Functions SDK callback API
-    to resume the paused workflow execution with the approval decision.
+    Uses the Lambda service APIs SendDurableExecutionCallbackSuccess or
+    SendDurableExecutionCallbackFailure to resume the paused durable execution.
     
     Args:
-        callback_token: Token from the paused durable execution
+        callback_id: Callback ID from the paused durable execution
         decision: Approval decision (approved/rejected)
         comments: Optional comments from the approver
         
     Returns:
         Tuple of (success, error_message)
-        - success: True if callback invoked successfully, False otherwise
+        - success: True if callback completed successfully, False otherwise
         - error_message: Error description if failed, None if successful
     """
-    # TODO: Integrate with AWS Lambda Durable Functions SDK
-    # The SDK will:
-    # 1. Validate the callback token
-    # 2. Resume the paused Lambda execution
-    # 3. Pass the decision and comments to the waiting function
+    import boto3
+    from botocore.exceptions import ClientError
     
-    # For now, this is a placeholder that will be replaced with actual SDK integration
-    # The actual implementation will use the durable execution SDK's callback mechanism
+    lambda_client = boto3.client('lambda')
+    
+    # Prepare callback payload with decision and comments
+    callback_payload = {
+        "decision": decision.value,
+        "comments": comments
+    }
     
     logger.info(
         json.dumps({
-            "message": "Invoking durable execution callback",
+            "message": "Completing durable execution callback",
             "decision": decision.value,
             "has_comments": comments is not None
         })
     )
     
     try:
-        # Placeholder for actual SDK call
-        # Example: durable_execution.invoke_callback(callback_token, {"decision": decision.value, "comments": comments})
+        if decision == Decision.APPROVED:
+            # Use SendDurableExecutionCallbackSuccess for approved decisions
+            response = lambda_client.send_durable_execution_callback_success(
+                CallbackId=callback_id,
+                Result=json.dumps(callback_payload)
+            )
+            
+            logger.info(
+                json.dumps({
+                    "message": "Callback success sent",
+                    "decision": decision.value
+                })
+            )
+            
+        elif decision == Decision.REJECTED:
+            # Use SendDurableExecutionCallbackFailure for rejected decisions
+            response = lambda_client.send_durable_execution_callback_failure(
+                CallbackId=callback_id,
+                Error="ApprovalRejected",
+                Cause=json.dumps(callback_payload)
+            )
+            
+            logger.info(
+                json.dumps({
+                    "message": "Callback failure sent",
+                    "decision": decision.value
+                })
+            )
+            
+        else:
+            error_msg = f"Invalid decision for callback: {decision.value}"
+            logger.error(
+                json.dumps({
+                    "message": "Invalid decision type",
+                    "decision": decision.value
+                })
+            )
+            return False, error_msg
         
-        # Simulate successful callback invocation
         logger.info(
             json.dumps({
-                "message": "Durable execution callback invoked successfully",
+                "message": "Durable execution callback completed successfully",
                 "decision": decision.value
             })
         )
         
         return True, None
         
-    except Exception as e:
-        error_msg = f"Failed to invoke durable execution callback: {str(e)}"
+    except ClientError as e:
+        error_msg = f"Failed to complete callback: {e.response['Error']['Code']} - {e.response['Error']['Message']}"
         logger.error(
             json.dumps({
-                "message": "Callback invocation failed",
+                "message": "Callback completion failed",
+                "error": error_msg,
+                "error_code": e.response['Error']['Code']
+            })
+        )
+        return False, error_msg
+        
+    except Exception as e:
+        error_msg = f"Unexpected error completing callback: {str(e)}"
+        logger.error(
+            json.dumps({
+                "message": "Unexpected callback error",
                 "error": error_msg,
                 "error_type": type(e).__name__
             })
@@ -353,29 +401,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 {"approval_id": approval.approval_id, "status": approval.status.value}
             )
         
-        # Task 6.3: Invoke durable execution callback
-        callback_success, callback_error = invoke_durable_callback(
-            callback_token=approval.callback_token,
-            decision=decision_request.decision,
-            comments=decision_request.comments
-        )
-        
-        if not callback_success:
-            logger.error(
-                json.dumps({
-                    "message": "Failed to invoke callback",
-                    "approval_id": approval.approval_id,
-                    "error": callback_error
-                })
-            )
-            return create_error_response(
-                500,
-                "CALLBACK_INVOCATION_FAILED",
-                callback_error,
-                {"approval_id": approval.approval_id}
-            )
-        
-        # Task 6.5: Update approval status in DynamoDB
+        # Task 6.5: Update approval status in DynamoDB BEFORE completing callback
+        # This ensures the decision is available when the workflow resumes
         try:
             updated_approval = update_approval_status(
                 approval_id=decision_request.approval_id,
@@ -394,7 +421,6 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             )
             
         except Exception as e:
-            # Log error but don't fail the request since callback was successful
             logger.error(
                 json.dumps({
                     "message": "Failed to update approval status in DynamoDB",
@@ -403,8 +429,34 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     "error_type": type(e).__name__
                 })
             )
-            # Note: Callback was successful, so workflow will resume correctly
-            # The status update failure is a data consistency issue but not critical
+            return create_error_response(
+                500,
+                "DATABASE_UPDATE_FAILED",
+                f"Failed to update approval status: {str(e)}",
+                {"approval_id": decision_request.approval_id}
+            )
+        
+        # Task 6.3: Complete durable execution callback AFTER DynamoDB update
+        callback_success, callback_error = invoke_durable_callback(
+            callback_id=approval.callback_token,
+            decision=decision_request.decision,
+            comments=decision_request.comments
+        )
+        
+        if not callback_success:
+            logger.error(
+                json.dumps({
+                    "message": "Failed to complete callback",
+                    "approval_id": approval.approval_id,
+                    "error": callback_error
+                })
+            )
+            return create_error_response(
+                500,
+                "CALLBACK_COMPLETION_FAILED",
+                callback_error,
+                {"approval_id": approval.approval_id}
+            )
         
         # Return success response
         return create_success_response(
