@@ -1,4 +1,4 @@
-# Saga Pattern with AWS Lambda Durable Functions (Node.js)
+# Saga Pattern with AWS Lambda durable functions (Node.js)
 
 This pattern demonstrates the Saga pattern for distributed transactions using AWS Lambda durable functions in Node.js. It coordinates a multi-step travel booking process (flight, hotel, car) with automatic compensating transactions on failure.
 
@@ -157,7 +157,7 @@ Or view in CloudWatch Logs console.
 }
 ```
 
-## How Durable Functions Enable Saga Pattern
+## How durable functions Enable Saga Pattern
 
 1. **State Management**: `context.step()` automatically checkpoints each operation
 2. **Idempotency**: Steps are executed exactly once, even on retries
@@ -173,6 +173,6 @@ sam delete --stack-name saga-pattern-demo
 
 ## Learn More
 
-- [AWS Lambda Durable Functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [AWS Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Saga Pattern](https://microservices.io/patterns/data/saga.html)
 - [Distributed Transactions](https://aws.amazon.com/blogs/compute/building-a-serverless-distributed-application-using-a-saga-orchestration-pattern/)

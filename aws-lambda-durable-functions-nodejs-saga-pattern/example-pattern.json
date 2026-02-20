@@ -3,7 +3,7 @@
   "description": "Implement the Saga pattern for distributed transactions using AWS Lambda durable functions with automatic compensating transactions",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -24,7 +24,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Durable Functions",
+        "text": "AWS Lambda durable functions",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -50,14 +50,14 @@
   },
   "cleanup": {
     "text": [
-      "sam delete --stack-name saga-pattern-demo"
+      "<code>sam delete --stack-name saga-pattern-demo</code>"
     ]
   },
   "authors": [
     {
       "name": "Surya Sai D",
       "image": "",
-      "bio": "Technical Account Manager at AWS, specializing in serverless architectures and distributed systems.",
+      "bio": "Surya works as a Technical Account Manager at AWS. He is an expert in Serverless frameworks and Event Driven Architectures. Surya is also passionate on technical writing and has contributed to AWS blogs and other Open Source Content.",
       "linkedin": "surya-sai-d-64920416a"
     }
   ]
