@@ -101,7 +101,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# Public subnets (matching CDK CIDR blocks)
+# Public subnets
 resource "aws_subnet" "public_subnet_1" {
   vpc_id                  = aws_vpc.lambda_managed_instances_vpc.id
   cidr_block              = "10.0.0.0/19"
@@ -109,10 +109,8 @@ resource "aws_subnet" "public_subnet_1" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                = "LambdaManagedInstancesPublicSubnet1"
-    Environment         = "demo"
-    "aws-cdk:subnet-name" = "Public"
-    "aws-cdk:subnet-type" = "Public"
+    Name        = "LambdaManagedInstancesPublicSubnet1"
+    Environment = "demo"
   }
 }
 
@@ -123,10 +121,8 @@ resource "aws_subnet" "public_subnet_2" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                = "LambdaManagedInstancesPublicSubnet2"
-    Environment         = "demo"
-    "aws-cdk:subnet-name" = "Public"
-    "aws-cdk:subnet-type" = "Public"
+    Name        = "LambdaManagedInstancesPublicSubnet2"
+    Environment = "demo"
   }
 }
 
@@ -137,24 +133,20 @@ resource "aws_subnet" "public_subnet_3" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                = "LambdaManagedInstancesPublicSubnet3"
-    Environment         = "demo"
-    "aws-cdk:subnet-name" = "Public"
-    "aws-cdk:subnet-type" = "Public"
+    Name        = "LambdaManagedInstancesPublicSubnet3"
+    Environment = "demo"
   }
 }
 
-# Private subnets (matching CDK CIDR blocks)
+# Private subnets
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = aws_vpc.lambda_managed_instances_vpc.id
   cidr_block        = "10.0.96.0/19"
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
-    Name                = "LambdaManagedInstancesPrivateSubnet1"
-    Environment         = "demo"
-    "aws-cdk:subnet-name" = "Private"
-    "aws-cdk:subnet-type" = "Private"
+    Name        = "LambdaManagedInstancesPrivateSubnet1"
+    Environment = "demo"
   }
 }
 
@@ -164,10 +156,8 @@ resource "aws_subnet" "private_subnet_2" {
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    Name                = "LambdaManagedInstancesPrivateSubnet2"
-    Environment         = "demo"
-    "aws-cdk:subnet-name" = "Private"
-    "aws-cdk:subnet-type" = "Private"
+    Name        = "LambdaManagedInstancesPrivateSubnet2"
+    Environment = "demo"
   }
 }
 
@@ -177,10 +167,8 @@ resource "aws_subnet" "private_subnet_3" {
   availability_zone = data.aws_availability_zones.available.names[2]
 
   tags = {
-    Name                = "LambdaManagedInstancesPrivateSubnet3"
-    Environment         = "demo"
-    "aws-cdk:subnet-name" = "Private"
-    "aws-cdk:subnet-type" = "Private"
+    Name        = "LambdaManagedInstancesPrivateSubnet3"
+    Environment = "demo"
   }
 }
 
@@ -394,7 +382,7 @@ resource "aws_security_group" "lambda_security_group" {
   }
 }
 
-# Restrict default security group (matching CDK behavior)
+# Restrict default security group
 resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.lambda_managed_instances_vpc.id
 
