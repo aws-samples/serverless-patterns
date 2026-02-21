@@ -14,10 +14,10 @@ import aws_cdk as cdk
 
 class EventbridgePipesSqsToDynamodb(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment = None, **kwargs) -> None:
         super().__init__(scope, construct_id, env=env, **kwargs)
 
-        # SQS queue for decoupling and buffering events for destination_lambda_b
+        # SQS queue for decoupling and buffering events
         source_queue = sqs.Queue(
             self, "EntryPointToEventbridgePipe",
             visibility_timeout=cdk.Duration.seconds(60),

@@ -1,8 +1,10 @@
-# SQS to DynamoDB using EventBridge Pipes with API Gateway and CDK/Python
+# Amazon SQS to Amazon DynamoDB using Amazon EventBridge Pipes with Amazon API Gateway and CDK/Python
 
 This pattern will send messages from an SQS queue to a DynamoDB table via API Gateway using EventBridge Pipes.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-dynamodb
+![Architecture](./architecture.png)
+
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-dynamodb](https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-dynamodb)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -55,21 +57,32 @@ Messages sent to the SQS queue are polled by EventBridge Pipe. EventBridge Pipe 
 
 Once this stack is deployed in your AWS account, copy the SQS queue name value from the output.
 
-Then, send a message to the SQS queue as follows:
+Alternatively, retrieve the queue URL using AWS CLI:
 ```sh
-    aws sqs send-message \
-        --queue-url "https://sqs.<region-id>.amazonaws.com/<account-id>/<queue-name>" \
-        --message-body '{"Message": "{\"content\":\"Test message\",\"params\":{\"name\":\"Mario\",\"surname\":\"Rossi\"}}"}'
+aws sqs list-queues --query 'QueueUrls[?contains(@, `EntryPointToEventbridgePipe`)]'
 ```
 
+Then, send a message to the SQS queue as follows:
+```sh
+aws sqs send-message \
+    --queue-url "<REPLACE_WITH_OUTPUT_FROM_PREVIOUS_COMMAND>" \
+    --message-body '{"Message": "{\"content\":\"Test message\",\"params\":{\"name\":\"Mario\",\"surname\":\"Rossi\"}}"}'
+```
+
+Navigate to [AWS Console DynamoDB Tables](https://console.aws.amazon.com/dynamodbv2/home#tables) and check for a table with name `Audit-Table`.
 When you check the DynamoDB table, you can see the entry with all the attributes parsed by API Gateway.
+
+Alternatively, you can scan the table using AWS CLI:
+```sh
+aws dynamodb scan --table-name Audit-Table
+```
 
 ## Cleanup
  
 1. Delete the stack
 
 ```bash
-    cdk destroy
+cdk destroy
 ```
 
 ---

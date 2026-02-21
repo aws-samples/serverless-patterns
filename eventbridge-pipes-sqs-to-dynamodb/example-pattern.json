@@ -1,5 +1,5 @@
 {
-    "title": "SQS to DynamoDB using EventBridge Pipes with API Gateway and CDK Python",
+    "title": "Amazon SQS to Amazon DynamoDB via Amazon EventBridge Pipes using CDK/Python",
     "description": "Pattern that sends messages from SQS queue to DynamoDB table via API Gateway using EventBridge Pipes. Implemented with CDK using Python.",
     "language": "Python",
     "level": "300",
@@ -23,7 +23,7 @@
     "resources": {
       "bullets": [
         {
-          "text": "Amazon Simple Queue Service",
+          "text": "Amazon SQS",
           "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
         },
         {
