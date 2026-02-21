@@ -24,7 +24,7 @@ provider "aws" {
 
 # Local variables
 locals {
-  function_name = "hello-world-managed-instances-tf"
+  function_name  = "hello-world-managed-instances-tf"
   log_group_name = "/demo/lambda/${local.function_name}"
 }
 
@@ -43,7 +43,7 @@ data "archive_file" "lambda_zip" {
 resource "aws_cloudwatch_log_group" "demo_log_group" {
   name              = local.log_group_name
   retention_in_days = 14
-  
+
   tags = {
     Name        = "DemoLogGroup"
     Environment = "demo"
@@ -179,7 +179,7 @@ data "aws_availability_zones" "available" {
 
 # Elastic IPs for NAT Gateways
 resource "aws_eip" "nat_eip_1" {
-  domain = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
@@ -189,7 +189,7 @@ resource "aws_eip" "nat_eip_1" {
 }
 
 resource "aws_eip" "nat_eip_2" {
-  domain = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
@@ -199,7 +199,7 @@ resource "aws_eip" "nat_eip_2" {
 }
 
 resource "aws_eip" "nat_eip_3" {
-  domain = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
@@ -400,14 +400,14 @@ resource "aws_default_security_group" "default" {
 resource "aws_lambda_function" "hello_world_function" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = local.function_name
-  role            = aws_iam_role.lambda_role.arn
-  handler         = "hello-world.lambda_handler"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "hello-world.lambda_handler"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  runtime         = "python3.13"
-  architectures   = ["arm64"]
-  description     = "Simple Hello World Lambda function on Managed Instances"
-  memory_size     = 2048
-  publish         = true
+  runtime          = "python3.13"
+  architectures    = ["arm64"]
+  description      = "Simple Hello World Lambda function on Managed Instances"
+  memory_size      = 2048
+  publish          = true
 
   logging_config {
     log_format = "JSON"
@@ -480,7 +480,7 @@ resource "aws_iam_role_policy_attachment" "capacity_provider_managed_policy" {
 # Lambda Capacity Provider for Managed Instances
 resource "aws_lambda_capacity_provider" "lambda_capacity_provider" {
   name = "lambda-capacity-provider-tf"
-  
+
   vpc_config {
     subnet_ids         = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.private_subnet_3.id]
     security_group_ids = [aws_security_group.lambda_security_group.id]
