@@ -3,12 +3,12 @@
   "description": "Orchestrate long-running ECS Fargate tasks using Lambda durable functions with callback pattern",
   "language": "Node.js",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
       "This pattern demonstrates how to use AWS Lambda durable functions to orchestrate Amazon ECS Fargate tasks that can run for up to 24 hours.",
-      "The Lambda function creates a callback ID, starts an ECS task with that ID, and suspends execution without incurring compute charges during the wait period.",
+      "The Lambda function creates a callback ID, starts an ECS task with that ID, and then automatically suspends execution without incurring compute charges during the wait period.",
       "When the ECS task completes, it calls the Lambda SendDurableExecutionCallbackSuccess API to resume the durable function and return results.",
       "This pattern is ideal for long-running batch jobs, data processing, ML training, or any workload that exceeds Lambda's 15-minute timeout."
     ]
@@ -54,14 +54,14 @@
   },
   "cleanup": {
     "text": [
-      "sam delete"
+      "<code>sam delete</code>"
     ]
   },
   "authors": [
     {
       "name": "Surya Sai D",
       "image": "",
-      "bio": "Surya works as a Technical Account Manager in AWS. He is an expert in Serverless frameworks and Event Driven Architectures. Surya is also passionate on technical writing and has contributed to AWS blogs and other Open Source Content.",
+      "bio": "Surya works as a Technical Account Manager at AWS. He is an expert in Serverless frameworks and Event Driven Architectures. Surya is also passionate on technical writing and has contributed to AWS blogs and other Open Source Content.",
       "linkedin": "surya-sai-d-64920416a"
     }
   ]

@@ -76,7 +76,7 @@ aws lambda invoke \
   response.json
 ```
 
-**Note:** The `:prod` alias is required for durable functions.
+**Note:** A qualified ARN (version or alias) is required for durable functions. See [invoking durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html#durable-invoking-qualified-arns).
 
 ### Monitor Execution
 
@@ -151,8 +151,8 @@ aws lambda send-durable-execution-callback-success \
 ### Key Configuration
 
 **Lambda Function:**
-- Runtime: `nodejs22.x` (required for durable functions)
-- `AutoPublishAlias: prod` (required)
+- Runtime: `nodejs22.x` (see [supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/durable-supported-runtimes.html))
+- `AutoPublishAlias: prod`
 - `DurableConfig` with execution timeout and retention period
 
 **ECS Task:**

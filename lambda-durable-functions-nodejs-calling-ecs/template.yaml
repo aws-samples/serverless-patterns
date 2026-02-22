@@ -213,7 +213,7 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ecs
 
-  # Lambda Durable Function - Callback Pattern
+  # Lambda durable function - Callback Pattern
   CallbackLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:

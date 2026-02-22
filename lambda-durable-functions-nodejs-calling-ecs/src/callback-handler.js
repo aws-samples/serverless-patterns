@@ -4,7 +4,7 @@ const { withDurableExecution } = require('@aws/durable-execution-sdk-js');
 const ecs = new ECSClient({ region: process.env.AWS_REGION });
 
 /**
- * Lambda Durable Function - Callback Pattern
+ * Lambda durable function - Callback Pattern
  * 
  * This function demonstrates the callback pattern where:
  * 1. Lambda creates a callback and gets a callback ID
@@ -14,10 +14,10 @@ const ecs = new ECSClient({ region: process.env.AWS_REGION });
  * 5. Lambda resumes and returns the result
  */
 exports.handler = withDurableExecution(async (event, context) => {
-  console.log('Starting Lambda Durable Function - Callback Pattern');
+  console.log('Starting Lambda durable function - Callback Pattern');
   console.log('Event:', JSON.stringify(event));
 
-  const message = event.message || 'Hello from Lambda Durable Function';
+  const message = event.message || 'Hello from Lambda durable function';
   const processingTime = event.processingTime || 10;
 
   try {
