@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda durable functions in NodeJS calling ECS",
+  "title": "AWS Lambda durable functions in NodeJS calling Amazon ECS",
   "description": "Orchestrate long-running ECS Fargate tasks using Lambda durable functions with callback pattern",
   "language": "Node.js",
   "level": "200",
