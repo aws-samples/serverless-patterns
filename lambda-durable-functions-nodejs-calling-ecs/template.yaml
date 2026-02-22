@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Lambda Durable Functions to ECS with Node.js - Callback Pattern
+  Lambda durable functions to ECS with Node.js - Callback Pattern
   
-  This pattern demonstrates Lambda Durable Functions invoking ECS tasks using the callback pattern.
+  This pattern demonstrates Lambda durable functions invoking ECS tasks using the callback pattern.
   The ECS task directly calls Lambda APIs (SendDurableExecutionCallbackSuccess/Failure) instead of using DynamoDB.
 
 Parameters:
@@ -231,7 +231,7 @@ Resources:
               Action:
                 - ecs:RunTask
                 - ecs:DescribeTasks
-              Resource: '*'
+              Resource: !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*'
             - Effect: Allow
               Action:
                 - iam:PassRole
@@ -243,43 +243,7 @@ Resources:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
-              Resource: '*'
-      AutoPublishAlias: prod
-      DurableConfig:
-        ExecutionTimeout: 86400
-        RetentionPeriodInDays: 7
-
-  # Lambda Durable Function - Polling Pattern
-  PollingLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ./src
-      Handler: polling-handler.handler
-      Environment:
-        Variables:
-          ECS_CLUSTER: !Ref ECSCluster
-          ECS_TASK_DEFINITION: !Ref ECSTaskDefinition
-          ECS_SUBNETS: !Sub ${PublicSubnet1},${PublicSubnet2}
-          ECS_SECURITY_GROUP: !Ref ECSSecurityGroup
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - ecs:RunTask
-                - ecs:DescribeTasks
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - iam:PassRole
-              Resource:
-                - !GetAtt ECSTaskExecutionRole.Arn
-                - !GetAtt ECSTaskRole.Arn
-            - Effect: Allow
-              Action:
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
-              Resource: '*'
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
       AutoPublishAlias: prod
       DurableConfig:
         ExecutionTimeout: 86400
@@ -287,12 +251,8 @@ Resources:
 
 Outputs:
   CallbackLambdaFunctionArn:
-    Description: ARN of the Callback Lambda Durable Function
+    Description: ARN of the Callback Lambda durable function
     Value: !GetAtt CallbackLambdaFunction.Arn
-
-  PollingLambdaFunctionArn:
-    Description: ARN of the Polling Lambda Durable Function
-    Value: !GetAtt PollingLambdaFunction.Arn
 
   ECSClusterName:
     Description: Name of the ECS Cluster

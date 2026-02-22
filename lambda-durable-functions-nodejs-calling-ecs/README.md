@@ -35,7 +35,7 @@ The pattern uses Lambda durable functions with the callback pattern to orchestra
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
-* Node.js 22.x runtime (automatically provided by Lambda)
+* Node.js runtime (see [supported runtimes for durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-supported-runtimes.html))
 
 ## Deployment
 
