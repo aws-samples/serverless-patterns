@@ -28,6 +28,10 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
+        "text": "Lambda Durable Execution SDK",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-js"
+      },
+      {
         "text": "Saga Pattern",
         "link": "https://microservices.io/patterns/data/saga.html"
       },

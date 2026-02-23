@@ -159,8 +159,8 @@ Or view in CloudWatch Logs console.
 
 ## How durable functions Enable Saga Pattern
 
-1. **State Management**: `context.step()` automatically checkpoints each operation
-2. **Idempotency**: Steps are executed exactly once, even on retries
+1. **State Management**: `context.step()` automatically creates checkpoints when completing the operation
+2. **Idempotency**: Completed steps are executed exactly once, even on retries
 3. **Compensation Tracking**: `completedSteps` array tracks what needs rollback
 4. **Automatic Recovery**: Failed executions resume from last checkpoint
 5. **No External Dependencies**: No DynamoDB or Step Functions needed
@@ -176,3 +176,9 @@ sam delete --stack-name saga-pattern-demo
 - [AWS Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Saga Pattern](https://microservices.io/patterns/data/saga.html)
 - [Distributed Transactions](https://aws.amazon.com/blogs/compute/building-a-serverless-distributed-application-using-a-saga-orchestration-pattern/)
+
+---
+
+© 2026 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
