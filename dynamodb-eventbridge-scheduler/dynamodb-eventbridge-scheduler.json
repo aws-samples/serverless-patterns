@@ -1,0 +1,109 @@
+{
+  "title": "Dynamic Amazon EventBridge Scheduler from Amazon DynamoDB Streams",
+  "description": "Automatically create, update, and delete EventBridge Scheduler schedules based on DynamoDB table changes using DynamoDB Streams.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to dynamically manage EventBridge Scheduler schedules by storing schedule configurations in a DynamoDB table.",
+      "When items are inserted, updated, or deleted from the DynamoDB table, a Lambda function is automatically triggered via DynamoDB Streams.",
+      "The Lambda function then creates, updates, or deletes the corresponding EventBridge Scheduler schedule.",
+      "When the scheduled time arrives, EventBridge Scheduler invokes the target Lambda function with the configured payload.",
+      "This pattern includes an auto-test feature that creates a sample schedule 2 minutes after deployment to verify the solution works end-to-end."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-eventbridge-scheduler",
+      "templateURL": "serverless-patterns/dynamodb-eventbridge-scheduler",
+      "projectFolder": "dynamodb-eventbridge-scheduler",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "DynamoDB Streams",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+      },
+      {
+        "text": "AWS Lambda Event Source Mapping",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+      },
+      {
+        "text": "Schedule expressions for EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Luigi Napoleone Capasso",
+      "bio": "Technical Account Manager @ AWS",
+      "linkedin": ""
+    }
+  ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 65,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "EventBridge"
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "streams"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3",
+            "label": "schedules"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4",
+            "label": "invokes"
+        }
+    }
+}
