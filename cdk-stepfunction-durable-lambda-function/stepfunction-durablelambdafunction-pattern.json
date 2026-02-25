@@ -1,0 +1,68 @@
+{
+  "title": "Step Functions to Lambda durable functions",
+  "description": "Create a Step Functions workflow to invoke Lambda durable functions synchronously and asynchronously.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to integrate AWS Lambda Durable Functions into an AWS Step Functions workflow. ",
+      "This pattern covers both the synchronous invocation (using default Request Response pattern) and asynchronous invocation (using the Step Function Wait for Callback with Task Token integration pattern) of the durable Lambda function.",
+      "It addresses the challenge of running long-running Lambda functions (beyond 15 minutes) within a Step Functions orchestration, using asynchronous invocation and durable checkpointing.",
+      "This pattern deploys one Step Functions and two Lambda functions along with required IAM policies."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-stepfunction-durable-lambda-function",
+      "templateURL": "serverless-patterns/cdk-stepfunction-durable-lambda-function",
+      "projectFolder": "cdk-stepfunction-durable-lambda-function",
+      "templateFile": "cdk_stepfunction_durable_lambda_function_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Step Functions Integration Patterns",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html"
+      },
+      {
+        "text": "AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Invoking durable Lambda functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html"
+      },
+      {
+        "text": "Durable functions or Step Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-step-functions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Akshay Singhal",
+      "image": "https://avatars.githubusercontent.com/u/13421773?v=4",
+      "bio": "Akshay Singhal is a Principal Technical Account Manager (TAM) for AWS Enterprise Support focusing on the Security ISV (Independent Software Vendors) segment and loves everything serverless..",
+      "linkedin": "https://www.linkedin.com/in/singhalakshay",
+      "twitter": "@_sin_ak"
+    }
+  ]
+}
