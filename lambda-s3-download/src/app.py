@@ -49,7 +49,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": json.dumps({
-                "message": f"{download_filename} uploaded successfully",
+                "message": f"{download_filename} downloaded and stored successfully",
                 "bucket": target_bucket,
                 "key": download_filename,
                 "checksum_sha256": objectSummary["Checksum"]["ChecksumSHA256"],

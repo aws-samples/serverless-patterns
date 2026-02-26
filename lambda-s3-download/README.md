@@ -1,6 +1,6 @@
-# Lambda S3 Download
+# AWS Lambda to Amazon S3 — URL File Downloader
 
-This pattern deploys a Lambda function that downloads a file from a URL and uploads it to an S3 bucket using multipart upload. It streams the file in configurable chunks through `/tmp`, making it capable of handling files larger than Lambda's memory and storage limits.
+This pattern deploys an AWS Lambda function that downloads a file from a URL and stores it in Amazon S3 using multipart upload. It streams the file in configurable chunks through `/tmp`, making it capable of handling files larger than Lambda's memory and storage limits.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -93,6 +93,6 @@ Optional event parameters:
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

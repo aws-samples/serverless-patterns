@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Lambda function that downloads a file from a URL and uploads it to S3 using multipart upload
+Description: AWS Lambda function that downloads a file from a URL and stores it in Amazon S3 using multipart upload
 
 Parameters:
   TargetBucketName:
@@ -14,8 +14,6 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.12
       CodeUri: src/
-      Architectures:
-        - arm64
       Timeout: 900
       MemorySize: 1024
       EphemeralStorage:
@@ -29,5 +27,5 @@ Resources:
 
 Outputs:
   DownloadFunctionArn:
-    Description: Lambda function ARN
+    Description: Serverless Downloader Lambda function ARN
     Value: !GetAtt DownloadFunction.Arn
