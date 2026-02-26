@@ -92,10 +92,6 @@ Many applications benefit from using both services. A common pattern is using du
 1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 
-## Step Functions State Machine
-
-![image](./resources/stepfunctions_graph.png)
-
 
 ## How it works
 
@@ -105,6 +101,9 @@ Once the CDK stack is deployed successfully, a Step Function workflow is created
 - The `sfn-dfn-sync-durable-fn` durable Lambda function simulates a short running task that completes within the 15 mins timeout. It is configured with a durable execution timeout of 15 mins which matches the standard Lambda function timeout. This Lambda function can be invoked synchronously without specifying any InvocationType parameter (or using `RequestResponse` value, which is also the default).
 
 See AWS documentation for more details on [Invoking durable Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html).
+
+#### Step Functions State Machine
+![image](./resources/stepfunctions_graph.png)
 
 The state machine invokes these 2 durable Lambda functions in the following pattern:
 1. When the state machine starts, it first executes the 'Async Durable Lambda Fn Invoke' task, which invokes the `sfn-dfn-async-durable-fn` Lambda function. Since Step Functions' default `LambdaInvoke` uses synchronous invocation, we need to change to the '[Wait for Callback with Task Token](https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token)' integtation pattern with asynchronous invocation, otherwise Step Function task will throw an error - 
@@ -152,7 +151,7 @@ Once the Lambda function completes its execution and returns a response, Step Fu
 
 ## Testing
 
-Go to the AWS Step Functions Console and select the Step Function created by CDK (look for a name starting with `sfn-dfn-integration-pattern-cdk`). Execute the step function workflow and provide the input parameters as described above - this makes the Lambda durable function wait for 20 mins, which is more than the standard Lambda execution timeout but due to the durable execution configuration set at 1 hr, Lambda will pause and resume after 20 mins.  
+Go to the AWS Step Functions Console and select the Step Function created by CDK (look for a name starting with `sfn-dfn-integration-pattern-cdk`). Execute the step function workflow and provide the input parameters as described below - this makes the Lambda durable function wait for 20 mins, which is more than the standard Lambda execution timeout. Since the durable execution configuration is set at 1 hr, Lambda will pause and resume execution after 20 mins, instead of timing out.   
 ```bash
 {
     "minutes_to_wait": 20
