@@ -1,5 +1,5 @@
 """
-Lambda Durable Function - Calls REST API using AWS Durable Execution SDK
+AWS Lambda durable function - Calls REST API using AWS durable execution SDK
 """
 import json
 import os

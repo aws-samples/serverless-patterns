@@ -40,20 +40,12 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates AWS Lambda Durable Execution for calling external REST APIs. It uses the AWS Durable Execution SDK to create a durable function that can:
+This pattern demonstrates AWS Lambda durable Execution for calling external REST APIs. The function uses two key components:
 
-**AWS Durable Execution Features:**
-- **Automatic State Management**: AWS manages execution state across invocations
-- **Durable Steps**: The `@durable_step` decorator marks functions that can be retried automatically
-- **Durable Waits**: Use `context.wait()` to pause execution without consuming CPU or memory
-- **Built-in Retry Logic**: Failed steps are automatically retried by AWS
-- **Execution History**: AWS tracks the complete execution history and state
-
-The function uses two key components:
 1. `@durable_step` - Wraps the REST API call, making it automatically retryable
 2. `@durable_execution` - Marks the Lambda handler as a durable execution workflow
 
-AWS Lambda Durable Execution automatically handles failures, retries, and state persistence without requiring external services like DynamoDB or Step Functions.
+AWS Lambda durable Execution automatically handles failures, retries, and state persistence without requiring external services like DynamoDB or Step Functions.
 
 ## Testing
 
@@ -108,4 +100,16 @@ The execution is durable - if the API call fails, AWS Lambda will automatically 
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<your-stack-name>')].StackStatus"
     ```
 
-----
+## Learn More
+
+- [Lambda durable functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [Durable Execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-python)
+- [Callback Operations](https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html)
+- [SendDurableExecutionCallbackSuccess API](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/send_durable_execution_callback_success.html)
+
+---
+
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
+

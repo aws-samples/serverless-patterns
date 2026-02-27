@@ -1,13 +1,13 @@
 {
-  "title": "Lambda Durable Function - REST API Call",
-  "description": "A Lambda function that calls an external REST API using AWS Durable Execution SDK for automatic retries and state management.",
+  "title": "AWS Lambda durable function - REST API Call",
+"description": "A Lambda function that calls an external REST API using AWS durable execution SDK for automatic retries and state management.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates AWS Lambda Durable Execution for calling external REST APIs.",
+      "This pattern demonstrates AWS Lambda durable functions for calling external REST APIs.",
       "Uses the @durable_step decorator to make the REST API call automatically retryable.",
       "Uses the @durable_execution decorator to mark the Lambda handler as a durable workflow.",
       "AWS automatically handles failures, retries, and state persistence without external services."
@@ -24,7 +24,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Durable Execution",
+        "text": "AWS Lambda durable execution",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
