@@ -4,7 +4,7 @@
  */
 
 /**
- * Lambda Durable Function - Calls REST API using AWS Durable Execution SDK
+ * AWS Lambda durable function - Calls REST API using AWS durable execution SDK
  */
 import { withDurableExecution } from '@aws/durable-execution-sdk-js';
 

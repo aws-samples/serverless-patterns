@@ -1,8 +1,8 @@
-# Lambda Durable Function - REST API Call with Node.js
+# AWS Lambda durable function - REST API call with Node.js
 
-This pattern demonstrates a Lambda durable function that calls an external REST API using Node.js.
+This pattern demonstrates a AWS Lambda durable function that calls an external REST API using Node.js.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-rest-api-sam-js
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -40,18 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates AWS Lambda Durable Execution for calling external REST APIs. It uses the AWS Durable Execution SDK to create a durable function that can:
-
-**AWS Durable Execution Features:**
-- **Automatic State Management**: AWS manages execution state across invocations
-- **Durable Steps**: The `context.step()` method marks functions that can be retried automatically
-- **Durable Waits**: Use `context.wait()` to pause execution without consuming CPU or memory
-- **Built-in Retry Logic**: Failed steps are automatically retried by AWS
-- **Execution History**: AWS tracks the complete execution history and state
-
-The function uses the `withDurableExecution` wrapper to mark the Lambda handler as a durable execution workflow. All steps defined with `context.step()` are automatically retryable.
-
-AWS Lambda Durable Execution automatically handles failures, retries, and state persistence without requiring external services like DynamoDB or Step Functions.
+This pattern demonstrates AWS Lambda durable execution for calling external REST APIs. The function uses the `withDurableExecution` wrapper to mark the Lambda handler as a durable execution workflow. All steps defined with `context.step()` are automatically retryable.
 
 **Note**: This pattern requires Node.js 24.x runtime which has native support for durable execution.
 
@@ -108,4 +97,14 @@ The execution is durable - if the API call fails, AWS Lambda will automatically 
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<your-stack-name>')].StackStatus"
     ```
 
-----
+## Learn More
+
+- [AWS Lambda durable functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [durable execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-js)
+- [Callback Operations](https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html)
+---
+
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
+
