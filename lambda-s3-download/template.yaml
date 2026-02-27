@@ -12,7 +12,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       CodeUri: src/
       Timeout: 900
       MemorySize: 1024
@@ -26,6 +26,9 @@ Resources:
             BucketName: !Ref TargetBucketName
 
 Outputs:
+  DownloadFunctionName:
+    Description: Serverless Downloader Lambda Function Name
+    Value: !GetAtt DownloadFunction.Name
   DownloadFunctionArn:
     Description: Serverless Downloader Lambda function ARN
     Value: !GetAtt DownloadFunction.Arn

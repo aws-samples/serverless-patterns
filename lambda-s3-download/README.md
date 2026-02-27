@@ -54,7 +54,7 @@ The function is configured with a 15-minute timeout, 1 GB memory, and 10 GB ephe
 
 ## Testing
 
-Invoke the Lambda function with a test event:
+Retrieve the Lambda function's name from the SAM deployment output and invoke it with a test event:
 
 ```bash
 aws lambda invoke \
@@ -75,6 +75,22 @@ Optional event parameters:
 | `target_bucket_region` | S3 bucket region | Lambda's region |
 | `chunk_size_mb` | Size of each download chunk in MB (clamped between 5 and 5120) | 512 |
 
+Example with all optional parameters:
+
+```bash
+aws lambda invoke \
+  --function-name FUNCTION_NAME \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{
+    "download_url": "https://example.com/file.zip",
+    "download_filename": "file.zip",
+    "target_bucket": "my-other-bucket",
+    "target_bucket_region": "eu-central-1",
+    "chunk_size_mb": 256
+  }' \
+  response.json
+```
+
 ## Known Limitations
 
 - The Lambda function has a 15-minute maximum timeout. If the download and upload combined take longer than that, the function will be killed mid-stream and the multipart upload will be left incomplete. Consider setting an [S3 lifecycle rule](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpu-abort-incomplete-mpu-lifecycle-config.html) on the target bucket to auto-clean incomplete multipart uploads.
@@ -85,12 +101,8 @@ Optional event parameters:
 ## Cleanup
 
 1. Delete the stack
-    ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.

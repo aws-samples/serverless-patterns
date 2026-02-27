@@ -45,13 +45,13 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Robert Meyer",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-robert-meyer.jpg",
+      "image": "",
       "bio": "Robert is a Partner Solutions Architect with AWS in EMEA.",
       "linkedin": "https://www.linkedin.com/in/robert-meyer-phd-6a114a58/",
       "twitter": "@robl_on_tour"
