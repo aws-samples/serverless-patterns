@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.22"
+      version = "~> 5.0"
     }
   }
 
@@ -17,12 +17,20 @@ resource "aws_kinesis_stream" "sample_stream" {
   shard_count      = 1
   retention_period = 24
 }
+
+data "archive_file" "lambda_zip_file" {
+  type        = "zip"
+  source_file = "${path.module}/src/app.js"
+  output_path = "${path.module}/lambda.zip"
+}
+
 resource "aws_lambda_function" "sample_lambda" {
-  filename         = "sample_lambda.zip"  # Path to your Lambda code ZIP file
+  filename         = data.archive_file.lambda_zip_file.output_path
+  source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   function_name    = "sample-lambda"
   role             = aws_iam_role.lambda_role.arn
-  handler          = "index.handler"
-  runtime          = "nodejs16.x"  # Change to your preferred runtime
+  handler          = "app.handler"
+  runtime          = "nodejs22.x"  # Change to your preferred runtime
 }
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-role"
@@ -40,6 +48,44 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+resource "aws_iam_policy" "lambda_kinesis_policy" {
+  name = "lambda-kinesis-policy"
+
+  policy = jsonencode(
+    {
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Action = [
+            "kinesis:GetRecords",
+            "kinesis:GetShardIterator",
+            "kinesis:DescribeStream",
+            "kinesis:DescribeStreamSummary",
+            "kinesis:ListShards",
+            "kinesis:ListStreams"
+          ],
+          Resource = aws_kinesis_stream.sample_stream.arn
+        },
+        {
+          Effect = "Allow",
+          Action = [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          Resource = "arn:aws:logs:*:*:*"
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_kinesis_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_kinesis_policy.arn
+}
+
 resource "aws_lambda_event_source_mapping" "sample_mapping" {
   event_source_arn = aws_kinesis_stream.sample_stream.arn
   function_name    = aws_lambda_function.sample_lambda.arn
@@ -52,6 +98,6 @@ output "kinesis_data_stream" {
 }
 
 output "consumer_function" {
-  value = aws_lambda_function.sample_function.arn
+  value = aws_lambda_function.sample_lambda.arn
   description = "Consumer Function function name"
 }
