@@ -107,7 +107,7 @@ Resources:
                 Action:
                   - lambda:CheckpointDurableExecution
                   - lambda:GetDurableExecutionState
-                Resource: '*'
+                Resource: !GetAtt WorkflowFunction.Arn
       Tags:
         - Key: Pattern
           Value: lambda-durable-hitl
@@ -170,7 +170,7 @@ Resources:
                 Action:
                   - lambda:SendDurableExecutionCallbackSuccess
                   - lambda:SendDurableExecutionCallbackFailure
-                Resource: '*'
+                Resource: !GetAtt WorkflowFunction.Arn
       Tags:
         - Key: Pattern
           Value: lambda-durable-hitl

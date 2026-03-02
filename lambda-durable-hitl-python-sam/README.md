@@ -1,254 +1,73 @@
-# Lambda Durable Functions with Human-in-the-Loop (HITL) Pattern
+# Lambda Durable Functions to DynamoDB with Human-in-the-Loop
 
-This pattern demonstrates how to implement Lambda durable functions with Human-in-the-Loop capabilities using Python 3.13 and the AWS Durable Execution SDK. The pattern showcases how Lambda functions can pause execution, wait for human approval, and resume based on human decisions while maintaining state across the pause/resume cycle.
+This pattern demonstrates how to implement Lambda durable functions with Human-in-the-Loop (HITL) approval workflows. The workflow pauses execution, waits for human approval via callback, and resumes based on the decision while maintaining state across the pause/resume cycle.
 
-## Overview
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-hitl-python-sam
 
-This serverless pattern enables workflows that require human decision-making by pausing Lambda execution, notifying approvers, and resuming based on their decisions. The pattern uses Lambda durable functions to maintain execution state across pauses and resumes, making it ideal for approval workflows, content moderation, and any process requiring human judgment.
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-**Key Features:**
-- Durable execution with checkpointed steps (no re-execution on replay)
-- Polling-based approval checking with no compute charges during waits
-- Automatic timeout handling for overdue approvals
-- Complete audit trail in DynamoDB
-- SNS notifications for approvers
-- CLI tool for testing and managing approvals
+## Requirements
 
-## Architecture
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Docker](https://docs.docker.com/get-docker/) installed (for building Lambda container images)
+* [Python 3.13](https://www.python.org/downloads/) or later
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Initiator Layer                          │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐              ┌──────────────────────────┐    │
-│  │  CLI Tool    │              │  Test Invocation         │    │
-│  │              │              │  (Manual/Automated)      │    │
-│  └──────┬───────┘              └────────┬─────────────────┘    │
-│         │                               │                       │
-└─────────┼───────────────────────────────┼───────────────────────┘
-          │                               │
-          │ (6) List/Submit               │ (1) Invoke
-          │     Decision                  │     Workflow
-          │                               │
-┌─────────▼───────────────────────────────▼───────────────────────┐
-│                      AWS Lambda Layer                            │
-├──────────────────────────────────────────────────────────────────┤
-│  ┌────────────────────────────────┐  ┌──────────────────────────┐  │
-│  │  Workflow Lambda               │  │  Approval API Lambda     │  │
-│  │  (Durable Execution)           │  │                          │  │
-│  │                                │  │  - Get approval request  │  │
-│  │  - Create approval request     │  │  - Validate status       │  │
-│  │  - Pause with callback         │  │  - Invoke callback       │  │
-│  │  - Send notification           │  │  - Update status         │  │
-│  │  - Resume on callback          │  │                          │  │
-│  └────┬───────────────────┬───────┘  └──────────┬───────────────┘  │
-│       │                   │                      │                   │
-└───────┼───────────────────┼──────────────────────┼───────────────────┘
-        │                   │                      │
-        │ (2) Store         │ (4) Notify           │ (8,10) Get/Update
-        │     Request       │                      │        Status
-        │                   │                      │
-┌───────▼───────────────────┼──────────────────────▼───────────────────┐
-│                    Storage & Notification Layer                       │
-├───────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────┐         ┌──────────────────────────┐       │
-│  │  DynamoDB Table     │         │  SNS Topic               │       │
-│  │  ApprovalRequests   │         │  ApprovalNotifications   │       │
-│  │                     │         │                          │       │
-│  │  - approval_id (PK) │         │  - Sends notifications   │       │
-│  │  - callback_token   │         │    to approvers          │       │
-│  │  - document details │         │                          │       │
-│  │  - status           │         └────────┬─────────────────┘       │
-│  │  - timestamps       │                  │                         │
-│  └─────────────────────┘                  │ (5) Notification        │
-│                                            │                         │
-└────────────────────────────────────────────┼─────────────────────────┘
-                                             │
-                                             ▼
-                                    ┌────────────────┐
-                                    │   Approver     │
-                                    │   (Human)      │
-                                    └────────────────┘
-```
+## Deployment Instructions
 
-### Components
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd lambda-durable-hitl-python-sam
+    ```
+1. From the command line, use AWS SAM to build the application:
+    ```
+    sam build
+    ```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Enter the ApprovalTimeoutSeconds parameter (default: 300 seconds)
+    * Allow SAM CLI to create IAM roles with the required permissions.
 
-1. **Workflow Lambda** (`src/workflow/`): Orchestrates the approval workflow using Lambda durable functions SDK. It creates approval requests, polls DynamoDB for decisions using durable waits (no compute charges), sends notifications, and completes when a decision is made. Uses `@durable_execution` and `@durable_step` decorators for checkpointing.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-2. **Approval API Lambda** (`src/approval_api/`): Processes approval/rejection decisions. It validates requests, updates the approval status in DynamoDB, allowing the workflow to detect the decision and resume.
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
-3. **Shared Module** (`src/shared/`): Contains common code used by both Lambda functions:
-   - `models.py`: Data models (WorkflowEvent, ApprovalRequest, WorkflowResult, Decision enum)
-   - `dynamodb_operations.py`: DynamoDB operations (create/update approval requests)
+## How it works
 
-4. **DynamoDB Table**: Stores approval request state including document details, status, and timestamps. Uses a Global Secondary Index (StatusIndex) for querying pending approvals.
+This pattern implements a Human-in-the-Loop approval workflow using Lambda durable functions:
 
-5. **SNS Topic**: Sends notifications to approvers when new approval requests are created, including approval details and expiration time.
+1. **Workflow Lambda** creates an approval request in DynamoDB and sends an SNS notification to approvers
+2. The workflow pauses execution using `callback.result()` and waits for a callback
+3. **Approval API Lambda** processes the approval decision and calls the Lambda durable execution callback API
+4. The workflow resumes automatically when the callback is invoked and completes with the decision
 
-### Execution Flow
+The pattern uses the AWS Durable Execution SDK for Python with the `@durable_execution` decorator to maintain state across the pause/resume cycle. The callback pattern ensures no compute charges while waiting for human decisions.
 
-1. Test invocation triggers Workflow Lambda with document details (asynchronous invocation required for ExecutionTimeout > 15 minutes)
-2. Workflow Lambda creates approval request in DynamoDB (checkpointed step)
-3. Workflow Lambda sends SNS notification to approvers (checkpointed step)
-4. Workflow Lambda polls DynamoDB every 5 seconds using durable waits (no compute charges during waits)
-5. SNS delivers notification to approver
-6. Approver invokes Approval API Lambda to submit decision
-7. Approval API Lambda updates status in DynamoDB
-8. Workflow Lambda detects decision change during next poll
-9. Workflow Lambda completes and returns result
+### Architecture Components
 
-**Important**: Durable functions with ExecutionTimeout > 900 seconds (15 minutes) must be invoked asynchronously using `--invocation-type Event`.
-
-## Project Structure
-
-```
-lambda-durable-hitl-python-sam/
-├── src/
-│   ├── approval_api/            # Approval API Lambda function
-│   │   ├── app.py              # Processes approval decisions
-│   │   ├── Dockerfile          # Container image definition
-│   │   └── requirements.txt    # Function dependencies
-│   ├── shared/                  # Shared code between Lambda functions
-│   │   ├── __init__.py
-│   │   ├── models.py           # Data models (WorkflowEvent, ApprovalRequest, etc.)
-│   │   └── dynamodb_operations.py  # DynamoDB helper functions
-│   └── workflow/                # Workflow Lambda function (durable execution)
-│       ├── app.py              # Main workflow orchestrator
-│       ├── Dockerfile          # Container image definition
-│       └── requirements.txt    # Function dependencies (includes aws-durable-execution-sdk-python)
-├── template.yaml               # SAM template (infrastructure as code)
-├── example-pattern.json        # Pattern metadata for serverless-patterns repository
-├── .gitignore                  # Git ignore patterns
-└── README.md                   # This file
-```
-
-### Folder Purposes
-
-- **src/approval_api/**: Lambda function that processes approval/rejection decisions. Validates requests, updates DynamoDB status, allowing the workflow to detect decisions and complete.
-
-- **src/shared/**: Common code shared between both Lambda functions. Contains data models (WorkflowEvent, ApprovalRequest, WorkflowResult, Decision enum) and DynamoDB operations (create/update approval requests). Prevents code duplication.
-
-- **src/workflow/**: Main durable execution Lambda function that orchestrates the approval workflow. Uses AWS Durable Execution SDK with `@durable_execution` and `@durable_step` decorators for checkpointing. Polls DynamoDB for decisions using durable waits.
-
-### Key Files
-
-- **template.yaml**: Defines all AWS resources (Lambda functions, DynamoDB table, SNS topic, IAM roles)
-- **src/workflow/app.py**: Main durable execution logic with `@durable_execution` decorator
-- **src/approval_api/app.py**: Handles approval/rejection decisions
-- **src/shared/**: Common code shared between Lambda functions
-
-## Prerequisites
-
-- AWS CLI configured with appropriate credentials
-- AWS SAM CLI installed (version 1.100.0 or later)
-- Python 3.13 or later
-- Docker (for building Lambda container images)
-- An AWS account with permissions to create Lambda functions, DynamoDB tables, SNS topics, and IAM roles
-
-## Deployment
-
-### Step 1: Clone and Navigate
-
-```bash
-cd lambda-durable-hitl-python-sam
-```
-
-### Step 2: Build the Application
-
-```bash
-sam build
-```
-
-This command builds the Lambda container images and prepares the application for deployment.
-
-### Step 3: Deploy to AWS
-
-For first-time deployment:
-
-```bash
-sam deploy --guided
-```
-
-You'll be prompted for:
-- Stack name (e.g., `lambda-durable-hitl-stack`)
-- AWS Region (e.g., `us-east-1`)
-- Confirmation for creating IAM roles
-- Confirmation for deploying without authorization
-
-For subsequent deployments:
-
-```bash
-sam deploy
-```
-
-### Step 4: Note the Outputs
-
-After deployment, SAM will output important values:
-- `WorkflowFunctionName`: Name of the Workflow Lambda function
-- `ApprovalApiFunctionName`: Name of the Approval API Lambda function
-- `ApprovalsTableName`: Name of the DynamoDB table
-- `SnsTopicArn`: ARN of the SNS topic
-
-Save these values for testing.
-
-## Important Notes
-
-### Durable Function Invocation
-
-- **Asynchronous invocation required**: Durable functions with `ExecutionTimeout > 900 seconds` (15 minutes) MUST be invoked asynchronously using `--invocation-type Event`
-- **Version requirement**: You must publish a Lambda version before invoking a durable function (cannot use `$LATEST` or unqualified ARN)
-- **No synchronous response**: Asynchronous invocation returns immediately with a 202 status; check DynamoDB or CloudWatch Logs for results
-
-### Polling vs Callback Pattern
-
-This implementation uses a **polling pattern** where the workflow checks DynamoDB every 5 seconds for approval decisions:
-- **Advantages**: Simpler implementation, no callback token management, easier to test
-- **Durable waits**: Uses `context.wait(Duration.from_seconds(5))` which incurs no compute charges during waits
-- **Checkpointing**: Each poll is a checkpointed step, so on replay it won't re-execute completed checks
-
-### Configuration
-
-The SAM template configures the following environment variables:
-
-**Workflow Lambda:**
-- `APPROVALS_TABLE_NAME`: DynamoDB table name for approval requests
-- `SNS_TOPIC_ARN`: SNS topic ARN for notifications
-- `APPROVAL_TIMEOUT_SECONDS`: Default timeout in seconds (default: 300 for testing, can be increased to 3600 for production)
-
-**Approval API Lambda:**
-- `APPROVALS_TABLE_NAME`: DynamoDB table name for approval requests
-
-### Customizing Timeout
-
-To change the default approval timeout, update the `ApprovalTimeoutSeconds` parameter in `template.yaml`:
-
-```yaml
-Parameters:
-  ApprovalTimeoutSeconds:
-    Type: Number
-    Default: 3600  # 1 hour for production
-    Description: Default timeout for approval requests in seconds
-    MinValue: 60
-    MaxValue: 86400
-```
-
-Or pass it during deployment:
-
-```bash
-sam deploy --parameter-overrides ApprovalTimeoutSeconds=7200
-```
+- **Workflow Lambda**: Orchestrates the approval workflow using Lambda durable functions SDK with callback pattern
+- **Approval API Lambda**: Processes approval/rejection decisions and invokes the callback API to resume the workflow
+- **DynamoDB Table**: Stores approval request state including callback tokens, document details, and timestamps
+- **SNS Topic**: Sends notifications to approvers when new approval requests are created
 
 ## Testing
 
-### Testing with AWS CLI
-
-All testing can be done using standard AWS CLI commands. No additional tools required.
-
-#### Step 1: Set Environment Variables
+### Set Environment Variables
 
 ```bash
 export AWS_DEFAULT_REGION=us-east-1
-export STACK_NAME=app-sam  # Your CloudFormation stack name
+export STACK_NAME=<your-stack-name>
 
 # Get function names from CloudFormation outputs
 export WORKFLOW_FUNCTION=$(aws cloudformation describe-stacks \
@@ -262,28 +81,21 @@ export APPROVAL_API_FUNCTION=$(aws cloudformation describe-stacks \
   --output text)
 ```
 
-#### Step 2: Invoke the Workflow
+### Invoke the Workflow
 
 ```bash
-# Publish a Lambda version (required for durable functions)
-export WORKFLOW_VERSION=$(aws lambda publish-version \
-  --function-name $WORKFLOW_FUNCTION \
-  --query 'Version' \
-  --output text)
-
-# Invoke workflow asynchronously (required for ExecutionTimeout > 15 minutes)
+# Invoke workflow with a document approval request
 aws lambda invoke \
-  --function-name $WORKFLOW_FUNCTION:$WORKFLOW_VERSION \
-  --invocation-type Event \
+  --function-name $WORKFLOW_FUNCTION \
   --cli-binary-format raw-in-base64-out \
   --payload '{"document_id":"doc-123","document_name":"Q4 Budget Proposal","requester":"user@example.com"}' \
   response.json
 
-# Check response (should show StatusCode: 202)
+# Check response
 cat response.json
 ```
 
-#### Step 3: List Pending Approvals
+### List Pending Approvals
 
 ```bash
 # Scan DynamoDB for pending approval requests
@@ -295,53 +107,26 @@ aws dynamodb scan \
   --max-items 10
 ```
 
-Or get all items:
+### Submit Approval Decision
 
 ```bash
-aws dynamodb scan --table-name $STACK_NAME-ApprovalRequests --max-items 10
-```
+# Get the approval_id from the DynamoDB scan output above
 
-#### Step 4: Get Approval Details
-
-```bash
-# Get specific approval request by ID
-aws dynamodb get-item \
-  --table-name $STACK_NAME-ApprovalRequests \
-  --key '{"approval_id":{"S":"<APPROVAL_ID>"}}'
-```
-
-#### Step 5: Submit Approval Decision
-
-**Approve a request:**
-
-```bash
+# Approve the request
 aws lambda invoke \
   --function-name $APPROVAL_API_FUNCTION \
   --cli-binary-format raw-in-base64-out \
-  --payload '{"action":"decide","approval_id":"<APPROVAL_ID>","decision":"approved","approver":"test-approver","comments":"Looks good, approved"}' \
+  --payload '{"action":"decide","approval_id":"<APPROVAL_ID>","decision":"approved","approver":"test-approver","comments":"Looks good"}' \
   approval_response.json
 
 # Check response
 cat approval_response.json
 ```
 
-**Reject a request:**
+### Verify Workflow Completion
 
 ```bash
-aws lambda invoke \
-  --function-name $APPROVAL_API_FUNCTION \
-  --cli-binary-format raw-in-base64-out \
-  --payload '{"action":"decide","approval_id":"<APPROVAL_ID>","decision":"rejected","approver":"test-approver","comments":"Needs revision"}' \
-  approval_response.json
-
-# Check response
-cat approval_response.json
-```
-
-#### Step 6: Verify Workflow Completion
-
-```bash
-# Check DynamoDB to verify status changed
+# Check DynamoDB to verify status changed to approved
 aws dynamodb get-item \
   --table-name $STACK_NAME-ApprovalRequests \
   --key '{"approval_id":{"S":"<APPROVAL_ID>"}}'
@@ -350,155 +135,20 @@ aws dynamodb get-item \
 aws logs tail /aws/lambda/$WORKFLOW_FUNCTION --follow
 ```
 
-### Testing Timeout Scenarios
-
-To test timeout handling, invoke the workflow with a short timeout:
-
-```bash
-# Invoke workflow with 60-second timeout
-aws lambda invoke \
-  --function-name $WORKFLOW_FUNCTION:$WORKFLOW_VERSION \
-  --invocation-type Event \
-  --cli-binary-format raw-in-base64-out \
-  --payload '{"document_id":"doc-456","document_name":"Test Doc","requester":"user@example.com","timeout_seconds":60}' \
-  response.json
-```
-
-Wait for the timeout to expire (60 seconds), then check the approval status:
-
-```bash
-# Get approval_id from DynamoDB
-aws dynamodb scan --table-name $STACK_NAME-ApprovalRequests --max-items 5
-
-# Check status - should show "timeout"
-python approval_cli.py get <approval_id>
-```
-
-The status should show "timeout" and the workflow will have completed automatically.
-
-### Running Unit Tests
-
-```bash
-# Install test dependencies
-pip install -r tests/requirements.txt
-
-# Run all tests
-pytest tests/unit/
-
-# Run with coverage
-pytest tests/unit/ --cov=src --cov-report=html
-```
-
-### Running Property-Based Tests
-
-```bash
-# Run property tests
-pytest tests/property/
-
-# Run specific property test
-pytest tests/property/test_approval_properties.py::test_unique_approval_identifiers
-```
-
-## Use Cases
-
-### Document Approval Workflow
-
-The primary use case demonstrated in this pattern is document approval. When a document is submitted for review:
-
-1. The workflow pauses and creates an approval request
-2. Approvers receive a notification via SNS
-3. Approvers review the document and submit their decision via CLI
-4. The workflow resumes with the approval decision
-5. The system records the decision, comments, and timestamp
-
-This pattern is ideal for:
-- Contract approvals
-- Policy document reviews
-- Technical design document approvals
-- Budget proposal reviews
-
-### Expense Approval System
-
-This pattern can be adapted for expense approval workflows:
-
-1. Employee submits an expense report
-2. Workflow pauses and notifies the manager
-3. Manager reviews and approves/rejects via CLI or web interface
-4. Workflow resumes and processes the expense accordingly
-5. System maintains audit trail of all decisions
-
-Key benefits:
-- Automatic timeout for overdue approvals
-- Complete audit trail in DynamoDB
-- Scalable to handle high volumes of expense requests
-
-### Content Moderation Workflow
-
-For content moderation scenarios:
-
-1. User-generated content triggers the workflow
-2. Content is flagged for human review
-3. Moderator receives notification
-4. Moderator reviews and approves/rejects content
-5. Workflow resumes and publishes or removes content
-
-Advantages:
-- Durable execution ensures no content is lost during review
-- Timeout handling for content that requires urgent decisions
-- Flexible decision recording with comments
+Expected output: The workflow should complete and return the approval decision. The DynamoDB item should show status as "approved" with the approver's comments and timestamp.
 
 ## Cleanup
+ 
+1. Delete the stack
+    ```bash
+    sam delete
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'$STACK_NAME')].StackStatus"
+    ```
 
-To remove all resources created by this pattern:
+----
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-```bash
-sam delete
-```
-
-This will delete:
-- Lambda functions (Workflow and Approval API)
-- DynamoDB table (ApprovalRequests)
-- SNS topic (ApprovalNotifications)
-- IAM roles and policies
-- CloudWatch log groups
-
-**Note**: If you've subscribed email addresses to the SNS topic, you'll need to manually unsubscribe them before deletion.
-
-## Security Considerations
-
-- IAM roles follow least privilege principle
-- DynamoDB table uses encryption at rest
-- Callback tokens are not exposed in logs or error messages
-- API Gateway validates request parameters before processing
-- All input data is validated before processing
-
-## Cost Considerations
-
-This pattern uses the following AWS services:
-- **Lambda**: Pay per invocation and execution time
-- **DynamoDB**: On-demand billing for read/write requests
-- **SNS**: Pay per notification sent
-- **CloudWatch Logs**: Pay for log storage and ingestion
-
-Estimated cost for 1,000 approval requests per month: < $1 USD
-
-## Limitations
-
-- Maximum durable execution timeout: 1 year (configurable via `DurableConfig.ExecutionTimeout`)
-- Synchronous invocation only supported for ExecutionTimeout ≤ 900 seconds (15 minutes)
-- Must publish Lambda version before invoking durable function (cannot use $LATEST)
-- DynamoDB item size limit: 400 KB
-- SNS message size limit: 256 KB
-- Lambda container image size limit: 10 GB
-- Polling interval: 5 seconds (configurable in workflow code)
-
-## Additional Resources
-
-- [Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
-- [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
-- [DynamoDB Best Practices](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html)
-- [SNS Documentation](https://docs.aws.amazon.com/sns/)
-
-## License
-
-This pattern is released under the MIT-0 License. See the LICENSE file for details.
+SPDX-License-Identifier: MIT-0
