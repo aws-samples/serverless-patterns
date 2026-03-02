@@ -8,7 +8,7 @@
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		<avro.version>1.11.4</avro.version>
+		<avro.version>1.11.5</avro.version>
 	</properties>
 
 	<dependencies>
