@@ -107,7 +107,7 @@ Resources:
                 Action:
                   - lambda:CheckpointDurableExecution
                   - lambda:GetDurableExecutionState
-                Resource: !GetAtt WorkflowFunction.Arn
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-Workflow:$LATEST/durable-execution/*'
       Tags:
         - Key: Pattern
           Value: lambda-durable-hitl
@@ -170,7 +170,7 @@ Resources:
                 Action:
                   - lambda:SendDurableExecutionCallbackSuccess
                   - lambda:SendDurableExecutionCallbackFailure
-                Resource: !GetAtt WorkflowFunction.Arn
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-Workflow:$LATEST/durable-execution/*'
       Tags:
         - Key: Pattern
           Value: lambda-durable-hitl
