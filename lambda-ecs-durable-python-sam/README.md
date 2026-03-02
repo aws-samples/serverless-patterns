@@ -1,41 +1,10 @@
-# AWS Lambda Durable Functions to Amazon ECS with Python
+# Lambda Durable Functions to Amazon ECS with Python
 
-This pattern demonstrates how to invoke an Amazon ECS task from AWS Lambda Durable Functions using Python, showcasing resilient multi-step workflows with automatic checkpointing and state management.
+This pattern demonstrates how to invoke Amazon ECS tasks from AWS Lambda durable functions using Python. The workflow starts an ECS task, waits for a callback, and resumes based on the task result while maintaining state across the pause/resume cycle.
 
-Lambda Durable Functions enable you to build resilient applications that can execute for up to one year while maintaining reliable progress despite interruptions. This pattern shows two integration approaches: **synchronous (polling with durable waits)** and **callback (async with durable steps)**.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-ecs-python-sam
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns
-
-**Important:** This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
-
-## What are Lambda Durable Functions?
-
-Lambda Durable Functions enable you to build resilient multi-step applications that can execute for up to one year while maintaining reliable progress despite interruptions. Key features include:
-
-- **Automatic Checkpointing**: Each step is automatically checkpointed, so your function can resume from the last completed step after interruptions
-- **Cost-Effective Waits**: During wait operations, your function suspends without incurring compute charges
-- **Built-in Retries**: Steps have automatic retry logic with progress tracking
-- **Deterministic Replay**: When resuming, completed steps use stored results instead of re-executing
-
-This pattern uses the [AWS Durable Execution SDK for Python](https://docs.aws.amazon.com/lambda/latest/dg/durable-execution-sdk.html) to implement these capabilities.
-
-## Security Note
-
-This pattern is designed for learning and demonstration purposes. The IAM roles and security group use permissive configurations to simplify deployment and focus on the integration patterns:
-
-- **Security Group**: Allows all outbound traffic (required for pulling Docker images and calling AWS APIs)
-- **IAM Roles**: Use wildcard (`*`) resources for ECS task management
-
-**For production use**, you should:
-- Restrict security group egress to specific AWS service endpoints using VPC endpoints
-- Scope IAM policies to specific resources (task definitions, DynamoDB tables)
-- Implement least privilege access based on your security requirements
-- Consider using AWS PrivateLink for service-to-service communication
-- Enable VPC Flow Logs for network traffic monitoring
-- Package the AWS SDK in your Lambda deployment package (13-14MB) instead of relying on the Lambda-provided runtime SDK
-- Include the Durable Execution SDK in your deployment package for production (included in requirements.txt)
-
-Deploy this pattern in a non-production AWS account or isolated environment for testing.
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -43,278 +12,127 @@ Deploy this pattern in a non-production AWS account or isolated environment for 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-
-## Architecture
-
-### Pattern 1: Synchronous (Durable Polling) Integration
-
-```
-┌─────────────────────┐      ┌──────────────────┐      ┌─────────────┐
-│   Lambda Durable    │      │   ECS Task       │      │  CloudWatch │
-│   Function (Sync)   │─────▶│   (Python)       │─────▶│    Logs     │
-│                     │      │                  │      │             │
-└─────────────────────┘      └──────────────────┘      └─────────────┘
-      │                               │
-      │  Durable Wait (no charges)    │
-      └───────────────────────────────┘
-         Polls with checkpointing
-```
-
-**How it works:**
-1. Lambda durable function invokes the ECS task using `ecs:RunTask` (checkpointed step)
-2. Function uses `context.wait()` to pause without compute charges
-3. After each wait, function checks task status using `ecs:DescribeTasks` (checkpointed step)
-4. If interrupted, function automatically resumes from last checkpoint
-5. Once complete, Lambda returns the result
-6. Can run for up to 1 year (vs 15 minutes for standard Lambda)
-
-**Key Durable Features:**
-- `@durable_execution` decorator enables durable execution
-- `@durable_step` decorator marks functions as checkpointed steps
-- `context.wait()` suspends execution without charges
-- Automatic replay and recovery from failures
-
-**Use cases:**
-- Long-running tasks (hours to days)
-- Tasks requiring reliable progress tracking
-- Workflows that need automatic recovery
-- Cost-sensitive polling operations
-
-**Advantages over standard Lambda:**
-- No 15-minute timeout limitation
-- Pay only for active execution time (not wait time)
-- Automatic checkpointing and recovery
-- Built-in retry logic
-
-### Pattern 2: Callback (Durable Async) Integration
-
-```
-┌─────────────────────┐      ┌──────────────────┐      ┌─────────────┐
-│   Lambda Durable    │      │   ECS Task       │      │  CloudWatch │
-│  Function (Callback)│─────▶│   (Python)       │─────▶│    Logs     │
-│                     │      │                  │      │             │
-└─────────────────────┘      └──────────────────┘      └─────────────┘
-      │                               │                       │
-      │  Checkpointed Steps           │                       │
-      │                               ▼                       │
-      │                      ┌─────────────────┐              │
-      └──────────────────────│    DynamoDB     │◄─────────────┘
-                             │     Table       │
-                             └─────────────────┘
-```
-
-**How it works:**
-1. Lambda durable function creates DynamoDB record (checkpointed step)
-2. Lambda invokes the ECS task using `ecs:RunTask` (checkpointed step)
-3. Lambda updates DynamoDB with task ARN (checkpointed step)
-4. Lambda **returns immediately** (async pattern)
-5. The Python application in ECS processes the work
-6. When done, the ECS task updates DynamoDB with the result
-7. If any step fails, automatic retry with checkpoint recovery
-
-**Key Durable Features:**
-- Each step is automatically checkpointed
-- If interrupted, function resumes from last completed step
-- No re-execution of completed steps
-- Reliable task initiation guaranteed
-
-**Use cases:**
-- Fire-and-forget workflows
-- Asynchronous processing
-- When you don't need immediate results
-- Decoupling task execution from API responses
-- Workflows requiring guaranteed task initiation
-
-**Advantages:**
-- Reliable task initiation with automatic recovery
-- Minimal Lambda execution time
-- Each step is independently retryable
-- No risk of duplicate task creation (idempotent)
+* [Docker](https://docs.docker.com/get-docker/) installed (for building Lambda container images)
+* [Python 3.13](https://www.python.org/downloads/) or later
 
 ## Deployment Instructions
 
-### Prerequisites
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd lambda-ecs-python-sam
+    ```
+1. From the command line, use AWS SAM to build the application:
+    ```
+    sam build
+    ```
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Enter the VpcCIDR parameter (default: 10.0.0.0/16)
+    * Allow SAM CLI to create IAM roles with the required permissions.
+    * Create managed ECR repositories for all functions (required for container images)
 
-* Python 3.13 or 3.14 runtime support for Lambda Durable Functions
-* AWS SAM CLI version that supports DurableConfig and container images
-* Docker installed (for building Lambda container images)
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-### Step 1: Clone the Repository
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+## How it works
+
+This pattern implements an ECS task orchestration workflow using Lambda durable functions with callback pattern:
+
+1. **Sync Lambda** starts an ECS task and polls for completion using durable waits (no compute charges during waits)
+2. **Callback Lambda** starts an ECS task, pauses execution using `callback.result()`, and waits for a callback
+3. The ECS task processes work and calls Lambda durable execution callback API when complete
+4. The Lambda function resumes automatically when the callback is invoked and returns the result
+
+The pattern uses the AWS Durable Execution SDK for Python with the `@durable_execution` decorator to maintain state across the pause/resume cycle. The callback pattern ensures no compute charges while waiting for ECS task completion.
+
+### Architecture Components
+
+- **Sync Lambda**: Orchestrates ECS tasks using Lambda durable functions SDK with polling pattern and durable waits
+- **Callback Lambda**: Orchestrates ECS tasks using Lambda durable functions SDK with callback pattern
+- **ECS Tasks**: Process work and send callbacks to Lambda using durable execution callback APIs
+- **VPC and Networking**: Provides network connectivity for ECS tasks to pull Docker images and call AWS APIs
+- **CloudWatch Logs**: Stores execution logs for Lambda functions and ECS tasks
+
+## Testing
+
+### Set Environment Variables
 
 ```bash
-git clone https://github.com/aws-samples/serverless-patterns
-cd serverless-patterns/lambda-ecs-python-sam
+export AWS_DEFAULT_REGION=us-east-1
+export STACK_NAME=<your-stack-name>
+
+# Get function names from CloudFormation outputs
+export SYNC_FUNCTION=$(aws cloudformation describe-stacks \
+  --stack-name $STACK_NAME \
+  --query 'Stacks[0].Outputs[?OutputKey==`SyncLambdaFunctionArn`].OutputValue' \
+  --output text | awk -F: '{print $NF}')
+
+export CALLBACK_FUNCTION=$(aws cloudformation describe-stacks \
+  --stack-name $STACK_NAME \
+  --query 'Stacks[0].Outputs[?OutputKey==`CallbackLambdaFunctionArn`].OutputValue' \
+  --output text | awk -F: '{print $NF}')
 ```
 
-### Step 2: Build and Deploy
-
-This pattern uses Lambda container images with Python 3.13 to support durable functions. The build process will:
-- Build Docker images with the Durable Execution SDK
-- Create ECR repositories automatically
-- Push images to ECR
-- Deploy Lambda functions using the container images
+### Test Synchronous Pattern
 
 ```bash
-sam build
-sam deploy --guided
-```
-
-During the prompts:
-- **Stack Name**: `lambda-ecs-durable-demo` (or your preferred name)
-- **AWS Region**: Your preferred region (e.g., `us-east-1`)
-- **Parameter VpcCIDR**: Press Enter to use default (10.0.0.0/16)
-- **Confirm changes before deploy**: Y
-- **Allow SAM CLI IAM role creation**: Y
-- **Disable rollback**: N
-- **SyncLambdaFunction has no authorization defined**: Y
-- **CallbackLambdaFunction has no authorization defined**: Y
-- **Create managed ECR repositories for all functions**: Y (required for container images)
-- **Save arguments to samconfig.toml**: Y
-
-The deployment will take 5-10 minutes as it creates VPC, ECS cluster, Lambda functions, and other resources.
-
-### Step 3: Note the Outputs
-
-After deployment, note the following outputs:
-- `SyncLambdaFunctionArn` - ARN for the synchronous pattern Lambda
-- `CallbackLambdaFunctionArn` - ARN for the callback pattern Lambda
-- `CallbackTableName` - DynamoDB table for callback tracking
-- `ECSClusterName` - Name of the ECS cluster
-- `LogGroupName` - CloudWatch log group for ECS tasks
-
-**Important**: When invoking durable functions, you must use a qualified ARN (append `:$LATEST` to the function name).
-
-## How to Test
-
-### Testing the Synchronous (Durable) Pattern
-
-1. **Invoke the durable function asynchronously:**
-
-Lambda Durable Functions with execution timeout > 15 minutes must be invoked asynchronously. Use the `--invocation-type Event` flag and a qualified ARN (with `:$LATEST`):
-
-```bash
+# Invoke the sync function (must use qualified ARN with :$LATEST)
 aws lambda invoke \
-    --function-name lambda-ecs-durable-demo-sync-function:\$LATEST \
-    --invocation-type Event \
-    --cli-binary-format raw-in-base64-out \
-    --payload '{"message": "Hello from durable sync pattern", "processingTime": 10}' \
-    response.json
+  --function-name $SYNC_FUNCTION:\$LATEST \
+  --invocation-type Event \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"message": "Hello from sync pattern", "processingTime": 10}' \
+  response.json
+
+# Monitor Lambda logs
+aws logs tail /aws/lambda/$SYNC_FUNCTION --follow
+
+# Monitor ECS task logs
+aws logs tail /ecs/$STACK_NAME --follow
 ```
 
-**Note**: The `\$LATEST` qualifier is required for durable functions. The backslash escapes the dollar sign in bash.
-
-2. **Monitor the Lambda execution logs:**
+### Test Callback Pattern
 
 ```bash
-aws logs tail /aws/lambda/lambda-ecs-durable-demo-sync-function --follow
-```
-
-You'll see:
-- Task starting with checkpointed step
-- Durable waits (no compute charges during waits)
-- Status checks every 5 seconds (PROVISIONING → PENDING → RUNNING → STOPPED)
-- Each check is a separate checkpointed operation
-- Final result when task completes
-
-3. **View ECS task logs:**
-
-```bash
-aws logs tail /ecs/lambda-ecs-durable-demo --follow
-```
-
-4. **View execution in Lambda console:**
-
-Navigate to the Lambda console → Your function → "Monitoring" tab → "Logs" to see the execution timeline and checkpoints.
-
-### Testing the Callback (Durable) Pattern
-
-1. **Invoke the durable function asynchronously:**
-
-```bash
+# Invoke the callback function (must use qualified ARN with :$LATEST)
 aws lambda invoke \
-    --function-name lambda-ecs-durable-demo-callback-function:\$LATEST \
-    --invocation-type Event \
-    --cli-binary-format raw-in-base64-out \
-    --payload '{"message": "Hello from durable callback pattern", "processingTime": 30}' \
-    response.json
+  --function-name $CALLBACK_FUNCTION:\$LATEST \
+  --invocation-type Event \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"message": "Hello from callback pattern", "processingTime": 30}' \
+  response.json
+
+# Monitor Lambda logs
+aws logs tail /aws/lambda/$CALLBACK_FUNCTION --follow
+
+# Monitor ECS task logs
+aws logs tail /ecs/$STACK_NAME --follow
 ```
 
-2. **Monitor the Lambda execution logs:**
-
-```bash
-aws logs tail /aws/lambda/lambda-ecs-durable-demo-callback-function --follow
-```
-
-You'll see:
-- DynamoDB record creation (checkpointed)
-- ECS task initiation (checkpointed)
-- Function returns immediately
-
-3. **Check the status in DynamoDB:**
-
-```bash
-# Scan the table to see all executions
-aws dynamodb scan --table-name lambda-ecs-durable-demo-callbacks
-
-# Or get a specific execution (replace with your execution ID from logs)
-aws dynamodb get-item \
-    --table-name lambda-ecs-durable-demo-callbacks \
-    --key '{"executionId": {"S": "YOUR-EXECUTION-ID"}}'
-```
-
-4. **Monitor ECS task logs:**
-
-```bash
-aws logs tail /ecs/lambda-ecs-durable-demo --follow
-```
-
-The ECS task will update DynamoDB when processing is complete. You'll see the result in the `result` field with status `COMPLETED`.
-
-## Key Differences Between Patterns
-
-| Feature | Synchronous (Durable Polling) | Callback (Durable Async) |
-|---------|------------------------------|--------------------------|
-| **Execution Duration** | Up to 1 year | Up to 1 year |
-| **Checkpointing** | Automatic for each step | Automatic for each step |
-| **Wait Charges** | No charges during waits | N/A (returns immediately) |
-| **Polling** | Durable waits between checks | No polling needed |
-| **Task Awareness** | Task doesn't know about Lambda | Task updates DynamoDB |
-| **Complexity** | Moderate (durable steps + waits) | Moderate (durable steps + DynamoDB) |
-| **Use Case** | Long-running tasks needing results | Fire-and-forget workflows |
-| **Cost** | Pay only for active execution | Minimal (quick execution) |
-| **Result Retrieval** | Returned by function | Query DynamoDB |
-| **Reliability** | Automatic recovery from failures | Guaranteed task initiation |
-
-## Benefits of Lambda Durable Functions
-
-Compared to standard Lambda functions:
-
-✅ **Extended Duration**: Execute for up to 1 year (vs 15 minutes)
-✅ **Cost Optimization**: No charges during wait operations
-✅ **Automatic Recovery**: Built-in checkpointing and replay
-✅ **Simplified Code**: No manual state management needed
-✅ **Reliable Execution**: Guaranteed progress despite interruptions
-✅ **Built-in Retries**: Automatic retry logic for steps
+Expected output: The Lambda function should complete and return the ECS task result. The logs should show the callback being received and the function resuming execution.
 
 ## Cleanup
+ 
+1. Delete the stack
+    ```bash
+    sam delete
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'$STACK_NAME')].StackStatus"
+    ```
 
-To delete the resources:
-
-```bash
-sam delete
-```
-
-## Resources
-
-- [AWS Lambda Durable Functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
-- [Durable Execution SDK](https://docs.aws.amazon.com/lambda/latest/dg/durable-execution-sdk.html)
-- [AWS Lambda](https://aws.amazon.com/lambda/)
-- [Amazon ECS](https://aws.amazon.com/ecs/)
-- [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
-- [ECS RunTask API](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html)
-
----
-
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+----
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
