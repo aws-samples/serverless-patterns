@@ -177,3 +177,6 @@ cdk deploy -c allowed_cors_origin="https://example.com" -c cookie_ttl_seconds=36
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'CloudFrontSignedCookiesStack')].StackStatus"
     ```
 
+----
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+SPDX-License-Identifier: MIT-0
