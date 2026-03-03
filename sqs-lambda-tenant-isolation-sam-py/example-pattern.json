@@ -1,0 +1,49 @@
+{
+	"title": "AWS Lambda Tenant Isolation with SQS",
+	"description": "Lambda Isolation feature",
+	"language": "",
+	"level": "200",
+	"framework": "AWS SAM",
+	"introBox": {
+		"headline": "How it works",
+		"text": [
+			"This pattern demonstrate AWS Lambda's tenant isolation feature in Multi-tenant application."
+		]
+	},
+	"gitHub": {
+		"template": {
+			"repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-tenant-isolation-sam-py",
+			"templateURL": "serverless-patterns/sqs-lambda-tenant-isolation-sam-py",
+			"projectFolder": "sqs-lambda-tenant-isolation-sam-py"
+		}
+	},
+	"resources": {
+		"bullets": [{
+				"text": "AWS Lambda tenant isolation",
+				"link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
+			}
+		]
+	},
+	 "deploy": {
+      "text": ["sam build", "sam deploy --guided"]
+    },
+    "testing": {
+      "text": ["See the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>sam delete</code>."]
+    },
+	"authors": [{
+		"name": "Mitesh Purohit",
+		"image": "",
+		"bio": "Sr Solution Architect, AWS",
+		"linkedin": "https://www.linkedin.com/in/mitup/"
+	},
+	{
+		"name": "Ricardo Marques",
+		"image": "",
+		"bio": "Sr Serverless Specialist, AWS",
+		"linkedin": "https://www.linkedin.com/in/ricardo-marques-aws/"
+	}
+]
+}
