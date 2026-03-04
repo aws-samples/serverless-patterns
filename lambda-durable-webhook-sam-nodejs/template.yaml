@@ -65,12 +65,9 @@ Resources:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 7
       Policies:
-        Statement:
-          - Effect: Allow
-            Action:
-              - lambda:CheckpointDurableExecutions
-              - lambda:GetDurableExecutionState
-            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Environment}-webhook-processor'
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+        - Statement:           
           - Effect: Allow
             Action:
               - lambda:InvokeFunction

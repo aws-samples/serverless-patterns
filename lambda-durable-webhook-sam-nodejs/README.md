@@ -17,6 +17,10 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
+## Architecture
+
+![Architecture Diagram](architecture.png)
+
 ## How It Works
 
 This pattern demonstrates a serverless webhook receiver using AWS Lambda durable functions. The pattern receives webhook events via API Gateway, processes them durably with automatic checkpointing, and provides status query capabilities. The durable function processes webhooks in 3 checkpointed steps:
@@ -27,15 +31,17 @@ This pattern demonstrates a serverless webhook receiver using AWS Lambda durable
 
 This pattern acheives the following key features:
 
-- ✅ **Automatic Checkpointing** - Each processing step is checkpointed automatically
-- ✅ **Failure Recovery** - Resumes from last checkpoint on failure
-- ✅ **Asynchronous Processing** - Immediate 202 response, processing in background
-- ✅ **State Persistence** - Execution state stored in DynamoDB with TTL
-- ✅ **Status Query API** - Real-time status tracking via REST API
+- **Automatic Checkpointing** - Each processing step is checkpointed automatically
+- **Failure Recovery** - Resumes from last checkpoint on failure
+- **Asynchronous Processing** - Immediate 202 response, processing in background
+- **State Persistence** - Execution state stored in DynamoDB with TTL
+- **Status Query API** - Real-time status tracking via REST API
+
+**Note:** Each step writes status updates to DynamoDB before its main work. These writes are idempotent, so retries are safe. During replay, the DynamoDB status reflects the last successfully written state—not the current replay position. Status queries should treat intermediate states as "in progress."
 
 ## Important
 
-⚠️ **Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
+**Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
 ## Deployment
 
@@ -81,12 +87,25 @@ Once the Webhook is submitted, to query the status of webhook, use the following
    - Status query shows progression: `STARTED` → `VALIDATING` → `PROCESSING` → `COMPLETED`
    - Execution state persists in DynamoDB with TTL
 
-To simulate a failure scenario, perform the below curl command:
+To simulate a validation failure, send an invalid payload (empty or missing required fields):
 
-## Architecture
+   ```bash
+   # Send an invalid webhook (empty payload triggers validation failure)
+   curl -X POST <WebhookApiUrl> \
+     -H "Content-Type: application/json" \
+     -d '{}'
+   ```
 
-![Architecture Diagram](architecture.png)
+Query the status to see the failure:
 
+   ```bash
+   curl <StatusQueryApiUrl>
+   ```
+
+   **Failure indicators:**
+   - Status query shows `FAILED` status
+   - Error message indicates validation failure reason
+   - Execution state persists in DynamoDB for debugging
 
 ## Cleanup
 

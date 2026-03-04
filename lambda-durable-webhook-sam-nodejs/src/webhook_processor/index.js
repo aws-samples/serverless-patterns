@@ -1,11 +1,13 @@
 import { withDurableExecution } from "@aws/durable-execution-sdk-js";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { randomUUID } from 'crypto';
 
-// Initialize AWS clients
+// Initialize AWS clients at module scope for connection reuse
 const dynamodbClient = new DynamoDBClient({});
 const dynamodb = DynamoDBDocumentClient.from(dynamodbClient);
+const lambdaClient = new LambdaClient({});
 
 export const handler = withDurableExecution(
     async (event, context) => {
@@ -14,6 +16,11 @@ export const handler = withDurableExecution(
          * 1. Validate webhook
          * 2. Process business logic  
          * 3. Finalize processing
+         * 
+         * Design Note: Each step writes a status update to DynamoDB before doing its main work.
+         * DynamoDB UpdateCommand is naturally idempotent for these status writes.
+         * The DynamoDB status reflects the last successfully written status, not necessarily
+         * the current replay position.
          */
         
         // Extract configuration from environment
@@ -23,27 +30,38 @@ export const handler = withDurableExecution(
         // Parse the incoming webhook event
         const webhookPayload = JSON.parse(event.body || '{}');
         
-        // Use executionToken from API Gateway or generate new one
-        const executionToken = event.executionToken || randomUUID();
-        
-        console.log(`Processing webhook with execution token: ${executionToken}`);
-        console.log(`Webhook payload:`, JSON.stringify(webhookPayload, null, 2));
-        
-        try {
+        // Step 0: Initialize execution (checkpointed) - handles non-deterministic operations
+        const initResult = await context.step('initialize-execution', async (stepContext) => {
+            // Generate executionToken inside step to ensure determinism on replay
+            const token = event.executionToken || randomUUID();
+            const startTimestamp = Date.now();
+            
+            stepContext.logger.info(`Initializing webhook processing with token: ${token}`);
+            stepContext.logger.info(`Webhook payload: ${JSON.stringify(webhookPayload)}`);
+            
             // Store initial execution state
             await dynamodb.send(new PutCommand({
                 TableName: eventsTableName,
                 Item: {
-                    executionToken: executionToken,
+                    executionToken: token,
                     status: 'STARTED',
-                    timestamp: Date.now(),
+                    timestamp: startTimestamp,
                     payload: webhookPayload,
-                    ttl: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days TTL
+                    ttl: Math.floor(startTimestamp / 1000) + (7 * 24 * 60 * 60) // 7 days TTL
                 }
             }));
+            
+            return {
+                executionToken: token,
+                startTimestamp: startTimestamp
+            };
+        });
+        
+        const executionToken = initResult.executionToken;
 
+        try {
             // Step 1: Validate webhook (checkpointed)
-            const validationResult = await context.step(async (stepContext) => {
+            const validationResult = await context.step('validate-webhook', async (stepContext) => {
                 stepContext.logger.info(`Validating webhook ${executionToken}`);
                 
                 // Update status to VALIDATING
@@ -62,12 +80,10 @@ export const handler = withDurableExecution(
                 }));
 
                 // Call the separate webhook validator function
-                const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
-                const lambdaClient = new LambdaClient({});
-                
                 const validatorFunctionArn = process.env.WEBHOOK_VALIDATOR_FUNCTION_ARN;
                 const invokeResponse = await lambdaClient.send(new InvokeCommand({
                     FunctionName: validatorFunctionArn,
+                    InvocationType: 'RequestResponse',
                     Payload: JSON.stringify({
                         payload: webhookPayload,
                         executionToken: executionToken
@@ -119,8 +135,11 @@ export const handler = withDurableExecution(
             }
 
             // Step 2: Process business logic (checkpointed)
-            const processingResult = await context.step(async (stepContext) => {
+            const processingResult = await context.step('process-webhook', async (stepContext) => {
                 stepContext.logger.info(`Processing webhook ${executionToken}`);
+                
+                // Generate timestamp once at start of step for consistency
+                const processedAt = new Date().toISOString();
                 
                 // Update status to PROCESSING
                 await dynamodb.send(new UpdateCommand({
@@ -138,23 +157,21 @@ export const handler = withDurableExecution(
                 }));
 
                 // Simulate business processing logic - customize this based on your needs
+                // Keep state minimal - store IDs and references, not full objects
                 return {
-                    executionToken: executionToken,
+                    executionToken,
                     status: "processed",
-                    originalPayload: webhookPayload,
-                    businessResult: `Processed webhook of type: ${webhookPayload.type || 'unknown'}`,
-                    dataTransformed: webhookPayload.data ? JSON.stringify(webhookPayload.data).toUpperCase() : null,
-                    processedAt: new Date().toISOString(),
-                    metadata: {
-                        processedBy: 'webhook-processor-nodejs',
-                        version: '1.0.0'
-                    }
+                    payloadType: webhookPayload.type || 'unknown',
+                    processedAt: processedAt
                 };
             });
 
             // Step 3: Finalize processing (checkpointed)
-            const finalResult = await context.step(async (stepContext) => {
+            const finalResult = await context.step('finalize-webhook', async (stepContext) => {
                 stepContext.logger.info(`Finalizing webhook ${executionToken}`);
+                
+                // Generate timestamp once at start of step for consistency
+                const completedAt = new Date().toISOString();
                 
                 // Update final status to COMPLETED
                 await dynamodb.send(new UpdateCommand({
@@ -171,14 +188,14 @@ export const handler = withDurableExecution(
                         ':status': 'COMPLETED',
                         ':step': 'finalize',
                         ':result': processingResult,
-                        ':completedAt': new Date().toISOString()
+                        ':completedAt': completedAt
                     }
                 }));
 
                 return {
                     executionToken: executionToken,
                     status: "completed",
-                    finalResult: processingResult
+                    completedAt: completedAt
                 };
             });
 
@@ -197,22 +214,29 @@ export const handler = withDurableExecution(
             };
 
         } catch (error) {
-            console.error(`Error processing webhook ${executionToken}:`, error.message);
-            
-            // Update error state
-            await dynamodb.send(new UpdateCommand({
-                TableName: eventsTableName,
-                Key: { executionToken },
-                UpdateExpression: 'SET #status = :status, #error = :error',
-                ExpressionAttributeNames: {
-                    '#status': 'status',
-                    '#error': 'error'
-                },
-                ExpressionAttributeValues: {
-                    ':status': 'FAILED',
-                    ':error': error.message
-                }
-            }));
+            // Wrap error handling in a step to ensure proper checkpoint behavior
+            const errorResult = await context.step('handle-error', async (stepContext) => {
+                stepContext.logger.error(`Error processing webhook ${executionToken}: ${error.message}`);
+                
+                await dynamodb.send(new UpdateCommand({
+                    TableName: eventsTableName,
+                    Key: { executionToken },
+                    UpdateExpression: 'SET #status = :status, #error = :error',
+                    ExpressionAttributeNames: {
+                        '#status': 'status',
+                        '#error': 'error'
+                    },
+                    ExpressionAttributeValues: {
+                        ':status': 'FAILED',
+                        ':error': error.message
+                    }
+                }));
+                
+                return {
+                    status: 'FAILED',
+                    error: error.message
+                };
+            });
 
             return {
                 statusCode: 500,
@@ -222,7 +246,7 @@ export const handler = withDurableExecution(
                 body: JSON.stringify({
                     message: 'Webhook processing failed',
                     executionToken: executionToken,
-                    error: error.message
+                    ...errorResult
                 })
             };
         }
