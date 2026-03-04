@@ -3,7 +3,7 @@
   "description": "An AWS Lambda function that downloads a file from a URL and stores it in Amazon S3 using multipart upload with SHA256 checksums.",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -53,7 +53,7 @@
       "name": "Robert Meyer",
       "image": "",
       "bio": "Robert is a Partner Solutions Architect with AWS in EMEA.",
-      "linkedin": "https://www.linkedin.com/in/robert-meyer-phd-6a114a58/",
+      "linkedin": "robert-meyer-phd-6a114a58",
       "twitter": "@robl_on_tour"
     }
   ]
