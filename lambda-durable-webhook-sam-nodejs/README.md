@@ -39,8 +39,6 @@ This pattern acheives the following key features:
 
 **Note:** Each step writes status updates to DynamoDB before its main work. These writes are idempotent, so retries are safe. During replay, the DynamoDB status reflects the last successfully written state—not the current replay position. Status queries should treat intermediate states as "in progress."
 
-## Important
-
 **Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
 ## Deployment
