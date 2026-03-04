@@ -1,0 +1,27 @@
+{
+  "name": "lambda-durable-function-chaining-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "lambda-durable-function-chaining-cdk": "bin/lambda-durable-function-chaining-cdk.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.160",
+    "@types/jest": "^30",
+    "@types/node": "^24.10.1",
+    "aws-cdk": "2.1104.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.978.0",
+    "@aws-sdk/client-lambda": "^3.978.0",
+    "@aws/durable-execution-sdk-js": "^1.0.2",
+    "aws-cdk-lib": "^2.236.0",
+    "constructs": "^10.0.0"
+  }
+}
