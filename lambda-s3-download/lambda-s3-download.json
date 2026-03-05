@@ -1,0 +1,79 @@
+{
+    "title": "AWS Lambda to Amazon S3 — URL File Downloader",
+    "description": "An AWS Lambda function that downloads a file from a URL and stores it in Amazon S3 using multipart upload with SHA256 checksums.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an AWS Lambda function that streams a file from a URL and stores it in Amazon S3 using multipart upload.",
+            "The file is downloaded in configurable chunks (default 512 MB, clamped between 5 MB and 5 GB) and written to /tmp before being uploaded as individual parts. Each chunk is cleaned up from /tmp after upload, allowing the function to handle files larger than Lambda's memory or ephemeral storage limits.",
+            "SHA256 checksums are calculated for each part and verified on completion. If any step fails, the multipart upload is automatically aborted to avoid orphaned parts."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-download",
+            "templateURL": "serverless-patterns/lambda-s3-download",
+            "projectFolder": "lambda-s3-download",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "S3 Multipart Upload Overview",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html"
+            },
+            {
+                "text": "AWS Lambda - Configuring Ephemeral Storage",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-ephemeral-storage.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Robert Meyer",
+            "image": "",
+            "bio": "Robert is a Partner Solutions Architect with AWS in EMEA.",
+            "linkedin": "robert-meyer-phd-6a114a58",
+            "twitter": "@robl_on_tour"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "s3",
+            "label": "Amazon S3"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Stream"
+        }
+    }
+}
