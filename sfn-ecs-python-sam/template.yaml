@@ -1,0 +1,378 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Step Functions to ECS with Python - Demonstrates sync and callback patterns
+
+Parameters:
+  VpcCIDR:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for VPC
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-subnet-1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-subnet-2
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  # Security Group
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ECS tasks
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-ecs-sg
+
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ${AWS::StackName}-cluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  # CloudWatch Log Group
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+      RetentionInDays: 7
+
+  # ECS Task Execution Role
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  # ECS Task Role (for callback pattern)
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionsCallback
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:SendTaskSuccess
+                  - states:SendTaskFailure
+                  - states:SendTaskHeartbeat
+                Resource: '*'
+
+  # ECS Task Definition for Sync Pattern
+  SyncTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-sync-task
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: python-sync-container
+          Image: public.ecr.aws/docker/library/python:3.11-slim
+          Essential: true
+          Command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --quiet boto3 && python3 << 'EOF'
+              import os
+              import time
+              import json
+              from datetime import datetime
+              
+              def main():
+                  message = os.environ.get('MESSAGE', 'No message provided')
+                  processing_time = int(os.environ.get('PROCESSING_TIME', '5'))
+                  
+                  print(f"[SYNC] Starting processing: {message}")
+                  print(f"[SYNC] Will process for {processing_time} seconds")
+                  
+                  # Simulate processing
+                  time.sleep(processing_time)
+                  
+                  result = {
+                      "status": "success",
+                      "message": f"Processed: {message}",
+                      "processingTime": processing_time,
+                      "timestamp": datetime.utcnow().isoformat() + "Z"
+                  }
+                  
+                  print(f"[SYNC] Completed: {json.dumps(result)}")
+                  return result
+              
+              if __name__ == "__main__":
+                  main()
+              EOF
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: sync
+
+  # ECS Task Definition for Callback Pattern
+  CallbackTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-callback-task
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt ECSTaskRole.Arn
+      ContainerDefinitions:
+        - Name: python-callback-container
+          Image: public.ecr.aws/docker/library/python:3.11-slim
+          Essential: true
+          Command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --quiet boto3 && python3 << 'EOF'
+              import os
+              import boto3
+              import json
+              import time
+              from datetime import datetime
+              
+              def main():
+                  task_token = os.environ.get('TASK_TOKEN')
+                  message = os.environ.get('MESSAGE', 'No message provided')
+                  processing_time = int(os.environ.get('PROCESSING_TIME', '5'))
+                  
+                  if not task_token:
+                      print("[CALLBACK] ERROR: No task token provided!")
+                      return
+                  
+                  sfn_client = boto3.client('stepfunctions')
+                  
+                  try:
+                      print(f"[CALLBACK] Starting processing: {message}")
+                      print(f"[CALLBACK] Task token: {task_token[:20]}...")
+                      print(f"[CALLBACK] Will process for {processing_time} seconds")
+                      
+                      # Simulate processing
+                      time.sleep(processing_time)
+                      
+                      result = {
+                          "status": "success",
+                          "message": f"Processed: {message}",
+                          "processingTime": processing_time,
+                          "timestamp": datetime.utcnow().isoformat() + "Z"
+                      }
+                      
+                      print(f"[CALLBACK] Sending success callback")
+                      sfn_client.send_task_success(
+                          taskToken=task_token,
+                          output=json.dumps(result)
+                      )
+                      print(f"[CALLBACK] Success callback sent!")
+                      
+                  except Exception as e:
+                      print(f"[CALLBACK] ERROR: {str(e)}")
+                      try:
+                          sfn_client.send_task_failure(
+                              taskToken=task_token,
+                              error='ProcessingError',
+                              cause=str(e)
+                          )
+                          print(f"[CALLBACK] Failure callback sent")
+                      except Exception as callback_error:
+                          print(f"[CALLBACK] Failed to send callback: {str(callback_error)}")
+              
+              if __name__ == "__main__":
+                  main()
+              EOF
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: callback
+
+  # Step Functions Role
+  StepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ECSTaskExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:RunTask
+                  - ecs:StopTask
+                  - ecs:DescribeTasks
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - !GetAtt ECSTaskExecutionRole.Arn
+                  - !GetAtt ECSTaskRole.Arn
+              - Effect: Allow
+                Action:
+                  - events:PutTargets
+                  - events:PutRule
+                  - events:DescribeRule
+                Resource: '*'
+
+  # Synchronous Pattern State Machine
+  SyncStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub ${AWS::StackName}-sync-pattern
+      Type: STANDARD
+      Role: !GetAtt StepFunctionsRole.Arn
+      DefinitionUri: statemachine/sync-pattern.asl.json
+      DefinitionSubstitutions:
+        ECSCluster: !Ref ECSCluster
+        TaskDefinition: !Ref SyncTaskDefinition
+        Subnet1: !Ref PublicSubnet1
+        Subnet2: !Ref PublicSubnet2
+        SecurityGroup: !Ref ECSSecurityGroup
+
+  # Callback Pattern State Machine
+  CallbackStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub ${AWS::StackName}-callback-pattern
+      Type: STANDARD
+      Role: !GetAtt StepFunctionsRole.Arn
+      DefinitionUri: statemachine/callback-pattern.asl.json
+      DefinitionSubstitutions:
+        ECSCluster: !Ref ECSCluster
+        TaskDefinition: !Ref CallbackTaskDefinition
+        Subnet1: !Ref PublicSubnet1
+        Subnet2: !Ref PublicSubnet2
+        SecurityGroup: !Ref ECSSecurityGroup
+
+Outputs:
+  SyncStateMachineArn:
+    Description: ARN of the Synchronous Pattern State Machine
+    Value: !Ref SyncStateMachine
+
+  CallbackStateMachineArn:
+    Description: ARN of the Callback Pattern State Machine
+    Value: !Ref CallbackStateMachine
+
+  ECSClusterName:
+    Description: Name of the ECS Cluster
+    Value: !Ref ECSCluster
+
+  SyncTaskDefinitionArn:
+    Description: ARN of the Sync Task Definition
+    Value: !Ref SyncTaskDefinition
+
+  CallbackTaskDefinitionArn:
+    Description: ARN of the Callback Task Definition
+    Value: !Ref CallbackTaskDefinition
+
+  LogGroupName:
+    Description: CloudWatch Log Group for ECS tasks
+    Value: !Ref ECSLogGroup
