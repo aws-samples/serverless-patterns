@@ -1,0 +1,73 @@
+{
+  "title": "API Gateway with Lambda SnapStart and DynamoDB using Python CDK",
+  "description": "This pattern demonstrates how to create a REST API using API Gateway, AWS Lambda with SnapStart, and DynamoDB. Built with Python 3.12 and AWS CDK, it implements Lambda SnapStart to improve initialization performance for faster cold starts.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a REST API for managing car records using API Gateway and Lambda with SnapStart enabled.",
+      "The Lambda function is Python 3.12 based and includes a live alias that's integrated with API Gateway for seamless deployments.",
+      "Lambda SnapStart persists the initialized state of the Lambda runtime, significantly reducing cold start times for function initialization.",
+      "DynamoDB stores car records with a partition key of 'id', providing a scalable NoSQL database backend for the REST API."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-python-cdk-lambda-snapstart",
+      "templateURL": "serverless-patterns/apigw-python-cdk-lambda-snapstart",
+      "projectFolder": "apigw-python-cdk-lambda-snapstart",
+      "templateFile": "apigw-python-cdk-lambda-snapstart/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda SnapStart",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      },
+      {
+        "text": "API Gateway REST API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      },
+      {
+        "text": "AWS CDK Python Reference",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-python.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "python3 -m venv .venv",
+      "source .venv/bin/activate",
+      "pip install -r requirements.txt",
+      "cdk bootstrap",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Get the CarEndpoint from stack outputs, then test the endpoint to create a new car record:",
+      "curl --location --request POST \"$ENDPOINT/cars\" --header 'Content-Type: application/json' --data-raw '{\"make\":\"Porsche\",\"model\":\"992\",\"year\":\"2022\",\"color\":\"White\"}'",
+      "Change the endpoint and HTTP method to test other operations:",
+      "GET /cars/{carId} - Retrieve a car",
+      "PUT /cars/{carId} - Update a car",
+      "DELETE /cars/{carId} - Delete a car"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Matia Rasetina",
+      "image": "https://media.licdn.com/dms/image/v2/C4D03AQEpZLzvymfGyA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1612951581132?e=1772668800&v=beta&t=m8AkoSUFICMRk5-Gd0hEAji0N4gFSfFGuv4lbBuXcJY",
+      "bio": "Senior Software Engineer @ Elixirr Digital",
+      "linkedin": "https://www.linkedin.com/in/matiarasetina/",
+      "twitter": ""
+    }
+  ]
+}
