@@ -1,0 +1,5 @@
+## Merge download URL into previous result if it exists
+#if($ctx.result && $ctx.result.downloadUrl)
+  #set($ctx.prev.result.downloadUrl = $ctx.result.downloadUrl)
+#end
+$util.toJson($ctx.prev.result)
