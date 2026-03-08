@@ -1,6 +1,6 @@
 # Lambda durable functions invoking AWS Lambda function (Python)
 
-This pattern demonstrates how an AWS Lambda durable function can invoke a standard Lambda function using `context.invoke()` from the AWS Durable Execution SDK. The invocation is automatically checkpointed, so if the durable function is interrupted after the invoked function completes, it resumes with the stored result without re-invoking the target function.
+This pattern demonstrates how an AWS Lambda durable function can invoke a standard AWS Lambda function using `context.invoke()` from the durable execution SDK. The invocation is automatically checkpointed, so if the durable function is interrupted after the invoked function completes, it resumes with the stored result without re-invoking the target function.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-invoke-lambda-sam-python](https://serverlessland.com/patterns/lambda-durable-invoke-lambda-sam-python)
 
@@ -48,7 +48,7 @@ This pattern deploys two Lambda functions:
 
 2. **ProcessorFunction** - A standard Lambda function that receives a list of numeric values and returns computed statistics (sum, average, max, min).
 
-The durable function uses automatic checkpointing. Each step and invoke operation creates a checkpoint. If the function is interrupted (e.g., due to a transient failure), it replays from the beginning but skips completed checkpoints, resuming execution from where it left off.
+The AWS Lambda durable function uses automatic checkpointing. Each step and invoke operation creates a checkpoint. If the function is interrupted (e.g., due to a transient failure), it replays from the beginning but skips completed checkpoints, resuming execution from where it left off.
 
 
 ## Testing
