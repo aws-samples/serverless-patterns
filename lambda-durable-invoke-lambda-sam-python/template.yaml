@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Serverless pattern - Lambda Durable Function invoking another Lambda Function (Python).
-  Demonstrates how a durable Lambda function can use context.invoke() to call a standard
+  Serverless pattern - Lambda durable function invoking another AWS Lambda function (Python).
+  Demonstrates how a Lambda durable function can use context.invoke() to call a standard
   Lambda function as a checkpointed step in its workflow.
 
 Globals:
@@ -11,7 +11,7 @@ Globals:
     MemorySize: 128
 
 Resources:
-  # Standard Lambda function that processes sample values
+  # Standard AWS Lambda function that processes sample values
   ProcessorFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -19,7 +19,7 @@ Resources:
       Runtime: python3.14
       CodeUri: src/
 
-  # Durable Lambda function that orchestrates the workflow
+  # Lambda durable function that orchestrates the workflow
   DurableLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -41,10 +41,10 @@ Resources:
 
 Outputs:
   DurableLambdaFunctionArn:
-    Description: ARN of the durable Lambda function
+    Description: ARN of Lambda durable function
     Value: !GetAtt DurableLambdaFunction.Arn
   DurableLambdaFunctionAliasArn:
-    Description: Alias ARN of the durable Lambda function (use this for invocations)
+    Description: Alias ARN of the Lambda durable function (use this for invocations)
     Value: !Ref DurableLambdaFunction.Alias
   ProcessorFunctionArn:
     Description: ARN of the processor Lambda function
