@@ -1,0 +1,110 @@
+# AWS Lambda to Amazon S3 — URL File Downloader
+
+This pattern deploys an AWS Lambda function that downloads a file from a URL and stores it in Amazon S3 using multipart upload. It streams the file in configurable chunks through `/tmp`, making it capable of handling files larger than Lambda's memory and storage limits.
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ```
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd serverless-patterns/lambda-s3-download
+    ```
+1. Build the application:
+    ```
+    sam build
+    ```
+1. Deploy the application:
+    ```
+    sam deploy --guided
+    ```
+1. During the prompts:
+    * Enter a stack name
+    * Enter the desired AWS Region
+    * Enter the target S3 bucket name (the bucket must already exist)
+    * Allow SAM CLI to create IAM roles with the required permissions
+
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+## How it works
+
+The Lambda function:
+
+1. Receives a download URL and filename via the event payload
+2. Initiates an S3 multipart upload with SHA256 checksums
+3. Streams the file from the URL in chunks (default 512 MB), writing each chunk to `/tmp` and uploading it as a multipart part
+4. Cleans up each chunk from `/tmp` after uploading to stay within the 10 GB ephemeral storage limit
+5. Completes the multipart upload and returns the S3 object checksum
+6. If any step fails, aborts the multipart upload to avoid orphaned parts
+
+The function is configured with a 15-minute timeout, 1 GB memory, and 10 GB ephemeral storage.
+
+## Testing
+
+Retrieve the Lambda function's name from the SAM deployment output and invoke it with a test event:
+
+```bash
+aws lambda invoke \
+  --function-name FUNCTION_NAME \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{
+    "download_url": "https://example.com/file.zip",
+    "download_filename": "file.zip"
+  }' \
+  response.json
+```
+
+Optional event parameters:
+
+| Parameter | Description | Default |
+|---|---|---|
+| `target_bucket` | S3 bucket name (overrides the deployed parameter) | Value from template parameter |
+| `target_bucket_region` | S3 bucket region | Lambda's region |
+| `chunk_size_mb` | Size of each download chunk in MB (clamped between 5 and 5120) | 512 |
+
+Example with all optional parameters:
+
+```bash
+aws lambda invoke \
+  --function-name FUNCTION_NAME \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{
+    "download_url": "https://example.com/file.zip",
+    "download_filename": "file.zip",
+    "target_bucket": "my-other-bucket",
+    "target_bucket_region": "eu-central-1",
+    "chunk_size_mb": 256
+  }' \
+  response.json
+```
+
+## Known Limitations
+
+- The Lambda function has a 15-minute maximum timeout. If the download and upload combined take longer than that, the function will be killed mid-stream and the multipart upload will be left incomplete. Consider setting an [S3 lifecycle rule](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpu-abort-incomplete-mpu-lifecycle-config.html) on the target bucket to auto-clean incomplete multipart uploads.
+- The `download_filename` should be a flat filename (e.g. `file.zip`). If it contains slashes (e.g. `path/to/file.zip`), the temporary file path in `/tmp` will include subdirectories that may not exist, causing a write failure.
+- The maximum downloadable file size is limited by the 15-minute Lambda timeout, not by S3 (which supports up to 5 TB via multipart upload with 10,000 parts). In practice, Lambda can usually download roughly 55-110 GB in 15 minutes depending on network speed between Lambda and the source URL, so your mileage may vary. At the default chunk size of 512 MB, the 10,000 parts limit allows up to ~5 TB.
+- This pattern always uses multipart upload, even for small files. For files under 5 MB, this results in 3 PUT requests (CreateMultipartUpload + UploadPart + CompleteMultipartUpload) instead of a single PutObject call. The cost difference in that case is negligible (fractions of a cent), but can compound if done often enough.
+
+## Cleanup
+
+1. Delete the stack
+    ```
+    sam delete
+    ```
+----
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0

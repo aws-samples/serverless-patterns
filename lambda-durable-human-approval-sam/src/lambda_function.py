@@ -28,9 +28,18 @@ def lambda_handler(event, context: DurableContext):
     amount = body.get('amount', 0)
     description = body.get('description', 'No description')
     
-    # Get API Gateway URL from environment or construct it
-    region = os.environ.get('AWS_REGION', 'us-east-2')
-    api_base_url = f"https://w8a9tempjb.execute-api.{region}.amazonaws.com/prod"
+    # Get API Gateway URL from Parameter Store
+    param_name = os.environ.get('API_GATEWAY_PARAM')
+    if not param_name:
+        raise ValueError("API_GATEWAY_PARAM environment variable is not set")
+    
+    try:
+        import boto3
+        ssm = boto3.client('ssm')
+        response = ssm.get_parameter(Name=param_name)
+        api_base_url = response['Parameter']['Value']
+    except Exception as e:
+        raise ValueError(f"Could not get API Gateway URL from Parameter Store: {e}")
     
     print(f"Starting approval workflow for request: {request_id}")
     print(f"API Base URL: {api_base_url}")
