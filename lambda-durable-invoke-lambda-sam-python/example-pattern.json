@@ -1,5 +1,5 @@
 {
-  "title": "Lambda Durable Function invoking Lambda Function",
+  "title": "AWS Lambda durable function invoking an AWS Lambda Function",
   "description": "Lambda durable function invokes a standard Lambda function using context.invoke() with automatic checkpointing.",
   "language": "Python",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a durable Lambda function and a standard Lambda function. The durable function uses the AWS Durable Execution SDK to orchestrate a workflow that prepares input data in a checkpointed step and then invokes the standard Lambda function using context.invoke().",
+      "This pattern deploys an AWS Lambda durable function and a standard AWS Lambda function. The durable function uses the durable execution SDK to orchestrate a workflow that prepares input data in a checkpointed step and then invokes the standard Lambda function using context.invoke().",
       "The context.invoke() call creates a checkpoint so that if the durable function is interrupted after the invoked function completes, it resumes with the stored result without re-invoking the processor function.",
       "This pattern deploys two Lambda functions with the required IAM permissions for durable execution and cross-function invocation."
     ]
@@ -23,15 +23,15 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Durable Functions",
+        "text": "AWS Lambda durable functions",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
-        "text": "Durable Execution SDK for Python",
+        "text": "Durable execution SDK for Python",
         "link": "https://github.com/aws/aws-durable-execution-sdk-python"
       },
       {
-        "text": "Chained Invocations Across Functions",
+        "text": "Chained invocations across functions",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-examples.html"
       }
     ]
@@ -56,7 +56,7 @@
     {
       "name": "Sidharth Kothari",
       "image": "https://drive.google.com/file/d/1sUXFJLHYuCmadcu4Q7mhb0mBnWfTcrtT/view",
-      "bio": "Cloud Engineer II at AWS with deep expertise in serverless, event-driven and microservice-based solutions",
+      "bio": "Cloud Engineer II at AWS with expertise in serverless, GenAI, event-driven and microservice-based applications",
       "linkedin": "sidharthkothari"
     }
   ]
