@@ -6,7 +6,7 @@ terraform {
     }
   }
 
-  required_version = ">= 0.14.9"
+  required_version = "~> 1.14"
 }
 
 data "aws_caller_identity" "current" {}
