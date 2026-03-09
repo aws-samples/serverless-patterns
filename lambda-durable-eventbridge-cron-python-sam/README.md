@@ -1,16 +1,16 @@
-# EventBridge Cron to Durable Lambda Function
+# EventBridge Scheduler to Lambda durable function
 
-This pattern demonstrates how to trigger a durable Lambda function using EventBridge on a cron schedule. The Lambda function uses the AWS Durable Execution SDK to implement a multi-step workflow with checkpointing and automatic replay capabilities.
+This pattern demonstrates how to trigger a Lambda durable function using EventBridge Scheduler on a cron schedule. The Lambda function uses the durable execution SDK to implement a multi-step workflow with checkpointing and automatic replay capabilities.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-eventbridge-cron-python-sam](https://serverlessland.com/patterns/lambda-durable-eventbridge-cron-python-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Architecture
 
-![Architecture](EventBridge_DF_architecture.png)
+![Architecture](EventBridge_LambdaDF_architecture.png)
 
-This architecture demonstrates a serverless cron job implementation using EventBridge and durable Lambda functions. An EventBridge rule configured with a cron expression triggers the durable Lambda function every minute. The Lambda function uses the AWS Durable Execution SDK to implement a multi-step workflow that can span multiple invocations through checkpointing - when `context.wait()` is called, the function suspends execution and creates a checkpoint, then resumes from that point in a subsequent invocation without re-executing previous steps. 
+This architecture demonstrates a serverless cron job implementation using EventBridge and durable Lambda functions. An EventBridge rule configured with a cron expression triggers the durable Lambda function every minute. The Lambda function uses the durable execution SDK to implement a multi-step workflow that can span multiple invocations through checkpointing - when `context.wait()` is called, the function suspends execution and creates a checkpoint, then resumes from that point in a subsequent invocation without re-executing previous steps. 
 
 ## Requirements
 
@@ -48,7 +48,7 @@ This architecture demonstrates a serverless cron job implementation using EventB
 
 This pattern creates:
 
-1. **Durable Lambda Function**: A Python 3.14 Lambda function that uses the AWS Durable Execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.
+1. **Durable Lambda Function**: A Python 3.14 Lambda function that uses the durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.
 
 2. **EventBridge Cron Rule**: An EventBridge rule configured with `cron(* * * * ? *)` that triggers the Lambda function every minute.
 
