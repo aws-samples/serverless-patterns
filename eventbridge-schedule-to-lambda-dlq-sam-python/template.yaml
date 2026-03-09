@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  EventBridge Scheduler with Lambda and Dual SQS DLQs
+  
+  This pattern showcases EventBridge Scheduler's robust failure handling capabilities
+  with separate DLQs for Lambda execution failures and EventBridge invocation failures.
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+
+Resources:
+  # Main Lambda Function (invoked by EventBridge Scheduler)
+  ScheduledFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/scheduled/
+      Handler: app.lambda_handler
+      Description: Main function invoked by EventBridge Scheduler
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+          SIMULATE_FAILURE: false
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: !GetAtt LambdaExecutionDLQ.Arn
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt LambdaExecutionDLQ.QueueName
+
+  # Dead Letter Queue for Lambda execution failures
+  LambdaExecutionDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${AWS::StackName}-lambda-dlq'
+      MessageRetentionPeriod: 1209600  # 14 days
+      VisibilityTimeout: 300
+      Tags:
+        - Key: Pattern
+          Value: EventBridge-Scheduler-Lambda-DLQ
+
+  # Dead Letter Queue for EventBridge Scheduler invocation failures
+  SchedulerDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${AWS::StackName}-scheduler-dlq'
+      MessageRetentionPeriod: 1209600  # 14 days
+      VisibilityTimeout: 300
+      Tags:
+        - Key: Pattern
+          Value: EventBridge-Scheduler-Lambda-DLQ
+
+  # Queue Policy to allow EventBridge Scheduler to send messages to DLQ
+  SchedulerDLQPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref SchedulerDLQ
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowEventBridgeSchedulerToSendMessage
+            Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt SchedulerDLQ.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Sub 'arn:aws:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/default/${AWS::StackName}-schedule'
+
+  # IAM Role for EventBridge Scheduler
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt ScheduledFunction.Arn
+        - PolicyName: SendToDLQ
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource: !GetAtt SchedulerDLQ.Arn
+
+  # EventBridge Scheduler
+  EventSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub '${AWS::StackName}-schedule'
+      Description: Invokes Lambda function every 5 minutes with retry and DLQ
+      ScheduleExpression: rate(5 minutes)
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      State: ENABLED
+      Target:
+        Arn: !GetAtt ScheduledFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        RetryPolicy:
+          MaximumRetryAttempts: 3
+          MaximumEventAgeInSeconds: 3600  # 1 hour
+        DeadLetterConfig:
+          Arn: !GetAtt SchedulerDLQ.Arn
+
+Outputs:
+  ScheduledFunctionArn:
+    Description: ARN of the scheduled Lambda function
+    Value: !GetAtt ScheduledFunction.Arn
+    
+  ScheduledFunctionName:
+    Description: Name of the scheduled Lambda function
+    Value: !Ref ScheduledFunction
+    
+  LambdaExecutionDLQUrl:
+    Description: URL of the Lambda Execution Dead Letter Queue
+    Value: !Ref LambdaExecutionDLQ
+    
+  LambdaExecutionDLQArn:
+    Description: ARN of the Lambda Execution Dead Letter Queue
+    Value: !GetAtt LambdaExecutionDLQ.Arn
+    
+  SchedulerDLQUrl:
+    Description: URL of the EventBridge Scheduler Dead Letter Queue
+    Value: !Ref SchedulerDLQ
+    
+  SchedulerDLQArn:
+    Description: ARN of the EventBridge Scheduler Dead Letter Queue
+    Value: !GetAtt SchedulerDLQ.Arn
+    
+  ScheduleName:
+    Description: Name of the EventBridge Schedule
+    Value: !Ref EventSchedule
+    
+  ScheduleArn:
+    Description: ARN of the EventBridge Schedule
+    Value: !GetAtt EventSchedule.Arn
+    
+  TestFailureCommand:
+    Description: Command to simulate a Lambda execution failure
+    Value: !Sub |
+      aws lambda update-function-configuration \
+        --function-name ${ScheduledFunction} \
+        --environment Variables={LOG_LEVEL=INFO,SIMULATE_FAILURE=true}
