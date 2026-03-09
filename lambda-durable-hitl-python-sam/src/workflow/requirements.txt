@@ -1,0 +1,9 @@
+# AWS SDK
+boto3>=1.34.0
+botocore>=1.34.0
+
+# AWS Durable Execution SDK
+aws-durable-execution-sdk-python
+
+# Data validation and parsing
+pydantic>=2.5.0
