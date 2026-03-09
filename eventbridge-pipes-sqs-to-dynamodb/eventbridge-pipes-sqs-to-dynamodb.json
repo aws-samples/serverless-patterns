@@ -1,0 +1,114 @@
+{
+  "title": "Amazon SQS to Amazon DynamoDB via Amazon EventBridge Pipes using CDK/Python",
+  "description": "Send messages from an SQS queue to a DynamoDB table via API Gateway using EventBridge Pipes. Implemented with CDK/Python.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Messages sent to the Amazon SQS queue are polled by Amazon EventBridge Pipe.",
+      "Amazon EventBridge Pipe processes the messages and sends them to the Amazon API Gateway endpoint.",
+      "Amazon API Gateway transforms the message and writes the data to the Amazon DynamoDB table using direct integration."
+    ]
+  },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-dynamodb",
+        "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-dynamodb",
+        "projectFolder": "eventbridge-pipes-sqs-to-dynamodb",
+        "templateFile": "eventbridge_pipes_sqs_to_dynamodb/eventbridge_pipes_sqs_to_dynamodb.py"
+      }
+    },
+  "services": {
+    "from": {
+      "serviceName": "Amazon SQS",
+      "serviceURL": "/sqs/"
+    },
+    "to": {
+      "serviceName": "Amazon DynamoDB",
+      "serviceURL": "/dynamodb/"
+    }
+  },
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "sqs",
+      "label": "Amazon SQS"
+    },
+    "icon2": {
+      "x": 37,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "EventBridge Pipes"
+    },
+    "icon3": {
+      "x": 63,
+      "y": 50,
+      "service": "apigw",
+      "label": "API Gateway"
+    },
+    "icon4": {
+      "x": 90,
+      "y": 50,
+      "service": "dynamodb",
+      "label": "DynamoDB"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon3",
+      "to": "icon4"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon SQS Developer Guide",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "AWS CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes CDK v2 Python Reference",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html"
+      },
+      {
+        "text": "Amazon API Gateway DynamoDB Integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-overview-developer-experience.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": "Michele Scarimbolo",
+      "image": "https://avatars.githubusercontent.com/u/229997073",
+      "bio": "Technical Account Manager at AWS. Serverless specialist and enthusiast.",
+      "linkedin": "michele-scarimbolo",
+      "twitter": ""
+    }
+  ],
+  "patternType": "Serverless"
+}
