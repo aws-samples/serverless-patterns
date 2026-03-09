@@ -90,7 +90,7 @@ resource "aws_lambda_function" "processor" {
   function_name    = "${var.prefix}-scheduled-processor"
   role             = aws_iam_role.lambda_role.arn
   handler          = "processor.lambda_handler"
-  runtime          = "python3.12"
+  runtime          = "python3.14"
   timeout          = 30
   memory_size      = 128
   filename         = "processor.zip"
