@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.77.0"
+      version = "~> 6.19.0"
     }
   }
 
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "MyHandlerFunction-Function" {
   function_name = "s3-sqs-lambda-tf-LambdaFunction"
   role          = aws_iam_role.MyHandlerFunction-Role.arn
   handler       = "app.handler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs24.x"
 }
 
 # Create a zip file from the Lambda source code
