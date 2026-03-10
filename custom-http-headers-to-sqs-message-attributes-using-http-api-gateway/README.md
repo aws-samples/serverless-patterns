@@ -30,12 +30,12 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd _patterns-model custom-http-headers-to-sqs-message-attributes-using-http-api-gateway
+cd serverless-patterns/custom-http-headers-to-sqs-message-attributes-using-http-api-gateway
 ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
 
 ```
-sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM
+sam deploy --guided
 ```
 
 4. During the prompts enter the values corresponding to each field. The values in the square brackets are the default values, which can be overwritten once you enter the inputs.
@@ -73,10 +73,12 @@ This pattern sets up the following resources:
 
 
 ## Testing:
----
+
 1. Invoke the API Gateway with required headers and body and see the message being received with the headers as message attributes.
 
-- Example: (The following example is for the default configuration, you can modify the values based on your custom configuration). CLI: 
+- Replace the values `HTTP-API-ID` with the value from `HttpApiId` key from the `sam deploy` command. Replace `region` with the region you have the stack deployed to.
+
+CLI: 
 ```
 curl --location 'https://<HTTP-API-ID>.execute-api.<region>.amazonaws.com/sqs' \
 	--header 'header1: value for header1 which will go as MessageAttribute1' \
@@ -88,23 +90,31 @@ curl --location 'https://<HTTP-API-ID>.execute-api.<region>.amazonaws.com/sqs' \
 ```
 
 2. Use Case requirements:
-	- Required Headers:
-		- The following headers and their corresponding values are expected to passed along with the request when using this template
-			-->  header1's (key and value) is required for MessageAttribute1
-			--> header2's (key and value) is required for MessageAttribute2
-			--> 'static_header3' is the static value being configured for MessageAttribute3's header. Since is it configured this header is not mandatory when sending the request.
-	- Request Body Format:
-        {
-          "MessageBody": "Your message here"
-        }
 
-	- Message received in SQS will have the following attributes.
-```		
+Required Headers:
+
+- The following headers and their corresponding values are expected to passed along with the request when using this template
+			--> `header1` (key and value) is required for `MessageAttribute1`
+			--> `header2`(key and value) is required for `MessageAttribute2`
+			--> `static_header3` is the static value being configured for `MessageAttribute3` header. 
+
+Since is it configured this header is not mandatory when sending the request.
+
+
+Request Body Format:
+
+{
+    "MessageBody": "Your message here"
+}
+
+
+Message received in SQS will have the following attributes.
+
 Attributes (3)
-		--> Name: MessageAttribute1 | Type: String | Value: value for header1 which will go as MessageAttribute1
-		--> Name: MessageAttribute2 | Type: String | Value: value for header2 which will go as MessageAttribute2
-		--> Name: MessageAttribute3 | Type: String | Value: static_header3
-```
+--> Name: MessageAttribute1 | Type: String | Value: value for header1 which will go as MessageAttribute1
+--> Name: MessageAttribute2 | Type: String | Value: value for header2 which will go as MessageAttribute2
+--> Name: MessageAttribute3 | Type: String | Value: static_header3
+
 
 ## Cleanup
 ---
