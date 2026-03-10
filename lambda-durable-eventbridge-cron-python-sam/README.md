@@ -10,7 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ![Architecture](EventBridge_LambdaDF_architecture.png)
 
-This architecture demonstrates a serverless cron job implementation using EventBridge and durable Lambda functions. An EventBridge rule configured with a cron expression triggers the durable Lambda function every minute. The Lambda function uses the durable execution SDK to implement a multi-step workflow that can span multiple invocations through checkpointing - when `context.wait()` is called, the function suspends execution and creates a checkpoint, then resumes from that point in a subsequent invocation without re-executing previous steps. 
+This architecture demonstrates a serverless cron job implementation using EventBridge Scheduler and durable Lambda functions. An EventBridge Scheduler schedule configured with a cron expression triggers the durable Lambda function every minute. The Scheduler uses an IAM role to invoke the Lambda function, rather than resource-based permissions used by EventBridge rules. The Lambda function uses the durable execution SDK to implement a multi-step workflow that can span multiple invocations through checkpointing - when `context.wait()` is called, the function suspends execution and creates a checkpoint, then resumes from that point in a subsequent invocation without re-executing previous steps.
 
 ## Requirements
 
@@ -50,11 +50,13 @@ This pattern creates:
 
 1. **Durable Lambda Function**: A Python 3.14 Lambda function that uses the durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.
 
-2. **EventBridge Cron Rule**: An EventBridge rule configured with `cron(* * * * ? *)` that triggers the Lambda function every minute.
+2. **EventBridge Scheduler Schedule**: An EventBridge Scheduler schedule configured with `cron(* * * * ? *)` that triggers the Lambda function every minute, with `FlexibleTimeWindow` set to `OFF` for precise timing.
 
-3. **Function Versioning**: The Lambda function uses `AutoPublishAlias: live` to automatically publish a new version on each deployment and point the `live` alias to it.
+3. **Scheduler IAM Role**: An IAM role that the Scheduler assumes to invoke the Lambda function alias, following the identity-based permission model.
 
-4. **Targeted Invocation**: The EventBridge rule specifically targets the published version via the alias as it is a best practice to use numbered versions or aliases for production durable functions rather than $LATEST.
+4. **Function Versioning**: The Lambda function uses `AutoPublishAlias: live` to automatically publish a new version on each deployment and point the `live` alias to it.
+
+5. **Targeted Invocation**: The Scheduler specifically targets the published version via the alias as it is a best practice to use numbered versions or aliases for production durable functions rather than $LATEST.
 
 ### Durable Execution Flow
 
@@ -72,7 +74,7 @@ This demonstrates how durable functions can span multiple Lambda invocations whi
 
 ## Testing
 
-1. After deployment, the EventBridge rule will automatically trigger the Lambda function every minute.
+1. After deployment, the EventBridge Scheduler schedule will automatically trigger the Lambda function every minute.
 
 2. Monitor the function execution in CloudWatch Logs:
     ```bash

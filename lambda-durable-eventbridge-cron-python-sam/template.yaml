@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Durable Lambda function triggered by an EventBridge cron schedule every 1 minute
+Description: Durable Lambda function triggered by an EventBridge Scheduler cron schedule every 1 minute
 
 Globals:
   Function:
@@ -19,7 +19,7 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 900
         RetentionPeriodInDays: 7
-      Description: Durable execution Lambda triggered every minute by EventBridge
+      Description: Durable execution Lambda triggered every minute by EventBridge Scheduler
       Policies:
         - Statement:
             - Effect: Allow
@@ -27,25 +27,39 @@ Resources:
                 - lambda:InvokeFunction
               Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*
 
-  # EventBridge rule — every minute cron schedule
-  HourlyCronRule:
-    Type: AWS::Events::Rule
+  # IAM role for EventBridge Scheduler to invoke the Lambda alias
+  SchedulerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Ref DurableCronFunction.Alias
+
+  # EventBridge Scheduler — every minute cron schedule
+  HourlyCronSchedule:
+    Type: AWS::Scheduler::Schedule
     Properties:
       Description: Triggers the durable Lambda function every minute
       ScheduleExpression: cron(* * * * ? *)
+      FlexibleTimeWindow:
+        Mode: 'OFF'
       State: ENABLED
-      Targets:
-        - Arn: !Ref DurableCronFunction.Alias
-          Id: DurableCronFunctionTarget
-
-  # Permission for EventBridge to invoke the published alias
-  HourlyCronRulePermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref DurableCronFunction.Alias
-      Action: lambda:InvokeFunction
-      Principal: events.amazonaws.com
-      SourceArn: !GetAtt HourlyCronRule.Arn
+      Target:
+        Arn: !Ref DurableCronFunction.Alias
+        RoleArn: !GetAtt SchedulerExecutionRole.Arn
 
 Outputs:
   DurableCronFunctionAliasArn:
@@ -57,6 +71,6 @@ Outputs:
   DurableCronFunctionName:
     Description: Name of the durable cron Lambda function
     Value: !Ref DurableCronFunction
-  HourlyCronRuleArn:
-    Description: ARN of the EventBridge every-minute cron rule
-    Value: !GetAtt HourlyCronRule.Arn
+  HourlyCronScheduleArn:
+    Description: ARN of the EventBridge Scheduler every-minute cron schedule
+    Value: !GetAtt HourlyCronSchedule.Arn
