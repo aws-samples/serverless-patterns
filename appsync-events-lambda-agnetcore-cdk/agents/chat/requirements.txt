@@ -1,3 +1,4 @@
 strands-agents>=1.13.0
+strands-agents-tools>=0.2.22
 bedrock-agentcore>=1.0.3
 aws-opentelemetry-distro

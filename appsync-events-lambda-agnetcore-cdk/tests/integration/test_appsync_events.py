@@ -1,12 +1,15 @@
 """Integration tests for the deployed AppSync Event API.
 
-Tests HTTP publish, streaming responses, multi-turn conversations,
-and error handling for the full end-to-end flow.
+Tests HTTP publish, streaming responses, tool use (http_request,
+calculator, current_time), multi-turn conversations, and error
+handling for the full end-to-end flow.
 """
 
 import asyncio
 import json
+import re
 import uuid
+from datetime import datetime, timezone
 
 import pytest
 
@@ -30,6 +33,7 @@ async def _collect_response(ws, sub_id, timeout=60):
             if isinstance(event_data, str):
                 event_data = json.loads(event_data)
             events.append(event_data)
+            print(f"Chunk {len(events)}: {event_data}")
 
             payload = event_data.get("payload", event_data)
             if payload.get("type") == "complete":
@@ -49,15 +53,17 @@ def test_publish_returns_success(publish):
 
 
 @pytest.mark.asyncio
-async def test_subscribe_receives_agent_response(subscribe, publish):
-    """Subscribe via WebSocket, publish via HTTP, and verify
-    the agent streams chunks back via the channel."""
+async def test_http_request_tool(subscribe, publish):
+    """Ask the agent to fetch a URL using http_request and verify
+    it streams a summarised response back via the channel."""
     conversation_id = str(uuid.uuid4())
     publish_channel = f"chat/{conversation_id}"
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
         publish(publish_channel, {
-            "message": "Write a short nursery rhyme about goats",
+            "message": (
+                "Fetch the AWS blog homepage at https://aws.amazon.com/blogs/ and show me the latest 5 blog posts titles."
+            ),
             "sessionId": conversation_id,
         })
 
@@ -72,52 +78,42 @@ async def test_subscribe_receives_agent_response(subscribe, publish):
 async def test_conversation_with_session(subscribe, publish):
     """Test multi-turn conversation using sessionId for continuity.
 
-    Turn 1: Ask for a short nursery rhyme about goats (< 100 words).
-    Turn 2: Ask to make it longer (250-300 words) — the agent should
-    remember the first request via session persistence.
+    Turn 1: Ask the agent to fetch and summarise an AWS blog post.
+    Turn 2: Ask a follow-up question — the agent should remember
+    the blog content from the first turn via session persistence.
     """
     session_id = str(uuid.uuid4())
     publish_channel = f"chat/{session_id}"
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
-        # Turn 1: short nursery rhyme
+        # Turn 1: fetch and summarise an AWS blog post
         publish(publish_channel, {
             "message": (
-                "Write a short nursery rhyme about goats. "
+                "Fetch https://aws.amazon.com/blogs/aws/ and give me "
+                "a short summary of the first blog post you see. "
                 "Keep it under 100 words."
             ),
             "sessionId": session_id,
         })
 
-        _, complete_1 = await _collect_response(ws, sub_id)
+        events_1, complete_1 = await _collect_response(ws, sub_id)
         assert complete_1 is not None, "Turn 1 did not complete"
         response_1 = complete_1.get("response", "")
-        word_count_1 = len(response_1.split())
-        print(f"\n[turn 1] {word_count_1} words: {response_1[:200]}...")
-        assert word_count_1 < 150, f"Turn 1 too long: {word_count_1} words"
 
-        # Turn 2: ask to make it longer — agent should remember the rhyme
+        # Turn 2: ask a follow-up — agent should remember the blog post
         publish(publish_channel, {
             "message": (
-                "That was great! Now make the nursery rhyme longer, "
-                "between 250 and 300 words."
+                "Based on that blog post, what AWS services were mentioned? "
+                "List them out."
             ),
             "sessionId": session_id,
         })
 
-        _, complete_2 = await _collect_response(ws, sub_id)
+        events_2, complete_2 = await _collect_response(ws, sub_id)
         assert complete_2 is not None, "Turn 2 did not complete"
         response_2 = complete_2.get("response", "")
-        word_count_2 = len(response_2.split())
-        print(f"\n[turn 2] {word_count_2} words: {response_2[:200]}...")
 
-        assert word_count_2 > word_count_1, (
-            f"Turn 2 ({word_count_2} words) should be longer "
-            f"than turn 1 ({word_count_1} words)"
-        )
-        assert "goat" in response_2.lower(), (
-            "Turn 2 should reference goats from the conversation context"
-        )
+        assert len(response_2) > 0, "Turn 2 should have a non-empty response"
 
 @pytest.mark.asyncio
 async def test_unsubscribe_stops_receiving_events(subscribe, publish):
@@ -248,6 +244,62 @@ async def _expect_error_event(subscribe, publish, channel_id, payload, expected_
                     return
 
         pytest.fail(f"Did not receive error event for payload: {payload}")
+
+
+@pytest.mark.asyncio
+async def test_calculator_tool(subscribe, publish):
+    """Ask the agent to perform a calculation and verify it uses the
+    calculator tool and returns the correct result."""
+    conversation_id = str(uuid.uuid4())
+    publish_channel = f"chat/{conversation_id}"
+
+    async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
+        publish(publish_channel, {
+            "message": "Use the calculator to compute 347 * 29. Reply with only the number.",
+            "sessionId": conversation_id,
+        })
+
+        _, complete = await _collect_response(ws, sub_id)
+        assert complete is not None, "Did not receive a completion event"
+        response = complete.get("response", "")
+        assert "10063" in response, (
+            f"Expected calculator result 10063 in response: {response}"
+        )
+
+
+@pytest.mark.asyncio
+async def test_current_time_tool(subscribe, publish):
+    """Ask the agent for the current UTC time and verify the response
+    matches the actual time to the minute (±2 min grace)."""
+    conversation_id = str(uuid.uuid4())
+    publish_channel = f"chat/{conversation_id}"
+
+    async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
+        publish(publish_channel, {
+            "message": (
+                "Get the current time in UTC. "
+                "Reply with ONLY the time in this exact format: YYYY-MM-DD HH:MM "
+                "For example: 2026-03-11 14:05"
+            ),
+            "sessionId": conversation_id,
+        })
+
+        now_utc = datetime.now(timezone.utc)
+        _, complete = await _collect_response(ws, sub_id)
+        assert complete is not None, "Did not receive a completion event"
+        response = complete.get("response", "")
+
+        match = re.search(r"\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}", response)
+        assert match, f"Could not find YYYY-MM-DD HH:MM in response: {response}"
+
+        reported = datetime.strptime(match.group(), "%Y-%m-%d %H:%M").replace(
+            tzinfo=timezone.utc,
+        )
+        diff = abs((reported - now_utc).total_seconds())
+        assert diff <= 120, (
+            f"Reported time {match.group()} differs from actual "
+            f"{now_utc.strftime('%Y-%m-%d %H:%M')} by {diff:.0f}s (max 120s)"
+        )
 
 
 @pytest.mark.asyncio

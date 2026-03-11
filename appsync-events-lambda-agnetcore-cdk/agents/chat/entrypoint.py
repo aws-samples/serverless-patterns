@@ -11,6 +11,7 @@ import logging
 from strands import Agent
 from strands.models import BedrockModel
 from strands.session.s3_session_manager import S3SessionManager
+from strands_tools import http_request, calculator, current_time
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +27,16 @@ REGION = os.environ.get("AWS_REGION", "eu-west-1")
 SESSION_BUCKET = os.environ.get("SESSION_BUCKET")
 
 SYSTEM_PROMPT = """\
-You are a helpful chat assistant. Answer questions clearly and concisely.
+You are a research assistant with access to the web, a calculator, and a clock.
+
+You can:
+- Fetch and summarise content from any public URL using http_request
+- Perform mathematical calculations using calculator
+- Check the current date and time in any timezone using current_time
+
+When fetching web content, prefer converting HTML to markdown for readability
+by setting convert_to_markdown=true. Always cite the URL you fetched.
+Keep responses clear and concise.
 """
 
 
@@ -37,6 +47,7 @@ def _create_agent(session_id: str | None = None) -> Agent:
     kwargs = {
         "system_prompt": SYSTEM_PROMPT,
         "model": model,
+        "tools": [http_request, calculator, current_time],
     }
 
     if session_id and SESSION_BUCKET:
