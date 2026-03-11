@@ -71,7 +71,6 @@ def handler(event: dict, context) -> dict:
         },
     )
 
-    # Invoke AgentCore Runtime
     payload = json.dumps(
         {
             "content": content,
@@ -111,7 +110,7 @@ def handler(event: dict, context) -> dict:
                 logger.debug("Non-dict SSE event", extra={"data": data})
                 continue
 
-            # Skip Strands control events (init_event_loop, start, etc.)
+            # Skip Strands SDK control events
             if any(
                 k in data
                 for k in (
@@ -125,7 +124,7 @@ def handler(event: dict, context) -> dict:
                 logger.debug("Control event", extra={"data": data})
                 continue
 
-            # Extract text from the event — Strands uses "data" key
+            # Strands streams text tokens in the "data" key
             text = data.get("data", "")
             if isinstance(text, str) and text:
                 current_chunk += text

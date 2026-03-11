@@ -36,7 +36,6 @@ class ChatAgentConstruct(Construct):
 
         stack = Stack.of(self)
 
-        # S3 bucket for conversation sessions
         self.session_bucket = s3.Bucket(
             self,
             "SessionBucket",
@@ -46,7 +45,6 @@ class ChatAgentConstruct(Construct):
             enforce_ssl=True,
         )
 
-        # Build Docker image from agents/chat/
         agent_image = ecr_assets.DockerImageAsset(
             self,
             "AgentImage",
@@ -57,7 +55,6 @@ class ChatAgentConstruct(Construct):
             exclude=["**/__pycache__", "**/*.pyc"],
         )
 
-        # IAM role for the runtime
         self.runtime_role = iam.Role(
             self,
             "RuntimeRole",
@@ -71,7 +68,6 @@ class ChatAgentConstruct(Construct):
             ),
         )
 
-        # Merge environment variables
         merged_env = {
             "BEDROCK_MODEL_ID": model_id,
             "AWS_REGION": stack.region,
@@ -79,7 +75,7 @@ class ChatAgentConstruct(Construct):
             **(environment_variables or {}),
         }
 
-        # AgentCore Runtime (L1)
+        # AgentCore Runtime — L1 construct (no L2 available yet)
         runtime_name = f"{stack.stack_name.replace('-', '_')}_chat_agent"
         self.runtime = agentcore.CfnRuntime(
             self,
@@ -106,8 +102,6 @@ class ChatAgentConstruct(Construct):
             "SessionBucketName",
             value=self.session_bucket.bucket_name,
         )
-
-        # --- cdk-nag suppressions ---
 
         NagSuppressions.add_resource_suppressions(
             self.session_bucket,

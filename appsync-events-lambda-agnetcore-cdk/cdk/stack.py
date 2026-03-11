@@ -38,8 +38,8 @@ class ChatStack(Stack):
             stream_relay_function=(self.stream_relay.standard_lambda.function),
         )
 
-        # Stream relay needs the AppSync endpoint and API key
-        # to publish chunks — add them after the API is created.
+        # Pass AppSync endpoint and API key to the stream relay so it
+        # can publish response chunks back to the client.
         self.stream_relay.standard_lambda.function.add_environment(
             "APPSYNC_HTTP_ENDPOINT",
             self.chat_service.api.http_dns,
@@ -54,7 +54,6 @@ class ChatStack(Stack):
     def _add_nag_suppressions(self):
         """Add cdk-nag suppressions for CDK-managed resources."""
 
-        # CDK's LogRetention custom resource Lambda
         for child in self.node.children:
             if child.node.id.startswith("LogRetention"):
                 NagSuppressions.add_resource_suppressions(
@@ -76,8 +75,6 @@ class ChatStack(Stack):
                     apply_to_children=True,
                 )
 
-        # AppSync Events construct: grant_invoke wildcards and
-        # X-Ray Resource::* for the agent invoker Lambda
         NagSuppressions.add_resource_suppressions(
             self.chat_service,
             [
@@ -104,7 +101,6 @@ class ChatStack(Stack):
             apply_to_children=True,
         )
 
-        # Stream relay: AgentCore runtime ARN wildcard and X-Ray
         NagSuppressions.add_resource_suppressions(
             self.stream_relay,
             [

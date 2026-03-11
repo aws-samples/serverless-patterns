@@ -33,8 +33,6 @@ class ChatServiceConstruct(Construct):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # --- Event API ---
-
         api_key_provider = appsync.AppSyncAuthProvider(
             authorization_type=appsync.AppSyncAuthorizationType.API_KEY,
         )
@@ -61,11 +59,10 @@ class ChatServiceConstruct(Construct):
             ),
         )
 
-        # Responses namespace — no handler, used by stream relay to publish
-        # agent responses without re-triggering the invoker Lambda
+        # Separate "responses" namespace for outbound streaming — avoids
+        # re-invocation loops where the Lambda's own publishes would
+        # re-trigger the invoker.
         self.api.add_channel_namespace("responses")
-
-        # --- Agent invoker Lambda (thin dispatcher) ---
 
         self.agent_invoker = StandardLambda(
             self,
@@ -78,18 +75,17 @@ class ChatServiceConstruct(Construct):
             },
         )
 
-        # Grant permission to invoke the stream relay async
         stream_relay_function.grant_invoke(
             self.agent_invoker.function,
         )
 
-        # Register Lambda as a data source on the Event API
         lambda_ds = self.api.add_lambda_data_source(
             "AgentInvokerDS",
             self.agent_invoker.function,
         )
 
-        # Chat namespace with direct Lambda integration
+        # "chat" namespace with direct Lambda integration — AppSync invokes
+        # the agent invoker Lambda synchronously on each publish.
         self.api.add_channel_namespace(
             "chat",
             publish_handler_config=appsync.HandlerConfig(
@@ -98,8 +94,6 @@ class ChatServiceConstruct(Construct):
                 lambda_invoke_type=(appsync.LambdaInvokeType.REQUEST_RESPONSE),
             ),
         )
-
-        # --- Outputs ---
 
         CfnOutput(
             self,
@@ -116,8 +110,6 @@ class ChatServiceConstruct(Construct):
             "EventApiApiKey",
             value=self.api.api_keys["Default"].attr_api_key,
         )
-
-        # --- cdk-nag suppressions ---
 
         NagSuppressions.add_resource_suppressions(
             self.api,
