@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""CDK app entrypoint for the AppSync Events + Lambda + AgentCore stack."""
 import os
 
 import aws_cdk as cdk

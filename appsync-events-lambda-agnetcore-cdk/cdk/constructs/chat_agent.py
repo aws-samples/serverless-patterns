@@ -65,7 +65,9 @@ class ChatAgentConstruct(Construct):
                 "bedrock-agentcore.amazonaws.com",
             ),
             inline_policies=self._build_policies(
-                stack, agent_image, self.session_bucket,
+                stack,
+                agent_image,
+                self.session_bucket,
             ),
         )
 
@@ -100,7 +102,8 @@ class ChatAgentConstruct(Construct):
         CfnOutput(self, "RuntimeArn", value=self.runtime.attr_agent_runtime_arn)
         CfnOutput(self, "RuntimeName", value=runtime_name)
         CfnOutput(
-            self, "SessionBucketName",
+            self,
+            "SessionBucketName",
             value=self.session_bucket.bucket_name,
         )
 
@@ -108,7 +111,12 @@ class ChatAgentConstruct(Construct):
 
         NagSuppressions.add_resource_suppressions(
             self.session_bucket,
-            [{"id": "AwsSolutions-S1", "reason": "Access logs not required for sample code."}],
+            [
+                {
+                    "id": "AwsSolutions-S1",
+                    "reason": "Access logs not required for sample code.",
+                }
+            ],
         )
 
         NagSuppressions.add_resource_suppressions(

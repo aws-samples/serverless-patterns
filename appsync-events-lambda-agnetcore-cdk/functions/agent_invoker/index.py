@@ -37,22 +37,26 @@ def handler(event: dict, context) -> dict:
 
         message = payload.get("message")
         if not message or not str(message).strip():
-            results.append({
-                "id": event_id,
-                "payload": {
-                    "error": "message is required and cannot be empty",
-                },
-            })
+            results.append(
+                {
+                    "id": event_id,
+                    "payload": {
+                        "error": "message is required and cannot be empty",
+                    },
+                }
+            )
             continue
 
         session_id = payload.get("sessionId")
         if not session_id or not str(session_id).strip():
-            results.append({
-                "id": event_id,
-                "payload": {
-                    "error": "sessionId is required and cannot be empty",
-                },
-            })
+            results.append(
+                {
+                    "id": event_id,
+                    "payload": {
+                        "error": "sessionId is required and cannot be empty",
+                    },
+                }
+            )
             continue
 
         relay_payload = {
@@ -77,9 +81,11 @@ def handler(event: dict, context) -> dict:
             Payload=json.dumps(relay_payload).encode(),
         )
 
-        results.append({
-            "id": event_id,
-            "payload": {**payload, "sessionId": session_id},
-        })
+        results.append(
+            {
+                "id": event_id,
+                "payload": {**payload, "sessionId": session_id},
+            }
+        )
 
     return {"events": results}

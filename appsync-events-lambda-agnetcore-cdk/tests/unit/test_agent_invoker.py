@@ -18,10 +18,7 @@ def _make_event(payload, channel="/chat/test-123"):
 def _make_multi_event(payloads, channel="/chat/test-123"):
     """Build an event with multiple published messages."""
     return {
-        "events": [
-            {"id": f"evt-{i}", "payload": p}
-            for i, p in enumerate(payloads)
-        ],
+        "events": [{"id": f"evt-{i}", "payload": p} for i, p in enumerate(payloads)],
         "info": {"channel": {"path": channel}},
     }
 
@@ -111,10 +108,12 @@ def test_response_channel_prefixed_with_responses(mock_client, lambda_context):
 @patch("functions.agent_invoker.index.lambda_client")
 def test_multiple_events_processed_independently(mock_client, lambda_context):
     """Batch with one valid and one invalid event returns mixed results."""
-    event = _make_multi_event([
-        {"message": "hello", "sessionId": "s1"},
-        {"message": "world"},  # missing sessionId
-    ])
+    event = _make_multi_event(
+        [
+            {"message": "hello", "sessionId": "s1"},
+            {"message": "world"},  # missing sessionId
+        ]
+    )
     result = handler(event, lambda_context)
 
     assert mock_client.invoke.call_count == 1  # only valid event invoked

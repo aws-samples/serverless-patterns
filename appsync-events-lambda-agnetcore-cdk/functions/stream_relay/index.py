@@ -30,10 +30,12 @@ AGENT_RUNTIME_ARN = os.environ["AGENT_RUNTIME_ARN"]
 def _publish_to_channel(channel: str, event: dict):
     """Publish an event to an AppSync Events channel via HTTP."""
     url = f"https://{APPSYNC_HTTP_ENDPOINT}/event"
-    body = json.dumps({
-        "channel": channel,
-        "events": [json.dumps(event)],
-    }).encode()
+    body = json.dumps(
+        {
+            "channel": channel,
+            "events": [json.dumps(event)],
+        }
+    ).encode()
 
     req = urllib.request.Request(
         url,
@@ -70,10 +72,12 @@ def handler(event: dict, context) -> dict:
     )
 
     # Invoke AgentCore Runtime
-    payload = json.dumps({
-        "content": content,
-        "sessionId": session_id,
-    }).encode()
+    payload = json.dumps(
+        {
+            "content": content,
+            "sessionId": session_id,
+        }
+    ).encode()
     response = agentcore_client.invoke_agent_runtime(
         agentRuntimeArn=AGENT_RUNTIME_ARN,
         payload=payload,
@@ -108,10 +112,16 @@ def handler(event: dict, context) -> dict:
                 continue
 
             # Skip Strands control events (init_event_loop, start, etc.)
-            if any(k in data for k in (
-                "init_event_loop", "start", "start_event_loop",
-                "force_stop", "complete",
-            )):
+            if any(
+                k in data
+                for k in (
+                    "init_event_loop",
+                    "start",
+                    "start_event_loop",
+                    "force_stop",
+                    "complete",
+                )
+            ):
                 logger.debug("Control event", extra={"data": data})
                 continue
 
@@ -121,16 +131,16 @@ def handler(event: dict, context) -> dict:
                 current_chunk += text
                 full_response += text
 
-                if (
-                    len(current_chunk) >= 50
-                    or text.endswith((".", "!", "?", "\n"))
-                ):
-                    _publish_to_channel(channel, {
-                        "type": "chunk",
-                        "sequence": sequence,
-                        "content": current_chunk,
-                        "eventId": event_id,
-                    })
+                if len(current_chunk) >= 50 or text.endswith((".", "!", "?", "\n")):
+                    _publish_to_channel(
+                        channel,
+                        {
+                            "type": "chunk",
+                            "sequence": sequence,
+                            "content": current_chunk,
+                            "eventId": event_id,
+                        },
+                    )
                     sequence += 1
                     current_chunk = ""
     else:
@@ -143,13 +153,16 @@ def handler(event: dict, context) -> dict:
             full_response = raw
 
     # Publish completion event (includes any remaining chunk content)
-    _publish_to_channel(channel, {
-        "type": "complete",
-        "sequence": sequence,
-        "content": current_chunk,
-        "response": full_response,
-        "eventId": event_id,
-    })
+    _publish_to_channel(
+        channel,
+        {
+            "type": "complete",
+            "sequence": sequence,
+            "content": current_chunk,
+            "response": full_response,
+            "eventId": event_id,
+        },
+    )
 
     logger.info(
         "Stream relay complete",

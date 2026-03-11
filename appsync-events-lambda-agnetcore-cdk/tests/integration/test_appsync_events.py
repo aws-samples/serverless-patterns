@@ -60,12 +60,13 @@ async def test_http_request_tool(subscribe, publish):
     publish_channel = f"chat/{conversation_id}"
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
-        publish(publish_channel, {
-            "message": (
-                "Fetch the AWS blog homepage at https://aws.amazon.com/blogs/ and show me the latest 5 blog posts titles."
-            ),
-            "sessionId": conversation_id,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": ("Fetch the AWS blog homepage at https://aws.amazon.com/blogs/ and show me the latest 5 blog posts titles."),
+                "sessionId": conversation_id,
+            },
+        )
 
         received, complete = await _collect_response(ws, sub_id)
 
@@ -87,32 +88,36 @@ async def test_conversation_with_session(subscribe, publish):
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
         # Turn 1: fetch and summarise an AWS blog post
-        publish(publish_channel, {
-            "message": (
-                "Fetch https://aws.amazon.com/blogs/aws/ and give me "
-                "a short summary of the first blog post you see. "
-                "Keep it under 100 words."
-            ),
-            "sessionId": session_id,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": (
+                    "Fetch https://aws.amazon.com/blogs/aws/ and give me "
+                    "a short summary of the first blog post you see. "
+                    "Keep it under 100 words."
+                ),
+                "sessionId": session_id,
+            },
+        )
 
         _, complete_1 = await _collect_response(ws, sub_id)
         assert complete_1 is not None, "Turn 1 did not complete"
 
         # Turn 2: ask a follow-up — agent should remember the blog post
-        publish(publish_channel, {
-            "message": (
-                "Based on that blog post, what AWS services were mentioned? "
-                "List them out."
-            ),
-            "sessionId": session_id,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": ("Based on that blog post, what AWS services were mentioned? " "List them out."),
+                "sessionId": session_id,
+            },
+        )
 
         _, complete_2 = await _collect_response(ws, sub_id)
         assert complete_2 is not None, "Turn 2 did not complete"
         response_2 = complete_2.get("response", "")
 
         assert len(response_2) > 0, "Turn 2 should have a non-empty response"
+
 
 @pytest.mark.asyncio
 async def test_unsubscribe_stops_receiving_events(subscribe, publish):
@@ -124,18 +129,25 @@ async def test_unsubscribe_stops_receiving_events(subscribe, publish):
 
     async with subscribe(response_channel) as (ws, sub_id):
         # Verify subscription works — publish and collect response
-        publish(publish_channel, {
-            "message": "Say hello",
-            "sessionId": conversation_id,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": "Say hello",
+                "sessionId": conversation_id,
+            },
+        )
         _, complete = await _collect_response(ws, sub_id, timeout=30)
         assert complete is not None, "Should receive response while subscribed"
 
         # Unsubscribe from the channel
-        await ws.send(json.dumps({
-            "type": "unsubscribe",
-            "id": sub_id,
-        }))
+        await ws.send(
+            json.dumps(
+                {
+                    "type": "unsubscribe",
+                    "id": sub_id,
+                }
+            )
+        )
 
         # Wait for unsubscribe ack
         deadline = asyncio.get_event_loop().time() + 5
@@ -149,10 +161,13 @@ async def test_unsubscribe_stops_receiving_events(subscribe, publish):
 
         # Publish again — should NOT receive anything on this sub
         new_session = str(uuid.uuid4())
-        publish(publish_channel, {
-            "message": "Say goodbye",
-            "sessionId": new_session,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": "Say goodbye",
+                "sessionId": new_session,
+            },
+        )
 
         # Wait briefly — we should only see keepalives, no data
         got_data = False
@@ -182,14 +197,19 @@ async def test_channel_isolation(subscribe, publish):
     async with subscribe(f"/responses/chat/{id_a}") as (ws_a, sub_a):
         async with subscribe(f"/responses/chat/{id_b}") as (ws_b, sub_b):
             # Publish only to channel A
-            publish(f"chat/{id_a}", {
-                "message": "Say hello from channel A",
-                "sessionId": id_a,
-            })
+            publish(
+                f"chat/{id_a}",
+                {
+                    "message": "Say hello from channel A",
+                    "sessionId": id_a,
+                },
+            )
 
             # Channel A should receive the response
             _, complete_a = await _collect_response(
-                ws_a, sub_a, timeout=30,
+                ws_a,
+                sub_a,
+                timeout=30,
             )
             assert complete_a is not None, "Channel A should receive a response"
 
@@ -208,10 +228,7 @@ async def test_channel_isolation(subscribe, publish):
                     got_data_b = True
                     break
 
-            assert not got_data_b, (
-                "Channel B should not receive events from channel A"
-            )
-
+            assert not got_data_b, "Channel B should not receive events from channel A"
 
 
 async def _expect_error_event(subscribe, publish, channel_id, payload, expected_text):
@@ -237,9 +254,7 @@ async def _expect_error_event(subscribe, publish, channel_id, payload, expected_
                     event_data = json.loads(event_data)
                 error = event_data.get("payload", event_data).get("error", "")
                 if error:
-                    assert expected_text in error.lower(), (
-                        f"Expected '{expected_text}' in error: {error}"
-                    )
+                    assert expected_text in error.lower(), f"Expected '{expected_text}' in error: {error}"
                     return
 
         pytest.fail(f"Did not receive error event for payload: {payload}")
@@ -253,17 +268,18 @@ async def test_calculator_tool(subscribe, publish):
     publish_channel = f"chat/{conversation_id}"
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
-        publish(publish_channel, {
-            "message": "Use the calculator to compute 347 * 29. Reply with only the number.",
-            "sessionId": conversation_id,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": "Use the calculator to compute 347 * 29. Reply with only the number.",
+                "sessionId": conversation_id,
+            },
+        )
 
         _, complete = await _collect_response(ws, sub_id)
         assert complete is not None, "Did not receive a completion event"
         response = complete.get("response", "")
-        assert "10063" in response, (
-            f"Expected calculator result 10063 in response: {response}"
-        )
+        assert "10063" in response, f"Expected calculator result 10063 in response: {response}"
 
 
 @pytest.mark.asyncio
@@ -274,14 +290,15 @@ async def test_current_time_tool(subscribe, publish):
     publish_channel = f"chat/{conversation_id}"
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
-        publish(publish_channel, {
-            "message": (
-                "Get the current time in UTC. "
-                "Reply with ONLY the time in this exact format: YYYY-MM-DD HH:MM "
-                "For example: 2026-03-11 14:05"
-            ),
-            "sessionId": conversation_id,
-        })
+        publish(
+            publish_channel,
+            {
+                "message": (
+                    "Get the current time in UTC. " "Reply with ONLY the time in this exact format: YYYY-MM-DD HH:MM " "For example: 2026-03-11 14:05"
+                ),
+                "sessionId": conversation_id,
+            },
+        )
 
         now_utc = datetime.now(timezone.utc)
         _, complete = await _collect_response(ws, sub_id)
@@ -295,22 +312,16 @@ async def test_current_time_tool(subscribe, publish):
             tzinfo=timezone.utc,
         )
         diff = abs((reported - now_utc).total_seconds())
-        assert diff <= 120, (
-            f"Reported time {match.group()} differs from actual "
-            f"{now_utc.strftime('%Y-%m-%d %H:%M')} by {diff:.0f}s (max 120s)"
-        )
+        assert diff <= 120, f"Reported time {match.group()} differs from actual " f"{now_utc.strftime('%Y-%m-%d %H:%M')} by {diff:.0f}s (max 120s)"
 
 
 @pytest.mark.asyncio
 async def test_missing_session_id_returns_error(subscribe, publish):
     """Publishing without a sessionId should return an error via WebSocket."""
     await _expect_error_event(
-        subscribe, publish,
+        subscribe,
+        publish,
         channel_id=str(uuid.uuid4()),
         payload={"message": "hello"},
         expected_text="sessionid",
     )
-
-
-
-

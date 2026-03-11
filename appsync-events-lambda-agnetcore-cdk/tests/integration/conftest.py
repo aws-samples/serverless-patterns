@@ -1,5 +1,7 @@
 """Shared fixtures for integration tests."""
 
+# pylint: disable=redefined-outer-name
+
 import asyncio
 import base64
 import json
@@ -26,6 +28,7 @@ _DEFAULT_STACK_NAME = "AppsyncLambdaAgentcore"
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="session")
 def stack_outputs():
     """Fetch all CloudFormation stack outputs once for the test session."""
@@ -44,12 +47,14 @@ def stack_outputs():
 @pytest.fixture(scope="session")
 def get_output(stack_outputs):
     """Return a callable that looks up a stack output by key prefix."""
+
     def _lookup(prefix: str) -> str:
         for key, value in stack_outputs.items():
             if key.startswith(prefix):
                 return value
         pytest.skip(f"Stack output starting with '{prefix}' not found")
         return ""
+
     return _lookup
 
 
@@ -66,22 +71,27 @@ def api_config(get_output):
 @pytest.fixture(scope="session")
 def auth_subprotocol(api_config):
     """Base64-encoded auth subprotocol string for WebSocket connections."""
-    header = json.dumps({
-        "host": api_config["http_endpoint"],
-        "x-api-key": api_config["api_key"],
-    }).encode()
+    header = json.dumps(
+        {
+            "host": api_config["http_endpoint"],
+            "x-api-key": api_config["api_key"],
+        }
+    ).encode()
     return "header-" + base64.b64encode(header).decode().rstrip("=")
 
 
 @pytest.fixture(scope="session")
 def publish(api_config):
     """Return a callable that publishes to a channel via HTTP."""
+
     def _do_publish(channel: str, message: dict) -> dict:
         url = f"https://{api_config['http_endpoint']}/event"
-        payload = json.dumps({
-            "channel": f"/{channel}",
-            "events": [json.dumps(message)],
-        }).encode()
+        payload = json.dumps(
+            {
+                "channel": f"/{channel}",
+                "events": [json.dumps(message)],
+            }
+        ).encode()
         req = urllib.request.Request(
             url,
             data=payload,
@@ -93,6 +103,7 @@ def publish(api_config):
         )
         with urllib.request.urlopen(req) as resp:
             return json.loads(resp.read().decode())
+
     return _do_publish
 
 
@@ -106,11 +117,10 @@ def subscribe(api_config, auth_subprotocol):
         async with subscribe("/responses/chat/abc") as (ws, sub_id):
             ...
     """
+
     @asynccontextmanager
     async def _subscribe(channel: str):
-        ws_url = (
-            f"wss://{api_config['realtime_endpoint']}/event/realtime"
-        )
+        ws_url = f"wss://{api_config['realtime_endpoint']}/event/realtime"
         async with websockets.connect(
             ws_url,
             subprotocols=["aws-appsync-event-ws", auth_subprotocol],
@@ -122,15 +132,19 @@ def subscribe(api_config, auth_subprotocol):
             assert ack["type"] == "connection_ack"
 
             sub_id = str(uuid.uuid4())
-            await ws.send(json.dumps({
-                "type": "subscribe",
-                "id": sub_id,
-                "channel": channel,
-                "authorization": {
-                    "x-api-key": api_config["api_key"],
-                    "host": api_config["http_endpoint"],
-                },
-            }))
+            await ws.send(
+                json.dumps(
+                    {
+                        "type": "subscribe",
+                        "id": sub_id,
+                        "channel": channel,
+                        "authorization": {
+                            "x-api-key": api_config["api_key"],
+                            "host": api_config["http_endpoint"],
+                        },
+                    }
+                )
+            )
 
             while True:
                 msg = json.loads(

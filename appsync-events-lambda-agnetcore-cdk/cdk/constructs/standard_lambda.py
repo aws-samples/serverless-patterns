@@ -1,3 +1,5 @@
+"""Reusable Lambda blueprint construct with Powertools, X-Ray, and log groups."""
+
 from pathlib import Path
 from aws_cdk import (
     aws_lambda as lambda_,
@@ -104,12 +106,11 @@ class StandardLambda(Construct):
         # take precedence over defaults (e.g. a custom timeout or memory_size).
         merged_config = {**defaults, **kwargs}
 
-
         # Merge layers additively — the consumer's layers are appended
         # after the Powertools layer so all layers are included.
         if user_layers is not None:
             merged_config["layers"] = defaults.get("layers", []) + user_layers
-            
+
         # Merge environment variables additively — the consumer's env vars
         # are added alongside the Powertools defaults, not replacing them.
         if user_environment is not None:
@@ -119,16 +120,14 @@ class StandardLambda(Construct):
             }
 
         # Create the Lambda function with the merged configuration.
-        self.function = lambda_.Function(
-            self, "Function", handler=handler, code=code, **merged_config
-        )
+        self.function = lambda_.Function(self, "Function", handler=handler, code=code, **merged_config)
 
         # Expose convenience attributes so to keep the syntax similar to a standard lambda
         self.function_arn = self.function.function_arn
         self.function_name = self.function.function_name
 
         # Grant the Lambda function permission to write logs to its dedicated
-        # CloudWatch Log Group. 
+        # CloudWatch Log Group.
         log_group.grant_write(self.function)
 
         # Expose the function's IAM execution role as a public attribute.
@@ -183,7 +182,7 @@ class StandardLambda(Construct):
                         "-c",
                         " && ".join(
                             [
-                                # Install dependencies 
+                                # Install dependencies
                                 "pip install -r requirements.txt -t /asset-output/",
                                 # Copy the function source code alongside the
                                 # installed dependencies

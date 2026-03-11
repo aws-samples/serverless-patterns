@@ -95,24 +95,25 @@ class ChatServiceConstruct(Construct):
             publish_handler_config=appsync.HandlerConfig(
                 data_source=lambda_ds,
                 direct=True,
-                lambda_invoke_type=(
-                    appsync.LambdaInvokeType.REQUEST_RESPONSE
-                ),
+                lambda_invoke_type=(appsync.LambdaInvokeType.REQUEST_RESPONSE),
             ),
         )
 
         # --- Outputs ---
 
         CfnOutput(
-            self, "EventApiHttpEndpoint",
+            self,
+            "EventApiHttpEndpoint",
             value=self.api.http_dns,
         )
         CfnOutput(
-            self, "EventApiRealtimeEndpoint",
+            self,
+            "EventApiRealtimeEndpoint",
             value=self.api.realtime_dns,
         )
         CfnOutput(
-            self, "EventApiApiKey",
+            self,
+            "EventApiApiKey",
             value=self.api.api_keys["Default"].attr_api_key,
         )
 
@@ -123,13 +124,9 @@ class ChatServiceConstruct(Construct):
             [
                 {
                     "id": "AwsSolutions-IAM4",
-                    "reason": (
-                        "AWSAppSyncPushToCloudWatchLogs is the standard "
-                        "managed policy for AppSync API logging."
-                    ),
+                    "reason": ("AWSAppSyncPushToCloudWatchLogs is the standard " "managed policy for AppSync API logging."),
                     "applies_to": [
-                        "Policy::arn:<AWS::Partition>:iam::aws:policy/"
-                        "service-role/AWSAppSyncPushToCloudWatchLogs",
+                        "Policy::arn:<AWS::Partition>:iam::aws:policy/" "service-role/AWSAppSyncPushToCloudWatchLogs",
                     ],
                 },
             ],
