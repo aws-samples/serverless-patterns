@@ -13,6 +13,10 @@ uv = "latest"
 [tasks.init]
 description = "Initialise the environment"
 run = [
+    "for f in functions/*/requirements.txt agents/*/requirements.txt requirements.txt requirements-dev.txt; do [ -f \"$f\" ] && uv pip install -r \"$f\"; done",
+    "cdk bootstrap"
+]
+run_windows = [
     "uv pip install -r requirements.txt",
     "uv pip install -r requirements-dev.txt",
     "cdk bootstrap"
