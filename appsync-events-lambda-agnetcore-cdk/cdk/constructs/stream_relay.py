@@ -22,27 +22,23 @@ class StreamRelayConstruct(Construct):
         construct_id: str,
         *,
         agent_runtime_arn: str,
-        appsync_http_endpoint: str,
-        appsync_api_key: str,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        self.lambda_function = StandardLambda(
+        self.standard_lambda = StandardLambda(
             self,
-            "StreamRelayLambda",
+            "Lambda",
             handler="index.handler",
             code_path="functions/stream_relay",
             timeout=Duration.minutes(5),
             environment={
                 "AGENT_RUNTIME_ARN": agent_runtime_arn,
-                "APPSYNC_HTTP_ENDPOINT": appsync_http_endpoint,
-                "APPSYNC_API_KEY": appsync_api_key,
             },
         )
 
         # Grant permission to invoke AgentCore runtime
-        self.lambda_function.function.add_to_role_policy(
+        self.standard_lambda.function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["bedrock-agentcore:InvokeAgentRuntime"],
                 resources=[

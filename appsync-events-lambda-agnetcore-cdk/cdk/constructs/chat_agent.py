@@ -60,7 +60,7 @@ class ChatAgentConstruct(Construct):
         # IAM role for the runtime
         self.runtime_role = iam.Role(
             self,
-            "Role",
+            "RuntimeRole",
             assumed_by=iam.ServicePrincipal(
                 "bedrock-agentcore.amazonaws.com",
             ),
@@ -135,7 +135,7 @@ class ChatAgentConstruct(Construct):
                     "id": "AwsSolutions-IAM5",
                     "reason": "S3 session objects require wildcard suffix for read/write/delete operations.",
                     "applies_to": [
-                        "Resource::<AgentCoreRuntimeSessionBucket0198B79F.Arn>/*",
+                        "Resource::<ChatAgentSessionBucket56C92AD6.Arn>/*",
                     ],
                 },
                 {

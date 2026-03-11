@@ -4,7 +4,7 @@ import os
 import aws_cdk as cdk
 from cdk_nag import AwsSolutionsChecks
 
-from cdk.cdk_stack import CdkStack
+from cdk.stack import ChatStack
 
 
 app = cdk.App()
@@ -15,7 +15,7 @@ region = os.environ.get("AWS_REGION")
 if not region:
     raise EnvironmentError("AWS_REGION environment variable must be set")
 
-CdkStack(
+ChatStack(
     app,
     stack_name,
     env=cdk.Environment(region=region),

@@ -15,9 +15,9 @@ import websockets
 # ---------------------------------------------------------------------------
 # Output key prefixes (CDK appends hash suffixes)
 # ---------------------------------------------------------------------------
-_PREFIX_HTTP = "AppSyncEventsEventApiHttpEndpoint"
-_PREFIX_WS = "AppSyncEventsEventApiRealtimeEndpoint"
-_PREFIX_KEY = "AppSyncEventsEventApiApiKey"
+_PREFIX_HTTP = "ChatServiceEventApiHttpEndpoint"
+_PREFIX_WS = "ChatServiceEventApiRealtimeEndpoint"
+_PREFIX_KEY = "ChatServiceEventApiApiKey"
 
 _DEFAULT_STACK_NAME = "AppsyncLambdaAgentcore"
 
