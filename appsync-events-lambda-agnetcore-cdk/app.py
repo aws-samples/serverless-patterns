@@ -2,6 +2,7 @@
 import os
 
 import aws_cdk as cdk
+from cdk_nag import AwsSolutionsChecks
 
 from cdk.cdk_stack import CdkStack
 
@@ -19,5 +20,7 @@ CdkStack(
     stack_name,
     env=cdk.Environment(region=region),
 )
+
+cdk.Aspects.of(app).add(AwsSolutionsChecks(verbose=True))
 
 app.synth()

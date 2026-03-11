@@ -8,6 +8,7 @@ from aws_cdk import (
     Stack,
 )
 from constructs import Construct
+from cdk_nag import NagSuppressions
 
 
 class StandardLambda(Construct):
@@ -136,6 +137,23 @@ class StandardLambda(Construct):
         #   my_lambda.role.add_managed_policy(...)
         #   my_table.grant_read_write_data(my_lambda.function)
         self.role = self.function.role
+
+        # Suppress cdk-nag for the AWS managed Lambda basic execution role.
+        # CDK attaches this automatically and it is the standard practice
+        # for Lambda functions.
+        NagSuppressions.add_resource_suppressions(
+            self.function,
+            [
+                {
+                    "id": "AwsSolutions-IAM4",
+                    "reason": "AWSLambdaBasicExecutionRole is the standard managed policy for Lambda logging.",
+                    "applies_to": [
+                        "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                    ],
+                },
+            ],
+            apply_to_children=True,
+        )
 
     def _build_code(self, code_path: str, runtime: lambda_.Runtime) -> lambda_.Code:
         """

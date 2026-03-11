@@ -6,6 +6,7 @@ from aws_cdk import (
     aws_appsync as appsync,
     aws_logs as logs,
 )
+from cdk_nag import NagSuppressions
 
 
 class AppSyncEventsConstruct(Construct):
@@ -50,3 +51,19 @@ class AppSyncEventsConstruct(Construct):
         CfnOutput(self, "EventApiHttpEndpoint", value=self.api.http_dns)
         CfnOutput(self, "EventApiRealtimeEndpoint", value=self.api.realtime_dns)
         CfnOutput(self, "EventApiApiKey", value=self.api.api_keys["Default"].attr_api_key)
+
+        # Suppress cdk-nag for the AppSync managed logging policy.
+        # CDK creates this role automatically when log_config is set.
+        NagSuppressions.add_resource_suppressions(
+            self.api,
+            [
+                {
+                    "id": "AwsSolutions-IAM4",
+                    "reason": "AWSAppSyncPushToCloudWatchLogs is the standard managed policy for AppSync API logging.",
+                    "applies_to": [
+                        "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs",
+                    ],
+                },
+            ],
+            apply_to_children=True,
+        )

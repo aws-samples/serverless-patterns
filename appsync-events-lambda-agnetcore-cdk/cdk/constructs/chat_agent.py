@@ -17,6 +17,7 @@ from aws_cdk import (
     aws_iam as iam,
     aws_s3 as s3,
 )
+from cdk_nag import NagSuppressions
 
 
 class ChatAgentConstruct(Construct):
@@ -101,6 +102,50 @@ class ChatAgentConstruct(Construct):
         CfnOutput(
             self, "SessionBucketName",
             value=self.session_bucket.bucket_name,
+        )
+
+        # --- cdk-nag suppressions ---
+
+        NagSuppressions.add_resource_suppressions(
+            self.session_bucket,
+            [{"id": "AwsSolutions-S1", "reason": "Access logs not required for sample code."}],
+        )
+
+        NagSuppressions.add_resource_suppressions(
+            self.runtime_role,
+            [
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "Bedrock foundation model ARNs require wildcards for model version flexibility.",
+                    "applies_to": [
+                        "Resource::arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                        f"Resource::arn:aws:bedrock:{stack.region}:<AWS::AccountId>:inference-profile/*",
+                    ],
+                },
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": (
+                        "ecr:GetAuthorizationToken requires Resource::* (account-wide token, cannot be scoped). "
+                        "X-Ray actions (PutTraceSegments, PutTelemetryRecords, GetSamplingRules, GetSamplingTargets) "
+                        "do not support resource-level permissions per AWS documentation."
+                    ),
+                    "applies_to": ["Resource::*"],
+                },
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "S3 session objects require wildcard suffix for read/write/delete operations.",
+                    "applies_to": [
+                        "Resource::<AgentCoreRuntimeSessionBucket0198B79F.Arn>/*",
+                    ],
+                },
+                {
+                    "id": "AwsSolutions-IAM5",
+                    "reason": "AgentCore runtime log group name is determined at deploy time.",
+                    "applies_to": [
+                        f"Resource::arn:aws:logs:{stack.region}:<AWS::AccountId>:log-group:/aws/bedrock-agentcore/runtimes/*",
+                    ],
+                },
+            ],
         )
 
     @staticmethod
