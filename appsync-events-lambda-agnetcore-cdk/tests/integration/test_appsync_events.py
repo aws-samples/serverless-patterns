@@ -96,9 +96,8 @@ async def test_conversation_with_session(subscribe, publish):
             "sessionId": session_id,
         })
 
-        events_1, complete_1 = await _collect_response(ws, sub_id)
+        _, complete_1 = await _collect_response(ws, sub_id)
         assert complete_1 is not None, "Turn 1 did not complete"
-        response_1 = complete_1.get("response", "")
 
         # Turn 2: ask a follow-up — agent should remember the blog post
         publish(publish_channel, {
@@ -109,7 +108,7 @@ async def test_conversation_with_session(subscribe, publish):
             "sessionId": session_id,
         })
 
-        events_2, complete_2 = await _collect_response(ws, sub_id)
+        _, complete_2 = await _collect_response(ws, sub_id)
         assert complete_2 is not None, "Turn 2 did not complete"
         response_2 = complete_2.get("response", "")
 

@@ -9,7 +9,6 @@ RUN uv pip install --system --no-cache -r requirements.txt
 
 ARG AWS_REGION
 ENV AWS_REGION=${AWS_REGION}
-ENV DOCKER_CONTAINER=1
 
 RUN useradd -m -u 1000 bedrock_agentcore
 USER bedrock_agentcore
