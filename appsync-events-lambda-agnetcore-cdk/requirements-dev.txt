@@ -1,0 +1,6 @@
+pytest>=9.0.2
+pytest-asyncio>=1.3.0
+boto3>=1.42.64
+websockets>=16.0
+aws-lambda-powertools>=3.0.0
+aws-xray-sdk>=2.15.0

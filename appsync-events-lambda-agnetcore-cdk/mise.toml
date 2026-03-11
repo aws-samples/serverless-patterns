@@ -1,0 +1,57 @@
+[env]
+_.python.venv = { path = ".venv", create = true }
+CDK_DOCKER = "finch"
+AWS_REGION = "eu-west-1"
+
+[tools]
+node = "22"
+python = "3.14"
+uv = "latest"
+"npm:aws-cdk" = "2.1110"
+
+[tasks.init]
+description = "Initialise the environment"
+run = [
+    "uv pip install -r requirements.txt",
+    "uv pip install -r requirements-dev.txt",
+    "cdk bootstrap"
+]
+
+[tasks.clean]
+description = "Remove build artifacts and dependencies"
+run = [
+  "rm -rf .venv cdk.out",
+  "find . -type d \\( -name '__pycache__' -o -name '.pytest_cache' \\) -exec rm -rf {} +"
+]
+
+[tasks."cdk:synth"]
+description = "Deploy CDK Stack"
+run = "cdk synth"
+
+[tasks."cdk:sync"]
+description = "Sync CDK Stack - Development only"
+run = "cdk deploy --watch"
+
+[tasks."cdk:deploy"]
+description = "Deploy CDK Stack"
+run = "cdk deploy --require-approval never"
+
+[tasks."cdk:destroy"]
+description = "Destroy CDK Stack"
+run = "cdk destroy"
+
+[tasks.test]
+run = [
+    "mise run test:unit",
+    "mise run test:integration"
+]
+
+[tasks."test:unit"]
+run = "pytest tests/unit -v"
+
+[tasks."test:integration"]
+run = "pytest tests/integration -v" 
+
+[tasks."test:integration:verbose"]
+description = "Run integration tests with WebSocket output visible"
+run = "pytest tests/integration -v -s"
