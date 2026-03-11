@@ -23,7 +23,9 @@ MODEL_ID = os.environ.get("BEDROCK_MODEL_ID")
 if not MODEL_ID:
     raise ValueError("BEDROCK_MODEL_ID environment variable is required")
 
-REGION = os.environ.get("AWS_REGION", "eu-west-1")
+REGION = os.environ.get("AWS_REGION")
+if not REGION:
+    raise ValueError("AWS_REGION environment variable is required")
 SESSION_BUCKET = os.environ.get("SESSION_BUCKET")
 
 SYSTEM_PROMPT = """\
