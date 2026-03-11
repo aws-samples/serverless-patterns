@@ -2,6 +2,7 @@
 _.python.venv = { path = ".venv", create = true }
 CDK_DOCKER = "finch"
 AWS_REGION = "eu-west-1"
+STACK_NAME = "AppsyncLambdaAgentcore"
 
 [tools]
 node = "22"
@@ -25,20 +26,20 @@ run = [
 ]
 
 [tasks."cdk:synth"]
-description = "Deploy CDK Stack"
-run = "cdk synth"
+description = "Synthesize CDK Stack"
+run = "cdk synth -c stack_name=$STACK_NAME"
 
 [tasks."cdk:sync"]
 description = "Sync CDK Stack - Development only"
-run = "cdk deploy --watch"
+run = "cdk deploy --watch -c stack_name=$STACK_NAME"
 
 [tasks."cdk:deploy"]
 description = "Deploy CDK Stack"
-run = "cdk deploy --require-approval never"
+run = "cdk deploy --require-approval never -c stack_name=$STACK_NAME"
 
 [tasks."cdk:destroy"]
 description = "Destroy CDK Stack"
-run = "cdk destroy"
+run = "cdk destroy -c stack_name=$STACK_NAME"
 
 [tasks.test]
 run = [

@@ -15,7 +15,6 @@
     ]
   },
   "context": {
-    "stack_name": "AppsyncLambdaAgentcore",
     "model_id": "eu.anthropic.claude-sonnet-4-20250514-v1:0",
     "@aws-cdk/aws-signer:signingProfileNamePassedToCfn": true,
     "@aws-cdk/aws-ecs-patterns:secGroupsDisablesImplicitOpenListener": true,

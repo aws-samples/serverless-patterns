@@ -5,7 +5,6 @@ import base64
 import json
 import os
 from contextlib import asynccontextmanager
-from pathlib import Path
 import urllib.request
 import uuid
 
@@ -30,15 +29,7 @@ _DEFAULT_STACK_NAME = "AppsyncLambdaAgentcore"
 @pytest.fixture(scope="session")
 def stack_outputs():
     """Fetch all CloudFormation stack outputs once for the test session."""
-    cdk_json_path = Path(__file__).resolve().parents[2] / "cdk.json"
-    try:
-        with open(cdk_json_path, "r", encoding="utf-8") as f:
-            cdk_config = json.load(f)
-        stack_name = cdk_config.get("context", {}).get(
-            "stack_name", _DEFAULT_STACK_NAME,
-        )
-    except (FileNotFoundError, json.JSONDecodeError):
-        stack_name = _DEFAULT_STACK_NAME
+    stack_name = os.environ.get("STACK_NAME") or _DEFAULT_STACK_NAME
 
     region = os.environ.get("AWS_REGION")
     if not region:
