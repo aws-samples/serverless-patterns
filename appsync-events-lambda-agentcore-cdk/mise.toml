@@ -1,6 +1,5 @@
 [env]
 _.python.venv = { path = ".venv", create = true }
-CDK_DOCKER = "finch"
 AWS_REGION = "eu-west-1"
 STACK_NAME = "AppsyncLambdaAgentcore"
 
@@ -8,7 +7,7 @@ STACK_NAME = "AppsyncLambdaAgentcore"
 node = "22"
 python = "3.14"
 uv = "latest"
-"npm:aws-cdk" = "2.1110"
+"npm:aws-cdk" = "latest"
 
 [tasks.init]
 description = "Initialise the environment"

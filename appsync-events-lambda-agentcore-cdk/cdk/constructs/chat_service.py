@@ -105,6 +105,9 @@ class ChatServiceConstruct(Construct):
             "EventApiRealtimeEndpoint",
             value=self.api.realtime_dns,
         )
+        # NOTE: The API key is output in plaintext for convenience in this
+        # sample. For production, store it in Secrets Manager or SSM
+        # SecureString and retrieve it at runtime instead.
         CfnOutput(
             self,
             "EventApiApiKey",
