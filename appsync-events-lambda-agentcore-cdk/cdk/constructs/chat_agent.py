@@ -7,6 +7,9 @@ Creates:
 - CfnRuntime with HTTP protocol and PUBLIC network
 """
 
+import json
+from pathlib import Path
+
 from constructs import Construct
 from aws_cdk import (
     CfnOutput,
@@ -18,6 +21,31 @@ from aws_cdk import (
     aws_s3 as s3,
 )
 from cdk_nag import NagSuppressions
+
+INFERENCE_PROFILES_FILE = Path(__file__).parent / "inference_profiles.json"
+
+
+def resolve_inference_profile(model_id: str, region: str) -> str:
+    """Resolve a base model ID to its cross-region inference profile for the given region.
+
+    Raises ValueError if the model or region is not found in the mapping.
+    """
+    if not INFERENCE_PROFILES_FILE.exists():
+        raise ValueError(f"Inference profiles mapping not found at {INFERENCE_PROFILES_FILE}. ")
+
+    with open(INFERENCE_PROFILES_FILE, encoding="utf-8") as f:
+        mappings = json.load(f)
+
+    if model_id not in mappings:
+        available = ", ".join(sorted(mappings.keys())) or "(none)"
+        raise ValueError(f"Model '{model_id}' not found in inference profiles mapping. Available models: {available}. ")
+
+    region_map = mappings[model_id]
+    if region not in region_map:
+        available = ", ".join(sorted(region_map.keys()))
+        raise ValueError(f"Model '{model_id}' does not support cross-region inference in '{region}'. Supported regions: {available}. ")
+
+    return region_map[region]
 
 
 class ChatAgentConstruct(Construct):
@@ -35,6 +63,9 @@ class ChatAgentConstruct(Construct):
         super().__init__(scope, construct_id, **kwargs)
 
         stack = Stack.of(self)
+
+        # Resolve base model ID to cross-region inference profile
+        inference_profile_id = resolve_inference_profile(model_id, stack.region)
 
         self.session_bucket = s3.Bucket(
             self,
@@ -69,7 +100,7 @@ class ChatAgentConstruct(Construct):
         )
 
         merged_env = {
-            "BEDROCK_MODEL_ID": model_id,
+            "BEDROCK_MODEL_ID": inference_profile_id,
             "AWS_REGION": stack.region,
             "SESSION_BUCKET": self.session_bucket.bucket_name,
             **(environment_variables or {}),
@@ -118,9 +149,9 @@ class ChatAgentConstruct(Construct):
             [
                 {
                     "id": "AwsSolutions-IAM5",
-                    "reason": "Bedrock foundation model ARNs require wildcards for model version flexibility.",
+                    "reason": "Bedrock foundation model and inference profile ARNs require wildcards — the model is resolved at synth time from inference_profiles.json.",
                     "applies_to": [
-                        "Resource::arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                        "Resource::arn:aws:bedrock:*::foundation-model/*",
                         f"Resource::arn:aws:bedrock:{stack.region}:<AWS::AccountId>:inference-profile/*",
                     ],
                 },
@@ -162,7 +193,7 @@ class ChatAgentConstruct(Construct):
                             "bedrock:InvokeModelWithResponseStream",
                         ],
                         resources=[
-                            "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                            "arn:aws:bedrock:*::foundation-model/*",
                             f"arn:aws:bedrock:{stack.region}:{stack.account}:inference-profile/*",
                         ],
                     ),

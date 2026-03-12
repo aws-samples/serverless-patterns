@@ -15,7 +15,7 @@
     ]
   },
   "context": {
-    "model_id": "eu.anthropic.claude-sonnet-4-20250514-v1:0",
+    "model_id": "anthropic.claude-haiku-4-5-20251001-v1:0",
     "@aws-cdk/aws-signer:signingProfileNamePassedToCfn": true,
     "@aws-cdk/aws-ecs-patterns:secGroupsDisablesImplicitOpenListener": true,
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
