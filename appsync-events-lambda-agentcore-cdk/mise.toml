@@ -28,6 +28,7 @@ run = [
   "rm -rf .venv cdk.out",
   "find . -type d \\( -name '__pycache__' -o -name '.pytest_cache' \\) -exec rm -rf {} +"
 ]
+run_windows = "echo Not implemented"
 
 [tasks."cdk:synth"]
 description = "Synthesize CDK Stack"
@@ -41,9 +42,58 @@ run = "cdk deploy --watch -c stack_name=$STACK_NAME"
 description = "Deploy CDK Stack"
 run = "cdk deploy --require-approval never -c stack_name=$STACK_NAME"
 
+[tasks.deploy]
+description = "Install dependencies, bootstrap, and deploy"
+depends = "init"
+depends_post = "cdk:deploy"
+
 [tasks."cdk:destroy"]
 description = "Destroy CDK Stack"
 run = "cdk destroy -c stack_name=$STACK_NAME"
+
+[tasks.destroy]
+description = "Destroy stack and clean up orphaned CloudWatch log groups"
+run = """
+echo "Collecting log group names from stack $STACK_NAME..."
+
+# AppSync API log group — extract API ID from ARN
+APPSYNC_ARN=$(aws cloudformation list-stack-resources --stack-name $STACK_NAME --region $AWS_REGION \
+  --query "StackResourceSummaries[?ResourceType=='AWS::AppSync::Api'].PhysicalResourceId" --output text)
+APPSYNC_API_ID=$(echo "$APPSYNC_ARN" | grep -oE '[^/]+$')
+APPSYNC_LG="/aws/appsync/apis/$APPSYNC_API_ID"
+
+# AgentCore Runtime log group
+RUNTIME_ID=$(aws cloudformation list-stack-resources --stack-name $STACK_NAME --region $AWS_REGION \
+  --query "StackResourceSummaries[?ResourceType=='AWS::BedrockAgentCore::Runtime'].PhysicalResourceId" --output text)
+AGENTCORE_LG="/aws/bedrock-agentcore/runtimes/${RUNTIME_ID}-DEFAULT"
+
+# S3 Auto-Delete custom resource Lambda log group
+S3_AUTO_DELETE_FN=$(aws cloudformation list-stack-resources --stack-name $STACK_NAME --region $AWS_REGION \
+  --query "StackResourceSummaries[?ResourceType=='AWS::Lambda::Function' && contains(LogicalResourceId,'CustomS3AutoDelete')].PhysicalResourceId" --output text)
+S3_AUTO_DELETE_LG="/aws/lambda/$S3_AUTO_DELETE_FN"
+
+# Log Retention Lambda log group
+LOG_RETENTION_FN=$(aws cloudformation list-stack-resources --stack-name $STACK_NAME --region $AWS_REGION \
+  --query "StackResourceSummaries[?ResourceType=='AWS::Lambda::Function' && contains(LogicalResourceId,'LogRetention')].PhysicalResourceId" --output text)
+LOG_RETENTION_LG="/aws/lambda/$LOG_RETENTION_FN"
+
+LOG_GROUPS="$APPSYNC_LG $AGENTCORE_LG $S3_AUTO_DELETE_LG $LOG_RETENTION_LG"
+
+echo "Log groups to clean up after destroy:"
+for lg in $LOG_GROUPS; do echo "  $lg"; done
+
+mise run cdk:destroy
+
+echo "Deleting orphaned log groups..."
+for lg in $LOG_GROUPS; do
+  if aws logs describe-log-groups --log-group-name-prefix "$lg" --region $AWS_REGION --query "logGroups[?logGroupName=='$lg'].logGroupName" --output text | grep -q .; then
+    echo "Deleting $lg"
+    aws logs delete-log-group --log-group-name "$lg" --region $AWS_REGION
+  fi
+done
+echo "Done."
+"""
+run_windows = "echo Not implemented"
 
 [tasks.test]
 run = [
