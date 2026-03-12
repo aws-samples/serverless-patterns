@@ -11,8 +11,10 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI installed and configured](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 * [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [mise installed](https://mise.jdx.dev/) (installs Python 3.14, Node.js 22, AWS CDK, and uv automatically)
-* [Finch](https://runfinch.com/) or [Docker installed](https://docs.docker.com/get-docker/) (used for CDK bundling)
+* [Python 3.14](https://www.python.org/downloads/) with [pip](https://pip.pypa.io/en/stable/installation/)
+* [Node.js 22](https://nodejs.org/en/download/)
+* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm install -g aws-cdk`)
+* [Finch](https://runfinch.com/) or [Docker](https://docs.docker.com/get-docker/) (used for CDK bundling)
 
 ## Deployment Instructions
 
@@ -24,19 +26,30 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd appsync-events-lambda-agentcore-cdk
     ```
-1. Review `mise.toml` and update `AWS_REGION` and `STACK_NAME` in the `[env]` section as appropriate for your environment. If you are using Docker instead of Finch, comment out the `CDK_DOCKER = "finch"` line.
-1. Trust the mise configuration for this project:
+1. Create and activate a Python virtual environment:
     ```
-    mise trust
+    python -m venv .venv
+    source .venv/bin/activate        # On Windows: .venv\Scripts\activate
     ```
-1. Install tools and dependencies.
+1. Install Python dependencies:
     ```
-    mise install
-    mise run init
+    pip install -r requirements.txt
+    ```
+1. Set your target AWS region:
+    ```
+    export AWS_REGION=eu-west-1      # On Windows: set AWS_REGION=eu-west-1
+    ```
+1. If you are using [Finch](https://runfinch.com/) instead of Docker, set the `CDK_DOCKER` environment variable:
+    ```
+    export CDK_DOCKER=finch          # On Windows: set CDK_DOCKER=finch
+    ```
+1. Bootstrap CDK in your account/region (if not already done):
+    ```
+    cdk bootstrap
     ```
 1. Deploy the stack:
     ```
-    mise run cdk:deploy
+    cdk deploy
     ```
 1. Note the outputs from the CDK deployment process. These contain the AppSync Events HTTP endpoint, WebSocket endpoint, and API key needed for testing.
 
@@ -48,7 +61,7 @@ Figure 1 - Architecture
 
 1. The client publishes a message to the inbound channel (`/chat/{conversationId}`) via HTTP POST to AppSync Events.
 2. AppSync Events triggers the agent invoker Lambda via direct Lambda integration.
-3. The agent invoker validates the payload, invokes the stream relay Lambda asynchronously, and returns immediately.
+3. The agent invoker validates the payload, invokes the stream relay Lambda asynchronously, and returns immediately. This two-Lambda split is necessary because AppSync invokes the handler synchronously — a long-running stream would block the response.
 4. The stream relay calls `invoke_agent_runtime` on the Bedrock AgentCore Runtime, which hosts a Strands agent container, and consumes the Server-Sent Events (SSE) stream.
 5. The stream relay publishes each chunk back to the response channel on AppSync Events (`/responses/chat/{conversationId}`).
 6. The client receives agent response tokens in real time via the WebSocket subscription.
@@ -61,9 +74,17 @@ The agent is a Strands-based research assistant with access to `http_request`, `
 
 ### Automated tests
 
+Install the test dependencies:
+
 ```bash
-mise run test:unit                  # unit tests (no deployed stack needed)
-mise run test:integration:verbose   # integration tests with streaming output
+pip install -r requirements-dev.txt
+```
+
+Run the tests:
+
+```bash
+pytest tests/unit -v                  # unit tests (no deployed stack needed)
+pytest tests/integration -v -s        # integration tests with streaming output
 ```
 
 ### Using the AppSync Pub/Sub Editor
@@ -133,7 +154,7 @@ You can configure multiple authorization modes on a single API and apply differe
 
 1. Delete the stack
     ```
-    mise run cdk:destroy
+    cdk destroy
     ```
 
 ----
