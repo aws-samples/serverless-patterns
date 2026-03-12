@@ -1,0 +1,61 @@
+{
+  "title": "Real-time streaming chat with AppSync Events, Lambda, and Bedrock AgentCore",
+  "description": "Stream AI agent responses in real time using AppSync Events WebSockets with a two-phase Lambda architecture and Bedrock AgentCore Runtime.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a real-time streaming chat service using AWS AppSync Events with a two-phase Lambda architecture to invoke a Strands agent running on Amazon Bedrock AgentCore Runtime.",
+      "The client publishes messages to an inbound channel via HTTP. AppSync Events triggers an agent invoker Lambda via direct Lambda integration (synchronous only), which asynchronously invokes a separate stream relay Lambda and returns immediately. Two Lambdas are needed because AppSync Events does not support async Lambda invocation, so the invoker must return quickly. The stream relay calls the AgentCore Runtime, consumes the Server-Sent Events (SSE) stream, and publishes response chunks back to a separate response channel.",
+      "The client receives agent response tokens in real time via a WebSocket subscription. Separate channel namespaces for inbound and outbound traffic prevent re-invocation loops."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-events-lambda-agentcore-cdk",
+      "templateURL": "serverless-patterns/appsync-events-lambda-agentcore-cdk",
+      "projectFolder": "appsync-events-lambda-agentcore-cdk",
+      "templateFile": "cdk/stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppSync Events API",
+        "link": "https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-welcome.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agentcore.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "python -m venv .venv && source .venv/bin/activate",
+      "pip install -r requirements.txt",
+      "cdk bootstrap",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions using the AppSync Pub/Sub Editor and automated tests."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pete Davis",
+      "image": "https://github.com/pjdavis-aws.png",
+      "bio": "Senior Partner Solution Architect at AWS",
+      "linkedin": "peter-davis-2676585"
+    }
+  ]
+}
