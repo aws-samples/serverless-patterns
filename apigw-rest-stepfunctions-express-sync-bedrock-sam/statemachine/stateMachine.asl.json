@@ -6,9 +6,9 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::bedrock:invokeModel",
       "Parameters": {
-        "ModelId": "cohere.command-text-v14",
+        "ModelId": "cohere.command-r-v1:0",
         "Body": {
-          "prompt.$": "$.prompt_one",
+          "message.$": "$.prompt_one",
           "max_tokens": 2000
         },
         "ContentType": "application/json",
@@ -17,31 +17,41 @@
       "Next": "Add first result to conversation history",
       "ResultPath": "$.result_one",
       "ResultSelector": {
-        "result_one.$": "$.Body.generations[0].text"
+        "result_one.$": "$.Body.text"
       }
     },
     "Add first result to conversation history": {
       "Type": "Pass",
       "Next": "Invoke model with second prompt",
       "Parameters": {
-        "convo_one.$": "States.Format('{}',$.result_one.result_one)"
+        "chat_history": [
+          {
+            "role": "USER",
+            "message.$": "$.prompt_one"
+          },
+          {
+            "role": "CHATBOT",
+            "message.$": "$.result_one.result_one"
+          }
+        ]
       },
-      "ResultPath": "$.convo_one"
+      "ResultPath": "$.chat_history"
     },
     "Invoke model with second prompt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::bedrock:invokeModel",
       "Parameters": {
-        "ModelId": "cohere.command-text-v14",
+        "ModelId": "cohere.command-r-v1:0",
         "Body": {
-          "prompt.$": "States.Format('{}\n{}','Human: Now write a short story based on the following. Assistant:', $.convo_one.convo_one)",
+          "message": "Now write a short story based on the following.",
+          "chat_history.$": "$.chat_history.chat_history",
           "max_tokens": 1000
         },
         "ContentType": "application/json",
         "Accept": "*/*"
       },
       "ResultSelector": {
-        "result_two.$": "$.Body.generations[0].text"
+        "result_two.$": "$.Body.text"
       },
       "ResultPath": "$.result_two",
       "End": true
