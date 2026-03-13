@@ -1,0 +1,58 @@
+{
+  "title": "Trigger AI Agent with Amazon EventBridge Scheduler",
+  "description": "Create a EventBridge scheduler which invokes a Bedrock Agent upon triggering.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to trigger an Amazon Bedrock AI Agent on a recurring schedule using Amazon EventBridge Scheduler. An orchestrator AWS Lambda function, invoked by the scheduler, sends a task payload to the Bedrock Agent, which processes the input, generates an execution summary, and persists the result to a DynamoDB table via an action group Lambda. The pattern includes retry logic, a dead-letter queue for failed invocations, and least-privilege IAM policies scoped to the agent alias ARN."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ai-agent-trigger",
+      "templateURL": "serverless-patterns/eventbridge-scheduler-ai-agent-trigger",
+      "projectFolder": "eventbridge-scheduler-ai-agent-trigger",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke a Lambda function on a schedule",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-eventbridge-scheduler.html"
+      },
+      {
+        "text": "Allow users to view information about and invoke an agent",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/security_iam_id-based-policy-examples-agent.html#security_iam_id-based-policy-examples-perform-actions-agent"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajil Paloth",
+      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
+      "bio": "ProServe Delivery Consultant at AWS",
+      "linkedin": "paloth"
+    }
+  ]
+}
