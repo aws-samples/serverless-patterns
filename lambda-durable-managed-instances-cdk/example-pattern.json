@@ -1,0 +1,66 @@
+{
+  "title": "Lambda durable functions on Lambda Managed Instances",
+  "description": "This pattern demonstrates how to implement Lambda durable functions running on Lambda Managed Instances using AWS CDK.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to implement Lambda durable functions running on Lambda Managed Instances. Lambda durable functions allow Lambda functions to maintain state and execution context across multiple invocations, enabling long-running workflows that can span multiple function executions.",
+      "Lambda Managed Instances provide predictable performance with pre-warmed execution environments, reduced cold start latency, and consistent execution characteristics. The combination of these features allows for building robust, stateful serverless applications that can handle complex workflows while maintaining high performance.",
+      "The pattern implements a step-wait-step workflow where the function validates an order, waits for 5 seconds using durable execution, and then processes the order. The execution state is maintained across invocations, demonstrating how durable functions can pause and resume execution seamlessly.",
+      "This pattern deploys one Lambda Function with durable configuration, a VPC with subnets and security groups, and a Lambda Capacity Provider for managed instances."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-managed-instances-cdk",
+      "templateURL": "serverless-patterns/lambda-durable-managed-instances-cdk",
+      "projectFolder": "lambda-durable-managed-instances-cdk",
+      "templateFile": "lib/demo-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Lambda Managed Instances",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
+      },
+      {
+        "text": "AWS Lambda durable execution SDK for JavaScript",
+        "link": "https://www.npmjs.com/package/@aws/durable-execution-sdk-js"
+      },
+      {
+        "text": "AWS capabilities explorer",
+        "link": "https://builder.aws.com/build/capabilities/explore"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dmitry Gulin",
+      "bio": "Senior Modernization Architect, AWS.",
+      "linkedin": "dmitry-gulin"
+    }
+  ]
+}
