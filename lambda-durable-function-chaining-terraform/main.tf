@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.32.1"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.7"
+    }
   }
 }
 
@@ -52,10 +56,34 @@ variable "log_retention_days" {
 }
 
 ############################################################
-# IAM Role for All Lambda Functions
+# IAM Role – Worker Lambda Functions (non-durable)
 ############################################################
 
-resource "aws_iam_role" "lambda_role" {
+resource "aws_iam_role" "worker_role" {
+  name = "${var.prefix}-worker-role"
+
+  force_detach_policies = true
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "lambda.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "worker_basic_execution" {
+  role       = aws_iam_role.worker_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+############################################################
+# IAM Role – Durable Orchestrator Lambda Function
+############################################################
+
+resource "aws_iam_role" "orchestrator_role" {
   name = "${var.prefix}-durable-orchestrator-role"
 
   force_detach_policies = true
@@ -70,13 +98,8 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "basic_execution" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
 resource "aws_iam_role_policy_attachment" "durable_execution" {
-  role       = aws_iam_role.lambda_role.name
+  role       = aws_iam_role.orchestrator_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy"
 }
 
@@ -109,32 +132,6 @@ resource "aws_cloudwatch_log_group" "orchestrator" {
 }
 
 ############################################################
-# Scoped CloudWatch Logs Write Policy
-############################################################
-
-resource "aws_iam_role_policy" "lambda_logging" {
-  name = "${var.prefix}-lambda-cloudwatch-logging"
-  role = aws_iam_role.lambda_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-      Resource = [
-        "${aws_cloudwatch_log_group.step1.arn}:*",
-        "${aws_cloudwatch_log_group.step2.arn}:*",
-        "${aws_cloudwatch_log_group.step3.arn}:*",
-        "${aws_cloudwatch_log_group.orchestrator.arn}:*"
-      ]
-    }]
-  })
-}
-
-############################################################
 # Worker Lambda Functions
 ############################################################
 
@@ -145,7 +142,7 @@ resource "aws_lambda_function" "step1" {
   runtime       = "python3.14"
   memory_size   = 512
   timeout       = 30
-  role          = aws_iam_role.lambda_role.arn
+  role          = aws_iam_role.worker_role.arn
 
   logging_config {
     log_group  = aws_cloudwatch_log_group.step1.name
@@ -153,8 +150,7 @@ resource "aws_lambda_function" "step1" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.step1,
-    aws_iam_role_policy.lambda_logging
+    aws_cloudwatch_log_group.step1
   ]
 }
 
@@ -165,7 +161,7 @@ resource "aws_lambda_function" "step2" {
   runtime       = "python3.14"
   memory_size   = 512
   timeout       = 30
-  role          = aws_iam_role.lambda_role.arn
+  role          = aws_iam_role.worker_role.arn
 
   logging_config {
     log_group  = aws_cloudwatch_log_group.step2.name
@@ -173,8 +169,7 @@ resource "aws_lambda_function" "step2" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.step2,
-    aws_iam_role_policy.lambda_logging
+    aws_cloudwatch_log_group.step2
   ]
 }
 
@@ -185,7 +180,7 @@ resource "aws_lambda_function" "step3" {
   runtime       = "python3.14"
   memory_size   = 512
   timeout       = 30
-  role          = aws_iam_role.lambda_role.arn
+  role          = aws_iam_role.worker_role.arn
 
   logging_config {
     log_group  = aws_cloudwatch_log_group.step3.name
@@ -193,8 +188,7 @@ resource "aws_lambda_function" "step3" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.step3,
-    aws_iam_role_policy.lambda_logging
+    aws_cloudwatch_log_group.step3
   ]
 }
 
@@ -204,7 +198,7 @@ resource "aws_lambda_function" "step3" {
 
 resource "aws_iam_role_policy" "invoke_workers" {
   name = "${var.prefix}-invoke-worker-functions"
-  role = aws_iam_role.lambda_role.id
+  role = aws_iam_role.orchestrator_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -224,18 +218,101 @@ resource "aws_iam_role_policy" "invoke_workers" {
 }
 
 ############################################################
+# Inline Orchestrator Source Code
+#
+# The durable execution SDK (@durable_execution decorator and
+# DurableContext) is built into the python3.14 runtime when
+# durable_config is set — no extra layer is needed.
+############################################################
+
+data "archive_file" "orchestrator" {
+  type        = "zip"
+  output_path = "${path.module}/orchestrator.zip"
+
+  source {
+    filename = "orchestrator.py"
+    content  = <<-PYTHON
+      import json
+      import os
+      import logging
+      import boto3
+      from aws_durable_execution_sdk_python import DurableContext, durable_execution
+
+      logger = logging.getLogger()
+      logger.setLevel(logging.INFO)
+
+      lambda_client = boto3.client('lambda')
+
+
+      def call_lambda(function_arn, payload):
+          """Invoke a regular Lambda function and return parsed response."""
+          response = lambda_client.invoke(
+              FunctionName=function_arn,
+              InvocationType='RequestResponse',
+              Payload=json.dumps(payload)
+          )
+
+          if 'FunctionError' in response:
+              error_payload = json.loads(response['Payload'].read())
+              raise RuntimeError(f"Function {function_arn} failed: {error_payload}")
+
+          return json.loads(response['Payload'].read())
+
+
+      @durable_execution
+      def lambda_handler(event, context: DurableContext):
+          step1_arn = os.environ['STEP1_FUNCTION_ARN']
+          step2_arn = os.environ['STEP2_FUNCTION_ARN']
+          step3_arn = os.environ['STEP3_FUNCTION_ARN']
+
+          logger.info("Orchestrator invoked with event: %s", json.dumps(event, default=str))
+
+          # Step 1 — lambda receives the arg context.step() passes; ignored here
+          result1 = context.step(
+              lambda _: call_lambda(step1_arn, event),
+              name='step1-add'
+          )
+          logger.info("STEP1 result: %s", json.dumps(result1, default=str))
+
+          # Step 2
+          result2 = context.step(
+              lambda _: call_lambda(step2_arn, result1),
+              name='step2-transform'
+          )
+          logger.info("STEP2 result: %s", json.dumps(result2, default=str))
+
+          # Step 3
+          result3 = context.step(
+              lambda _: call_lambda(step3_arn, result2),
+              name='step3-finalize'
+          )
+          logger.info("STEP3 result: %s", json.dumps(result3, default=str))
+
+          response = {
+              'workflow': 'completed',
+              'input': event,
+              'output': result3
+          }
+          logger.info("Final response: %s", json.dumps(response, default=str))
+          return response
+    PYTHON
+  }
+}
+
+############################################################
 # Durable Orchestrator Function
 ############################################################
 
 resource "aws_lambda_function" "orchestrator" {
-  function_name = "${var.prefix}-durable-orchestrator"
-  filename      = "orchestrator.zip"
-  handler       = "orchestrator.lambda_handler"
-  runtime       = "python3.14"
-  memory_size   = 512
-  timeout       = 90
-  role          = aws_iam_role.lambda_role.arn
-  publish       = true
+  function_name    = "${var.prefix}-durable-orchestrator"
+  filename         = data.archive_file.orchestrator.output_path
+  source_code_hash = data.archive_file.orchestrator.output_base64sha256
+  handler          = "orchestrator.lambda_handler"
+  runtime          = "python3.14"
+  memory_size      = 512
+  timeout          = 90
+  role             = aws_iam_role.orchestrator_role.arn
+  publish          = true
 
   durable_config {
     execution_timeout = 90
@@ -266,8 +343,7 @@ resource "aws_lambda_function" "orchestrator" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.orchestrator,
-    aws_iam_role_policy.lambda_logging
+    aws_cloudwatch_log_group.orchestrator
   ]
 }
 

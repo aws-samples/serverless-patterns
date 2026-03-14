@@ -1,6 +1,6 @@
 # Function chaining with AWS Lambda durable functions in Terraform
 
-This Terraform pattern demonstrates function chaining using AWS Lambda durable functions. A durable orchestrator invokes three Lambda functions in sequence (add, transform and finalize). The output of each step is passed as the input to the next. The framework automatically checkpoints after every step, so if the orchestrator fails mid-workflow, it replays from the beginning and skips already-completed work. This ensures exactly-once execution without re-processing.
+This Terraform pattern demonstrates function chaining using AWS Lambda durable functions. A durable orchestrator invokes three Lambda functions in sequence (add, transform and finalize). The output of each step is passed as the input to the next. The durable functions framework automatically checkpoints after every step, so if the orchestrator fails mid-workflow, it replays from the beginning and skips already-completed work. This ensures exactly-once execution without re-processing.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-function-chaining-terraform
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform](https://learn.hashicorp.cxom/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
 
 ## Deployment Instructions
 
@@ -46,7 +46,7 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern uses a durable orchestrator to chain three Lambda functions in sequence. Each function receives the output of the previous step as its input, forming a pipeline: **Add → Transform → Finalize**.
 
-At each `context.invoke()` call, the durable framework creates a checkpoint. If the orchestrator fails at any point, it automatically replays from the beginning but skips already-completed steps using stored results, ensuring no work is repeated. Workflows resume from the last successful checkpoint, recovering automatically without manual intervention.
+At each `context.invoke()` call, the durable function creates a checkpoint. If the orchestrator fails at any point, it automatically replays from the beginning but skips already-completed steps using stored results, ensuring no work is repeated. Workflows resume from the last successful checkpoint, recovering automatically without manual intervention.
 
 Consider the following input,
 
