@@ -1,0 +1,58 @@
+{
+  "title": "EventBridge Scheduler fan-out pattern",
+  "description": "Create an Amazon EventBridge Scheduler that fans out to multiple targets via a custom Event Bus",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon EventBridge Scheduler to trigger multiple downstream targets from a single schedule. Since Scheduler supports only one target per schedule, this pattern uses a custom EventBridge Event Bus as the fan-out hub."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-fanout-pattern",
+      "templateURL": "serverless-patterns/eventbridge-fanout-pattern",
+      "projectFolder": "eventbridge-fanout-pattern",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Creating Amazon EventBridge event patterns",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html"
+      },
+      {
+        "text": "Event buses in Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_400_400/B56ZZH3LL6H0Ag-/0/1744962369913?e=1774483200&v=beta&t=wAhvwq-jEIWnyQwDfIkK_-Sq16Z4RvpjWtYmDkc3eg4",
+      "bio": "Solutions Architect at AWS",
+      "linkedin": "archanavenkat"
+    }
+  ]
+}
