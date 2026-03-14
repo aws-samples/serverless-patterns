@@ -1,4 +1,4 @@
-# API Gateway + Lambda SnapStart + DynamoDB (Python CDK)
+# Amazon API Gateway + AWS Lambda SnapStart + Amazon DynamoDB
 
 This pattern demonstrates how to create a REST API using API Gateway, AWS Lambda and DynamoDB.
 It's built with [Python 3.12](https://www.python.org/downloads/release/python-3128/), together with
