@@ -28,10 +28,21 @@ to improve initialization performance of the Lambda function.
 
 ## Deploy
 
+To deploy this stack, run the following commands from the root of the `serverless-patterns` repository:
+
 ```bash
+# Move to the pattern directory and create a Python virtual environment
+cd apigw-python-cdk-lambda-snapstart
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+
+# Install the AWS CDK for Python
+pip3 install -r requirements.txt
+
+# Install AWS Lambda Powertools library for the CarHandler Lambda
+pip3 install -r CarHandler/requirements.txt -t CarHandler/
+
+# Bootstrap your environment and deploy
 cdk bootstrap
 cdk deploy
 ```
@@ -43,7 +54,19 @@ Get endpoint URL from stack outputs (`CarEndpoint`), then run:
 ```bash
 ENDPOINT="<put-the-CarEndpoint-output-URL-here>"
 
+# Create a car (use the returned "id" in the response for GET/PUT/DELETE below)
 curl --location --request POST "$ENDPOINT/cars" \
   --header 'Content-Type: application/json' \
   --data-raw '{"make":"Porsche","model":"992","year":"2022","color":"White"}'
+
+# Get a car by id
+curl --location "$ENDPOINT/cars/<car-id>"
+
+# Update a car
+curl --location --request PUT "$ENDPOINT/cars/<car-id>" \
+  --header 'Content-Type: application/json' \
+  --data-raw '{"make":"Porsche","model":"992","year":"2023","color":"Racing Yellow"}'
+
+# Delete a car
+curl --location --request DELETE "$ENDPOINT/cars/<car-id>"
 ```
