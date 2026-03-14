@@ -8,7 +8,7 @@ to improve initialization performance of the Lambda function.
 ## Architecture
 
 - API Gateway REST API (`prod` stage)
-- AWS Lambda (Python 3.12)
+- AWS Lambda functon(Python 3.12)
 - Lambda SnapStart enabled on published versions
 - Lambda `live` alias integrated with API Gateway
 - DynamoDB table with partition key `id`
