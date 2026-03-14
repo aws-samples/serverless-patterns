@@ -1,16 +1,24 @@
-import base64
 import json
-import logging
 import os
 import uuid
 from decimal import Decimal
-from typing import Any, Dict, Optional
+from typing import Any
 
 import boto3
 from botocore.exceptions import ClientError
 
-logger = logging.getLogger()
-logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.event_handler import (
+    APIGatewayRestResolver,
+    Response,
+    content_types,
+)
+from aws_lambda_powertools.event_handler.exceptions import BadRequestError, NotFoundError
+from aws_lambda_powertools.logging import correlation_paths
+from aws_lambda_powertools.utilities.typing import LambdaContext
+
+logger = Logger(level=os.getenv("LOG_LEVEL", "INFO"))
+app = APIGatewayRestResolver()
 
 table_name = os.environ["CAR_TABLE_NAME"]
 dynamodb = boto3.resource("dynamodb")
@@ -23,35 +31,20 @@ def _json_default(value: Any) -> Any:
         return float(value)
     raise TypeError(f"Object of type {type(value)} is not JSON serializable")
 
-def _response(status_code: int, body: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    payload = "" if body is None else json.dumps(body, default=_json_default)
-    return {
-        "statusCode": status_code,
-        "headers": {"Content-Type": "application/json"},
-        "body": payload,
-    }
 
-def _parse_body(event: Dict[str, Any]) -> Dict[str, Any]:
-    raw = event.get("body") or "{}"
-    if event.get("isBase64Encoded", False):
-        raw = base64.b64decode(raw).decode("utf-8")
-    try:
-        body = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise ValueError("Invalid JSON body") from exc
+def _json_body() -> dict:
+    """Parse request body as JSON object; empty or missing body returns {}."""
+    raw = app.current_event.json_body
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise BadRequestError("Request body must be a JSON object")
+    return raw
 
-    if not isinstance(body, dict):
-        raise ValueError("Request body must be a JSON object")
 
-    return body
-
-def _path_parts(path: str) -> list[str]:
-    if not path:
-        return []
-    return [part for part in path.strip("/").split("/") if part]
-
-def _create_car(event: Dict[str, Any]) -> Dict[str, Any]:
-    body = _parse_body(event)
+@app.post("/cars")
+def create_car() -> Response:
+    body = _json_body()
     car_id = str(uuid.uuid4())
     car = {
         "id": car_id,
@@ -61,21 +54,31 @@ def _create_car(event: Dict[str, Any]) -> Dict[str, Any]:
         "color": body.get("color"),
     }
     table.put_item(Item=car)
-    return _response(201, car)
+    return Response(
+        status_code=201,
+        content_type=content_types.APPLICATION_JSON,
+        body=json.dumps(car, default=_json_default),
+    )
 
-def _get_car(car_id: str) -> Dict[str, Any]:
+
+@app.get("/cars/<car_id>")
+def get_car(car_id: str) -> Response:
     item = table.get_item(Key={"id": car_id}).get("Item")
     if not item:
-        return _response(404, {"message": f"Car with id {car_id} not found"})
-    return _response(200, item)
+        raise NotFoundError(f"Car with id {car_id} not found")
+    return Response(
+        status_code=200,
+        content_type=content_types.APPLICATION_JSON,
+        body=json.dumps(item, default=_json_default),
+    )
 
-def _update_car(event: Dict[str, Any], car_id: str) -> Dict[str, Any]:
-    body = _parse_body(event)
 
+@app.put("/cars/<car_id>")
+def update_car(car_id: str) -> Response:
+    body = _json_body()
     existing = table.get_item(Key={"id": car_id}).get("Item")
     if not existing:
-        return _response(404, {"message": f"Car with id {car_id} not found"})
-
+        raise NotFoundError(f"Car with id {car_id} not found")
     updated = {
         "id": car_id,
         "make": body.get("make", existing.get("make")),
@@ -84,10 +87,15 @@ def _update_car(event: Dict[str, Any], car_id: str) -> Dict[str, Any]:
         "color": body.get("color", existing.get("color")),
     }
     table.put_item(Item=updated)
-    return _response(200, updated)
+    return Response(
+        status_code=200,
+        content_type=content_types.APPLICATION_JSON,
+        body=json.dumps(updated, default=_json_default),
+    )
 
 
-def _delete_car(car_id: str) -> Dict[str, Any]:
+@app.delete("/cars/<car_id>")
+def delete_car(car_id: str) -> Response:
     try:
         table.delete_item(
             Key={"id": car_id},
@@ -95,31 +103,38 @@ def _delete_car(car_id: str) -> Dict[str, Any]:
         )
     except ClientError as exc:
         if exc.response["Error"]["Code"] == "ConditionalCheckFailedException":
-            return _response(404, {"message": f"Car with id {car_id} not found"})
+            raise NotFoundError(f"Car with id {car_id} not found") from exc
         raise
+    return Response(status_code=204, body="")
 
-    return _response(204)
 
-def handler(event: Dict[str, Any], _: Any) -> Dict[str, Any]:
-    method = (event.get("httpMethod") or "").upper()
-    path = event.get("path") or ""
-    parts = _path_parts(path)
+@app.exception_handler(NotFoundError)
+def handle_not_found(exc: NotFoundError) -> Response:
+    return Response(
+        status_code=404,
+        content_type=content_types.APPLICATION_JSON,
+        body=json.dumps({"message": str(exc)}),
+    )
 
-    logger.info(json.dumps({"method": method, "path": path}))
 
-    try:
-        if method == "POST" and parts == ["cars"]:
-            return _create_car(event)
+@app.exception_handler(BadRequestError)
+def handle_bad_request(exc: BadRequestError) -> Response:
+    return Response(
+        status_code=400,
+        content_type=content_types.APPLICATION_JSON,
+        body=json.dumps({"message": str(exc)}),
+    )
 
-        if len(parts) == 2 and parts[0] == "cars":
-            car_id = parts[1]
-            if method == "GET":
-                return _get_car(car_id)
-            if method == "PUT":
-                return _update_car(event, car_id)
-            if method == "DELETE":
-                return _delete_car(car_id)
 
-        return _response(404, {"message": "Route not found"})
-    except ValueError as exc:
-        return _response(400, {"message": str(exc)})
+@app.not_found
+def handle_route_not_found(_exc: Exception) -> Response:
+    return Response(
+        status_code=404,
+        content_type=content_types.APPLICATION_JSON,
+        body=json.dumps({"message": "Route not found"}),
+    )
+
+
+@logger.inject_lambda_context(correlation_id_path=correlation_paths.API_GATEWAY_REST)
+def handler(event: dict, context: LambdaContext) -> dict:
+    return app.resolve(event, context)
