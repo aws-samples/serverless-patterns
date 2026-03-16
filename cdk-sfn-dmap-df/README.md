@@ -1,6 +1,6 @@
 # AWS Step Functions Distributed Map with Lambda durable functions
 
-This pattern demonstrates how to use AWS Step Functions Distributed Map with an Amazon S3 JSON input to fan out across 50 product catalog items, invoking a Lambda durable function for each item. The key technique is using the AWS Step Functions AWS SDK service integration (`CallAwsService` targeting `lambda:invoke`) instead of the optimized Lambda integration. This is necessary because only the raw SDK integration exposes the `DurableExecutionName` parameter, which enables per-item idempotency derived from each product's `itemId`.
+This pattern demonstrates how to use AWS Step Functions Distributed Map with an Amazon S3 JSON input to fan out across 50 product catalog items, invoking a Lambda durable function for each item. The key technique is using the AWS Step Functions AWS SDK service integration (`CallAwsService` targeting `lambda:invoke`) instead of the optimized Lambda integration. This is currently necessary because only the raw SDK integration exposes the `DurableExecutionName` parameter, which enables per-item idempotency, derived from each product's `itemId`, showcased in this example.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cdk-sfn-dmap-df](https://serverlessland.com/patterns/cdk-sfn-dmap-df)
 
