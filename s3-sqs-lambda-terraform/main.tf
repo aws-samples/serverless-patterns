@@ -2,11 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.57.0"
+      version = "~> 6.19.0"
     }
   }
 
-  required_version = ">= 0.14.9"
+  required_version = "~> 1.14"
 }
 
 data "aws_caller_identity" "current" {}
@@ -23,16 +23,16 @@ resource "aws_s3_bucket" "MySourceS3Bucket" {
 
 # Send notifications to SQS for all events in the bucket
 resource "aws_s3_bucket_notification" "MySourceS3BucketNotification" {
-  bucket      = aws_s3_bucket.MySourceS3Bucket.id
+  bucket = aws_s3_bucket.MySourceS3Bucket.id
 
   queue {
-    queue_arn     = aws_sqs_queue.MyHandlerQueue.arn
-    events        = [
+    queue_arn = aws_sqs_queue.MyHandlerQueue.arn
+    events = [
       "s3:ObjectCreated:*"
     ]
     filter_suffix = ".jpg"
   }
-  
+
 }
 
 #################################################################
@@ -40,7 +40,7 @@ resource "aws_s3_bucket_notification" "MySourceS3BucketNotification" {
 #################################################################
 # Create SQS - Queue
 resource "aws_sqs_queue" "MyHandlerQueue" {
-  name      = "s3-sqs-lambda-tf-SQSResizerQueue"
+  name = "s3-sqs-lambda-tf-SQSResizerQueue"
 }
 
 # Create SQS - Policy
@@ -105,7 +105,7 @@ resource "aws_iam_role" "MyHandlerFunction-Role" {
   name = "s3-sqs-lambda-tf-MyHandlerFunction-Role"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Action = "sts:AssumeRole"
@@ -120,41 +120,41 @@ resource "aws_iam_role" "MyHandlerFunction-Role" {
 
 # Creating IAM Policies for Lambda
 resource "aws_iam_role_policy" "MyHandlerFunction-Policy-source" {
-  name   = "s3-sqs-lambda-tf-MyHandlerFunction-Role"
+  name = "s3-sqs-lambda-tf-MyHandlerFunction-Role"
   policy = jsonencode(
-{
-    "Statement": [
+    {
+      "Statement" : [
         {
-            "Action": [
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:GetBucketLocation",
-                "s3:GetObjectVersion",
-                "s3:GetLifecycleConfiguration"
-            ],
-            "Resource": [
-      				"arn:aws:s3:::${aws_s3_bucket.MySourceS3Bucket.id}",
-      				"arn:aws:s3:::${aws_s3_bucket.MySourceS3Bucket.id}/*"
-            ],
-            "Effect": "Allow"
+          "Action" : [
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:GetBucketLocation",
+            "s3:GetObjectVersion",
+            "s3:GetLifecycleConfiguration"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::${aws_s3_bucket.MySourceS3Bucket.id}",
+            "arn:aws:s3:::${aws_s3_bucket.MySourceS3Bucket.id}/*"
+          ],
+          "Effect" : "Allow"
         }
-    ]
-}
+      ]
+    }
   )
   role = aws_iam_role.MyHandlerFunction-Role.name
 }
 
 resource "aws_iam_role_policy_attachment" "AWSLambdaBasicExecutionRole" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = "${aws_iam_role.MyHandlerFunction-Role.name}"
+  role       = aws_iam_role.MyHandlerFunction-Role.name
 }
 
 resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-  role       = "${aws_iam_role.MyHandlerFunction-Role.name}"
+  role       = aws_iam_role.MyHandlerFunction-Role.name
 }
 
-  
+
 #################################################################
 # Outputs
 #################################################################

@@ -36,6 +36,7 @@ Resources:
   CallbackHandlerFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${AWS::StackName}-CallbackHandlerFunction'
       CodeUri: src/
       Handler: callback_handler.lambda_handler
       Runtime: python3.14
@@ -56,6 +57,7 @@ Resources:
   ApprovalFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${AWS::StackName}-ApprovalFunction'
       CodeUri: src/
       Handler: lambda_function.lambda_handler
       Runtime: python3.14
@@ -139,7 +141,7 @@ Resources:
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApprovalFunction.Arn}:live/invocations'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-ApprovalFunction:live/invocations'
                 requestParameters:
                   integration.request.header.X-Amz-Invocation-Type: "'Event'"
                 responses:
