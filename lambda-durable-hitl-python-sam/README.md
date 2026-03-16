@@ -1,4 +1,4 @@
-# Lambda Durable Functions to DynamoDB with Human-in-the-Loop
+# AWS Lambda durable functions to DynamoDB with Human-in-the-Loop
 
 This pattern demonstrates how to implement Lambda durable functions with Human-in-the-Loop (HITL) approval workflows. The workflow pauses execution, waits for human approval via callback, and resumes based on the decision while maintaining state across the pause/resume cycle.
 
@@ -136,6 +136,10 @@ aws logs tail /aws/lambda/$WORKFLOW_FUNCTION --follow
 ```
 
 Expected output: The workflow should complete and return the approval decision. The DynamoDB item should show status as "approved" with the approver's comments and timestamp.
+
+A successful test shows these log messages:
+- Workflow logs: `Callback created` → `Approval request created` → `SNS notification sent` → `Waiting for approval callback`
+- After approval: `Callback received, workflow resuming` → `Workflow completed successfully` with decision "approved"
 
 ## Cleanup
  

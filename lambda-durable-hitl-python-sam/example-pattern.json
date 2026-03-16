@@ -1,5 +1,5 @@
 {
-  "title": "Lambda Durable Functions with Human-in-the-Loop",
+  "title": "Lambda durable functions with Human-in-the-Loop",
   "description": "Demonstrates Lambda durable functions with human approval workflow using Python 3.13, DynamoDB, and SNS",
   "language": "Python",
   "level": "300",
@@ -66,13 +66,14 @@
   "authors": [
     {
       "name": "Mian Tariq",
-      "bio": "Cloud Solutions Architect"
+      "bio": "Cloud Solutions Architect",
+      "linkedin": "mian-tariq"
     }
   ],
   "patternArch": {
     "icon1": {
       "name": "lambda",
-      "label": "Lambda Durable Functions"
+      "label": "Lambda durable functions"
     },
     "icon2": {
       "name": "dynamodb",
