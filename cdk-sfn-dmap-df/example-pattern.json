@@ -42,11 +42,13 @@
       "Clone the repository: <code>git clone https://github.com/aws-samples/serverless-patterns</code>",
       "Change directory: <code>cd cdk-sfn-dmap-df</code>",
       "Install dependencies: <code>npm install</code>",
+      "Run tests: <code>npm test</code>",
       "Deploy the CDK stack: <code>cdk deploy</code>"
     ]
   },
   "testing": {
     "text": [
+      "Run local tests: <code>npm test</code> — validates CDK stack assertions and runs the durable function locally using LocalDurableTestRunner (no AWS deployment needed).",
       "Start the state machine: <code>aws stepfunctions start-execution --state-machine-arn &lt;StateMachineArn from stack output&gt; --name \"catalog-update-$(date +%s)\"</code>",
       "Monitor the execution in the AWS Step Functions console to see all 50 child executions.",
       "Re-run with the same input to demonstrate idempotency — durable functions return cached results."

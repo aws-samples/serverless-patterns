@@ -35,13 +35,21 @@ Important: this application uses various AWS services and there are costs associ
     npm install
     ```
 
-4. Deploy the CDK stack to your default AWS account and region:
+4. Run tests:
+
+    ```bash
+    npm test
+    ```
+
+    This runs the CDK stack assertions and the local durable function tests using `LocalDurableTestRunner`. The durable function tests verify the three-operation workflow (validate → wait → update) and price tier assignment without deploying to AWS.
+
+5. Deploy the CDK stack to your default AWS account and region:
 
     ```bash
     cdk deploy
     ```
 
-5. Note the outputs from the CDK deployment process. These contain the resource names and ARNs used for testing.
+6. Note the outputs from the CDK deployment process. These contain the resource names and ARNs used for testing.
 
 ## How it works
 
