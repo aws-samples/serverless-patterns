@@ -2,7 +2,7 @@
 
 This pattern shows how to use AWS Lambda durable functions to orchestrate [Amazon Bedrock Async Invoke](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_StartAsyncInvoke.html) for AI video generation. The durable function starts an Amazon Nova Reel video generation job, then polls for completion using `waitForCondition` with exponential backoff. During each polling interval the function suspends execution entirely, incurring zero compute charges while Bedrock processes the video.
 
-Without durable functions this pattern would require a separate polling mechanism such as Step Functions, EventBridge rules, or a cron-based poller. Here the entire workflow is a single, linear function that reads top-to-bottom.
+Without durable functions this pattern would require separate polling mechanism such as in-process waiting (charging for idle time) or additional infrastructure for orchestration or cron schedules. Here the entire workflow is a single, linear function that reads top-to-bottom.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-bedrock-async-invoke](https://serverlessland.com/patterns/lambda-durable-bedrock-async-invoke)
 
@@ -16,6 +16,18 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (version 2.232.1 or later) installed and configured
 * [Node.js 22.x](https://nodejs.org/) installed
 * Amazon Bedrock model access enabled for **Amazon Nova Reel** (`amazon.nova-reel-v1:1`) in your target region
+
+## Configuration
+
+The Lambda function reads the following environment variables. The CDK stack sets `OUTPUT_BUCKET_NAME` automatically; the others can be overridden if needed.
+
+| Variable | Default | Description |
+|---|---|---|
+| `BEDROCK_MODEL_ID` | `amazon.nova-reel-v1:1` | Bedrock model identifier for video generation. Change this if you want to use a different model. |
+| `BEDROCK_REGION` | `us-east-1` | AWS region where the Bedrock model is available. Override this if your model access is enabled in a different region (e.g. `us-west-2`). |
+| `OUTPUT_BUCKET_NAME` | *(set by CDK)* | S3 bucket where Bedrock writes the generated video. Provisioned and configured automatically by the CDK stack. |
+
+To override `BEDROCK_MODEL_ID` or `BEDROCK_REGION`, update the Lambda environment variables in `lib/cdk-bedrock-async-invoke-stack.ts` or pass them as CDK context values before deploying.
 
 ## Deployment Instructions
 
@@ -37,6 +49,12 @@ Important: this application uses various AWS services and there are costs associ
     npm install
     ```
 
+1. Run unit tests to verify everything is working:
+
+    ```bash
+    npm test
+    ```
+
 1. Deploy the CDK stack:
 
     ```bash
@@ -44,10 +62,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
     The stack creates:
-    - An S3 bucket for video output (auto-deleted on stack destroy, 7-day lifecycle)
-    - A durable Lambda function with 30-minute execution timeout
-    - IAM permissions for Bedrock and S3 access
-    - A CloudWatch log group with 1-week retention
+    * An S3 bucket for video output (auto-deleted on stack destroy, 7-day lifecycle)
+    * A durable Lambda function with 30-minute execution timeout
+    * IAM permissions for Bedrock and S3 access
+    * A CloudWatch log group with 1-week retention
 
 1. Note the outputs from the CDK deployment process. These contain the resource names and ARNs used for testing.
 
@@ -111,14 +129,6 @@ aws lambda get-durable-execution \
 ```
 
 Once the status shows `SUCCEEDED`, the result will contain the S3 URI where the video was written.
-
-### Run unit tests
-
-```bash
-npm test
-```
-
-This runs both CDK infrastructure tests and durable handler tests (with mocked Bedrock calls).
 
 ## Cleanup
 
