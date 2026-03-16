@@ -1,4 +1,4 @@
-# Lambda Durable Functions to Amazon ECS with Python
+# AWS Lambda durable functions to Amazon ECS with Python
 
 This pattern demonstrates how to invoke Amazon ECS tasks from AWS Lambda durable functions using Python. The workflow starts an ECS task, waits for a callback, and resumes based on the task result while maintaining state across the pause/resume cycle.
 
@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-ecs-python-sam
+    cd lambda-ecs-durable-python-sam
     ```
 1. From the command line, use AWS SAM to build the application:
     ```
@@ -94,12 +94,13 @@ aws lambda invoke \
   --payload '{"message": "Hello from sync pattern", "processingTime": 10}' \
   response.json
 
-# Monitor Lambda logs
-aws logs tail /aws/lambda/$SYNC_FUNCTION --follow
-
 # Monitor ECS task logs
 aws logs tail /ecs/$STACK_NAME --follow
 ```
+
+A successful sync test shows these log messages:
+- ECS task logs: `[SYNC] Completed: {"status": "success", ...}`
+- Lambda logs: `Durable execution completed` with the ECS task result
 
 ### Test Callback Pattern
 
@@ -119,7 +120,10 @@ aws logs tail /aws/lambda/$CALLBACK_FUNCTION --follow
 aws logs tail /ecs/$STACK_NAME --follow
 ```
 
-Expected output: The Lambda function should complete and return the ECS task result. The logs should show the callback being received and the function resuming execution.
+A successful callback test shows these log messages:
+- Lambda logs: `Callback created` followed by `Waiting for callback from ECS task`
+- ECS task logs: `[CALLBACK] Success callback sent!`
+- Lambda logs: `Callback received` followed by `Durable execution completed` with the ECS task result
 
 ## Cleanup
  

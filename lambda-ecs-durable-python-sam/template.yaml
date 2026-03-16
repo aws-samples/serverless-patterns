@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Lambda Durable Functions to ECS with Python - Demonstrates durable execution patterns with ECS tasks
+  Lambda durable functions to ECS with Python - Demonstrates durable execution patterns with ECS tasks
 
 Parameters:
   VpcCIDR:
@@ -315,8 +315,11 @@ Resources:
             - Effect: Allow
               Action:
                 - ecs:RunTask
+              Resource: !Ref SyncTaskDefinition
+            - Effect: Allow
+              Action:
                 - ecs:DescribeTasks
-              Resource: '*'
+              Resource: !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task/${AWS::StackName}-cluster/*'
             - Effect: Allow
               Action:
                 - iam:PassRole
@@ -327,7 +330,7 @@ Resources:
               Action:
                 - lambda:CheckpointDurableExecutions
                 - lambda:GetDurableExecutionState
-              Resource: '*'
+              Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-sync-function:$LATEST/durable-execution/*'
 
   # Lambda Function for Callback Pattern (Durable)
   CallbackLambdaFunction:
@@ -359,7 +362,7 @@ Resources:
             - Effect: Allow
               Action:
                 - ecs:RunTask
-              Resource: '*'
+              Resource: !Ref CallbackTaskDefinition
             - Effect: Allow
               Action:
                 - iam:PassRole

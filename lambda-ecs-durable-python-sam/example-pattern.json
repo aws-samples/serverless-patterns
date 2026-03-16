@@ -1,13 +1,13 @@
 {
   "title": "AWS Lambda Durable Functions to Amazon ECS with Python",
-  "description": "Invoke ECS tasks from Lambda Durable Functions with automatic checkpointing, state management, and resilient execution patterns",
+  "description": "Invoke ECS tasks from Lambda durable functions with automatic checkpointing, state management, and resilient execution patterns",
   "language": "Python",
   "level": "300",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates AWS Lambda Durable Functions invoking Amazon ECS tasks with resilient, long-running execution capabilities:",
+      "This pattern demonstrates AWS Lambda durable functions invoking Amazon ECS tasks with resilient, long-running execution capabilities:",
       "1. Durable Synchronous Pattern: Lambda uses checkpointed steps and durable waits to poll ECS task status. Can run for up to 1 year with automatic recovery from failures. No compute charges during wait periods.",
       "2. Durable Callback Pattern: Lambda uses checkpointed steps to reliably initiate ECS tasks. Each step (create record, start task, update status) is automatically checkpointed for guaranteed execution.",
       "The pattern uses the AWS Durable Execution SDK for Python, providing automatic state management, checkpoint-based recovery, and cost-effective long-running workflows. Includes inline Python code in ECS containers, VPC networking, and DynamoDB for callback tracking."
@@ -24,7 +24,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Durable Functions",
+        "text": "Lambda durable functions",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -62,7 +62,7 @@
       "name": "Mian Tariq",
       "image": "",
       "bio": "Senior Delivery Consultant",
-      "linkedin": ""
+      "linkedin": "mian-tariq"
     }
   ]
 }
