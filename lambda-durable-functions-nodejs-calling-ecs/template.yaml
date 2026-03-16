@@ -1,0 +1,271 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda durable functions to ECS with Node.js - Callback Pattern
+  
+  This pattern demonstrates Lambda durable functions invoking ECS tasks using the callback pattern.
+  The ECS task directly calls Lambda APIs (SendDurableExecutionCallbackSuccess/Failure) instead of using DynamoDB.
+
+Parameters:
+  VpcCIDR:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for VPC
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 512
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+
+Resources:
+  # VPC Configuration
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [0, !Cidr [!Ref VpcCIDR, 4, 8]]
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [1, !Cidr [!Ref VpcCIDR, 4, 8]]
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-2
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ECS tasks
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-ecs-sg
+
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ${AWS::StackName}-cluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  # CloudWatch Log Group
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+      RetentionInDays: 7
+
+  # ECS Task Execution Role
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt ECSLogGroup.Arn
+
+  # ECS Task Role (for Lambda callback APIs)
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaCallbackPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:SendDurableExecutionCallbackSuccess
+                  - lambda:SendDurableExecutionCallbackFailure
+                  - lambda:SendDurableExecutionCallbackHeartbeat
+                Resource: '*'
+
+  # ECS Task Definition with Inline Node.js Code
+  ECSTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-task
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt ECSTaskRole.Arn
+      ContainerDefinitions:
+        - Name: worker
+          Image: public.ecr.aws/docker/library/python:3.12-alpine
+          Essential: true
+          EntryPoint: ["/bin/sh", "-c"]
+          Command:
+            - |
+              python3 -u -c "
+              import os, time, sys
+              print('=== ECS Task Started ===', flush=True)
+              print(f'Callback ID: {os.environ.get(\"CALLBACK_ID\", \"N/A\")}', flush=True)
+              print(f'Message: {os.environ.get(\"MESSAGE\", \"N/A\")}', flush=True)
+              print(f'Processing Time: {os.environ.get(\"PROCESSING_TIME\", \"10\")} seconds', flush=True)
+              print('', flush=True)
+              print('Simulating work...', flush=True)
+              time.sleep(int(os.environ.get('PROCESSING_TIME', '10')))
+              print('', flush=True)
+              print('=== Task Completed Successfully ===', flush=True)
+              print('Result: {\"status\":\"completed\",\"message\":\"Processed: ' + os.environ.get('MESSAGE', '') + '\"}', flush=True)
+              print('', flush=True)
+              print('Note: In production, call Lambda SendDurableExecutionCallbackSuccess API here', flush=True)
+              print('Command: aws lambda send-durable-execution-callback-success --callback-id $CALLBACK_ID --result {...}', flush=True)
+              sys.exit(0)
+              "
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+
+  # Lambda durable function - Callback Pattern
+  CallbackLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: callback-handler.handler
+      Environment:
+        Variables:
+          ECS_CLUSTER: !Ref ECSCluster
+          ECS_TASK_DEFINITION: !Ref ECSTaskDefinition
+          ECS_SUBNETS: !Sub ${PublicSubnet1},${PublicSubnet2}
+          ECS_SECURITY_GROUP: !Ref ECSSecurityGroup
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ecs:RunTask
+                - ecs:DescribeTasks
+              Resource: !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*'
+            - Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - !GetAtt ECSTaskRole.Arn
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+      AutoPublishAlias: prod
+      DurableConfig:
+        ExecutionTimeout: 86400
+        RetentionPeriodInDays: 7
+
+Outputs:
+  CallbackLambdaFunctionArn:
+    Description: ARN of the Callback Lambda durable function
+    Value: !GetAtt CallbackLambdaFunction.Arn
+
+  ECSClusterName:
+    Description: Name of the ECS Cluster
+    Value: !Ref ECSCluster
+
+  ECSTaskDefinitionArn:
+    Description: ARN of the ECS Task Definition
+    Value: !Ref ECSTaskDefinition
+
+  LogGroupName:
+    Description: CloudWatch Log Group for ECS tasks
+    Value: !Ref ECSLogGroup
+
+  VPCId:
+    Description: VPC ID
+    Value: !Ref VPC
