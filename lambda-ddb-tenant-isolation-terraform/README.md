@@ -6,6 +6,8 @@ This pattern implements a serverless multi-tenant counter API using Amazon API G
 
 When a request hits the standard endpoint, the Lambda function increments a single shared counter in DynamoDB, exposing activity across all tenants. The isolated endpoint requires a tenant ID header, which maps to a dedicated Lambda execution environment and a tenant-specific DynamoDB row. Each tenant gets an independent counter, ensuring complete data separation. 
 
+Please note that this pattern deploys API Gateway endpoints with no authorization. Production deployments should secure all endpoints with an appropriate authorization mechanism such as AWS IAM authorization, Amazon Cognito user pools, or API key usage plans.
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-ddb-tenant-isolation-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.

@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.31.0"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -65,6 +69,259 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 # ──────────────────────────────────────────────
+# Inline Lambda Code → ZIP archives
+# ──────────────────────────────────────────────
+
+data "archive_file" "standard_lambda_zip" {
+  type        = "zip"
+  output_path = "${path.module}/standard_lambda_function.zip"
+
+  source {
+    content  = <<-PYTHON
+import json
+import logging
+import os
+
+import boto3
+from botocore.exceptions import ClientError
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+TABLE_NAME = os.environ["TABLE_NAME"]
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(TABLE_NAME)
+
+# The single partition key every tenant shares — the core of the problem.
+SHARED_KEY = "SHARED"
+
+
+def lambda_handler(event, context):
+    """
+    Standard Lambda handler WITHOUT tenant isolation.
+
+    All tenants share a single DynamoDB row, so every call — regardless
+    of which tenant makes it — increments the same counter.  This is the
+    multi-tenant anti-pattern this demo exists to highlight.
+    """
+    try:
+        if not isinstance(event, dict):
+            return _error(400, "Bad Request", "Invalid request format")
+
+        headers = event.get("headers", {}) or {}
+        tenant_id_from_header = (
+            headers.get("x-tenant-id")
+            or headers.get("Tenant-Id")
+            or headers.get("TENANT-ID")
+        )
+
+        logger.info(
+            "Processing standard request — Method: %s, Path: %s, Tenant Header: %s",
+            event.get("httpMethod", "UNKNOWN"),
+            event.get("path", "UNKNOWN"),
+            tenant_id_from_header,
+        )
+
+        http_method = event.get("httpMethod", "")
+        if not http_method:
+            return _error(400, "Bad Request", "Missing HTTP method in request")
+        if http_method != "GET":
+            return _error(
+                405,
+                "Method Not Allowed",
+                f"HTTP method {http_method} is not supported. Only GET requests are allowed.",
+            )
+
+        # ── Atomic increment on the SHARED row ──────────────────────
+        response = table.update_item(
+            Key={"pk": SHARED_KEY},
+            UpdateExpression="SET #c = if_not_exists(#c, :zero) + :inc",
+            ExpressionAttributeNames={"#c": "counter"},
+            ExpressionAttributeValues={":zero": 0, ":inc": 1},
+            ReturnValues="UPDATED_NEW",
+        )
+        counter = int(response["Attributes"]["counter"])
+
+        if tenant_id_from_header:
+            logger.warning(
+                "PROBLEM: Tenant '%s' is using SHARED counter value %d! "
+                "This demonstrates data leakage between tenants.",
+                tenant_id_from_header,
+                counter,
+            )
+        else:
+            logger.info("Request without tenant header — shared counter: %d", counter)
+
+        body = {
+            "counter": counter,
+            "tenant_id": tenant_id_from_header,
+            "isolation_enabled": False,
+            "message": (
+                f"This function does NOT provide tenant isolation and every tenant reads and writes the same DynamoDB row. Incremented counter is shared across all the tenants"
+            ),
+        }
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache",
+            },
+            "body": json.dumps(body),
+        }
+
+    except ClientError as exc:
+        logger.error("DynamoDB error: %s", exc.response["Error"]["Message"], exc_info=True)
+        return _error(500, "Internal Server Error", "Database error while updating counter")
+    except Exception:
+        logger.error("Unexpected error processing request", exc_info=True)
+        return _error(500, "Internal Server Error", "An unexpected error occurred")
+
+
+def _error(status_code, error_type, message):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+        },
+        "body": json.dumps(
+            {"error": error_type, "message": message, "statusCode": status_code}
+        ),
+    }
+    PYTHON
+    filename = "standard_lambda_function.py"
+  }
+}
+
+data "archive_file" "isolated_lambda_zip" {
+  type        = "zip"
+  output_path = "${path.module}/isolated_lambda_function.zip"
+
+  source {
+    content  = <<-PYTHON
+import json
+import logging
+import os
+import re
+
+import boto3
+from botocore.exceptions import ClientError
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+TABLE_NAME = os.environ["TABLE_NAME"]
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(TABLE_NAME)
+
+# Simple allowlist for tenant IDs — alphanumeric, hyphens, underscores.
+TENANT_ID_PATTERN = re.compile(r"^[\w\-]{1,100}$")
+
+
+def lambda_handler(event, context):
+    """
+    Tenant-isolated Lambda handler.
+
+    * The Lambda runtime guarantees a dedicated execution environment per
+      tenant (`PER_TENANT` isolation mode).
+    * Each tenant's counter is stored in its own DynamoDB row keyed by
+      ``tenant_id``, so even at the data layer there is no sharing.
+    """
+    try:
+        if not isinstance(event, dict):
+            return _error(400, "Bad Request", "Invalid request format")
+
+        logger.info(
+            "Processing isolated request — Method: %s, Path: %s",
+            event.get("httpMethod", "UNKNOWN"),
+            event.get("path", "UNKNOWN"),
+        )
+
+        http_method = event.get("httpMethod", "")
+        if not http_method:
+            return _error(400, "Bad Request", "Missing HTTP method in request")
+        if http_method != "GET":
+            return _error(
+                405,
+                "Method Not Allowed",
+                f"HTTP method {http_method} is not supported. Only GET requests are allowed.",
+            )
+
+        # ── Resolve tenant ID from Lambda context ───────────────────
+        tenant_id = getattr(context, "tenant_id", None)
+
+        if not tenant_id:
+            logger.error("Missing tenant_id in Lambda context")
+            return _error(
+                400,
+                "Missing Tenant ID",
+                "Tenant ID is required. Ensure the x-tenant-id header is provided.",
+            )
+
+        tenant_id = tenant_id.strip()
+
+        if not TENANT_ID_PATTERN.match(tenant_id):
+            logger.error("Invalid tenant ID format: %s", tenant_id)
+            return _error(
+                400,
+                "Invalid Tenant ID",
+                "Tenant ID must be 1-100 alphanumeric, hyphen, or underscore characters.",
+            )
+
+        # ── Atomic per-tenant increment ─────────────────────────────
+        response = table.update_item(
+            Key={"tenant_id": tenant_id},
+            UpdateExpression="SET #c = if_not_exists(#c, :zero) + :inc",
+            ExpressionAttributeNames={"#c": "counter"},
+            ExpressionAttributeValues={":zero": 0, ":inc": 1},
+            ReturnValues="UPDATED_NEW",
+        )
+        counter = int(response["Attributes"]["counter"])
+
+        logger.info("Tenant '%s' — isolated counter now at %d", tenant_id, counter)
+
+        body = {
+            "counter": counter,
+            "tenant_id": tenant_id,
+            "isolation_enabled": True,
+            "message": f"Counter incremented for tenant {tenant_id}",
+        }
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache",
+            },
+            "body": json.dumps(body),
+        }
+
+    except ClientError as exc:
+        logger.error("DynamoDB error: %s", exc.response["Error"]["Message"], exc_info=True)
+        return _error(500, "Internal Server Error", "Database error while updating counter")
+    except Exception:
+        logger.error("Unexpected error processing isolated request", exc_info=True)
+        return _error(500, "Internal Server Error", "An unexpected error occurred")
+
+
+def _error(status_code, error_type, message):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+        },
+        "body": json.dumps(
+            {"error": error_type, "message": message, "statusCode": status_code}
+        ),
+    }
+    PYTHON
+    filename = "isolated_lambda_function.py"
+  }
+}
+
+# ──────────────────────────────────────────────
 # DynamoDB Tables
 # ──────────────────────────────────────────────
 
@@ -103,11 +360,13 @@ resource "aws_dynamodb_table" "isolated_counter_table" {
 }
 
 # ──────────────────────────────────────────────
-# IAM
+# IAM — Per-function roles with least-privilege DynamoDB access
 # ──────────────────────────────────────────────
 
-resource "aws_iam_role" "lambda_execution_role" {
-  name = "${local.name_prefix}-lambda-role"
+# ──────────────── Standard Lambda Role ────────────────
+
+resource "aws_iam_role" "standard_lambda_execution_role" {
+  name = "${local.name_prefix}-standard-lambda-role"
 
   force_detach_policies = true
 
@@ -130,9 +389,82 @@ resource "aws_iam_role" "lambda_execution_role" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  role       = aws_iam_role.lambda_execution_role.name
+resource "aws_iam_role_policy_attachment" "standard_lambda_basic_execution" {
+  role       = aws_iam_role.standard_lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy" "standard_dynamodb_policy" {
+  name = "${local.name_prefix}-standard-dynamodb"
+  role = aws_iam_role.standard_lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowSharedTableOnly"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ]
+        Resource = aws_dynamodb_table.shared_counter_table.arn
+      }
+    ]
+  })
+}
+
+# ──────────────── Isolated Lambda Role ────────────────
+
+resource "aws_iam_role" "isolated_lambda_execution_role" {
+  name = "${local.name_prefix}-isolated-lambda-role"
+
+  force_detach_policies = true
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Environment = var.environment
+    Prefix      = var.prefix
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "isolated_lambda_basic_execution" {
+  role       = aws_iam_role.isolated_lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy" "isolated_dynamodb_policy" {
+  name = "${local.name_prefix}-isolated-dynamodb"
+  role = aws_iam_role.isolated_lambda_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowIsolatedTableOnly"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ]
+        Resource = aws_dynamodb_table.isolated_counter_table.arn
+      }
+    ]
+  })
 }
 
 # ──────────────────────────────────────────────
@@ -162,75 +494,19 @@ resource "aws_cloudwatch_log_group" "counter_isolated_log_group" {
 }
 
 # ──────────────────────────────────────────────
-# Scoped CloudWatch Logs Write Policy
-# ──────────────────────────────────────────────
-
-resource "aws_iam_role_policy" "cloudwatch_logs_policy" {
-  name = "${local.name_prefix}-cw-logs"
-  role = aws_iam_role.lambda_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = [
-          "${aws_cloudwatch_log_group.counter_standard_log_group.arn}:*",
-          "${aws_cloudwatch_log_group.counter_isolated_log_group.arn}:*"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "dynamodb_policy" {
-  name = "${local.name_prefix}-dynamodb"
-  role = aws_iam_role.lambda_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowSharedTable"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
-        ]
-        Resource = aws_dynamodb_table.shared_counter_table.arn
-      },
-      {
-        Sid    = "AllowIsolatedTable"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem"
-        ]
-        Resource = aws_dynamodb_table.isolated_counter_table.arn
-      }
-    ]
-  })
-}
-
-# ──────────────────────────────────────────────
 # Lambda Functions
 # ──────────────────────────────────────────────
 
 resource "aws_lambda_function" "counter_standard_function" {
-  filename      = "standard_lambda_function.zip"
-  function_name = "${local.name_prefix}-counter-standard"
-  role          = aws_iam_role.lambda_execution_role.arn
-  handler       = "standard_lambda_function.lambda_handler"
-  runtime       = "python3.14"
-  timeout       = 30
-  memory_size   = 128
-  description   = "[${var.prefix}] Lambda without tenant isolation — shared DynamoDB counter"
+  filename         = data.archive_file.standard_lambda_zip.output_path
+  source_code_hash = data.archive_file.standard_lambda_zip.output_base64sha256
+  function_name    = "${local.name_prefix}-counter-standard"
+  role             = aws_iam_role.standard_lambda_execution_role.arn
+  handler          = "standard_lambda_function.lambda_handler"
+  runtime          = "python3.14"
+  timeout          = 25
+  memory_size      = 128
+  description      = "[${var.prefix}] Lambda without tenant isolation — shared DynamoDB counter"
 
   logging_config {
     log_group  = aws_cloudwatch_log_group.counter_standard_log_group.name
@@ -251,21 +527,21 @@ resource "aws_lambda_function" "counter_standard_function" {
 
   depends_on = [
     aws_cloudwatch_log_group.counter_standard_log_group,
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_iam_role_policy.cloudwatch_logs_policy,
-    aws_iam_role_policy.dynamodb_policy
+    aws_iam_role_policy_attachment.standard_lambda_basic_execution,
+    aws_iam_role_policy.standard_dynamodb_policy
   ]
 }
 
 resource "aws_lambda_function" "counter_isolated_function" {
-  filename      = "isolated_lambda_function.zip"
-  function_name = "${local.name_prefix}-counter-isolated"
-  role          = aws_iam_role.lambda_execution_role.arn
-  handler       = "isolated_lambda_function.lambda_handler"
-  runtime       = "python3.14"
-  timeout       = 30
-  memory_size   = 128
-  description   = "[${var.prefix}] Lambda with tenant isolation — per-tenant DynamoDB counter"
+  filename         = data.archive_file.isolated_lambda_zip.output_path
+  source_code_hash = data.archive_file.isolated_lambda_zip.output_base64sha256
+  function_name    = "${local.name_prefix}-counter-isolated"
+  role             = aws_iam_role.isolated_lambda_execution_role.arn
+  handler          = "isolated_lambda_function.lambda_handler"
+  runtime          = "python3.14"
+  timeout          = 25
+  memory_size      = 128
+  description      = "[${var.prefix}] Lambda with tenant isolation — per-tenant DynamoDB counter"
 
   tenancy_config {
     tenant_isolation_mode = "PER_TENANT"
@@ -290,9 +566,8 @@ resource "aws_lambda_function" "counter_isolated_function" {
 
   depends_on = [
     aws_cloudwatch_log_group.counter_isolated_log_group,
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_iam_role_policy.cloudwatch_logs_policy,
-    aws_iam_role_policy.dynamodb_policy
+    aws_iam_role_policy_attachment.isolated_lambda_basic_execution,
+    aws_iam_role_policy.isolated_dynamodb_policy
   ]
 }
 
@@ -307,18 +582,6 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = "execute-api:Invoke"
-        Resource  = "*"
-      }
-    ]
-  })
 
   tags = {
     Environment = var.environment
@@ -683,7 +946,7 @@ output "isolated_lambda_function_name" {
   value       = aws_lambda_function.counter_isolated_function.function_name
 }
 
-output "dyanamodb_shared_counter_table_name" {
+output "dynamodb_shared_counter_table_name" {
   description = "DynamoDB table for shared counters"
   value       = aws_dynamodb_table.shared_counter_table.name
 }
