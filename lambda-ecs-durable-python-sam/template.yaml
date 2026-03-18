@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Lambda durable functions to ECS with Python - Demonstrates durable execution patterns with ECS tasks
+  Lambda durable functions to ECS with Python - Demonstrates durable execution patterns with ECS tasks (uksb-1tthgi812) (tag:lambda-ecs-durable-python-sam)
 
 Parameters:
   VpcCIDR:
