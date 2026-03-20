@@ -106,7 +106,6 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Access-Control-Allow-Origin': '*'
             },
             'body': json.dumps({
-                'error': 'Internal server error',
-                'message': str(e)
+                'error': 'Internal server error'
             })
         }

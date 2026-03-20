@@ -10,7 +10,8 @@ from unittest.mock import Mock, patch, MagicMock
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from webhook_processor import validate_signature, store_event
+from webhook_processor import store_event
+from webhook_validator import validate_signature
 
 
 class TestWebhookProcessor(unittest.TestCase):

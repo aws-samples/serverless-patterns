@@ -1,6 +1,6 @@
-# Webhook Receiver with AWS Lambda Durable Functions (Python)
+# Webhook Receiver with Lambda durable functions (Python)
 
-This pattern demonstrates a serverless webhook receiver using AWS Lambda Durable Functions with Python. The pattern receives webhook events via API Gateway, processes them durably with automatic checkpointing, and provides status query capabilities.
+This pattern demonstrates a serverless webhook receiver using Lambda durable functions with Python. The pattern receives webhook events via API Gateway, processes them durably with automatic checkpointing, and provides status query capabilities.
 
 **Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
@@ -173,7 +173,7 @@ Stored event: 1234567890123, status: completed
 
 ### Durable Execution
 
-The webhook processor uses AWS Lambda Durable Functions to:
+The webhook processor uses Lambda durable functions to:
 1. **Checkpoint automatically** after each step
 2. **Persist state** to DynamoDB
 3. **Resume from last checkpoint** on failure
@@ -352,7 +352,7 @@ See [SECURITY.md](SECURITY.md) for detailed security recommendations.
 
 ## Learn More
 
-- [AWS Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [Lambda durable functions documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
 - [Serverless Land Patterns](https://serverlessland.com/patterns)
 
