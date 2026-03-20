@@ -39,7 +39,7 @@ Each step is automatically checkpointed, allowing the workflow to resume from th
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
 * [Python 3.13](https://www.python.org/downloads/) (for local development)
-* [Docker](https://docs.docker.com/get-docker/) (for containerized builds)
+* [Docker](https://docs.docker.com/get-docker/) or [Finch](https://runfinch.com/) (for `sam build --use-container`)
 
 ### Required IAM Permissions
 
@@ -53,12 +53,13 @@ Your AWS CLI user/role needs the following permissions for deployment and testin
 
 ## Deployment
 
-1. Navigate to the pattern directory:
+1. Clone the repository and navigate to the pattern directory:
    ```bash
-   cd lambda-durable-webhook-sam-python
+   git clone https://github.com/aws-samples/serverless-patterns
+   cd serverless-patterns/lambda-durable-webhook-sam-python
    ```
 
-2. Build the application using containerized build (required for Python 3.13):
+2. Build the application:
    ```bash
    sam build --use-container
    ```
@@ -71,7 +72,7 @@ Your AWS CLI user/role needs the following permissions for deployment and testin
    During the guided deployment, provide:
    - **Stack Name**: `lambda-durable-webhook` (or your preferred name)
    - **AWS Region**: Choose a region that supports durable functions (e.g., `us-east-1`)
-   - **WebhookSecret**: (Optional) Leave empty or provide a secret for HMAC validation
+   - **WebhookSecret**: Press Enter to skip (optional — only needed if you want HMAC signature validation)
    - **Confirm changes**: Y
    - **Allow SAM CLI IAM role creation**: Y
    - **Save arguments to configuration file**: Y
@@ -84,14 +85,18 @@ Your AWS CLI user/role needs the following permissions for deployment and testin
 
 ## Testing
 
-### Step 1: Get Your API Endpoint
+### Step 1: Monitor Lambda Logs (in a separate terminal)
 
-After deployment, get the webhook endpoint:
+View the durable function execution logs:
 ```bash
-aws cloudformation describe-stacks \
-  --stack-name lambda-durable-webhook \
-  --query 'Stacks[0].Outputs[?OutputKey==`WebhookEndpoint`].OutputValue' \
-  --output text
+# Get function name
+FUNCTION_NAME=$(aws cloudformation describe-stack-resources \
+  --stack-name <stack-name> \
+  --query 'StackResources[?LogicalResourceId==`WebhookProcessorFunction`].PhysicalResourceId' \
+  --output text)
+
+# Tail logs
+aws logs tail /aws/lambda/$FUNCTION_NAME --follow
 ```
 
 ### Step 2: Submit a Webhook
@@ -120,7 +125,7 @@ Expected response (202 Accepted):
 Wait a few seconds, then query the status. First, get the execution token from DynamoDB:
 ```bash
 aws dynamodb scan \
-  --table-name lambda-durable-webhook-webhook-events \
+  --table-name <stack-name>-webhook-events \
   --limit 1 \
   --query 'Items[0].executionToken.S' \
   --output text
@@ -145,28 +150,6 @@ Expected response:
     "keys": ["type", "data", "timestamp"]
   }
 }
-```
-
-### Step 4: Monitor Lambda Logs
-
-View the durable function execution logs:
-```bash
-# Get function name
-FUNCTION_NAME=$(aws cloudformation describe-stack-resources \
-  --stack-name lambda-durable-webhook \
-  --query 'StackResources[?LogicalResourceId==`WebhookProcessorFunction`].PhysicalResourceId' \
-  --output text)
-
-# Tail logs
-aws logs tail /aws/lambda/$FUNCTION_NAME --follow
-```
-
-You should see the 3 checkpointed steps:
-```
-Step 1: Validating 1234567890123
-Step 2: Processing 1234567890123
-Step 3: Finalizing 1234567890123
-Stored event: 1234567890123, status: completed
 ```
 
 ## How It Works
@@ -266,41 +249,14 @@ python -m pytest tests/ --cov=src --cov-report=html
 
 To completely remove the stack and all resources:
 
-### Option 1: Using SAM CLI (Recommended)
-
 ```bash
-sam delete --stack-name lambda-durable-webhook --region us-east-1
+sam delete
 ```
 
 When prompted:
 - **Delete the stack**: Y
 - **Delete ECR repository**: Y (if using container images)
 - **Delete S3 bucket**: Y
-
-### Option 2: Using AWS CLI
-
-```bash
-# Delete the CloudFormation stack
-aws cloudformation delete-stack \
-  --stack-name lambda-durable-webhook \
-  --region us-east-1
-
-# Wait for deletion to complete
-aws cloudformation wait stack-delete-complete \
-  --stack-name lambda-durable-webhook \
-  --region us-east-1
-```
-
-### Verify Cleanup
-
-Confirm all resources are deleted:
-
-```bash
-# Check stack status (should return error if deleted)
-aws cloudformation describe-stacks \
-  --stack-name lambda-durable-webhook \
-  --region us-east-1
-```
 
 ### Clean Local Build Artifacts
 
