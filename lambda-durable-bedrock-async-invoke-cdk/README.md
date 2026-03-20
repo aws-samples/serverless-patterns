@@ -4,7 +4,7 @@ This pattern shows how to use AWS Lambda durable functions to orchestrate [Amazo
 
 Without durable functions this pattern would require separate polling mechanism such as in-process waiting (charging for idle time) or additional infrastructure for orchestration or cron schedules. Here the entire workflow is a single, linear function that reads top-to-bottom.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-bedrock-async-invoke](https://serverlessland.com/patterns/lambda-durable-bedrock-async-invoke)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-bedrock-async-invoke-cdk](https://serverlessland.com/patterns/lambda-durable-bedrock-async-invoke-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -40,7 +40,7 @@ To override `BEDROCK_MODEL_ID` or `BEDROCK_REGION`, update the Lambda environmen
 1. Change directory to the pattern directory:
 
     ```bash
-    cd lambda-durable-bedrock-async-invoke
+    cd lambda-durable-bedrock-async-invoke-cdk
     ```
 
 1. Install the project dependencies:

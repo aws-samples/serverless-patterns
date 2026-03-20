@@ -20,16 +20,19 @@ describe('CdkBedrockAsyncInvokeStack', () => {
         });
     });
 
-    test('grants Bedrock permissions', () => {
+    test('grants scoped Bedrock permissions', () => {
         template.hasResourceProperties('AWS::IAM::Policy', {
             PolicyDocument: {
                 Statement: Match.arrayWith([
                     Match.objectLike({
                         Action: Match.arrayWith([
                             'bedrock:InvokeModel',
-                            'bedrock:GetAsyncInvoke',
                             'bedrock:StartAsyncInvoke',
                         ]),
+                        Resource: 'arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:*',
+                    }),
+                    Match.objectLike({
+                        Action: 'bedrock:GetAsyncInvoke',
                     }),
                 ]),
             },

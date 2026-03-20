@@ -64,15 +64,25 @@ export class CdkBedrockAsyncInvokeStack extends cdk.Stack {
         // when writing to the bucket via the async invocation.
         outputBucket.grantReadWrite(videoGeneratorFunction);
 
-        // Grant Bedrock invocation permissions
+        // Grant Bedrock invocation permissions scoped to the Nova Reel model
+        const bedrockRegion = 'us-east-1';
+        const modelArn = `arn:aws:bedrock:${bedrockRegion}::foundation-model/amazon.nova-reel-v1:*`;
+
         videoGeneratorFunction.addToRolePolicy(
             new iam.PolicyStatement({
                 actions: [
                     'bedrock:InvokeModel',
-                    'bedrock:GetAsyncInvoke',
                     'bedrock:StartAsyncInvoke',
                 ],
-                resources: ['*'],
+                resources: [modelArn],
+            }),
+        );
+
+        // GetAsyncInvoke operates on invocation ARNs, not model ARNs
+        videoGeneratorFunction.addToRolePolicy(
+            new iam.PolicyStatement({
+                actions: ['bedrock:GetAsyncInvoke'],
+                resources: [`arn:aws:bedrock:${bedrockRegion}:${this.account}:async-invoke/*`],
             }),
         );
 
