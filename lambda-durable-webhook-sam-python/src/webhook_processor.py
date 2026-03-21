@@ -8,7 +8,9 @@ import time
 import logging
 from datetime import datetime
 from typing import Dict, Any
-from aws_durable_execution_sdk_python import DurableContext, StepConfig, durable_execution
+from aws_durable_execution_sdk_python import DurableContext, durable_execution
+from aws_durable_execution_sdk_python.config import StepConfig
+from aws_durable_execution_sdk_python.retries import RetryPresets
 import boto3
 
 logger = logging.getLogger()
@@ -71,7 +73,7 @@ def lambda_handler(event: Dict[str, Any], context: DurableContext) -> Dict[str, 
     validation_result = context.step(
         validate_webhook,
         name='validate-webhook',
-        config=StepConfig(max_attempts=1)
+        config=StepConfig(retry_strategy=RetryPresets.none())
     )
     
     # Step 2: Process

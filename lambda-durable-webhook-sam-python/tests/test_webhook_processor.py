@@ -10,6 +10,9 @@ from unittest.mock import Mock, patch, MagicMock
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
+# Set env var before importing module (module-level DynamoDB table init requires it)
+os.environ.setdefault('EVENTS_TABLE_NAME', 'test-table')
+
 from webhook_processor import store_event
 from webhook_validator import validate_signature
 
