@@ -1,6 +1,6 @@
 {
     "title": "Prompt Chaining with Amazon API Gateway and AWS Step Functions",
-    "description": "Prompt Chaining no-code example with Amazon API Gateway HTTP API, AWS Step Functions and Amazon Bedrock.",
+    "description": "Prompt Chaining no-code example with Amazon API Gateway REST API, AWS Step Functions and Amazon Bedrock.",
     "language": "",
     "level": "200",
     "framework": "AWS SAM",
@@ -8,10 +8,10 @@
         "headline": "How it works",
         "text": [
             "The provided example demonstrates the deployment of a serverless application using the AWS Serverless Application Model (SAM) template.",
-            "This serverless application includes an Amazon API Gateway HTTP API endpoint that is connected to an AWS Step Functions state machine.",
+            "This serverless application includes an Amazon API Gateway REST API endpoint that is connected to an AWS Step Functions state machine.",
             "The state machine is designed to invoke an Express workflow synchronously.",
             "It utilizes AWS Step Functions' intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model.",
-            "The output from the state machine execution is returned to the client within 29 seconds through the HTTP API.",
+            "The output from the state machine execution is returned to the client within 29 seconds through the REST API.",
             "This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response.",
             "By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs."
         ]
@@ -73,7 +73,7 @@
             "x": 20,
             "y": 50,
             "service": "apigw",
-            "label": "API Gateway HTTP API"
+            "label": "API Gateway REST API"
         },
         "icon2": {
             "x": 50,
