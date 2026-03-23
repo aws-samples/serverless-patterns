@@ -14,7 +14,7 @@ Resources:
       #Name: APIGWStepFunctionExpressSync
       DefinitionUri: statemachine/stateMachine.asl.json
       DefinitionSubstitutions:
-        ModelId: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-r-v1:0
+        ModelId: !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/global.amazon.nova-2-lite-v1:0
       Role:
         Fn::GetAtt: [ StatesMachineExecutionRole, Arn ]
       Type: EXPRESS
@@ -110,7 +110,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - "bedrock:InvokeModel"
-                Resource: !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/cohere.command-r-v1:0
+                Resource:
+                  - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/global.amazon.nova-2-lite-v1:0
+                  - arn:aws:bedrock:*::foundation-model/amazon.nova-2-lite-v1:0
 
 ##########################################################################
 #   Outputs                                                              #
