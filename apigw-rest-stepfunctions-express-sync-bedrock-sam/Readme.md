@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [NOTE! Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) at the time of writing, this example uses Amazon Bedrock foundation model cohere.command-r-v1:0
+* This example uses Amazon Bedrock foundation model amazon.nova-2-lite-v1:0
 
 
 ## Deployment Instructions
@@ -45,32 +45,26 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it Works
 In this example, the state machine is invoked with a JSON payload
+
 ```asl
 {
   "prompt_one": "Write a 500 word blog post on The Beatles"
 }
 ```
-During execution, the Task state calls the Bedrock API and the response is passed to the task 'result_one'.
-```asl
-{
-  "result_one.$": "$.Body.generations[0].text"
-}
-```
-A Pass state is then used to format the data using an Intrinsic Function (States.) which is passed to the next state.
-```asl
-{
-  "convo_one.$": "States.Format('{}',$.result_one.result_one)"
-}
-```
-The second prompt is then executed with new instructions and the results from the first execution. This provides the prompt with more context
-```asl
-{
-  "prompt.$": "States.Format('{}\n{}','Human: Now write a short story based on the following. Assistant:', $.convo_one.convo_one)",
-  "max_tokens": 1000
-}
-```
-By default, the state then sends the task result as output.
 
+During execution, the Task state calls the Bedrock API and the response is passed to the task 'result_one'.
+
+```asl
+{
+  "result_one.$": "$.Body.output.message.content[0].text"
+}
+```
+
+A Pass state is then used to build the conversation history with the first prompt, the model's response, and the second prompt, which is passed to the next state.
+
+The second prompt is then executed with the conversation history that includes the results from the first execution. This provides the model with more context.
+
+By default, the state then sends the task result as output.
 
 ## Testing
 
