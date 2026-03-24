@@ -1,17 +1,17 @@
-# EventBridge fan-out pattern in Terraform
+# # Amazon EventBridge fan-out pattern in Terraform
 
-This Terraform pattern demonstrates schedule fan-out using Amazon EventBridge Scheduler. A single schedule puts an event onto a custom EventBridge Event Bus, which routes it to three downstream targets simultaneously which includes an AWS Lambda function for processing, an Amazon SNS topic for notifications, and an Amazon SQS queue for archival. Each target is matched by its own EventBridge Rule on the bus, so new targets can be added without modifying the schedule itself. Every target is fully decoupled and if one fails, the others are unaffected.
+This Terraform pattern demonstrates schedule fan-out using Amazon EventBridge Scheduler. A single schedule puts an event onto a custom EventBridge event bus, which routes it to three downstream targets simultaneously which includes an AWS Lambda function for processing, an Amazon SNS topic for notifications, and an Amazon SQS queue for archival. Each target is matched by its own EventBridge Rule on the bus, so new targets can be added without modifying the schedule itself. Every target is fully decoupled and if one fails, the others are unaffected.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-fanout-pattern
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-## Requirements
+## Prerequisites
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
+* [Terraform](https://learn.hashicorp.cxom/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
 
 ## Deployment Instructions
 
@@ -73,7 +73,7 @@ To test the full flow without waiting for the next five-minute trigger, you can 
 
 1. Now check the CloudWatch logs for the Lambda function to see if the message has been processed
     ```
-    aws logs tail /aws/lambda/$PREFIX-scheduled-processor --since 2m --format short
+    aws logs tail /aws/lambda/$PREFIX-scheduled-processor --region $(terraform output -raw region) --since 5m --format short
     ```
     You should see an output like this:
     ```
@@ -94,7 +94,7 @@ To test the full flow without waiting for the next five-minute trigger, you can 
 
 1. Check the SQS queue to see if the message has been received
     ```
-    aws sqs receive-message --queue-url $(terraform output -raw sqs_queue_url) --wait-time-seconds 5
+    aws sqs receive-message --queue-url $(terraform output -raw sqs_queue_url) --region $(terraform output -raw region) --wait-time-seconds 5
     ```
     You should see an output in this format:
     ```

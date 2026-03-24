@@ -297,6 +297,10 @@ output "prefix" {
   value = var.prefix
 }
 
+output "region" {
+  value = var.aws_region
+}
+
 output "event_bus_name" {
   value = aws_cloudwatch_event_bus.scheduled_bus.name
 }
