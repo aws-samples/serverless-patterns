@@ -122,10 +122,13 @@ Repeat the same command with the same `--durable-execution-name` to safely retry
 
 ### Check execution status
 
+Use the durable execution ARN returned by the invoke command (or construct it from your account/region/function):
+
 ```bash
+DURABLE_EXEC_ARN="arn:aws:lambda:<region>:<account-id>:function:video-generator-durable:$LATEST/durable-execution/my-beach-video-001"
+
 aws lambda get-durable-execution \
-  --function-name 'video-generator-durable:$LATEST' \
-  --durable-execution-name "my-beach-video-001"
+  --durable-execution-arn "$DURABLE_EXEC_ARN"
 ```
 
 Once the status shows `SUCCEEDED`, the result will contain the S3 URI where the video was written.

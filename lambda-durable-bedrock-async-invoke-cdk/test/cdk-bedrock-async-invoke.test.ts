@@ -2,6 +2,12 @@ import * as cdk from 'aws-cdk-lib/core';
 import { Template, Match } from 'aws-cdk-lib/assertions';
 import { CdkBedrockAsyncInvokeStack } from '../lib/cdk-bedrock-async-invoke-stack';
 
+// Prevent CDK from falling back to Docker/Finch bundling.
+// When esbuild is available locally this is a no-op; when it isn't,
+// pointing CDK_DOCKER at a non-existent binary forces a clear local-
+// bundling error instead of an infinite Finch loop.
+process.env.CDK_DOCKER = 'false';
+
 describe('CdkBedrockAsyncInvokeStack', () => {
     const app = new cdk.App();
     const stack = new CdkBedrockAsyncInvokeStack(app, 'TestStack');
@@ -29,7 +35,9 @@ describe('CdkBedrockAsyncInvokeStack', () => {
                             'bedrock:InvokeModel',
                             'bedrock:StartAsyncInvoke',
                         ]),
-                        Resource: 'arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:*',
+                        Resource: Match.arrayWith([
+                            'arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-reel-v1:*',
+                        ]),
                     }),
                     Match.objectLike({
                         Action: 'bedrock:GetAsyncInvoke',

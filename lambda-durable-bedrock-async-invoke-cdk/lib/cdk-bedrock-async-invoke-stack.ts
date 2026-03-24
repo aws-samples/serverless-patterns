@@ -74,7 +74,10 @@ export class CdkBedrockAsyncInvokeStack extends cdk.Stack {
                     'bedrock:InvokeModel',
                     'bedrock:StartAsyncInvoke',
                 ],
-                resources: [modelArn],
+                resources: [
+                    modelArn,
+                    `arn:aws:bedrock:${bedrockRegion}:${this.account}:async-invoke/*`,
+                ],
             }),
         );
 
