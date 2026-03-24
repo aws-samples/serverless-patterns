@@ -1,7 +1,7 @@
 {
-  "title": "Scheduled ECS Task Execution using EventBridge Cron and Terraform",
-  "description": "This pattern demonstrates how to use Amazon EventBridge to schedule and trigger Amazon ECS tasks on a cron schedule using Terraform. The pattern provides a serverless, cost-effective solution for running scheduled containerized workloads.",
-  "language": "Terraform",
+  "title": "Scheduled Amazon ECS Task Execution using Amazon EventBridge Cron and Terraform",
+  "description": "Use Amazon EventBridge to schedule and trigger ECS Fargate tasks on a cron schedule, deployed with Terraform as IaC.",
+  "language": "python",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -63,9 +63,9 @@
   "authors": [
     {
       "name": "Sudhansu Mohapatra",
-      "bio": "Assoc. Delivery Consultant at AWS",
+      "bio": "Delivery Consultant at AWS",
       "image": "https://drive.google.com/file/d/1uTQ3MbFvziRfBPWHsVsD5vbVyGuFO665/view?usp=sharing",
-      "linkedin": "https://www.linkedin.com/in/sudhansu-mohapatra-83a51811a/"
+      "linkedin": "sudhansu-mohapatra-83a51811a"
     }
   ]
 }

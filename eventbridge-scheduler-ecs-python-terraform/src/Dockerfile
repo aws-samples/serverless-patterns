@@ -1,18 +1,13 @@
-# Simple container for EventBridge ECS Cron Demo
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+FROM python:3.12-slim
 
-# Set working directory
 WORKDIR /app
 
-# Copy entrypoint script
-COPY entrypoint.sh .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Make entrypoint executable
-RUN chmod +x entrypoint.sh
+COPY app.py .
 
-# Set default environment variables
 ENV TASK_FAMILY="eventbridge-ecs-cron-task"
 ENV CLUSTER_NAME="eventbridge-ecs-cron-cluster"
 
-# Run the entrypoint script
-CMD ["./entrypoint.sh"]
+CMD ["python", "app.py"]
