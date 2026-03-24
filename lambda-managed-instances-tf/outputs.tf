@@ -62,7 +62,7 @@ output "function_alias" {
 
 output "manual_association_command" {
   description = "Manual command to associate Lambda function with capacity provider"
-  value = "aws lambda put-capacity-provider-function --capacity-provider-arn ${aws_lambda_capacity_provider.lambda_capacity_provider.arn} --function-name ${aws_lambda_function.hello_world_function.function_name}"
+  value       = "aws lambda put-capacity-provider-function --capacity-provider-arn ${aws_lambda_capacity_provider.lambda_capacity_provider.arn} --function-name ${aws_lambda_function.hello_world_function.function_name}"
 }
 
 output "nat_gateway_ids" {
