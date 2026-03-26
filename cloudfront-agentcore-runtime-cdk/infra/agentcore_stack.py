@@ -66,7 +66,7 @@ class AgentcoreStack(Stack):
                     iam.PolicyStatement(
                         sid="ECRTokenAccess",
                         actions=["ecr:GetAuthorizationToken"],
-                        resources=["*"]
+                        resources=["*"]  # ecr:GetAuthorizationToken does not support resource-level permissions, see https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonelasticcontainerregistry.html
                     ),
                     iam.PolicyStatement(
                         actions=["logs:DescribeLogStreams", "logs:CreateLogGroup"],
@@ -82,11 +82,11 @@ class AgentcoreStack(Stack):
                     ),
                     iam.PolicyStatement(
                         actions=["xray:PutTraceSegments", "xray:PutTelemetryRecords", "xray:GetSamplingRules", "xray:GetSamplingTargets"],
-                        resources=["*"]
+                        resources=["*"]  # X-Ray actions do not support resource-level permissions, see https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsx-ray.html
                     ),
                     iam.PolicyStatement(
                         actions=["cloudwatch:PutMetricData"],
-                        resources=["*"],
+                        resources=["*"],  # cloudwatch:PutMetricData does not support resource-level permissions, scoped via condition key; see https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatch.html
                         conditions={"StringEquals": {"cloudwatch:namespace": "bedrock-agentcore"}}
                     ),
                     iam.PolicyStatement(
