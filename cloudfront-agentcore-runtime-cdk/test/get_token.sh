@@ -13,9 +13,10 @@ fi
 read -p "Pool ID [$POOL_ID]: " input && POOL_ID=${input:-$POOL_ID}
 read -p "Client ID [$CLIENT_ID]: " input && CLIENT_ID=${input:-$CLIENT_ID}
 read -p "Username [$USERNAME]: " input && USERNAME=${input:-$USERNAME}
+echo "Password requires: min 8 chars, uppercase, lowercase, digit, symbol"
 read -sp "Password: " PASSWORD
 echo
-read -p "Region [${REGION:-us-west-2}]: " input && REGION=${input:-${REGION:-us-west-2}}
+read -p "Region [$REGION]: " input && REGION=${input:-$REGION}
 
 cat > "$CONFIG_FILE" << EOF
 POOL_ID=$POOL_ID

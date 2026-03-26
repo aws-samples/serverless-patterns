@@ -1,4 +1,4 @@
-POOL_ID=<get from CDK Output>
-CLIENT_ID=<get from CDK Output>
+POOL_ID=
+CLIENT_ID=
 USERNAME=test
-REGION=us-west-2
+REGION=

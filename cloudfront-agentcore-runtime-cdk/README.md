@@ -1,6 +1,6 @@
 # CloudFront to Amazon Bedrock AgentCore Runtime
 
-This pattern demonstrates how to proxy requests to Amazon Bedrock AgentCore Runtime through CloudFront with OAuth 2.0 authentication, supporting all three [AgentCore Runtime service contracts](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-service-contract.html): A2A, HTTP, and MCP protocols.
+This pattern demonstrates how to proxy requests to Amazon Bedrock AgentCore Runtime through CloudFront with OAuth 2.0 authentication, supporting A2A, HTTP, and MCP protocols of the [AgentCore Runtime service contract](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-service-contract.html).
 
 Benefits of using CloudFront in front of AgentCore Runtime:
 - Global edge caching and low-latency access
@@ -55,7 +55,7 @@ Important: this application uses various AWS services and there are costs associ
     1. Check the CDK outputs for `UserPoolId`, `UserPoolClientId`, and `DistributionUrl`.
     2. Verify the CloudFront distribution is deployed:
         ```shell
-        aws cloudfront list-distributions --query "DistributionList.Items[*].[Id,Status,DomainName]" --output table
+        aws cloudfront list-distributions --query "DistributionList.Items[*].[Id,Status,DomainName]" --output table  --no-cli-pager 
         ```
     3. Confirm the distribution status shows "Deployed".
 
@@ -133,14 +133,20 @@ This pattern creates:
 
 ## Optional: Update A2A Agent Card URL
 
-If you want A2A clients to discover your agent via CloudFront instead of the direct AgentCore Runtime URL, run this script after deployment:
+By default, the A2A agent card advertises the direct AgentCore Runtime endpoint, which bypasses CloudFront and its benefits (edge caching, DDoS protection, WAF integration). If you want A2A clients to discover your agent via CloudFront instead of the direct AgentCore Runtime URL, run this script after deployment. 
 
 ```shell
 cd ..
 ./scripts/update_a2a_cloudfront_url.sh
 ```
 
-This configures the A2A agent to advertise the CloudFront URL in its agent card (`/.well-known/agent-card.json`). This is required when using A2A-compatible clients that rely on the agent card for endpoint discovery.
+This configures the A2A agent to advertise the CloudFront URL in its agent card (`/a2a/.well-known/agent-card.json`). This is required when using A2A-compatible clients that rely on the agent card for endpoint discovery.
+
+You can verify the agent card is accessible via CloudFront using tools like [A2A Inspector](https://github.com/a2aproject/a2a-inspector) with the agent card URL:
+```
+https://<distribution-id>.cloudfront.net/a2a/.well-known/agent-card.json
+```
+Set the Bearer token in the request header for authentication.
 
 ## Cleanup
 
