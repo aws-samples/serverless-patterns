@@ -51,6 +51,14 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy --all
     ```
 
+5. After `cdk deploy --all` completes, verify the deployment:
+    1. Check the CDK outputs for `UserPoolId`, `UserPoolClientId`, and `DistributionUrl`.
+    2. Verify the CloudFront distribution is deployed:
+        ```shell
+        aws cloudfront list-distributions --query "DistributionList.Items[*].[Id,Status,DomainName]" --output table
+        ```
+    3. Confirm the distribution status shows "Deployed".
+
 ## How it works
 
 This pattern creates:
