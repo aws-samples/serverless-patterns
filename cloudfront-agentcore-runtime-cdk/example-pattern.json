@@ -1,5 +1,5 @@
 {
-    "title": "CloudFront to Amazon Bedrock AgentCore Runtime",
+    "title": "Amazon CloudFront to Amazon Bedrock AgentCore Runtime",
     "description": "This pattern demonstrates how to proxy requests to Amazon Bedrock AgentCore Runtime through CloudFront with OAuth 2.0 authentication, supporting all three AgentCore Runtime service contracts: A2A, HTTP, and MCP protocols.",
     "language": "Python",
     "level": "300",

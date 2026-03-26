@@ -7,7 +7,7 @@ Benefits of using CloudFront in front of AgentCore Runtime:
 - DDoS protection via AWS Shield Standard (included)
 - Optional AWS WAF integration for IP rate limiting, geo-blocking, and bot protection
 - Custom domain support with SSL/TLS certificates
-- Request/response transformation via CloudFront Functions
+- Request/response transformation via Amazon CloudFront Functions
 - Centralized access logging and monitoring
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/cloudfront-agentcore-runtime-cdk)
