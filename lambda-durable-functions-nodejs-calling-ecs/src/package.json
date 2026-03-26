@@ -1,0 +1,23 @@
+{
+  "name": "lambda-ecs-durable-nodejs",
+  "version": "1.0.0",
+  "description": "Lambda durable functions calling ECS with Node.js",
+  "main": "callback-handler.js",
+  "dependencies": {
+    "@aws-sdk/client-ecs": "^3.700.0",
+    "@aws-sdk/client-lambda": "^3.700.0",
+    "@aws/durable-execution-sdk-js": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lambda",
+    "durable",
+    "ecs",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT-0"
+}

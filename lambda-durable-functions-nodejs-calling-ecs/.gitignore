@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# SAM build artifacts
+.aws-sam/
+samconfig.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test outputs
+response.json
+*.log
+
+# Environment
+.env
+.env.local
