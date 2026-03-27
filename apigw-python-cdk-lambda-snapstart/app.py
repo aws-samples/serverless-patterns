@@ -63,6 +63,7 @@ class CarStoreStack(Stack):
         )
         CfnOutput(self, "CarTableName", value=car_table.table_name)
 
+description = "Sample app (uksb-1tthgi812) (tag:apigw-python-cdk-lambda-snapstart)"
 app = App()
-CarStoreStack(app, "CarStoreStack")
+CarStoreStack(app, "CarStoreStack", description=description)
 app.synth()
