@@ -1,7 +1,7 @@
 {
   "title": "Hello World on AWS Lambda Managed Instances (Terraform)",
   "description": "Deploy a simple Hello World AWS Lambda function on Lambda Managed Instances using Terraform",
-  "language": "JavaScript",
+  "language": "Node.js",
   "level": "200",
   "framework": "Terraform",
   "introBox": {

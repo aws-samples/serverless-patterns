@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) (latest available version) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) (version 1.0 or later) installed
-* [Node.js](https://nodejs.org/) (version 18.x or later) for Lambda function dependencies
+* [Node.js](https://nodejs.org/) (version 24.x or later) for Lambda function dependencies
 
 ## Deployment Instructions
 
@@ -47,16 +47,25 @@ Important: this application uses various AWS services and there are costs associ
     ```
     Note: This stack will deploy to your default AWS region. You can specify a different region by setting the `aws_region` variable.
 
-### Automated deployment
+### Deployment script
 
-1. Use the automated deployment script:
+1. Use can use `deploy.sh` script to run all deployment commands:
     ```
     ./deploy.sh [aws-region]
     ```
 
 1. Note the outputs from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
 
+
+You can customize the deployment by modifying the variables in `variables.tf` or by passing variables during deployment:
+
+```bash
+terraform apply -var="aws_region=us-east-1"
+```
+
 ## How it works
+
+![Architecture Diagram](doc/architecture-diagram.png)
 
 This pattern creates a capacity provider with VPC and security group configuration, then deploys a Node.js Lambda function (ARM64 architecture) that is associated with the capacity provider to run on managed EC2 instances. The Terraform configuration provisions a complete VPC infrastructure with public and private subnets across multiple availability zones, NAT gateways for outbound connectivity, and all necessary IAM roles and permissions.
 
@@ -177,14 +186,6 @@ The included test script (`./test-lambda.sh`) automatically inspects both the ca
 ## Regional Availability
 
 This stack will deploy to your default AWS region or the region specified in the `aws_region` variable. Before deploying, please verify that AWS Lambda Managed Instances feature is available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official [AWS Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html).
-
-## Customization
-
-You can customize the deployment by modifying the variables in `variables.tf` or by passing variables during deployment:
-
-```bash
-terraform apply -var="aws_region=us-east-1"
-```
 
 ## Cleanup
  
