@@ -1,12 +1,12 @@
-# Lambda durable functions on Lambda Managed Instances
+# AWS Lambda durable functions on AWS Lambda Managed Instances
 
-This pattern demonstrates how to implement Lambda durable functions running on Lambda Managed Instances using AWS CDK. Lambda durable functions allow Lambda functions to maintain state and execution context across multiple invocations, while Lambda Managed Instances provide predictable performance and reduced cold starts.
+This pattern demonstrates how to implement AWS Lambda durable functions running on AWS Lambda Managed Instances using AWS CDK. AWS Lambda durable functions allow Lambda functions to maintain state and execution context across multiple invocations, while AWS Lambda Managed Instances provide predictable performance and reduced cold starts.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-managed-instances-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-**Note**: Lambda Managed Instances provision EC2 instances that are **NOT eligible for the AWS Free Tier**. These instances will incur charges immediately upon deployment, regardless of your Free Tier status.
+**Note**: AWS Lambda Managed Instances provision EC2 instances that are **NOT eligible for the AWS Free Tier**. These instances will incur charges immediately upon deployment, regardless of your Free Tier status.
 
 ## Requirements
 
@@ -40,21 +40,21 @@ Important: this application uses various AWS services and there are costs associ
     ```
     Note: This stack is currently configured to deploy to the `us-east-2` region. Please refer to the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) for feature availability in your desired region.
 
-1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
+1. Note the outputs from the AWS CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
 This pattern demonstrates the integration of two key Lambda features:
 
-### Lambda durable functions
-[Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) enable Lambda functions to maintain state and execution context across multiple invocations. This allows for:
+### AWS Lambda durable functions
+[AWS Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) enable Lambda functions to maintain state and execution context across multiple invocations. This allows for:
 - Long-running workflows that can span multiple function invocations
 - State persistence between executions
 - Improved reliability for complex processing tasks
 - Better handling of timeouts and retries
 
-### Lambda Managed Instances
-[Lambda Managed Instances](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html) provide:
+### AWS Lambda Managed Instances
+[AWS Lambda Managed Instances](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html) provide:
 - Predictable performance with pre-warmed execution environments
 - Reduced cold start latency
 - Consistent execution characteristics
@@ -64,7 +64,7 @@ The combination of these features allows for building robust, stateful serverles
 
 ## Testing
 
-After deployment, you can test the Lambda durable function using the provided test script, AWS CLI, or AWS Console.
+After deployment, you can test the AWS Lambda durable function using the provided test script, AWS CLI, or AWS Console.
 
 ### Automated Testing Script
 
@@ -218,10 +218,10 @@ Monitor the execution through multiple channels:
 
 ## Regional Availability
 
-This stack is configured to deploy to the `us-east-2` region. Before deploying to a different region, please verify that both Lambda durable functions and Lambda Managed Instances features are available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official AWS documentation:
+This stack is configured to deploy to the `us-east-2` region. Before deploying to a different region, please verify that both AWS Lambda durable functions and AWS Lambda Managed Instances features are available in your target region by using the [AWS capabilities explorer](https://builder.aws.com/build/capabilities/explore) or consulting the official AWS documentation:
 
-- [Lambda durable functions documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
-- [Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html)
+- [AWS Lambda durable functions documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
+- [AWS Lambda Managed Instances documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html)
 
 ## Cleanup
  

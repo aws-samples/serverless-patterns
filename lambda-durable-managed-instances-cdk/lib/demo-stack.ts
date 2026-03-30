@@ -14,7 +14,7 @@ export class DemoStack extends Stack {
       runtime: Runtime.NODEJS_24_X,
       architecture: Architecture.ARM_64,
       functionName: 'step-wait-step-durable-function',
-      description: 'Lambda durable function demonstrating step-wait-step pattern',
+      description: 'AWS Lambda durable function demonstrating step-wait-step pattern',
       bundling: {
         format: OutputFormat.ESM,
         mainFields: ['module', 'main'],

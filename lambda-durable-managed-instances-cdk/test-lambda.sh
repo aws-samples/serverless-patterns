@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test script for Lambda durable function
+# Test script for AWS Lambda durable function
 # Usage: ./test-lambda.sh [profile] [region]
 
 set -e
@@ -16,7 +16,7 @@ LOG_GROUP="/aws/lambda/step-wait-step-durable-function"
 PROFILE="${1:-default}"
 REGION="${2:-us-east-2}"
 
-echo "🚀 Testing Lambda durable function..."
+echo "🚀 Testing AWS Lambda durable function..."
 echo "Function: $FUNCTION_NAME"
 echo "Profile: $PROFILE"
 echo "Region: $REGION"

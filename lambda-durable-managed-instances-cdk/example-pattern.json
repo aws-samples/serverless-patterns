@@ -1,14 +1,14 @@
 {
-  "title": "Lambda durable functions on Lambda Managed Instances",
-  "description": "This pattern demonstrates how to implement Lambda durable functions running on Lambda Managed Instances using AWS CDK.",
+  "title": "AWS Lambda durable functions on AWS Lambda Managed Instances",
+  "description": "This pattern demonstrates how to implement AWS Lambda durable functions running on AWS Lambda Managed Instances using AWS CDK.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to implement Lambda durable functions running on Lambda Managed Instances. Lambda durable functions allow Lambda functions to maintain state and execution context across multiple invocations, enabling long-running workflows that can span multiple function executions.",
-      "Lambda Managed Instances provide predictable performance with pre-warmed execution environments, reduced cold start latency, and consistent execution characteristics. The combination of these features allows for building robust, stateful serverless applications that can handle complex workflows while maintaining high performance.",
+      "This sample project demonstrates how to implement AWS Lambda durable functions running on AWS Lambda Managed Instances. AWS Lambda durable functions allow Lambda functions to maintain state and execution context across multiple invocations, enabling long-running workflows that can span multiple function executions.",
+      "AWS Lambda Managed Instances provide predictable performance with pre-warmed execution environments, reduced cold start latency, and consistent execution characteristics. The combination of these features allows for building robust, stateful serverless applications that can handle complex workflows while maintaining high performance.",
       "The pattern implements a step-wait-step workflow where the function validates an order, waits for 5 seconds using durable execution, and then processes the order. The execution state is maintained across invocations, demonstrating how durable functions can pause and resume execution seamlessly.",
       "This pattern deploys one Lambda Function with durable configuration, a VPC with subnets and security groups, and a Lambda Capacity Provider for managed instances."
     ]

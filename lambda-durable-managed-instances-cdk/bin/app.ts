@@ -7,7 +7,7 @@ new DemoStack(app, 'LambdaDurableFunctionsManagedInstancesDemo', {
   stackName: 'lambda-durable-functions-managed-instances',
   env: { 
     account: process.env.CDK_DEFAULT_ACCOUNT, 
-    region: 'us-east-2' 
+    region: process.env.CDK_DEFAULT_REGION ?? 'us-east-2',
   },
-  description: 'POC stack demonstrating Lambda durable functions running on Lambda Managed Instances',
+  description: 'POC stack demonstrating AWS Lambda durable functions running on AWS Lambda Managed Instances',
 });
