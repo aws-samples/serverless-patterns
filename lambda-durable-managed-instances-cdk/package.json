@@ -10,15 +10,15 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@types/node": "^24.10.2",
-    "aws-cdk": "2.1033.0",
-    "esbuild": "^0.27.1",
+    "@types/node": "^25.5.0",
+    "aws-cdk": "2.1115.0",
+    "esbuild": "^0.27.4",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "@aws/durable-execution-sdk-js": "^1.0.0",
-    "aws-cdk-lib": "2.232.1",
-    "constructs": "^10.4.3"
+    "@aws/durable-execution-sdk-js": "^1.1.0",
+    "aws-cdk-lib": "2.245.0",
+    "constructs": "^10.6.0"
   }
 }
