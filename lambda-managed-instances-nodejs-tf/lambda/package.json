@@ -5,6 +5,6 @@
   "main": "hello-world.mjs",
   "type": "module",
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^2.30.0"
+    "@aws-lambda-powertools/logger": "^2.32.0"
   }
 }
