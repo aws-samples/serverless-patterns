@@ -1,14 +1,14 @@
-# EventBridge Cron to Durable Lambda Function
+# Amazon EventBridge cron to AWS Lambda durable function
 
-This pattern demonstrates how to trigger a durable Lambda function using EventBridge on a cron schedule. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow with checkpointing and automatic replay capabilities.
+This pattern demonstrates how to trigger a Lambda durable function using Amazon EventBridge on a cron schedule. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow with checkpointing and automatic replay capabilities.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-eventbrdige-cron-nodejs-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-eventbridge-cron-nodejs-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Architecture
 
-This architecture consists of a serverless cron job implementation using EventBridge and durable Lambda functions. An EventBridge rule configured with a cron expression triggers the durable Lambda function every 5-minutes. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow that can span multiple invocations through checkpointing - when `context.wait()` is called, the function suspends execution and creates a checkpoint, then resumes from that point in a subsequent invocation without re-executing previous steps. 
+This architecture consists of a serverless cron job implementation using Amazon EventBridge and Lambda durable functions. An Amazon EventBridge rule configured with a cron expression triggers the Lambda durable function every 5-minutes. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow that can span multiple invocations through checkpointing - when `context.wait()` is called, the function suspends execution and creates a checkpoint, then resumes from that point in a subsequent invocation without re-executing previous steps. 
 
 ## Requirements
 
@@ -45,29 +45,29 @@ This architecture consists of a serverless cron job implementation using EventBr
 
 This pattern creates:
 
-1. **Durable Orchestrator Lambda Function**: A Nodejs 24.x Lambda function that uses the AWS durable execution SDK to implement a multi-step workflow (invoking 2 Lmabda functions) with automatic checkpointing and replay capabilities.
+1. **Durable Orchestrator Lambda Function**: A Node.js 24.x Lambda function that uses the AWS durable execution SDK to implement a multi-step workflow (invoking 2 Lambda functions) with automatic checkpointing and replay capabilities.
 
 2. **Data Processor Lambda Function**: An activity function that simulates processing records.
 
 3. **Notification Service Lambda Function**: A final step that simulates sending a summary once processing is complete.
 
-4. **EventBridge Cron Rule**: An EventBridge rule configured with `rate(5 minutes)` that triggers the Lambda function every 5-minutes.
+4. **Amazon EventBridge Cron Rule**: An Amazon EventBridge rule configured with `rate(5 minutes)` that triggers the Lambda function every 5-minutes.
 
 5. **Function Versioning**: The Lambda function uses `AutoPublishAlias: prod` to automatically publish a new version on each deployment and point the `prod` alias to it.
 
-6. **Targeted Invocation**: The EventBridge rule specifically targets the published version via the alias as it is a best practice to use numbered versions or aliases for production durable functions rather than $LATEST.
+6. **Targeted Invocation**: The Amazon EventBridge rule specifically targets the published version via the alias as it is a best practice to use numbered versions or aliases for production durable functions rather than $LATEST.
 
 ### Durable Execution Flow
 
 The Lambda function implements a durable workflow with three steps:
 
-1. **Data Processing Step**: Invokes DataProcessor Lambda function with business logic simulating processing data (checkpointed)
+1. **Data Processing Step**: Uses `context.invoke()` to call DataProcessor Lambda function with automatic checkpointing
 2. **Wait Period**: Suspends execution for 10 seconds using `context.wait()` - no compute costs during wait
-3. **Notification Service Processing**: Invokes NotificationService Lambda function with business logic simulating sending notifications and returns results
+3. **Notification Service Processing**: Uses `context.invoke()` to call NotificationService Lambda function and returns results
 
 **Execution Pattern**:
-- **Invocation 1**: `invoke-data-processor()` runs → checkpoint created → `context.wait()` suspends execution
-- **Invocation 2**: `invoke-data-processor()` replays from checkpoint (no re-execution) → wait completes → `invoke-notification-service()` runs → workflow completes
+- **Invocation 1**: `context.invoke("DataProcessorFunction", ...)` runs → checkpoint created → `context.wait()` suspends execution
+- **Invocation 2**: DataProcessor replays from checkpoint (no re-execution) → wait completes → `context.invoke("NotificationServiceFunction", ...)` runs → workflow completes
 
 This demonstrates how durable functions can span multiple Lambda invocations while maintaining state and avoiding redundant work through checkpointing.
 

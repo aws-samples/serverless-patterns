@@ -1,15 +1,15 @@
 {
-  "title": "EventBridge Cron to durable Lambda function",
-  "description": "Create a durable Lambda function triggered by EventBridge on a cron schedule using AWS SAM.",
-  "language": "Nodejs",
+  "title": "Amazon EventBridge Cron to Lambda durable function",
+  "description": "Create a Lambda durable function triggered by Amazon EventBridge on a cron schedule using AWS SAM.",
+  "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to create a durable Lambda function that is triggered by EventBridge on a cron schedule. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.",
+      "This sample project demonstrates how to create a Lambda durable function that is triggered by Amazon EventBridge on a cron schedule. The Lambda function uses the AWS durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.",
       "The durable execution pattern allows Lambda functions to span multiple invocations while maintaining state. When the function calls context.wait(), it suspends execution and creates a checkpoint. A subsequent invocation resumes from the checkpoint without re-executing previous steps.",
-      "This pattern deploys a durable Lambda function with Nodejs 24 runtime, an EventBridge rule with cron schedule, and uses function versioning to ensure the cron trigger targets a published version rather than $LATEST."
+      "This pattern deploys a Lambda durable function with Node.js 24 runtime, an Amazon EventBridge rule with cron schedule, and uses function versioning to ensure the cron trigger targets a published version rather than $LATEST."
     ]
   },
   "gitHub": {
@@ -31,7 +31,7 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html"
       },
       {
-        "text": "AWS durable execution SDK for Nodejs",
+        "text": "AWS durable execution SDK for Node.js",
         "link": "https://github.com/aws/aws-durable-execution-sdk-js"
       }
     ]

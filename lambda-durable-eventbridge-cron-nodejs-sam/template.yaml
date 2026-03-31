@@ -1,7 +1,7 @@
-#AWS SAM template to deploy the durable function with EventBridge schedule
+#AWS SAM template to deploy the Lambda durable function with Amazon EventBridge schedule
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Durable Function with EventBridge Hourly Schedule
+Description: Lambda Durable Function with Amazon EventBridge 5-Minute Schedule
 
 Resources:
   # Main Durable Orchestrator Function
@@ -32,7 +32,7 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: "rate(5 minutes)"
-            Description: Trigger durable function every 5 minutes
+            Description: Trigger Lambda durable function every 5 minutes
             Enabled: true
 
   # Data Processor Function
