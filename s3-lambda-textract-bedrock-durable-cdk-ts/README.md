@@ -116,7 +116,7 @@ Example use cases:
       --query 'Stacks[0].Outputs[?OutputKey==`ProcessorFunctionName`].OutputValue' \
       --output text)
 
-    aws logs tail /aws/lambda/doc-processor-durable --follow
+    aws logs tail /aws/lambda/$FUNCTION_NAME --follow
     ```
 
 ### Check Processing Results
