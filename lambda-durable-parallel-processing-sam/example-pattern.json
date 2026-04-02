@@ -1,6 +1,6 @@
 {
   "title": "Parallel Processing with AWS Lambda durable functions",
-  "description": "Order processing workflow using Lambda durable functions with parallel execution of multiple validation steps including inventory, payment, shipping, and tax calculations",
+  "description": "Parallel order processing using Lambda durable functions with concurrent inventory, payment, shipping, and tax validation",
   "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",
@@ -34,8 +34,8 @@
         "link": "https://github.com/aws/aws-durable-execution-sdk-js"
       },
       {
-        "text": "Parallel Processing with Durable Functions",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-parallel.html"
+        "text": "Durable Functions Examples and Use Cases",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-examples.html"
       },
       {
         "text": "AWS Blog: Build multi-step applications with Lambda durable functions",
@@ -61,7 +61,7 @@
     {
       "name": "Sasidharan Ramasamy",
       "bio": "Technical Account Manager @ AWS with over 10 years of industry experience",
-      "linkedin": "https://www.linkedin.com/in/sasidharan-ramasamy/"
+      "linkedin": "sasidharan-ramasamy"
     }
   ]
 }

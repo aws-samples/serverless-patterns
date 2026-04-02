@@ -21,7 +21,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 2. Change directory to the pattern directory:
     ```bash
-    cd lambda-durable-parallel-processing-sam
+    cd serverless-patterns/lambda-durable-parallel-processing-sam
     ```
 
 3. Install dependencies:
@@ -36,7 +36,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 5. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```bash
-    sam deploy --guided
+    sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
     ```
 
 6. During the prompts:
@@ -54,6 +54,45 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 This pattern uses AWS Lambda durable functions to orchestrate parallel execution of multiple worker functions:
 
 ### Architecture
+
+```
+                         ┌─────────────────────┐
+                         │   Lambda Invoke      │
+                         │  (test event/payload)│
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │   Orchestrator (Durable)       │
+                    │   - Validate Input             │
+                    │   - Calculate Subtotal         │
+                    │   - context.parallel([...])    │
+                    └──────────────┬────────────────┘
+                                   │
+              ┌────────────┬───────┴───────┬────────────┐
+              ▼            ▼               ▼            ▼
+     ┌──────────────┐ ┌──────────┐ ┌───────────┐ ┌──────────┐
+     │  Inventory   │ │ Payment  │ │ Shipping  │ │   Tax    │
+     │   Check      │ │Validation│ │Calculation│ │Calculation│
+     └──────┬───────┘ └────┬─────┘ └─────┬─────┘ └────┬─────┘
+            │              │             │             │
+            └──────────────┴──────┬──────┴─────────────┘
+                                  │
+                                  ▼
+                    ┌───────────────────────────────┐
+                    │   Orchestrator (continued)     │
+                    │   - Validate Results           │
+                    │   - Calculate Totals           │
+                    │   - Durable Wait (1s)          │
+                    │   - Finalize Order             │
+                    └───────────────────────────────┘
+                                  │
+                                  ▼
+                         ┌─────────────────┐
+                         │  Order Response  │
+                         │  (JSON result)   │
+                         └─────────────────┘
+```
 
 The solution consists of five Lambda functions:
 
@@ -350,7 +389,7 @@ Parallel execution completed
 
 - [Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Durable Execution SDK for JavaScript](https://github.com/aws/aws-durable-execution-sdk-js)
-- [Parallel Processing Patterns](https://docs.aws.amazon.com/lambda/latest/dg/durable-parallel.html)
+- [Durable Functions Examples and Use Cases](https://docs.aws.amazon.com/lambda/latest/dg/durable-examples.html)
 - [AWS SAM Documentation](https://docs.aws.amazon.com/serverless-application-model/)
 
 ---
