@@ -1,10 +1,11 @@
+#!/bin/bash
+
 # This script should be used to test the pattern. It does the following tasks:
 # 	1. Gathers output values from Terraform
 # 	2. Adds test data to DynamoDB
 # 	3. Starts the Glue job
 # 	4. Runs a CLI command to check the contents of S3
 
-#!/bin/bash
 set -e
 
 echo "Testing DynamoDB to S3 Glue Zero-ETL Integration..."

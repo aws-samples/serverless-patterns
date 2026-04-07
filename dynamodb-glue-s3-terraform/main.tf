@@ -12,13 +12,16 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_caller_identity" "current" {}
+
 locals {
    name_prefix = var.environment
+   account_id  = data.aws_caller_identity.current.account_id
 }
 
 # S3 bucket for data storage
 resource "aws_s3_bucket" "data_bucket" {
-  bucket = "${local.name_prefix}-${var.s3_bucket_name}"
+  bucket = "${local.name_prefix}-${var.s3_bucket_name}-${local.account_id}"
   force_destroy = true
 }
 
@@ -29,6 +32,36 @@ resource "aws_s3_bucket_public_access_block" "data_bucket_pab" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+# Configure S3 bucket lifecycle policy
+resource "aws_s3_bucket_lifecycle_configuration" "data_lifecycle" {
+  bucket = aws_s3_bucket.data_bucket.id
+
+  rule {
+    id     = "delete-after-90-days"
+    status = "Enabled"
+
+    # Apply to ALL objects
+    filter {}
+
+    expiration {
+      days = 90
+    }
+
+  }
+}
+
+# Encrypt S3 bucket using SSE-S3
+resource "aws_s3_bucket_server_side_encryption_configuration" "data_encryption" {
+  bucket = aws_s3_bucket.data_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"  # SSE-S3 encryption
+    }
+    bucket_key_enabled = true
+  }
 }
 
 # Upload the script file to S3
@@ -43,8 +76,6 @@ resource "aws_dynamodb_table" "source_table" {
   name             = "${var.table_name}"
   billing_mode     = "PAY_PER_REQUEST"
   hash_key         = "id"
-  stream_enabled   = true
-  stream_view_type = "NEW_AND_OLD_IMAGES"
 
   attribute {
     name = "id"
@@ -112,12 +143,34 @@ resource "aws_iam_role_policy" "glue_zero_etl_policy" {
       {
         Effect = "Allow"
         Action = [
-          "glue:*",
+          "glue:GetJob",
+          "glue:GetJobRun",
+          "glue:GetJobRuns",
+          "glue:StartJobRun",
+          "glue:BatchStopJobRun",
+          "glue:GetDatabase",
+          "glue:GetDatabases",
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:GetPartition",
+          "glue:GetPartitions",
+          "glue:CreateTable",
+          "glue:UpdateTable",
+          "glue:DeleteTable",
+          "glue:BatchCreatePartition",
+          "glue:BatchDeletePartition",
+          "glue:UpdatePartition"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = "arn:aws:logs:*:*:/aws-glue/*"
       }
     ]
   })

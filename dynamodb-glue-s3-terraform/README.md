@@ -1,10 +1,10 @@
 # Amazon DynamoDB to S3 with zero-ETL using AWS Glue with Terraform
 
-This pattern demonstrates how to create a zero-ETL integration between Aamazon DynamoDB and Amazon S3 using AWS Glue transformation job. The AWS Glue job copies data in the specified format, which can be queried usind Amazon Athena.
+This pattern demonstrates how to create a zero-ETL integration between Amazon DynamoDB and Amazon S3 using AWS Glue transformation job. The AWS Glue job copies data in the specified format, which can be queried using Amazon Athena.
 
 Learn more about this pattern at Serverless Land Patterns: Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/terraform-dynamodb-glue-s3-integration
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+Important: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
 
@@ -21,25 +21,25 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd terraform-dynamodb-glue-s3-integration
+    cd dynamodb-glue-s3-terraform
     ```
 3. Run below terraform commands to deploy to your AWS account in the desired region (default is us-east-1):
     ```
     terraform init
     terraform validate
-    terraform plan -var region=<YOUR_REGION>
-    terraform apply -var region=<YOUR_REGION>
+    terraform plan -var aws_region=<YOUR_REGION>
+    terraform apply -var aws_region=<YOUR_REGION>
     ```
 
 ## How it works
 
-This Terraform pattern creates a zero-ETL integration that automatically exports DynamoDB data to S3 using AWS Glue. The AWS Glue job reads from the Amazon DynamoDB table and writes the data in the specified format (currently specified as Parquet in the script) to an encrypted Amazon S3 bucket for potential use in analytics and/or for long-term storage. The entire infrastructure is provisioned with the required IAM permissions, and includes automated testing script to validate the data pipeline functionality.
+This Terraform pattern creates zero-ETL integration that automatically exports DynamoDB data to S3 using AWS Glue. The AWS Glue job reads from the Amazon DynamoDB table and writes the data in the specified format (currently specified as Parquet in the script) to an encrypted Amazon S3 bucket for potential use in analytics and/or for long-term storage. The entire infrastructure is provisioned with the required IAM permissions, and includes automated testing script to validate the data pipeline functionality.
 
 ![pattern](Images/pattern.png)
 
 ## Testing
 
-After deployment, run ./test.sh. This script adds rows to Amazon DynamoDB database and triggers then the AWS Glue job. Once the job is complete, check Amazon S3 for the target files.
+After deployment, run ./test.sh. This script adds rows to Amazon DynamoDB database and triggers the AWS Glue job. Once the job is complete, check Amazon S3 for the target files.
 
 ## Cleanup
  
