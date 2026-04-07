@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Lambda Durable Function - Call REST API with Python
+Description: AWS Lambda durable functions - Call REST API with Python
 
 Resources:
   DurableFunction:
@@ -11,7 +11,7 @@ Resources:
       Runtime: python3.14
       Timeout: 300
       DurableConfig:
-        ExecutionTimeout: 900  # 15 minutes - allows durablefunction to be invoked syncronously and asynchronously
+        ExecutionTimeout: 900  # 15 minutes - allows durable functions to be invoked synchronously and asynchronously
         RetentionPeriodInDays: 7
       MemorySize: 128
       Architectures:

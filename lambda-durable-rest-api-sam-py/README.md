@@ -1,4 +1,4 @@
-# Lambda Durable Function - REST API Call with Python
+# AWS Lambda durable functions - REST API Call with Python
 
 This pattern demonstrates a Lambda durable function that calls an external REST API using Python.
 
