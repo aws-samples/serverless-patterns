@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Python 3.14](https://www.python.org/downloads/) installed locally (required for `sam build` to resolve pip dependencies and package the Lambda function)
 
 ## Deployment Instructions
 
@@ -24,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     cd lambda-durable-rest-api-sam-py
     ```
 
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam build
     sam deploy --guided
@@ -40,12 +41,12 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates AWS Lambda durable Execution for calling external REST APIs. The function uses two key components:
+This pattern demonstrates AWS Lambda Durable Execution for calling external REST APIs. The function uses two key components:
 
 1. `@durable_step` - Wraps the REST API call, making it automatically retryable
 2. `@durable_execution` - Marks the Lambda handler as a durable execution workflow
 
-AWS Lambda durable Execution automatically handles failures, retries, and state persistence without requiring external services like DynamoDB or Step Functions.
+AWS Lambda Durable Execution automatically handles failures, retries, and state persistence without requiring external services like DynamoDB or Step Functions.
 
 ## Testing
 
@@ -93,11 +94,11 @@ The execution is durable - if the API call fails, AWS Lambda will automatically 
  
 1. Delete the stack:
     ```bash
-    aws cloudformation delete-stack --stack-name <your-stack-name>
+    aws sam delete-stack --stack-name <your-stack-name>
     ```
 1. Confirm the stack has been deleted:
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<your-stack-name>')].StackStatus"
+    aws sam list-stacks --query "StackSummaries[?contains(StackName,'<your-stack-name>')].StackStatus"
     ```
 
 ## Learn More

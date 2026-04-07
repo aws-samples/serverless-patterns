@@ -1,6 +1,6 @@
 {
   "title": "AWS Lambda durable function - REST API Call",
-"description": "A Lambda function that calls an external REST API using AWS durable execution SDK for automatic retries and state management.",
+"description": "An AWS Lambda function that calls an external REST API using Durable Execution SDK for automatic retries and state management.",
   "language": "Python",
   "level": "200",
   "framework": "SAM",

@@ -13,12 +13,20 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 900  # 15 minutes - allows durablefunction to be invoked syncronously and asynchronously
         RetentionPeriodInDays: 7
-      MemorySize: 512
+      MemorySize: 128
       Architectures:
         - x86_64
+      LoggingConfig:
+        LogGroup: !Ref DurableFunctionLogGroup
       Environment:
         Variables:
           API_URL: https://jsonplaceholder.typicode.com/posts/1
+
+  DurableFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-DurableFunction
+      RetentionInDays: 30
 
 Outputs:
   FunctionArn:
