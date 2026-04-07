@@ -21,7 +21,7 @@ locals {
 
 # S3 bucket for data storage
 resource "aws_s3_bucket" "data_bucket" {
-  bucket = "${local.name_prefix}-${var.s3_bucket_name}-${local.account_id}"
+  bucket = "${local.name_prefix}-${var.s3_bucket_name}-${var.aws_region}-${local.account_id}"
   force_destroy = true
 }
 

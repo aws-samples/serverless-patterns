@@ -22,3 +22,8 @@ output "iam_role_arn" {
   description = "ARN of the IAM role for Glue"
   value       = aws_iam_role.glue_zero_etl_role.arn
 }
+
+output "region" {
+  description = "Current region"
+  value       = var.aws_region
+}
