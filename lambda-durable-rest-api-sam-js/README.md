@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Node.js 24.x](https://nodejs.org/) installed locally (required for `sam build` to resolve npm dependencies and package the Lambda function)
 
 ## Deployment Instructions
 
@@ -24,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     cd lambda-durable-rest-api-sam-js
     ```
 
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam build
     sam deploy --guided
@@ -40,15 +41,15 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern demonstrates AWS Lambda durable execution for calling external REST APIs. The function uses the `withDurableExecution` wrapper to mark the Lambda handler as a durable execution workflow. All steps defined with `context.step()` are automatically retryable.
+This pattern demonstrates AWS Lambda Durable Execution for calling external REST APIs. The function uses the `withDurableExecution` wrapper to mark the Lambda handler as a Durable Execution workflow. All steps defined with `context.step()` are automatically retryable.
 
-**Note**: This pattern requires Node.js 24.x runtime which has native support for durable execution.
+**Note**: This pattern requires Node.js 24.x runtime which has native support for Durable Execution.
 
 ## Testing
 
 1. Get the function name from the stack outputs:
 ```bash
-aws cloudformation describe-stacks --stack-name <your-stack-name> \
+aws sam describe-stacks --stack-name <your-stack-name> \
   --query 'Stacks[0].Outputs[?OutputKey==`FunctionName`].OutputValue' --output text
 ```
 
@@ -90,17 +91,17 @@ The execution is durable - if the API call fails, AWS Lambda will automatically 
  
 1. Delete the stack:
     ```bash
-    aws cloudformation delete-stack --stack-name <your-stack-name>
+    aws sam delete-stack --stack-name <your-stack-name>
     ```
 1. Confirm the stack has been deleted:
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<your-stack-name>')].StackStatus"
+    aws sam list-stacks --query "StackSummaries[?contains(StackName,'<your-stack-name>')].StackStatus"
     ```
 
 ## Learn More
 
 - [AWS Lambda durable functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
-- [durable execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-js)
+- [Durable Execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-js)
 - [Callback Operations](https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html)
 ---
 
