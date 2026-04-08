@@ -30,8 +30,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ### 2. Tenant-Isolated Processor (`tenant-isolated-processor/`)
 - Configured with tenant isolation mode enabled
-- Processes requests in isolated execution environments per tenant
-- Accesses tenant ID via `context.identity.tenant_id`
+- Processes requests in isolated execution environments per tenant using message-group-id
 
 ## Message Format
 
@@ -50,8 +49,7 @@ sam deploy --guided
 
 ## Testing
 
-Step 1:
-
+Step 1: 
 After deploying infrastructure using SAM, run below command to get SQS Queue URL. Replace <your-stack-name> with your cloudformation stack name.
 
 ```bash
