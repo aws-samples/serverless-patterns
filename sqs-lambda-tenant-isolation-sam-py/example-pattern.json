@@ -1,5 +1,5 @@
 {
-	"title": "AWS Lambda Tenant Isolation with SQS",
+	"title": "AWS Lambda Tenant Isolation with Amazon SQS",
 	"description": "Lambda Isolation feature",
 	"language": "",
 	"level": "200",
