@@ -20,12 +20,13 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
-## Components
+## How it works
+
+<img width="535" height="183" alt="image" src="https://github.com/user-attachments/assets/b6af3efa-e81b-4a08-80ca-b7536934d490" />
 
 ### 1. SQS Processor (`sqs-processor/`)
 - Triggered by SQS queue messages
-- Extracts `customer-id` from message payload
-- Invokes tenant-isolated Lambda asynchronously with `TenantId` parameter
+- Invokes tenant-isolated Lambda asynchronously
 
 ### 2. Tenant-Isolated Processor (`tenant-isolated-processor/`)
 - Configured with tenant isolation mode enabled
@@ -47,21 +48,42 @@ sam build
 sam deploy --guided
 ```
 
-## How it works
-
-```
-SQS Queue → SQS Processor Lambda → Tenant-Isolated Lambda
-            (reads customer-id)     (processes with tenant isolation)
-```
-
 ## Testing
 
-Send a message to the SQS queue:
+Step 1:
+
+After deploying infrastructure using SAM, run below command to get SQS Queue URL. Replace <your-stack-name> with your cloudformation stack name.
+
+```bash
+aws cloudformation describe-stacks \
+  --stack-name <your-stack-name> \
+  --query "Stacks[0].Outputs[?OutputKey=='MyQueueUrl'].OutputValue" \
+  --output text
+```
+
+Step 2:
+You send messages to the SQS queue with --message-group-id set to a tenant identifier. Use below CLI command to send-message. Make sure to set --message-group-id as tenant name. Send multiple messages with different tenant name
 
 ```bash
 aws sqs send-message \
   --queue-url <QUEUE_URL> \
-  --message-body '{"data": "test payload"}'
+  --message-body '{"data": "test payload"}' \
+  --message-group-id "tenant-blue"
 ```
 
-After dropping the message, review cloudwatch log for Tenant-Isolated Lambda. Different log streams should be created for each tenant.
+```bash
+aws sqs send-message \
+  --queue-url <QUEUE_URL> \
+  --message-body '{"data": "test payload"}' \
+  --message-group-id "tenant-green"
+```
+
+Step 3:
+The SQS processor Lambda picks up the message, reads the MessageGroupId from the SQS record attributes, and passes it as the TenantId when invoking the tenant-isolated LambdaAfter dropping the message, review cloudwatch log for Tenant-Isolated Lambda.
+
+aws logs describe-log-streams \
+  --log-group-name /aws/lambda/tenant-isolated-processor \
+  --order-by LastEventTime \
+  --descending
+
+Different log streams should be created for each tenant.
