@@ -1,0 +1,24 @@
+{
+  "name": "lambda-durable-managed-instances-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "lambda-durable-managed-instances-cdk": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "aws-cdk": "2.1115.0",
+    "esbuild": "^0.27.4",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@aws/durable-execution-sdk-js": "^1.1.0",
+    "aws-cdk-lib": "2.245.0",
+    "constructs": "^10.6.0"
+  }
+}
