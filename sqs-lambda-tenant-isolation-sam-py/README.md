@@ -1,6 +1,6 @@
 # AWS Lambda Tenant Isolation with Amazon SQS
 
-This pattern demonstrates AWS Lambda's tenant isolation feature in Multi-tenant application. It uses single Amazon SQS for multi-tenant application and isolating messages using messagegroupid and invoking isolated lambda enviornments. 
+This pattern demonstrates AWS Lambda's tenant isolation feature in Multi-tenant application. It uses single Amazon SQS for multi-tenant application and isolating messages using MessageGroupId and invoking isolated AWS Lambda environments. 
 
 ## Key Features
 
@@ -79,20 +79,24 @@ aws sqs send-message \
 Step 3:
 The SQS processor Lambda picks up the message, reads the MessageGroupId from the SQS record attributes, and passes it as the TenantId when invoking the tenant-isolated LambdaAfter dropping the message, review cloudwatch log for Tenant-Isolated Lambda.
 
+```bash
 aws logs describe-log-streams \
   --log-group-name /aws/lambda/tenant-isolated-processor \
   --order-by LastEventTime \
   --descending
+```
 
 Different log streams should be created for each tenant.
 
 ## Cleanup
 
 Delete the stack
+
 ```bash
 aws cloudformation delete-stack --stack-name STACK_NAME
 ```
 Confirm the stack has been deleted
+
 ```bash
 aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
 ```
