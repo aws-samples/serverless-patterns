@@ -1,6 +1,6 @@
 # AWS Lambda Tenant Isolation with Amazon SQS
 
-This pattern demonstrate AWS Lambda's tenant isolation feature in Multi-tenant application. It uses single Amazon SQS for multi-tenant application and isolating messages using messagegroupid and invoking isolated lambda enviornments. 
+This pattern demonstrates AWS Lambda's tenant isolation feature in Multi-tenant application. It uses single Amazon SQS for multi-tenant application and isolating messages using messagegroupid and invoking isolated lambda enviornments. 
 
 ## Key Features
 
