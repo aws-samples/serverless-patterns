@@ -1,8 +1,8 @@
 {
-  "title": "Amazon API Gateway (HTTP) to Amazon Simple Queue Service (SQS) for passing custom http headers as message attributes.",
+  "title": "Send customer headers from Amazon API Gateway to Amazon SQS",
   "description": "Amazon API Gateway (HTTP) to Amazon Simple Queue Service (SQS) for passing custom http headers as message attributes.",
   "level": "300",
-  "framework": "AWS Serverless Application Model",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [

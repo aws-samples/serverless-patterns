@@ -1,6 +1,6 @@
 {
-  "title": "Amazon S3 to AWS Lambda (Durable) to Amazon Textract and Bedrock",
-  "description": "Extract text from documents with Amazon Textract and summarize with Amazon Bedrock using a durable AWS Lambda function.",
+  "title": "Amazon S3 to AWS Lambda durable functions to Amazon Textract and Bedrock",
+  "description": "Extract text from documents with Amazon Textract and summarize with Amazon Bedrock using an AWS Lambda durable function.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
@@ -119,7 +119,9 @@
     ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk destroy</code>"]
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {

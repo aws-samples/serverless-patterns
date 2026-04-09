@@ -1,6 +1,6 @@
 {
-  "title": "Lambda durable functions with Human-in-the-Loop",
-  "description": "Demonstrates Lambda durable functions with human approval workflow using Python 3.13, DynamoDB, and SNS",
+  "title": "AWS Lambda durable functions with human-in-the-Loop",
+  "description": "Demonstrates Lambda durable functions with human approval workflow using Python, DynamoDB, and SNS",
   "language": "Python",
   "level": "300",
   "framework": "SAM",

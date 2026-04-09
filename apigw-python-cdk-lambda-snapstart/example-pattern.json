@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway with Lambda SnapStart and DynamoDB using Python CDK",
+  "title": "Integrate AWS Lambda SnapStart function with Amazon API Gateway",
   "description": "This pattern demonstrates how to create a REST API using API Gateway, AWS Lambda with SnapStart, and DynamoDB. Built with Python 3.12 and AWS CDK, it implements Lambda SnapStart to improve initialization performance for faster cold starts.",
   "language": "Python",
   "level": "200",

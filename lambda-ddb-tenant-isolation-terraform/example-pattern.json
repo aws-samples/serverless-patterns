@@ -8,7 +8,6 @@
     "headline": "How it works",
     "text": [
       "This solution works by exposing two API Gateway endpoints, /standard and /isolated, each backed by a separate Lambda function. When a request hits the /standard endpoint, the Lambda function increments a single shared counter row in DynamoDB, meaning all tenants read and write the same value. When a request hits the /isolated endpoint with an x-tenant-id header, API Gateway maps the header to the Lambda execution context, ensuring a dedicated execution environment per tenant, and the Lambda function increments a tenant-specific counter row in DynamoDB, keeping each tenant's data completely separate."
-
     ]
   },
   "gitHub": {
