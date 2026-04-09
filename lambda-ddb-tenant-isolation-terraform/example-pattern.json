@@ -1,0 +1,55 @@
+{
+  "title": "Multi-tenant API with Amazon API Gateway and AWS Lambda Tenant Isolation",
+  "description": "This pattern implements a serverless multi-tenant API using Amazon API Gateway, AWS Lambda and Amazon DynamoDB to demonstrate tenant isolation.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This solution works by exposing two API Gateway endpoints, /standard and /isolated, each backed by a separate Lambda function. When a request hits the /standard endpoint, the Lambda function increments a single shared counter row in DynamoDB, meaning all tenants read and write the same value. When a request hits the /isolated endpoint with an x-tenant-id header, API Gateway maps the header to the Lambda execution context, ensuring a dedicated execution environment per tenant, and the Lambda function increments a tenant-specific counter row in DynamoDB, keeping each tenant's data completely separate."
+
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ddb-tenant-isolation-terraform",
+      "templateURL": "serverless-patterns/lambda-ddb-tenant-isolation-terraform",
+      "projectFolder": "lambda-ddb-tenant-isolation-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Tenant Isolation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_200_200/B56ZZH3LL6H0AY-/0/1744962369852?e=1772668800&v=beta&t=y0t7bsQKJwy5McO395hDmW7QPu_K-a1WKXeTA0-ecno",
+      "bio": "Solutions Architect at AWS",
+      "linkedin": "archanavenkat"
+    }
+  ]
+}
