@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda Durable Function - Call REST API with Node.js
+
+Resources:
+  DurableFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs24.x
+      Timeout: 300
+      DurableConfig:
+        ExecutionTimeout: 900  # 15 minutes - allows durablefunction to be invoked syncronously and asynchronously
+        RetentionPeriodInDays: 7
+      MemorySize: 128
+      Architectures:
+        - x86_64
+      LoggingConfig:
+        LogGroup: !Ref DurableFunctionLogGroup
+      Environment:
+        Variables:
+          API_URL: https://jsonplaceholder.typicode.com/posts/1
+
+  DurableFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-DurableFunction
+      RetentionInDays: 30
+
+Outputs:
+  FunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt DurableFunction.Arn
+  
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref DurableFunction
