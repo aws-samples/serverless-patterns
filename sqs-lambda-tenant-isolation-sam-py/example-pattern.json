@@ -1,6 +1,6 @@
 {
 	"title": "AWS Lambda Tenant Isolation with Amazon SQS",
-	"description": "Lambda Isolation feature",
+	"description": "This pattern demonstrates AWS Lambda tenant isolation with Amazon SQS fair queues for multi-tenant message processing."
 	"language": "",
 	"level": "200",
 	"framework": "AWS SAM",
