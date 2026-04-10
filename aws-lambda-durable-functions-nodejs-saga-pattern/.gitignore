@@ -1,0 +1,8 @@
+.aws-sam/
+*.pyc
+__pycache__/
+.DS_Store
+samconfig.toml
+response.json
+node_modules/
+package-lock.json
