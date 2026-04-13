@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-client</artifactId>
-			<version>6.2.2</version>
+			<version>6.2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
