@@ -1,7 +1,7 @@
 {
   "name": "nodejs-durable-order-processor",
   "version": "1.0.0",
-  "description": "AWS Lambda Durable Functions - Node.js Orchestrator with structured logging and error handling",
+  "description": "AWS Lambda durable functions - Node.js orchestrator with structured logging and error handling",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Lambda Durable Functions - Node.js Order Processing Demo
+Description: AWS Lambda Durable Functions Demo Using Nodejs
 
 Globals:
   Function:
-    Runtime: nodejs22.x
-    Timeout: 900
+    Runtime: nodejs24.x
+    Timeout: 30
     MemorySize: 512
     Architectures:
-      - x86_64
+      - arm64
     LoggingConfig:
       LogFormat: JSON
       ApplicationLogLevel: INFO
@@ -28,7 +28,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
       Policies:
         - PolicyName: LambdaInvokePolicy
           PolicyDocument:
@@ -37,25 +37,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
-                Resource: '*'
-        - PolicyName: DurableExecutionPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - states:StartExecution
-                  - states:DescribeExecution
-                  - states:StopExecution
-                  - states:GetExecutionHistory
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
-
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-OrderEnricher'
   # Enrichment Lambda Function (Simple, Non-Durable)
   OrderEnricherFunction:
     Type: AWS::Serverless::Function
@@ -100,12 +82,7 @@ Outputs:
 
   TestCommand:
     Description: Command to test the durable function
-    Value: !Sub |
-      aws lambda invoke \
-        --function-name ${DurableOrderProcessorFunction.Arn}:prod \
-        --payload '{"orderId":"ORDER-123","nodejsLambdaArn":"${OrderEnricherFunction.Arn}"}' \
-        --cli-binary-format raw-in-base64-out \
-        response.json && cat response.json | jq .
+    Value: !Sub 'aws lambda invoke --function-name ${DurableOrderProcessorFunction.Arn}:prod --payload ''{"orderId":"ORDER-123","nodejsLambdaArn":"${OrderEnricherFunction.Arn}"}'' --cli-binary-format raw-in-base64-out response.json && cat response.json | jq .'
 
   LogsCommand:
     Description: Command to view logs

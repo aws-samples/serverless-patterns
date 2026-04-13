@@ -1,13 +1,13 @@
 {
-  "title": "AWS Lambda Durable Functions with Node.js",
-  "description": "Demonstrates AWS Lambda Durable Functions using Node.js with automatic checkpointing, durable waits, and fault tolerance for long-running workflows.",
+  "title": "AWS Lambda durable functions with Node.js",
+  "description": "Demonstrates AWS Lambda durable functions using Node.js with automatic checkpointing, durable waits, and fault tolerance for long-running workflows.",
   "language": "Node.js",
   "level": "200",
   "framework": "SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates AWS Lambda Durable Functions using Node.js to build resilient, long-running workflows that can execute for up to one year.",
+      "This pattern demonstrates AWS Lambda durable functions using Node.js to build resilient, long-running workflows that can execute for up to one year.",
       "The orchestrator function uses the @aws/durable-execution-sdk-js to implement checkpointed steps with context.step(), durable waits with context.wait(), and automatic recovery from failures.",
       "The workflow validates input, invokes an enrichment Lambda function, waits 2 seconds (without compute charges), and finalizes the order processing."
     ]
@@ -23,7 +23,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Durable Functions Documentation",
+        "text": "AWS Lambda durable functions documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -39,7 +39,7 @@
   "deploy": {
     "text": [
       "sam build",
-      "sam deploy --guided"
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
     ]
   },
   "testing": {
@@ -49,15 +49,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: sam delete --stack-name durable-functions-demo"
+      "Delete the stack: <code>sam delete --stack-name durable-functions-demo</code>"
     ]
   },
   "authors": [
     {
-      "name": "Sangeetha S",
+      "name": "Your Name",
       "image": "",
-      "bio": "Technical Account Manager @ AWS",
-      "linkedin": "sangita-sethumadhavan"
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": ""
     }
   ]
 }
