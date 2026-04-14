@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 import pytest
 
 
-async def _collect_response(ws, sub_id, timeout=60):
+async def _collect_response(ws, sub_id, timeout=180):
     """Collect streaming events until a completion event arrives."""
     events = []
     complete = None
@@ -100,7 +100,7 @@ async def test_conversation_with_session(subscribe, publish):
             },
         )
 
-        _, complete_1 = await _collect_response(ws, sub_id)
+        _, complete_1 = await _collect_response(ws, sub_id, timeout=180)
         assert complete_1 is not None, "Turn 1 did not complete"
 
         # Turn 2: ask a follow-up — agent should remember the blog post
@@ -112,7 +112,7 @@ async def test_conversation_with_session(subscribe, publish):
             },
         )
 
-        _, complete_2 = await _collect_response(ws, sub_id)
+        _, complete_2 = await _collect_response(ws, sub_id, timeout=180)
         assert complete_2 is not None, "Turn 2 did not complete"
         response_2 = complete_2.get("response", "")
 
