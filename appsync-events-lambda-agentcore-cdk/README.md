@@ -1,4 +1,4 @@
-# AppSync Events to Lambda to Bedrock AgentCore
+# AWS AppSync Events integration with AWS Lambda and Amazon Bedrock AgentCore
 
 This pattern deploys a real-time streaming chat service using AWS AppSync Events with Lambda to invoke a Strands agent running on Amazon Bedrock AgentCore Runtime.
 
