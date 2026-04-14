@@ -80,7 +80,7 @@ class StandardLambda(Construct):
             "layers": [powertools_layer],
             "environment": {
                 "POWERTOOLS_SERVICE_NAME": construct_id,
-                "LOG_LEVEL": "DEBUG",
+                "LOG_LEVEL": "INFO",
             },
             "tracing": lambda_.Tracing.ACTIVE,
             "log_group": log_group,
