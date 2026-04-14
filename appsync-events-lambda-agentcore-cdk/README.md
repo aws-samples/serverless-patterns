@@ -121,7 +121,7 @@ You can test the deployed service directly from the AWS Console using the AppSyn
         }
     ]
     ```
-    Click **Publish**. When prompted, choose **WebSocket** as the publish method.
+    Choose **Publish**. When prompted, choose **WebSocket** as the publish method.
 
     ![AppSync Pub/Sub Editor — Publish panel](images/appsync-pubsub-publish.jpg)
     
