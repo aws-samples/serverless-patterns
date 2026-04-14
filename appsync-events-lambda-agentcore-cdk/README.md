@@ -35,7 +35,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
     pip install -r requirements.txt
     ```
-1. Set your target AWS region:
+1. Set your target AWS region (must be a region where [Bedrock AgentCore](https://docs.aws.amazon.com/general/latest/gr/bedrock_agentcore.html) is available):
+    ```
+    export AWS_REGION=eu-west-1     # On Windows: set AWS_REGION=eu-west-1
+    ```
     ```
     export AWS_REGION=eu-west-1      # On Windows: set AWS_REGION=eu-west-1
     ```
