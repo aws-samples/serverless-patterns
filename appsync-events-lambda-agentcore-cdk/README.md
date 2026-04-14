@@ -155,7 +155,7 @@ You can configure multiple authorization modes on a single API and apply differe
 
 ## Cleanup
 
-1. Delete the stack
+1. Delete the stack (answer `y` when prompted to confirm):
     ```
     cdk destroy
     ```
