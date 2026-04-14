@@ -97,7 +97,7 @@ You can test the deployed service directly from the AWS Console using the AppSyn
 1. Open the [AWS AppSync console](https://console.aws.amazon.com/appsync/) in the region you deployed to (e.g. `eu-west-1`).
 1. Select the Event API created by the stack (look for the API with "EventApi" in the name).
 1. Choose the **Pub/Sub Editor** tab.
-1. Scroll to the bottom of the page. The API key is pre-populated in the authorization token field. Click **Connect** to establish a WebSocket connection.
+1. Scroll to the bottom of the page. The API key is pre-populated in the authorization token field. Choose **Connect** to establish a WebSocket connection.
 1. In the **Subscribe** panel, select `responses` from the namespace dropdown, then enter the path:
     ```
     /chat/test-conversation-1
