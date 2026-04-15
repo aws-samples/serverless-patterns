@@ -102,7 +102,8 @@ You can test the deployed service directly from the AWS Console using the AppSyn
     ```
     /chat/test-conversation-1
     ```
-1. Click **Subscribe**.
+    > **Note:** The namespace is automatically prepended to the path. Since the namespace is `responses`, the full channel becomes `/responses/chat/test-conversation-1`. Do not include the namespace in the path field.
+1. Choose **Subscribe**.
 
     ![AppSync Pub/Sub Editor — Subscribe panel](images/appsync-pubsub-subscribe.jpg)
     
@@ -112,7 +113,11 @@ You can test the deployed service directly from the AWS Console using the AppSyn
     ```
     /test-conversation-1
     ```
+    
+    > **Note:** The namespace `chat` is prepended automatically, so the full channel is `/chat/test-conversation-1`. Do not enter `/chat/test-conversation-1` as the path — that would produce `/chat/chat/test-conversation-1` and messages will not reach the subscriber.
+    
     Enter this JSON as the event payload:
+    
     ```json
     [
         {
@@ -133,6 +138,9 @@ You can test the deployed service directly from the AWS Console using the AppSyn
     
     Figure 4 - AppSync Pub/Sub Editor - Subscribe results
 
+The following video demonstrates the full publish and subscribe flow in the Pub/Sub Editor:
+
+https://github.com/aws-samples/serverless-patterns/blob/main/appsync-events-lambda-agentcore-cdk/images/pubsub-demo.mp4
 
 A few things to note:
 
