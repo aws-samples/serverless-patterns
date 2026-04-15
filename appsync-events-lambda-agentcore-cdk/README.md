@@ -138,9 +138,11 @@ You can test the deployed service directly from the AWS Console using the AppSyn
     
     Figure 4 - AppSync Pub/Sub Editor - Subscribe results
 
-The following video demonstrates the full publish and subscribe flow in the Pub/Sub Editor:
+    The following demo shows the full publish and subscribe flow:
 
-<video src="images/pubsub-demo.mp4" controls width="100%"></video>
+    ![Pub/Sub Editor demo](images/pubsub-demo.gif)
+
+    Figure 5 - AppSync Pub/Sub Editor - Demo
 
 A few things to note:
 
