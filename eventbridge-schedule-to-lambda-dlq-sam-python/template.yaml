@@ -9,7 +9,7 @@ Description: >
 Globals:
   Function:
     Timeout: 30
-    Runtime: python3.12
+    Runtime: python3.14
     Architectures:
       - x86_64
 
