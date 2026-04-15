@@ -79,44 +79,54 @@ async def test_http_request_tool(subscribe, publish):
 async def test_conversation_with_session(subscribe, publish):
     """Test multi-turn conversation using sessionId for continuity.
 
-    Turn 1: Ask the agent to fetch and summarise an AWS blog post.
-    Turn 2: Ask a follow-up question — the agent should remember
-    the blog content from the first turn via session persistence.
+    Turn 1: Ask the agent to compute 347 * 29 using the calculator tool.
+    Turn 2: Ask the agent to divide the previous result by 7 — it must
+    recall 10063 from session history to produce the correct answer.
     """
     session_id = str(uuid.uuid4())
     publish_channel = f"chat/{session_id}"
 
     async with subscribe(f"/responses/{publish_channel}") as (ws, sub_id):
-        # Turn 1: fetch and summarise an AWS blog post
+        # Turn 1: deterministic calculator call
         publish(
             publish_channel,
             {
                 "message": (
-                    "Fetch https://aws.amazon.com/blogs/aws/ and give me "
-                    "a short summary of the first blog post you see. "
-                    "Keep it under 100 words."
+                    "Use the calculator to compute 347 * 29. "
+                    "Reply with only the result."
                 ),
                 "sessionId": session_id,
             },
         )
 
-        _, complete_1 = await _collect_response(ws, sub_id, timeout=180)
+        _, complete_1 = await _collect_response(ws, sub_id)
         assert complete_1 is not None, "Turn 1 did not complete"
+        assert "10063" in complete_1.get("response", ""), (
+            "Turn 1 should contain 10063"
+        )
 
-        # Turn 2: ask a follow-up — agent should remember the blog post
+        # Small delay to allow session persistence to flush
+        await asyncio.sleep(2)
+
+        # Turn 2: follow-up that requires session recall
         publish(
             publish_channel,
             {
-                "message": ("Based on that blog post, what AWS services were mentioned? " "List them out."),
+                "message": (
+                    "Take the number you just calculated and divide it by 7 "
+                    "using the calculator. Reply with only the result."
+                ),
                 "sessionId": session_id,
             },
         )
 
-        _, complete_2 = await _collect_response(ws, sub_id, timeout=180)
+        _, complete_2 = await _collect_response(ws, sub_id)
         assert complete_2 is not None, "Turn 2 did not complete"
         response_2 = complete_2.get("response", "")
 
-        assert len(response_2) > 0, "Turn 2 should have a non-empty response"
+        assert "1437" in response_2, (
+            f"Turn 2 should contain 1437 (10063/7): {response_2}"
+        )
 
 
 @pytest.mark.asyncio
