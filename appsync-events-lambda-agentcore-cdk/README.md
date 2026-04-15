@@ -140,7 +140,7 @@ You can test the deployed service directly from the AWS Console using the AppSyn
 
 The following video demonstrates the full publish and subscribe flow in the Pub/Sub Editor:
 
-https://github.com/aws-samples/serverless-patterns/blob/main/appsync-events-lambda-agentcore-cdk/images/pubsub-demo.mp4
+<video src="images/pubsub-demo.mp4" controls width="100%"></video>
 
 A few things to note:
 
