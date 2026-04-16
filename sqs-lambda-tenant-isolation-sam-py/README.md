@@ -93,13 +93,7 @@ Different log streams should be created for each tenant.
 Delete the stack
 
 ```bash
-aws cloudformation delete-stack --stack-name STACK_NAME
-```
-Confirm the stack has been deleted
-
-```bash
-aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-```
+sam delete
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
