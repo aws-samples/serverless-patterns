@@ -1,6 +1,6 @@
 # Amazon EventBridge Scheduler to Amazon Bedrock AI Agent
 
-This pattern demonstrates how to trigger an Amazon Bedrock AI Agent on a recurring schedule using Amazon EventBridge Scheduler. An orchestrator Lambda function, invoked by the scheduler, sends a task payload to the Bedrock Agent, which processes the input, generates an execution summary, and persists the result to a DynamoDB table via an action group Lambda.
+This pattern demonstrates how to trigger an Amazon Bedrock AI Agent on a recurring schedule using Amazon EventBridge Scheduler. An orchestrator AWS Lambda function, invoked by the scheduler, sends a task payload to the Bedrock Agent, which processes the input, generates an execution summary, and persists the result to a Amazon DynamoDB table via an action group Lambda.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-scheduler-ai-agent-trigger
 
@@ -60,7 +60,7 @@ The pattern deploys the following resources:
 
 ## Testing
 
-1. Invoke the orchestrator Lambda manually:
+1. Replace `<prefix>` with the prefix chosen during deployment and invoke the orchestrator Lambda function manually:
     ```
     aws lambda invoke \
       --function-name <prefix>-agent-orchestrator \
@@ -77,7 +77,7 @@ The pattern deploys the following resources:
 
 1. Destroy the stack:
     ```
-    terraform destroy -auto-approve
+    terraform destroy --auto-approve
     ```
 1. Confirm all resources have been removed:
     ```

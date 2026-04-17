@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.32.1"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.7"
+    }
   }
 }
 
@@ -131,14 +135,25 @@ resource "aws_cloudwatch_log_group" "action_group_logs" {
   retention_in_days = var.log_retention_days
 }
 
+data "archive_file" "action_group" {
+  type        = "zip"
+  output_path = "${path.module}/action_group.zip"
+
+  source {
+    filename = "action_group.py"
+    content  = file("${path.module}/action_group.py")
+  }
+}
+
 resource "aws_lambda_function" "action_group" {
-  function_name = "${var.prefix}-agent-action-group"
-  role          = aws_iam_role.action_group_role.arn
-  handler       = "action_group.lambda_handler"
-  runtime       = "python3.14"
-  timeout       = 30
-  memory_size   = 128
-  filename      = "action_group.zip"
+  function_name    = "${var.prefix}-agent-action-group"
+  role             = aws_iam_role.action_group_role.arn
+  handler          = "action_group.lambda_handler"
+  runtime          = "python3.14"
+  timeout          = 30
+  memory_size      = 128
+  filename         = data.archive_file.action_group.output_path
+  source_code_hash = data.archive_file.action_group.output_base64sha256
 
   environment {
     variables = {
@@ -330,14 +345,25 @@ resource "aws_cloudwatch_log_group" "orchestrator_logs" {
   retention_in_days = var.log_retention_days
 }
 
+data "archive_file" "orchestrator" {
+  type        = "zip"
+  output_path = "${path.module}/orchestrator.zip"
+
+  source {
+    filename = "orchestrator.py"
+    content  = file("${path.module}/orchestrator.py")
+  }
+}
+
 resource "aws_lambda_function" "orchestrator" {
-  function_name = "${var.prefix}-agent-orchestrator"
-  role          = aws_iam_role.orchestrator_role.arn
-  handler       = "orchestrator.lambda_handler"
-  runtime       = "python3.14"
-  timeout       = 120
-  memory_size   = 256
-  filename      = "orchestrator.zip"
+  function_name    = "${var.prefix}-agent-orchestrator"
+  role             = aws_iam_role.orchestrator_role.arn
+  handler          = "orchestrator.lambda_handler"
+  runtime          = "python3.14"
+  timeout          = 120
+  memory_size      = 256
+  filename         = data.archive_file.orchestrator.output_path
+  source_code_hash = data.archive_file.orchestrator.output_base64sha256
 
   environment {
     variables = {
