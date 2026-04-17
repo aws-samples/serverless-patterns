@@ -28,8 +28,10 @@ This pattern sends emails through Amazon SES. You **must** have a verified SES i
 3. **If your SES account is in sandbox mode** (the default for new accounts), you must also verify every **recipient** email address and ensure `ses:SendEmail` permissions include the recipient identity. For the seed test data included in this pattern:
 
     ```bash
-    aws ses verify-email-identity --email-address rajilpaloth@gmail.com
+    aws ses verify-email-identity --email-address recipient@example.com
     ```
+
+    > **Note:** Replace `recipient@example.com` with the email address used in your seed test data (`cust-001` record).
 
     > **Note:** In sandbox mode, SES requires `ses:SendEmail` permission for both the sender and recipient identities. If your SES account has **production access** enabled, recipient verification and permissions are not required.
 
@@ -49,7 +51,7 @@ This pattern sends emails through Amazon SES. You **must** have a verified SES i
 
     ```bash
     aws ses get-identity-verification-attributes \
-      --identities noreply@yourdomain.com rajilpaloth@gmail.com
+      --identities noreply@yourdomain.com recipient@example.com
     ```
 
 ### Prerequisites — DynamoDB Table Population
@@ -80,20 +82,12 @@ The notification processor Lambda in this pattern only **reads** the table and *
 
 ![Architecture diagram](Architecture.png)
 
-EventBridge Scheduler (rate 1 hour)
-│
-├── on failure ──▶ SQS DLQ
-│
-▼
-Notification Processor Lambda
-│
-├── READ ──▶ DynamoDB (abandoned-carts)
-│ query CartAbandoned = "true"
-│ filter NotificationSent = "false"
-│
-└── SEND ──▶ Amazon SES
-per-customer abandoned cart email
-then mark NotificationSent = "true"
+The numbered steps below correspond to the labels in the architecture diagram:
+
+1. **Amazon EventBridge Scheduler** fires on the configured schedule (default: every hour) and invokes the Notification Processor Lambda function.
+2. If the scheduler fails to invoke the Lambda after 3 retries, the event is routed to an **SQS Dead-Letter Queue (DLQ)** for investigation.
+3. The **Notification Processor Lambda** queries the **DynamoDB Global Secondary Index** (`CartAbandonedIndex`) for all records where `CartAbandoned = "true"` and filters for `NotificationSent = "false"`.
+4. For each eligible record, the Lambda builds a personalised HTML email and sends it via **Amazon SES**, then updates the DynamoDB record to set `NotificationSent = "true"` with a `NotifiedAt` timestamp, ensuring no duplicate emails are sent.
 
 ## Deployment Instructions
 
@@ -145,27 +139,29 @@ then mark NotificationSent = "true"
     terraform output
     ```
 
-## How it works
+## Verify Deployment
 
-1. **EventBridge Scheduler** fires on the configured schedule (default: every hour) and invokes the **Notification Processor Lambda** function.
+After `terraform apply` completes, verify the resources were created:
 
-2. The Lambda function queries the **DynamoDB Global Secondary Index** (`CartAbandonedIndex`) to retrieve all records where `CartAbandoned = "true"`.
+1. **Confirm the EventBridge schedule is active:**
 
-3. For each abandoned cart record, the function checks the `NotificationSent` attribute:
-   - If `"true"` → the customer has already been emailed, so the record is **skipped**.
-   - If `"false"` → the function proceeds to send an email.
+    ```bash
+    aws scheduler get-schedule --name $(terraform output -raw schedule_name)
+    ```
 
-4. The function builds a **personalised HTML email** containing the customer's name, cart items, cart total, and a call-to-action button, then sends it via **Amazon SES**.
+2. **Confirm the DynamoDB table has seed data:**
 
-5. After a successful send, the function **updates the DynamoDB record**, setting `NotificationSent = "true"` and recording a `NotifiedAt` timestamp. This ensures the customer is **never emailed twice** for the same abandoned cart, even if the scheduler fires again.
+    ```bash
+    aws dynamodb scan --table-name $(terraform output -raw dynamodb_table_name) --select COUNT
+    ```
 
-6. If the scheduler fails to invoke the Lambda after 3 retries, the event is sent to the **SQS Dead-Letter Queue** for investigation.
+    Expected: `Count: 3`
 
-**Seed test data included:**
+## Seed Test Data
 
 | CustomerId | Email | CartAbandoned | NotificationSent | Expected Behaviour |
 |---|---|---|---|---|
-| `cust-001` | `rajilpaloth@gmail.com` | `true` | `false` | ✅ Will receive email |
+| `cust-001` | `recipient@example.com` | `true` | `false` | ✅ Will receive email |
 | `cust-002` | `activecustomer@example.com` | `false` | `false` | ⏭️ Not abandoned — not queried |
 | `cust-003` | `alreadynotified@example.com` | `true` | `true` | ⏭️ Already notified — skipped |
 
@@ -175,7 +171,7 @@ then mark NotificationSent = "true"
 
     ```bash
     aws lambda invoke \
-      --function-name cartnotify-notification-processor \
+      --function-name <prefix>-notification-processor \
       --cli-binary-format raw-in-base64-out \
       --payload '{
         "source": "manual-test",
@@ -193,7 +189,7 @@ then mark NotificationSent = "true"
     }
     ```
 
-2. **Check the recipient inbox** (`rajilpaloth@gmail.com`) for the abandoned cart email. Check the spam/junk folder if it does not appear in the inbox.
+2. **Check the recipient inbox** for the abandoned cart email. Check the spam/junk folder if it does not appear in the inbox.
 
 3. **Verify the DynamoDB record was updated:**
 
@@ -264,7 +260,7 @@ then mark NotificationSent = "true"
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `MessageRejected: Email address is not verified` | SES sandbox — recipient not verified | Run `aws ses verify-email-identity --email-address rajilpaloth@gmail.com` and click the verification link |
+| `MessageRejected: Email address is not verified` | SES sandbox — recipient not verified | Run `aws ses verify-email-identity --email-address recipient@example.com` and click the verification link |
 | `AccessDenied` on `ses:SendEmail` | SES identity ARN mismatch | Verify the `ses_identity_arn` variable matches your sender email exactly |
 | Lambda returns `notificationsSent: 0` | All abandoned carts already notified | Reset with the `update-item` command in the Testing section |
 | No items returned from GSI query | GSI not yet backfilled | Wait 30 seconds after deploy for the GSI to populate |
@@ -295,7 +291,7 @@ then mark NotificationSent = "true"
 
     ```bash
     aws ses delete-verified-email-identity --email-address noreply@yourdomain.com
-    aws ses delete-verified-email-identity --email-address rajilpaloth@gmail.com
+    aws ses delete-verified-email-identity --email-address recipient@example.com
     ```
 
 ----

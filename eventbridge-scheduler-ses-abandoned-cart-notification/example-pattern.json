@@ -1,6 +1,6 @@
 {
-  "title": "EventBridge Scheduler + SES Integration- Per-customer notification scheduling (abandoned cart, billing reminders)",
-  "description": "Create a EventBridge scheduler which sends per customer notifcations for abandoned carts and billing reminders using SES.",
+  "title": "Amazon EventBridge Scheduler to Amazon SES - Per-customer notification scheduling",
+  "description": "Create an Amazon EventBridge Scheduler schedule that sends per-customer notifications for abandoned carts using Amazon SES.",
   "language": "Python",
   "level": "300",
   "framework": "Terraform",

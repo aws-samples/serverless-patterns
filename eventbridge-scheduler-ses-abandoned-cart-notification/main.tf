@@ -110,6 +110,10 @@ resource "aws_dynamodb_table" "abandoned_carts" {
   tags = {
     Project = "${var.prefix}-abandoned-cart-notifications"
   }
+
+  server_side_encryption {
+    enabled = true
+  }
 }
 
 # ── Seed test data ──
@@ -120,8 +124,8 @@ resource "aws_dynamodb_table_item" "test_user_abandoned" {
 
   item = jsonencode({
     CustomerId = { S = "cust-001" }
-    Email      = { S = "rajilpaloth@gmail.com" }
-    CustomerName    = { S = "Rajil Paloth" }
+    Email      = { S = "recipient@example.com" }
+    CustomerName    = { S = "Jane Doe" }
     CartAbandoned   = { S = "true" }
     NotificationSent = { S = "false" }
     CartItems = { L = [
@@ -272,8 +276,9 @@ resource "aws_lambda_function" "processor" {
 ############################################################
 
 resource "aws_sqs_queue" "scheduler_dlq" {
-  name                      = "${var.prefix}-cart-notify-dlq"
-  message_retention_seconds = 1209600 # 14 days
+  name                       = "${var.prefix}-cart-notify-dlq"
+  message_retention_seconds  = 1209600 # 14 days
+  sqs_managed_sse_enabled    = true
 }
 
 ############################################################
