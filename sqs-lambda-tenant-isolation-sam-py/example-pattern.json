@@ -1,7 +1,6 @@
 {
 	"title": "AWS Lambda Tenant Isolation with Amazon SQS",
-	"description": "This pattern demonstrates AWS Lambda tenant isolation with Amazon SQS fair queues for multi-tenant message processing."
-	"language": "",
+	"description": "This pattern demonstrates AWS Lambda tenant isolation with Amazon SQS fair queues for multi-tenant message processing.""language": "",
 	"level": "200",
 	"framework": "AWS SAM",
 	"introBox": {
@@ -18,32 +17,41 @@
 		}
 	},
 	"resources": {
-		"bullets": [{
+		"bullets": [
+			{
 				"text": "AWS Lambda tenant isolation",
 				"link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
 			}
 		]
 	},
-	 "deploy": {
-      "text": ["sam build", "sam deploy --guided"]
-    },
-    "testing": {
-      "text": ["See the GitHub repo for detailed testing instructions."]
-    },
-    "cleanup": {
-      "text": ["Delete the stack: <code>sam delete</code>."]
-    },
-	"authors": [{
-		"name": "Mitesh Purohit",
-		"image": "",
-		"bio": "Sr Solution Architect, AWS",
-		"linkedin": "https://www.linkedin.com/in/mitup/"
+	"deploy": {
+		"text": [
+			"sam build",
+			"sam deploy --guided"
+		]
 	},
-	{
-		"name": "Ricardo Marques",
-		"image": "",
-		"bio": "Sr Serverless Specialist, AWS",
-		"linkedin": "https://www.linkedin.com/in/ricardo-marques-aws/"
-	}
-]
+	"testing": {
+		"text": [
+			"See the GitHub repo for detailed testing instructions."
+		]
+	},
+	"cleanup": {
+		"text": [
+			"Delete the stack: <code>sam delete</code>."
+		]
+	},
+	"authors": [
+		{
+			"name": "Mitesh Purohit",
+			"image": "",
+			"bio": "Sr Solution Architect, AWS",
+			"linkedin": "https://www.linkedin.com/in/mitup/"
+		},
+		{
+			"name": "Ricardo Marques",
+			"image": "",
+			"bio": "Sr Serverless Specialist, AWS",
+			"linkedin": "ricardo-marques-aws"
+		}
+	]
 }
