@@ -1,0 +1,61 @@
+{
+  "title": "EventBridge to SQS Fair Queue with Lambda Consumer",
+  "description": "Route events from Amazon EventBridge to an SQS fair queue for equitable multi-tenant processing with Lambda.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an EventBridge rule that routes events to an SQS fair queue, consumed by a Lambda function. Fair queues ensure equitable processing across tenants by preventing any single tenant from monopolizing the consumer.",
+      "Events are published to EventBridge with a tenant ID. The EventBridge rule matches events and forwards them to an SQS fair queue with the tenant ID as the message group. SQS fair queues automatically balance consumption across groups, ensuring no single tenant starves others.",
+      "This pattern is ideal for multi-tenant SaaS applications where you need fair processing guarantees without building custom throttling logic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sqs-fair-queue-lambda-cdk",
+      "templateURL": "serverless-patterns/eventbridge-sqs-fair-queue-lambda-cdk",
+      "projectFolder": "eventbridge-sqs-fair-queue-lambda-cdk",
+      "templateFile": "lib/eventbridge-sqs-fair-queue-lambda-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge targets SQS fair queues",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2025/11/amazon-eventbridge-sqs-fair-queue-targets/"
+      },
+      {
+        "text": "Amazon SQS fair queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/fair-queues.html"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://aws.amazon.com/eventbridge/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
