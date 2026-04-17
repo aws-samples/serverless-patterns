@@ -10,7 +10,7 @@ export class LambdaDurableBedrockStack extends cdk.Stack {
 
     const modelId = new cdk.CfnParameter(this, "BedrockModelId", {
       type: "String",
-      default: "us.anthropic.claude-sonnet-4-20250514",
+      default: "us.anthropic.claude-sonnet-4-20250514-v1:0",
       description: "Bedrock model ID (inference profile) to use",
     });
 
@@ -24,13 +24,14 @@ export class LambdaDurableBedrockStack extends cdk.Stack {
       environment: {
         MODEL_ID: modelId.valueAsString,
       },
-      logRetention: logs.RetentionDays.ONE_WEEK,
     });
 
     // Enable durable execution via CfnFunction escape hatch
     const cfnFn = fn.node.defaultChild as lambda.CfnFunction;
-    cfnFn.addOverride("Properties.DurableExecution", {
-      Enabled: true,
+    cfnFn.addOverride("Properties.Runtime", "nodejs24.x");
+    cfnFn.addOverride("Properties.DurableConfig", {
+      ExecutionTimeout: 900, // 15 minutes max durable execution
+      RetentionPeriodInDays: 14,
     });
 
     // Bedrock InvokeModel permission
@@ -41,26 +42,18 @@ export class LambdaDurableBedrockStack extends cdk.Stack {
       })
     );
 
-    // Durable execution permissions
+    // Durable execution permissions (wildcard to avoid circular dep)
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: [
           "lambda:CheckpointDurableExecution",
           "lambda:GetDurableExecutionState",
         ],
-        resources: [fn.functionArn, `${fn.functionArn}:*`],
+        resources: ["*"],
       })
     );
 
-    // Publish version (durable functions require qualified invocation)
-    // Use CfnVersion to avoid CDK validation of DurableExecution property
-    const version = new lambda.CfnVersion(this, "DurableVersion", {
-      functionName: fn.functionName,
-    });
-    version.addDependency(cfnFn);
-
     new cdk.CfnOutput(this, "FunctionName", { value: fn.functionName });
     new cdk.CfnOutput(this, "FunctionArn", { value: fn.functionArn });
-    new cdk.CfnOutput(this, "VersionArn", { value: version.attrFunctionArn });
   }
 }
