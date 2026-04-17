@@ -63,7 +63,7 @@ Important: this application uses various AWS services and there are costs associ
 Figure 1 - Architecture
 
 1. The client publishes a message to the inbound channel (`/chat/{conversationId}`) via HTTP POST to AppSync Events.
-2. AppSync Events triggers the agent invoker Lambda via direct Lambda integration.
+2. AppSync Events triggers the agent invoker Lambda function via direct Lambda integration.
 3. The agent invoker validates the payload, invokes the stream relay Lambda asynchronously, and returns immediately. This two-Lambda split is necessary because AppSync invokes the handler synchronously — a long-running stream would block the response.
 4. The stream relay calls `invoke_agent_runtime` on the Bedrock AgentCore Runtime, which hosts a Strands agent container, and consumes the Server-Sent Events (SSE) stream.
 5. The stream relay publishes each chunk back to the response channel on AppSync Events (`/responses/chat/{conversationId}`).
