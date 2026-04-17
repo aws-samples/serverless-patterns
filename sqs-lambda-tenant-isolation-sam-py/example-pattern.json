@@ -1,6 +1,7 @@
 {
 	"title": "AWS Lambda Tenant Isolation with Amazon SQS",
-	"description": "This pattern demonstrates AWS Lambda tenant isolation with Amazon SQS fair queues for multi-tenant message processing.""language": "",
+	"description": "This pattern demonstrates AWS Lambda tenant isolation with Amazon SQS fair queues for multi-tenant message processing.",
+	"language": "Python",
 	"level": "200",
 	"framework": "AWS SAM",
 	"introBox": {
