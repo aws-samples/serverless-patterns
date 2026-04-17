@@ -94,6 +94,7 @@ Delete the stack
 
 ```bash
 sam delete
+```
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
