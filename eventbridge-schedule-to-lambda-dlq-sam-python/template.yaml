@@ -39,6 +39,7 @@ Resources:
       QueueName: !Sub '${AWS::StackName}-lambda-dlq'
       MessageRetentionPeriod: 1209600  # 14 days
       VisibilityTimeout: 300
+      SqsManagedSseEnabled: true
       Tags:
         - Key: Pattern
           Value: EventBridge-Scheduler-Lambda-DLQ
@@ -50,6 +51,7 @@ Resources:
       QueueName: !Sub '${AWS::StackName}-scheduler-dlq'
       MessageRetentionPeriod: 1209600  # 14 days
       VisibilityTimeout: 300
+      SqsManagedSseEnabled: true
       Tags:
         - Key: Pattern
           Value: EventBridge-Scheduler-Lambda-DLQ
