@@ -1,0 +1,63 @@
+{
+  "title": "Lambda Managed Instances with CDK TypeScript",
+  "description": "Create AWS Lambda Managed Instances using AWS CDK in TypeScript.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create and deploy AWS Lambda Managed Instances using AWS CDK in TypeScript. Lambda Managed Instances allow you to run Lambda functions on dedicated EC2 instances for workloads that require more control over the underlying infrastructure.",
+      "The pattern creates all necessary infrastructure including VPC, subnets, security groups, IAM roles, and a Lambda capacity provider that manages EC2 instances. The Lambda function is configured to use the managed instances capacity provider instead of the standard serverless execution environment.",
+      "This pattern deploys a VPC with public and private subnets, NAT Gateway, Lambda capacity provider, Lambda function with Node.js runtime, and all required IAM roles and policies."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-cdk-ts",
+      "templateURL": "serverless-patterns/lambda-managed-instances-cdk-ts",
+      "projectFolder": "lambda-managed-instances-cdk-ts",
+      "templateFile": "lambda-managed-instances-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Managed Instances Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/managed-instances.html"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/"
+      },
+      {
+        "text": "AWS CDK TypeScript Reference",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "AWS Serverless Patterns",
+      "image": "https://serverlessland.com/assets/images/logos/serverless-land-logo.png",
+      "bio": "AWS Serverless Patterns Collection",
+      "linkedin": "",
+      "twitter": "AWSOpen"
+    }
+  ]
+}
