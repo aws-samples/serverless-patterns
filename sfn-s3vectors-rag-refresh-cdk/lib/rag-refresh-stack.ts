@@ -60,7 +60,7 @@ export class RagRefreshStack extends cdk.Stack {
     }));
     embedFunction.addToRolePolicy(new iam.PolicyStatement({
       actions: ['s3vectors:PutVectors'],
-      resources: ['*'],
+      resources: [vectorIndex.attrIndexArn],
     }));
 
     // --- Lambda: validate vectors via QueryVectors ---
@@ -86,7 +86,7 @@ export class RagRefreshStack extends cdk.Stack {
     }));
     validateFunction.addToRolePolicy(new iam.PolicyStatement({
       actions: ['s3vectors:QueryVectors', 's3vectors:GetVectors'],
-      resources: ['*'],
+      resources: [vectorIndex.attrIndexArn],
     }));
 
     // --- Lambda: rollback (delete vectors) ---
@@ -105,7 +105,7 @@ export class RagRefreshStack extends cdk.Stack {
 
     rollbackFunction.addToRolePolicy(new iam.PolicyStatement({
       actions: ['s3vectors:DeleteVectors'],
-      resources: ['*'],
+      resources: [vectorIndex.attrIndexArn],
     }));
 
     // --- Step Functions workflow (JSONata) ---

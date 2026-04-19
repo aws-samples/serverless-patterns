@@ -8,6 +8,6 @@ const app = new cdk.App();
 new RagRefreshStack(app, 'RagRefreshStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.AWS_REGION,
+    region: process.env.CDK_DEFAULT_REGION,
   },
 });
