@@ -17,6 +17,8 @@ This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync u
 
 This pattern sets up an AWS AppSync GraphQL API configured with Amazon Cognito User Pools for authentication. Authenticated users can send a prompt through a GraphQL mutation (`invoke`).
 
+![Architecture Diagram](diagram.png)
+
 ### Flow
 
 1. **Authentication**: Users are authenticated against an Amazon Cognito User Pool
