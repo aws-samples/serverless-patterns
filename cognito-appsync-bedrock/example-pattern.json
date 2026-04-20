@@ -33,7 +33,11 @@
       {
         "text": "Amazon DynamoDB - Fast and flexible NoSQL database",
         "link": "https://aws.amazon.com/dynamodb/"
-      }
+      },
+      {
+        "text": "Amazon Bedrock - Fully managed service for foundation models",
+        "link": "https://aws.amazon.com/bedrock/"
+       }
     ]
   },
   "deploy": {
