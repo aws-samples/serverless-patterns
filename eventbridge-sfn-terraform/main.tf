@@ -52,7 +52,7 @@ resource "aws_iam_role" "StateMachineRole" {
 POLICY2
 }
 
-# Create an IAM policy for Eventbridge to be able to start a Step Function execution
+# Create an IAM policy for Eventbridge to be able to start a Step Functions execution
 resource "aws_iam_policy" "EventBridgePolicy" {
   policy = <<POLICY3
 {
@@ -70,7 +70,7 @@ resource "aws_iam_policy" "EventBridgePolicy" {
 POLICY3
 }
 
-# Create an IAM policy to enable Step Function State Machine to push logs to CloudWatch logs
+# Create an IAM policy to enable Step Functions State Machine to push logs to CloudWatch logs
 resource "aws_iam_policy" "StateMachineLogDeliveryPolicy" {
   policy = <<POLICY4
 {
@@ -106,12 +106,12 @@ resource "aws_iam_role_policy_attachment" "StateMachinePolicyAttachment" {
   policy_arn = aws_iam_policy.StateMachineLogDeliveryPolicy.arn
 }
 
-# Create an Log group for the Step Function
+# Create an Log group for the Step Functions
 resource "aws_cloudwatch_log_group" "MyLogGroup" {
   name_prefix = "/aws/vendedlogs/states/StateMachine-terraform-"
 }
 
-# Create a Step Function State Machine
+# Create a Step Functions State Machine
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "eventbridge-state-machine-demo-${data.aws_caller_identity.current.account_id}"
   role_arn = aws_iam_role.StateMachineRole.arn
@@ -169,7 +169,7 @@ resource "aws_cloudwatch_event_rule" "MyEventRule" {
 PATTERN
 }
 
-# Set the Step Function as target to the Eventbridge rule
+# Set the Step Functions as target to the Eventbridge rule
 resource "aws_cloudwatch_event_target" "SFNTarget" {
   rule     = aws_cloudwatch_event_rule.MyEventRule.name
   arn      = aws_sfn_state_machine.sfn_state_machine.arn
@@ -184,5 +184,5 @@ output "CW-Logs-Stream-Name" {
 
 output "StepFunction-Name" {
   value       = aws_sfn_state_machine.sfn_state_machine.name
-  description = "The Step Function Name"
+  description = "The Step Functions Name"
 }
