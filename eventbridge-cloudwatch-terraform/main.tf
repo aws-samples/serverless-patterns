@@ -41,7 +41,7 @@ resource "aws_cloudwatch_log_resource_policy" "MyCloudWatchLogPolicy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
         ],
-      "Resource": "${aws_cloudwatch_log_group.MyLogGroup.arn}",
+      "Resource": "${aws_cloudwatch_log_group.MyLogGroup.arn}:*",
       "Condition": {
         "ArnEquals": {
           "aws:SourceArn": "${aws_cloudwatch_event_rule.MyEventRule.arn}"
