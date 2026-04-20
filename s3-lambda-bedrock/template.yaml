@@ -85,6 +85,6 @@ Outputs:
   ContentBucket:
     Description: "S3 bucket name"
     Value: !Ref ContentBucket
-  LambdaFuncton:
+  LambdaFunction:
     Value: !Ref bedrockemb
     Description: Lambda Function ARN

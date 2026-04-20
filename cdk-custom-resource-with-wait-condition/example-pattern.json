@@ -1,0 +1,62 @@
+{
+  "title": "CDK custom resource with wait condition",
+  "description": "Use AWS CloudFormation Wait Conditions for long-running custom resources up to 12 hours",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "AWS Lambda functions have a 15-minute execution timeout, limiting CloudFormation custom resources to short-running operations. This pattern extends custom resource execution time to 12 hours using CloudFormation Wait Conditions. The architecture uses four components working together: A Custom Resource Handler Lambda receives CloudFormation lifecycle events and immediately starts a Step Function execution, then returns success to prevent timeouts. The Step Function orchestrates the long-running process with built-in retry mechanisms and error handling. When the process completes, a Completion Signal Handler Lambda sends success or failure signals to a Wait Condition Handle URL. The Wait Condition blocks CloudFormation stack completion until receiving the signal.",
+      "This decouples custom resource lifecycle management from process execution, enabling asynchronous processing with proper CloudFormation integration. The Step Function provides visual workflow monitoring and state management while the Wait Condition ensures stack operations complete only after the long-running process finishes. The pattern deploys two Lambda functions, one Step Function, a Wait Condition Handle, and a Wait Condition.",
+      "Use cases include database migrations, complex infrastructure provisioning, and third-party system integrations that exceed Lambda's 15-minute limit."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-custom-resource-with-wait-condition",
+      "templateURL": "serverless-patterns/cdk-custom-resource-with-wait-condition",
+      "projectFolder": "cdk-custom-resource-with-wait-condition",
+      "templateFile": "lib/demo-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Custom resources",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html"
+      },
+      {
+        "text": "Using wait conditions",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-waitcondition.html"
+      },
+      {
+        "text": "Implementing long running deployments with AWS CloudFormation Custom Resources using AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/devops/implementing-long-running-deployments-with-aws-cloudformation-custom-resources-using-aws-step-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --require-approval never"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Review Amazon CloudWatch logs for the Lambda functions and Step Function execution to confirm that the",
+      "long-running process completed successfully and the wait condition was signaled."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy -f</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dmitry Gulin",
+      "bio": "Senior Delivery Consultant, AWS.",
+      "linkedin": "dmitry-gulin"
+    }
+  ]
+}

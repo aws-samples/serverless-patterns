@@ -1,0 +1,59 @@
+{
+  "title": "Amazon API Gateway private integration with Application Load Balancer",
+  "description": "This sample project demonstrates how API Gateway connects to Application Load Balancer using VPV Link V2.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon API Gateway receives the HTTP GET request.",
+      "The API Gateway routes the request to Application Load Balancer using VPC link V2.",
+      "The Application Load Balancer routes the request to one of the tasks under Amazon ECS cluster."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-vpclink-alb-ecs",
+      "templateURL": "serverless-patterns/apigw-vpclink-alb-ecs",
+      "projectFolder": "apigw-vpclink-alb-ecs",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda tenant isolation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
+      },
+      {
+        "text": "AWS Blog - Build scalable REST APIs using Amazon API Gateway private integration with Application Load Balancer",
+        "link": "https://aws.amazon.com/blogs/compute/build-scalable-rest-apis-using-amazon-api-gateway-private-integration-with-application-load-balancer/"
+      }      
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/biswanath-mukherjee.jpg",
+      "bio": "I am a Sr. Solutions Architect working at AWS India. I help strategic global enterprise customer to architect their workload to run on AWS.",
+      "linkedin": "biswanathmukherjee"
+    }   
+  ]
+}

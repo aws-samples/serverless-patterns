@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.431.0",
-    "@langchain/community": "^0.3.11",
+    "@langchain/community": "^1.1.14",
     "@smithy/eventstream-codec": "^2.0.12",
     "@smithy/protocol-http": "^3.0.8",
     "@smithy/signature-v4": "^2.0.12",

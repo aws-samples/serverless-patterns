@@ -1,0 +1,26 @@
+openapi: 3.0.1
+info:
+  title: REST API VPC Link Demo
+  version: '1.0'
+paths:
+  /{proxy+}:
+    x-amazon-apigateway-any-method:
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: ANY
+        uri:
+          Fn::Sub: 'http://${PrivateALB.DNSName}/{proxy}'
+        connectionType: VPC_LINK
+        connectionId:
+          Ref: VpcLink
+        integrationTarget:
+          Ref: PrivateALB
+        requestParameters:
+          integration.request.path.proxy: method.request.path.proxy
+        passthroughBehavior: when_no_match

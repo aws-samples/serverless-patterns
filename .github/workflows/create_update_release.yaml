@@ -10,11 +10,11 @@ on:
 jobs:
   get-release:
     runs-on: ubuntu-latest
-    outputs: 
+    outputs:
       latest_release: ${{ steps.get_latest_release.outputs.latest_release }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get the latest release tag
         id: get_latest_release
@@ -36,7 +36,7 @@ jobs:
         run: echo "Latest release ${{ needs.get-release.outputs.latest_release }}"
 
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Release doesn't exist so create one
         id: create_release
@@ -45,7 +45,7 @@ jobs:
         run: |
           gh release create v1.0.0 --notes "Initial release v1.0.0" --prerelease=false
           echo "Release created"
-      
+
       - name: Zip files of folders
         id: zip_folders
         run: |
@@ -57,7 +57,7 @@ jobs:
             fi
           done
           echo "Zip files created"
-    
+
       - name: upload files to the release
         id: upload_files
         env:
@@ -79,8 +79,8 @@ jobs:
     if: needs.get-release.outputs.latest_release != ''
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
+
       - name: Fetch latest tags
         run: |
           git fetch --tags
@@ -97,7 +97,7 @@ jobs:
             echo "No latest release found"
             echo "" > changed_files.txt
           fi
-        
+
       - name: Identify changed folders
         id: identify_folders
         run: |
@@ -109,7 +109,7 @@ jobs:
             echo "No changed files"
             echo "" > changed_folders.txt
           fi
-      
+
       - name: Archive changed folders
         run: |
           mkdir -p temp_archives
@@ -121,10 +121,10 @@ jobs:
               echo "Folder $folder does not exist"
             fi
           done < changed_folders.txt
-      
+
       - name: Upload archives to release
         if: needs.get-release.outputs.latest_release != ''
-        env: 
+        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           while IFS= read -r folder; do
@@ -132,6 +132,7 @@ jobs:
             if [ -f "$archive" ]; then
               gh release upload ${{ needs.get-release.outputs.latest_release }} "$archive" --clobber
               echo "Uploaded $archive, waiting to avoid rate limits..."
+              sleep 3
             else
               echo "Archive $archive not found"
             fi

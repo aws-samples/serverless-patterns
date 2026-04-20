@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk');
-const transcribe = new AWS.TranscribeService();
+const { TranscribeClient, GetTranscriptionJobCommand } = require('@aws-sdk/client-transcribe');
+const transcribe = new TranscribeClient({});
 
 module.exports.handler = async (event, context) => {
     console.log(event)
@@ -12,7 +12,7 @@ module.exports.handler = async (event, context) => {
         TranscriptionJobName: jobName
     };
 
-    let jobData = await transcribe.getTranscriptionJob(params).promise();
+    let jobData = await transcribe.send(new GetTranscriptionJobCommand(params));
     let jobStatus = jobData.TranscriptionJob.TranscriptionJobStatus;
     if ( jobStatus == 'COMPLETED' || jobStatus == 'FAILED') {
         let s3Loc = jobData.TranscriptionJob.Transcript.TranscriptFileUri;

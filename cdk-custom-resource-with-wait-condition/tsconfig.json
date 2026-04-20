@@ -1,0 +1,12 @@
+{
+  "extends": "@tsconfig/node24",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "experimentalDecorators": true,
+    "isolatedModules": true,
+    "rootDir": "."
+  },
+  "exclude": ["cdk.out", "build", "node_modules", "dist", "**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"]
+}

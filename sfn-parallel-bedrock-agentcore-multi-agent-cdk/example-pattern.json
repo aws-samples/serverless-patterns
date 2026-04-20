@@ -1,0 +1,74 @@
+{
+    "title": "Multi-agent orchestration with AWS Step Functions",
+    "description": "Orchestrate parallel specialized AI agents on Amazon Bedrock AgentCore using the native Step Functions SDK integration with Parallel state for fan-out",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an AWS Step Functions workflow that orchestrates multiple specialized AI agents running on Amazon Bedrock AgentCore and synthesizes their results into a single output.",
+            "Using the native Step Functions SDK integration for Bedrock AgentCore, a Parallel state fans out three research branches simultaneously: market data, competitive analysis, and recent news. When all branches complete, a synthesis agent receives the combined outputs and produces the final report. Each branch includes built-in retries for fault tolerance, and Step Functions handles the fan-out, join, and result aggregation automatically."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-parallel-bedrock-agentcore-multi-agent-cdk",
+            "templateURL": "serverless-patterns/sfn-parallel-bedrock-agentcore-multi-agent-cdk",
+            "projectFolder": "sfn-parallel-bedrock-agentcore-multi-agent-cdk",
+            "templateFile": "lib/orchestrator-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Step Functions adds 28 new service integrations, including Amazon Bedrock AgentCore",
+                "link": "https://aws.amazon.com/about-aws/whats-new/2026/03/aws-step-functions-sdk-integrations/"
+            },
+            {
+                "text": "AWS Step Functions SDK service integrations",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+            },
+            {
+                "text": "AWS Step Functions Parallel state documentation",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-parallel-state.html"
+            },
+            {
+                "text": "Amazon Bedrock AgentCore documentation",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agentcore.html"
+            },
+            {
+                "text": "Strands Agents SDK",
+                "link": "https://github.com/strands-agents/sdk-python"
+            },
+            {
+                "text": "AWS CDK Developer Guide",
+                "link": "https://docs.aws.amazon.com/cdk/latest/guide/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "npm install",
+            "cdk deploy --all"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stacks: <code>cdk destroy --all</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ben Freiberg",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/ben-freiberg.jpg",
+            "bio": "Ben is a Senior Solutions Architect at Amazon Web Services (AWS) based in Frankfurt, Germany.",
+            "linkedin": "benfreiberg"
+        }
+    ]
+}

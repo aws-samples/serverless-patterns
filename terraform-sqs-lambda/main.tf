@@ -8,7 +8,7 @@ provider "aws" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 4.0"
+  version = "~> 8.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
