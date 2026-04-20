@@ -1,7 +1,7 @@
 {
-  "title": "REST API Gateway to Private ALB and ECS Fargate via VPC Link V2",
+  "title": "Amazon API Gateway REST API to Private ALB via VPC Link V2",
   "description": "This pattern demonstrates REST API Gateway integration with a private Application Load Balancer and ECS Fargate cluster using VPC Link V2",
-  "language": "HCL",
+  "language": "YAML",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -17,7 +17,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-vpclink-pvt-alb-terraform",
       "templateURL": "serverless-patterns/apigw-rest-vpclink-pvt-alb-terraform",
       "projectFolder": "apigw-rest-vpclink-pvt-alb-terraform",
-      "templateFile": "apigw-rest-vpclink-pvt-alb-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {

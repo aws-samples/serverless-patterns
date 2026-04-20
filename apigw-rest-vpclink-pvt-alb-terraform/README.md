@@ -1,4 +1,4 @@
-# REST Amazon API Gateway to Private HTTP Endpoint via Amazon VPC Link V2
+# Amazon API Gateway REST API to Private ALB via VPC Link V2
 
 This pattern demonstrates direct integration between REST API Gateway and a private Application Load Balancer using VPC Link V2. Previously, connecting REST API Gateway to a private ALB required VPC Link V1 with an intermediary Network Load Balancer, adding complexity and cost. VPC Link V2 eliminates this requirement, enabling direct ALB integration for simplified architecture and reduced operational overhead.
 
@@ -36,9 +36,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/apigw-rest-vpclink-pvt-alb-terraform
     ```
-3. Update the `terraform.tfvars` file with your VPC ID and private subnet IDs:
+3. Create a `terraform.tfvars` file with your VPC ID, CIDR, and private subnet IDs:
     ```hcl
     vpc_id = "vpc-xxxxxxxxx"
+
+    vpc_cidr = "10.0.0.0/16"
     
     private_subnets = [
       "subnet-xxxxxxxxx",
@@ -62,6 +64,8 @@ Important: this application uses various AWS services and there are costs associ
 6. Note the output from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
+
+![Architecture Diagram](./architecture.png)
 
 This pattern demonstrates secure integration between a public REST API Gateway endpoint and a private Application Load Balancer with an ECS Fargate cluster. Traffic flows through Amazon VPC Link V2, which provides a secure, private connection from API Gateway to the internal ALB without exposing backend resources to the public internet.
 
