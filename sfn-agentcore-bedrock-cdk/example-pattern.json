@@ -1,0 +1,61 @@
+{
+  "title": "Step Functions with Bedrock AgentCore Multi-Agent Orchestration",
+  "description": "Use AWS Step Functions to orchestrate multiple Bedrock AgentCore agents in parallel via a Map state, then aggregate their responses into a unified summary using Bedrock Converse.",
+  "language": "TypeScript",
+  "level": "400",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Step Functions state machine that invokes multiple Bedrock AgentCore agents in parallel using a Map state, then aggregates their responses into a single coherent summary via Amazon Bedrock Converse.",
+      "The workflow: (1) A trigger Lambda starts the state machine with a prompt and list of agent runtime ARNs, (2) the Map state fans out to invoke each AgentCore agent in parallel via a bundled Lambda intermediary, (3) an aggregate Lambda uses Bedrock Converse to synthesize all agent responses into a unified summary.",
+      "Key architectural decisions: The @aws-sdk/client-bedrock-agentcore SDK is not available in the Lambda runtime and must be bundled using NodejsFunction. InvokeAgentRuntime returns a streaming response, requiring a Lambda intermediary rather than direct Step Functions SDK integration. Account-level enforced guardrails require bedrock:ApplyGuardrail permission on all Bedrock-calling roles."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-agentcore-bedrock-cdk",
+      "templateURL": "serverless-patterns/sfn-agentcore-bedrock-cdk",
+      "projectFolder": "sfn-agentcore-bedrock-cdk",
+      "templateFile": "lib/sfn-agentcore-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Documentation",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agentcore.html"
+      },
+      {
+        "text": "AWS Step Functions Map State",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --parameters AgentRuntimeArns=<comma-separated-arns> --parameters BedrockModelId=<model-id>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
