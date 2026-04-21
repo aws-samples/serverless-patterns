@@ -1,6 +1,6 @@
 {
-  "title": "Lambda Durable Functions with Amazon Bedrock",
-  "description": "Use AWS Lambda durable functions to orchestrate a multi-step AI content pipeline with Amazon Bedrock, featuring automatic checkpointing and failure recovery.",
+  "title": "AWS Lambda durable functions with Amazon Bedrock",
+  "description": "AWS Lambda durable functions with Amazon Bedrock for a multi-step AI pipeline with automatic checkpointing and failure recovery.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",

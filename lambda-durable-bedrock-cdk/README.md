@@ -1,4 +1,4 @@
-# Lambda Durable Functions with Amazon Bedrock
+# AWS Lambda durable functions with Amazon Bedrock
 
 This pattern deploys a Lambda durable function that orchestrates a multi-step AI content pipeline using Amazon Bedrock. Each step is automatically checkpointed, so the workflow resumes from the last completed step after any interruption — without re-invoking Bedrock.
 
@@ -59,28 +59,45 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
 
-4. Note the Lambda function name from the stack outputs.
+4. Note the outputs printed after deployment. You will need `FunctionName` and `FunctionVersion` for testing.
+
+    Example output:
+    ```
+    Outputs:
+    LambdaDurableBedrockStack.FunctionName = LambdaDurableBedrockStack-DurableBedrockFn3CE0D50D-AbCdEfGh
+    LambdaDurableBedrockStack.FunctionVersion = 1
+    ```
 
 ## Testing
 
-1. Invoke the durable function (use the published version from the output):
+1. Invoke the durable function. Replace `<FunctionName>` with the `FunctionName` value from the deploy output, and `<Version>` with the `FunctionVersion` value:
     ```bash
     aws lambda invoke \
       --function-name <FunctionName> \
+      --qualifier <Version> \
+      --payload '{"topic": "Serverless AI workflows with Lambda durable functions"}' \
+      --cli-binary-format raw-in-base64-out \
+      output.json
+    ```
+
+    For example, if your deploy output showed `FunctionName = MyStack-DurableBedrockFn-AbCdEfGh` and `FunctionVersion = 1`:
+    ```bash
+    aws lambda invoke \
+      --function-name MyStack-DurableBedrockFn-AbCdEfGh \
       --qualifier 1 \
       --payload '{"topic": "Serverless AI workflows with Lambda durable functions"}' \
       --cli-binary-format raw-in-base64-out \
       output.json
     ```
 
-2. Since the function includes a wait, the initial invocation returns quickly. Check the durable execution status:
+2. The function includes a durable wait, so the initial invocation returns quickly with a `"PENDING"` status. Check the durable execution status using the same `<FunctionName>` and `<Version>`:
     ```bash
     aws lambda list-durable-executions \
       --function-name <FunctionName> \
-      --qualifier 1
+      --qualifier <Version>
     ```
 
-3. Once the execution completes, view the result:
+3. Once the execution status shows `"SUCCEEDED"`, view the result:
     ```bash
     cat output.json | jq .
     ```

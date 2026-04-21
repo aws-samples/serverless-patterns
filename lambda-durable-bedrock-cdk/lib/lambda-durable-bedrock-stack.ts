@@ -1,7 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as iam from "aws-cdk-lib/aws-iam";
-import * as logs from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
 
 export class LambdaDurableBedrockStack extends cdk.Stack {
@@ -34,26 +33,38 @@ export class LambdaDurableBedrockStack extends cdk.Stack {
       RetentionPeriodInDays: 14,
     });
 
-    // Bedrock InvokeModel permission
+    // Bedrock InvokeModel — scoped to the specific inference profile and its
+    // underlying foundation model rather than a wildcard resource.
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["bedrock:InvokeModel"],
-        resources: ["*"],
+        resources: [
+          `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
+          "arn:aws:bedrock:*::foundation-model/*",
+        ],
       })
     );
 
-    // Durable execution permissions (wildcard to avoid circular dep)
-    fn.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: [
-          "lambda:CheckpointDurableExecution",
-          "lambda:GetDurableExecutionState",
-        ],
-        resources: ["*"],
-      })
+    // Durable execution + CloudWatch Logs permissions via AWS managed policy
+    // https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicDurableExecutionRolePolicy.html
+    fn.role!.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName(
+        "service-role/AWSLambdaBasicDurableExecutionRolePolicy"
+      )
     );
+
+    // Publish a version via L1 — fn.currentVersion doesn't recognise the
+    // DurableConfig escape-hatch property on CDK 2.180.
+    const cfnVersion = new lambda.CfnVersion(this, "DurableBedrockFnVersion", {
+      functionName: fn.functionName,
+      description: "Durable execution version",
+    });
 
     new cdk.CfnOutput(this, "FunctionName", { value: fn.functionName });
     new cdk.CfnOutput(this, "FunctionArn", { value: fn.functionArn });
+    new cdk.CfnOutput(this, "FunctionVersion", {
+      value: cfnVersion.attrVersion,
+      description: "Published version number — use as --qualifier value",
+    });
   }
 }
