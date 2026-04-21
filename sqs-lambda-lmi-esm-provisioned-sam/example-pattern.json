@@ -1,0 +1,68 @@
+{
+  "title": "Amazon SQS to AWS Lambda with Lambda Managed Instances (LMI) Provisioned Mode ESM",
+  "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda Managed Instances (LMI) with a Provisioned Mode Event Source Mapping for faster scaling and higher throughput.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A producer sends messages to an Amazon SQS Standard Queue. The Event Source Mapping (ESM) is configured with Provisioned Mode, which pre-allocates dedicated event pollers between a configurable minimum and maximum. Each poller handles up to 1 MB/s throughput, 10 concurrent Lambda invocations, and 10 SQS API calls per second.",
+      "The Lambda function runs on Lambda Managed Instances (LMI) — an EC2-backed execution model that supports multiconcurrency, allowing each execution environment to handle multiple SQS batches simultaneously. LMI instances run inside a private VPC with outbound access via a NAT Gateway.",
+      "Partial batch failure reporting (ReportBatchItemFailures) ensures only failed messages are returned to the queue. After 3 failed attempts, messages are moved to a Dead Letter Queue. A CloudWatch Alarm fires as soon as any message lands in the DLQ.",
+      "This pattern deploys one SQS Standard Queue, one Dead Letter Queue, one Lambda function with an LMI Capacity Provider, one Event Source Mapping with Provisioned Mode, a VPC with private subnets and NAT Gateway, and one CloudWatch Alarm."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-lmi-esm-provisioned-sam",
+      "templateURL": "serverless-patterns/sqs-lambda-lmi-esm-provisioned-sam",
+      "projectFolder": "sqs-lambda-lmi-esm-provisioned-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      },
+      {
+        "text": "Lambda Managed Instances (LMI) overview",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/managed-instances.html"
+      },
+      {
+        "text": "Event Source Mapping Provisioned Mode for SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#sqs-esm-provisioned-mode"
+      },
+      {
+        "text": "Reporting batch item failures for SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Serda Kasaci Yildirim",
+      "image": "https://drive.google.com/file/d/1rzVS1hrIMdqy6P9i7-o7OBLNc0xY0FVB/view?usp=sharing",
+      "bio": "Serda is a Solutions Architect at Amazon Web Services (AWS) based in Vienna with 3 years at AWS, specializing in serverless technologies and Event-Driven Architecture.",
+      "linkedin": "serdakasaci"
+    }
+  ]
+}

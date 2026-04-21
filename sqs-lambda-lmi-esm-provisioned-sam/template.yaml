@@ -1,0 +1,365 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Amazon SQS (Standard) + Lambda Managed Instances (LMI) with Provisioned Mode ESM.
+  This pattern demonstrates how to use Lambda's Provisioned Mode for SQS Event Source
+  Mappings to achieve faster scaling and higher throughput for message processing workloads.
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    Timeout: 30
+    MemorySize: 2048
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: sqs-lmi-processor
+        LOG_LEVEL: INFO
+
+Parameters:
+  MinPollers:
+    Type: Number
+    Default: 2
+    MinValue: 2
+    MaxValue: 200
+    Description: >
+      Minimum number of provisioned event pollers (2-200). Each poller handles up to
+      1 MB/s throughput, 10 concurrent invokes, and 10 SQS API calls/sec.
+
+  MaxPollers:
+    Type: Number
+    Default: 10
+    MinValue: 2
+    MaxValue: 2000
+    Description: >
+      Maximum number of provisioned event pollers (2-2000). Lambda scales between
+      MinPollers and MaxPollers based on queue depth.
+
+  BatchSize:
+    Type: Number
+    Default: 10
+    MinValue: 1
+    MaxValue: 10000
+    Description: Maximum number of messages per Lambda invocation batch.
+
+  MaxBatchingWindowSeconds:
+    Type: Number
+    Default: 5
+    MinValue: 0
+    MaxValue: 300
+    Description: >
+      Maximum time (seconds) Lambda waits to fill a batch before invoking.
+      Set to 0 for lowest latency; higher values improve throughput efficiency.
+
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+
+  SubnetAZ1Cidr:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: CIDR for private subnet in AZ1
+
+  SubnetAZ2Cidr:
+    Type: String
+    Default: 10.0.2.0/24
+    Description: CIDR for private subnet in AZ2
+
+Resources:
+
+  # -----------------------------------------------------------------------
+  # VPC — private network for LMI EC2 instances
+  # -----------------------------------------------------------------------
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-vpc"
+
+  # Private subnet in AZ1
+  SubnetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref SubnetAZ1Cidr
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-subnet-az1"
+
+  # Private subnet in AZ2
+  SubnetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref SubnetAZ2Cidr
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-subnet-az2"
+
+  # -----------------------------------------------------------------------
+  # NAT Gateway — allows LMI instances to reach AWS APIs (SQS, Lambda, etc.)
+  # without exposing them to inbound internet traffic
+  # -----------------------------------------------------------------------
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Public subnet for NAT Gateway (NAT GW must live in a public subnet)
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-public-subnet"
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+
+  # Private route table — routes outbound traffic through NAT Gateway
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  SubnetAZ1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetAZ1
+      RouteTableId: !Ref PrivateRouteTable
+
+  SubnetAZ2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetAZ2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # Security group for LMI EC2 instances — no inbound, outbound to AWS APIs only
+  LMISecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for LMI EC2 instances
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS outbound for AWS API calls
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-lmi-sg"
+
+  # -----------------------------------------------------------------------
+  # LMI Capacity Provider — manages the EC2 fleet that runs the function
+  # -----------------------------------------------------------------------
+  CapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-capacity-provider"
+      VpcConfig:
+        SubnetIds:
+          - !Ref SubnetAZ1
+          - !Ref SubnetAZ2
+        SecurityGroupIds:
+          - !Ref LMISecurityGroup
+      InstanceRequirements:
+        Architectures:
+          - arm64               # matches the function architecture below
+      ScalingConfig:
+        MaxVCpuCount: 40          # max vCPUs across all EC2 instances; tune for your workload
+        AverageCPUUtilization: 70 # scale up when avg CPU exceeds 70%
+      Tags:
+        Pattern: sqs-lmi-provisioned-esm
+
+  # -----------------------------------------------------------------------
+  # Dead Letter Queue — receives messages that fail after all retries
+  # -----------------------------------------------------------------------
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+      Tags:
+        - Key: Pattern
+          Value: sqs-lmi-provisioned-esm
+
+  # -----------------------------------------------------------------------
+  # Main SQS Standard Queue
+  # -----------------------------------------------------------------------
+  MessageQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-queue"
+      VisibilityTimeout: 90          # Must be >= 6x Lambda timeout
+      MessageRetentionPeriod: 86400  # 1 day
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+      Tags:
+        - Key: Pattern
+          Value: sqs-lmi-provisioned-esm
+
+  # -----------------------------------------------------------------------
+  # Lambda Function — runs on LMI (EC2-backed, multiconcurrency)
+  # -----------------------------------------------------------------------
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-processor"
+      CodeUri: src/
+      Handler: handler.lambda_handler
+      Description: Processes SQS messages via LMI Provisioned Mode ESM
+      # Wire function to the LMI capacity provider.
+      # NOTE: CapacityProviderConfig must be set on first deploy — cannot be
+      # added or removed after the function resource has been created.
+      CapacityProviderConfig:
+        Arn: !GetAtt CapacityProvider.Arn
+        # Memory-to-vCPU ratio per execution environment: 2, 4, or 8 GiB/vCPU
+        # Must not exceed the function's total memory (512 MB here = 0.5 GiB,
+        # so set to 2 which is the minimum supported ratio)
+        ExecutionEnvironmentMemoryGiBPerVCpu: 2
+        # Max concurrent invocations per execution environment (multiconcurrency)
+        # Each env can handle multiple SQS batches simultaneously
+        PerExecutionEnvironmentMaxConcurrency: 10
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt MessageQueue.QueueName
+      Tags:
+        Pattern: sqs-lmi-provisioned-esm
+
+  # -----------------------------------------------------------------------
+  # Event Source Mapping — SQS -> Lambda with Provisioned Mode (LMI)
+  #
+  # Key settings:
+  #   ProvisionedPollerConfig  — enables LMI Provisioned Mode
+  #   FunctionResponseTypes    — partial batch failure reporting
+  #   ScalingConfig is NOT set — mutually exclusive with ProvisionedPollerConfig
+  # -----------------------------------------------------------------------
+  SQSEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !GetAtt ProcessorFunction.Arn
+      EventSourceArn: !GetAtt MessageQueue.Arn
+      BatchSize: !Ref BatchSize
+      MaximumBatchingWindowInSeconds: !Ref MaxBatchingWindowSeconds
+      # Report partial batch failures so only failed messages return to queue
+      FunctionResponseTypes:
+        - ReportBatchItemFailures
+      # LMI Provisioned Mode — pre-allocates dedicated polling resources
+      # Enables 3x faster scaling and up to 16x higher processing capacity
+      # vs. on-demand mode. Cannot be combined with ScalingConfig.MaximumConcurrency.
+      ProvisionedPollerConfig:
+        MinimumPollers: !Ref MinPollers
+        MaximumPollers: !Ref MaxPollers
+
+  # -----------------------------------------------------------------------
+  # CloudWatch Alarm — alert when messages land in the DLQ
+  # -----------------------------------------------------------------------
+  DLQAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-dlq-messages"
+      AlarmDescription: Messages arrived in the Dead Letter Queue
+      Namespace: AWS/SQS
+      MetricName: NumberOfMessagesSent
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt DeadLetterQueue.QueueName
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  VpcId:
+    Description: VPC ID
+    Value: !Ref VPC
+
+  SubnetAZ1Id:
+    Description: Private Subnet AZ1 ID
+    Value: !Ref SubnetAZ1
+
+  SubnetAZ2Id:
+    Description: Private Subnet AZ2 ID
+    Value: !Ref SubnetAZ2
+
+  LMISecurityGroupId:
+    Description: LMI Security Group ID
+    Value: !Ref LMISecurityGroup
+
+  CapacityProviderArn:
+    Description: LMI Capacity Provider ARN
+    Value: !GetAtt CapacityProvider.Arn
+
+  QueueUrl:
+    Description: SQS Queue URL for sending test messages
+    Value: !Ref MessageQueue
+
+  QueueArn:
+    Description: SQS Queue ARN
+    Value: !GetAtt MessageQueue.Arn
+
+  DLQUrl:
+    Description: Dead Letter Queue URL
+    Value: !Ref DeadLetterQueue
+
+  ProcessorFunctionArn:
+    Description: Lambda Processor Function ARN
+    Value: !GetAtt ProcessorFunction.Arn
+
+  EventSourceMappingId:
+    Description: ESM UUID — use this to inspect or update the mapping
+    Value: !Ref SQSEventSourceMapping
