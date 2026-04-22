@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import * as path from "path";
@@ -9,6 +10,20 @@ import { Construct } from "constructs";
 export class ApigwArbitraryKeysStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    // Cognito User Pool with custom tenantId attribute
+    const userPool = new cognito.UserPool(this, "TenantUserPool", {
+      selfSignUpEnabled: false,
+      signInAliases: { email: true },
+      customAttributes: {
+        tenantId: new cognito.StringAttribute({ mutable: false }),
+      },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const userPoolClient = userPool.addClient("TenantUserPoolClient", {
+      authFlows: { userPassword: true },
+    });
 
     const authorizerLogGroup = new cdk.aws_logs.LogGroup(this, "AuthorizerLogGroup", {
       retention: cdk.aws_logs.RetentionDays.ONE_WEEK,
@@ -38,9 +53,10 @@ export class ApigwArbitraryKeysStack extends cdk.Stack {
       deploy: false,
     });
 
+    // Token authorizer using Authorization header (Cognito JWT)
     const lambdaAuthorizer = new apigateway.TokenAuthorizer(this, "TokenAuthorizer", {
       handler: authorizerFn,
-      identitySource: "method.request.header.x-tenant-id",
+      identitySource: "method.request.header.Authorization",
     });
 
     const protectedResource = api.root.addResource("protected");
@@ -99,5 +115,13 @@ export class ApigwArbitraryKeysStack extends cdk.Stack {
     new cdk.CfnOutput(this, "DevApiUrl", { value: devStage.urlForPath("/") });
     new cdk.CfnOutput(this, "ProdUsagePlanId", { value: prodUsagePlan.usagePlanId });
     new cdk.CfnOutput(this, "DevUsagePlanId", { value: devUsagePlan.usagePlanId });
+    new cdk.CfnOutput(this, "UserPoolId", {
+      value: userPool.userPoolId,
+      description: "Cognito User Pool ID",
+    });
+    new cdk.CfnOutput(this, "UserPoolClientId", {
+      value: userPoolClient.userPoolClientId,
+      description: "Cognito User Pool Client ID",
+    });
   }
 }

@@ -10,43 +10,53 @@
           <mxGeometry x="50" y="300" width="80" height="80" as="geometry"/>
         </mxCell>
 
+        <!-- Cognito -->
+        <mxCell id="7" value="Amazon Cognito&#xa;(User Pool)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;" vertex="1" parent="1">
+          <mxGeometry x="170" y="140" width="78" height="78" as="geometry"/>
+        </mxCell>
+
         <!-- API Gateway -->
         <mxCell id="3" value="Amazon API Gateway" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
-          <mxGeometry x="300" y="300" width="78" height="78" as="geometry"/>
+          <mxGeometry x="380" y="300" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- Lambda Authorizer -->
         <mxCell id="4" value="Lambda Authorizer" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
-          <mxGeometry x="550" y="160" width="78" height="78" as="geometry"/>
+          <mxGeometry x="620" y="160" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- DynamoDB -->
         <mxCell id="5" value="Amazon DynamoDB&#xa;(Tenant → API Key)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="1">
-          <mxGeometry x="830" y="160" width="78" height="78" as="geometry"/>
+          <mxGeometry x="880" y="160" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- Protected Endpoint (Mock) -->
         <mxCell id="6" value="Protected Endpoint&#xa;(Mock Integration)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
-          <mxGeometry x="550" y="430" width="78" height="78" as="geometry"/>
+          <mxGeometry x="620" y="430" width="78" height="78" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow: Client -> Cognito -->
+        <mxCell id="8" value="1. Authenticate&#xa;(get JWT with tenantId)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="2" target="7" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: Client -> API Gateway -->
-        <mxCell id="10" value="1. x-tenant-id header" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="2" target="3" parent="1">
+        <mxCell id="10" value="2. Authorization: Bearer &lt;JWT&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="2" target="3" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: API Gateway -> Lambda Authorizer -->
-        <mxCell id="11" value="2. Authorize request" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="4" parent="1">
+        <mxCell id="11" value="3. Forward token" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="4" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: Lambda Authorizer -> DynamoDB -->
-        <mxCell id="12" value="3. Query tenant → API key" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="4" target="5" parent="1">
+        <mxCell id="12" value="4. Query tenant → API key" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="4" target="5" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: API Gateway -> Protected Endpoint -->
-        <mxCell id="13" value="4. Allow / Deny&#xa;(usageIdentifierKey)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="6" parent="1">
+        <mxCell id="13" value="5. Allow / Deny&#xa;(usageIdentifierKey)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="6" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 

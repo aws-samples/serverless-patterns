@@ -4,9 +4,24 @@ import { randomBytes } from "crypto";
 const apigwClient = new APIGatewayClient();
 
 exports.handler = async (event) => {
-  const tenantId = event.authorizationToken;
-  if (!tenantId) {
+  const token = event.authorizationToken;
+  if (!token) {
     throw new Error("Unauthorized");
+  }
+
+  // Decode the JWT payload to extract tenantId
+  let tenantId;
+  try {
+    const payload = JSON.parse(
+      Buffer.from(token.replace(/^Bearer\s+/i, "").split(".")[1], "base64url").toString(),
+    );
+    tenantId = payload["custom:tenantId"];
+  } catch (err) {
+    throw new Error("Unauthorized: Invalid token");
+  }
+
+  if (!tenantId) {
+    throw new Error("Unauthorized: No tenant ID in claims");
   }
 
   // arn:aws:execute-api:{region}:{account}:{apiId}/{stage}/{method}/{resource}

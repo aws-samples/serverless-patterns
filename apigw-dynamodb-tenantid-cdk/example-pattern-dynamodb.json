@@ -1,6 +1,6 @@
 {
-  "title": "Amazon API Gateway, AWS Lambda Authorizer & DynamoDB for API Key Authentication",
-  "description": "Implement a secure API key-based authorization system using Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB for tenant-to-API-key mapping.",
+  "title": "Amazon API Gateway with Cognito, Lambda Authorizer & DynamoDB for Tenant API Key Authentication",
+  "description": "Implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. Cognito issues JWTs with a custom tenantId claim, and the Lambda authorizer maps tenants to API keys via DynamoDB.",
 
   "language": "TypeScript",
   "level": "200",
@@ -8,8 +8,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to implement a secure API key-based authorization system using Amazon API Gateway, Lambda Authorizer, and Amazon DynamoDB.",
-      "A DynamoDB table stores the mapping between tenant IDs and API keys. The Lambda authorizer derives the tenant ID from the authorization token and queries DynamoDB to retrieve the corresponding API key.",
+      "This pattern demonstrates how to implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, Lambda Authorizer, and Amazon DynamoDB.",
+      "Amazon Cognito authenticates users and issues JWTs (ID tokens) containing a custom tenantId claim.",
+      "The client sends the JWT in the Authorization header. API Gateway forwards the token to the Lambda authorizer, which decodes the JWT, extracts the custom:tenantId claim, and queries DynamoDB to retrieve the corresponding API key.",
       "The authorizer returns a policy document with the usageIdentifierKey set to the API key, enabling API Gateway usage plan integration.",
       "The API Gateway then allows or denies access to the protected endpoint based on the policy returned by the authorizer."
     ]
@@ -24,6 +25,10 @@
   },
   "resources": {
     "bullets": [
+      {
+        "text": "Amazon Cognito Developer Guide",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+      },
       {
         "text": "Lambda Authorizers for Amazon API Gateway",
         "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
@@ -43,19 +48,20 @@
     ]
   },
   "deploy": {
-    "text": ["npm install", "cdk deploy --app \"npx ts-node --prefer-ts-exts bin/apigw-dynamodb-apikey-cdk.ts\""]
+    "text": ["npm install", "cdk deploy"]
   },
   "testing": {
     "text": [
+      "Create a Cognito user: <code>aws cognito-idp admin-create-user --user-pool-id USER_POOL_ID --username user@example.com --user-attributes Name=email,Value=user@example.com Name=custom:tenantId,Value=sample-tenant --temporary-password \"TempPass1!\"</code>",
+      "Set a permanent password: <code>aws cognito-idp admin-set-user-password --user-pool-id USER_POOL_ID --username user@example.com --password \"MySecurePass1!\" --permanent</code>",
       "Insert a tenant mapping into the DynamoDB table: <code>aws dynamodb put-item --table-name TABLE_NAME --item '{\"tenantId\": {\"S\": \"sample-tenant\"}, \"apiKey\": {\"S\": \"my-api-key-123\"}}'</code>",
-      "Make a request to the protected endpoint using the tenant ID: <code>curl -H \"x-tenant-id: sample-tenant\" https://REPLACE_WITH_CREATED_API_URL.amazonaws.com/prod/protected</code>",
+      "Get a token and call the API: <code>node get-token.js --user-pool-id USER_POOL_ID --client-id CLIENT_ID --username user@example.com --password \"MySecurePass1!\" --api-url https://REPLACE_WITH_API_URL/protected</code>",
       "If successful, you should receive a response: <code>{ \"message\": \"Access granted\" }</code>"
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the CDK stack: <code>cdk destroy --app \"npx ts-node --prefer-ts-exts bin/apigw-dynamodb-apikey-cdk.ts\"</code>"
+      "Delete the CDK stack: <code>cdk destroy</code>"
     ]
   }
-  
 }

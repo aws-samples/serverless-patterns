@@ -10,14 +10,19 @@
           <mxGeometry x="50" y="340" width="80" height="80" as="geometry"/>
         </mxCell>
 
+        <!-- Cognito -->
+        <mxCell id="15" value="Amazon Cognito&#xa;(User Pool)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;" vertex="1" parent="1">
+          <mxGeometry x="170" y="140" width="78" height="78" as="geometry"/>
+        </mxCell>
+
         <!-- API Gateway -->
         <mxCell id="3" value="Amazon API Gateway&#xa;(apiKeySource: AUTHORIZER)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
-          <mxGeometry x="300" y="340" width="78" height="78" as="geometry"/>
+          <mxGeometry x="380" y="340" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- Lambda Authorizer -->
-        <mxCell id="4" value="Lambda Authorizer&#xa;(Generates Arbitrary Key)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
-          <mxGeometry x="580" y="170" width="78" height="78" as="geometry"/>
+        <mxCell id="4" value="Lambda Authorizer&#xa;(Decodes JWT,&#xa;Generates Arbitrary Key)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="620" y="170" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- API Gateway (Usage Plans lookup) -->
@@ -27,12 +32,12 @@
 
         <!-- Prod Stage -->
         <mxCell id="6" value="Prod Stage&#xa;(/prod/protected)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
-          <mxGeometry x="580" y="470" width="78" height="78" as="geometry"/>
+          <mxGeometry x="620" y="470" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- Dev Stage -->
         <mxCell id="7" value="Dev Stage&#xa;(/dev/protected)" style="outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
-          <mxGeometry x="580" y="620" width="78" height="78" as="geometry"/>
+          <mxGeometry x="620" y="620" width="78" height="78" as="geometry"/>
         </mxCell>
 
         <!-- Prod Usage Plan -->
@@ -45,33 +50,38 @@
           <mxGeometry x="850" y="630" width="150" height="50" as="geometry"/>
         </mxCell>
 
+        <!-- Arrow: Client -> Cognito -->
+        <mxCell id="16" value="1. Authenticate&#xa;(get JWT with tenantId)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="2" target="15" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
         <!-- Arrow: Client -> API Gateway -->
-        <mxCell id="20" value="1. Request with&#xa;x-tenant-id header" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="2" target="3" parent="1">
+        <mxCell id="20" value="2. Authorization: Bearer &lt;JWT&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="2" target="3" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: API Gateway -> Lambda Authorizer -->
-        <mxCell id="21" value="2. Authorize&#xa;(methodArn contains stage)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="4" parent="1">
+        <mxCell id="21" value="3. Forward token" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="4" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: Lambda -> GetUsagePlans -->
-        <mxCell id="22" value="3. GetUsagePlans&#xa;(find plan for apiId + stage)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="4" target="5" parent="1">
+        <mxCell id="22" value="4. GetUsagePlans&#xa;(find plan for apiId + stage)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="4" target="5" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: Lambda returns to APIGW -->
-        <mxCell id="23" value="4. Return&#xa;usageIdentifierKey (128 char)&#xa;+ usagePlanId (if found)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;fontSize=11;dashed=1;" edge="1" source="4" target="3" parent="1">
+        <mxCell id="23" value="5. Return&#xa;usageIdentifierKey (128 char)&#xa;+ usagePlanId (if found)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;fontSize=11;dashed=1;" edge="1" source="4" target="3" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: API Gateway -> Prod Stage -->
-        <mxCell id="24" value="5a. Route to stage" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="6" parent="1">
+        <mxCell id="24" value="6a. Route to stage" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="6" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
         <!-- Arrow: API Gateway -> Dev Stage -->
-        <mxCell id="25" value="5b. Route to stage" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="7" parent="1">
+        <mxCell id="25" value="6b. Route to stage" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;" edge="1" source="3" target="7" parent="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
 
@@ -86,7 +96,7 @@
         </mxCell>
 
         <!-- Title -->
-        <mxCell id="30" value="API Gateway with Arbitrary Usage Identifier Keys (AUIK)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="30" value="API Gateway with Cognito, AUIK &amp; Lambda Authorizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="300" y="30" width="600" height="40" as="geometry"/>
         </mxCell>
 

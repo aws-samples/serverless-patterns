@@ -1,6 +1,6 @@
-# Amazon API Gateway with AWS Lambda Authorizer and DynamoDB for API Key Authentication
+# Amazon API Gateway with Cognito, Lambda Authorizer, and DynamoDB for Tenant API Key Authentication
 
-This pattern demonstrates how to implement a secure API key-based authorization system using Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. A DynamoDB table stores the mapping between tenant IDs and API keys. The Lambda authorizer validates the tenant ID from the request header, retrieves the corresponding API key from DynamoDB, and returns a policy document enabling API Gateway access.
+This pattern demonstrates how to implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. Cognito authenticates users and issues JWTs containing a custom `tenantId` claim. The Lambda authorizer extracts the tenant ID from the JWT, looks up the corresponding API key in DynamoDB, and returns a policy document enabling API Gateway access.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-dynamodb-apikey-cdk](https://serverlessland.com/patterns/apigw-dynamodb-apikey-cdk)
 
@@ -33,28 +33,49 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
 
-Note the outputs from the CDK deployment process. The output will include the API Gateway URL and the DynamoDB table name you'll need for testing.
+Note the outputs from the CDK deployment process. The output will include the API Gateway URL, DynamoDB table name, Cognito User Pool ID, and User Pool Client ID.
 
 ## How it works
 
 ![Architecture Diagram](./apigw-dynamodb-apikey-cdk.drawio)
 
-1. Client makes a request to the API with a tenant ID in the `x-tenant-id` header
-2. API Gateway forwards the authorization request to the Lambda Authorizer
-3. The Lambda Authorizer looks up the tenant ID in the DynamoDB table
+1. Client authenticates with Amazon Cognito and receives a JWT (ID token) containing the custom `tenantId` claim
+2. Client makes a request to the API with the JWT in the `Authorization` header
+3. API Gateway forwards the token to the Lambda Authorizer
+4. The Lambda Authorizer decodes the JWT, extracts the `custom:tenantId` claim, and looks up the tenant in the DynamoDB table
    - If the tenant exists, the associated API key is retrieved and returned in the authorization context via `usageIdentifierKey`
-   - If the tenant does not exist, the request is denied
-4. The API Gateway allows or denies access to the protected endpoint based on the policy returned by the authorizer
+   - If the tenant does not exist or the token is invalid, the request is denied
+5. The API Gateway allows or denies access to the protected endpoint based on the policy returned by the authorizer
 
 The DynamoDB table uses `tenantId` as the partition key and stores the corresponding `apiKey` for each tenant.
 
 ## Testing
 
-1. Get the DynamoDB table name and API Gateway URL from the deployment output:
+1. Get the outputs from the deployment:
     ```bash
     # The outputs will be similar to
     ApigwDynamodbApikeyCdkStack.ApiUrl = https://abc123def.execute-api.us-east-1.amazonaws.com/prod/
     ApigwDynamodbApikeyCdkStack.TableName = ApigwDynamodbApikeyCdkStack-TenantApiKeyTableXXXXXX-YYYYYY
+    ApigwDynamodbApikeyCdkStack.UserPoolId = us-east-1_XXXXXXXXX
+    ApigwDynamodbApikeyCdkStack.UserPoolClientId = XXXXXXXXXXXXXXXXXXXXXXXXXX
+    ```
+
+1. Create a Cognito user with a tenantId:
+    ```bash
+    aws cognito-idp admin-create-user \
+      --user-pool-id USER_POOL_ID \
+      --username user@example.com \
+      --user-attributes Name=email,Value=user@example.com Name=custom:tenantId,Value=sample-tenant \
+      --temporary-password "TempPass1!"
+    ```
+
+1. Set a permanent password for the user:
+    ```bash
+    aws cognito-idp admin-set-user-password \
+      --user-pool-id USER_POOL_ID \
+      --username user@example.com \
+      --password "MySecurePass1!" \
+      --permanent
     ```
 
 1. Insert a tenant mapping into the DynamoDB table:
@@ -64,26 +85,22 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
       --item '{"tenantId": {"S": "sample-tenant"}, "apiKey": {"S": "my-api-key-123"}}'
     ```
 
-1. Make a request to the protected endpoint with a valid tenant ID:
+1. Get a token and call the API using the helper script:
     ```bash
-    curl -H "x-tenant-id: sample-tenant" https://REPLACE_WITH_API_URL/protected
+        node get-token.js --user-pool-id USER_POOL_ID --client-id CLIENT_ID \
+        --username user@example.com --password "MySecurePass1!" \
+        --api-url https://REPLACE_WITH_API_URL/protected
     ```
     If successful, you should receive a response like:
     ```json
     { "message": "Access granted" }
     ```
 
-1. Try with an invalid tenant ID:
-    ```bash
-    curl -H "x-tenant-id: invalid-tenant" https://REPLACE_WITH_API_URL/protected
-    ```
-    You should receive an unauthorized error.
-
-1. Try without a tenant ID:
+1. Try with an invalid or missing token:
     ```bash
     curl https://REPLACE_WITH_API_URL/protected
     ```
-    You should also receive an unauthorized error.
+    You should receive an unauthorized error.
 
 ## Cleanup
 

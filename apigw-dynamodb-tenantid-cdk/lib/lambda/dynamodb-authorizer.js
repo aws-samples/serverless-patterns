@@ -4,13 +4,23 @@ const client = new DynamoDBClient();
 const TABLE_NAME = process.env.TABLE_NAME;
 
 exports.handler = async (event) => {
-  const tenantId = event.authorizationToken;
+  const token = event.authorizationToken;
 
-  if (!tenantId) {
-    throw new Error("Unauthorized: No tenant ID provided");
+  if (!token) {
+    throw new Error("Unauthorized: No token provided");
   }
 
   try {
+    // Decode the JWT payload (Cognito token is already validated by API Gateway if needed)
+    const payload = JSON.parse(
+      Buffer.from(token.replace(/^Bearer\s+/i, "").split(".")[1], "base64url").toString(),
+    );
+    const tenantId = payload["custom:tenantId"];
+
+    if (!tenantId) {
+      throw new Error("Unauthorized: No tenant ID in claims");
+    }
+
     const result = await client.send(
       new GetItemCommand({
         TableName: TABLE_NAME,
@@ -24,7 +34,7 @@ exports.handler = async (event) => {
 
     const apiKey = result.Item.apiKey.S;
 
-    const authResponse = {
+    return {
       principalId: tenantId,
       policyDocument: {
         Version: "2012-10-17",
@@ -39,8 +49,6 @@ exports.handler = async (event) => {
       context: { tenantId },
       usageIdentifierKey: apiKey,
     };
-
-    return authResponse;
   } catch (error) {
     console.error("Authorization error:", error.message);
     throw new Error("Unauthorized");
