@@ -122,7 +122,7 @@ resource "aws_api_gateway_rest_api" "MyApiGatewayRestApi" {
             "type" : "aws",
             "credentials" : "${aws_iam_role.APIGWRole.arn}",
             "httpMethod" : "POST",
-            "uri" : "arn:aws:apigateway:${data.aws_region.current.name}:dynamodb:action/PutItem",
+            "uri" : "arn:aws:apigateway:${data.aws_region.current.id}:dynamodb:action/PutItem",
             "responses" : {
               "default" : {
                 "statusCode" : "200",
@@ -160,7 +160,7 @@ resource "aws_api_gateway_rest_api" "MyApiGatewayRestApi" {
             "type" : "aws",
             "credentials" : "${aws_iam_role.APIGWRole.arn}",
             "httpMethod" : "POST",
-            "uri" : "arn:aws:apigateway:${data.aws_region.current.name}:dynamodb:action/Query",
+            "uri" : "arn:aws:apigateway:${data.aws_region.current.id}:dynamodb:action/Query",
             "responses" : {
               "default" : {
                 "statusCode" : "200",
