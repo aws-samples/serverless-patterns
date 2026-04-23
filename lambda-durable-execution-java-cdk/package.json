@@ -1,0 +1,20 @@
+{
+  "name": "lambda-durable-execution-java-cdk",
+  "version": "1.0.0",
+  "bin": {
+    "app": "bin/app.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.180.0",
+    "constructs": "10.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "~5.7.0"
+  }
+}
