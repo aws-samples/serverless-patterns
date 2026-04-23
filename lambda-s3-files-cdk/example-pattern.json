@@ -1,0 +1,61 @@
+{
+  "title": "Lambda with Amazon S3 Files Mount",
+  "description": "Mount an Amazon S3 bucket as a local file system on AWS Lambda using Amazon S3 Files, enabling standard file operations (read, write, list) without downloading objects.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function with an Amazon S3 Files file system mounted at /mnt/s3data. The function performs standard file operations (read, write, list) on S3 data using the local filesystem — no S3 API calls needed.",
+      "S3 Files (GA April 2026) provides NFS access to S3 buckets with sub-millisecond latency on small files and full POSIX semantics. The pattern creates a VPC, S3 Files file system, mount targets, access point, and a Lambda function wired together.",
+      "Multiple Lambda functions can connect to the same S3 Files file system simultaneously, sharing data through a common workspace without custom synchronization logic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-files-cdk",
+      "templateURL": "serverless-patterns/lambda-s3-files-cdk",
+      "projectFolder": "lambda-s3-files-cdk",
+      "templateFile": "lib/lambda-s3-files-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 Files Documentation",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files.html"
+      },
+      {
+        "text": "Configuring Amazon S3 Files access for Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem-s3files.html"
+      },
+      {
+        "text": "Mounting S3 file systems on Lambda functions",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files-mounting-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
