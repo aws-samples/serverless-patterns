@@ -6,42 +6,76 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::bedrock:invokeModel",
       "Parameters": {
-        "ModelId": "cohere.command-text-v14",
+        "ModelId": "global.amazon.nova-2-lite-v1:0",
         "Body": {
-          "prompt.$": "$.prompt_one",
-          "max_tokens": 2000
-        },
-        "ContentType": "application/json",
-        "Accept": "*/*"
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "text.$": "$.prompt_one"
+                }
+              ]
+            }
+          ],
+          "inferenceConfig": {
+            "maxTokens": 2000
+          }
+        }
       },
       "Next": "Add first result to conversation history",
       "ResultPath": "$.result_one",
       "ResultSelector": {
-        "result_one.$": "$.Body.generations[0].text"
+        "result_one.$": "$.Body.output.message.content[0].text"
       }
     },
     "Add first result to conversation history": {
       "Type": "Pass",
       "Next": "Invoke model with second prompt",
       "Parameters": {
-        "convo_one.$": "States.Format('{}',$.result_one.result_one)"
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text.$": "$.prompt_one"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text.$": "$.result_one.result_one"
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "Now write a short story based on the above."
+              }
+            ]
+          }
+        ]
       },
-      "ResultPath": "$.convo_one"
+      "ResultPath": "$.conversation"
     },
     "Invoke model with second prompt": {
       "Type": "Task",
       "Resource": "arn:aws:states:::bedrock:invokeModel",
       "Parameters": {
-        "ModelId": "cohere.command-text-v14",
+        "ModelId": "global.amazon.nova-2-lite-v1:0",
         "Body": {
-          "prompt.$": "States.Format('{}\n{}','Human: Now write a short story based on the following. Assistant:', $.convo_one.convo_one)",
-          "max_tokens": 1000
-        },
-        "ContentType": "application/json",
-        "Accept": "*/*"
+          "messages.$": "$.conversation.messages",
+          "inferenceConfig": {
+            "maxTokens": 2000
+          }
+        }
       },
       "ResultSelector": {
-        "result_two.$": "$.Body.generations[0].text"
+        "result_two.$": "$.Body.output.message.content[0].text"
       },
       "ResultPath": "$.result_two",
       "End": true
