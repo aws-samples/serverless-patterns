@@ -17,11 +17,14 @@ export class S3VectorsLambdaBedrockStack extends cdk.Stack {
 
     const indexName = "knowledge-base";
 
-    // S3 Vectors policy (shared by both functions)
+    // S3 Vectors policy (shared by both functions and custom resource)
+    // Note: s3vectors does not support resource-level ARNs yet — wildcard required
     const s3VectorsPolicy = new iam.PolicyStatement({
       actions: [
         "s3vectors:CreateVectorBucket",
+        "s3vectors:DeleteVectorBucket",
         "s3vectors:CreateVectorIndex",
+        "s3vectors:DeleteVectorIndex",
         "s3vectors:PutVectors",
         "s3vectors:QueryVectors",
         "s3vectors:GetVectors",
@@ -32,7 +35,11 @@ export class S3VectorsLambdaBedrockStack extends cdk.Stack {
 
     const bedrockPolicy = new iam.PolicyStatement({
       actions: ["bedrock:InvokeModel"],
-      resources: ["*"],
+      resources: [
+        `arn:aws:bedrock:${this.region}::foundation-model/amazon.titan-embed-text-v2:0`,
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0`,
+        "arn:aws:bedrock:*::foundation-model/*",
+      ],
     });
 
     const sharedEnv = {
