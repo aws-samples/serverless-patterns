@@ -111,7 +111,7 @@ export class LambdaS3FilesStack extends cdk.Stack {
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["s3files:ClientMount", "s3files:ClientWrite"],
-        resources: ["*"],
+        resources: [accessPoint.getAtt("AccessPointArn").toString()],
       })
     );
     bucket.grantRead(fn);
