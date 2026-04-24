@@ -6,6 +6,16 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+> **⚠️ Important Note:** As of April 2026, `FairQueueConfiguration` is **API-only** and not yet supported in the CloudFormation schema. This means the fair queue configuration cannot be deployed via CDK/CloudFormation. This pattern deploys the standard SQS queue, EventBridge rule, Lambda consumer, and DLQ via CDK, but the fair queue enablement must be done separately via the AWS CLI or SDK after deployment:
+>
+> ```bash
+> aws sqs set-queue-attributes \
+>   --queue-url <QueueUrl> \
+>   --attributes '{"FairQueueConfiguration":"{\"MessageGroupIdFieldPath\":\"$.detail.tenantId\"}"}'
+> ```
+>
+> Once CloudFormation adds `FairQueueConfiguration` support, this pattern will be updated to deploy fully via CDK.
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in.
