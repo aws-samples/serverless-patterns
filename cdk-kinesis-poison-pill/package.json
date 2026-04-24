@@ -37,6 +37,6 @@
     "js-yaml": "^4.1.0",
     "openapi3-ts": "^4.4.0",
     "source-map-support": "^0.5.21",
-    "uuid": "^11.1.0"
+    "uuid": "^14.0.0"
   }
 }
