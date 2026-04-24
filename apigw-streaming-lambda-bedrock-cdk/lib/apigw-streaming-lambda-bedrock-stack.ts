@@ -31,7 +31,10 @@ export class ApigwStreamingLambdaBedrockStack extends cdk.Stack {
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["bedrock:InvokeModelWithResponseStream"],
-        resources: ["*"],
+        resources: [
+          `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
+          "arn:aws:bedrock:*::foundation-model/*",
+        ],
       })
     );
 
