@@ -108,7 +108,10 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
 
     testFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
-      resources: ['*'],
+      resources: [
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
+        'arn:aws:bedrock:*::foundation-model/*',
+      ],
     }));
 
     testFn.addToRolePolicy(new iam.PolicyStatement({
