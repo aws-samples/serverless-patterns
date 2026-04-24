@@ -24,15 +24,11 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
       RetentionPeriodInDays: 7,
     });
 
-    // Durable execution checkpoint permissions
-    fn.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: [
-          "lambda:CheckpointDurableExecution",
-          "lambda:GetDurableExecutionState",
-        ],
-        resources: ["*"],
-      })
+    // Durable execution permissions via AWS managed policy
+    fn.role!.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName(
+        "service-role/AWSLambdaBasicDurableExecutionRolePolicy"
+      )
     );
 
     // Version and alias via L1 to avoid CDK version property validation
