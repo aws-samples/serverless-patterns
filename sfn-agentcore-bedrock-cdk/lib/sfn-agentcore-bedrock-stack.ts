@@ -35,6 +35,8 @@ export class SfnAgentcoreBedrockStack extends cdk.Stack {
       },
     });
 
+    // Note: AgentCore runtime ARNs are user-provided at deploy time via parameter,
+    // so resource-level scoping requires wildcard for flexibility
     invokeAgentFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock-agentcore:InvokeAgentRuntime'],
       resources: ['*'],
@@ -54,13 +56,16 @@ export class SfnAgentcoreBedrockStack extends cdk.Stack {
 
     aggregateFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
-      resources: ['*'],
+      resources: [
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${bedrockModelIdParam.valueAsString}`,
+        'arn:aws:bedrock:*::foundation-model/*',
+      ],
     }));
 
     // Required when account-level enforced guardrails are active
     aggregateFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:ApplyGuardrail'],
-      resources: ['*'],
+      resources: [`arn:aws:bedrock:${this.region}:${this.account}:guardrail/*`],
     }));
 
     // SFN IAM Role
