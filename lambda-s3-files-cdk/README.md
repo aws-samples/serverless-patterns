@@ -35,7 +35,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-[Amazon S3 Files](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files.html) (GA April 2026) provides NFS access to S3 buckets with full POSIX semantics. This pattern mounts an S3 bucket on a Lambda function at `/mnt/s3data`.
+[Amazon S3 Files](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files.html) provides NFS access to S3 buckets with full POSIX semantics. This pattern mounts an S3 bucket on a Lambda function at `/mnt/s3data`.
 
 ### What gets deployed
 

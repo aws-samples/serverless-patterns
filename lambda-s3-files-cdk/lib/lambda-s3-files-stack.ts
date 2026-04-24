@@ -82,7 +82,7 @@ export class LambdaS3FilesStack extends cdk.Stack {
 
     // Lambda function with S3 Files mount
     const fn = new lambda.Function(this, "S3FilesFn", {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_22_X, // overridden to nodejs24.x below
       handler: "index.handler",
       code: lambda.Code.fromAsset("src"),
       timeout: cdk.Duration.minutes(1),
@@ -96,6 +96,7 @@ export class LambdaS3FilesStack extends cdk.Stack {
 
     // Attach S3 Files filesystem config via escape hatch
     const cfnFn = fn.node.defaultChild as lambda.CfnFunction;
+    cfnFn.addOverride("Properties.Runtime", "nodejs24.x");
     cfnFn.fileSystemConfigs = [
       {
         arn: accessPoint.getAtt("AccessPointArn").toString(),

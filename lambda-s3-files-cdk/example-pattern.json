@@ -1,5 +1,5 @@
 {
-  "title": "Lambda with Amazon S3 Files Mount",
+  "title": "AWS Lambda with Amazon S3 Files Mount",
   "description": "Mount an Amazon S3 bucket as a local file system on AWS Lambda using Amazon S3 Files, enabling standard file operations (read, write, list) without downloading objects.",
   "language": "TypeScript",
   "level": "300",
@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys a Lambda function with an Amazon S3 Files file system mounted at /mnt/s3data. The function performs standard file operations (read, write, list) on S3 data using the local filesystem — no S3 API calls needed.",
-      "S3 Files (GA April 2026) provides NFS access to S3 buckets with sub-millisecond latency on small files and full POSIX semantics. The pattern creates a VPC, S3 Files file system, mount targets, access point, and a Lambda function wired together.",
+      "S3 Files provides NFS access to S3 buckets with sub-millisecond latency on small files and full POSIX semantics. The pattern creates a VPC, S3 Files file system, mount targets, access point, and a Lambda function wired together.",
       "Multiple Lambda functions can connect to the same S3 Files file system simultaneously, sharing data through a common workspace without custom synchronization logic."
     ]
   },
