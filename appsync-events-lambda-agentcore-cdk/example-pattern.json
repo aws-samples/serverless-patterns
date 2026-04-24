@@ -1,6 +1,6 @@
 {
-  "title": "Real-time streaming chat with AppSync Events, Lambda, and Bedrock AgentCore",
-  "description": "Stream AI agent responses in real time using AppSync Events WebSockets with a two-phase Lambda architecture and Bedrock AgentCore Runtime.",
+  "title": "Streaming chat with AWS AppSync Events and Amazon Bedrock AgentCore",
+  "description": "Stream AI agent responses in real time using AWS AppSync Events WebSockets, two-phase AWS Lambda functions, and Amazon Bedrock AgentCore Runtime.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",
@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys a real-time streaming chat service using AWS AppSync Events with a two-phase Lambda architecture to invoke a Strands agent running on Amazon Bedrock AgentCore Runtime.",
-      "The client publishes messages to an inbound channel via HTTP. AppSync Events triggers an agent invoker Lambda via direct Lambda integration (synchronous only), which asynchronously invokes a separate stream relay Lambda and returns immediately. Two Lambdas are needed because AppSync Events does not support async Lambda invocation, so the invoker must return quickly. The stream relay calls the AgentCore Runtime, consumes the Server-Sent Events (SSE) stream, and publishes response chunks back to a separate response channel.",
+      "The client publishes messages to an inbound channel via HTTP. AppSync Events triggers an agent invoker Lambda via direct Lambda integration (synchronous only), which asynchronously invokes a separate stream relay Lambda function, then returns immediately. Two Lambda functions are needed because AppSync Events requires a synchronous function invocation, so the invoker must return quickly. The stream relay calls the AgentCore Runtime, consumes the Server-Sent Events (SSE) stream, and publishes response chunks back to a separate response channel.",
       "The client receives agent response tokens in real time via a WebSocket subscription. Separate channel namespaces for inbound and outbound traffic prevent re-invocation loops."
     ]
   },

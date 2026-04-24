@@ -1,6 +1,6 @@
 {
-  "title": "Amazon EventBridge Cron to Lambda durable function",
-  "description": "Create a Lambda durable function triggered by Amazon EventBridge on a cron schedule using AWS SAM.",
+  "title": "Amazon EventBridge Cron to AWS Lambda durable function",
+  "description": "Create an AWS Lambda durable function triggered by Amazon EventBridge on a cron schedule using AWS SAM.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
