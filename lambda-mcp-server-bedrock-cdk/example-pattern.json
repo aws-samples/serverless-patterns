@@ -1,0 +1,38 @@
+{
+  "title": "Lambda MCP Server with Amazon Bedrock",
+  "description": "Deploy a stateless MCP (Model Context Protocol) server on Lambda with Function URL that exposes Bedrock tools",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a stateless MCP server on AWS Lambda with a Function URL endpoint.",
+      "The server implements the MCP Streamable HTTP transport protocol and exposes two Bedrock-powered tools: ask_bedrock and summarize.",
+      "Any MCP client (Claude Desktop, Kiro, VS Code extensions) can connect to the Function URL and use the tools to interact with Amazon Bedrock."
+    ]
+  },
+  "gitHub": {
+    "template": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-mcp-server-bedrock-cdk",
+    "templateURL": "serverless-patterns/lambda-mcp-server-bedrock-cdk"
+  },
+  "resources": {
+    "bullets": [
+      { "text": "MCP Specification - Streamable HTTP Transport", "link": "https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http" },
+      { "text": "Sample Serverless MCP Servers", "link": "https://github.com/aws-samples/sample-serverless-mcp-servers" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
