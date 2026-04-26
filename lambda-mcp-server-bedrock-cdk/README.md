@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 
 MCP (Model Context Protocol) is an open standard for connecting AI assistants to external tools and data sources. This pattern deploys a serverless MCP server that:
 
-- **Runs on Lambda** with a Function URL — no API Gateway needed
+- **Runs on Lambda** with a Function URL (IAM auth) — no API Gateway needed
 - **Implements MCP protocol** (JSON-RPC 2.0 over HTTP) with `initialize`, `tools/list`, and `tools/call`
 - **Exposes two tools**: `ask_bedrock` (general Q&A) and `summarize` (text summarization)
 - **Stateless design** — scales horizontally with no session management
@@ -57,21 +57,21 @@ Amazon Bedrock (Claude) → Response
 
 ## Testing
 
-Test the MCP server directly with curl:
+Test the MCP server directly with curl (requires [AWS SigV4 signing](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html)):
 
 ```bash
-# Initialize
-curl -X POST <McpServerUrl> \
+# Initialize (using awscurl for SigV4)
+awscurl --service lambda -X POST <McpServerUrl> \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 
 # List tools
-curl -X POST <McpServerUrl> \
+awscurl --service lambda -X POST <McpServerUrl> \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
 
 # Call ask_bedrock tool
-curl -X POST <McpServerUrl> \
+awscurl --service lambda -X POST <McpServerUrl> \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"ask_bedrock","arguments":{"prompt":"What is MCP?"}}}'
 ```

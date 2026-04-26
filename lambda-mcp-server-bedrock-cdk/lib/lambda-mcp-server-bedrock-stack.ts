@@ -32,7 +32,7 @@ export class LambdaMcpServerBedrockStack extends cdk.Stack {
 
     // Function URL for MCP Streamable HTTP transport
     const fnUrl = mcpFn.addFunctionUrl({
-      authType: lambda.FunctionUrlAuthType.NONE,
+      authType: lambda.FunctionUrlAuthType.AWS_IAM,
       invokeMode: lambda.InvokeMode.BUFFERED,
     });
 
