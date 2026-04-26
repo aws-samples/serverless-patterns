@@ -1,0 +1,38 @@
+{
+  "title": "AWS Secrets Manager with Post-Quantum TLS and Lambda",
+  "description": "Retrieve secrets over hybrid post-quantum TLS (ML-KEM) connections to protect against future quantum threats",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Secrets Manager secret and a Lambda function that retrieves it over a hybrid post-quantum TLS connection.",
+      "The AWS SDK automatically negotiates ML-KEM (X25519MLKEM768) key exchange with Secrets Manager, combining classical and post-quantum cryptography.",
+      "This protects secrets against harvest-now-decrypt-later (HNDL) attacks where adversaries record encrypted traffic today to decrypt with future quantum computers."
+    ]
+  },
+  "gitHub": {
+    "template": "https://github.com/aws-samples/serverless-patterns/tree/main/secretsmanager-post-quantum-tls-lambda-cdk",
+    "templateURL": "serverless-patterns/secretsmanager-post-quantum-tls-lambda-cdk"
+  },
+  "resources": {
+    "bullets": [
+      { "text": "AWS Secrets Manager now supports hybrid post-quantum TLS", "link": "https://aws.amazon.com/about-aws/whats-new/2026/04/aws-secrets-manager-post-quantum-tls/" },
+      { "text": "AWS Post-Quantum Cryptography migration", "link": "https://aws.amazon.com/security/post-quantum-cryptography/migrating-to-post-quantum-cryptography/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
