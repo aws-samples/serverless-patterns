@@ -1,0 +1,52 @@
+{
+  "title": "Lambda SnapStart with Amazon Bedrock",
+  "description": "Invoke Amazon Bedrock from a Lambda function with SnapStart enabled for dramatically reduced cold start latency, deployed with AWS CDK.",
+  "language": "Python",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Python Lambda function with SnapStart enabled that invokes Amazon Bedrock (Claude Sonnet) for text generation.",
+      "Lambda SnapStart reduces cold start latency by up to 10x by pre-initializing the execution environment and caching a snapshot of the initialized state.",
+      "When a new execution environment is needed, Lambda restores from the cached snapshot instead of running full initialization, providing near-instant cold starts.",
+      "A published version and alias are created to activate SnapStart optimization — SnapStart only applies to published versions, not $LATEST."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-snapstart-bedrock-cdk",
+      "templateURL": "serverless-patterns/lambda-snapstart-bedrock-cdk",
+      "projectFolder": "lambda-snapstart-bedrock-cdk",
+      "templateFile": "lib/lambda-snapstart-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Lambda SnapStart documentation", "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html" },
+      { "text": "Lambda SnapStart for Python and .NET", "link": "https://aws.amazon.com/blogs/aws/reduce-cold-starts-for-your-lambda-functions-with-snapstart-for-python-and-net/" },
+      { "text": "Amazon Bedrock documentation", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "lambda", "label": "Lambda (SnapStart)" },
+    "icon2": { "x": 80, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
+    "line1": { "from": "icon1", "to": "icon2" }
+  }
+}
