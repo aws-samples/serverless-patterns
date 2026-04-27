@@ -218,19 +218,6 @@ Resources:
           Value: s3files-lambda
 
   # -----------------------------------------------------------------------
-  # Lambda Layer — pandas
-  # -----------------------------------------------------------------------
-  PandasLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: !Sub "${AWS::StackName}-pandas"
-      Description: pandas for CSV processing
-      ContentUri: layer/
-      CompatibleRuntimes:
-        - python3.14
-      RetentionPolicy: Delete
-
-  # -----------------------------------------------------------------------
   # Lambda Function
   # -----------------------------------------------------------------------
   S3FilesReaderFunction:
@@ -241,11 +228,9 @@ Resources:
       CodeUri: src/
       Handler: handler.lambda_handler
       Description: >
-        Reads a CSV from /mnt/s3data/input/ using pandas and returns the row
-        count, column names, and a preview of the first 5 rows — all via
-        standard Python file I/O through the S3 Files mount. No boto3 S3 calls needed.
-      Layers:
-        - !Ref PandasLayer
+        Reads a CSV from /mnt/s3data/input/ using Python's built-in csv module
+        and returns the row count, column names, and a preview of the first 5
+        rows — all via standard file I/O through the Amazon S3 Files mount.
       FileSystemConfigs:
         - Arn: !GetAtt AccessPoint.AccessPointArn
           LocalMountPath: /mnt/s3data

@@ -19,28 +19,16 @@ Important: this application uses various AWS services and there are costs associ
 1. An Amazon S3 bucket is linked to an **S3 file system** (Amazon S3 Files), providing full POSIX file system semantics over S3 data.
 2. A **mount target** is created in a private subnet, giving the Lambda function NFS access to the file system.
 3. The Lambda function is configured with `FileSystemConfigs` pointing to the access point, mounting the S3 bucket at `/mnt/s3data`.
-4. When invoked, Lambda reads a CSV file from `/mnt/s3data/input/` using `pandas.read_csv()` — a standard file path, no boto3 required.
+4. When invoked, AWS Lambda reads a CSV file from `/mnt/s3data/input/` using Python's built-in `csv` module — a standard file path.
 5. It returns the row count, column names, and a preview of the first 5 rows as JSON.
 
 ## Build Instructions
 
-Build the pandas Lambda layer targeting Linux x86_64 (Lambda's runtime), then remove pyarrow to stay within Lambda's 250MB unzipped layer limit:
-
 ```bash
-pip install pandas \
-  --platform manylinux2014_x86_64 \
-  --target layer/python/ \
-  --implementation cp \
-  --python-version 3.14 \
-  --only-binary=:all:
-
-# Remove pyarrow if present (not needed for CSV reads, exceeds layer size limit)
-rm -rf layer/python/pyarrow
-
 sam build
 ```
 
-> The `--platform` flag ensures Linux-compatible wheels are downloaded regardless of your local OS (macOS, Windows, or Linux).
+No external dependencies — the handler uses Python's built-in `csv` module.
 
 ## Deployment Instructions
 
@@ -78,7 +66,7 @@ sam build
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install pytest pandas
+pip install pytest
 pytest src/tests/ -v
 ```
 

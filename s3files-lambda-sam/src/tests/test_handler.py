@@ -1,11 +1,11 @@
 """
 Unit tests for handler.py
 
-The S3 Files mount is simulated using pytest's tmp_path fixture,
+The Aamzon S3 Files mount is simulated using pytest's tmp_path fixture,
 so no real AWS infrastructure is needed to run these tests.
 
 Run:
-    pip install pytest pandas
+    pip install pytest
     pytest src/tests/ -v
 """
 
@@ -102,6 +102,15 @@ class TestHappyPath:
         handler.MOUNT_PATH = str(sales_file)
         result = handler.lambda_handler({"file": "input/sales.csv"}, {})
         assert "input/sales.csv" in result["body"]["file"]
+
+    def test_preview_values_are_strings(self, sales_file):
+        """csv.DictReader returns all values as strings."""
+        import handler
+        handler.MOUNT_PATH = str(sales_file)
+        result = handler.lambda_handler({"file": "input/sales.csv"}, {})
+        first_row = result["body"]["preview"][0]
+        assert first_row["region"] == "North"
+        assert first_row["revenue"] == "1000"
 
 
 # ---------------------------------------------------------------------------

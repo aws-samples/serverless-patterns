@@ -9,7 +9,7 @@
     "text": [
       "Amazon S3 Files is a shared file system built on Amazon EFS that provides full POSIX file system semantics over your S3 data. It lets file-based applications, agents, and tools work directly with S3 data without duplicating it or learning new APIs.",
       "This pattern links an S3 bucket to an S3 file system and mounts it on a Lambda function at /mnt/s3data. When invoked, the Lambda function reads a CSV file from the mount path — all through standard Python file I/O, with no boto3 S3 calls.",
-      "This pattern deploys one S3 bucket, one S3 file system, one mount target, one S3 Files access point, one Lambda function with a pandas layer, and a VPC with a private subnet and VPC endpoints for S3."
+      "This pattern deploys one Amazon S3 bucket, one Amazon S3 file system, one mount target, one Amazon S3 Files access point, one AWS Lambda function, and a VPC with a private subnet and VPC endpoints for Amazon S3."
     ]
   },
   "gitHub": {
@@ -42,8 +42,6 @@
   },
   "deploy": {
     "text": [
-      "pip install pandas --platform manylinux2014_x86_64 --target layer/python/ --implementation cp --python-version 3.14 --only-binary=:all:",
-      "rm -rf layer/python/pyarrow",
       "sam build",
       "sam deploy --guided"
     ]

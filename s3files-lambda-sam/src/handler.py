@@ -1,18 +1,17 @@
 """
 Amazon S3 Files + AWS Lambda
 
-Demonstrates accessing an S3 bucket as a file system from Lambda using
+Demonstrates accessing an Amazon S3 bucket as a file system from AWS Lambda using
 Amazon S3 Files. Files are read and written via standard Python file I/O
-at the local mount path — no boto3 S3 calls needed.
+at the local mount path.
 
-The S3 bucket is mounted at /mnt/s3data via the S3 Files file system.
+The Amazon S3 bucket is mounted at /mnt/s3data via the Amazon S3 Files file system.
 """
 
+import csv
 import json
 import logging
 import os
-
-import pandas as pd
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
@@ -37,15 +36,19 @@ def lambda_handler(event, context):
         return {"statusCode": 404, "body": {"error": f"File not found: {input_path}"}}
 
     # Read the CSV directly from the S3 Files mount using standard file I/O
-    df = pd.read_csv(input_path)
-    logger.info("Read %s: %d rows, %d columns", input_path, len(df), len(df.columns))
+    with open(input_path, newline="") as f:
+        reader = csv.DictReader(f)
+        columns = reader.fieldnames or []
+        rows = list(reader)
+
+    logger.info("Read %s: %d rows, %d columns", input_path, len(rows), len(columns))
 
     return {
         "statusCode": 200,
         "body": {
             "file": input_path,
-            "rows": len(df),
-            "columns": list(df.columns),
-            "preview": df.head(5).to_dict(orient="records"),
+            "rows": len(rows),
+            "columns": columns,
+            "preview": rows[:5],
         },
     }
