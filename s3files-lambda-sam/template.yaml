@@ -102,7 +102,7 @@ Resources:
           Value: !Sub "${AWS::StackName}-mount-target-sg"
 
   # -----------------------------------------------------------------------
-  # VPC Endpoints — keep all traffic on the AWS private network
+  # VPC Endpoints — keep all traffic on the AWS network
   # -----------------------------------------------------------------------
 
   # S3 Gateway Endpoint — free, routes S3 API traffic via the route table
