@@ -1,6 +1,6 @@
-# Lambda with Amazon S3 Files Mount
+# AWS Lambda with Amazon S3 Files Mount
 
-This pattern deploys a Lambda function with an Amazon S3 Files file system mounted as a local directory, enabling standard file operations on S3 data without downloading objects.
+This pattern deploys an AWS Lambda function with an Amazon S3 Files file system mounted as a local directory, enabling standard file operations on S3 data without downloading objects.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3-files-cdk
 
@@ -8,7 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Node and NPM](https://nodejs.org/en/download/) installed
