@@ -54,15 +54,15 @@ Once the application is deployed, you can test it using the following instructio
 	```
 	* Repeate the process as many times as you can, try doing it with different Pet Types
 1. Invoke the DynamoDB **Query** action to query items by PetType in the DynamoDB table:
-	* Run the below command after you replace <KEY> and <URL> with the terraform output from earlier.
+	* Run the below command after you replace <KEY> and <URL> with the terraform output from earlier. Append the PetType to the URL (e.g. `/dog`).
 	```
-	curl -H 'x-api-key: <KEY>' --request GET '<URL>'
+	curl -H 'x-api-key: <KEY>' --request GET '<URL>/dog'
 	```
 	* Repeate the process as many times as you can with different Pet Types
 	* You should receive a "200 OK" response with a list of the matching results. Example: 
 	```
 	{
-		"music": [
+		"pets": [
 			{
 				"id": "45b33352-fea0-4e8b-8c7a-6be11ec4ff80",
 				"PetType": "dog",
