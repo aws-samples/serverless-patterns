@@ -6,7 +6,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: python3.13
+    Runtime: python3.14
     Architectures:
       - x86_64
     Timeout: 60
@@ -227,7 +227,7 @@ Resources:
       Description: pandas for CSV processing
       ContentUri: layer/
       CompatibleRuntimes:
-        - python3.13
+        - python3.14
       RetentionPolicy: Delete
 
   # -----------------------------------------------------------------------
