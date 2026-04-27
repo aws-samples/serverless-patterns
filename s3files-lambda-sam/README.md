@@ -73,7 +73,7 @@ sam build
 
 ## Testing
 
-### Unit tests (no AWS required)
+### Unit tests (no AWS access required)
 
 ```bash
 python3 -m venv .venv
