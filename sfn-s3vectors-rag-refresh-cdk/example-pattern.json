@@ -1,0 +1,68 @@
+{
+    "title": "Knowledge base refresh pipeline with AWS Step Functions & Amazon S3 Vectors",
+    "description": "Automate ingestion of new documents into an Amazon S3 Vectors knowledge base using AWS Step Functions Distributed Map with validation",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "When new documents land in an S3 bucket, a Step Functions workflow fans out via Distributed Map to process each document in parallel.",
+            "For each document, a Lambda function reads the content, generates vector embeddings using Amazon Bedrock, and stores them with PutVectors in the S3 Vectors vector bucket.",
+            "After ingestion completes, a validation step uses QueryVectors to confirm the new content is searchable. A Choice state either confirms success or rolls back by deleting the newly added vectors if validation fails."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-s3vectors-rag-refresh-cdk",
+            "templateURL": "serverless-patterns/sfn-s3vectors-rag-refresh-cdk",
+            "projectFolder": "sfn-s3vectors-rag-refresh-cdk",
+            "templateFile": "lib/rag-refresh-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon S3 Vectors documentation",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/vectors.html"
+            },
+            {
+                "text": "AWS Step Functions Distributed Map",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/concepts-asl-use-map-state-distributed.html"
+            },
+            {
+                "text": "Amazon Bedrock Embeddings",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/embeddings.html"
+            },
+            {
+                "text": "AWS CDK Developer Guide",
+                "link": "https://docs.aws.amazon.com/cdk/latest/guide/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "npm install",
+            "cd lambda && npm install && cd ..",
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ben Freiberg",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/ben-freiberg.jpg",
+            "bio": "Ben is a Senior Solutions Architect at Amazon Web Services (AWS) based in Frankfurt, Germany.",
+            "linkedin": "benfreiberg"
+        }
+    ]
+}
