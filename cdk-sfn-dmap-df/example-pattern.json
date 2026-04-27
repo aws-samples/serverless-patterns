@@ -1,0 +1,68 @@
+{
+  "title": "AWS Step Functions Distributed Map with Lambda durable functions",
+  "description": "Fan out across Amazon S3 items using Distributed Map, invoking a Lambda durable function per item with per-item idempotency.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses AWS Step Functions Distributed Map to read items from an Amazon S3 JSON file and fan out processing across Lambda durable functions.",
+      "Each item is processed by a durable function invoked via the AWS SDK service integration (CallAwsService targeting lambda:invoke).",
+      "The DurableExecutionName parameter is derived from each item's ID, providing per-item idempotency across re-runs.",
+      "The durable function executes a three-step workflow: validate the item, wait for rate limiting, and update the catalog entry."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sfn-dmap-df",
+      "templateURL": "serverless-patterns/cdk-sfn-dmap-df",
+      "projectFolder": "cdk-sfn-dmap-df",
+      "templateFile": "lib/cdk-sfn-dmap-df-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions Distributed Map",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/concepts-asl-use-map-state-distributed.html"
+      },
+      {
+        "text": "Lambda durable functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "AWS SDK Service Integration for Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Clone the repository: <code>git clone https://github.com/aws-samples/serverless-patterns</code>",
+      "Change directory: <code>cd cdk-sfn-dmap-df</code>",
+      "Install dependencies: <code>npm install</code>",
+      "Run tests: <code>npm test</code>",
+      "Deploy the CDK stack: <code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Run local tests: <code>npm test</code> — validates CDK stack assertions and runs the durable function locally using LocalDurableTestRunner (no AWS deployment needed).",
+      "Start the state machine: <code>aws stepfunctions start-execution --state-machine-arn &lt;StateMachineArn from stack output&gt; --name \"catalog-update-$(date +%s)\"</code>",
+      "Monitor the execution in the AWS Step Functions console to see all 50 child executions.",
+      "Re-run with the same input to demonstrate idempotency — durable functions return cached results."
+    ]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>cdk destroy</code>"]
+  },
+  "authors": [
+    {
+      "name": "Marco Jahn",
+      "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
+      "bio": "Senior Solutions Architect, Amazon Web Services",
+      "linkedin": "marcojahn"
+    }
+  ]
+}
