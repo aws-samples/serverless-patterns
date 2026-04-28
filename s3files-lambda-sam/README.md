@@ -1,6 +1,6 @@
 # Mount an Amazon S3 Bucket as a File System on AWS Lambda using Amazon S3 Files
 
-This pattern mounts an Amazon S3 bucket as a file system on an AWS Lambda function using **Amazon S3 Files**, then reads CSV files with **pandas** using standard Python file I/O.
+This pattern mounts an Amazon S3 bucket as a file system on an AWS Lambda function using **Amazon S3 Files**, enabling standard Python file I/O to read S3 data.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3files-lambda-sam
 

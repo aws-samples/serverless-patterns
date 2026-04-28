@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Mount an S3 Bucket as a File System on AWS Lambda using Amazon S3 Files. Mount an S3 bucket as a file system and read
-  CSV files with pandas using standard file I/O at /mnt/s3data.
+  Mount an Amazon S3 Bucket as a File System on AWS Lambda using Amazon S3 Files. Read
+  CSV files using standard Python file I/O at /mnt/s3data.
 
 Globals:
   Function:
