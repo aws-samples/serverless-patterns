@@ -50,7 +50,7 @@ Resources:
                 Action:
                   - lambda:CheckpointDurableExecution
                   - lambda:GetDurableExecutionState
-                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-ParallelProcessor'
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-ParallelProcessor*'
 
   # Worker Lambda Functions (Simple, Non-Durable)
   
