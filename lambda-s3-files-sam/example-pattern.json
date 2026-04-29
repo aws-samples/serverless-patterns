@@ -1,6 +1,6 @@
 {
   "title": "Amazon S3 Bucket as a File System on AWS Lambda with Amazon S3 Files",
-  "description": "Mount an Amazon S3 bucket as a file system on AWS Lambda using Amazon S3 Files. Read data with standard Python file I/O — no S3 SDK calls required.",
+  "description": "This pattern mounts an Amazon S3 bucket as a file system on AWS Lambda using Amazon S3 Files. Read data with standard Python file I/O.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
