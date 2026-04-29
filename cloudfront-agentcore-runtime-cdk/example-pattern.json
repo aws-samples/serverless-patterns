@@ -10,7 +10,7 @@
             "This pattern creates a CloudFront distribution that proxies requests to three AgentCore Runtimes (A2A, HTTP, MCP protocols).",
             "CloudFront Functions strip path prefixes (/a2a, /rest, /mcp) before forwarding to the appropriate AgentCore Runtime.",
             "AgentCore validates JWT tokens for OAuth 2.0 authentication.",
-            "Benefits include: global edge caching, DDoS protection via AWS Shield, optional WAF integration for rate limiting and geo-blocking, custom domain support, and centralized logging."
+            "Benefits include: Custom domain support, DDoS protection via AWS Shield, optional WAF integration for rate limiting and geo-blocking, custom authorizer logic via Lambda@Edge, and centralized logging."
         ]
     },
     "gitHub": {

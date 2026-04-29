@@ -3,10 +3,10 @@
 This pattern demonstrates how to proxy requests to Amazon Bedrock AgentCore Runtime through CloudFront with OAuth 2.0 authentication, supporting A2A, HTTP, and MCP protocols of the [AgentCore Runtime service contract](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-service-contract.html).
 
 Benefits of using CloudFront in front of AgentCore Runtime:
-- Global edge caching and low-latency access
+- Custom domain support with SSL/TLS certificates
 - DDoS protection via AWS Shield Standard (included)
 - Optional AWS WAF integration for IP rate limiting, geo-blocking, and bot protection
-- Custom domain support with SSL/TLS certificates
+- Custom authorizer logic via Lambda@Edge
 - Request/response transformation via Amazon CloudFront Functions
 - Centralized access logging and monitoring
 
