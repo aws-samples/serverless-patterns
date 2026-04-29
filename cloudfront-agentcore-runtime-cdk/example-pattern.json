@@ -1,0 +1,81 @@
+{
+    "title": "Amazon CloudFront to Amazon Bedrock AgentCore Runtime",
+    "description": "This pattern demonstrates how to proxy requests to Amazon Bedrock AgentCore Runtime through CloudFront with OAuth 2.0 authentication, supporting all three AgentCore Runtime service contracts: A2A, HTTP, and MCP protocols.",
+    "language": "Python",
+    "level": "300",
+    "framework": "CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern creates a CloudFront distribution that proxies requests to three AgentCore Runtimes (A2A, HTTP, MCP protocols).",
+            "CloudFront Functions strip path prefixes (/a2a, /rest, /mcp) before forwarding to the appropriate AgentCore Runtime.",
+            "AgentCore validates JWT tokens for OAuth 2.0 authentication.",
+            "Benefits include: Custom domain support, DDoS protection via AWS Shield, optional WAF integration for rate limiting and geo-blocking, custom authorizer logic via Lambda@Edge, and centralized logging."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-agentcore-runtime-cdk",
+            "templateURL": "serverless-patterns/cloudfront-agentcore-runtime-cdk",
+            "projectFolder": "cloudfront-agentcore-runtime-cdk",
+            "templateFile": "app.py"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AgentCore Runtime Service Contracts",
+                "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-service-contract.html"
+            },
+            {
+                "text": "Amazon Bedrock AgentCore Runtime Documentation",
+                "link": "https://aws.github.io/bedrock-agentcore-starter-toolkit/"
+            },
+            {
+                "text": "CloudFront Functions Documentation",
+                "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-functions.html"
+            },
+            {
+                "text": "Using AWS WAF with CloudFront",
+                "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-awswaf.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "python3 -m venv .venv",
+            "source .venv/bin/activate",
+            "pip3 install -r requirements.txt",
+            "cdk bootstrap aws://<account-id>/us-west-2 aws://<account-id>/us-east-1",
+            "cdk deploy --all"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Get a bearer token: <code>cd test && ./get_token.sh</code>",
+            "Set environment variables: <code>export CF_URL=\"https://&lt;distribution-id&gt;.cloudfront.net\" && export BEARER_TOKEN=\"&lt;token&gt;\"</code>",
+            "Test A2A protocol: <code>python test_a2a.py</code>",
+            "Test HTTP protocol: <code>python test_http.py</code>",
+            "Test MCP protocol: <code>pip install mcp && python test_mcp.py</code>"
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stacks: <code>cdk destroy --all</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Rakshith Rao",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/rakshith-rao.png",
+            "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+            "linkedin": "rakshithrao"
+        },
+        {
+            "name": "Biswanath Mukherjee",
+            "image": "https://serverlessland.com/assets/images/resources/contributors/biswanath-mukherjee.jpg",
+            "bio": "I am a Sr. Solutions Architect working at AWS India.",
+            "linkedin": "biswanathmukherjee"
+        }
+    ]
+}
