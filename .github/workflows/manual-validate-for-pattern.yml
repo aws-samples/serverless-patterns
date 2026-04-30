@@ -24,6 +24,7 @@ jobs:
       # run a custom script to get the SHA, and then finally checkout the PR branch
       - name: Checkout Repo
         uses: actions/checkout@v3
+<<<<<<< HEAD
       # Use the fork repo URL in subsequent steps
       - name: Get repo URL
         run: echo "REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
@@ -32,6 +33,18 @@ jobs:
         shell: bash
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+=======
+      - name: Get fork repo URL
+        id: get-fork-url
+        run: |
+          PR_DATA=$(cat $GITHUB_EVENT_PATH)
+          FORK_REPO_URL=$(echo $PR_DATA | jq -r .pull_request.head.repo.clone_url)
+          echo "Fork Repo URL: $FORK_REPO_URL"
+          echo "::set-output name=FORK_REPO_URL::$FORK_REPO_URL"  
+      # Use the fork repo URL in subsequent steps
+      - name: Use Fork Repo URL
+        run: echo "The Fork Repo URL is ${{ steps.get-fork-url.outputs.FORK_REPO_URL }}"    
+>>>>>>> a6cc9e21 (update to action)
       - name: Extract PR details
         id: extract_PR_details
         uses: actions/github-script@v6
@@ -52,5 +65,4 @@ jobs:
           MODIFIED_FILES: ${{ steps.extract_PR_details.outputs.files }}
           ADDED_FILES: "${{ steps.changed-files.outputs.added_files }}"
           PR_NUMBER: ${{ inputs.prNumber }}
-          ACTOR: ${{ steps.extract_PR_details.outputs.user }}
           TOKEN: "${{ secrets.GITHUB_TOKEN }}"           
