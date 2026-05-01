@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 import boto3
 from botocore.exceptions import ClientError
@@ -28,17 +28,18 @@ def lambda_handler(event, context):
             body = event
         
         # Check for failure flag to test saga compensation
+        # Let this exception propagate directly for the durable SDK to handle
         if body.get('failBookHotel', False):
             print("SIMULATED FAILURE: failBookHotel flag is set to True")
-            raise Exception("Simulated hotel reservation failure for testing saga compensation")
+            raise RuntimeError("Simulated hotel reservation failure for testing saga compensation")
         
         # Extract reservation details from event
         reservation_id = body.get('reservationId', str(uuid.uuid4()))
         guest_name = body.get('guestName', 'John Doe')
         hotel_name = body.get('hotelName', 'Grand Hotel')
         room_type = body.get('roomType', 'Deluxe Suite')
-        check_in = body.get('checkIn', datetime.utcnow().date().isoformat())
-        check_out = body.get('checkOut', datetime.utcnow().date().isoformat())
+        check_in = body.get('checkIn', datetime.now(timezone.utc).date().isoformat())
+        check_out = body.get('checkOut', datetime.now(timezone.utc).date().isoformat())
         price = Decimal(str(body.get('price', 199.99)))  # Convert to Decimal for DynamoDB
         
         # Validate required fields
@@ -60,8 +61,8 @@ def lambda_handler(event, context):
             'checkOut': check_out,
             'price': price,
             'status': 'RESERVED',
-            'createdAt': datetime.utcnow().isoformat(),
-            'updatedAt': datetime.utcnow().isoformat()
+            'createdAt': datetime.now(timezone.utc).isoformat(),
+            'updatedAt': datetime.now(timezone.utc).isoformat()
         }
         
         # Put item in DynamoDB

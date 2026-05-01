@@ -6,3 +6,7 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# Lambda layer build artifacts
+lambda/saga-workflow/saga-layer.zip
+lambda/saga-workflow/layer-build/

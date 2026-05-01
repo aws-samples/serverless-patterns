@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 import boto3
 from botocore.exceptions import ClientError
@@ -28,9 +28,10 @@ def lambda_handler(event, context):
             body = event
         
         # Check for failure flag to test saga compensation
+        # Let this exception propagate directly for the durable SDK to handle
         if body.get('failBookCar', False):
             print("SIMULATED FAILURE: failBookCar flag is set to True")
-            raise Exception("Simulated car rental failure for testing saga compensation")
+            raise RuntimeError("Simulated car rental failure for testing saga compensation")
         
         # Extract rental details from event
         rental_id = body.get('rentalId', str(uuid.uuid4()))
@@ -38,8 +39,8 @@ def lambda_handler(event, context):
         car_type = body.get('carType', 'Sedan')
         pickup_location = body.get('pickupLocation', 'Airport')
         dropoff_location = body.get('dropoffLocation', 'Airport')
-        pickup_date = body.get('pickupDate', datetime.utcnow().date().isoformat())
-        dropoff_date = body.get('dropoffDate', datetime.utcnow().date().isoformat())
+        pickup_date = body.get('pickupDate', datetime.now(timezone.utc).date().isoformat())
+        dropoff_date = body.get('dropoffDate', datetime.now(timezone.utc).date().isoformat())
         price = Decimal(str(body.get('price', 89.99)))  # Convert to Decimal for DynamoDB
         
         # Validate required fields
@@ -62,8 +63,8 @@ def lambda_handler(event, context):
             'dropoffDate': dropoff_date,
             'price': price,
             'status': 'RESERVED',
-            'createdAt': datetime.utcnow().isoformat(),
-            'updatedAt': datetime.utcnow().isoformat()
+            'createdAt': datetime.now(timezone.utc).isoformat(),
+            'updatedAt': datetime.now(timezone.utc).isoformat()
         }
         
         # Put item in DynamoDB

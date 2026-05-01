@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 import boto3
 from botocore.exceptions import ClientError
 
@@ -53,7 +53,7 @@ def lambda_handler(event, context):
             ExpressionAttributeNames={'#status': 'status'},
             ExpressionAttributeValues={
                 ':status': 'CANCELLED',
-                ':updatedAt': datetime.utcnow().isoformat()
+                ':updatedAt': datetime.now(timezone.utc).isoformat()
             }
         )
         

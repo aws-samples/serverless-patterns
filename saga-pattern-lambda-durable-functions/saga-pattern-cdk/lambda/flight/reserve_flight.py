@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 import boto3
 from botocore.exceptions import ClientError
@@ -28,9 +28,10 @@ def lambda_handler(event, context):
             body = event
         
         # Check for failure flag to test saga compensation
+        # Let this exception propagate directly for the durable SDK to handle
         if body.get('failBookFlight', False):
             print("SIMULATED FAILURE: failBookFlight flag is set to True")
-            raise Exception("Simulated flight booking failure for testing saga compensation")
+            raise RuntimeError("Simulated flight booking failure for testing saga compensation")
         
         # Extract booking details from event
         booking_id = body.get('bookingId', str(uuid.uuid4()))
@@ -58,8 +59,8 @@ def lambda_handler(event, context):
             'destination': destination,
             'price': price,
             'status': 'RESERVED',
-            'createdAt': datetime.utcnow().isoformat(),
-            'updatedAt': datetime.utcnow().isoformat()
+            'createdAt': datetime.now(timezone.utc).isoformat(),
+            'updatedAt': datetime.now(timezone.utc).isoformat()
         }
         
         # Put item in DynamoDB

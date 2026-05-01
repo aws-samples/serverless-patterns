@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
-import { aws_dynamodb, aws_lambda, aws_logs, Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { aws_dynamodb, aws_lambda, aws_logs, aws_sqs, Duration, RemovalPolicy } from 'aws-cdk-lib';
 
 export class SagaPatternCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -167,9 +167,15 @@ export class SagaPatternCdkStack extends cdk.Stack {
     });
 
     const sagaDependenciesLayer = new aws_lambda.LayerVersion(this, 'SagaDependenciesLayer', {
-      code: aws_lambda.Code.fromAsset('lambda/saga-workflow/saga-layer.zip'),
+      code: aws_lambda.Code.fromAsset('saga-layer.zip'),
       compatibleRuntimes: [aws_lambda.Runtime.PYTHON_3_14],
       description: 'Saga pattern dependencies (durable SDK, boto3, etc.)',
+    });
+
+    // Dead Letter Queue for failed saga executions
+    const sagaDLQ = new aws_sqs.Queue(this, 'SagaDurableFunctionDLQ', {
+      queueName: 'saga-durable-function-dlq',
+      retentionPeriod: Duration.days(14),
     });
 
     const sagaDurableFunction = new aws_lambda.Function(this, 'SagaDurableFunction', {
@@ -181,15 +187,13 @@ export class SagaPatternCdkStack extends cdk.Stack {
       handler: 'index.lambda_handler',
       logGroup: sagaDurableFunctionLogGroup,
       layers: [sagaDependenciesLayer],
+      deadLetterQueue: sagaDLQ,
       durableConfig: {
         executionTimeout: Duration.hours(1),
         retentionPeriod: Duration.days(30)
       },
       code: aws_lambda.Code.fromAsset('lambda/saga-workflow'),
       environment: {
-        HOTEL_TABLE_NAME: hotelTable.tableName,
-        FLIGHT_TABLE_NAME: flightTable.tableName,
-        CAR_TABLE_NAME: carTable.tableName,
         RESERVE_FLIGHT_FUNCTION: reserveFlight.functionName,
         CANCEL_FLIGHT_FUNCTION: cancelFlight.functionName,
         RESERVE_HOTEL_FUNCTION: reserveHotel.functionName,
@@ -198,11 +202,6 @@ export class SagaPatternCdkStack extends cdk.Stack {
         CANCEL_CAR_FUNCTION: cancelCar.functionName,
       },
     });
-
-    // Grant Lambda permissions to access DynamoDB tables
-    hotelTable.grantReadWriteData(sagaDurableFunction);
-    flightTable.grantReadWriteData(sagaDurableFunction);
-    carTable.grantReadWriteData(sagaDurableFunction);
 
     // Grant individual Lambda functions access to their respective tables
     flightTable.grantReadWriteData(reserveFlight);
@@ -269,6 +268,11 @@ export class SagaPatternCdkStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'CarTableName', {
       value: carTable.tableName,
       description: 'Car rentals table name',
+    });
+
+    new cdk.CfnOutput(this, 'SagaDLQUrl', {
+      value: sagaDLQ.queueUrl,
+      description: 'Dead Letter Queue URL for failed saga executions',
     });
   }
 }

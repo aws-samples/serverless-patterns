@@ -10,7 +10,7 @@ This saga is built using the `aws-durable-execution-sdk` with Python 3.14 runtim
 
 ## Architecture
 
-![Saga Architecture](./images/saga-lambda-durable-functions-architecture.svg)
+![Saga Architecture](./images/saga-architecture.png)
 
 ### Components
 
@@ -18,7 +18,7 @@ This saga is built using the `aws-durable-execution-sdk` with Python 3.14 runtim
 - **Service Functions**: Individual Lambda functions for each service (flight, hotel, car)
   - Reserve functions: Create reservations in DynamoDB
   - Cancel functions: Rollback reservations (compensating transactions)
-- **DynamoDB Tables**: Store reservation state for each service
+- **Amazon DynamoDB Tables**: Store reservation state for each service
 
 ### Saga Flow
 
@@ -42,6 +42,7 @@ Reserve Flight → Reserve Hotel → Reserve Car (FAILS)
 
 - [AWS Account](https://aws.amazon.com/free/)
 - [AWS CLI](https://aws.amazon.com/cli/) installed and configured
+- [Python 3.11+](https://www.python.org/downloads/) installed (required for building the Lambda layer)
 - [Node.js 18+](https://nodejs.org/) installed
 - [AWS CDK](https://aws.amazon.com/cdk/) installed (`npm install -g aws-cdk`)
 - [Git](https://git-scm.com/) installed
@@ -61,7 +62,19 @@ cd serverless-patterns/saga-pattern-lambda-durable-functions/saga-pattern-cdk
 npm install
 ```
 
-### 3. Bootstrap AWS CDK (First Time Only)
+### 3. Build the Lambda Layer
+
+The saga orchestrator requires a Lambda layer with the durable execution SDK. Build it using:
+
+```bash
+./build-layer.sh
+```
+
+This creates `saga-layer.zip` in the current directory containing the required Python dependencies.
+
+> **Note:** The build script requires Python 3.11+ and uses a temporary virtual environment for clean, isolated builds.
+
+### 4. Bootstrap AWS CDK (First Time Only)
 
 ```bash
 cdk bootstrap
@@ -73,7 +86,7 @@ Or with a specific profile:
 cdk bootstrap --profile your-profile-name
 ```
 
-### 4. Deploy the Stack
+### 5. Deploy the Stack
 
 ```bash
 npm run build
@@ -81,11 +94,12 @@ cdk deploy
 ```
 
 The deployment creates:
-- 3 DynamoDB tables (flight-bookings, hotel-reservations, car-rentals)
+- 3 Amazon DynamoDB tables (flight-bookings, hotel-reservations, car-rentals)
 - 7 Lambda functions (1 orchestrator + 6 service functions)
+- 1 Amazon SQS dead letter queue for failed saga executions
 - IAM roles and permissions
 
-### 5. Note the Outputs
+### 6. Note the Outputs
 
 After deployment, save the function ARNs from the stack outputs:
 - `SagaDurableFunctionArn` - Main orchestrator function
@@ -382,13 +396,9 @@ Look for:
 
 For durable functions that can run for extended periods, async invocation is recommended.
 
-### Additional Test Files
-
-See `saga-pattern-cdk/lambda/test-events.json` for more test scenarios and `saga-pattern-cdk/TESTING.md` for comprehensive testing documentation.
-
 ## Monitoring
 
-### CloudWatch Logs
+### Amazon CloudWatch Logs
 
 Each Lambda function logs to CloudWatch:
 - `/aws/lambda/saga-durable-function` - Orchestrator logs
@@ -396,7 +406,7 @@ Each Lambda function logs to CloudWatch:
 - `/aws/lambda/saga-reserve-hotel` - Hotel service logs
 - `/aws/lambda/saga-reserve-car` - Car service logs
 
-### CloudWatch Insights Query
+### Amazon CloudWatch Insights Query
 
 Find all compensation events:
 

@@ -4,7 +4,7 @@ import { SagaPatternCdkStack } from '../lib/saga-pattern-cdk-stack';
 
 const app = new cdk.App();
 new SagaPatternCdkStack(app, 'SagaPatternCdkStack', {
-  description: "This templates deploys AWS Lambda Durable Function workflow that implements the SAGA pattern for travel booking use case."
+  description: "This template deploys an AWS Lambda durable function workflow that implements the saga pattern for a travel booking use case."
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

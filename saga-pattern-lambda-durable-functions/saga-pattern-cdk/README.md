@@ -47,10 +47,10 @@ All tables use:
 
 ## Prerequisites
 
-- Node.js and npm installed
+- Node.js 18+ and npm installed
 - AWS CDK CLI installed (`npm install -g aws-cdk`)
 - AWS credentials configured
-- Python 3.14 runtime available in your AWS region
+- Python 3.11+ installed (required for building the Lambda layer)
 
 ## Deployment
 
@@ -58,6 +58,13 @@ All tables use:
 ```bash
 npm install
 ```
+
+### Build the Lambda layer
+```bash
+./build-layer.sh
+```
+
+This creates `saga-layer.zip` containing the durable execution SDK and other Python dependencies. The script uses a temporary virtual environment for clean, isolated builds.
 
 ### Build the project
 ```bash

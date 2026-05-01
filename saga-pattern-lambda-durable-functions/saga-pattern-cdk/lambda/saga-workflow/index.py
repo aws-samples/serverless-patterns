@@ -1,15 +1,10 @@
 from aws_durable_execution_sdk_python.config import Duration
 from aws_durable_execution_sdk_python.context import DurableContext, StepContext, durable_step
 from aws_durable_execution_sdk_python.execution import durable_execution
-import random
 import datetime
-import boto3
-import logging
 import json
 import os
 import uuid
-
-dynamodb = boto3.client('dynamodb')
 
 # Get function names from environment variables
 RESERVE_FLIGHT_FUNCTION = os.environ.get('RESERVE_FLIGHT_FUNCTION', 'saga-reserve-flight')
@@ -25,13 +20,26 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
     """
     Saga orchestrator that coordinates distributed transactions across flight, hotel, and car services.
     Implements compensating transactions (cancellations) if any step fails.
-    Uses direct context.invoke() calls instead of durable steps.
+    Uses context.invoke() calls which are checkpointed durable operations.
     """
-    print(f"Saga workflow started at: {datetime.datetime.now()}")
+    context.logger.info("Saga workflow started")
     context.logger.info(f"Received event: {json.dumps(event)}")
     
-    # Generate unique IDs for this saga transaction
-    transaction_id = str(uuid.uuid4())
+    # Generate unique IDs inside a step to ensure determinism during replay
+    # Non-deterministic operations like uuid.uuid4() must be wrapped in steps
+    generated_ids = context.step(
+        lambda _: {
+            "transaction_id": str(uuid.uuid4()),
+            "booking_id": str(uuid.uuid4()),
+            "reservation_id": str(uuid.uuid4()),
+            "rental_id": str(uuid.uuid4()),
+            "flight_number_suffix": uuid.uuid4().hex[:6].upper(),
+            "today": datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+        },
+        name="generate-ids"
+    )
+    
+    transaction_id = generated_ids["transaction_id"]
     booking_id = None
     reservation_id = None
     rental_id = None
@@ -40,13 +48,13 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
         # Step 1: Reserve the flight
         context.logger.info("Step 1: Reserving flight...")
         flight_data = {
-            "bookingId": str(uuid.uuid4()),
+            "bookingId": generated_ids["booking_id"],
             "passengerName": event.get("passengerName", "John Doe"),
-            "flightNumber": event.get("flightNumber", f"FL{uuid.uuid4().hex[:6].upper()}"),
+            "flightNumber": event.get("flightNumber", f"FL{generated_ids['flight_number_suffix']}"),
             "departure": event.get("departure", "JFK"),
             "destination": event.get("destination", "LAX"),
             "price": event.get("flightPrice", 299.99),
-            "failBookFlight": event.get("failBookFlight", False)  # Pass failure flag
+            "failBookFlight": event.get("failBookFlight", False)
         }
         
         flight_result = context.invoke(
@@ -79,14 +87,14 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
         # Step 2: Reserve hotel
         context.logger.info("Step 2: Reserving hotel...")
         hotel_data = {
-            "reservationId": str(uuid.uuid4()),
+            "reservationId": generated_ids["reservation_id"],
             "guestName": event.get("guestName", "John Doe"),
             "hotelName": event.get("hotelName", "Grand Hotel"),
             "roomType": event.get("roomType", "Deluxe Suite"),
-            "checkIn": event.get("checkIn", datetime.datetime.utcnow().date().isoformat()),
-            "checkOut": event.get("checkOut", datetime.datetime.utcnow().date().isoformat()),
+            "checkIn": event.get("checkIn", generated_ids["today"]),
+            "checkOut": event.get("checkOut", generated_ids["today"]),
             "price": event.get("hotelPrice", 199.99),
-            "failBookHotel": event.get("failBookHotel", False)  # Pass failure flag
+            "failBookHotel": event.get("failBookHotel", False)
         }
         
         hotel_result = context.invoke(
@@ -120,15 +128,15 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
         # Step 3: Reserve car
         context.logger.info("Step 3: Reserving car...")
         car_data = {
-            "rentalId": str(uuid.uuid4()),
+            "rentalId": generated_ids["rental_id"],
             "driverName": event.get("driverName", "John Doe"),
             "carType": event.get("carType", "Sedan"),
             "pickupLocation": event.get("pickupLocation", "Airport"),
             "dropoffLocation": event.get("dropoffLocation", "Airport"),
-            "pickupDate": event.get("pickupDate", datetime.datetime.utcnow().date().isoformat()),
-            "dropoffDate": event.get("dropoffDate", datetime.datetime.utcnow().date().isoformat()),
+            "pickupDate": event.get("pickupDate", generated_ids["today"]),
+            "dropoffDate": event.get("dropoffDate", generated_ids["today"]),
             "price": event.get("carPrice", 89.99),
-            "failBookCar": event.get("failBookCar", False)  # Pass failure flag
+            "failBookCar": event.get("failBookCar", False)
         }
         
         car_result = context.invoke(
