@@ -1,6 +1,6 @@
-# AWS Step Functions to start a AWS Glue Job Through a Cloudwatch event rule
+# AWS Step Functions to start a AWS Glue Job Through a CloudWatch event rule
 
-The Terraform template deploys a AWS Step Function, a AWS Glue Job, a Cloudwatch Event Rule, a Amazon S3 bucket and the minimum IAM resources required to run the application.
+The Terraform template deploys a AWS Step Functions, a AWS Glue Job, a CloudWatch Event Rule, a Amazon S3 bucket and the minimum IAM resources required to run the application.
 
 ## Architecture
 ![Alt](./resources/architecture.png)
@@ -8,13 +8,13 @@ The Terraform template deploys a AWS Step Function, a AWS Glue Job, a Cloudwatch
 This pattern demonstrates the use of Terraform modules and deploys the below resources:
 * Amazon S3 bucket and load the sample Python script as an object 
 * Sample AWS Glue Job which executes the script in the S3 bucket
-* AWS Step Function to invoke the AWS Glue Job synchronously. The Function will wait until the Job is completed
-* Cloudwatch Event Rule which is configured to start the AWS Step Function evey 10 minutes
+* AWS Step Functions to invoke the AWS Glue Job synchronously. The Function will wait until the Job is completed
+* CloudWatch Event Rule which is configured to start the AWS Step Functions evey 10 minutes
 
 
 ## How it works
 
-The AWS Cloudwatch rule is configured to start a Step Function execution every 10 minutes. The Step function then invokes a AWS Glue Job with some default arguments and a test message.
+The AWS CloudWatch rule is configured to start a Step Functions execution every 10 minutes. The Step function then invokes a AWS Glue Job with some default arguments and a test message.
 The Arguments to the AWS Glue Job, the Python script and the CloudWatch event rule can be modified as per requirement.
 
 
@@ -71,7 +71,7 @@ After deployment, go to the cloudwatch logs to check the event details.
     ```bash
     terraform show
     ```
-    ```
+
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
