@@ -1,5 +1,5 @@
-locals{
-  schedule_expression= "rate(10 minutes)"
+locals {
+  schedule_expression = "rate(10 minutes)"
 }
 
 # Variables
@@ -30,8 +30,8 @@ resource "aws_iam_role" "allow_cloudwatch_to_execute_role" {
 }
 
 resource "aws_iam_role_policy" "state_execution" {
-  name        = "state_execution_policy"
-  role   = aws_iam_role.allow_cloudwatch_to_execute_role.id
+  name = "state_execution_policy"
+  role = aws_iam_role.allow_cloudwatch_to_execute_role.id
 
   policy = <<EOF
 {
@@ -51,14 +51,14 @@ EOF
 }
 
 resource "aws_cloudwatch_event_rule" "stf_trigger_rule" {
-  name = "stf_trigger_rule"
+  name                = "stf_trigger_rule"
   schedule_expression = local.schedule_expression
-  description = "Sample Event for Glue terraform example"
+  description         = "Sample Event for Glue terraform example"
 }
 
 resource "aws_cloudwatch_event_target" "cloudwatch_event_target" {
-  rule = aws_cloudwatch_event_rule.stf_trigger_rule.name
-  arn = var.stf_function_arn
+  rule     = aws_cloudwatch_event_rule.stf_trigger_rule.name
+  arn      = var.stf_function_arn
   role_arn = aws_iam_role.allow_cloudwatch_to_execute_role.arn
 }
 
