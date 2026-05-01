@@ -1,0 +1,63 @@
+{
+  "title": "AWS Lambda durable functions Investigation Failure Escalation Workflow",
+  "description": "Tiered investigation failure escalation workflow using Lambda durable functions with callback-based pausing, automatic tier escalation, and human acknowledgment handling",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern implements a tiered escalation workflow using Lambda durable functions. When a DevOps Agent's investigation fails or times out, the Escalation Function gathers failure context and creates an incident ticket in DynamoDB.",
+      "The workflow pages Tier 1 on-call personnel via SNS and pauses execution using create_callback(), incurring no compute charges while waiting for human acknowledgment.",
+      "If no acknowledgment is received within a configurable timeout (default 15 minutes), the workflow automatically escalates to Tier 2 by paging the next responder and waiting again.",
+      "On-call responders acknowledge incidents by clicking a link in the notification, which triggers an API Gateway endpoint that resumes the paused durable function via callback.",
+      "The incident ticket creation and notification steps are designed as extensible integration points, allowing customers to replace DynamoDB and SNS with external services such as Jira, ServiceNow, PagerDuty, or Opsgenie."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-investigation-escalation-sam",
+      "templateURL": "serverless-patterns/lambda-durable-investigation-escalation-sam",
+      "projectFolder": "lambda-durable-investigation-escalation-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda durable functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Durable Execution SDK for Python",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-python"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Note: Lambda durable functions have limited regional availability. Please check the AWS documentation for current regional support.",
+      "sam build",
+      "sam deploy --guided --region us-east-2"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --region us-east-2</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Your name",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Your bio.",
+      "linkedin": "linked-in-ID",
+      "twitter": "twitter-handle"
+    }
+  ]
+}
