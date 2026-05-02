@@ -36,7 +36,7 @@ aws ecr get-login-password --region ${TARGET_AWS_REGION} | docker login --userna
 }
 
 # Build image
-docker build --no-cache -t ${IMAGE_NAME} ${BUILD_FOLDER} --platform linux/amd64
+docker build --no-cache --provenance=false -t ${IMAGE_NAME} ${BUILD_FOLDER} --platform linux/amd64
 
 # Docker Tag and Push
 docker tag ${IMAGE_NAME}:latest ${IMAGE_URI}:latest
