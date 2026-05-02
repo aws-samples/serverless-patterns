@@ -2,7 +2,7 @@
 
 This pattern will provision Amazon Elastic Container Registry (ECR), push the code into the Container Registry along with AWS Lambda function to execute the container.
 
-As part of the build process, a container will be built, pushed into ECR, and ultimately deployed as an AWS Lambda function. When an AWS Lambda is executed, the container's example bash script will run. Following the completion of the AWS lambda function execution, logs will be published to AWS Cloudwatch. The security component is likewise handled by KMS Keys and IAM Roles.
+As part of the build process, a container will be built, pushed into ECR, and ultimately deployed as an AWS Lambda function. When an AWS Lambda is executed, the container's example bash script will run. Following the completion of the AWS lambda function execution, logs will be published to AWS CloudWatch. The security component is likewise handled by KMS Keys and IAM Roles.
 
 ## Getting started with Terraform Serverless Patterns
 
@@ -14,27 +14,27 @@ You also need [docker](https://www.docker.com/) and md5 to be installed on your 
 
 The deployment will require you to provide the AWS VPC id along with the Subnet id(s) where you want this pattern to be deployed. 
 
-Optionally, you can also specify env and organization (tagging purposes), timeout and memory_size (AWS Lmabda function compute purposes) and lastly logging_level to specify the logging level for your function. These values default to entires in the variable.tf file if not provided at deployment.
+Optionally, you can also specify env and organization (tagging purposes), timeout and memory_size (AWS Lambda function compute purposes) and lastly logging_level to specify the logging level for your function. These values default to entires in the variable.tf file if not provided at deployment.
 
 ```shell
 # terraform init
 terraform init
 
 # terraform plan with sample values for vpc and subnet
-terraform plan  -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
+terraform plan -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
 
 # terraform apply
 terraform apply -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
 ```
 
-Once deployed you can execute the Lambda function from the AWS Lambda Console or via AWS CLI. The logs will be published to Amazon Cloudwatch.
+Once deployed you can execute the Lambda function from the AWS Lambda Console or via AWS CLI. The logs will be published to Amazon CloudWatch.
 
 ```shell
 aws lambda invoke \
     --function-name testing-serverlessland-ecr-lambda \
     --cli-binary-format raw-in-base64-out \
     --log-type Tail --query 'LogResult' --output text \
-    response.json  | base64 --decode
+    response.json | base64 --decode
 ```
 
 
