@@ -1,0 +1,50 @@
+{
+  "title": "AWS Lambda AZ-aware routing with metadata endpoint",
+  "description": "Deploy a Lambda function that reads its Availability Zone ID from the new metadata endpoint and demonstrates same-AZ routing to reduce cross-AZ latency.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "services": {
+    "from": "lambda",
+    "to": "dynamodb"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function that uses the new Lambda metadata endpoint (March 2026) to discover which Availability Zone it is running in. The function reads the AZ ID (e.g., use1-az1) and demonstrates how to use it for same-AZ routing decisions.",
+      "Same-AZ routing eliminates cross-AZ data transfer costs and reduces latency by approximately 1ms per hop. This is valuable for latency-sensitive workloads that call downstream services like ElastiCache, RDS, or DynamoDB DAX."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-az-aware-routing-cdk",
+      "templateURL": "serverless-patterns/lambda-az-aware-routing-cdk",
+      "projectFolder": "lambda-az-aware-routing-cdk",
+      "templateFile": "lib/lambda-az-aware-routing-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Lambda AZ metadata announcement", "link": "https://aws.amazon.com/about-aws/whats-new/2026/03/lambda-availability-zone-metadata/" },
+      { "text": "Using the Lambda metadata endpoint", "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-metadata-endpoint.html" },
+      { "text": "AZ IDs for cross-account consistency", "link": "https://docs.aws.amazon.com/global-infrastructure/latest/regions/az-ids.html" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"],
+    "file": "lib/lambda-az-aware-routing-stack.ts"
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
