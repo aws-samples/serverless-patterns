@@ -63,34 +63,59 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. Invoke the agent. Replace `<AgentId>` and `<AgentAliasId>` with the values from the deploy output:
-    ```bash
-    aws bedrock-agent-runtime invoke-agent \
-      --agent-id <AgentId> \
-      --agent-alias-id <AgentAliasId> \
-      --session-id test-session-1 \
-      --input-text "What is the weather in Tokyo?" \
-      --region us-east-1
-    ```
-    For example, if your deploy output showed AgentId = 2VHQREVYJM and AgentAliasId = WRP0JKNQFL:
-    ```bash
-    aws bedrock-agent-runtime invoke-agent \
-      --agent-id 2VHQREVYJM \
-      --agent-alias-id WRP0JKNQFL \
-      --session-id test-session-1 \
-      --input-text "What is the weather in Tokyo?" \
-      --region us-east-1
-    ```
+The Bedrock Agent `InvokeAgent` API returns a streaming response, so use the Python SDK (not the CLI). Replace `<AgentId>` and `<AgentAliasId>` with the values from the deploy output:
 
-2. Try a multi-tool query:
-    ```bash
-    aws bedrock-agent-runtime invoke-agent \
-      --agent-id <AgentId> \
-      --agent-alias-id <AgentAliasId> \
-      --session-id test-session-2 \
-      --input-text "What is the weather and current time in London?" \
-      --region us-east-1
-    ```
+```bash
+python3 -c "
+import boto3, json
+client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
+response = client.invoke_agent(
+    agentId='<AgentId>',
+    agentAliasId='<AgentAliasId>',
+    sessionId='test-session-1',
+    inputText='What is the weather in Tokyo?'
+)
+for event in response['completion']:
+    if 'chunk' in event:
+        print(event['chunk']['bytes'].decode())
+"
+```
+
+For example, if your deploy output showed AgentId = `2VHQREVYJM` and AgentAliasId = `WRP0JKNQFL`:
+
+```bash
+python3 -c "
+import boto3
+client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
+response = client.invoke_agent(
+    agentId='2VHQREVYJM',
+    agentAliasId='WRP0JKNQFL',
+    sessionId='test-session-1',
+    inputText='What is the weather in Tokyo?'
+)
+for event in response['completion']:
+    if 'chunk' in event:
+        print(event['chunk']['bytes'].decode())
+"
+```
+
+Try a multi-tool query:
+
+```bash
+python3 -c "
+import boto3
+client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
+response = client.invoke_agent(
+    agentId='<AgentId>',
+    agentAliasId='<AgentAliasId>',
+    sessionId='test-session-2',
+    inputText='What is the weather and current time in London?'
+)
+for event in response['completion']:
+    if 'chunk' in event:
+        print(event['chunk']['bytes'].decode())
+"
+```
 
 ## Cleanup
 
