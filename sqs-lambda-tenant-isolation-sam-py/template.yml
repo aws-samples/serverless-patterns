@@ -3,11 +3,52 @@ Transform: AWS::Serverless-2016-10-31
 Description: Lambda Tenant Isolation Demo
 
 Resources:
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: tenant-isolation-dlq
+      SqsManagedSseEnabled: true
+      MessageRetentionPeriod: 1209600  # 14 days
+
   ProcessingQueue:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: tenant-isolation-queue
       VisibilityTimeout: 300
+      SqsManagedSseEnabled: true
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  QueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref ProcessingQueue
+      PolicyDocument:
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 'sqs:*'
+            Resource: !GetAtt ProcessingQueue.Arn
+            Condition:
+              Bool:
+                'aws:SecureTransport': 'false'
+          - Sid: AllowSameAccountSendMessage
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'sqs:SendMessage'
+            Resource: !GetAtt ProcessingQueue.Arn
+          - Sid: DenyExternalSendMessage
+            Effect: Deny
+            Principal: '*'
+            Action: 'sqs:SendMessage'
+            Resource: !GetAtt ProcessingQueue.Arn
+            Condition:
+              StringNotEquals:
+                'aws:PrincipalAccount': !Ref AWS::AccountId
 
   TenantIsolatedFunctionRole:
     Type: AWS::IAM::Role
@@ -34,6 +75,34 @@ Resources:
       TenancyConfig:
         TenantIsolationMode: PER_TENANT
 
+  SQSProcessorFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SQSProcessorPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                Resource: !GetAtt ProcessingQueue.Arn
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt TenantIsolatedFunction.Arn
+
   SQSProcessorFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -42,21 +111,17 @@ Resources:
       Handler: index.handler
       Runtime: python3.12
       Timeout: 60
+      Role: !GetAtt SQSProcessorFunctionRole.Arn
       Environment:
         Variables:
           TENANT_ISOLATED_FUNCTION_NAME: !Ref TenantIsolatedFunction
-      Policies:
-        - Statement:
-          - Effect: Allow
-            Action:
-              - lambda:InvokeFunction
-            Resource: !GetAtt TenantIsolatedFunction.Arn
       Events:
         SQSEvent:
           Type: SQS
           Properties:
             Queue: !GetAtt ProcessingQueue.Arn
             BatchSize: 10
+  
 
 Outputs:
   QueueUrl:
