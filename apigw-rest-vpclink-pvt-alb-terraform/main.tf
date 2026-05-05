@@ -18,14 +18,14 @@ provider "aws" {
 # PART 1: Private ALB with ECS Fargate Target
 ##############################################
 
-# ALB security group
-resource "aws_security_group" "alb_sg" {
-  name        = "rest-api-alb-sg"
-  description = "Security group for private ALB"
+# VPC Link V2 security group
+resource "aws_security_group" "vpclink_sg" {
+  name        = "rest-api-vpclink-sg"
+  description = "Security group for VPC Link V2"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description = "Allow HTTP from VPC"
+  egress {
+    description = "Allow HTTP to ALB"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -33,8 +33,30 @@ resource "aws_security_group" "alb_sg" {
   }
 
   tags = {
+    Name = "rest-api-vpclink-sg"
+  }
+}
+
+# ALB security group
+resource "aws_security_group" "alb_sg" {
+  name        = "rest-api-alb-sg"
+  description = "Security group for private ALB"
+  vpc_id      = var.vpc_id
+
+  tags = {
     Name = "rest-api-alb-sg"
   }
+}
+
+# ALB ingress from VPC Link
+resource "aws_security_group_rule" "alb_from_vpclink" {
+  type                     = "ingress"
+  description              = "Allow HTTP from VPC Link"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.alb_sg.id
+  source_security_group_id = aws_security_group.vpclink_sg.id
 }
 
 # ALB egress rule to ECS
@@ -166,8 +188,9 @@ resource "aws_ecs_service" "app" {
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 50
   enable_ecs_managed_tags            = false
-  health_check_grace_period_seconds  = 60
+  health_check_grace_period_seconds  = 120
   launch_type                        = "FARGATE"
+  wait_for_steady_state              = true
 
   network_configuration {
     subnets         = var.private_subnets
@@ -208,6 +231,18 @@ resource "aws_lb_target_group" "ecs_tg" {
   vpc_id      = var.vpc_id
   target_type = "ip"
 
+  health_check {
+    enabled             = true
+    path                = "/"
+    protocol            = "HTTP"
+    port                = "traffic-port"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 15
+    matcher             = "200"
+  }
+
   tags = {
     Name = "rest-api-ecs-tg"
   }
@@ -231,7 +266,7 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_apigatewayv2_vpc_link" "vpclink" {
   name               = "rest-api-vpclink-v2"
-  security_group_ids = []
+  security_group_ids = [aws_security_group.vpclink_sg.id]
   subnet_ids         = var.private_subnets
 
   tags = {
@@ -302,7 +337,8 @@ resource "null_resource" "vpclink_integration" {
   depends_on = [
     aws_apigatewayv2_vpc_link.vpclink,
     aws_lb_listener.http,
-    aws_api_gateway_method.proxy_any
+    aws_api_gateway_method.proxy_any,
+    aws_ecs_service.app
   ]
 }
 

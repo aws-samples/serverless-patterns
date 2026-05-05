@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed and configured
-* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) installed
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) version 1.9 or later installed
 
 ## Deployment Instructions
 
@@ -73,19 +73,27 @@ The integration uses the `--integration-target` parameter with AWS CLI (via Terr
 
 ## Testing
 
-The stack outputs the REST API endpoint. Test it by accessing any path through the API:
+After deployment, use the `rest_api_endpoint` output value (which already includes the `/prod` stage path). Test it by appending a path:
 
 ```bash
-curl https://<API-ENDPOINT>/index.html
+curl <rest_api_endpoint>/index.html
+```
+
+For example, if the output is `https://abc123.execute-api.us-east-1.amazonaws.com/prod`, the curl command becomes:
+
+```bash
+curl https://abc123.execute-api.us-east-1.amazonaws.com/prod/index.html
 ```
 
 You should see the nginx welcome page HTML. To check just the status code:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" https://<API-ENDPOINT>/index.html ; echo
+curl -s -o /dev/null -w "%{http_code}" <rest_api_endpoint>/index.html ; echo
 ```
 
 Expected response: **200**
+
+Note: If you get a `503 Service Temporarily Unavailable` response immediately after deployment, wait one or two minutes for the ECS tasks to pass ALB target group health checks, then retry.
 
 ## Cleanup
  
