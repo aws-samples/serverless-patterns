@@ -1,0 +1,177 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Investigation Failure Escalation Pattern using AWS Lambda durable functions
+
+Parameters:
+  OncallEmail:
+    Type: String
+    Description: Email address to receive escalation notifications
+  AckTimeout:
+    Type: Number
+    Default: 900
+    Description: Timeout in seconds to wait for on-call acknowledgment before marking unacknowledged
+
+Resources:
+  # DynamoDB Table for Incident Records
+  IncidentTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-incidents'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: incidentId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: incidentId
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # DynamoDB Table for Callback Mapping
+  CallbackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${AWS::StackName}-callbacks'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: uuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: uuid
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # SNS Topic for Escalation Notifications
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref OncallEmail
+
+  # Durable Escalation Function
+  EscalationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-EscalationFunction'
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.14
+      Timeout: 120
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          INCIDENT_TABLE_NAME: !Ref IncidentTable
+          CALLBACK_TABLE_NAME: !Ref CallbackTable
+          NOTIFICATION_TOPIC_ARN: !Ref NotificationTopic
+          API_GATEWAY_PARAM: !Sub '/${AWS::StackName}/api-gateway-url'
+          ACK_TIMEOUT: !Ref AckTimeout
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref IncidentTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref CallbackTable
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt NotificationTopic.TopicName
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:CheckpointDurableExecution
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-EscalationFunction-*'
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/api-gateway-url'
+
+  # Callback Handler Function
+  CallbackHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-CallbackHandlerFunction'
+      CodeUri: src/
+      Handler: callback_handler.lambda_handler
+      Runtime: python3.14
+      Timeout: 30
+      Environment:
+        Variables:
+          CALLBACK_TABLE_NAME: !Ref CallbackTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CallbackTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+            Resource: !GetAtt CallbackTable.Arn
+          - Effect: Allow
+            Action:
+              - lambda:SendDurableExecutionCallbackSuccess
+            Resource: '*'
+
+  # Lambda Permission for API Gateway — EscalationFunction (alias)
+  EscalationFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EscalationFunction.Alias
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EscalationApi}/*'
+
+  # Lambda Permission for API Gateway — CallbackHandlerFunction
+  CallbackHandlerInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CallbackHandlerFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EscalationApi}/*/*/{uuid}'
+
+  # API Gateway for Acknowledgment Endpoint
+  EscalationApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /{uuid}:
+            get:
+              parameters:
+                - name: uuid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                '200':
+                  description: Callback processed
+              x-amazon-apigateway-integration:
+                type: aws_proxy
+                httpMethod: POST
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CallbackHandlerFunction.Arn}/invocations'
+                passthroughBehavior: when_no_match
+
+  # Store API Gateway URL in Parameter Store
+  ApiGatewayUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AWS::StackName}/api-gateway-url'
+      Type: String
+      Value: !Sub 'https://${EscalationApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+      Description: 'API Gateway URL for the escalation workflow'
+    DependsOn: EscalationApi
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${EscalationApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+
+  EscalationFunctionArn:
+    Description: Escalation Durable Function ARN
+    Value: !GetAtt EscalationFunction.Arn
