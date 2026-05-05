@@ -1,0 +1,58 @@
+{
+  "title": "Amazon EventBridge Scheduler to Amazon SES - Per-customer notification scheduling",
+  "description": "Create an Amazon EventBridge Scheduler schedule that sends per-customer notifications for abandoned carts using Amazon SES.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to use Amazon EventBridge Scheduler to drive per-customer abandoned cart email notifications on an hourly cadence. A Lambda function, invoked by the scheduler, queries a DynamoDB GSI for customers with abandoned carts that have not yet been notified, sends each a personalised HTML email via Amazon SES, and marks the record as notified to prevent duplicate emails. The pattern includes idempotent notification logic, seed test data, a dead-letter queue for failed scheduler invocations, and least-privilege IAM policies scoped to the specific SES identity and DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ses-abandoned-cart-notification",
+      "templateURL": "serverless-patterns/eventbridge-scheduler-ses-abandoned-cart-notification",
+      "projectFolder": "eventbridge-scheduler-ses-abandoned-cart-notification",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Verify Sender Email Address",
+        "link": "https://console.aws.amazon.com/ses/home#/verified-identities"
+      },
+      {
+        "text": "Request production access (Moving out of the Amazon SES sandbox)",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajil Paloth",
+      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
+      "bio": "ProServe Delivery Consultant at AWS",
+      "linkedin": "paloth"
+    }
+  ]
+}
