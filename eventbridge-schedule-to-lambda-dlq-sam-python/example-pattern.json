@@ -1,0 +1,68 @@
+{
+  "title": "Amazon EventBridge Scheduler to AWS Lambda with Dual Dead Letter Queues",
+  "description": "Creates an EventBridge schedule to invoke a Lambda function with dual DLQs for comprehensive failure handling",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates EventBridge Scheduler's failure handling capabilities through dual Dead Letter Queues. One DLQ captures Lambda execution failures (code errors, timeouts), while the other captures scheduler invocation failures (permissions, throttling, resource not found).",
+      "The pattern is deployed using the AWS Serverless Application Model (SAM) and includes a Python-based Lambda function that can simulate failures for testing both DLQ paths."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-dlq-sam-python",
+      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-dlq-sam-python",
+      "projectFolder": "eventbridge-schedule-to-lambda-dlq-sam-python",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "EventBridge Scheduler Retry Policies",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule-retry.html"
+      },
+      {
+        "text": "EventBridge Scheduler Dead Letter Queues",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/configuring-schedule-dlq.html"
+      },
+      {
+        "text": "Lambda Asynchronous Invocation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
+      },
+      {
+        "text": "SQS Dead Letter Queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sasidharan Ramasamy",
+      "bio": "Technical Account Manager @ AWS with over 10 years of industry experience",
+      "linkedin": "https://www.linkedin.com/in/sasidharan-ramasamy/"
+    }
+  ]
+}
