@@ -15,7 +15,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-1. Set up your username and password for RabbitMQ access. In a new terminal window enter:
+1. Set up your username and password for RabbitMQ access. The password must be at least 12 characters long (maximum 250 characters). In a new terminal window enter:
     ```
     aws secretsmanager create-secret --name MQaccess --secret-string '{"username": "your-username", "password": "your-password"}'
     ```
