@@ -1,9 +1,9 @@
 {
-  "title": "Trigger AI Agent with Amazon EventBridge Scheduler",
-  "description": "Create a EventBridge scheduler which invokes a Bedrock Agent upon triggering.",
-  "language": "Python",
-  "level": "300",
-  "framework": "Terraform",
+    "title": "Invoke AI Agent with Amazon EventBridge Scheduler",
+    "description": "Create a EventBridge scheduler which invokes an Amazon Bedrock Agent.",
+    "language": "Python",
+    "level": "300",
+    "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
