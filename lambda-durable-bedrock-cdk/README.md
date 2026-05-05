@@ -92,7 +92,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. The function includes a durable wait, so the initial invocation returns quickly with a `"PENDING"` status. Check the durable execution status using the same `<FunctionName>` and `<Version>`:
     ```bash
-    aws lambda list-durable-executions \
+    aws lambda list-durable-executions-by-function \
       --function-name <FunctionName> \
       --qualifier <Version>
     ```
