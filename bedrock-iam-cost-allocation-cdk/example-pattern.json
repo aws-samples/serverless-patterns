@@ -1,0 +1,38 @@
+{
+  "title": "Amazon Bedrock IAM Cost Allocation with Lambda",
+  "description": "Deploy tagged IAM roles for per-team Bedrock cost attribution in AWS Cost Explorer and CUR 2.0",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates two Lambda functions with separately tagged IAM roles that invoke Amazon Bedrock.",
+      "Each role is tagged with team and cost-center attributes. When the functions invoke Bedrock, costs are automatically attributed to the IAM principal in CUR 2.0.",
+      "After activating cost allocation tags in the AWS Billing console, you can filter and group Bedrock inference costs by team, project, or cost center in Cost Explorer."
+    ]
+  },
+  "gitHub": {
+    "template": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-iam-cost-allocation-cdk",
+    "templateURL": "serverless-patterns/bedrock-iam-cost-allocation-cdk"
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Introducing granular cost attribution for Amazon Bedrock", "link": "https://aws.amazon.com/blogs/machine-learning/introducing-granular-cost-attribution-for-amazon-bedrock/" },
+      { "text": "IAM principal cost allocation documentation", "link": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/iam-principal-cost-allocation.html" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
