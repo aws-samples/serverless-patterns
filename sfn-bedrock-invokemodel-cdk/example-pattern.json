@@ -1,0 +1,52 @@
+{
+  "title": "Step Functions to Amazon Bedrock InvokeModel",
+  "description": "Invoke Amazon Bedrock directly from Step Functions using the native InvokeModel optimized integration — no Lambda function required. Deployed with AWS CDK.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Step Functions Express workflow that invokes Amazon Bedrock (Claude Sonnet) directly using the native bedrock:InvokeModel optimized integration.",
+      "No Lambda function is needed — Step Functions calls Bedrock directly, reducing latency, cost, and operational complexity.",
+      "The workflow accepts a prompt string as input, sends it to Bedrock, and returns the generated response with usage metadata.",
+      "Built-in retry logic handles transient failures with exponential backoff."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-bedrock-invokemodel-cdk",
+      "templateURL": "serverless-patterns/sfn-bedrock-invokemodel-cdk",
+      "projectFolder": "sfn-bedrock-invokemodel-cdk",
+      "templateFile": "lib/sfn-bedrock-invokemodel-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Step Functions optimized integration for Amazon Bedrock", "link": "https://aws.amazon.com/about-aws/whats-new/2023/11/aws-step-functions-optimized-integration-bedrock/" },
+      { "text": "Build generative AI apps using Step Functions and Bedrock", "link": "https://aws.amazon.com/blogs/aws/build-generative-ai-apps-using-aws-step-functions-and-amazon-bedrock/" },
+      { "text": "Amazon Bedrock documentation", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "sfn", "label": "Step Functions" },
+    "icon2": { "x": 80, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
+    "line1": { "from": "icon1", "to": "icon2" }
+  }
+}
