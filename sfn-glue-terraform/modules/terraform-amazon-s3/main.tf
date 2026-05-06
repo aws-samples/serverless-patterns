@@ -12,18 +12,18 @@ resource "aws_s3_bucket" "s3_sample_glue_bucket" {
 resource "aws_s3_bucket_public_access_block" "s3_glue_bucket_block_public_access" {
   bucket = aws_s3_bucket.s3_sample_glue_bucket.id
 
-  block_public_acls   = true
-  block_public_policy = true
-  ignore_public_acls = true
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
 # upload the AWS Glue script to the bucket
-resource "aws_s3_bucket_object" "glue_script_object" {
+resource "aws_s3_object" "glue_script_object" {
   bucket = aws_s3_bucket.s3_sample_glue_bucket.bucket
   key    = "glue_script.py"
   source = "./resources/glue_script.py"
-  acl = "private"
+  acl    = "private"
 }
 
 ## IAM Resources
@@ -39,5 +39,5 @@ output "bucket_arn" {
 }
 
 output "glue_script_name" {
-  value = aws_s3_bucket_object.glue_script_object.key
+  value = aws_s3_object.glue_script_object.key
 }
