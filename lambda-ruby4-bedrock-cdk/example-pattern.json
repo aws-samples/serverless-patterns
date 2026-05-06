@@ -1,0 +1,52 @@
+{
+  "title": "AWS Lambda Ruby 4.0 with Amazon Bedrock",
+  "description": "Deploy a Ruby 4.0 Lambda function that invokes Amazon Bedrock (Claude) for AI-powered text generation with JSON structured logging.",
+  "language": "Ruby",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Ruby 4.0 Lambda function that invokes Amazon Bedrock (Claude Sonnet) for AI text generation.",
+      "The function uses the AWS SDK for Ruby (aws-sdk-bedrockruntime gem) bundled in the Lambda runtime.",
+      "JSON structured logging is enabled via Lambda advanced logging controls (new in Ruby 4.0).",
+      "The function runs on ARM64 (Graviton) for optimal price-performance."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ruby4-bedrock-cdk",
+      "templateURL": "serverless-patterns/lambda-ruby4-bedrock-cdk",
+      "projectFolder": "lambda-ruby4-bedrock-cdk",
+      "templateFile": "lib/lambda-ruby4-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "AWS Lambda Ruby 4.0 Runtime", "link": "https://aws.amazon.com/about-aws/whats-new/2026/04/aws-lambda-adds-ruby/" },
+      { "text": "Lambda Advanced Logging Controls", "link": "https://aws.amazon.com/blogs/compute/introducing-advanced-logging-controls-for-aws-lambda-functions/" },
+      { "text": "Amazon Bedrock Documentation", "link": "https://docs.aws.amazon.com/bedrock/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS, passionate about serverless and AI/ML.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "lambda", "label": "Lambda (Ruby 4.0)" },
+    "icon2": { "x": 80, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
+    "line1": { "from": "icon1", "to": "icon2" }
+  }
+}
