@@ -1,0 +1,40 @@
+{
+  "title": "Amazon DynamoDB Cross-Account Replication with Global Tables",
+  "description": "Deploy a DynamoDB Global Table with cross-account replication and IAM role for secure cross-account read access.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a DynamoDB Global Table that replicates data across AWS accounts and regions.",
+      "A cross-account IAM role enables the replica account to read from the table securely.",
+      "DynamoDB handles replication automatically with sub-second latency between regions.",
+      "Point-in-time recovery is enabled for data protection."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-cross-account-replication-cdk",
+      "templateURL": "serverless-patterns/dynamodb-cross-account-replication-cdk",
+      "projectFolder": "dynamodb-cross-account-replication-cdk",
+      "templateFile": "lib/dynamodb-cross-account-replication-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "DynamoDB Global Tables Cross-Account Replication", "link": "https://aws.amazon.com/blogs/database/amazon-dynamodb-global-tables-now-support-replication-across-aws-accounts/" },
+      { "text": "DynamoDB Global Tables Documentation", "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html" }
+    ]
+  },
+  "deploy": { "text": ["cdk deploy --parameters ReplicaAccountId=123456789012"] },
+  "testing": { "text": ["See the README for testing instructions."] },
+  "cleanup": { "text": ["cdk destroy"] },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS, passionate about serverless and AI/ML.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
