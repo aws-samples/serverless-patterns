@@ -1,4 +1,4 @@
-# Saga Pattern with Lambda durable functions
+# Saga Pattern with AWS Lambda durable functions
 
 This pattern demonstrates how to implement the Saga pattern for distributed transactions using AWS Lambda durable functions. The example implements a travel booking system that coordinates flight, hotel, and car reservations with automatic compensating transactions (rollbacks) on failure.
 
@@ -14,9 +14,9 @@ This saga is built using the `aws-durable-execution-sdk` with Python 3.14 runtim
 
 ### Components
 
-- **Saga Orchestrator**: Durable Lambda function that coordinates the distributed transaction
+- **Saga Orchestrator**: Durable lambda function that coordinates the distributed transaction
 - **Service Functions**: Individual Lambda functions for each service (flight, hotel, car)
-  - Reserve functions: Create reservations in DynamoDB
+  - Reserve functions: Create reservations in Amazon DynamoDB
   - Cancel functions: Rollback reservations (compensating transactions)
 - **Amazon DynamoDB Tables**: Store reservation state for each service
 
@@ -43,7 +43,7 @@ Reserve Flight → Reserve Hotel → Reserve Car (FAILS)
 - [AWS Account](https://aws.amazon.com/free/)
 - [AWS CLI](https://aws.amazon.com/cli/) installed and configured
 - [Python 3.11+](https://www.python.org/downloads/) installed (required for building the Lambda layer)
-- [Node.js 18+](https://nodejs.org/) installed
+- [Node.js 22+](https://nodejs.org/) installed
 - [AWS CDK](https://aws.amazon.com/cdk/) installed (`npm install -g aws-cdk`)
 - [Git](https://git-scm.com/) installed
 
@@ -221,23 +221,13 @@ aws lambda invoke \
 }
 ```
 
-**Using Lambda Console:**
-
-1. Navigate to AWS Lambda Console
-2. Open `saga-durable-function`
-3. Go to "Test" tab
-4. Click "Create new event"
-5. Name it (e.g., "FailFlightTest")
-6. Select invocation type: "Event" (for async execution)
-7. Paste the JSON payload above
-8. Click "Save" then "Test"
-
 **Expected Behavior:**
 - Flight fails immediately
 - Hotel and car never attempted
 - No compensations needed (nothing to rollback)
 - DynamoDB: No records created
 ![saga-failure-with-car-booking](./images/saga-failure-with-car.png)
+
 ### Test Scenario 3: Hotel Fails After Flight Succeeds
 
 **Using AWS CLI:**
@@ -271,9 +261,6 @@ Create a test event named "FailHotelTest" with invocation type "Event" (async) a
 **Expected Behavior:**
 - Flight reserved
 - Hotel fails
-- Car never attempted
-- Compensation: Flight gets cancelled
-- DynamoDB: Flight record with `status: "CANCELLED"`
 
 **Console View:**
 
@@ -334,10 +321,6 @@ Hotel reserved successfully: <reservation-id>
 Step 3: Reserving car...
 SIMULATED FAILURE: failBookCar flag is set to True
 Error in saga workflow: Simulated car rental failure
-Starting compensation (rollback) process...
-Compensating: Cancelling hotel reservation <reservation-id>
-Compensating: Cancelling flight booking <booking-id>
-Compensation process completed
 ```
 
 ### Verify Compensation in DynamoDB
@@ -374,10 +357,6 @@ Look for:
 4. Click "Create new event"
 5. Name your test event (e.g., "SuccessTest", "FailCarTest")
 6. **Important:** Select invocation type "Event" for async execution (recommended for durable functions)
-7. Paste the JSON payload from any test scenario above
-8. Click "Save"
-9. Click "Test" to execute
-10. Check CloudWatch Logs for execution results (async invocations return immediately)
 
 ### Async vs Sync Invocation
 
@@ -424,19 +403,6 @@ To avoid incurring charges, delete all resources:
 ```bash
 cdk destroy
 ```
-
-Confirm the deletion when prompted. This will remove:
-- All Lambda functions
-- All DynamoDB tables and their data
-- IAM roles and policies
-
-## Additional Resources
-
-- [AWS Lambda Durable Functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
-- [Saga Pattern Overview](https://microservices.io/patterns/data/saga.html)
-- [AWS CDK Documentation](https://docs.aws.amazon.com/cdk/)
-
-
 
 ---
 
