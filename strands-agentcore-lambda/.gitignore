@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.pyc
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AWS
+.aws-sam/
+samconfig.toml
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Lambda deployment artifacts
+*-deps/
+*-package/
+*.zip
+
+# Credentials
+jwt_tokens.json
+test_credentials.json
+
+# Kiro IDE
+.kiro/
+
+
+# Generated outputs
+infrastructure/stack_outputs.json

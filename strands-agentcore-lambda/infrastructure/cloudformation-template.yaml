@@ -1,0 +1,508 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Serverless AI Agent Gateway - MVP infrastructure with AgentCore Gateway and Lambda functions'
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Description: Environment name prefix for all resources
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+  BedrockModelId:
+    Type: String
+    Description: Bedrock model ID for the Agent Lambda (cross-region inference profile)
+    Default: us.anthropic.claude-sonnet-4-6
+
+  BedrockBaseModelId:
+    Type: String
+    Description: Base Bedrock foundation model ID (without cross-region prefix)
+    Default: anthropic.claude-sonnet-4-6
+
+Outputs:
+  GatewayId:
+    Description: AgentCore Gateway ID
+    Value: !Ref AgentCoreGateway
+    Export:
+      Name: !Sub '${EnvironmentName}-GatewayId'
+  
+  CognitoUserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref CognitoUserPool
+    Export:
+      Name: !Sub '${EnvironmentName}-CognitoUserPoolId'
+  
+  AgentLambdaArn:
+    Description: Agent Lambda Function ARN
+    Value: !GetAtt AgentLambda.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-AgentLambdaArn'
+  
+  InterceptorLambdaArn:
+    Description: Interceptor Lambda Function ARN
+    Value: !GetAtt InterceptorLambda.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-InterceptorLambdaArn'
+  
+  ToolLambdaArn:
+    Description: Tool Lambda Function ARN
+    Value: !GetAtt ToolLambda.Arn
+    Export:
+      Name: !Sub '${EnvironmentName}-ToolLambdaArn'
+
+Resources:
+  # Cognito User Pool for authentication
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      UserPoolName: !Sub '${EnvironmentName}-ai-agent-user-pool'
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      UserPoolTags:
+        Environment: !Ref EnvironmentName
+        Component: Authentication
+
+  # Cognito User Pool Client
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${EnvironmentName}-ai-agent-client'
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+
+  # IAM Role for AgentCore Gateway
+  GatewayExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-gateway-execution-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      Policies:
+        - PolicyName: InvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt ToolLambda.Arn
+                  - !GetAtt InterceptorLambda.Arn
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: Gateway
+
+  # AgentCore Gateway with Cognito JWT authentication and Request Interceptor
+  AgentCoreGateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      Name: !Sub '${EnvironmentName}-ai-agent-gateway'
+      Description: 'AgentCore Gateway for AI agent system with JWT authentication and user context propagation'
+      AuthorizerType: CUSTOM_JWT
+      AuthorizerConfiguration:
+        CustomJWTAuthorizer:
+          DiscoveryUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/openid-configuration'
+          AllowedClients:
+            - !Ref CognitoUserPoolClient
+      ProtocolType: MCP
+      ProtocolConfiguration:
+        Mcp:
+          SupportedVersions:
+            - '2025-03-26'
+          Instructions: 'Gateway for AI agent tool execution'
+      InterceptorConfigurations:
+        - InterceptionPoints:
+            - REQUEST
+          Interceptor:
+            Lambda:
+              Arn: !GetAtt InterceptorLambda.Arn
+          InputConfiguration:
+            PassRequestHeaders: true
+      RoleArn: !GetAtt GatewayExecutionRole.Arn
+      Tags:
+        Environment: !Ref EnvironmentName
+        Component: Gateway
+
+  # IAM Role for Agent Lambda
+  AgentLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-agent-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: AgentLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                  - bedrock:Converse
+                  - bedrock:ConverseStream
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${BedrockModelId}'
+                  - !Sub 'arn:${AWS::Partition}:bedrock:*::foundation-model/${BedrockBaseModelId}'
+              - Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetGateway
+                Resource: !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:gateway/*'
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: AgentLambda
+
+  # IAM Role for Interceptor Lambda
+  InterceptorLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-interceptor-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: InterceptorLambda
+
+  # Agent Lambda Function
+  AgentLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${EnvironmentName}-agent-lambda'
+      Description: 'Strands Framework-based AI agent with Claude 3 Sonnet'
+      Runtime: python3.12
+      Handler: agent.handler.lambda_handler
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'Agent Lambda placeholder'}
+      Role: !GetAtt AgentLambdaRole.Arn
+      Timeout: 120
+      MemorySize: 1024
+      Environment:
+        Variables:
+          COGNITO_JWKS_URL: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/jwks.json'
+          GATEWAY_ID: !Ref AgentCoreGateway
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: AgentLambda
+
+  # Interceptor Lambda Function
+  InterceptorLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${EnvironmentName}-interceptor-lambda'
+      Description: 'Gateway Request Interceptor for user context propagation'
+      Runtime: python3.12
+      Handler: interceptor.handler.lambda_handler
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'body': {'toolName': '', 'parameters': {}}}
+      Role: !GetAtt InterceptorLambdaRole.Arn
+      Timeout: 5
+      MemorySize: 128
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: InterceptorLambda
+
+  # IAM Role for Tool Lambda
+  ToolLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-tool-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ToolLambdaS3Policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListAllMyBuckets
+                  - s3:GetBucketLocation
+                Resource: '*'
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: ToolLambda
+
+  # Tool Lambda Function
+  ToolLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${EnvironmentName}-tool-lambda'
+      Description: 'MCP tool implementation for AWS service operations'
+      Runtime: python3.12
+      Handler: tool.handler.lambda_handler
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'result': {'buckets': []}}
+      Role: !GetAtt ToolLambdaRole.Arn
+      Timeout: 10
+      MemorySize: 256
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+          TOOL_NAME: 'list-s3-buckets'
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: ToolLambda
+
+  # Lambda Permission for Gateway to invoke Tool Lambda
+  ToolLambdaGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ToolLambda
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  # Lambda Permission for Gateway to invoke Interceptor Lambda
+  InterceptorLambdaGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref InterceptorLambda
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  # Gateway Target for list-s3-buckets tool
+  ListS3BucketsTarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    DependsOn: ToolLambdaGatewayPermission
+    Properties:
+      GatewayIdentifier: !Ref AgentCoreGateway
+      Name: list-s3-buckets
+      Description: Lists all S3 buckets in the AWS account with their creation dates
+      CredentialProviderConfigurations:
+        - CredentialProviderType: GATEWAY_IAM_ROLE
+      TargetConfiguration:
+        Mcp:
+          Lambda:
+            LambdaArn: !GetAtt ToolLambda.Arn
+            ToolSchema:
+              InlinePayload:
+                - Name: list-s3-buckets
+                  Description: Lists all S3 buckets in the AWS account with their creation dates
+                  InputSchema:
+                    Type: object
+                    Properties:
+                      user_context:
+                        Type: object
+                        Properties:
+                          user_id:
+                            Type: string
+                          username:
+                            Type: string
+                          client_id:
+                            Type: string
+                  OutputSchema:
+                    Type: object
+                    Properties:
+                      buckets:
+                        Type: array
+                      count:
+                        Type: integer
+                      user_context:
+                        Type: object
+
+  # CloudWatch Log Groups
+  AgentLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${EnvironmentName}-agent-lambda'
+      RetentionInDays: 30
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: AgentLambda
+
+  InterceptorLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${EnvironmentName}-interceptor-lambda'
+      RetentionInDays: 30
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: InterceptorLambda
+
+  ToolLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${EnvironmentName}-tool-lambda'
+      RetentionInDays: 30
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Component
+          Value: ToolLambda
+
+  # CloudWatch Alarms for Agent Lambda
+  AgentLambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-agent-lambda-errors'
+      AlarmDescription: 'Alert when Agent Lambda error rate exceeds threshold'
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref AgentLambda
+      TreatMissingData: notBreaching
+
+  AgentLambdaDurationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-agent-lambda-duration'
+      AlarmDescription: 'Alert when Agent Lambda duration exceeds threshold'
+      MetricName: Duration
+      Namespace: AWS/Lambda
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 100000
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref AgentLambda
+      TreatMissingData: notBreaching
+
+  AgentLambdaThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-agent-lambda-throttles'
+      AlarmDescription: 'Alert when Agent Lambda is throttled'
+      MetricName: Throttles
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref AgentLambda
+      TreatMissingData: notBreaching
+
+  # CloudWatch Alarms for Tool Lambda
+  ToolLambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-tool-lambda-errors'
+      AlarmDescription: 'Alert when Tool Lambda error rate exceeds threshold'
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ToolLambda
+      TreatMissingData: notBreaching
+
+  ToolLambdaDurationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${EnvironmentName}-tool-lambda-duration'
+      AlarmDescription: 'Alert when Tool Lambda duration exceeds threshold'
+      MetricName: Duration
+      Namespace: AWS/Lambda
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 8000
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ToolLambda
+      TreatMissingData: notBreaching
