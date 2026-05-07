@@ -1,5 +1,5 @@
 {
-  "title": "Saga Pattern with AWS Lambda Durable Functions",
+  "title": "Saga Pattern with AWS Lambda durable functions",
   "description": "Implement the saga pattern for distributed transactions using AWS Lambda durable functions with automatic compensating transactions.",
   "language": "Python",
   "level": "300",
