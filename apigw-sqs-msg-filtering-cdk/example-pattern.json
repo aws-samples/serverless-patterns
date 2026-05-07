@@ -15,7 +15,7 @@
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sqs-msg-filtering-cdk",
       "templateURL": "serverless-patterns/apigw-sqs-msg-filtering-cdk",
       "projectFolder": "apigw-sqs-msg-filtering-cdk",
-      "templateFile": "cdk/lib/apigw-sqs-msg-filtering-cdk-stack.ts"
+      "templateFile": "cdk/lib/apigw-sqs-msg-filtering-stack.ts"
     }
   },
   "resources": {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-import { ApigwSqsMsgFilteringCdkStack } from '../lib/apigw-sqs-msg-filtering-cdk-stack';
+import { ApigwSqsMsgFilteringCdkStack } from '../lib/apigw-sqs-msg-filtering-stack';
 
 const app = new cdk.App();
 new ApigwSqsMsgFilteringCdkStack(app, 'ApigwSqsMsgFilteringCdkStack', {
