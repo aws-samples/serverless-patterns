@@ -1,6 +1,6 @@
 # Amazon Bedrock Agent with OpenAI model
 
-This pattern deploys an Amazon Bedrock Agent powered by an OpenAI GPT OSS foundation model with a Lambda action group that provides tool-use capabilities.
+This pattern deploys an Amazon Bedrock Agent powered by an OpenAI GPT OSS foundation model with an AWS Lambda action group that provides tool-use capabilities.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-agent-openai-cdk
 
@@ -17,15 +17,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-┌──────────┐     ┌──────────────────────┐     ┌──────────────────┐
-│  User    │────▶│  Bedrock Agent        │────▶│  Lambda Action   │
-│  (CLI)   │     │  (OpenAI GPT OSS)    │     │  Group Handler   │
-└──────────┘     └──────────────────────┘     └──────────────────┘
-                  │ Orchestrates tool use │     │ getWeather       │
-                  │ via OpenAI model      │     │ getTime          │
-                  └──────────────────────┘     └──────────────────┘
-```
+![Architecture diagram showing User sending a request to Amazon Bedrock Agent (OpenAI GPT OSS), which orchestrates tool use by invoking an AWS Lambda action group handler with getWeather and getTime tools](architecture.png)
+
+*Figure 1: The user sends a natural language query to the Bedrock Agent. The agent uses the OpenAI GPT OSS model to reason about which tools to call, invokes the Lambda action group, and synthesizes the result.*
 
 ## How it works
 
