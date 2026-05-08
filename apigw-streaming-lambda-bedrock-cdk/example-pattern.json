@@ -1,17 +1,17 @@
 {
-  "title": "API Gateway REST Streaming with Lambda and Amazon Bedrock",
-  "description": "Stream LLM responses from Amazon Bedrock through API Gateway REST API using Lambda response streaming for real-time AI chat experiences.",
-  "language": "TypeScript",
-  "level": "300",
-  "framework": "AWS CDK",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "This pattern deploys an API Gateway REST API with response streaming enabled, backed by a Lambda function that streams responses from Amazon Bedrock (Claude) in real-time using Server-Sent Events (SSE).",
-      "When a client sends a prompt, API Gateway forwards it to a streaming Lambda function. The Lambda invokes Bedrock with streaming enabled and progressively writes each text chunk to the response stream. The client receives tokens as they are generated, dramatically reducing time-to-first-byte.",
-      "This pattern is ideal for building AI chatbots, copilots, and interactive assistants where real-time streaming improves user experience."
-    ]
-  },
+    "title": "Stream Amazon Bedrock responses with Amazon API Gateway",
+    "description": "Stream LLM responses from Amazon Bedrock through Amazon API Gateway REST API using AWS Lambda response streaming for real-time AI chat experiences.",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an Amazon API Gateway REST API with response streaming enabled, backed by an AWS Lambda function that streams responses from Amazon Bedrock (Claude) in real-time using Server-Sent Events (SSE).",
+            "When a client sends a prompt, API Gateway forwards it to a streaming Lambda function. The function invokes Amazon Bedrock and progressively writes each text chunk to the response stream. The client receives tokens as they are generated, dramatically reducing time-to-first-byte.",
+            "This pattern is ideal for building AI chatbots, copilots, and interactive assistants where real-time streaming improves user experience."
+        ]
+    },
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-streaming-lambda-bedrock-cdk",
