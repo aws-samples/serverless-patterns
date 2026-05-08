@@ -1,6 +1,6 @@
-# API Gateway REST Streaming with Lambda and Amazon Bedrock
+# Amazon API Gateway REST Streaming with AWS Lambda and Amazon Bedrock
 
-This pattern deploys an API Gateway REST API with response streaming enabled, backed by a streaming Lambda function that returns real-time LLM responses from Amazon Bedrock using Server-Sent Events (SSE).
+This pattern deploys an Amazon API Gateway REST API with response streaming enabled, backed by a streaming AWS Lambda function that returns real-time LLM responses from Amazon Bedrock using Server-Sent Events (SSE).
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-streaming-lambda-bedrock-cdk
 
@@ -25,6 +25,8 @@ Important: this application uses various AWS services and there are costs associ
 ```
 
 ## How it works
+
+> **Note:** This sample does not include authentication/authorization for simplicity. In a production setting, enable IAM authorization, Cognito, or API keys on the API Gateway method.
 
 1. Client sends a POST request with a prompt to the API Gateway REST endpoint.
 2. API Gateway forwards the request to a Lambda function using **streaming invocation** (`InvokeWithResponseStreaming`).
@@ -63,7 +65,7 @@ Important: this application uses various AWS services and there are costs associ
       -d '{"prompt": "Explain serverless computing in 3 paragraphs"}'
     ```
 
-2. You should see the response stream in real-time, token by token.
+2. The API streams the response in real-time, token by token.
 
 ## Cleanup
 

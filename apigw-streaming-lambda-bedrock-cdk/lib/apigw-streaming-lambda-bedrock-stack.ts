@@ -17,10 +17,10 @@ export class ApigwStreamingLambdaBedrockStack extends cdk.Stack {
 
     // Streaming Lambda function
     const fn = new lambda.Function(this, "StreamingBedrockFn", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("src"),
-      timeout: cdk.Duration.minutes(5),
+      timeout: cdk.Duration.minutes(5), // Must be >= API Gateway integration timeout (5 min) to avoid premature termination
       memorySize: 256,
       environment: {
         MODEL_ID: modelId.valueAsString,
@@ -50,6 +50,7 @@ export class ApigwStreamingLambdaBedrockStack extends cdk.Stack {
     // Add POST method with standard Lambda proxy integration
     const method = chatResource.addMethod(
       "POST",
+        // Override default 29s API Gateway timeout to allow streaming responses to complete
       new apigateway.LambdaIntegration(fn, { timeout: cdk.Duration.minutes(5) })
     );
 
