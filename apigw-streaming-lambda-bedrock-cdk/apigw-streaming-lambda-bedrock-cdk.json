@@ -1,0 +1,89 @@
+{
+    "title": "Stream Amazon Bedrock responses with Amazon API Gateway",
+    "description": "Stream LLM responses from Amazon Bedrock through Amazon API Gateway REST API using AWS Lambda response streaming for real-time AI chat experiences.",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an Amazon API Gateway REST API with response streaming enabled, backed by an AWS Lambda function that streams responses from Amazon Bedrock (Claude) in real-time using Server-Sent Events (SSE).",
+            "When a client sends a prompt, API Gateway forwards it to a streaming Lambda function. The function invokes Amazon Bedrock and progressively writes each text chunk to the response stream. The client receives tokens as they are generated, dramatically reducing time-to-first-byte.",
+            "This pattern is ideal for building AI chatbots, copilots, and interactive assistants where real-time streaming improves user experience."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-streaming-lambda-bedrock-cdk",
+            "templateURL": "serverless-patterns/apigw-streaming-lambda-bedrock-cdk",
+            "projectFolder": "apigw-streaming-lambda-bedrock-cdk",
+            "templateFile": "lib/apigw-streaming-lambda-bedrock-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Building responsive APIs with Amazon API Gateway response streaming",
+                "link": "https://aws.amazon.com/blogs/compute/building-responsive-apis-with-amazon-api-gateway-response-streaming/"
+            },
+            {
+                "text": "Serverless strategies for streaming LLM responses",
+                "link": "https://aws.amazon.com/blogs/compute/serverless-strategies-for-streaming-llm-responses/"
+            },
+            {
+                "text": "Amazon Bedrock",
+                "link": "https://aws.amazon.com/bedrock/"
+            }
+        ]
+    },
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda",
+            "label": "Lambda (Streaming)"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Bedrock (Claude)"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    },
+    "deploy": {
+        "text": [
+            "cdk deploy"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>cdk destroy</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nithin Chandran R",
+            "bio": "Technical Account Manager at AWS",
+            "linkedin": "nithin-chandran-r"
+        }
+    ]
+}
