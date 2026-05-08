@@ -1,0 +1,50 @@
+{
+  "title": "Aurora Serverless v2 with Lambda and Amazon Bedrock",
+  "description": "Deploy an Aurora Serverless v2 PostgreSQL database that scales to zero, with Lambda functions that query stored knowledge and use Amazon Bedrock for AI-powered answers.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "services": {
+    "from": "auroraserverlessv2",
+    "to": "bedrock"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Aurora Serverless v2 PostgreSQL cluster (platform version 4 with up to 30% better performance) that scales to zero when idle. A setup Lambda seeds a knowledge table, and a query Lambda retrieves relevant context from Aurora and sends it to Amazon Bedrock for AI-powered answers.",
+      "Aurora Serverless v2 is ideal for agentic AI workloads with burst patterns and long idle windows. The enhanced scaling algorithm in platform version 4 efficiently handles workloads where multiple tasks compete for resources."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/aurora-serverless-v2-lambda-bedrock-cdk",
+      "templateURL": "serverless-patterns/aurora-serverless-v2-lambda-bedrock-cdk",
+      "projectFolder": "aurora-serverless-v2-lambda-bedrock-cdk",
+      "templateFile": "lib/aurora-serverless-v2-lambda-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Aurora Serverless v2 platform version 4", "link": "https://aws.amazon.com/about-aws/whats-new/2026/04/aurora-serverless-smarter-scaling/" },
+      { "text": "Amazon Aurora Serverless", "link": "https://aws.amazon.com/rds/aurora/serverless/" },
+      { "text": "Amazon Bedrock", "link": "https://aws.amazon.com/bedrock/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"],
+    "file": "lib/aurora-serverless-v2-lambda-bedrock-stack.ts"
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
