@@ -54,7 +54,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-After deployment, go to the cloudwatch logs to check the event details.
+After deployment, the Amazon EventBridge rule automatically triggers the AWS Step Functions state machine every 10 minutes. Wait for at least 10 minutes, then verify that the execution completed successfully.
+
+1. Verify the AWS Step Functions state machine execution `status` is `SUCCEEDED`.
+    ```sh
+    aws stepfunctions list-executions --state-machine-arn $(terraform output -raw aws_step_function_arn)
+    ```
+1. Verify the AWS Glue job run `JobRunState` is `SUCCEEDED`.
+    ```sh
+    aws glue get-job-runs --job-name sample-glue-job-terraform
+    ```
+
 ## Cleanup
 
 1. Change directory to the pattern directory:
