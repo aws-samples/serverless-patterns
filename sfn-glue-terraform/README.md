@@ -1,6 +1,6 @@
 # AWS Step Functions to start a AWS Glue Job Through a CloudWatch event rule
 
-The Terraform template deploys a AWS Step Functions, a AWS Glue Job, a CloudWatch Event Rule, a Amazon S3 bucket and the minimum IAM resources required to run the application.
+The Terraform template deploys a AWS Step Functions state machine, a AWS Glue Job, a CloudWatch Event Rule, a Amazon S3 bucket and the minimum IAM resources required to run the application.
 
 ## Architecture
 ![Alt](./resources/architecture.png)
