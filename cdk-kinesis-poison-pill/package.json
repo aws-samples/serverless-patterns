@@ -20,7 +20,6 @@
     "@types/uuid": "^10.0.0",
     "aws-cdk": "2.1003.0",
     "aws-cdk-local": "^2.19.2",
-    "aws-sdk": "^2.1692.0",
     "axios": "^1.8.2",
     "jest": "^29.7.0",
     "jest-openapi": "^0.14.2",

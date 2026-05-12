@@ -8,7 +8,7 @@ import { WafStack } from "./waf";
 buildSync({
   bundle: true,
   entryPoints: [path.resolve(__dirname, "api", "lambda", "index.ts")],
-  external: ["aws-sdk"],
+  external: ["@aws-sdk/*"],
   format: "cjs",
   outfile: path.join(__dirname, "api", "dist", "index.js"),
   platform: "node",

@@ -1,9 +1,9 @@
 // ! Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //   SPDX-License-Identifier: MIT-0
-const AWS = require('aws-sdk');
+const { KinesisClient, PutRecordCommand } = require('@aws-sdk/client-kinesis');
 
 const streamName = process.env.KINESIS_STREAM;
-const kinesisClient = new AWS.Kinesis({ region: process.env.AWS_REGION });
+const kinesisClient = new KinesisClient();
 
 function putToStream(propertyId, propertyValue, propertyTimestamp) {
     const payload = {
@@ -20,7 +20,7 @@ function putToStream(propertyId, propertyValue, propertyTimestamp) {
         PartitionKey: propertyId
     };
     //return params
-    return kinesisClient.putRecord(params).promise();
+    return kinesisClient.send(new PutRecordCommand(params));
 }
 
 exports.lambda_handler = async (event, context) => {
