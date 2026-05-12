@@ -7,6 +7,8 @@ import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb'
 import * as apigateway from 'aws-cdk-lib/aws-apigateway'
 import * as lambda from 'aws-cdk-lib/aws-lambda'
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
+import * as path from 'path'
 
 
 export class ApigwLambdaDynamodbCdkTsStack extends Stack {
@@ -19,13 +21,16 @@ export class ApigwLambdaDynamodbCdkTsStack extends Stack {
       }
     )
 
-    const lambda_backend = new lambda.Function(this, "lambdaFunction", {
+    const lambda_backend = new NodejsFunction(this, "lambdaFunction", {
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: "index.handler",
-      code: lambda.Code.fromAsset("src"),
+      handler: "handler",
+      entry: path.join(__dirname, '../src/index.ts'),
       tracing: lambda.Tracing.ACTIVE,
       environment: {
         DYNAMODB: dynamodb_table.tableName
+      },
+      bundling: {
+        externalModules: ['@aws-sdk/*'],
       },
     })
 
