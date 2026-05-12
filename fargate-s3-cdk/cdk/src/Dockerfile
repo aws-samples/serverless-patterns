@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:14-alpine
+FROM --platform=linux/amd64 node:22-alpine AS build
 WORKDIR /usr
 COPY package.json ./
 COPY tsconfig.json ./
@@ -6,11 +6,10 @@ COPY src ./src
 RUN npm install
 RUN npm run build
 
-FROM --platform=linux/amd64 node:14-alpine
+FROM --platform=linux/amd64 node:22-alpine
 WORKDIR /usr
 COPY package.json ./
-RUN npm install --only=production
-COPY --from=0 /usr/dist .
-RUN npm install pm2 -g
+RUN npm install --omit=dev
+COPY --from=build /usr/dist .
 EXPOSE 80
-CMD ["pm2-runtime","index.js"]
+CMD ["node","index.js"]
