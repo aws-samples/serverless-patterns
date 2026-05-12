@@ -73,7 +73,7 @@ After deployment, the Amazon EventBridge rule automatically triggers the AWS Ste
     ```
 1. Delete all created resources
     ```bash
-    terraform apply -destroy
+    terraform apply --destroy
     ```
 1. During the prompts:
     * Enter yes
