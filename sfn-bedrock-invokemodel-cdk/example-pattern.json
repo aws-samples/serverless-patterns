@@ -1,14 +1,14 @@
 {
-  "title": "Step Functions to Amazon Bedrock InvokeModel",
-  "description": "Invoke Amazon Bedrock directly from Step Functions using the native InvokeModel optimized integration — no Lambda function required. Deployed with AWS CDK.",
+  "title": "AWS Step Functions Express integration with Amazon Bedrock InvokeModel",
+  "description": "Invoke Amazon Bedrock directly from Step Functions using the native InvokeModel optimized integration. Deployed with AWS CDK.",
   "language": "TypeScript",
   "level": "200",
   "framework": "CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a Step Functions Express workflow that invokes Amazon Bedrock (Claude Sonnet) directly using the native bedrock:InvokeModel optimized integration.",
-      "No Lambda function is needed — Step Functions calls Bedrock directly, reducing latency, cost, and operational complexity.",
+      "This pattern deploys a Step Functions Express workflow that invokes Amazon Bedrock (Claude Sonnet) directly using the bedrock:InvokeModel optimized integration.",
+      "The optimized integration provides native error handling, automatic retries, and direct payload mapping without intermediate compute.",
       "The workflow accepts a prompt string as input, sends it to Bedrock, and returns the generated response with usage metadata.",
       "Built-in retry logic handles transient failures with exponential backoff."
     ]

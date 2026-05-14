@@ -1,6 +1,6 @@
-# Step Functions to Amazon Bedrock InvokeModel (CDK)
+# AWS Step Functions Express workflow with optimized integration for Amazon Bedrock InvokeModel
 
-This pattern deploys a Step Functions Express workflow that invokes Amazon Bedrock (Claude Sonnet) directly using the **native InvokeModel optimized integration** — no Lambda function required. Deployed with AWS CDK.
+This pattern deploys a Step Functions Express workflow that invokes Amazon Bedrock (Claude Sonnet) directly using the optimized integration. Deployed with AWS CDK.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-bedrock-invokemodel-cdk
 
@@ -11,12 +11,12 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
-- [Node.js](https://nodejs.org/) 18.x or later
-- [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for Anthropic Claude Sonnet in your AWS account
+- [Node.js](https://nodejs.org/) 20.x or later
+- [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for a model of your choice (Anthropic Claude Sonnet is the default in this pattern) in your AWS account
 
 ## How it works
 
-Step Functions has a native optimized integration with Amazon Bedrock that lets you call `bedrock:InvokeModel` directly from a workflow state — no Lambda function needed. This reduces latency, cost, and operational complexity.
+Step Functions has an optimized integration with Amazon Bedrock that lets you call `bedrock:InvokeModel` directly from a workflow state. The optimized integration provides native error handling, automatic retries, and direct payload mapping without intermediate compute.
 
 **Key points:**
 - Uses `arn:aws:states:::bedrock:invokeModel` resource (optimized integration)
@@ -78,6 +78,6 @@ cdk destroy
 
 ---
 
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
