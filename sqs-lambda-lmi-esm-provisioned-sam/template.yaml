@@ -266,8 +266,7 @@ Resources:
       CapacityProviderConfig:
         Arn: !GetAtt CapacityProvider.Arn
         # Memory-to-vCPU ratio per execution environment: 2, 4, or 8 GiB/vCPU
-        # Must not exceed the function's total memory (512 MB here = 0.5 GiB,
-        # so set to 2 which is the minimum supported ratio)
+        # so set to 2 which is the minimum supported ratio
         ExecutionEnvironmentMemoryGiBPerVCpu: 2
         # Max concurrent invocations per execution environment (multiconcurrency)
         # Each env can handle multiple SQS batches simultaneously

@@ -1,6 +1,6 @@
 {
-  "title": "Amazon SQS to AWS Lambda with Lambda Managed Instances (LMI) Provisioned Mode ESM",
-  "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda Managed Instances (LMI) with a Provisioned Mode Event Source Mapping for faster scaling and higher throughput.",
+  "title": "Amazon SQS to AWS Lambda with LMI Provisioned Mode",
+  "description": "Process SQS messages using Lambda Managed Instances (LMI) with Provisioned Mode ESM for faster scaling and higher throughput.",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
