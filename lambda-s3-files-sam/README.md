@@ -2,7 +2,7 @@
 
 This pattern mounts an Amazon S3 bucket as a file system on an AWS Lambda function using **Amazon S3 Files**, enabling standard Python file I/O to read S3 data.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3files-lambda-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-s3-files-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -39,7 +39,7 @@ No external dependencies — the handler uses Python's built-in `csv` module.
 
 2. Change to the pattern directory:
     ```bash
-    cd s3files-lambda-sam
+    cd lambda-s3-files-sam
     ```
 
 3. Build (see Build Instructions above).

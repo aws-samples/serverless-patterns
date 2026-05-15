@@ -14,9 +14,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3files-lambda-sam",
-      "templateURL": "serverless-patterns/s3files-lambda-sam",
-      "projectFolder": "s3files-lambda-sam",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-files-sam",
+      "templateURL": "serverless-patterns/lambda-s3-files-sam",
+      "projectFolder": "lambda-s3-files-sam",
       "templateFile": "template.yaml"
     }
   },
