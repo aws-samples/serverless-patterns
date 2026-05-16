@@ -1,0 +1,41 @@
+{
+  "title": "API Gateway to Lambda to Amazon Bedrock with Application-Level Guardrails",
+  "description": "Deploy a REST API that invokes Amazon Bedrock with per-request Guardrails for content and topic filtering at the application level — each API call is individually screened.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern applies Bedrock Guardrails at the application level — each InvokeModel call passes guardrailIdentifier and guardrailVersion, giving per-request content screening.",
+      "Unlike account-level enforcement (which applies to ALL Bedrock calls globally), this approach lets different APIs apply different guardrails or skip them entirely.",
+      "The guardrail includes content filters (sexual, violence, hate, misconduct) and topic filters (financial advice denied).",
+      "Blocked requests return a configurable message without consuming model tokens."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-guardrails-cdk",
+      "templateURL": "serverless-patterns/apigw-lambda-bedrock-guardrails-cdk",
+      "projectFolder": "apigw-lambda-bedrock-guardrails-cdk",
+      "templateFile": "lib/apigw-lambda-bedrock-guardrails-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Amazon Bedrock Guardrails", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html" },
+      { "text": "Using Guardrails with InvokeModel", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-use-invoke-api.html" },
+      { "text": "Content and topic filters", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-content-filters.html" }
+    ]
+  },
+  "deploy": { "text": ["cdk deploy"] },
+  "testing": { "text": ["See the README for testing instructions."] },
+  "cleanup": { "text": ["cdk destroy"] },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS, passionate about serverless and AI/ML.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
