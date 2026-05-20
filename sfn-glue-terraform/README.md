@@ -1,6 +1,6 @@
-# AWS Step Functions to start a AWS Glue Job Through a Cloudwatch event rule
+# AWS Step Functions to start a AWS Glue Job Through a CloudWatch event rule
 
-The Terraform template deploys a AWS Step Function, a AWS Glue Job, a Cloudwatch Event Rule, a Amazon S3 bucket and the minimum IAM resources required to run the application.
+The Terraform template deploys a AWS Step Functions state machine, a AWS Glue Job, a CloudWatch Event Rule, a Amazon S3 bucket and the minimum IAM resources required to run the application.
 
 ## Architecture
 ![Alt](./resources/architecture.png)
@@ -8,13 +8,13 @@ The Terraform template deploys a AWS Step Function, a AWS Glue Job, a Cloudwatch
 This pattern demonstrates the use of Terraform modules and deploys the below resources:
 * Amazon S3 bucket and load the sample Python script as an object 
 * Sample AWS Glue Job which executes the script in the S3 bucket
-* AWS Step Function to invoke the AWS Glue Job synchronously. The Function will wait until the Job is completed
-* Cloudwatch Event Rule which is configured to start the AWS Step Function evey 10 minutes
+* AWS Step Functions to invoke the AWS Glue Job synchronously. The Function will wait until the Job is completed
+* CloudWatch Event Rule which is configured to start the AWS Step Functions evey 10 minutes
 
 
 ## How it works
 
-The AWS Cloudwatch rule is configured to start a Step Function execution every 10 minutes. The Step function then invokes a AWS Glue Job with some default arguments and a test message.
+The AWS CloudWatch rule is configured to start a Step Functions execution every 10 minutes. The Step function then invokes a AWS Glue Job with some default arguments and a test message.
 The Arguments to the AWS Glue Job, the Python script and the CloudWatch event rule can be modified as per requirement.
 
 
@@ -54,7 +54,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-After deployment, go to the cloudwatch logs to check the event details.
+After deployment, the Amazon EventBridge rule automatically triggers the AWS Step Functions state machine every 10 minutes. Wait for at least 10 minutes, then verify that the execution completed successfully.
+
+1. Verify the AWS Step Functions state machine execution `status` is `SUCCEEDED`.
+    ```sh
+    aws stepfunctions list-executions --state-machine-arn $(terraform output -raw aws_step_function_arn)
+    ```
+1. Verify the AWS Glue job run `JobRunState` is `SUCCEEDED`.
+    ```sh
+    aws glue get-job-runs --job-name sample-glue-job-terraform
+    ```
+
 ## Cleanup
 
 1. Change directory to the pattern directory:
@@ -63,7 +73,7 @@ After deployment, go to the cloudwatch logs to check the event details.
     ```
 1. Delete all created resources
     ```bash
-    terraform apply -destroy
+    terraform apply --destroy
     ```
 1. During the prompts:
     * Enter yes
@@ -71,7 +81,7 @@ After deployment, go to the cloudwatch logs to check the event details.
     ```bash
     terraform show
     ```
-    ```
+
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
