@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Saga pattern implementation using AWS Lambda durable functions in Node.js
+
+Resources:
+  SagaOrchestratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/orchestrator/
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Timeout: 900
+      MemorySize: 512
+      AutoPublishAlias: prod
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+
+Outputs:
+  SagaOrchestratorFunction:
+    Description: Saga Orchestrator Lambda Function ARN
+    Value: !GetAtt SagaOrchestratorFunction.Arn
+  
+  SagaOrchestratorFunctionAlias:
+    Description: Saga Orchestrator Function Alias (use this for invocation)
+    Value: !Sub '${SagaOrchestratorFunction}:prod'
