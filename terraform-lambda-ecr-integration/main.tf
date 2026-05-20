@@ -14,7 +14,7 @@ locals {
     organization = var.organization
     env          = var.env
   }
-  region                 = data.aws_region.current.name
+  region                 = data.aws_region.current.id
   account_id             = data.aws_caller_identity.current.account_id
   standard_resource_name = "${var.env}-${var.organization}-ecr-lambda"
   ecr_base_arn           = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com"
