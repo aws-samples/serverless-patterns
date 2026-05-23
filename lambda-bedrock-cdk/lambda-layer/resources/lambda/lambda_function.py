@@ -2,7 +2,7 @@ import json
 import boto3
 
 # Get list of available foundational models using the 'bedrock' client.
-# This allows the application to interact with the service configuratoin.
+# This allows the application to interact with the service configuration.
 bedrock = boto3.client('bedrock')
 models = str(bedrock.list_foundation_models())
 
@@ -25,7 +25,7 @@ def handler(event, context):
             "models":models
         }
         statusCode = 500
-    # Bedrock invocation sucessful, alongside the modela response, return model_id and execution time to help evaluate models performances
+    # Bedrock invocation successful; alongside the model response, return model_id and execution time to help evaluate model performance
     return {
         'statusCode': statusCode,
         'model_id': model_id,
