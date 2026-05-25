@@ -18,9 +18,15 @@ export class AgentcoreGatewayLambdaStack extends cdk.Stack {
       description: "AgentCore Gateway Lambda tool target",
     });
 
-    // Gateway IAM role
+    // Gateway IAM role with confused-deputy protection
     const gatewayRole = new iam.Role(this, "GatewayRole", {
-      assumedBy: new iam.ServicePrincipal("bedrock-agentcore.amazonaws.com"),
+      assumedBy: new iam.ServicePrincipal("bedrock-agentcore.amazonaws.com", {
+        conditions: {
+          StringEquals: {
+            "aws:SourceAccount": this.account,
+          },
+        },
+      }),
       description: "Role for AgentCore Gateway to invoke Lambda tools",
     });
     toolFn.grantInvoke(gatewayRole);
