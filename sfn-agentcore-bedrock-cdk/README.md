@@ -77,22 +77,37 @@ Important: this application uses various AWS services and there are costs associ
 
 4. Note the `TriggerFunctionName` from the stack outputs.
 
+## When to use this pattern
+
+Use **SFN-orchestrated multi-agent** when you need:
+- **Deterministic execution paths** — you know which agents to call and in what order
+- **Parallel fan-out with guaranteed completion** — all agents must respond before aggregation
+- **Auditability** — Step Functions provides full execution history, retries, and error handling
+- **Cost predictability** — fixed number of agent invocations per execution
+
+Use **single-agent** when one agent with tools can handle the full task. Use **dynamic LLM-driven orchestration** (e.g., a supervisor agent) when the set of agents to invoke depends on runtime context.
+
 ## Testing
 
-1. Invoke the trigger function with a prompt and your agent runtime ARNs:
+The pattern is designed for agents with **distinct specializations**. For example, a migration planning scenario:
+
+1. Invoke the trigger function with a domain-specific prompt and specialized agent ARNs:
     ```bash
     aws lambda invoke \
       --function-name <TriggerFunctionName> \
       --payload '{
-        "prompt": "What are the best practices for building serverless applications?",
+        "prompt": "We are migrating a 3-tier Java application from on-premises to AWS. What should we consider?",
         "agentRuntimeArns": [
-          "arn:aws:bedrock-agentcore:us-east-1:123456789012:runtime/agent1",
-          "arn:aws:bedrock-agentcore:us-east-1:123456789012:runtime/agent2"
+          "arn:aws:bedrock-agentcore:us-east-1:123456789012:runtime/security-agent",
+          "arn:aws:bedrock-agentcore:us-east-1:123456789012:runtime/cost-optimization-agent",
+          "arn:aws:bedrock-agentcore:us-east-1:123456789012:runtime/architecture-agent"
         ]
       }' \
       --cli-binary-format raw-in-base64-out \
       output.json
     ```
+
+    Each agent responds from its domain expertise (security risks, cost implications, architecture recommendations), and the aggregation Lambda produces a unified migration plan.
 
 2. The trigger returns the Step Functions execution ARN. Monitor the execution:
     ```bash
