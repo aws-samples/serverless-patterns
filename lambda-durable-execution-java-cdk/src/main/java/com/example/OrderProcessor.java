@@ -18,12 +18,15 @@ public class OrderProcessor extends DurableHandler<Map<String, Object>, Map<Stri
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> input, DurableContext ctx) {
-        String orderId = (String) input.getOrDefault("orderId", UUID.randomUUID().toString());
+        // Wrap UUID generation in a step to ensure determinism on replay
+        String orderId = input.containsKey("orderId")
+            ? (String) input.get("orderId")
+            : ctx.step("generate-order-id", String.class, stepCtx -> UUID.randomUUID().toString());
         double amount = ((Number) input.getOrDefault("amount", 99.99)).doubleValue();
 
         // Step 1: Validate order
         String validation = ctx.step("validate-order", String.class, stepCtx -> {
-            System.out.println("Validating order " + orderId);
+            stepCtx.getLogger().info("Validating order " + orderId);
             if (amount <= 0) {
                 throw new IllegalArgumentException("Invalid order amount: " + amount);
             }
@@ -32,13 +35,13 @@ public class OrderProcessor extends DurableHandler<Map<String, Object>, Map<Stri
 
         // Step 2: Reserve inventory
         String reservationId = ctx.step("reserve-inventory", String.class, stepCtx -> {
-            System.out.println("Reserving inventory for order " + orderId);
+            stepCtx.getLogger().info("Reserving inventory for order " + orderId);
             return "RES-" + UUID.randomUUID().toString().substring(0, 8);
         });
 
         // Step 3: Process payment
         String paymentId = ctx.step("process-payment", String.class, stepCtx -> {
-            System.out.println("Processing payment of $" + amount + " for order " + orderId);
+            stepCtx.getLogger().info("Processing payment of $" + amount + " for order " + orderId);
             return "PAY-" + UUID.randomUUID().toString().substring(0, 8);
         });
 
@@ -47,7 +50,7 @@ public class OrderProcessor extends DurableHandler<Map<String, Object>, Map<Stri
 
         // Step 4: Confirm shipment
         String trackingNumber = ctx.step("confirm-shipment", String.class, stepCtx -> {
-            System.out.println("Confirming shipment for order " + orderId);
+            stepCtx.getLogger().info("Confirming shipment for order " + orderId);
             return "TRACK-" + UUID.randomUUID().toString().substring(0, 8);
         });
 

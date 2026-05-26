@@ -40,6 +40,7 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    cdk deploy
    ```
+   > **Note:** If this is the first time you deploy a CDK stack in this account/region, run `cdk bootstrap` before `cdk deploy`.
 
 ## How it works
 
