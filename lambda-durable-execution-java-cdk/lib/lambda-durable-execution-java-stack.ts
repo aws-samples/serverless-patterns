@@ -7,7 +7,6 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Lambda function
     const fn = new lambda.Function(this, "DurableOrderProcessorFn", {
       runtime: lambda.Runtime.JAVA_17,
       handler: "com.example.OrderProcessor::handleRequest",
@@ -15,37 +14,26 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
       timeout: cdk.Duration.minutes(15),
       memorySize: 512,
       description: "Durable order processing workflow using Java SDK",
+      durableConfig: {
+        executionTimeout: cdk.Duration.hours(1),
+        retentionPeriod: cdk.Duration.days(7),
+      },
     });
 
-    // Enable durable execution via escape hatch
-    const cfnFn = fn.node.defaultChild as lambda.CfnFunction;
-    cfnFn.addOverride("Properties.DurableConfig", {
-      ExecutionTimeout: 3600,
-      RetentionPeriodInDays: 7,
-    });
-
-    // Durable execution permissions via AWS managed policy
     fn.role!.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName(
         "service-role/AWSLambdaBasicDurableExecutionRolePolicy"
       )
     );
 
-    // Version and alias via L1 to avoid CDK version property validation
-    const version = new lambda.CfnVersion(this, "FnVersion", {
-      functionName: fn.functionName,
-      description: "Durable execution version",
-    });
-
-    const alias = new lambda.CfnAlias(this, "ProdAlias", {
-      functionName: fn.functionName,
-      functionVersion: version.attrVersion,
-      name: "prod",
+    const alias = new lambda.Alias(this, "ProdAlias", {
+      aliasName: "prod",
+      version: fn.currentVersion,
     });
 
     new cdk.CfnOutput(this, "FunctionName", { value: fn.functionName });
     new cdk.CfnOutput(this, "FunctionAliasArn", {
-      value: alias.ref,
+      value: alias.aliasName,
       description: "Use this ARN to invoke the durable function",
     });
   }
