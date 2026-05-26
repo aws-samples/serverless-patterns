@@ -2,6 +2,7 @@ const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-be
 
 const client = new BedrockRuntimeClient();
 const MODEL_ID = process.env.MODEL_ID;
+if (!MODEL_ID) throw new Error("MODEL_ID environment variable is required");
 
 exports.handler = async (event) => {
   const prompt = event.prompt || "What are the benefits of Lambda Managed Instances?";

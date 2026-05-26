@@ -42,10 +42,19 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
         actions: ["bedrock:InvokeModel"],
         resources: [
           `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
-          "arn:aws:bedrock:*::foundation-model/*",
+          `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
         ],
       })
     );
+
+    // Published version required for Managed Instances execution
+    const version = fn.currentVersion;
+    const alias = new lambda.Alias(this, "ProdAlias", {
+      aliasName: "prod",
+      version,
+    });
 
     // Lambda Managed Instances: EC2-backed compute with serverless management
     const vpc = new ec2.Vpc(this, "ManagedInstancesVpc", {
@@ -59,7 +68,6 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
     });
 
     const capacityProvider = new lambda.CapacityProvider(this, "CapacityProvider", {
-      capacityProviderName: "bedrock-capacity-provider",
       subnets: vpc.privateSubnets,
       securityGroups: [securityGroup],
       architectures: [lambda.Architecture.ARM_64],
@@ -69,6 +77,7 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "FunctionName", { value: fn.functionName });
     new cdk.CfnOutput(this, "FunctionArn", { value: fn.functionArn });
+    new cdk.CfnOutput(this, "AliasArn", { value: alias.functionArn, description: "Invoke this ARN to run on Managed Instances" });
     new cdk.CfnOutput(this, "LogGroupName", { value: logGroup.logGroupName });
   }
 }

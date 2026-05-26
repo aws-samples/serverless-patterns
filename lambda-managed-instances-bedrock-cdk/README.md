@@ -28,11 +28,20 @@ This pattern adds Bedrock integration to demonstrate a real-world use case beyon
 ## Architecture
 
 ```
-User → Lambda Function (on Managed Instances / EC2)
-         ├── VPC with private subnets
-         ├── CapacityProvider (ARM64)
-         └── Bedrock InvokeModel → Claude response
+┌──────────┐       ┌─────────────────────────────────────────────┐
+│  Client  │──────▶│  Lambda Function (Managed Instances / EC2)   │
+└──────────┘       │  ARM64 · 2048 MB · nodejs24.x               │
+                   └──────────────────┬──────────────────────────┘
+                                      │ VPC private subnet
+                                      │ NAT Gateway
+                                      ▼
+                   ┌─────────────────────────────────────────────┐
+                   │  Amazon Bedrock (Claude Sonnet)              │
+                   │  InvokeModel via inference profile           │
+                   └─────────────────────────────────────────────┘
 ```
+
+**Note on networking:** This pattern uses a NAT Gateway for internet egress (including Bedrock API calls). For production workloads, consider adding a VPC interface endpoint for Bedrock (`com.amazonaws.{region}.bedrock-runtime`) to keep traffic on the AWS network and eliminate NAT costs.
 
 ## Deployment Instructions
 
@@ -58,7 +67,7 @@ Invoke the function:
 
 ```bash
 aws lambda invoke \
-  --function-name managed-instances-bedrock-cdk \
+  --function-name managed-instances-bedrock-cdk --qualifier prod \
   --payload '{"prompt":"Explain Lambda Managed Instances in 3 sentences"}' \
   --cli-binary-format raw-in-base64-out \
   output.json && cat output.json | python3 -m json.tool
