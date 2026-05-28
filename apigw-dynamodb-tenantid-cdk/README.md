@@ -6,7 +6,7 @@ Usage plans enforce rate limits via API keys, but auth tokens (JWTs from Cognito
 This pattern demonstrates how to implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. Cognito authenticates users and issues JWTs containing a custom `tenantId` claim. The Lambda authorizer extracts the tenant ID from the JWT, looks up the corresponding API key in DynamoDB, and returns a policy document enabling API Gateway access.
 
 What this pattern solves:
-  - Bridges the auth–throttling gap — The Lambda authorizer acts as the glue between identity (JWT tenantId) and rate-limiting (API Gateway API key). By looking up the tenant's API key in DynamoDB and returning it via usageIdentifierKey, a single auth token automatically activates the correct usage plan. Auth and throttling become one  unified flow rather than two disconnected systems.
+  - Bridges the auth–throttling gap — The Lambda authorizer acts as the glue between identity (JWT tenantId) and rate-limiting (API Gateway API key). By looking up the tenant's API key in DynamoDB and returning it via [usageIdentifierKey] (https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-output.html), a single auth token automatically activates the correct usage plan. Auth and throttling become one  unified flow rather than two disconnected systems.
   - Scales to millions of tokens per tenant — Any number of JWTs can map to the same tenant's API key. You don't need a  1:1 relationship between auth tokens and API keys. A tenant can have millions of active tokens, but they all resolve  to one API key and one rate-limit policy — making management tractable at scale. 
   - Eliminates per-application auth logic — Backend services no longer independently validate tenants or enforce limits.  The gateway handles both centrally, preventing inconsistency and reducing overhead.
   - Prevents noisy neighbors transparently — Tenants only interact with their auth credentials. The API key mapping and  usage plan enforcement happen internally, so rate-limiting is invisible to consumers but enforced consistently.
@@ -52,7 +52,7 @@ Note the outputs from the CDK deployment process. The output will include the AP
 2. Client makes a request to the API with the JWT in the `Authorization` header
 3. API Gateway forwards the token to the Lambda Authorizer
 4. The Lambda Authorizer decodes the JWT, extracts the `custom:tenantId` claim, and looks up the tenant in the DynamoDB table
-   - If the tenant exists, the associated API key is retrieved and returned in the authorization context via [`usageIdentifierKey`] (https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-output.html)
+   - If the tenant exists, the associated API key is retrieved and returned in the authorization context via `usageIdentifierKey` 
    - If the tenant does not exist or the token is invalid, the request is denied
 5. The API Gateway allows or denies access to the protected endpoint based on the policy returned by the authorizer
 
