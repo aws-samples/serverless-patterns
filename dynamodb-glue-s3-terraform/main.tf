@@ -196,8 +196,8 @@ resource "aws_glue_job" "zero_etl_job" {
     "--job-language"                     = "python"
     "--job-bookmark-option"              = "job-bookmark-enable"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--source-table"                     = aws_dynamodb_table.source_table.name
-    "--target-bucket"                    = aws_s3_bucket.data_bucket.bucket
+    "--source_table"                     = aws_dynamodb_table.source_table.name
+    "--target_bucket"                    = aws_s3_bucket.data_bucket.bucket
     "--database-name"                    = aws_glue_catalog_database.zero_etl_database.name
   }
 

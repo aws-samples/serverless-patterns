@@ -10,7 +10,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 
-args = getResolvedOptions(sys.argv, ['JOB_NAME', 'source-table', 'target-bucket'])
+args = getResolvedOptions(sys.argv, ['JOB_NAME', 'source_table', 'target_bucket'])
 
 sc = SparkContext()
 glueContext = GlueContext(sc)

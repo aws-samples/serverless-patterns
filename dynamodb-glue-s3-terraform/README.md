@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to create a zero-ETL integration between Amazon DynamoDB and Amazon S3 using AWS Glue transformation job. The AWS Glue job copies data in the specified format, which can be queried using Amazon Athena.
 
-Learn more about this pattern at Serverless Land Patterns: Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/terraform-dynamodb-glue-s3-integration
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-glue-s3-terraform
 
 Important: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -45,7 +45,7 @@ After deployment, run ./test.sh. This script adds rows to Amazon DynamoDB databa
  
 1. Delete the stack
     ```
-    terraform destroy -var region=<YOUR_REGION>
+    terraform destroy -var aws_region=<YOUR_REGION>
     ```
 ----
 Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
