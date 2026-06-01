@@ -52,7 +52,7 @@ class EventbridgePipesSqsToMultipleSqsStack(Stack):
         # Create Pipe enrichment Lambda function
         enrichment_lambda = _lambda.Function(
             self, 'enrichment-lambda',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('lambda'),
             handler='index.handler',
             retry_attempts=0,

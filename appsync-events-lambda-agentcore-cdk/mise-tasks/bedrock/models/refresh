@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+#MISE description="Refresh inference profiles for all models in the mapping file"
+
+"""Reads model IDs from cdk/constructs/inference_profiles.json and
+runs 'mise run bedrock:models:refresh' for each one.
+"""
+
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+MAPPING_FILE = Path(os.environ.get("MISE_PROJECT_DIR", ".")) / "cdk" / "constructs" / "inference_profiles.json"
+
+
+def main():
+    if not MAPPING_FILE.exists():
+        print(f"Error: {MAPPING_FILE} not found. Run 'mise run bedrock:models:generate <model_id>' first.", file=sys.stderr)
+        sys.exit(1)
+
+    with open(MAPPING_FILE) as f:
+        mappings = json.load(f)
+
+    if not mappings:
+        print("No models found in mapping file.", file=sys.stderr)
+        sys.exit(1)
+
+    model_ids = sorted(mappings.keys())
+    print(f"Refreshing {len(model_ids)} model(s):\n")
+
+    failed = []
+    for model_id in model_ids:
+        print(f"{'=' * 60}")
+        print(f"  {model_id}")
+        print(f"{'=' * 60}")
+        result = subprocess.run(["mise", "run", "bedrock:models:generate", model_id])
+        if result.returncode != 0:
+            failed.append(model_id)
+        print()
+
+    if failed:
+        print(f"\nFailed to refresh: {', '.join(failed)}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"All {len(model_ids)} model(s) refreshed successfully.")
+
+
+if __name__ == "__main__":
+    main()

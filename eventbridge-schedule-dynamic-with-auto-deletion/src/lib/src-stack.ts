@@ -41,7 +41,7 @@ export class DynamicEventBridgeSchedulesStack extends cdk.Stack {
     const emailService: NodejsFunction = new NodejsFunction(this, 'email-service', {
       memorySize: 1024,
       timeout: cdk.Duration.seconds(5),
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/email-service/index.ts'),
     });
@@ -56,7 +56,7 @@ export class DynamicEventBridgeSchedulesStack extends cdk.Stack {
     const scheduleCreator: NodejsFunction = new NodejsFunction(this, 'schedule-creator', {
       memorySize: 1024,
       timeout: cdk.Duration.seconds(5),
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: "./src/schedule-creator/index.ts",
       bundling: {

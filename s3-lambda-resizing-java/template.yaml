@@ -28,7 +28,7 @@ Resources:
     Properties:
       CodeUri: ResizerFunction
       Handler: resizer.App::handleRequest
-      Runtime: java21
+      Runtime: java25
       Timeout: 30
       MemorySize: 1024
       AutoPublishAlias: live

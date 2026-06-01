@@ -1,0 +1,100 @@
+{
+    "title": "Amazon API Gateway REST API with Private ALB integration via VPC link V2",
+    "description": "This pattern demonstrates integrating an API Gateway REST API with a private Amazon Application Load Balancer using VPC link V2",
+    "level": "200",
+    "language": "",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an API Gateway REST API endpoint that integrates with a private Application Load Balancer using VPC link V2",
+            "The private ALB routes traffic to an ECS Fargate cluster running containerized applications",
+            "The pattern creates all required security groups, IAM roles, and networking components for secure private integration"
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-vpclink-pvt-alb-sam",
+            "templateURL": "serverless-patterns/apigw-rest-vpclink-pvt-alb-sam",
+            "projectFolder": "apigw-rest-vpclink-pvt-alb-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "REST API private integration using VPC link",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html"
+            },
+            {
+                "text": "Working with VPC links for REST APIs",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-vpc-link.html"
+            },
+            {
+                "text": "Tutorial: Build a REST API with API Gateway private integration",
+                "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-private-integration.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "sam delete"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Abhishek Agawane",
+            "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+            "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
+            "linkedin": "agawabhi"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 40,
+            "y": 50,
+            "service": "vpc-endpoint",
+            "label": "VPC link V2"
+        },
+        "icon3": {
+            "x": 65,
+            "y": 50,
+            "service": "alb",
+            "label": "Application Load Balancer"
+        },
+        "icon4": {
+            "x": 90,
+            "y": 50,
+            "service": "ecs",
+            "label": "Amazon ECS"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        }
+    }
+}

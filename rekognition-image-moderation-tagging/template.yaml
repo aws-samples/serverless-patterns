@@ -33,7 +33,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: lambda-start-processing-Image-rekognition
-      Runtime: python3.11
+      Runtime: python3.14
       Handler: src/lambda-start-processing-Image-rekognition.lambda_handler
       MemorySize: 128
       Timeout: 10

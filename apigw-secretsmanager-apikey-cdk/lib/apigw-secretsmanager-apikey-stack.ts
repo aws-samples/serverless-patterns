@@ -32,7 +32,7 @@ export class ApigwSecretsmanagerApikeyStack extends cdk.Stack {
 
     // Create Lambda authorizer
     const authorizer = new lambda.NodejsFunction(this, "ApiKeyAuthorizer", {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       entry: path.join(__dirname, "lambda/authorizer.js"),
       role: authorizerRole,
       timeout: cdk.Duration.seconds(10),

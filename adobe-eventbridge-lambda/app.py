@@ -56,7 +56,7 @@ class AdobeIntegrationStack(Stack):
         adobe_process_order_events_lambda = _lambda.Function(
             self,
             id='AdobeProcessOrderEventsLambda',
-            runtime=_lambda.Runtime.PYTHON_3_11,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='AdobeProcessOrderEvents.handler',
             role=lambda_role,

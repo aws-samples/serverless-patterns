@@ -1,0 +1,99 @@
+[tool.ruff]
+line-length = 124
+select = ["E", "F", "PL", "S"]
+
+[tool.black]
+line-length = 124
+target-version = ["py37", "py38", "py39"]
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | \.env
+  | _build
+  | buck-out
+  | build
+  | dist
+  | cdk.out
+  | codeseeder.out
+)/
+'''
+
+[tool.isort]
+profile = "black"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.0.1"
+tag_format = "$version"
+
+[tool.bandit.assert_used]
+skips = ['*_test.py', '*/test_*.py']
+
+[tool.pylint.format]
+max-line-length = 124
+
+[tool.pylint.main]
+ignore-paths = ['tests']
+extension-pkg-whitelist = "pydantic"
+init-hook = """
+import sys; 
+extra_paths = [
+".",
+"./src",
+"./src/lambdas",
+"src/layers",
+"src/layers/common_layer",
+"src/layers/common_layer/common",
+".venv/lib/python3.14/site-packages"
+]
+sys.path.extend(extra_paths)
+"""
+disable = ["C0114", "C0115", "C0116"] # Disable docstring warnings
+fail-under = 6
+
+[tool.pyright]
+extraPaths = [
+  "src",
+  "src/lambdas",
+  "src/layers",
+  "src/layers/common_layer",
+  "src/layers/common_layer/common",
+  ".venv/lib",
+]
+[tool.pytest.ini_options]
+pythonpath = [
+  "src",
+  "src/lambdas",
+  "src/layers",
+  "src/layers/common_layer",
+  "src/layers/common_layer/common",
+  ".venv/lib/python3.14/site-packages",
+]
+markers = ["target_account"]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-p no:cacheprovider -n auto --junit-xml=unittests.xml --cov-branch --cov-report xml:cov.xml --cov=src --cov-report term"
+
+[tool.coverage.run]
+omit = [
+  "*/tests/*",
+  "*/__init__.py",
+  "*setup.py",
+]
+branch = true
+
+[tool.coverage.report]
+include_namespace_packages = "true" # This ensures files which don't yet have any tests configured are still captured.
+fail_under = 75
+
+[tool.codespell]
+check-filenames = ""
+skip = "htmlcov,.doctrees,*.pyc,*.class,*.ico,*.out,*.PNG,*.inv,*.png,*.jpg,*.dot,requirements.txt"
+
+[tool.yamllint]
+key-duplicates = "disable"

@@ -7,7 +7,7 @@ Description: >
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     MemorySize: 128
     Timeout: 15
 
@@ -124,4 +124,4 @@ Resources:
 Outputs:
   RestApiEndpoint:
     Description: The endpoint for the REST API Gateway.
-    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/"

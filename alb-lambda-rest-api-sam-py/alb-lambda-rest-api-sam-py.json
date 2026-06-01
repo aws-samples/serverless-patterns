@@ -34,7 +34,7 @@
             },
             {
                 "text": "AWS SAM build image for Python 3.9",
-                "link": "https://gallery.ecr.aws/sam/build-python3.9"
+                "link": "https://gallery.ecr.aws/sam/build-python3.14"
             },
             {
                 "text": "Docker Desktop",

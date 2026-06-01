@@ -104,7 +104,7 @@ Resources:
       Handler: app.lambda_handler
       FunctionName: iotpush
       Description: Lambda to push message to IOT topic
-      Runtime: python3.9
+      Runtime: python3.14
       Timeout: 10
       MemorySize: 128
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -203,4 +203,4 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"

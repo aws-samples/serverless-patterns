@@ -15,32 +15,6 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
-* [Amazon Bedrock Nova Reel Access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html#add-model-access)
-
-## Amazon Bedrock setup instructions
-You must request access to Amazon Nova Reel model before you can use it. If you try to use the model (with the API or console) before you have requested access to it, you receive an error message. For more information, see [Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
-
-1. In the AWS console, select the region from which you want to access Amazon Bedrock. At the time of writing, Amazon Bedrock is available in us-east-1 (N. Virginia) and us-west-2 (Oregon) regions.
-
-    ![Region Selection](bedrock_setup/region-selection.png)
-
-1. Find **Amazon Bedrock** by searching in the AWS console.
-
-    ![Bedrock Search](bedrock_setup/bedrock-search.png)
-
-1. Expand the side menu.
-
-    ![Bedrock Expand Menu](bedrock_setup/bedrock-menu-expand.png)
-
-1. From the side menu, select **Model access**.
-
-    ![Model Access](bedrock_setup/model-access-link.png)
-
-1. Select the **Edit** button.
-
-    ![Model Access View](bedrock_setup/model-access-view.png)
-
-6. Use the checkboxes to select the models you wish to enable. Review the applicable EULAs as needed. Click **Save changes** to activate the models in your account. For this pattern we only need Nova Reel /  model id: amazon.nova-reel-v1:0.
 
 ## Deployment Instructions
 
@@ -100,12 +74,12 @@ We'll be making requests to the *generateVideo* endpoint with a desired prompt.
 
 Follow the example below and replace `{your-api-url}` with your api url from step 9. 
 
-    ```
-    curl -X POST \
-    {your-api-url}/generateVideo \
-    -H "Content-Type: application/json" \
-    -d '{"prompt": "video of a car made up of fruits"}'
-    ```
+```sh
+curl -X POST \
+{your-api-url}/generateVideo \
+-H "Content-Type: application/json" \
+-d '{"prompt": "video of a car made up of fruits"}'
+```
 
 ## Review results
 

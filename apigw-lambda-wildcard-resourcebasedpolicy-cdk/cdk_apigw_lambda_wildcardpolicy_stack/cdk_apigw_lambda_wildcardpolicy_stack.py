@@ -12,7 +12,7 @@ class CdkApigwLambdaWildCardPolicyStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         
         # Create a Lambda function
-        lambda_function = _lambda.Function(self, 'CDKFunction',runtime=_lambda.Runtime.PYTHON_3_11,handler='appfunc.handler',code=_lambda.Code.from_asset('function'))
+        lambda_function = _lambda.Function(self, 'CDKFunction',runtime=_lambda.Runtime.PYTHON_3_14,handler='appfunc.handler',code=_lambda.Code.from_asset('function'))
         
         # Create an API Gateway REST API
         api = apigateway.RestApi(self, 'CDKAPI', rest_api_name='CDKAPI', default_integration=LambdaIntegrationNoPermission(lambda_function))

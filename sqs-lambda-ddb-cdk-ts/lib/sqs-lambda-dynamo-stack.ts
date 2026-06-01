@@ -74,7 +74,7 @@ export class SqsLambdaDynamoStack extends cdk.Stack {
         this,
         `${table.name}-Lambda`,
         {
-          runtime: lambda.Runtime.NODEJS_20_X,
+          runtime: lambda.Runtime.NODEJS_24_X,
           code: lambda.Code.fromAsset("lib/lambda"),
           handler: "index.handler",
           environment: {

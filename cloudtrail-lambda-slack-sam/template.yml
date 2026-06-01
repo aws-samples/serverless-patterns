@@ -164,7 +164,7 @@ Resources:
       Handler: index.lambda_handler
       PackageType: Zip
       Role: !GetAtt LambdaIamRole.Arn
-      Runtime: python3.9
+      Runtime: python3.14
       Timeout: 300
 
   CloudwatchLogGroup:

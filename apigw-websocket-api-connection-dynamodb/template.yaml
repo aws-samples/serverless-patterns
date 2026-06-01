@@ -46,7 +46,7 @@ Resources:
   DefaultRouteFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Handler: index.handler
       InlineCode: 'exports.handler = async (event) => {return {statusCode: 200, body: JSON.stringify(event)}}'
 
@@ -250,7 +250,7 @@ Resources:
 Outputs:
   APIEndpoint:
     Description: "API Gateway WebSocket endpoint URL"
-    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/${ApiStageName}"
+    Value: !Sub "wss://${WebSocketApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${ApiStageName}"
 
   SessionsTable:
     Description: "DynamoDB sessions table for WebSocket API connection ID tracking"

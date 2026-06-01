@@ -1,6 +1,6 @@
 # Prompt Chaining with Amazon API Gateway, AWS Step Functions and Amazon Bedrock.
 
-The AWS Serverless Application Model (SAM) template deploys an Amazon API Gateway HTTP API endpoint connected to an AWS Step Functions state machine. This example demonstrates how to invoke an Express state machine synchronously and utilize AWS Step Functions intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model. The output from the state machine execution is returned to the client within 29 seconds, using the HTTP API. This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response. By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs.
+The AWS Serverless Application Model (SAM) template deploys an Amazon API Gateway REST API endpoint connected to an AWS Step Functions state machine. This example demonstrates how to invoke an Express state machine synchronously and utilize AWS Step Functions intrinsic functions to chain two prompts, which are then used to invoke the Amazon Bedrock language model. The output from the state machine execution is returned to the client within 29 seconds, using the REST API. This no-code example showcases how the results from the first prompt can be used to provide context for the second prompt, allowing the language model to deliver a highly-curated response. By chaining these prompts, the system can leverage the capabilities of the language model to generate more meaningful and contextual outputs.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-rest-stepfunctions-express-sync-bedrock-sam)
 
@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [NOTE! Manage Access to Amazon Bedrock Foundation Models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) at the time of writing, this example uses Amazon Bedrock foundation model cohere.command-text-v14
+* This example uses Amazon Bedrock foundation model amazon.nova-2-lite-v1:0
 
 
 ## Deployment Instructions
@@ -45,32 +45,26 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it Works
 In this example, the state machine is invoked with a JSON payload
+
 ```asl
 {
   "prompt_one": "Write a 500 word blog post on The Beatles"
 }
 ```
-During execution, the Task state calls the Bedrock API and the response is passed to the task 'result_one'.
-```asl
-{
-  "result_one.$": "$.Body.generations[0].text"
-}
-```
-A Pass state is then used to format the data using an Intrinsic Function (States.) which is passed to the next state.
-```asl
-{
-  "convo_one.$": "States.Format('{}',$.result_one.result_one)"
-}
-```
-The second prompt is then executed with new instructions and the results from the first execution. This provides the prompt with more context
-```asl
-{
-  "prompt.$": "States.Format('{}\n{}','Human: Now write a short story based on the following. Assistant:', $.convo_one.convo_one)",
-  "max_tokens": 1000
-}
-```
-By default, the state then sends the task result as output.
 
+During execution, the Task state calls the Bedrock API and the response is passed to the task 'result_one'.
+
+```asl
+{
+  "result_one.$": "$.Body.output.message.content[0].text"
+}
+```
+
+A Pass state is then used to build the conversation history with the first prompt, the model's response, and the second prompt, which is passed to the next state.
+
+The second prompt is then executed with the conversation history that includes the results from the first execution. This provides the model with more context.
+
+By default, the state then sends the task result as output.
 
 ## Testing
 
@@ -78,7 +72,6 @@ The stack will output the **api endpoint**. You can use *Postman* or *curl* to s
    
 ```
 curl -H "Content-type: application/json" -X POST -d '{"prompt_one": "Write a 500 word blog post on The Beatles"}' <Your API endpoint>
-
 ```
 After runnning the above command, API Gateway will invoke the State machine and return the results back to the client instead of just the State machine's execution Id. 
 
@@ -93,6 +86,6 @@ After runnning the above command, API Gateway will invoke the State machine and 
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

@@ -16,7 +16,7 @@ export class EventbridgeScehdulesWithCdkStack extends cdk.Stack {
     const exampleFunction: NodejsFunction = new NodejsFunction(this, 'scheduled-lambda-function', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/example-func/index.ts'),
     });

@@ -63,13 +63,13 @@ class CognitoSnsSmsOriginationIdentityStack extends cdk.Stack {
         //Creating an AWS Lambda layers
         const cognito_custom_sms_sender_lambda_layer = new lambda.LayerVersion(this, 'cognito-customsmssender-nodejs-lib', {
             code: new lambda.AssetCode('lambda/layer/'),
-            compatibleRuntimes: [lambda.Runtime.NODEJS_18_X],
+            compatibleRuntimes: [lambda.Runtime.NODEJS_24_X],
             compatibleArchitectures: [lambda.Architecture.X86_64, lambda.Architecture.ARM_64],
             removalPolicy: aws_cdk_lib_1.RemovalPolicy.DESTROY,
         });
         //Creating CustomSMSSender Lambda function
         const cognito_custom_sms_sender_lambda_function = new lambda.Function(this, 'cognito-customsmssender-lambda-function', {
-            runtime: lambda.Runtime.NODEJS_18_X,
+            runtime: lambda.Runtime.NODEJS_24_X,
             code: lambda.Code.fromAsset('lambda/code'),
             description: 'Customer SMS Sender Lambda function',
             role: lambda_role,

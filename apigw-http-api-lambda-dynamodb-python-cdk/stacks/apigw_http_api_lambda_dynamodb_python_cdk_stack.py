@@ -72,7 +72,7 @@ class ApigwHttpApiLambdaDynamodbPythonCdkStack(Stack):
             self,
             "ApiHandler",
             function_name="apigw_handler",
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset("lambda/apigw-handler"),
             handler="index.handler",
             vpc=vpc,

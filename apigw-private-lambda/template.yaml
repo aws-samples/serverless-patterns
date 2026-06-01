@@ -22,7 +22,7 @@ Resources:
         "body": json.dumps({
           "message" : "Hello this is the private API"}),
         }
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         APIRoot:
           Type: Api 

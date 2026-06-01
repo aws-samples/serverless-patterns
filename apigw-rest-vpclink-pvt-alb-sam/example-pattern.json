@@ -1,0 +1,62 @@
+{
+  "title": "REST API Gateway to Private ALB and ECS Fargate via VPC Link V2",
+  "description": "This pattern demonstrates REST API Gateway integration with a private Application Load Balancer and ECS Fargate cluster using VPC Link V2",
+  "language": "YAML",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a REST API Gateway endpoint that integrates with a private Application Load Balancer using VPC Link V2",
+      "The private ALB routes traffic to an ECS Fargate cluster running containerized applications",
+      "The pattern creates all required security groups, IAM roles, and networking components for secure private integration"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-vpclink-pvt-alb-sam",
+      "templateURL": "serverless-patterns/apigw-rest-vpclink-pvt-alb-sam",
+      "projectFolder": "apigw-rest-vpclink-pvt-alb-sam",
+      "templateFile": "apigw-rest-vpclink-pvt-alb-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "REST API private integration using VPC link",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-private-integration.html"
+      },
+      {
+        "text": "Working with VPC links for REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-vpc-link.html"
+      },
+      {
+        "text": "Tutorial: Build a REST API with API Gateway private integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-private-integration.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
+      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "title": "Function chaining with AWS Lambda durable functions in Terraform",
+  "description": "A durable orchestrator that chains three Lambda functions in sequence to demonstrate AWS Lambda's durable function",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A durable orchestrator invokes three Lambda functions in sequence, passing each step's output as input to the next. The durable framework checkpoints after every `context.invoke()` call and if the orchestrator fails, it replays from the beginning but skips completed steps using stored results, ensuring no work is repeated."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-function-chaining-terraform",
+      "templateURL": "serverless-patterns/lambda-durable-function-chaining-terraform",
+      "projectFolder": "lambda-durable-function-chaining-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Build multi-step applications and AI workflows with AWS Lambda durable functions",
+        "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "image": "ttps://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_200_200/B56ZZH3LL6H0AY-/0/1744962369852?e=1772668800&v=beta&t=y0t7bsQKJwy5McO395hDmW7QPu_K-a1WKXeTA0-ecno",
+      "bio": "Solutions Architect at AWS",
+      "linkedin": "archanavenkat"
+    }
+  ]
+}

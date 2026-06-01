@@ -18,7 +18,9 @@ Parameters:
       - python3.9
       - python3.11
       - python3.12
-    Default: python3.12
+      - python3.13
+      - python3.14
+    Default: python3.14
   MSKKafkaVersion:
     Type: String
     Default: 3.5.1

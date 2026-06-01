@@ -1,11 +1,12 @@
 import express from 'express';
-import AWS from 'aws-sdk';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import moment from 'moment';
 
 const app = express();
 const port = 80;
-AWS.config.update({region: process.env.region});
-const documentClient = new AWS.DynamoDB.DocumentClient();
+const ddbClient = new DynamoDBClient({ region: process.env.region });
+const documentClient = DynamoDBDocumentClient.from(ddbClient);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -15,7 +16,6 @@ app.get( '/', ( req, res ) => {
 } );
 
 app.post( '/additem', async ( req, res) => {
-  // tslint:disable-next-line:no-console
   console.log(req.body);
 
   const params = {
@@ -27,10 +27,9 @@ app.post( '/additem', async ( req, res) => {
     }
   }
   try {
-    const data = await documentClient.put(params).promise();
+    const data = await documentClient.send(new PutCommand(params));
   }
   catch (err) {
-    // tslint:disable-next-line:no-console
     console.log(err);
     return res.send( err );
   }
@@ -38,6 +37,5 @@ app.post( '/additem', async ( req, res) => {
 });
 
 app.listen( port, () => {
-  // tslint:disable-next-line:no-console
   console.log( `server started at http://localhost:${ port }` );
 });

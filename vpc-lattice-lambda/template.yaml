@@ -122,7 +122,7 @@ Resources:
     Properties:
       CodeUri: primary/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Architectures:
         - x86_64
         
@@ -131,7 +131,7 @@ Resources:
     Properties:
       CodeUri: secondary/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Architectures:
         - x86_64
         
@@ -140,7 +140,7 @@ Resources:
     Properties:
       CodeUri: demolambda/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Environment:
         Variables: 
           URL: !GetAtt VLService.DnsEntry.DomainName

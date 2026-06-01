@@ -16,7 +16,7 @@ export class ServerlessControlStack extends Stack {
 			index: 'handler.py',
 			handler: 'handler', 
 			functionName: 'CallPlanner',
-			runtime: Runtime.PYTHON_3_9,
+			runtime: Runtime.PYTHON_3_14,
 			memorySize: 128,
 			timeout: Duration.seconds(5)
 		});
@@ -32,7 +32,7 @@ export class ServerlessControlStack extends Stack {
 			index: 'handler.py', 
 			handler: 'handler', 
 			functionName: 'ThirdPartyProcessor',
-			runtime: Runtime.PYTHON_3_9,
+			runtime: Runtime.PYTHON_3_14,
 			memorySize: 128,
       timeout: Duration.seconds(30)
 		});

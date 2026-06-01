@@ -207,7 +207,7 @@ Outputs:
   ApiRootUrl:
     Description: Root Url of the API
     Value: !Sub 
-      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/${ApigatewayStageName}'
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${ApigatewayStageName}'
       - ApiId: !Ref Api
   ApiKeyId:
     Description: API Key Id

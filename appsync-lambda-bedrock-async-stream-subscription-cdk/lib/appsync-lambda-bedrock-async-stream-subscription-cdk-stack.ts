@@ -36,7 +36,7 @@ export class AppsyncLambdaBedrockAsyncStreamSubscriptionCdkStack extends cdk.Sta
     
 
     const invocationHandler = new NodejsFunction(this, 'InvocationHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, 'lambda/invocation/index.ts'),
       timeout: cdk.Duration.minutes(15),

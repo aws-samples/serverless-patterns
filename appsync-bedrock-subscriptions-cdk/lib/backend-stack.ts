@@ -32,7 +32,7 @@ export class BackendStack extends cdk.Stack {
     const lambdaFunction = new NodejsFunction(this, "chat", {
       entry: "src/ask.ts",
       timeout: cdk.Duration.seconds(15),
-      runtime: cdk.aws_lambda.Runtime.NODEJS_18_X,
+      runtime: cdk.aws_lambda.Runtime.NODEJS_24_X,
       memorySize: 2048,
       bundling: {
         nodeModules: ["langchain"],

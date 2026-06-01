@@ -122,8 +122,8 @@ Resources:
       LayerName: Boto3-SDK-layer-latest
       ContentUri: dependencies/
       CompatibleRuntimes:
-        - python3.10
-        - python3.11
+        - python3.14
+        - python3.14
 
   #
   # Lambda function
@@ -149,7 +149,7 @@ Resources:
       Layers:
         - !Ref LatestPythonSDK
       CodeUri: src/
-      Runtime: python3.11
+      Runtime: python3.14
       Timeout: 900
 
   #

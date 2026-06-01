@@ -6,7 +6,7 @@ Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster w
 Globals:
   Function:
     CodeUri: ./src
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     MemorySize: 128
     Timeout: 30
 

@@ -1,0 +1,255 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Dynamic Amazon EventBridge Scheduler creation from Amazon DynamoDB Streams'
+
+Resources:
+  # DynamoDB Table with Streams enabled
+  ScheduleConfigTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ScheduleConfigs
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: scheduleId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: scheduleId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # Stream Processor Lambda
+  StreamProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ScheduleStreamProcessor
+      Runtime: python3.12
+      Handler: index.lambda_handler
+      Timeout: 60
+      Environment:
+        Variables:
+          SCHEDULER_ROLE_ARN: !GetAtt SchedulerExecutionRole.Arn
+          TARGET_LAMBDA_ARN: !GetAtt TargetLambdaFunction.Arn
+      Policies:
+        - DynamoDBStreamReadPolicy:
+            TableName: !Ref ScheduleConfigTable
+            StreamName: !Select [3, !Split ["/", !GetAtt ScheduleConfigTable.StreamArn]]
+        - Statement:
+            - Effect: Allow
+              Action:
+                - scheduler:CreateSchedule
+                - scheduler:UpdateSchedule
+                - scheduler:DeleteSchedule
+                - scheduler:GetSchedule
+              Resource: !Sub 'arn:aws:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/default/*'
+            - Effect: Allow
+              Action: iam:PassRole
+              Resource: !GetAtt SchedulerExecutionRole.Arn
+      Events:
+        DynamoDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ScheduleConfigTable.StreamArn
+            StartingPosition: LATEST
+            MaximumBatchingWindowInSeconds: 1
+            BatchSize: 10
+      InlineCode: |
+        import boto3
+        import json
+        import os
+        
+        scheduler = boto3.client('scheduler')
+        SCHEDULER_ROLE_ARN = os.environ['SCHEDULER_ROLE_ARN']
+        TARGET_LAMBDA_ARN = os.environ['TARGET_LAMBDA_ARN']
+        
+        def lambda_handler(event, context):
+            for record in event['Records']:
+                try:
+                    event_name = record['eventName']
+                    
+                    if event_name == 'INSERT':
+                        item = record['dynamodb']['NewImage']
+                        create_schedule(item)
+                    elif event_name == 'MODIFY':
+                        item = record['dynamodb']['NewImage']
+                        update_schedule(item)
+                    elif event_name == 'REMOVE':
+                        item = record['dynamodb']['OldImage']
+                        delete_schedule(item)
+                except Exception as e:
+                    print(f"Error processing record: {e}")
+                    print(f"Record data: {json.dumps(record, default=str)}")
+                    raise
+        
+        def validate_item(item):
+            required_fields = ['scheduleId', 'scheduleExpression']
+            missing = [f for f in required_fields if f not in item]
+            if missing:
+                raise ValueError(f"Missing required fields: {missing}. Item: {json.dumps(item, default=str)}")
+        
+        def create_schedule(item):
+            validate_item(item)
+            scheduler.create_schedule(
+                Name=item['scheduleId']['S'],
+                ScheduleExpression=item['scheduleExpression']['S'],
+                FlexibleTimeWindow={'Mode': 'OFF'},
+                Target={
+                    'Arn': TARGET_LAMBDA_ARN,
+                    'RoleArn': SCHEDULER_ROLE_ARN,
+                    'Input': item.get('payload', {}).get('S', '{}')
+                },
+                State='ENABLED' if item.get('enabled', {}).get('BOOL', True) else 'DISABLED'
+            )
+            print(f"Created schedule: {item['scheduleId']['S']}")
+        
+        def update_schedule(item):
+            validate_item(item)
+            scheduler.update_schedule(
+                Name=item['scheduleId']['S'],
+                ScheduleExpression=item['scheduleExpression']['S'],
+                FlexibleTimeWindow={'Mode': 'OFF'},
+                Target={
+                    'Arn': TARGET_LAMBDA_ARN,
+                    'RoleArn': SCHEDULER_ROLE_ARN,
+                    'Input': item.get('payload', {}).get('S', '{}')
+                },
+                State='ENABLED' if item.get('enabled', {}).get('BOOL', True) else 'DISABLED'
+            )
+            print(f"Updated schedule: {item['scheduleId']['S']}")
+        
+        def delete_schedule(item):
+            if 'scheduleId' not in item:
+                print(f"Cannot delete: missing scheduleId in item")
+                return
+            try:
+                scheduler.delete_schedule(Name=item['scheduleId']['S'])
+                print(f"Deleted schedule: {item['scheduleId']['S']}")
+            except scheduler.exceptions.ResourceNotFoundException:
+                print(f"Schedule not found: {item['scheduleId']['S']}")
+
+  # IAM Role for EventBridge Scheduler to invoke target Lambda
+  SchedulerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*'
+
+  # Example Target Lambda (the one that gets invoked by schedules)
+  TargetLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ScheduledTaskExecutor
+      Runtime: python3.12
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        
+        def lambda_handler(event, context):
+            print(f"Scheduled task executed with payload: {json.dumps(event)}")
+            
+            return {'statusCode': 200, 'body': 'Task completed'}
+
+  # Custom Resource to auto-create a test schedule
+  TestScheduleCreator:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Handler: index.handler
+      Timeout: 60
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ScheduleConfigTable
+      InlineCode: |
+        import boto3
+        import json
+        import cfnresponse
+        from datetime import datetime, timedelta, timezone
+        
+        dynamodb = boto3.resource('dynamodb')
+        
+        def handler(event, context):
+            try:
+                if event['RequestType'] == 'Create':
+                    table = dynamodb.Table(event['ResourceProperties']['TableName'])
+                    
+                    # Create a schedule 5 minutes from now (UTC)
+                    schedule_time = datetime.now(timezone.utc) + timedelta(minutes=5)
+                    schedule_expression = schedule_time.strftime('at(%Y-%m-%dT%H:%M:%S)')
+                    
+                    print(f"Current UTC time: {datetime.now(timezone.utc)}")
+                    print(f"Schedule will fire at: {schedule_time} UTC")
+                    print(f"Schedule expression: {schedule_expression}")
+                    
+                    table.put_item(Item={
+                        'scheduleId': 'auto-test-schedule',
+                        'scheduleExpression': schedule_expression,
+                        'payload': json.dumps({
+                            'message': 'Auto-created test schedule', 
+                            'scheduledTime': schedule_time.isoformat(),
+                            'createdAt': datetime.now(timezone.utc).isoformat()
+                        }),
+                        'enabled': True
+                    })
+                    
+                    print(f"Successfully created test schedule in DynamoDB")
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, {
+                        'ScheduleTime': schedule_time.isoformat(),
+                        'ScheduleExpression': schedule_expression
+                    })
+                else:
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+            except Exception as e:
+                print(f"Error creating test schedule: {e}")
+                import traceback
+                traceback.print_exc()
+                cfnresponse.send(event, context, cfnresponse.FAILED, {'Error': str(e)})
+
+  TriggerTestSchedule:
+    Type: Custom::TestSchedule
+    Properties:
+      ServiceToken: !GetAtt TestScheduleCreator.Arn
+      TableName: !Ref ScheduleConfigTable
+
+Outputs:
+  TableName:
+    Description: DynamoDB Table Name
+    Value: !Ref ScheduleConfigTable
+  
+  StreamProcessorFunctionArn:
+    Description: Stream Processor Lambda ARN
+    Value: !GetAtt StreamProcessorFunction.Arn
+  
+  TargetLambdaArn:
+    Description: Target Lambda ARN
+    Value: !GetAtt TargetLambdaFunction.Arn
+
+  TestScheduleId:
+    Description: Auto-created test schedule ID
+    Value: auto-test-schedule
+  
+  TestScheduleNote:
+    Description: Important timing information
+    Value: "The test schedule fires 5 minutes after deployment in UTC timezone. Check EventBridge Scheduler console for exact time."
+  
+  ExampleDynamoDBItem:
+    Description: Example item to insert into DynamoDB
+    Value: !Sub |
+      {
+        "scheduleId": "user-123-reminder",
+        "scheduleExpression": "at(2026-02-15T10:00:00)",
+        "payload": "{\"userId\": \"123\", \"action\": \"send-reminder\"}",
+        "enabled": true
+      }

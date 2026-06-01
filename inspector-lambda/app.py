@@ -67,7 +67,7 @@ class InspectorCdkStack(Stack):
         inspector_initial_scan_lambda = _lambda.Function(
             self, 
             id='InspectorInitialScanLambda',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='InspectorInitialScan.handler',
             role=lambda_role,
@@ -79,7 +79,7 @@ class InspectorCdkStack(Stack):
         inspector_findings_lambda = _lambda.Function(
             self, 
             id='InspectorFindingsLambda',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='InspectorFindings.handler',
             role=lambda_role,

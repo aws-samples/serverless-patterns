@@ -27,7 +27,7 @@ Resources:
         - Arn
       MemorySize: 128
       Timeout: 5
-      Runtime: python3.9
+      Runtime: python3.14
       Environment:
         Variables:
           RECIPIENT: !Ref RECIPIENT

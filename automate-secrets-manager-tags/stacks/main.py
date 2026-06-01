@@ -15,7 +15,7 @@ class AutomateSecretsManagerTagsStack(Stack):
 
         # Create a Lambda function to handle the tagging
         lambda_function = _lambda.Function(self, "MyEventBridgeLambda",
-            runtime=_lambda.Runtime.PYTHON_3_13,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="index.lambda_handler",
             code=_lambda.Code.from_asset("lambda")
         )

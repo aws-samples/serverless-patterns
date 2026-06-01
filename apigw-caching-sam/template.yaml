@@ -28,7 +28,7 @@ Resources:
       Timeout: 3
       MemorySize: 128
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Architectures:
         - x86_64
       Events:
@@ -42,4 +42,4 @@ Resources:
 Outputs:
   CachedApiUrl:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${CachedApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${CachedApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"

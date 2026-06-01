@@ -1,5 +1,6 @@
 const axios = require('axios');
-const { SignatureV4 } = require('@aws-sdk/signature-v4');
+const { SignatureV4 } = require('@smithy/signature-v4');
+const { HttpRequest } = require('@smithy/protocol-http');
 const { Sha256 } = require('@aws-crypto/sha256-js');
 
 const {
@@ -21,23 +22,21 @@ const sigv4 = new SignatureV4({
 
 module.exports.handler = async (event) => {
     const cfRequest = event.Records[0].cf.request;
-    const headers = cfRequest.headers;
 
     const apiUrl = new URL(`https://${cfRequest.origin.custom.domainName}${cfRequest.uri}`);
 
-    const signV4Options = {
+    const request = new HttpRequest({
         method: cfRequest.method,
-        hostname: apiUrl.host,
+        hostname: apiUrl.hostname,
         path: apiUrl.pathname + (cfRequest.querystring ? `?${cfRequest.querystring}` : ''),
         protocol: apiUrl.protocol,
-        query: cfRequest.querystring,
         headers: {
-            host: apiUrl.hostname
+            host: apiUrl.hostname,
         },
-    };
+    });
 
     try {
-        return await signAndForwardRequest(signV4Options, apiUrl);
+        return await signAndForwardRequest(request, apiUrl);
     } catch (error) {
         console.error('An error occurred', error);
         return {
@@ -48,12 +47,13 @@ module.exports.handler = async (event) => {
     }
 };
 
-async function signAndForwardRequest(signV4Options, apiUrl) {
-    const signed = await sigv4.sign(signV4Options);
+async function signAndForwardRequest(request, apiUrl) {
+    const signed = await sigv4.sign(request);
     const result = await axios({
-        ...signed,
+        method: signed.method,
         url: apiUrl.href,
-        timeout: 5000
+        headers: signed.headers,
+        timeout: 5000,
     });
 
     return {

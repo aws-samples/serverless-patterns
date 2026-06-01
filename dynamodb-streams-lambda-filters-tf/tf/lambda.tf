@@ -73,7 +73,7 @@ resource "aws_lambda_function" "lambda_dynamodb_stream_handler_bachelors" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "handler.bachelors_handler"
   role             = aws_iam_role.iam_for_lambda.arn
-  runtime          = "python3.10"
+  runtime          = "python3.14"
 }
 
 resource "aws_lambda_function" "lambda_dynamodb_stream_handler_masters" {
@@ -82,7 +82,7 @@ resource "aws_lambda_function" "lambda_dynamodb_stream_handler_masters" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "handler.masters_handler"
   role             = aws_iam_role.iam_for_lambda.arn
-  runtime          = "python3.10"
+  runtime          = "python3.14"
 }
 
 resource "aws_lambda_function" "lambda_dynamodb_stream_handler_modify" {
@@ -91,7 +91,7 @@ resource "aws_lambda_function" "lambda_dynamodb_stream_handler_modify" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "handler.modify_handler"
   role             = aws_iam_role.iam_for_lambda.arn
-  runtime          = "python3.10"
+  runtime          = "python3.14"
 }
 
 resource "aws_lambda_function" "lambda_dynamodb_stream_handler_delete" {
@@ -100,7 +100,7 @@ resource "aws_lambda_function" "lambda_dynamodb_stream_handler_delete" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "handler.remove_handler"
   role             = aws_iam_role.iam_for_lambda.arn
-  runtime          = "python3.10"
+  runtime          = "python3.14"
 }
 
 resource "aws_lambda_event_source_mapping" "lambda_bachelors_dynamodb" {

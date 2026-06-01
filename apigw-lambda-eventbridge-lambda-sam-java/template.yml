@@ -4,7 +4,7 @@ Description: AWS-SAM-Lambda-EventBridge-Lambda (uksb-1tthgi812) (tag:apigw-lambd
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 512
     Timeout: 25
 

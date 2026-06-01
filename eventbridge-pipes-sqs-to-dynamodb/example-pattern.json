@@ -1,0 +1,65 @@
+{
+    "title": "Amazon SQS to Amazon DynamoDB via Amazon EventBridge Pipes using CDK/Python",
+    "description": "Pattern that sends messages from SQS queue to DynamoDB table via API Gateway using EventBridge Pipes. Implemented with CDK using Python.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "Messages sent to the SQS queue are polled by EventBridge Pipe.",
+        "EventBridge Pipe processes the messages and sends them to API Gateway endpoint.",
+        "API Gateway transforms the message and writes the data to DynamoDB table using direct integration."
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-dynamodb",
+        "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-dynamodb",
+        "projectFolder": "eventbridge-pipes-sqs-to-dynamodb",
+        "templateFile": "eventbridge-pipes-sqs-to-dynamodb/eventbridge_pipes_sqs_to_dynamodb/eventbridge_pipes_sqs_to_dynamodb.py"
+      }
+    },
+    "resources": {
+      "bullets": [
+        {
+          "text": "Amazon SQS",
+          "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+        },
+        {
+          "text": "EventBridge Pipes Documentation",
+          "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+        },
+        {
+          "text": "Cloudformation API for Pipes",
+          "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+        },
+        {
+          "text": "Pipes Documentation for CDK v2 Python",
+          "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html"
+        },
+        {
+          "text": "API Gateway DynamoDB Integration",
+          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-overview-developer-experience.html"
+        }
+      ]
+    },
+    "deploy": {
+      "text": ["cdk deploy"]
+    },
+    "testing": {
+      "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    },
+    "cleanup": {
+      "text": ["Delete the stack: <code>cdk destroy</code>."]
+    },
+    "authors": [
+      {
+        "name": "Michele Scarimbolo",
+        "image": "https://avatars.githubusercontent.com/u/229997073",
+        "bio": "Technical Account Manager at AWS. Serverless specialist and enthusiast.",
+        "linkedin": "michele-scarimbolo",
+        "twitter": ""
+      }
+    ]
+  }

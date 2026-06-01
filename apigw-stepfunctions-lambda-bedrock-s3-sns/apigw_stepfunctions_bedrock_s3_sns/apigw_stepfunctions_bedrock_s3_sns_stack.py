@@ -48,7 +48,7 @@ class ApigwStepFunctionBedrockSns(Stack):
         
         # create the Lambda function that invokes Bedrock Model
         bedrock_invoke_lambda_function = _lambda.Function(self, "InvokeModelFunction",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="invoke.handler",
             code=_lambda.Code.from_asset("./functions/functioncode.zip"),
             timeout=Duration.seconds(900),
@@ -59,7 +59,7 @@ class ApigwStepFunctionBedrockSns(Stack):
 
         # create the Lambda function that fetches status of Video Generation
         fetch_status_lambda_function = _lambda.Function(self, "FetchStatusFunction",
-            runtime=_lambda.Runtime.PYTHON_3_12,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler="fetchstatus.handler",
             code=_lambda.Code.from_asset("./functions/functioncode.zip"),
             timeout=Duration.seconds(900),

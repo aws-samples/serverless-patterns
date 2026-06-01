@@ -1,0 +1,22 @@
+{
+  "name": "sfn-parallel-bedrock-agentcore-multi-agent-cdk",
+  "version": "1.0.0",
+  "description": "CDK app deploying a Step Functions multi-agent orchestration with parallel AgentCore runtimes",
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "synth": "cdk synth"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "aws-cdk": "^2.221.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.221.0",
+    "@aws-cdk/aws-bedrock-agentcore-alpha": "2.221.0-alpha.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}

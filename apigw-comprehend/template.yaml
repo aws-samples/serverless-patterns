@@ -71,4 +71,4 @@ Outputs:
   ComprehendApiEndpoint:
     Description: API endpoint URL
     Value: !Sub >-
-      https://${ComprehendApi}.execute-api.${AWS::Region}.amazonaws.com/prod/detectSentiment
+      https://${ComprehendApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/detectSentiment

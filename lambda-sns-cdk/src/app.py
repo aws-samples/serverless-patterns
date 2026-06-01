@@ -20,7 +20,7 @@ class LambdaSnsCdkStack(cdk.Stack):
 
         # Create Lambda function
         lambdaFn = _lambda.Function(self, "SNSPublisher",
-                                    runtime=_lambda.Runtime.PYTHON_3_9,
+                                    runtime=_lambda.Runtime.PYTHON_3_14,
                                     code=_lambda.Code.from_asset("lambda"),
                                     handler="handler.main",
                                     timeout=cdk.Duration.seconds(10))

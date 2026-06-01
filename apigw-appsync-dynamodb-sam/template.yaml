@@ -209,7 +209,7 @@ Resources:
 Outputs:
   ApiGatewayEndpoint:
     Description: "HTTP API Gateway endpoint for /restaurant path"
-    Value: !Sub "https://${HttpApiProxy}.execute-api.${AWS::Region}.amazonaws.com/restaurant"
+    Value: !Sub "https://${HttpApiProxy}.execute-api.${AWS::Region}.${AWS::URLSuffix}/restaurant"
 
   AppSyncApiKey:
     Description: "AppSync API Key"

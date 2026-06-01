@@ -40,7 +40,7 @@ resource "aws_lambda_function" "process_function" {
   function_name    = "process-function"
   role            = aws_iam_role.lambda_role.arn
   handler         = "app.lambda_handler"
-  runtime         = "python3.13"
+  runtime         = "python3.14"
   architectures   = ["arm64"]
   timeout         = 3
 

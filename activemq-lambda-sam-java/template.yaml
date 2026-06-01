@@ -4,7 +4,7 @@ Description: Event driven Amazon MQ for ActiveMQ message processing using AWS La
 
 Globals:
   Function:
-    Runtime: java21
+    Runtime: java25
     MemorySize: 512
 
 Parameters:
@@ -147,7 +147,7 @@ Resources:
 Outputs:
   ActiveMQWebConsole:
     Description: The ActiveMQ web-console host
-    Value: !Sub 'https://${MyMQBroker}-1.mq.${AWS::Region}.amazonaws.com:8162/admin/index.jsp'
+    Value: !Sub 'https://${MyMQBroker}-1.mq.${AWS::Region}.${AWS::URLSuffix}:8162/admin/index.jsp'
   MyMQMessageHandlerFunction:
     Description: The name of the ActiveMQ message handler function
     Value: !Ref MyMQMessageHandlerFunction

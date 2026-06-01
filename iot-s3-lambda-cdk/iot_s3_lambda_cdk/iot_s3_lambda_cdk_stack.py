@@ -30,7 +30,7 @@ class IotS3LambdaCdkStack(Stack):
         iot_s3_lambda = _lambda.Function(
             self, 
             id='IotS3LambdaCdk',
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='lambda_function.handler',
         )

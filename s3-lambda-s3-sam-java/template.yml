@@ -4,7 +4,7 @@ Description: s3-lambda-s3 (uksb-1tthgi812) (tag:s3-lambda-s3-sam-java)
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 512
     Timeout: 25
 

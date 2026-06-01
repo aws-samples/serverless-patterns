@@ -21,7 +21,7 @@ export class EbLambdaCloudeventsStack extends cdk.Stack {
       reservedConcurrentExecutions: 1,
       deadLetterQueue: dlq,
       logRetention: RetentionDays.ONE_DAY,
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_24_X,
     });
 
 

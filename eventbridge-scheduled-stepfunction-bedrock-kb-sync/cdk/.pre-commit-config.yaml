@@ -1,0 +1,133 @@
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.2.2
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      #- id: end-of-file-fixer
+      - id: mixed-line-ending
+        stages: [pre-commit]
+      - id: detect-aws-credentials
+        stages: [pre-commit]
+        args: ["--allow-missing-credentials"]
+      - id: check-yaml
+        stages: [pre-commit]
+        alias: pipeline
+        args: ['--unsafe']
+      - id: check-json
+        stages: [pre-commit]
+        alias: pipeline
+        exclude: ^.vscode/
+      - id: check-merge-conflict
+        stages: [pre-commit]
+      - id: check-case-conflict
+        stages: [pre-commit]
+      - id: check-executables-have-shebangs
+        stages: [pre-commit]
+      - id: detect-private-key
+        stages: [pre-commit]
+      - id: pretty-format-json
+        stages: [pre-commit]
+        args: ["--autofix"]
+        exclude: ^.vscode/
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+  - repo: https://github.com/pypa/pip-audit
+    rev: v2.8.0
+    hooks:
+      - id: pip-audit
+        args: ["-r", "requirements.txt"]
+  - repo: https://github.com/awslabs/git-secrets
+    rev: 99d01d5
+    hooks:
+      - id: git-secrets
+        alias: pipeline
+        stages:
+          - pre-commit
+        name: Git Secrets
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        alias: pipeline
+        args:
+          - -d relaxed
+        exclude: ^.github/
+  - repo: https://github.com/ambv/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.2
+    hooks:
+      - id: flake8
+        alias: pipeline
+        args:
+          - --ignore=E501,W503,E203,E712
+  - repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+        alias: pipeline
+        args:
+          - --profile
+          - black
+          - --filter-files
+  - repo: https://github.com/detailyang/pre-commit-shell
+    rev: 1.0.5
+    hooks:
+      - id: shell-lint
+        alias: pipeline
+        args: ["-S", "error"]
+        exclude: ^.github/
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.2.2
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        always_run: true
+        args: []
+  - repo: local
+    hooks:
+      - id: pylint
+        alias: pipeline
+        stages: [pre-commit]
+        name: pylint
+        entry: pylint
+        language: system
+        pass_filenames: false
+        args: ["src"]
+        types: [python]
+      - id: pytest
+        alias: pipeline
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: bandit
+        alias: pipeline
+        stages: [pre-commit]
+        name: bandit
+        entry: bandit
+        language: system
+        args: [--recursive, src, --exclude, "**/test_*.py,**/tests/**"]
+        pass_filenames: false
+        always_run: true
+      - id: codespell
+        alias: pipeline
+        stages: [pre-commit]
+        name: codespell
+        entry: codespell
+        language: system
+        args: [src, scripts, tests, config, docs, app.py]
+        pass_filenames: false
+        always_run: true

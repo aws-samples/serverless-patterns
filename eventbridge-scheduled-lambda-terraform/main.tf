@@ -25,7 +25,7 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "app.lambda_handler"
   role             = aws_iam_role.lambda_iam_role.arn
-  runtime          = "python3.8"
+  runtime          = "python3.14"
 }
 
 data "archive_file" "lambda_zip_file" {

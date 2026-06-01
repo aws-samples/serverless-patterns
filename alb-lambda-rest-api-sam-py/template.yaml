@@ -34,7 +34,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src.app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       Architectures:
         - x86_64
       Policies:

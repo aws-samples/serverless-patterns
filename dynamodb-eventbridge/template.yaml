@@ -23,7 +23,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       CodeUri: publish/
       Description: A Lambda function that forward changes on DynamoDB table to EventBridge bus.
       MemorySize: 128
@@ -47,7 +47,7 @@ Resources:
     Properties:
       CodeUri: subscribe/
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Description: A Lambda function that receive Insert events from the table.
       MemorySize: 128
       Timeout: 3
@@ -57,7 +57,7 @@ Resources:
     Properties:
       CodeUri: subscribe/
       Handler: app.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Description: A Lambda function that receive Deletion events from the table.
       MemorySize: 128
       Timeout: 3

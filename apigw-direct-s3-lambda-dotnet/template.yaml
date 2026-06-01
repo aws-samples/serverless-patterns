@@ -181,7 +181,7 @@ Resources:
             - image/jpeg
 Outputs:
   API:
-    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/
     Description: API Gateway URL    
   S3LambdaAuthorizerFunction:
     Description: "Lambda authorizer Function used to protect API"

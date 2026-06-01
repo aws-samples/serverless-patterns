@@ -222,7 +222,7 @@ class QBusinessStack(Stack):
         # Lambda function for initiating data source sync
         data_source_sync_lambda = lambda_.Function(
             self, "DataSourceSyncLambda",
-            runtime=lambda_.Runtime.PYTHON_3_12,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset("src/dataSourceSync"),
             handler="dataSourceSyncLambda.lambda_handler",
             timeout=Duration.minutes(15),

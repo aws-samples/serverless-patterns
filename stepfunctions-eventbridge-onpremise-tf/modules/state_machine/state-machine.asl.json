@@ -1,0 +1,34 @@
+{
+"QueryLanguage": "JSONata",
+"Comment": "Call On-Premises API",
+    "StartAt": "DirectHTTPCall",
+    "States": {
+        "DirectHTTPCall": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::http:invoke",
+            "Arguments": {
+                "ApiEndpoint": "${GetHelloEndpoint}",
+                "Method": "GET",
+                "InvocationConfig": {
+                    "ConnectionArn": "${EventBridgeConnectionArn}"
+                }
+            },
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "HandleError"
+                }
+            ],
+            "Next": "Success"
+        },
+        "HandleError": {
+            "Type": "Fail",
+            "Cause": "Direct API call failed"
+        },
+        "Success": {
+            "Type": "Succeed"
+        }
+    }
+}

@@ -17,7 +17,7 @@ class SNSLambdaStack(Stack):
 
         # Lambda Function
         lambdaFn = _lambda.Function(self, "SNSEventHandler",
-                                    runtime=_lambda.Runtime.PYTHON_3_9,
+                                    runtime=_lambda.Runtime.PYTHON_3_14,
                                     code=_lambda.Code.from_asset("lambda"),
                                     handler="handler.main",
                                     timeout=Duration.seconds(10))

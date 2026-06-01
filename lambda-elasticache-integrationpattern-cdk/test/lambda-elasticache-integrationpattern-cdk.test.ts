@@ -11,6 +11,6 @@ test('Validate stack resources', () => {
   // Assert it creates the function with the correct properties
   template.hasResourceProperties("AWS::Lambda::Function", {
     Handler: "handler",
-    Runtime: "nodejs18.x",
+    Runtime: "nodejs24.x",
   });
 });

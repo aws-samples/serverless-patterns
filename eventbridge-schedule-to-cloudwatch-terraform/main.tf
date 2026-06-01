@@ -18,8 +18,6 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-
-
 # This section creates cron schedules using Amazon EventBridge Scheduler, as well as the required IAM roles to interact with CloudWatch
 
 resource "aws_scheduler_schedule" "cloudwatch-schedule" {
@@ -55,7 +53,6 @@ resource "aws_scheduler_schedule" "cloudwatch-schedule" {
   }
 }
 
-
 resource "aws_iam_policy" "scheduler_cloudwatch_policy" {
   name = "scheduler_cloudwatch_policy"
 
@@ -77,7 +74,6 @@ resource "aws_iam_policy" "scheduler_cloudwatch_policy" {
 
 resource "aws_iam_role" "scheduler-cloudwatch-role" {
   name = "scheduler-cloudwatch-role"
-  managed_policy_arns = [aws_iam_policy.scheduler_cloudwatch_policy.arn]
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -92,4 +88,9 @@ resource "aws_iam_role" "scheduler-cloudwatch-role" {
       },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "scheduler_cloudwatch_attachment" {
+  role       = aws_iam_role.scheduler-cloudwatch-role.name
+  policy_arn = aws_iam_policy.scheduler_cloudwatch_policy.arn
 }

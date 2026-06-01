@@ -1,0 +1,10 @@
+node_modules/
+.aws-sam/
+dist/
+coverage/
+*.log
+.env
+.DS_Store
+
+# SAM
+samconfig.toml

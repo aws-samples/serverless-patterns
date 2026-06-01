@@ -52,7 +52,7 @@ class DelayFifoQueueTestStack(Stack):
         
         # create a Lambda function to process messages from the queue
         process_queue_function = lambda_.Function(self, "ProcessMessageLambda",
-                                                    runtime=lambda_.Runtime.PYTHON_3_9,
+                                                    runtime=lambda_.Runtime.PYTHON_3_14,
                                                     code=lambda_.Code.from_asset("lambda"),
                                                     handler="process_message.handler",
                                                     environment={

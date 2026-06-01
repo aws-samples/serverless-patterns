@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.22"
+      version = "~> 5.0"
     }
   }
 
@@ -31,7 +31,7 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
   handler          = "app.handler"
   role             = aws_iam_role.lambda_iam_role.arn
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs22.x"
   environment {
     variables = {
       SSMParameterName = var.ssm_parameter_name
@@ -50,11 +50,7 @@ data "aws_iam_policy" "lambda_basic_execution_role_policy" {
 }
 
 resource "aws_iam_role" "lambda_iam_role" {
-  name_prefix         = "LambdaSSMParameterRole-"
-  managed_policy_arns = [
-    data.aws_iam_policy.lambda_basic_execution_role_policy.arn,
-    aws_iam_policy.lambda_policy.arn
-  ]
+  name_prefix = "LambdaSSMParameterRole-"
 
   assume_role_policy = <<EOF
 {
@@ -73,11 +69,21 @@ resource "aws_iam_role" "lambda_iam_role" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_iam_role.name
+  policy_arn = data.aws_iam_policy.lambda_basic_execution_role_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_ssm" {
+  role       = aws_iam_role.lambda_iam_role.name
+  policy_arn = aws_iam_policy.lambda_policy.arn
+}
+
 data "aws_iam_policy_document" "lambda_policy_document" {
   statement {
-  
+
     effect = "Allow"
-  
+
     actions = [
       "ssm:GetParameter",
       "ssm:PutParameter"

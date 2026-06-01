@@ -1,10 +1,14 @@
 import express from "express";
-import AWS from "aws-sdk";
+import {
+  SQSClient,
+  SendMessageCommand,
+  ReceiveMessageCommand,
+  DeleteMessageCommand,
+} from "@aws-sdk/client-sqs";
 
 const app = express();
 const port = 80;
-AWS.config.update({ region: process.env.region });
-const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+const sqs = new SQSClient({ region: process.env.region });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -16,13 +20,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/sendmessage", async (req, res) => {
-  const params = {
-    MessageBody: req.body.MessageBody,
-    QueueUrl: QUEUE_URL,
-  };
-
   try {
-    const result = await sqs.sendMessage(params).promise();
+    const result = await sqs.send(
+      new SendMessageCommand({
+        MessageBody: req.body.MessageBody,
+        QueueUrl: QUEUE_URL,
+      })
+    );
     return res.status(200).send({
       body: "OK!",
       sqsResponse: result,
@@ -33,13 +37,13 @@ app.post("/sendmessage", async (req, res) => {
 });
 
 app.get("/readmessage", async (req, res) => {
-  const params = {
-    QueueUrl: QUEUE_URL,
-    MaxNumberOfMessages: 1,
-  };
-
   try {
-    const result = await sqs.receiveMessage(params).promise();
+    const result = await sqs.send(
+      new ReceiveMessageCommand({
+        QueueUrl: QUEUE_URL,
+        MaxNumberOfMessages: 1,
+      })
+    );
     if (result.Messages) {
       return res.status(200).send({
         body: "OK!",
@@ -55,6 +59,5 @@ app.get("/readmessage", async (req, res) => {
 });
 
 app.listen(port, () => {
-  // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);
 });

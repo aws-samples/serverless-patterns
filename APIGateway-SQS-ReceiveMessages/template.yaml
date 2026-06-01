@@ -115,7 +115,7 @@ Outputs:
   # API Gateway Invoke URL
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+    Value: !Sub https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod
 
   QueueName:
     Description: SQS Name

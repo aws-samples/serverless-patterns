@@ -237,7 +237,7 @@ Outputs:
   # Output for the AmazonMQ Cluster
   MQBrokerManagementURI:
     Description: 'The AmazonMQ Web-Console URI. Please note: If deploying with MQPubliclyAccessible set to false, this will only be accessible from within the VPC.'
-    Value: !Sub 'https://${MQBroker}-1.mq.${AWS::Region}.amazonaws.com:8162'
+    Value: !Sub 'https://${MQBroker}-1.mq.${AWS::Region}.${AWS::URLSuffix}:8162'
   MQBrokerArn:
     Description: 'The ARN of the AmazonMQ cluster'
     Value: !GetAtt MQBroker.Arn

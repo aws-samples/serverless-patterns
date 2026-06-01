@@ -24,7 +24,7 @@ Resources:
     Properties:
       FunctionName: !Sub '${AWS::StackName}-rekognition-function'
       Handler: lambda_function.handler
-      Runtime: python3.8
+      Runtime: python3.14
       Timeout: 30
       Environment:
         Variables:

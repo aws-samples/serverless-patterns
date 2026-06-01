@@ -8,8 +8,8 @@
     "headline": "How it works",
     "text": [
       "Amazon API Gateway receives the HTTP POST request containing a text which will is taken as a prompt.",
-      "AWS Lambda is triggered by the API Gateway, this function forwards the prompt to Amazon Bedrock API using AWS SDK for javascript bedrock-runtime API. It uses Anthropic Claude-v2 model and sets other required parameters to fixed values for simplicity.",
-      "Based on the given prompt, using Anthropic Claude-v2 model, Amazon Bedrock generates the content and returns the response to Lambda.",
+      "AWS Lambda is triggered by the API Gateway, this function forwards the prompt to Amazon Bedrock API using AWS SDK for javascript bedrock-runtime API. It uses Anthropic Claude Sonnet 4.5 model and sets other required parameters to fixed values for simplicity.",
+      "Based on the given prompt, using Anthropic Claude Sonnet 4.5 model, Amazon Bedrock generates the content and returns the response to Lambda.",
       "Lambda processes the Bedrock output and sends it back to the user via the API Gateway."
     ]
   },

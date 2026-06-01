@@ -29,7 +29,7 @@ Resources:
       Environment:
         Variables:
           S3_BUCKET_NAME: !Ref s3BucketName
-      Runtime: python3.9
+      Runtime: python3.14
       Handler: index.lambda_handler
       CodeUri: src/
       MemorySize: 128
@@ -55,4 +55,4 @@ Resources:
 Outputs:
   RestApiEndpoint:
     Description: "The endpoint for the REST API Gateway"
-    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/"

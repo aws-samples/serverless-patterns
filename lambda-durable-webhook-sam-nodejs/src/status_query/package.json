@@ -1,0 +1,15 @@
+{
+  "name": "status-query-function",
+  "version": "1.0.0",
+  "description": "Status query function for webhook processing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0"
+  },
+  "author": "",
+  "license": "MIT"
+}

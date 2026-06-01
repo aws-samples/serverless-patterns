@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Role: !GetAtt MyLambdaFunctionRole.Arn
       Timeout: 3
       Events:

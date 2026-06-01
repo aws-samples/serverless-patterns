@@ -29,7 +29,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       MemorySize: 2048
       Layers:
         - !Sub 'arn:aws:lambda:${AWS::Region}:175033217214:layer:graphicsmagick:2'

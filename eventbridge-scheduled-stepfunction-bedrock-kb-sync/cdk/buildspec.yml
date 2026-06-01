@@ -1,0 +1,40 @@
+version: 0.2
+env:
+  variables:
+    DEFAULT_PYTHON_VERSION: 3.9.17        # Change Python Runtime Version     - Default 3.9.17
+    BOOTSTRAP_COMMON_LAMBDA_LAYER: false  # Checkout the Common Lambda Layer  - Default false
+    BOOTSTRAP_NODE_VERSION: 20            # Install specific Node Runtime     - Default 18
+    BOOTSTRAP_PYTHON_PATH: true          # Add Common Paths to PYTHONPATH     - Default true
+    BOOTSTRAP_GENERATE_PARAMS: true       # Invoke adf  generate_params.py    - Default true
+    BOOTSTRAP_QUIET: true                 # Less wordy logs                   - Default false
+phases:
+  install:
+    commands:
+      - aws s3 cp s3://$S3_BUCKET_NAME/adf-build/ adf-build/ --recursive --quiet
+      - . ./adf-build/helpers/platform_buildspec_init.sh
+  pre_build:
+    commands:
+      - pylint src
+      - bandit -r src
+      - codespell src scripts tests config docs app.py
+  build:
+    commands:
+      - cdk synth --path-metadata false -o cdk.out
+      - ./adf-build/generate_cdk_assets.py cdk.out
+      - cp cdk.out/*.template.json .
+  post_build:
+    commands:
+      - ./adf-build/helpers/pylint_script.sh
+artifacts:
+  files:
+    - "params/*"
+    - "*.template.json"
+reports:
+  unit_tests:
+    files:
+      - unittests.xml
+    file-format: JUNITXML
+  coverage_tests:
+    files:
+      - cov.xml
+    file-format: COBERTURAXML

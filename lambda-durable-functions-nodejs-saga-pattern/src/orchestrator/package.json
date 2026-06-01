@@ -1,0 +1,7 @@
+{
+  "name": "saga-orchestrator",
+  "version": "1.0.0",
+  "dependencies": {
+    "@aws/durable-execution-sdk-js": "^1.0.0"
+  }
+}

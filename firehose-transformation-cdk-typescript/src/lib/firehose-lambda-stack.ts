@@ -41,7 +41,7 @@ export class FirehoseLambdaStack extends cdk.Stack {
     const lambdaFn = new lambda.NodejsFunction(this, 'firehose-lambda-function', {
       entry: 'lambda/index.ts',
       handler: 'handler',
-      runtime: lambda_.Runtime.NODEJS_18_X,
+      runtime: lambda_.Runtime.NODEJS_24_X,
       architecture: lambda_.Architecture.X86_64,
       role: lambda_role,
       timeout: cdk.Duration.seconds(60)

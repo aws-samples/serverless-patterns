@@ -4,7 +4,7 @@ Description: Serverless patterns - Amazon API Gateway REST API with method-level
 
 Globals:
   Function:
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     CodeUri: src/
 
 Resources:
@@ -70,4 +70,4 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"

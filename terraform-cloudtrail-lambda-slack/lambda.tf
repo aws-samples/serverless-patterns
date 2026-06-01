@@ -46,7 +46,7 @@ resource "aws_lambda_function" "test_lambda" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "slacklambda.lambda_handler"
 
-  runtime = "python3.9"
+  runtime = "python3.14"
   environment {
     variables = {
       url = var.slack

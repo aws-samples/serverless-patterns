@@ -1,8 +1,8 @@
-# AWS Step Functions Express Workflow to Amazon Bedrock Anthropic Claude Model v2.1 for Content Generation  
+# AWS Step Functions Express Workflow to Amazon Bedrock Anthropic Claude Sonnet 4.5 for Content Generation
 
 The Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. API Gateway).
 
-The SAM template deploys a Step Functions Express workflow that invokes Amazon Bedrock Anthropic Claude Model v2.1 and returns the generated content based on the provided prompts. The SAM template contains the required resources with IAM permission to run the application with logging enabled.
+The SAM template deploys a Step Functions Express workflow that invokes Amazon Bedrock Anthropic Claude Sonnet 4.5 and returns the generated content based on the provided prompts. The SAM template contains the required resources with IAM permission to run the application with logging enabled.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/stepfunctions-bedrock-sam
 
@@ -42,7 +42,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * Start the Express Workflow using the `start-sync-execution` api command with a "prompt" string in English for generating content as per the input payload.
-* The Express Workflow invokes Amazon Bedrock Anthropic Claude v2.1 Model with the prompt.
+* The Express Workflow invokes Amazon Bedrock Anthropic Claude Sonnet 4.5 with the prompt.
 * Amazon Bedrock returns the generated content as the given promptsentiment of the input text. 
 * If the integration succeeds, the generated content is returned in the Step Function execution results within an `output` object.
 * If the integration fails, the Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
@@ -57,7 +57,7 @@ Please refer to the architecture diagram below:
 Run the following AWS CLI command to send a 'start-sync-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSyncToBedrockArn} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs. Also, please update {your-region} with the region that you provided while running the SAM template.
 
 ```bash
-aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachineExpressSyncToBedrockArn}" --input "{\"prompt\": \"\n\nHuman:Write 5 lines about how Moon was formed.\n\nAssistant:\"}" --region {your-region}
+aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{StateMachineExpressSyncToBedrockArn}" --input "{\"prompt\": \"Write 5 lines about how Moon was formed.\"}" --region {your-region}
 ```
 
 ### Example output:
@@ -70,22 +70,22 @@ aws stepfunctions start-sync-execution  --name "test" --state-machine-arn "{Stat
     "startDate": "2024-01-08T11:49:18.981000+05:30",
     "stopDate": "2024-01-08T11:49:28.758000+05:30",
     "status": "SUCCEEDED",
-    "input": "{\"prompt\": \"\\n\\nHuman:Write 5 lines about how Moon was formed.\\n\\nAssistant:\"}",
+    "input": "{\"prompt\": \"Write 5 lines about how Moon was formed.\"}",
     "inputDetails": {
         "included": true
     },
-    "output": "{\"Body\":{\"completion\":\" Here is a 5 line summary of how the Moon was formed:\\n\\n1. The leading theory is that the Moon formed from debris left over after a massive collision between the young Earth and a Mars-sized body about 4.5 billion years ago.\\n\\n2. This collision threw molten rock and debris into Earth's orbit that eventually cooled and coalesced into the Moon we see today. \\n\\n3. Over billions of years, the Moon's gravity caused Earth's rotation to slow down and its orbit to expand outward. \\n\\n4. The Moon likely had an intense period of volcanism in its early history, but volcanism ended around 3 billion years ago as the Moon's interior cooled.\\n\\n5. Without the stabilizing effect of the Moon, Earth would wobble more on its axis, causing more radical climate swings over long time periods.\",\"stop_reason\":\"stop_sequence\",\"stop\":\"\\n\\nHuman:\"},\"ContentType\":\"application/json\"}",
+    "output": "{\"Body\":{\"model\":\"claude-sonnet-4-5-20250929\",\"id\":\"msg_bdrk_014iQLvHi98ir4DN9aaqNs1P\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"# How the Moon Was Formed\\n\\n1. **Giant Impact**: About 4.5 billion years ago, a Mars-sized object called Theia collided with the early Earth in a catastrophic impact.\\n\\n2. **Debris Field**: The collision ejected massive amounts of rocky debris from both Earth and Theia into orbit around our planet.\\n\\n3. **Accretion Process**: This orbiting debris gradually clumped together through gravitational attraction over millions of years.\\n\\n4. **Moon Formation**: The accumulated material eventually coalesced to form the Moon, which initially orbited much closer to Earth than it does today.\\n\\n5. **Supporting Evidence**: This \\\"Giant Impact Hypothesis\\\" is supported by the Moon's composition being similar to Earth's mantle and its relatively small iron core.\"}],\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"usage\":{\"input_tokens\":18,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"output_tokens\":173}},\"ContentType\":\"application/json\"}",
     "outputDetails": {
         "included": true
     },
     "billingDetails": {
         "billedMemoryUsedInMB": 64,
-        "billedDurationInMilliseconds": 9800
+        "billedDurationInMilliseconds": 4900
     }
 }
 ```
 ## Cleanup
- 
+
 Delete the stack
 ```bash
     sam delete

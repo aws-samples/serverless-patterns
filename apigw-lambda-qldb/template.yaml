@@ -40,7 +40,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: create-person.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: 2012-10-17
@@ -68,7 +68,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: get-person.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -95,7 +95,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: get-person-history.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -122,7 +122,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: update-person.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -151,7 +151,7 @@ Resources:
     Properties:
       CodeUri: src
       Handler: delete-person.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -179,7 +179,7 @@ Outputs:
 
   PersonApi:
     Description: "API Gateway endpoint URL for Prod stage for Person functions"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/person/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/person/"
 
   PersonLedger:
     Description: QLDB Ledger for the sample application

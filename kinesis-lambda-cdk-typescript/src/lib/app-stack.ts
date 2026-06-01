@@ -23,7 +23,7 @@ export class AppStack extends cdk.Stack {
     // write lambda cdk construct to pick from lambda_code folder
     const lambdaFn = new Function(this, prefix + 'Lambda-Function', {
       functionName: prefix + 'KinesisLambda-Function',
-      runtime: Runtime.NODEJS_18_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'app.lambdaHandler',
       code: new AssetCode(path.join(__dirname, '../lambda_code')),
       environment: {

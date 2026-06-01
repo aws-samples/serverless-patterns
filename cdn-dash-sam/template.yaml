@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: lambda_function.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.14
       Timeout: 90
       MemorySize: 1028
       Policies:

@@ -8,7 +8,7 @@ Globals:
     MemorySize: 128
     Architectures: ["arm64"]
     Handler: bootstrap
-    Runtime: provided.al2023
+    Runtime: provided.al2023023
     Timeout: 29
     Environment:
       Variables:

@@ -139,14 +139,14 @@ class OpenSearchServerlessStack(Stack):
             description='Dependencies for the lambda functions',
             code= _lambda.Code.from_asset( 'layers/'), # required
             compatible_runtimes=[
-                _lambda.Runtime.PYTHON_3_11
+                _lambda.Runtime.PYTHON_3_14
             ],
         )
         
         # Define the Lambda function resource and give the associated Execution role the permission to call the relevant Bedrock service api to start ingestion job
         create_aoss_index_function = _lambda.Function(
             self, 'CreateAOSSIndex',
-            runtime=_lambda.Runtime.PYTHON_3_11,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('functions'),
             handler='index_creation.on_event',
             timeout=Duration.seconds(30),

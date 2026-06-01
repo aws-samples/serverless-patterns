@@ -8,7 +8,7 @@ custom:
 
 provider:
   name: aws
-  runtime: python3.9
+  runtime: python3.14
   region: us-east-1
   iam:
     role:

@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys an Amazon API Gateway Rest Edge-Optimized API with a Lambda integration. The AWS Lambda function is written in Python3.9. The function returns a small message and a status code to the caller.
+This pattern deploys an Amazon API Gateway Rest Edge-Optimized API with a Lambda integration. The AWS Lambda function is written in . The function returns a small message and a status code to the caller.
 
 ## Testing
 

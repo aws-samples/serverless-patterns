@@ -1,0 +1,29 @@
+{
+    "Comment": "This is a demo Step Function immitating a long running process for managing a custom resource.",
+    "StartAt": "Custom Resource Management Placeholder",
+    "States": {
+        "Custom Resource Management Placeholder": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "Send Completion Signal",
+            "Comment": "This wait task simulates some business logic applying changes to the environment."
+        },
+        "Send Completion Signal": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Output": "{% $states.result.Payload %}",
+            "Arguments": {
+                "FunctionName": "${SendCompletionSignalLambdaArn}",
+                "Payload": {
+                    "waitConditionHandle": "{% $states.input.WaitConditionHandle %}",
+                    "status": "SUCCESS",
+                    "reason": "Configuration Complete",
+                    "uniqueId": "ID1234",
+                    "data": "Application has completed configuration."
+                }
+            },
+            "End": true
+        }
+    },
+    "QueryLanguage": "JSONata"
+}

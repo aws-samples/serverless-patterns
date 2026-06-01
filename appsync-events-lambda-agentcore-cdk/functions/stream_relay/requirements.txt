@@ -1,0 +1,1 @@
+# Dependencies provided by Lambda runtime (boto3) and Powertools layer

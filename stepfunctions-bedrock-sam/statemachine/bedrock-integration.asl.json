@@ -1,5 +1,5 @@
 {
-  "Comment": "This state machine demonstrates the integration with Amazon Bedrock Anthropic Claude v2.1 Model",
+  "Comment": "This state machine demonstrates the integration with Amazon Bedrock Anthropic Claude Sonnet 4.5",
   "StartAt": "Bedrock InvokeModel",
   "States": {
     "Bedrock InvokeModel": {
@@ -8,8 +8,19 @@
       "Parameters": {
         "ModelId": "${ModelId}",
         "Body": {
-          "prompt.$": "$.prompt",
-          "max_tokens_to_sample": 200
+          "anthropic_version": "bedrock-2023-05-31",
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text.$": "$.prompt"
+                }
+              ]
+            }
+          ],
+          "max_tokens": 200
         }
       },
         "Retry": [

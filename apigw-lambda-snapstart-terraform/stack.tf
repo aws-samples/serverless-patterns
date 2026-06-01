@@ -129,7 +129,7 @@ resource "aws_lambda_function" "UnicornStockBrokerFunction" {
   filename = var.SourceCodePath
 
   handler = "org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest"
-  runtime = "java11"
+  runtime = "java25"
 
   environment {
     variables = {

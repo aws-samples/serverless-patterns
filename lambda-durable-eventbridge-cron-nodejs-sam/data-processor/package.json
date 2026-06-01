@@ -1,0 +1,13 @@
+{
+  "name": "data-processor-lambda",
+  "version": "1.0.0",
+  "description": "Simple data processor service",
+  "main": "index.js",
+  "type": "module",
+  "keywords": [
+    "aws",
+    "lambda"
+  ],
+  "author": "",
+  "license": "MIT"
+}

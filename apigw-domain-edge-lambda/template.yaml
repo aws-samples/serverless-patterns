@@ -26,7 +26,7 @@ Resources:
         "body": json.dumps({
           "message" : "Hello World! This is the edge-optimized custom domain name and the regional API"}),
         }
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         HelloWorld:
           Type: Api 

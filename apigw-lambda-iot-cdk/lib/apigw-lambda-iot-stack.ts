@@ -20,7 +20,7 @@ export class ApigwLambdaIotStack extends Stack {
       handler: 'handler.handler',
       code: Code.fromAsset('./src'),
       description: 'This function publishes a message to AWS IoT Core',
-      runtime: Runtime.PYTHON_3_9,
+      runtime: Runtime.PYTHON_3_14,
     })
 
     const iotPublishHandlerPersmission = new PolicyStatement(({

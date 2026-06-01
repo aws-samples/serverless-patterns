@@ -71,7 +71,7 @@ export class LambdaElasticacheIntegrationpatternCdkStack extends Stack {
 
     // Lambda creation
     const redisaccess = new lambda.Function(this, 'Elasticache-RedisAccess', {
-      runtime: lambda.Runtime.NODEJS_18_X,    // execution environment
+      runtime: lambda.Runtime.NODEJS_24_X,    // execution environment
       code: lambda.Code.fromAsset('lambda'),  // code loaded from "lambda" directory
       handler: 'index.handler',               // file is "index", function is "handler"
       role: lambdarole,

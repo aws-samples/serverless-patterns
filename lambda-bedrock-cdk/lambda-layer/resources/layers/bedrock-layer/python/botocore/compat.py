@@ -89,7 +89,7 @@ def ensure_bytes(s, encoding='utf-8', errors='strict'):
 try:
     import xml.etree.cElementTree as ETree
 except ImportError:
-    # cElementTree does not exist from Python3.9+
+    # cElementTree does not exist from Python3+
     import xml.etree.ElementTree as ETree
 XMLParseError = ETree.ParseError
 import json

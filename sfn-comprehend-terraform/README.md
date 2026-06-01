@@ -1,0 +1,107 @@
+# AWS Step Functions integration with Amazon Comprehend using terraform
+
+The AWS Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. Amazon API Gateway) to run an express workflow and return the result.
+
+The Terraform template deploys an AWS Step Functions Express workflow that invokes Amazon Comprehend and returns the sentiment analysis done by Amazon Comprehend in the response. The Terraform template contains the required resouces with IAM permission to run the application with logging enabled.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-comprehend-terraform
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Requirements
+
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) with version 1.x installed
+
+## Deployment Instructions
+
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ``` 
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```
+    cd sfn-comprehend-terraform
+    ```
+3. From the command line, use Terraform to deploy the AWS resources for the pattern as specified in the main.tf file:
+    ```
+    terraform init
+    terraform apply --auto-approve
+    ```
+4. Review the output from the Terraform deployment process to ensure there are no errors.
+
+5. Note the outputs from the Terraform deployment process. These contain the resource names and/or ARNs which are used for testing.
+
+## How it works
+
+* Start the Standard Workflow using the `start-execution` api command with a "message" string in English for sentiment analysis in the input payload.
+* The Express Workflow invokes Amazon Comprehend.
+* Amazon Comprehend returns the sentiment of the input text. 
+* If the integration works fine, the sentiment analysis outcome is returned in Step Function execution results within a `output` object
+* If the integration fails, the AWS Step Functions workflow will retry up to 5 times before exiting with a `status:FAILED` response.
+
+Please refer to the architecture diagram below:
+
+![End to End Architecture](image/architecture.png)
+
+
+## Testing
+
+Run the following AWS CLI command to send a 'start-execution' command to start the AWS Step Functions workflow. Note, you must edit the <StateMachineArn> placeholder with the ARN of the deployed AWS Step Functions workflow. This is provided in the stack outputs.
+
+```bash
+aws stepfunctions start-execution \
+  --state-machine-arn <StateMachineArn> \
+  --input '{"message":"I am very happy today."}'
+```
+
+After running the above command, the exection ARN will be displayed as follows -
+```bash
+{
+    "executionArn": "arn:aws:states:us-east-1:<AccountId>:execution:StateMachineExpressSyncToComprehend:4d309af8-fb35-4427-aefc-da035954ccc3",
+    "startDate": "2025-10-15T16:29:41.454000+02:00"
+}
+```
+
+Run the describe-execution command to view the output from StepFunctions execution
+
+```bash
+aws stepfunctions describe-execution --execution-arn arn:aws:states:us-east-1:<AccountId>:execution:StateMachineExpressSyncToComprehend:4d309af8-fb35-4427-aefc-da035954ccc3
+```
+
+### Example output:
+
+```bash
+{
+    "executionArn": "arn:aws:states:us-east-1:204524526462:execution:StateMachineExpressSyncToComprehend:4d309af8-fb35-4427-aefc-da035954ccc3",
+    "stateMachineArn": "arn:aws:states:us-east-1:204524526462:stateMachine:StateMachineExpressSyncToComprehend",
+    "name": "4d309af8-fb35-4427-aefc-da035954ccc3",
+    "status": "SUCCEEDED",
+    "startDate": "2025-10-15T16:29:41.454000+02:00",
+    "stopDate": "2025-10-15T16:29:41.724000+02:00",
+    "input": "{\"message\":\"I am very happy today.\"}",
+    "inputDetails": {
+        "included": true
+    },
+    "output": "{\"message\":\"I am very happy today.\",\"Sentiment\":{\"Sentiment\":\"POSITIVE\",\"SentimentScore\":{\"Mixed\":6.753839E-4,\"Negative\":5.647173E-4,\"Neutral\":0.0011139456,\"Positive\":0.99764603}}}",
+    "outputDetails": {
+        "included": true
+    },
+    "redriveCount": 0,
+    "redriveStatus": "NOT_REDRIVABLE",
+    "redriveStatusReason": "Execution is SUCCEEDED and cannot be redriven"
+}
+```
+## Cleanup
+ 
+Delete the stack
+    ```bash
+    terraform destroy --auto-approve
+    ```
+
+----
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0

@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: ScheduledFunction
       Handler: com.serverlessland.App::handleRequest
-      Runtime: java11
+      Runtime: java25
       Architectures:
         - x86_64
       MemorySize: 256

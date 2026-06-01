@@ -28,7 +28,7 @@ Resources:
       Role: 
         Fn::GetAtt: CustomWorkflowLambdaRole.Arn
       Handler: workflow-lambda.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       CodeUri: custom_workflow_lambda/
       Timeout: 300
       MemorySize: 128

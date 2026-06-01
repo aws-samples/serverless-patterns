@@ -84,7 +84,7 @@ Resources:
       Description: Lambda to be invoked by the SQS Queue
       CodeUri: lambda/sqs-handler/
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Timeout: 3
       MemorySize: 128
       Role: !GetAtt SqsHandlerLambdaExecutionRole.Arn
@@ -109,7 +109,7 @@ Resources:
       Description: Lambda to be invoked by API Gateway for authorization
       CodeUri: lambda/authorizer/
       Handler: index.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.14
       Timeout: 3
       MemorySize: 128
       Role: !GetAtt AuthorizerLambdaExecutionRole.Arn
@@ -298,4 +298,4 @@ Resources:
 Outputs:
   HttpApiEndpoint:
     Description: "Http API endpoint"
-    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"

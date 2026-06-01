@@ -15,7 +15,7 @@ export class ClaimCheckStack extends cdk.Stack {
     super(scope, id, props);
 
     // Prerequisites that are not specific to this pattern
-    const lambdaRuntime = lambda.Runtime.NODEJS_18_X;
+    const lambdaRuntime = lambda.Runtime.NODEJS_24_X;
     const deadLetterQueue1 = new sqs.Queue(this, 'ClaimCheckDeadLetterQueue1', {
       enforceSSL: true,
     });

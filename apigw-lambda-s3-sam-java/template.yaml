@@ -4,7 +4,7 @@ Description: This template exposes API to to retrieve Amazon S3 pre-signed URL t
 
 Globals:
   Function:
-    Runtime: java21
+    Runtime: java25
     MemorySize: 3008
     Timeout: 120
 
@@ -66,7 +66,7 @@ Outputs:
   APIGatewayEndpoint:
     Description: API Gateway Endpoint
     Value:
-      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/invoke
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/invoke
   MyS3BucketName:
     Description: S3 Bucket Name
     Value: !Ref MyS3Bucket

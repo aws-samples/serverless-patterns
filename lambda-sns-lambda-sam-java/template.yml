@@ -4,7 +4,7 @@ Description: aws-publisher-subscriber-pattern (uksb-1tthgi812) (tag:lambda-sns-l
 
 Globals:
   Function:
-    Runtime: java11
+    Runtime: java25
     MemorySize: 3072
     Timeout: 30
 

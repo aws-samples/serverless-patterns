@@ -43,7 +43,7 @@ Resources:
       LayerName: combined-dependencies-layer
       ContentUri: ./
       CompatibleRuntimes:
-        - python3.12
+        - python3.14
     Metadata:
       BuildMethod: makefile
       BuildArchitecture: x86_64
@@ -55,7 +55,7 @@ Resources:
     Properties:
       CodeUri: ./
       Handler: handlers.authorizer.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       Layers:
         - !Ref CombinedLayer
 
@@ -81,7 +81,7 @@ Resources:
     Properties:
       CodeUri: ./
       Handler: handlers.pre_token_gen_lambda.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: '2012-10-17'
@@ -146,7 +146,7 @@ Resources:
     Properties:
       CodeUri: ./
       Handler: index.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.14
       InlineCode: |
         import json
 

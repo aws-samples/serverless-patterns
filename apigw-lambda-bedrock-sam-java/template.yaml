@@ -4,7 +4,7 @@ Description: This template exposes API to invoke Amazon Bedrock Mistral LLM usin
 
 Globals:
   Function:
-    Runtime: java17
+    Runtime: java25
     MemorySize: 3008
     Timeout: 120
 
@@ -46,4 +46,4 @@ Outputs:
   APIGatewayEndpoint:
     Description: API Gateway Endpoint
     Value:
-      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/invoke
+      Fn::Sub: https://${MyAPIGateway}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/invoke

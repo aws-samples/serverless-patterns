@@ -24,7 +24,7 @@ class S3LambdaBedrockCdkPythonStack(Stack):
             
         # defina Lambda function with timeout
         lambda_function = lambda_.Function(self, "s3-lambda-bedrock-cdk-python",
-            runtime=lambda_.Runtime.PYTHON_3_12,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="lambda_function.lambda_handler",
             code=lambda_.Code.from_asset("src"),
             timeout=cdk.Duration.seconds(300),

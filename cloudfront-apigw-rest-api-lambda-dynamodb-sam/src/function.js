@@ -3,9 +3,11 @@
 
 const randomBytes = require('crypto').randomBytes;
 
-const AWS = require('aws-sdk');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
-const ddb = new AWS.DynamoDB.DocumentClient();
+const client = new DynamoDBClient({});
+const ddb = DynamoDBDocumentClient.from(client);
 
 exports.handler = (event, context, callback) => {
 
@@ -46,7 +48,7 @@ exports.handler = (event, context, callback) => {
 };
 
 function recordObject(message) {
-    return ddb.put({
+    const command = new PutCommand({
         TableName : process.env.DatabaseTable,
         Item: {
             Name: message.name,
@@ -56,7 +58,8 @@ function recordObject(message) {
             Address: message.address,
             RequestTime: new Date().toISOString(),
         },
-    }).promise();
+    });
+    return ddb.send(command);
 }
 
 function toUrlString(buffer) {

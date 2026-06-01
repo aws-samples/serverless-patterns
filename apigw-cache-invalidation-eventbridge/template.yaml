@@ -298,7 +298,7 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"
 
   CloudWatchDashboard:
     Condition: deployMetricsDashboard

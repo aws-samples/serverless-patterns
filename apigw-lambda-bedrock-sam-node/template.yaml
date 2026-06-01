@@ -1,0 +1,160 @@
+
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for Amazon API Gateway response streaming with AWS Lambda proxy integration (uksb-1tthgi812) (tag:apigw-lambda-bedrock-sam-node)
+Resources:
+  # CloudWatch Log Group for API Gateway Access Logs
+  ApiGatewayAccessLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Sub "/aws/apigateway/${AWS::StackName}/access-logs"
+
+  # IAM Role for API Gateway to write to CloudWatch Logs
+  ApiGatewayCloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+  # API Gateway Account Configuration
+  ApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !GetAtt ApiGatewayCloudWatchRole.Arn
+
+  StreamingApi:
+    Type: AWS::Serverless::Api
+    DependsOn: ApiGatewayAccount
+    Properties:
+      StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiGatewayAccessLogs.Arn
+        Format: '{"requestId":"$context.requestId","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","path":"$context.path","resourcePath":"$context.resourcePath","status":$context.status,"responseLength":$context.responseLength,"responseTime":$context.responseTime,"userAgent":"$context.identity.userAgent","sourceIp":"$context.identity.sourceIp","protocol":"$context.protocol","error.message":"$context.error.message","error.messageString":"$context.error.messageString"}'
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: api-gateway-streaming-config.yaml
+
+  StreamingResponseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/streaming
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Architectures:
+        - x86_64
+      MemorySize: 256
+      Timeout: 300
+      Environment:
+        Variables:
+          BEDROCK_REGION: !Ref AWS::Region
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - bedrock-runtime:InvokeModel
+                - bedrock-runtime:InvokeModelWithResponseStream
+              Resource: "*"
+
+  # Non-streaming API Gateway
+  NonStreamingApi:
+    Type: AWS::Serverless::Api
+    DependsOn: ApiGatewayAccount
+    Properties:
+      StageName: Prod
+      EndpointConfiguration:
+        Type: REGIONAL
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiGatewayAccessLogs.Arn
+        Format: '{"requestId":"$context.requestId","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","path":"$context.path","resourcePath":"$context.resourcePath","status":$context.status,"responseLength":$context.responseLength,"responseTime":$context.responseTime,"userAgent":"$context.identity.userAgent","sourceIp":"$context.identity.sourceIp","protocol":"$context.protocol","error.message":"$context.error.message","error.messageString":"$context.error.messageString"}'
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: api-gateway-non-streaming-config.yaml
+
+  NonStreamingResponseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/nonstreaming
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Architectures:
+        - x86_64
+      MemorySize: 256
+      Timeout: 300
+      Environment:
+        Variables:
+          BEDROCK_REGION: !Ref AWS::Region
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - bedrock-runtime:InvokeModel
+                - bedrock-runtime:InvokeModelWithResponseStream
+              Resource: "*"
+
+  ApiGatewayInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref StreamingResponseFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${StreamingApi}/*/*"
+
+  ApiGatewayNonStreamingInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref NonStreamingResponseFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${NonStreamingApi}/*/*"
+
+Outputs:
+  StreamingApiUrl:
+    Description: "API Gateway streaming endpoint URL"
+    Value: !Sub "https://${StreamingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ask"
+  
+  NonStreamingApiUrl:
+    Description: "API Gateway non-streaming endpoint URL"
+    Value: !Sub "https://${NonStreamingApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ask"

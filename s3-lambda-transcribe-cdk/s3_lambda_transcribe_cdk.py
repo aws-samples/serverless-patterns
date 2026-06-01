@@ -29,7 +29,7 @@ class TriggerTranscribe(Construct):
 
         python_lambda_kwargs = {
             'handler': 'lambda_function.lambda_handler',
-            'runtime': lambda_.Runtime.PYTHON_3_9,
+            'runtime': lambda_.Runtime.PYTHON_3_14,
             'timeout': Duration.minutes(2)
         }
 

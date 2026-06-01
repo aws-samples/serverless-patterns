@@ -191,7 +191,7 @@ Resources:
       Handler: index.lambda_handler
       MemorySize: 256
       Role: !GetAtt LambdaRole.Arn
-      Runtime: python3.9
+      Runtime: python3.14
       Timeout: 60
   
   LambdaRole:
@@ -287,7 +287,7 @@ Resources:
       Handler: index.lambda_handler
       MemorySize: 256
       Role: !GetAtt LambdaRole.Arn
-      Runtime: python3.9
+      Runtime: python3.14
       Timeout: 60
 
   ENIsIP:
@@ -410,12 +410,12 @@ Outputs:
   APIGatewayURL:
     Condition: SameAccCheck
     Value: !Sub 
-      - 'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com/v0/lambda'
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/v0/lambda'
       - ApiId: !Ref ApiGatewayRestApi
   CURLCommand:  
     Condition: SameAccCheck
     Value: !Sub 
-      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.amazonaws.com'"
+      - "curl https://${CustomDomain}/${ApiGatewayStage}/lambda -H 'Host:${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}'"
       - CustomDomain: !Ref HostedZoneRecordSet
         ApiGatewayStage: !Ref ApiGatewayStage
         ApiId: !Ref ApiGatewayRestApi

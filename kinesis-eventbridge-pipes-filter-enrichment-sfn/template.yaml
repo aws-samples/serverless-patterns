@@ -69,7 +69,7 @@ Resources:
         - ResourceName: EnrichmentLambda
       CodeUri: src/enricher
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 128
       Timeout: 30
       Tracing: Active

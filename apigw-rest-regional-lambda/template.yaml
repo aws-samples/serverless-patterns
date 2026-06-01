@@ -16,7 +16,7 @@ Resources:
         "body": json.dumps({
           "message" : "Hello World! This is the regional API"}),
         }
-      Runtime: python3.9
+      Runtime: python3.14
       Events:
         HelloWorld:
           Type: Api 
@@ -37,6 +37,6 @@ Resources:
 Outputs:
   EndpointUrl:
     Description: 'REST regional endpoint URL'
-    Value: !Sub 'https://${ApiRegional}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Value: !Sub 'https://${ApiRegional}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod'
 
 

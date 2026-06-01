@@ -19,7 +19,7 @@ Resources:
     Properties:
       CodeUri: HandlerKafka/
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
       Architectures:
         - x86_64
       Events:

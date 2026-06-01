@@ -87,7 +87,7 @@ Resources:
       Description: Lambda to be invoked by the API Gateway
       CodeUri: src/
       Handler: app.handler
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Timeout: 3
       MemorySize: 128
       Events:
@@ -145,7 +145,7 @@ Resources:
 Outputs:
   MyApiEndpoint:
     Description: "API endpoint"
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
 
   MyLambdaFunction:
     Description: MyLambdaFunction name

@@ -17,7 +17,7 @@ Resources:
     Properties:
       FunctionName: LambdaProducerFunction
       Handler: apiHandler.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       CodeUri: src/
       Policies:
         DynamoDBCrudPolicy:
@@ -51,7 +51,7 @@ Resources:
     Properties:
       FunctionName: LambdaConsumerFunction
       Handler: messageHandler.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       CodeUri: src/
       Policies: 
       - KinesisStreamReadPolicy:
@@ -67,4 +67,4 @@ Resources:
 Outputs:
   EndpointUrl:
     Description: 'HTTP REST endpoint URL'
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod'

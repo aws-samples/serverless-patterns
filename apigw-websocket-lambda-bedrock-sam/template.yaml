@@ -35,7 +35,7 @@ Resources:
     Properties:
       CodeUri: ./src/
       Handler: app.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Timeout: 30
       Environment:
         Variables:
@@ -134,6 +134,6 @@ Resources:
 Outputs:
   WebSocketURL:
     Description: "WebSocket URL"
-    Value: !Sub "wss://${WebSocketAPI}.execute-api.${AWS::Region}.amazonaws.com/prod"
+    Value: !Sub "wss://${WebSocketAPI}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod"
 
     

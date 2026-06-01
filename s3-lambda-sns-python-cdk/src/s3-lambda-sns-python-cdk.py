@@ -32,7 +32,7 @@ class CdkS3LambdaSnsPythonStack(cdk.Stack):
         # Define Lambda function
         my_function = lambda_.Function(
             self, "MyFunction",
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             code=lambda_.Code.from_asset("src"),
             handler="lambda_function.lambda_handler"
         )

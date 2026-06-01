@@ -20,7 +20,7 @@ export class DemoStack extends Stack {
             architecture: Architecture.ARM_64,
             logGroup,
             loggingFormat: LoggingFormat.JSON,
-            runtime: Runtime.NODEJS_20_X,
+            runtime: Runtime.NODEJS_24_X,
         };
 
         const customResourceStartLambda = new NodejsFunction(this, 'start', commonLambdaProps);

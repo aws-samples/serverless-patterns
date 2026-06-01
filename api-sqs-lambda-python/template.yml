@@ -38,7 +38,7 @@ Resources:
       Description: Lambda to be invoked by the SQS Queue
       CodeUri: src/index.zip
       Handler: index.handler
-      Runtime: python3.11
+      Runtime: python3.14
       Architectures:
         - x86_64
       Timeout: 30

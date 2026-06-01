@@ -553,7 +553,7 @@
         "output": {
           "CompatibleRuntimes": [
             "python3.6",
-            "python3.7"
+            "python3.14"
           ],
           "Content": {
             "CodeSha256": "tv9jJO+rPbXUUXuRKi7CwHzKtLDkDRJLB3cC3Z/ouXo=",
@@ -585,7 +585,7 @@
         },
         "output": {
           "CompatibleRuntimes": [
-            "python3.8"
+            "python3.14"
           ],
           "Content": {
             "CodeSha256": "6x+xmpl/M3BnQUk7gS9sGmfeFsR/npojXoA3fZUv4eU=",
@@ -945,7 +945,7 @@
     "ListLayers": [
       {
         "input": {
-          "CompatibleRuntime": "python3.7"
+          "CompatibleRuntime": "python3.14"
         },
         "output": {
           "Layers": [
@@ -953,7 +953,7 @@
               "LatestMatchingVersion": {
                 "CompatibleRuntimes": [
                   "python3.6",
-                  "python3.7"
+                  "python3.14"
                 ],
                 "CreatedDate": "2018-11-15T00:37:46.592+0000",
                 "Description": "My layer",
@@ -1109,7 +1109,7 @@
         "input": {
           "CompatibleRuntimes": [
             "python3.6",
-            "python3.7"
+            "python3.14"
           ],
           "Content": {
             "S3Bucket": "lambda-layers-us-west-2-123456789012",
@@ -1122,7 +1122,7 @@
         "output": {
           "CompatibleRuntimes": [
             "python3.6",
-            "python3.7"
+            "python3.14"
           ],
           "Content": {
             "CodeSha256": "tv9jJO+rPbXUUXuRKi7CwHzKtLDkDRJLB3cC3Z/ouXo=",

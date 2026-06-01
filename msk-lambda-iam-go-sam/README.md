@@ -42,9 +42,9 @@ Read more about [SAM Build here](https://docs.aws.amazon.com/serverless-applicat
     cd msk-lambda-iam-go-sam
     ```
 
-This solution uses the AWS Lambda [custom runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html) `provided.al2` which is the prefered way to run Go applications in Lambda. For more information, see [https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/](https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/).
+This solution uses the AWS Lambda [custom runtime](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html) which is the prefered way to run Go applications in Lambda. For more information, see [https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/](https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/).
 
-The AWS SAM template configures the `provided.al2` runtime and builds the Go function using the following syntax.
+The AWS SAM template configures the custom runtime and builds the Go function using the following syntax.
 
 ```yaml
 ...
@@ -55,7 +55,7 @@ The AWS SAM template configures the `provided.al2` runtime and builds the Go fun
     Properties:
       CodeUri: HandlerKafka/
       Handler: bootstrap
-      Runtime: provided.al2
+      Runtime: provided.al2023
 ```
 You can also use the managed Go.1 runtime by amending the AWS SAM template:
 

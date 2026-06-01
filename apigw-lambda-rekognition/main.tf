@@ -77,7 +77,7 @@ resource "aws_lambda_function" "generate_presigned_url" {
   function_name = "${lower(var.prefix)}-generate-presigned-url"
   role          = aws_iam_role.lambda_role.arn
   handler       = "generate_presigned_url.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   timeout       = 30
   environment {
     variables = {
@@ -90,7 +90,7 @@ resource "aws_lambda_function" "process_s3_event" {
   function_name = "${lower(var.prefix)}-process-s3-event"
   role          = aws_iam_role.lambda_role.arn
   handler       = "process_s3_event.lambda_handler"
-  runtime       = "python3.12"
+  runtime       = "python3.14"
   timeout       = 60
   environment {
     variables = {
@@ -104,6 +104,8 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
     lambda_function_arn = aws_lambda_function.process_s3_event.arn
     events              = ["s3:ObjectCreated:*"]
   }
+
+  depends_on = [aws_lambda_permission.allow_s3]
 }
 resource "aws_lambda_permission" "allow_s3" {
   statement_id  = "${lower(var.prefix)}-allow-s3-invoke-lambda"
@@ -145,8 +147,14 @@ resource "aws_lambda_permission" "allow_api_gateway" {
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on  = [aws_api_gateway_integration.integration]
   rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = "dev"
 }
+
+resource "aws_api_gateway_stage" "stage" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  stage_name    = "dev"
+}
+
 output "api_id" {
   description = "The ID of the API Gateway REST API"
   value       = aws_api_gateway_rest_api.api.id
@@ -178,4 +186,8 @@ output "lambda_generate_presigned_url_log_group" {
 output "lambda_process_s3_event_log_group" {
   description = "The name of the CloudWatch log group for the process_s3_event Lambda function"
   value       = aws_cloudwatch_log_group.lambda_log_group[1].name
+}
+output "api_gateway_endpoint_url" {
+  description = "The URL of the API Gateway endpoint for generating presigned URLs"
+  value       = "${aws_api_gateway_stage.stage.invoke_url}/${aws_api_gateway_resource.resource.path_part}"
 }

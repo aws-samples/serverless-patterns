@@ -26,6 +26,6 @@
     "source-map-support": "^0.5.21"
   },
   "dependencies": {
-    "aws-sdk": "^2.1066.0"
+    "@aws-sdk/client-codecommit": "^3.0.0"
   }
 }

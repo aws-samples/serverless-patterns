@@ -1,0 +1,13 @@
+{
+  "name": "durable-agent-caller",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-crypto/sha256-js": "latest",
+    "@aws-sdk/client-bedrock-agentcore": "^3.998.0",
+    "@aws-sdk/credential-provider-node": "latest",
+    "@aws/durable-execution-sdk-js": "latest",
+    "@smithy/protocol-http": "latest",
+    "@smithy/signature-v4": "latest"
+  }
+}

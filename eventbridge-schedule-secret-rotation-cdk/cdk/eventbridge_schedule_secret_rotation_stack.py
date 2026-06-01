@@ -71,7 +71,7 @@ class EventbridgeScheduleSecretRotationCdkStack(Stack):
                 role=rotation_lambda_role,
                 code=lambda_.Code.from_asset("src//lambda"),
                 handler="rotation_lambda.lambda_handler",
-                runtime=lambda_.Runtime.PYTHON_3_11,
+                runtime=lambda_.Runtime.PYTHON_3_14,
                 environment={
                     "SECRET_ID": secret.attr_id
                 },

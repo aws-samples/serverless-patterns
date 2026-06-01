@@ -22,7 +22,7 @@ Resources:
       Handler: app.lambda_handler
       FunctionName: BedrockEmb
       Description: Lambda to get bedrock embedding for indexing
-      Runtime: python3.9
+      Runtime: python3.14
       Timeout: 10
       MemorySize: 128
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -85,6 +85,6 @@ Outputs:
   ContentBucket:
     Description: "S3 bucket name"
     Value: !Ref ContentBucket
-  LambdaFuncton:
+  LambdaFunction:
     Value: !Ref bedrockemb
     Description: Lambda Function ARN

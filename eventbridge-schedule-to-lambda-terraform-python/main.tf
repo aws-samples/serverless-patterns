@@ -24,7 +24,7 @@ resource "aws_lambda_function" "eventbridge_function" {
   filename      = data.archive_file.LambdaZipFile.output_path
   handler       = "eventbridge_function.lambda_handler"
   role          = aws_iam_role.iam_for_lambda.arn
-  runtime       = "python3.10"
+  runtime       = "python3.14"
   memory_size   = 128
   timeout       = 30
 }

@@ -1,6 +1,6 @@
 # Regional API with Edge-Optimized domain name to Lambda
 
-This pattern creates an Amazon API Gateway Regional rest API with an Edge-Optimized domain name. The API is integrated with a Lambda function in python3.9.
+This pattern creates an Amazon API Gateway Regional rest API with an Edge-Optimized domain name. The API is integrated with a Lambda function in Python.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-domain-edge-lambda
 

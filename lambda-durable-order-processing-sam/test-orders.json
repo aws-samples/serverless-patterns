@@ -1,0 +1,50 @@
+{
+  "lowValueOrder": {
+    "customerId": "CUST-001",
+    "customerEmail": "customer1@example.com",
+    "items": [
+      {
+        "productId": "BOOK-001",
+        "name": "Programming Book",
+        "quantity": 2,
+        "price": 45.99
+      }
+    ]
+  },
+  "highValueOrder": {
+    "customerId": "CUST-002",
+    "customerEmail": "customer2@example.com",
+    "items": [
+      {
+        "productId": "SERVER-001",
+        "name": "Enterprise Server",
+        "quantity": 1,
+        "price": 3500.00
+      }
+    ]
+  },
+  "multiItemOrder": {
+    "customerId": "CUST-003",
+    "customerEmail": "customer3@example.com",
+    "items": [
+      {
+        "productId": "LAPTOP-001",
+        "name": "Gaming Laptop",
+        "quantity": 1,
+        "price": 1299.99
+      },
+      {
+        "productId": "MOUSE-001",
+        "name": "Wireless Mouse",
+        "quantity": 2,
+        "price": 29.99
+      },
+      {
+        "productId": "KEYBOARD-001",
+        "name": "Mechanical Keyboard",
+        "quantity": 1,
+        "price": 149.99
+      }
+    ]
+  }
+}

@@ -37,7 +37,7 @@ Resources:
     Type: AWS::Serverless::Function #https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
     Properties:
       FunctionName: LambdaFunction
-      Runtime: python3.8
+      Runtime: python3.14
       Handler: app.lambda_handler
       CodeUri: ./src
       Events:

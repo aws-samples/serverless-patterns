@@ -33,7 +33,7 @@ Resources:
     Properties:
       CodeUri: firstfunction/
       Handler: first-function.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Timeout: 3
       Policies: 
         - CloudWatchPutMetricPolicy: {}
@@ -42,7 +42,7 @@ Resources:
     Properties:
       CodeUri: secondfunction/
       Handler: second-function.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Timeout: 3
       Policies: 
         - CloudWatchPutMetricPolicy: {}

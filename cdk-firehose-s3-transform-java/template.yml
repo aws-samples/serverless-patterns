@@ -10,7 +10,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: org.example.StreamLambdaHandler::handleRequest
-      Runtime: java17
+      Runtime: java25
       CodeUri: .
       MemorySize: 512
       Policies: AWSLambdaBasicExecutionRole

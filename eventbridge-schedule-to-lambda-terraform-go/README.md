@@ -34,11 +34,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Compile the main.go file to create an executable:
     ```
-    GOOS=linux GOARCH=amd64 go build -o main main.go
+    GOOS=linux GOARCH=amd64 go build -o bootstrap main.go
     ```
 1. Create a zip file with the Go executable file:
     ```
-    zip main.zip main
+    zip myFunction.zip bootstrap
     ```
 1. Change directory back into the pattern directory:
     ```

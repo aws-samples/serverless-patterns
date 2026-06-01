@@ -76,7 +76,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python3.9
+      Runtime: python3.14
       # Python inline code to create a buildspec.yml file in the backup bucket to run CodeBuild
       InlineCode: |
         import boto3

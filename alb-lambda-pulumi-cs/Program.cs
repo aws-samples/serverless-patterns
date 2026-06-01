@@ -97,7 +97,7 @@ return await Deployment.RunAsync(() =>
 
     var fn = new Aws.Lambda.Function("fn", new()
     {
-        Runtime = "nodejs18.x",
+        Runtime = "nodejs24.x",
         Handler = "index.handler",
         Role = lambdaRole.Arn,
         Code = new FileArchive("./lambda"),

@@ -66,7 +66,7 @@ You should be able to get the output in the log tails windows in the embedding f
  
 1. Delete the stack
 ```
-    sam delete
+sam delete
 ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.

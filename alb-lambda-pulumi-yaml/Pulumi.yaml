@@ -59,7 +59,7 @@ resources:
   fn: 
     type: aws:lambda:Function
     properties:
-      runtime: nodejs18.x
+      Runtime: nodejs24.x
       handler: index.handler
       role: ${lambdaRole.arn}
       code: 

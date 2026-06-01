@@ -16,7 +16,7 @@ Resources:
     Properties:
       CodeUri: write_to_dynamodb/
       Handler: app.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Timeout: 10
       Tracing: Active
@@ -123,7 +123,7 @@ Resources:
     Properties:
       CodeUri: test-package-vulnerability/
       Handler: vulnerable-lambda-fn.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.14
       MemorySize: 128
       Timeout: 10
       Tracing: Active

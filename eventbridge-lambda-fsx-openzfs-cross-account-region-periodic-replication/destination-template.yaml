@@ -107,7 +107,7 @@ Resources:
       Handler: CopySnapshotAndUpdateVolume.lambda_handler
       Role: !GetAtt CopySnapshotAndUpdateVolumeLambdaRole.Arn
       CodeUri: src/CopySnapshotAndUpdateVolume.py
-      Runtime: python3.13
+      Runtime: python3.14
       Timeout: 600
 
 #

@@ -22,7 +22,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-target-lambda
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       MemorySize: 128
       Timeout: 15
       Architectures:

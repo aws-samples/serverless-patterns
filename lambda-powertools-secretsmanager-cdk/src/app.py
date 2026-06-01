@@ -70,7 +70,7 @@ class LambdaServiceStack(Stack):
         )
 
         lambda_handler = lambda_.Function(self, 'lambda-handler',
-            runtime = lambda_.Runtime.PYTHON_3_9,
+            runtime = lambda_.Runtime.PYTHON_3_14,
             handler = 'handler.handler',
             code = lambda_.Code.from_asset('lambda'),
             layers = [ layer ],

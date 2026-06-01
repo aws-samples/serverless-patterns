@@ -18,7 +18,7 @@ Resources:
             console.log(logprefix);
             return "Hello from the mapping template API"; 
         };
-      Runtime: nodejs18.x
+      Runtime: nodejs24.x
       Events:
         HelloWorld:
           Type: Api 

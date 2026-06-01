@@ -3,7 +3,7 @@ Description: Serverless Pattern - Amazon API Gateway using Lambda Authorizer and
 Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
-    Runtime: nodejs18.x
+    Runtime: nodejs24.x
 Resources:
   # REST API
   AppApi:
@@ -61,4 +61,4 @@ Outputs:
   # API Gateway endpoint to be used during tests
   AppApiEndpoint:
     Description: API Endpoint
-    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod"
