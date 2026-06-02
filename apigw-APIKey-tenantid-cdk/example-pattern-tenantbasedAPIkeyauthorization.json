@@ -63,5 +63,12 @@
     "text": [
       "Delete the CDK stack: <code>cdk destroy</code>"
     ]
-  }
+  },  
+  "authors": [
+    {
+      "name": "Lavanya Tangutur",     
+      "bio": "Lavanya Tangutur serves as a Senior Technical Account Manager at AWS ocused on helping customers build, deploy, and run secure, resilient, and cost-effective workloads on AWS.",
+      "linkedin": "www.linkedin.com/in/lavanyatangutur"
+    }
+  ]
 }
