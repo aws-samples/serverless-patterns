@@ -3,7 +3,7 @@
   "description": "Invoke Amazon Bedrock directly from Step Functions using the native InvokeModel optimized integration. Deployed with AWS CDK.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -29,13 +29,13 @@
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"]
+    "text": ["<code>cdk deploy</code>"]
   },
   "testing": {
     "text": ["See the README for testing instructions."]
   },
   "cleanup": {
-    "text": ["cdk destroy"]
+    "text": ["<code>cdk destroy</code>"]
   },
   "authors": [
     {
