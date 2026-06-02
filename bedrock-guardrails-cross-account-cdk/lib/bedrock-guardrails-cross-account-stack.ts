@@ -96,7 +96,7 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
 
     // Test Lambda
     const testFn = new lambda.Function(this, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'test.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src')),
       memorySize: 256,
@@ -112,11 +112,6 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
         `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
         'arn:aws:bedrock:*::foundation-model/*',
       ],
-    }));
-
-    testFn.addToRolePolicy(new iam.PolicyStatement({
-      actions: ['bedrock:ApplyGuardrail'],
-      resources: [guardrail.attrGuardrailArn],
     }));
 
     testFn.node.addDependency(enforceCr);

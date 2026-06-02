@@ -1,6 +1,6 @@
-# Bedrock Guardrails Account-Level Enforcement
+# Amazon Bedrock Guardrails Account-Level Enforcement
 
-This pattern deploys an Amazon Bedrock Guardrail with content and topic filters, enforces it at the account level so ALL Bedrock API calls are automatically guarded, and provides a test Lambda that demonstrates the enforcement without specifying any guardrailIdentifier.
+This pattern deploys an Amazon Bedrock Guardrail with content and topic filters, enforces it at the account level so ALL Bedrock API calls are automatically guarded, and provides a test AWS Lambda function that demonstrates the enforcement without specifying any guardrail identifier.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-guardrails-cross-account-cdk
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js 18+](https://nodejs.org/en/download/) installed
+* [Node.js 20+](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
 * [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for Anthropic Claude Sonnet in your target region
 
@@ -125,6 +125,6 @@ cdk destroy
 - **inputTags deprecation:** The `inputTags` parameter in the enforcement configuration is being deprecated in favor of `selectiveContentGuarding`. This pattern uses `IGNORE` for inputTags as a placeholder.
 
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
