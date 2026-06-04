@@ -14,7 +14,7 @@ This saga is built using the `aws-durable-execution-sdk` with Python 3.14 runtim
 
 ### Components
 
-- **Saga Orchestrator**: Durable lambda function that coordinates the distributed transaction
+- **Saga Orchestrator**: AWS Lambda durable function that coordinates the distributed transaction
 - **Service Functions**: Individual Lambda functions for each service (flight, hotel, car)
   - Reserve functions: Create reservations in Amazon DynamoDB
   - Cancel functions: Rollback reservations (compensating transactions)
@@ -101,14 +101,7 @@ The deployment creates:
 
 ### 6. Note the Outputs
 
-After deployment, save the function ARNs from the stack outputs:
-- `SagaDurableFunctionArn` - Main orchestrator function
-- `ReserveFlightFunctionArn` - Flight reservation service
-- `CancelFlightFunctionArn` - Flight cancellation service
-- `ReserveHotelFunctionArn` - Hotel reservation service
-- `CancelHotelFunctionArn` - Hotel cancellation service
-- `ReserveCarFunctionArn` - Car rental service
-- `CancelCarFunctionArn` - Car cancellation service
+After deployment, CDK outputs the ARNs for all Lambda functions and DynamoDB table names.
 
 ## How It Works
 
@@ -190,12 +183,10 @@ aws lambda invoke \
   }
 }
 ```
-You can view the function output in the AWS Lambda Durable console as well:
-![saga success response](./images/saga-success.png)
 
 **Validation:**
 - All three services succeed
-- DynamoDB records show `status: "RESERVED"`
+- Amazon DynamoDB records show `status: "RESERVED"`
 - No compensations triggered
 
 ### Test Scenario 2: Flight Fails Immediately
@@ -225,8 +216,7 @@ aws lambda invoke \
 - Flight fails immediately
 - Hotel and car never attempted
 - No compensations needed (nothing to rollback)
-- DynamoDB: No records created
-![saga-failure-with-car-booking](./images/saga-failure-with-car.png)
+- Amazon DynamoDB: No records created
 
 ### Test Scenario 3: Hotel Fails After Flight Succeeds
 
@@ -254,20 +244,11 @@ aws lambda invoke \
 }
 ```
 
-**Using Lambda Console:**
-
-Create a test event named "FailHotelTest" with invocation type "Event" (async) and the JSON payload above.
-
 **Expected Behavior:**
 - Flight reserved
 - Hotel fails
-
-**Console View:**
-
-After the failure, you should see the error state in the Lambda console showing the compensation process:
-
-![Saga Failure Console](./images/saga-failure-with-car.png)
-
+- Compensation: Flight cancelled (reverse order)
+- Amazon DynamoDB: Flight record updated to `status: "CANCELLED"`
 
 ### Test Scenario 4: Car Fails After Flight and Hotel Succeed
 
@@ -295,33 +276,14 @@ aws lambda invoke \
 }
 ```
 
-**Using Lambda Console:**
-
-Create a test event named "FailCarTest" with invocation type "Event" (async) and the JSON payload above.
-
 **Expected Behavior:**
 - Flight reserved
 - Hotel reserved
 - Car fails
 - Compensation: Hotel cancelled, then flight cancelled (reverse order)
-- DynamoDB: Flight and hotel records with `status: "CANCELLED"`
-
-**Console View:**
-
-After the failure, you should see the error state in the Lambda console showing the compensation process:
+- Amazon DynamoDB: Flight and hotel records with `status: "CANCELLED"`
 
 ![Saga Failure Console](./images/saga-failure-with-car.png)
-
-**CloudWatch Logs:**
-```
-Step 1: Reserving flight...
-Flight reserved successfully: <booking-id>
-Step 2: Reserving hotel...
-Hotel reserved successfully: <reservation-id>
-Step 3: Reserving car...
-SIMULATED FAILURE: failBookCar flag is set to True
-Error in saga workflow: Simulated car rental failure
-```
 
 ### Verify Compensation in DynamoDB
 
@@ -349,31 +311,9 @@ Look for:
 - `updatedAt` timestamp changes after cancellation
 - No orphaned records
 
-### Testing in Lambda Console
-
-1. Navigate to AWS Lambda Console
-2. Open `saga-durable-function`
-3. Go to "Test" tab
-4. Click "Create new event"
-5. Name your test event (e.g., "SuccessTest", "FailCarTest")
-6. **Important:** Select invocation type "Event" for async execution (recommended for durable functions)
-
 ### Async vs Sync Invocation
 
-**Async Invocation (Event) - Recommended:**
-- Lambda returns immediately with 202 Accepted
-- Function executes in the background
-- Check CloudWatch Logs for results
-- Use `--invocation-type Event` in CLI
-- Select "Event" in Lambda Console test configuration
-
-**Sync Invocation (RequestResponse):**
-- Lambda waits for function to complete
-- Returns the actual response
-- Use `--invocation-type RequestResponse` in CLI (default)
-- Select "RequestResponse" in Lambda Console test configuration
-
-For durable functions that can run for extended periods, async invocation is recommended.
+Use `--invocation-type Event` (async) for durable functions — Lambda returns 202 immediately and the function runs in the background. Use `--invocation-type RequestResponse` (default) for synchronous execution.
 
 ## Monitoring
 
