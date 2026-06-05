@@ -20,6 +20,7 @@ export class DynamodbCrossAccountReplicationStack extends cdk.Stack {
       sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
       billing: dynamodb.Billing.onDemand(),
       pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: true },
+      // DESTROY for easy cleanup in sample patterns. Use RETAIN in production.
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       replicas: [{ region: replicaRegion }],
     });

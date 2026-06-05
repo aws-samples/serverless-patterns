@@ -1,6 +1,6 @@
 # Amazon DynamoDB Global Tables with Cross-Account Read Access
 
-This pattern deploys a DynamoDB Global Table (same-account, multi-region) and an IAM role that grants a separate AWS account read-only access to the table in both regions.
+This pattern deploys an Amazon DynamoDB Global Table (same-account, multi-region) and an IAM role that grants a separate AWS account read-only access to the table in both regions.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-cross-account-replication-cdk
 
