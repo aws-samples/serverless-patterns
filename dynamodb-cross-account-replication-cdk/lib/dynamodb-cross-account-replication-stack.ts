@@ -34,7 +34,6 @@ export class DynamodbCrossAccountReplicationStack extends cdk.Stack {
       actions: [
         'dynamodb:GetItem',
         'dynamodb:Query',
-        'dynamodb:Scan',
         'dynamodb:BatchGetItem',
       ],
       resources: [

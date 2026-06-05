@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
 * [Node.js](https://nodejs.org/en/download/) 20.x or later
 * Two AWS accounts (one owns the table, the other reads from it)
+* CDK bootstrapped in the deployment account/region (`cdk bootstrap`)
 
 ## How it works
 
