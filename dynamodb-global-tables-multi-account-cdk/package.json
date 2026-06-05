@@ -1,0 +1,15 @@
+{
+  "name": "dynamodb-global-tables-multi-account-cdk",
+  "version": "1.0.0",
+  "bin": { "app": "bin/app.ts" },
+  "scripts": { "build": "tsc", "cdk": "cdk" },
+  "devDependencies": {
+    "aws-cdk": "^2.258.0",
+    "typescript": "~5.7.0",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.258.0",
+    "constructs": "^10.0.0"
+  }
+}

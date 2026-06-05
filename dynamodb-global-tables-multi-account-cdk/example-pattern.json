@@ -1,0 +1,41 @@
+{
+  "title": "Amazon DynamoDB Global Tables with True Multi-Account Replication",
+  "description": "Deploy a DynamoDB Global Table that replicates across two separate AWS accounts using TableV2MultiAccountReplica. Deployed with AWS CDK.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a DynamoDB Global Table in Account A and a multi-account replica in Account B using TableV2MultiAccountReplica.",
+      "Writes in either account are automatically replicated to the other with sub-second latency.",
+      "CDK handles the cross-account resource policies needed for replication.",
+      "The replica must be in a different region from the source (Global Tables requirement)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-global-tables-multi-account-cdk",
+      "templateURL": "serverless-patterns/dynamodb-global-tables-multi-account-cdk",
+      "projectFolder": "dynamodb-global-tables-multi-account-cdk",
+      "templateFile": "lib/source-table-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "DynamoDB Global Tables cross-account replication", "link": "https://aws.amazon.com/blogs/database/amazon-dynamodb-global-tables-now-support-replication-across-aws-accounts/" },
+      { "text": "CDK TableV2MultiAccountReplica", "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_dynamodb.TableV2MultiAccountReplica.html" },
+      { "text": "DynamoDB Global Tables documentation", "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html" }
+    ]
+  },
+  "deploy": { "text": ["See README for multi-account deployment steps"] },
+  "testing": { "text": ["See the README for testing instructions."] },
+  "cleanup": { "text": ["<code>cdk destroy</code> in reverse order (replica first, then source)"] },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
