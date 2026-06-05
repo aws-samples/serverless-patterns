@@ -71,10 +71,21 @@ aws dynamodb get-item --table-name <TableName> \
 # Cross-account read (from reader account, assuming the role)
 aws sts assume-role --role-arn <CrossAccountRoleArn> \
   --role-session-name reader-test
-# Use returned credentials to read from either region
+
+# Export the temporary credentials
+export AWS_ACCESS_KEY_ID=<AccessKeyId from above>
+export AWS_SECRET_ACCESS_KEY=<SecretAccessKey from above>
+export AWS_SESSION_TOKEN=<SessionToken from above>
+
+# Read from the replica region using the cross-account role
+aws dynamodb get-item --table-name <TableName> \
+  --key '{"PK":{"S":"user#123"},"SK":{"S":"profile"}}' \
+  --region us-west-2
 ```
 
 ## Cleanup
+
+> **⚠️ Warning:** `cdk destroy` with `RemovalPolicy.DESTROY` will permanently delete the table and all its data. Back up any important data before destroying.
 
 ```bash
 cdk destroy
