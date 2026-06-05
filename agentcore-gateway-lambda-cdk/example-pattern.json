@@ -1,0 +1,50 @@
+{
+  "title": "Amazon Bedrock AgentCore Gateway with Lambda tools",
+  "description": "Deploy an AgentCore Gateway with Lambda tool targets, exposing tools via the MCP protocol with IAM authentication.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "services": {
+    "from": "bedrockagentcore",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon Bedrock AgentCore Gateway that exposes Lambda functions as MCP (Model Context Protocol) tools. The Gateway handles tool discovery (tools/list) and invocation (tools/call) with IAM-based authentication.",
+      "AgentCore Gateway provides a unified connectivity layer between AI agents and tools. Lambda functions are registered as targets with inline tool schemas, enabling any MCP-compatible client to discover and invoke them."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-gateway-lambda-cdk",
+      "templateURL": "serverless-patterns/agentcore-gateway-lambda-cdk",
+      "projectFolder": "agentcore-gateway-lambda-cdk",
+      "templateFile": "lib/agentcore-gateway-lambda-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Amazon Bedrock AgentCore Gateway", "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-building.html" },
+      { "text": "Model Context Protocol (MCP)", "link": "https://modelcontextprotocol.io/" },
+      { "text": "Run custom MCP proxies on AgentCore Runtime", "link": "https://aws.amazon.com/blogs/machine-learning/run-custom-mcp-proxies-serverless-on-amazon-bedrock-agentcore-runtime/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"],
+    "file": "lib/agentcore-gateway-lambda-stack.ts"
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
