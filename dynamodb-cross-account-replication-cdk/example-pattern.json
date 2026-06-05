@@ -1,14 +1,14 @@
 {
-  "title": "Amazon DynamoDB Cross-Account Replication with Global Tables",
-  "description": "Deploy a DynamoDB Global Table with cross-account replication and IAM role for secure cross-account read access.",
+  "title": "Amazon DynamoDB Global Tables with Cross-Account Read Access",
+  "description": "Deploy a DynamoDB Global Table with a cross-account IAM role for secure read-only access from another AWS account.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates a DynamoDB Global Table that replicates data across AWS accounts and regions.",
-      "A cross-account IAM role enables the replica account to read from the table securely.",
+      "This pattern creates a DynamoDB Global Table (same-account, multi-region) with an IAM role for cross-account read access.",
+      "The reader account assumes the IAM role and can query the table in either region.",
       "DynamoDB handles replication automatically with sub-second latency between regions.",
       "Point-in-time recovery is enabled for data protection."
     ]
