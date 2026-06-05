@@ -107,7 +107,7 @@ aws stepfunctions start-execution \
 
 ### Monitor Execution
 
-Monitor the execution in the AWS Step Functions console. The Distributed Map view shows all 50 child executions and their status. Each child invokes the durable function synchronously with a unique `DurableExecutionName`. Results are written back to the Amazon S3 bucket under the `results/` prefix.
+Monitor the execution in the [AWS Step Functions console](https://console.aws.amazon.com/states). The Distributed Map view shows all 50 child executions and their status. Each child invokes the durable function synchronously with a unique `DurableExecutionName`. Results are written back to the Amazon S3 bucket under the `results/` prefix.
 
 ### Verify Deployment
 
