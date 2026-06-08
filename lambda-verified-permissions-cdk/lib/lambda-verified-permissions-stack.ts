@@ -8,7 +8,6 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create policy store with Cedar schema
     const policyStore = new verifiedpermissions.CfnPolicyStore(this, 'PolicyStore', {
       validationSettings: { mode: 'STRICT' },
       schema: {
@@ -28,13 +27,12 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
       }
     });
 
-    // Create policies
     new verifiedpermissions.CfnPolicy(this, 'AdminPolicy', {
       policyStoreId: policyStore.attrPolicyStoreId,
       definition: {
         static: {
-          statement: 'permit(principal, action, resource) when { principal.role == "admin" };',
-          description: 'Admins can perform any action'
+          statement: 'permit(principal, action in [MyApp::Action::"Read", MyApp::Action::"Write", MyApp::Action::"Delete"], resource) when { principal.role == "admin" };',
+          description: 'Admins can read, write, and delete documents'
         }
       }
     });
@@ -49,7 +47,26 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
       }
     });
 
-    // Lambda authorizer function
+    new verifiedpermissions.CfnPolicy(this, 'OwnerWritePolicy', {
+      policyStoreId: policyStore.attrPolicyStoreId,
+      definition: {
+        static: {
+          statement: 'permit(principal, action == MyApp::Action::"Write", resource) when { resource.owner == principal };',
+          description: 'Document owners can write to their own documents'
+        }
+      }
+    });
+
+    new verifiedpermissions.CfnPolicy(this, 'ConfidentialDenyPolicy', {
+      policyStoreId: policyStore.attrPolicyStoreId,
+      definition: {
+        static: {
+          statement: 'forbid(principal, action, resource) when { principal.role == "reader" && resource.classification == "confidential" };',
+          description: 'Readers cannot access confidential documents'
+        }
+      }
+    });
+
     const authFn = new lambda.Function(this, 'AuthorizerFn', {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
@@ -60,7 +77,14 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
 
     authFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['verifiedpermissions:IsAuthorized'],
-      resources: [`arn:aws:verifiedpermissions::${this.account}:policy-store/${policyStore.attrPolicyStoreId}`]
+      resources: [cdk.Fn.join('', [
+        'arn:',
+        this.partition,
+        ':verifiedpermissions::',
+        this.account,
+        ':policy-store/',
+        policyStore.attrPolicyStoreId
+      ])]
     }));
 
     const fnUrl = authFn.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.AWS_IAM });

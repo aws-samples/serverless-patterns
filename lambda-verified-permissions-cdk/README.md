@@ -14,42 +14,64 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-┌──────────┐     ┌──────────────────┐     ┌─────────────────────────┐
-│  Client  │────▶│  AWS Lambda      │────▶│  Amazon Verified        │
-│          │     │  (Authorizer)    │     │  Permissions            │
-└──────────┘     └──────────────────┘     │  (Cedar Policy Store)   │
-                                          └─────────────────────────┘
-```
+![Architecture Diagram](architecture.png)
 
-## How it works
+1. Client sends a SigV4-signed request to the Lambda Function URL.
+2. Lambda receives the authorization request with user identity, action, and resource.
+3. Lambda calls the Verified Permissions `IsAuthorized` API with the request context.
+4. Cedar policies evaluate the request and return ALLOW or DENY.
 
-1. Lambda receives an authorization request with user identity, action, and resource.
-2. Lambda calls the Verified Permissions `IsAuthorized` API with the request context.
-3. Cedar policies evaluate the request and return ALLOW or DENY.
-4. The pattern includes two policies: admins can perform any action, readers can only read.
+## Cedar Policies
+
+The pattern includes four policies demonstrating different authorization patterns:
+
+- **Admin policy** – Admins can read, write, and delete documents (scoped to explicit actions).
+- **Reader policy** – Readers can only read documents.
+- **Owner policy** – Document owners can write to their own documents.
+- **Confidential deny policy** – Readers cannot access confidential documents.
 
 ## Deployment
 
 ```bash
+cd src && npm install && cd ..
 npm install
 cdk deploy
 ```
 
 ## Testing
 
+The Lambda Function URL uses `AWS_IAM` authentication, so requests must be signed with [SigV4](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-signing.html). The simplest way is using `curl` with `--aws-sigv4`:
+
 ```bash
-python3 -c "
-import boto3, json
-client = boto3.client('lambda')
+# Get the Function URL from stack outputs
+FUNCTION_URL=$(aws cloudformation describe-stacks \
+  --stack-name LambdaVerifiedPermissionsStack \
+  --query 'Stacks[0].Outputs[?OutputKey==`FunctionUrl`].OutputValue' \
+  --output text)
+
 # Admin can delete (ALLOW)
-r = client.invoke(FunctionName='<FunctionName>', Payload=json.dumps({'body': json.dumps({'userId':'alice','role':'admin','action':'Delete','resourceId':'doc-1','classification':'confidential'})}))
-print('Admin Delete:', json.loads(json.loads(r['Payload'].read())['body'])['decision'])
+curl -s "$FUNCTION_URL" \
+  --aws-sigv4 "aws:amz:us-east-1:lambda" \
+  --user "$(aws configure get aws_access_key_id):$(aws configure get aws_secret_access_key)" \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"alice","role":"admin","action":"Delete","resourceId":"doc-1","classification":"confidential"}'
+
 # Reader cannot delete (DENY)
-r = client.invoke(FunctionName='<FunctionName>', Payload=json.dumps({'body': json.dumps({'userId':'bob','role':'reader','action':'Delete','resourceId':'doc-2','classification':'public'})}))
-print('Reader Delete:', json.loads(json.loads(r['Payload'].read())['body'])['decision'])
-"
+curl -s "$FUNCTION_URL" \
+  --aws-sigv4 "aws:amz:us-east-1:lambda" \
+  --user "$(aws configure get aws_access_key_id):$(aws configure get aws_secret_access_key)" \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"bob","role":"reader","action":"Delete","resourceId":"doc-2","classification":"public"}'
+
+# Reader cannot access confidential documents (DENY)
+curl -s "$FUNCTION_URL" \
+  --aws-sigv4 "aws:amz:us-east-1:lambda" \
+  --user "$(aws configure get aws_access_key_id):$(aws configure get aws_secret_access_key)" \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"bob","role":"reader","action":"Read","resourceId":"doc-3","classification":"confidential"}'
 ```
+
+> **Note:** Replace `us-east-1` with your deployment region. If using temporary credentials (e.g., SSO), include the session token via `--header "x-amz-security-token: $AWS_SESSION_TOKEN"`.
 
 ## Cleanup
 

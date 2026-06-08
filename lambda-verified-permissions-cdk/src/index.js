@@ -1,12 +1,18 @@
 const { VerifiedPermissionsClient, IsAuthorizedCommand } = require('@aws-sdk/client-verifiedpermissions');
 const client = new VerifiedPermissionsClient();
 
+const VALID_ROLES = ['admin', 'reader'];
+
 exports.handler = async (event) => {
   const body = JSON.parse(event.body || '{}');
   const { userId, role, action, resourceId, classification } = body;
 
   if (!userId || !role || !action || !resourceId) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields: userId, role, action, resourceId' }) };
+  }
+
+  if (!VALID_ROLES.includes(role)) {
+    return { statusCode: 400, body: JSON.stringify({ error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` }) };
   }
 
   const params = {
