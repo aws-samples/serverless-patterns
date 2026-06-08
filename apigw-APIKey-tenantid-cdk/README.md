@@ -17,7 +17,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Prerequisites: Usage Plan and API Key
 
-Before using this pattern, you must create API Gateway [Usage Plans](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) and an [API Key](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html) associated with it. The usage plan must be associated with the API and stage created by this CDK stack. The API key value stored in the DynamoDB table must match a valid API key linked to a usage plan in API Gateway — otherwise, requests will be rejected even if the Lambda authorizer returns a successful policy.
+Before using this pattern, you must create API Gateway [Usage Plans](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) and an [API Key](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html) associated with it. The usage plan must be associated with the API and stage created by this CDK stack. 
+The usage plan must be associated with the API and stage created by this CDK stack. The API key value stored in the DynamoDB table must match a valid API key linked to a usage plan in API Gateway — otherwise, requests will be rejected even if the Lambda authorizer returns a successful policy.
 
 For guidance on creating and configuring usage plans and API keys, see:
 - [Create and use usage plans with API keys](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html)
@@ -83,6 +84,32 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
     ApigwDynamodbApikeyCdkStack.TableName = ApigwDynamodbApikeyCdkStack-TenantApiKeyTableXXXXXX-YYYYYY
     ApigwDynamodbApikeyCdkStack.UserPoolId = us-east-1_XXXXXXXXX
     ApigwDynamodbApikeyCdkStack.UserPoolClientId = XXXXXXXXXXXXXXXXXXXXXXXXXX
+    ```
+
+1. Create a usage plan:
+    ```bash
+    aws apigateway create-usage-plan \
+      --name "TenantUsagePlan" \
+      --throttle burstLimit=50,rateLimit=100 \
+      --api-stages apiId=API_ID,stage=prod
+    ```
+    Note the `id` from the output — this is your USAGE_PLAN_ID.
+
+1. Create an API key:
+    ```bash
+    aws apigateway create-api-key \
+      --name "SampleTenantKey" \
+      --enabled \
+      --value "my-api-key-123"
+    ```
+    Note the `id` from the output — this is your API_KEY_ID.
+
+1. Associate the API key with the usage plan:
+    ```bash
+    aws apigateway create-usage-plan-key \
+      --usage-plan-id USAGE_PLAN_ID \
+      --key-id API_KEY_ID \
+      --key-type "API_KEY"
     ```
 
 1. Create a Cognito user with a tenantId:
