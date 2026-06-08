@@ -100,7 +100,7 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
     aws apigateway create-api-key \
       --name "SampleTenantKey" \
       --enabled \
-      --value "my-api-key-123"
+      --value "tenant-usage-api-key-123"
     ```
     Note the `id` from the output — this is your API_KEY_ID.
 
@@ -134,7 +134,7 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
     ```bash
     aws dynamodb put-item \
       --table-name TABLE_NAME \
-      --item '{"tenantId": {"S": "sample-tenant"}, "apiKey": {"S": "my-api-key-123"}}'
+      --item '{"tenantId": {"S": "sample-tenant"}, "apiKey": {"S": "tenant-usage-api-key-123"}}'
     ```
 
 1. Get a token and call the API using the helper script:
