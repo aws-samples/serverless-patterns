@@ -54,13 +54,27 @@ This pattern creates a REST API backed by three AWS Lambda functions that intera
 
 1. The client sends an HTTPS request (SigV4-signed) to Amazon API Gateway with IAM authorization.
 2. API Gateway routes the request to the appropriate Lambda function based on path: Search (`POST /search`), Index (`POST /index`), or Delete (`DELETE /documents`).
-3. The Lambda function calls the OpenSearch Serverless collection — performing a neural/lexical/hybrid query, bulk indexing via the ingest pipeline, or a bulk delete. Lambda functions send and receive plain text only; no client-side embedding generation is needed.
+3. The Lambda function calls the OpenSearch Serverless collection — performing a neural/lexical/hybrid query, bulk indexing via the ingest pipeline, or a bulk delete.
 4. For semantic and hybrid search, and during document indexing, the OpenSearch ML model calls Amazon Bedrock (Amazon Titan Text Embeddings V2) to generate 1024-dimensional embeddings server-side.
 5. For hybrid search, the search pipeline applies min-max score normalization to combine BM25 (lexical) and k-NN (semantic) results with configurable weights (0.3 lexical / 0.7 semantic).
 
 The OpenSearch collection lives inside a NextGen collection group, which enables scale-to-zero behavior. When idle, both indexing and search OCUs (OpenSearch Compute Units) drop to zero. When a request arrives, capacity provisions in approximately 10 seconds. Requests are queued (not dropped) during this window.
 
-The NextGen collection group is created using a Lambda-backed custom resources since CloudFormation doesn't yet natively support the `Generation` parameter.
+The NextGen collection group is created using a Lambda-backed custom resource since CloudFormation doesn't yet natively support the `Generation` parameter.
+
+### Scale-to-zero in action
+
+The chart below shows the OCU (OpenSearch Compute Unit) metrics from CloudWatch during a test run:
+
+![CloudWatch metrics showing Search and Indexing OCUs scaling from zero, handling traffic, then returning to zero](images/search-acu-scaling.png)
+
+*Figure 2 — Two test runs separated by a period of no activity. Search OCUs scale 0 → 2 during queries, Indexing OCUs scale 0 → 1 during document ingestion. Both return to 0 after the idle timeout.*
+
+The pattern:
+1. **Idle** — Both indexing and search OCUs sit at 0. No compute cost.
+2. **Traffic arrives** — First request triggers provisioning (~10 seconds). Requests are queued during this window.
+3. **Active** — OCUs scale up to match demand, up to the configured maximum.
+4. **Traffic subsides** — After 10 minutes of no requests, OCUs scale back to 0.
 
 ## Testing
 
