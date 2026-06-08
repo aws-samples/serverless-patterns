@@ -149,7 +149,7 @@ awscurl --service execute-api --region $AWS_REGION -X DELETE \
 
 1. Delete the stack:
     ```bash
-    sam delete --stack-name STACK_NAME
+    sam delete
     ```
 
     This removes all resources including the API Gateway, Lambda functions, OpenSearch collection, collection group, security policies, IAM roles, and CloudWatch log groups.
