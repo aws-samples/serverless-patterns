@@ -24,19 +24,25 @@ The SAM template deploys:
 
 
 ## Deploy
-1. Copy glue job script and libs:
+1. Manually create two Amazon S3 buckets:
+- `ARTIFACTS_BUCKET` — stores the AWS Glue job script.
+- `DATA_BUCKET` — stores the source data for the AWS Glue job.
+
+```bash
+> aws s3 mb s3://<ARTIFACTS_BUCKET>
+> aws s3 mb s3://<DATA_BUCKET>
+```
+
+2. Copy AWS Glue job script:
 
 ```bash
 > aws s3 cp code/glue s3://<ARTIFACTS_BUCKET>/glue --recursive
 ```
 
-2. Build and deploy stack: 
+3. Build and deploy stack. During the `sam deploy --guided` prompts, pass the bucket names to `ArtifactsBucket` and `SourceBucket`:
 
 ```bash
-
 > sam build --template code/cloudformation/stack.yaml
-
-
 > sam deploy --guided
 ```
 
