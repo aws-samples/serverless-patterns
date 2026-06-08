@@ -25,6 +25,18 @@ export class ApigwDynamodbApikeyStack extends cdk.Stack {
       customAttributes: {
         tenantId: new cognito.StringAttribute({ mutable: false }),
       },
+      passwordPolicy: {
+        minLength: 12,
+        requireUppercase: true,
+        requireLowercase: true,
+        requireDigits: true,
+        requireSymbols: true,
+      },
+      mfa: cognito.Mfa.OPTIONAL,
+      mfaSecondFactor: {
+        sms: true,
+        otp: true,
+      },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
@@ -45,6 +57,8 @@ export class ApigwDynamodbApikeyStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(10),
       environment: {
         TABLE_NAME: table.tableName,
+        USER_POOL_ID: userPool.userPoolId,
+        CLIENT_ID: userPoolClient.userPoolClientId,
       },
       bundling: {
         externalModules: ["@aws-sdk/*"],
@@ -58,6 +72,7 @@ export class ApigwDynamodbApikeyStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, "ApiGateway", {
       restApiName: "DynamoDB API Key Protected Service",
       description: "API protected with DynamoDB-based API key authorization",
+      apiKeySourceType: apigateway.ApiKeySourceType.AUTHORIZER,
     });
 
     // Token authorizer using Authorization header (Cognito JWT)

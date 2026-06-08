@@ -1,9 +1,9 @@
-# Amazon API Gateway with Cognito, Lambda Authorizer, and DynamoDB for Tenant API Key Authentication
+# Amazon API Gateway with Lambda authorizer, Amazon Cognito and Amazon DynamoDB for Tenant API Key Authentication
 
 API Gateway's usage plans and API keys are fundamentally disconnected from authorization tokens.
 Usage plans enforce rate limits via API keys, but auth tokens (JWTs from Cognito, Auth0, etc.) carry identity and permissions — these are two separate systems with no native link. This means customers cannot simply issue an auth token that inherently comes with rate-limiting attached. At scale (millions of auth tokens across thousands of tenants), managing this disconnect manually becomes untenable.
 
-This pattern demonstrates how to implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. Cognito authenticates users and issues JWTs containing a custom `tenantId` claim. The Lambda authorizer extracts the tenant ID from the JWT, looks up the corresponding API key in DynamoDB, and returns a policy document enabling API Gateway access.
+This pattern demonstrates how to implement a secure tenant-based API key authorization system using AWS Lambda authorizer, Amazon API Gateway, Amazon Cognito, and Amazon DynamoDB. Cognito authenticates users and issues JWTs containing a custom `tenantId` claim. The Lambda authorizer extracts the tenant ID from the JWT, looks up the corresponding API key in DynamoDB, and returns a policy document enabling API Gateway access.
 
 What this pattern solves:
   - Bridges the auth–throttling gap — The Lambda authorizer acts as the glue between identity (JWT tenantId) and rate-limiting (API Gateway API key). By looking up the tenant's API key in DynamoDB and returning it via [usageIdentifierKey](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-output.html), a single auth token automatically activates the correct usage plan. Auth and throttling become one  unified flow rather than two disconnected systems.
@@ -14,6 +14,14 @@ What this pattern solves:
 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Prerequisites: Usage Plan and API Key
+
+Before using this pattern, you must create API Gateway [Usage Plans](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) and an [API Key](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html) associated with it. The usage plan must be associated with the API and stage created by this CDK stack. The API key value stored in the DynamoDB table must match a valid API key linked to a usage plan in API Gateway — otherwise, requests will be rejected even if the Lambda authorizer returns a successful policy.
+
+For guidance on creating and configuring usage plans and API keys, see:
+- [Create and use usage plans with API keys](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html)
+- [Setting up API keys using the API Gateway console](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html)
 
 ## Requirements
 
@@ -31,11 +39,15 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-APIKey-tenantid-cdk
+    cd apigw-apikey-tenantid-cdk
     ```
 1. Install dependencies:
     ```
     npm install
+    ```
+1. Bootstrap the CDK environment (if you haven't already):
+    ```
+    cdk bootstrap
     ```
 1. Deploy the stack:
     ```
@@ -58,7 +70,11 @@ Note the outputs from the CDK deployment process. The output will include the AP
 
 The DynamoDB table uses `tenantId` as the partition key and stores the corresponding `apiKey` for each tenant.
 
+
+
 ## Testing
+
+> **Note:** This sample uses `USER_PASSWORD_AUTH` for simplicity. In production, use `USER_SRP_AUTH` (Secure Remote Password) so that the password is never transmitted over the network. The plain password flow here is for demonstration purposes only.
 
 1. Get the outputs from the deployment:
     ```bash

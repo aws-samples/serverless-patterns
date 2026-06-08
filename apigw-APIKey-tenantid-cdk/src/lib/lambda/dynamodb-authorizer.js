@@ -1,9 +1,16 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
-const client = new DynamoDBClient();
+import { CognitoJwtVerifier } from "aws-jwt-verify";
 
+const client = new DynamoDBClient();
 const TABLE_NAME = process.env.TABLE_NAME;
 
-exports.handler = async (event) => {
+const verifier = CognitoJwtVerifier.create({
+  userPoolId: process.env.USER_POOL_ID,
+  tokenUse: "id",
+  clientId: process.env.CLIENT_ID,
+});
+
+export const handler = async (event) => {
   const token = event.authorizationToken;
 
   if (!token) {
@@ -11,10 +18,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Decode the JWT payload (Cognito token is already validated by API Gateway if needed)
-    const payload = JSON.parse(
-      Buffer.from(token.replace(/^Bearer\s+/i, "").split(".")[1], "base64url").toString(),
-    );
+    const payload = await verifier.verify(token.replace(/^Bearer\s+/i, ""));
     const tenantId = payload["custom:tenantId"];
 
     if (!tenantId) {

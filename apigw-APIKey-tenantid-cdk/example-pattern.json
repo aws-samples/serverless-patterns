@@ -1,5 +1,5 @@
 {
-  "title": "Amazon API Gateway with Cognito, Lambda Authorizer & DynamoDB for Tenant API Key Authentication",
+  "title": "Amazon API Gateway with Lambda authorizer, Amazon Cognito, & Amazon DynamoDB for Tenant API Key Authentication",
   "description": "Implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. Cognito issues JWTs with a custom tenantId claim, and the Lambda authorizer maps tenants to API keys via DynamoDB.",
 
   "language": "TypeScript",
@@ -17,9 +17,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-APIKey-tenantid-cdk",
-      "templateURL": "serverless-patterns/apigw-APIKey-tenantid-cdk",
-      "projectFolder": "apigw-APIKey-tenantid-cdk",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-apikey-tenantid-cdk",
+      "templateURL": "serverless-patterns/apigw-apikey-tenantid-cdk",
+      "projectFolder": "apigw-apikey-tenantid-cdk",
       "templateFile": "src/lib/apigw-dynamodb-apikey-stack.ts"
     }
   },
