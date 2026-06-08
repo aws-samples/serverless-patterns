@@ -6,7 +6,7 @@ This pattern deploys a Step Functions that includes a Glue Job as one of its ste
 
 The SAM template deploys:
 * A Step Functions State Machine
-* An EventBridge rule that triggers the Step Functions every 2 days
+* An EventBridge rule that triggers the Step Functions every 2 days (disabled by default)
 * A Glue Job
 * IAM roles required to run the application.
 
@@ -14,7 +14,7 @@ The SAM template deploys:
 ## Download
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 ```bash
-> git clone https://github.com/NicoliAraujo/serverless-patterns.git
+> git clone https://github.com/aws-samples/serverless-patterns.git
 ```
 
 2. Change directory to the pattern directory:
@@ -64,6 +64,7 @@ The output should be the description and status of Glue Job run:
     "ExecutionTime": 49,
     "GlueVersion": "1.0",
     "Id": "jr_ee276c9398f2d981c850f79cb7b54a28b57d9f6484deb8a9051db4bcbbc12d1f",
+    "JobMode": "SCRIPT",
     "JobName": "Feature Engineering",
     "JobRunState": "SUCCEEDED",
     "LastModifiedOn": 1638296059130,
