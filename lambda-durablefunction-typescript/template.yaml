@@ -1,0 +1,288 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Fraud Detection Durable Function with Bedrock AgentCore - SAM Template'
+
+Parameters:
+  FunctionName:
+    Type: String
+    Default: 'fn-Fraud-Detection'
+    Description: 'Name of the Lambda function'
+  
+  LayerName:
+    Type: String
+    Default: 'lr-FraudDetection'
+    Description: 'Name of the Lambda layer'
+  
+  RoleName:
+    Type: String
+    Default: 'durable-function-execution-role'
+    Description: 'Name of the Lambda execution role'
+  
+  AgentRuntimeName:
+    Type: String
+    Default: 'fraud_risk_scorer'
+    Description: 'Name of the Bedrock AgentCore runtime'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9_]{0,47}'
+  
+  AgentRoleName:
+    Type: String
+    Default: 'bedrock-agentcore-runtime-fraud-role'
+    Description: 'Name of the Bedrock AgentCore IAM role'
+  
+  ECRRepoName:
+    Type: String
+    Default: 'fraud-risk-scorer'
+    Description: 'Name of the ECR repository'
+  
+  LambdaRegion:
+    Type: String
+    Default: 'us-east-2'
+    Description: 'Region for Lambda deployment'
+  
+  AgentRegion:
+    Type: String
+    Default: 'us-east-2'
+    Description: 'Region for Bedrock AgentCore (must be us-east-1)'
+  
+  ExecutionTimeout:
+    Type: Number
+    Default: 600
+    MinValue: 1
+    MaxValue: 31622400
+    Description: 'Durable execution timeout in seconds (max 1 year)'
+  
+  RetentionPeriodInDays:
+    Type: Number
+    Default: 7
+    MinValue: 1
+    MaxValue: 90
+    Description: 'Retention period for execution history in days'
+
+Globals:
+  Function:
+    Timeout: 120
+    MemorySize: 128
+    Runtime: nodejs24.x
+
+Resources:
+  # IAM Role for Bedrock AgentCore
+  BedrockAgentCoreRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref AgentRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AssumeRolePolicy
+            Effect: Allow
+            Principal:
+              Service:
+                - bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                'aws:SourceAccount': !Ref AWS::AccountId
+              ArnLike:
+                'aws:SourceArn': !Sub 'arn:aws:bedrock-agentcore:${AgentRegion}:${AWS::AccountId}:*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+        - PolicyName: AgentCoreRuntimePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: BedrockModelInvocation
+                Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource:
+                  - 'arn:aws:bedrock:*::foundation-model/*'
+                  - !Sub 'arn:aws:bedrock:${AgentRegion}:${AWS::AccountId}:*'
+              - Sid: GetAgentAccessToken
+                Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetWorkloadAccessToken
+                  - bedrock-agentcore:GetWorkloadAccessTokenForJWT
+                  - bedrock-agentcore:GetWorkloadAccessTokenForUserId
+                Resource:
+                  - !Sub 'arn:aws:bedrock-agentcore:${AgentRegion}:${AWS::AccountId}:workload-identity-directory/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AgentRegion}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/agentName-*'
+              - Sid: ECRToken
+                Effect: Allow
+                Action:
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                Resource: 
+                  - !Sub 'arn:aws:ecr:${AgentRegion}:${AWS::AccountId}:repository/*'
+              - Sid: ECRImageAccess
+                Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                Resource: '*'
+              - Sid: CreateCloudWatchLogGroup
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:DescribeLogStreams
+                Resource: 
+                  - !Sub 'arn:aws:logs:${AgentRegion}:${AWS::AccountId}:log-group:/aws/bedrock-agentcore/runtimes/*'
+              - Sid: ViewCloudWatchLogGroup
+                Effect: Allow
+                Action:
+                  - logs:DescribeLogGroups
+                Resource: 
+                  - !Sub 'arn:aws:logs:${AgentRegion}:${AWS::AccountId}:log-group:*'
+              - Sid: CreateCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: 
+                  - !Sub 'arn:aws:logs:${AgentRegion}:${AWS::AccountId}:log-group:/aws/bedrock-agentcore/runtimes/*:log-stream:*'
+              - Sid: XrayObservability
+                Effect: Allow
+                Action:
+                  - xray:PutTraceSegments
+                  - xray:PutTelemetryRecords
+                  - xray:GetSamplingRules
+                  - xray:GetSamplingTargets
+                Resource: '*'
+              - Sid: PutCloudWatchMetrics
+                Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    'cloudwatch:namespace': 'bedrock-agentcore'
+
+  # Lambda Layer for Node.js dependencies
+  FraudDetectionLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: !Ref LayerName
+      Description: 'Node modules for Fraud Detection durable function'
+      Content:
+        S3Bucket: !Sub 'durable-functions-${AWS::AccountId}'
+        S3Key: !Sub 'layers/${LayerName}.zip'
+      CompatibleRuntimes:
+        - nodejs24.x
+
+  # IAM Role for Lambda Function
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaDurableExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AWSLambdaDurableExecutionRole
+                Effect: Allow
+                Action:
+                  - lambda:CheckpointDurableExecution
+                  - lambda:GetDurableExecutionState
+                Resource: !Sub 'arn:aws:lambda:${LambdaRegion}:${AWS::AccountId}:function:${FunctionName}:*'
+        - PolicyName: BedrockAgentCoreInvokePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: InvokeAgentRuntime
+                Effect: Allow
+                Action:
+                  - bedrock-agentcore:InvokeAgentRuntime
+                Resource:
+                  - !Sub '${AgentRuntime.AgentRuntimeArn}/*'
+                  - !GetAtt AgentRuntime.AgentRuntimeArn
+
+  # Durable Lambda Function using pre-built function.zip
+  FraudDetectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref FunctionName
+      CodeUri:
+        Bucket: !Sub 'durable-functions-${AWS::AccountId}'
+        Key: !Sub 'functions/${FunctionName}.zip'
+      Handler: index.handler
+      Runtime: nodejs24.x
+      Timeout: 120
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref FraudDetectionLayer
+      Environment:
+        Variables:
+          AGENT_RUNTIME_ARN: !GetAtt AgentRuntime.AgentRuntimeArn
+          AGENT_REGION: !Ref AgentRegion
+      DurableConfig:
+        ExecutionTimeout: !Ref ExecutionTimeout
+        RetentionPeriodInDays: !Ref RetentionPeriodInDays
+
+
+  # Native Bedrock AgentCore Runtime
+  AgentRuntime:
+    Type: AWS::BedrockAgentCore::Runtime
+    Properties:
+      AgentRuntimeName: !Ref AgentRuntimeName
+      Description: 'Fraud risk scoring agent runtime'
+      RoleArn: !GetAtt BedrockAgentCoreRole.Arn
+      AgentRuntimeArtifact:
+        ContainerConfiguration:
+          ContainerUri: !Sub '${AWS::AccountId}.dkr.ecr.${AgentRegion}.amazonaws.com/${ECRRepoName}:latest'
+      NetworkConfiguration:
+        NetworkMode: PUBLIC
+      Tags:
+        Project: 'FraudDetection'
+        Environment: 'Demo'
+
+
+
+Outputs:
+  DeploymentBucket:
+    Description: 'S3 bucket for deployment artifacts'
+    Value: !Sub 'durable-functions-${AWS::AccountId}'
+    Export:
+      Name: !Sub '${AWS::StackName}-DeploymentBucket'
+
+
+
+  AgentRuntimeArn:
+    Description: 'Bedrock AgentCore Runtime ARN'
+    Value: !GetAtt AgentRuntime.AgentRuntimeArn
+    Export:
+      Name: !Sub '${AWS::StackName}-AgentRuntimeArn'
+
+  AgentRuntimeId:
+    Description: 'Bedrock AgentCore Runtime ID'
+    Value: !GetAtt AgentRuntime.AgentRuntimeId
+    Export:
+      Name: !Sub '${AWS::StackName}-AgentRuntimeId'
+
+  LambdaFunctionArn:
+    Description: 'Lambda Function ARN (with durable configuration)'
+    Value: !GetAtt FraudDetectionFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunctionArn'
+
+  LambdaFunctionName:
+    Description: 'Lambda Function Name'
+    Value: !Ref FunctionName
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunctionName'
+
+  LayerArn:
+    Description: 'Lambda Layer ARN'
+    Value: !Ref FraudDetectionLayer
+    Export:
+      Name: !Sub '${AWS::StackName}-LayerArn'
