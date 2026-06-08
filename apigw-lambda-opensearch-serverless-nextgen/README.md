@@ -67,6 +67,8 @@ The NextGen collection group is created using a Lambda-backed custom resources s
 Install the test dependencies:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate        # On Windows: .venv\Scripts\activate
 pip install -r tests/requirements.txt
 ```
 
@@ -101,7 +103,7 @@ Install the project dependencies (includes `awscurl`):
 pip install -r requirements.txt
 ```
 
-Set your stack name and region:
+Set your stack name and region (if not already set):
 
 ```bash
 STACK_NAME="your-stack-name"
