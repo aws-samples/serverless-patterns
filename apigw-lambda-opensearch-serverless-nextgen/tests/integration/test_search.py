@@ -25,9 +25,9 @@ STACK_NAME = os.environ.get("STACK_NAME")
 REGION = os.environ.get("AWS_REGION")
 
 if not STACK_NAME or not REGION:
-    pytest.skip(
-        "STACK_NAME and AWS_REGION environment variables must be set",
-        allow_module_level=True,
+    pytest.exit(
+        "STACK_NAME and AWS_REGION environment variables must be set to run integration tests",
+        returncode=1,
     )
 
 
