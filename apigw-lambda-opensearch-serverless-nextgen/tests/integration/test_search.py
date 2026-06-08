@@ -24,10 +24,11 @@ from requests_aws4auth import AWS4Auth
 STACK_NAME = os.environ.get("STACK_NAME")
 REGION = os.environ.get("AWS_REGION")
 
-if not STACK_NAME:
-    raise RuntimeError("STACK_NAME environment variable must be set")
-if not REGION:
-    raise RuntimeError("AWS_REGION environment variable must be set")
+if not STACK_NAME or not REGION:
+    pytest.skip(
+        "STACK_NAME and AWS_REGION environment variables must be set",
+        allow_module_level=True,
+    )
 
 
 def _get_auth():
