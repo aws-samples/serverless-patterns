@@ -6,11 +6,13 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
+> **Note:** CloudTrail data events are billed separately from management events. See [AWS CloudTrail Pricing](https://aws.amazon.com/cloudtrail/pricing/) for current data event rates.
+
 ## Requirements
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
-* [Node.js](https://nodejs.org/en/download/) installed
+* [Node.js 20+](https://nodejs.org/en/download/) installed
 
 ## Deployment Instructions
 
@@ -19,14 +21,18 @@ Important: this application uses various AWS services and there are costs associ
     cd serverless-patterns/eventbridge-cloudtrail-dataplane-cdk
     npm install
     ```
-2. Deploy:
+2. Bootstrap CDK (first-time CDK users only):
+    ```
+    cdk bootstrap
+    ```
+3. Deploy:
     ```
     cdk deploy
     ```
 
 ## How it works
 
-- A CloudTrail trail is created with data event logging enabled
+- A CloudTrail trail is created with data event logging enabled for EventBridge event buses (`AWS::Events::EventBus`)
 - EventBridge data plane API calls (PutEvents) are now logged to CloudTrail (new May 2026 feature)
 - An EventBridge rule captures these CloudTrail events matching `aws.events` source with `PutEvents` event name
 - A Lambda function processes the events, logging the caller identity, source IP, event bus, and entry count

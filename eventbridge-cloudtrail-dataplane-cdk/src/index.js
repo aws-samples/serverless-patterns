@@ -1,6 +1,6 @@
 exports.handler = async (event) => {
   const detail = event.detail || {};
-  console.log(JSON.stringify({
+  console.info(JSON.stringify({
     message: 'EventBridge data plane API call detected',
     eventName: detail.eventName,
     eventSource: detail.eventSource,
