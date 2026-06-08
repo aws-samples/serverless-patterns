@@ -1,8 +1,8 @@
 # Amazon API Gateway to AWS Lambda to Amazon OpenSearch Serverless NextGen
 
-This pattern deploys a serverless semantic search API using Amazon API Gateway, AWS Lambda, and Amazon OpenSearch Serverless with the NextGen architecture. Both Lambda and OpenSearch scale independently to zero when idle, resulting in zero baseline compute cost.
+This pattern deploys a serverless semantic search API using Amazon API Gateway, AWS Lambda, and Amazon OpenSearch Serverless with the NextGen architecture. All three services operate on a pay-per-use model with no minimum baseline cost, meaning the entire stack incurs zero compute charges when idle.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-opensearch-serverless-nextgen 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-opensearch-serverless-nextgen
+    cd serverless-patterns/apigw-lambda-opensearch-serverless-nextgen
     ```
 1. Build the application:
     ```
@@ -41,7 +41,6 @@ Important: this application uses various AWS services and there are costs associ
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the API Gateway endpoint URLs for search, index, and delete operations.
 
 ## How it works
 
@@ -51,20 +50,15 @@ Figure 1 - Architecture
 
 This pattern creates a REST API backed by three Lambda functions that interact with an OpenSearch Serverless NextGen collection configured for vector search:
 
-1. The client sends an HTTPS request (SigV4-signed) to Amazon API Gateway.
+1. The client sends an HTTPS request (SigV4-signed) to Amazon API Gateway with IAM authorization.
 2. API Gateway routes the request to the appropriate Lambda function based on path: Search (`POST /search`), Index (`POST /index`), or Delete (`DELETE /documents`).
-3. The Lambda function calls the OpenSearch Serverless collection — performing a neural/lexical/hybrid query, bulk indexing via the ingest pipeline, or a bulk delete.
-4. For semantic and hybrid search, and during document indexing, the OpenSearch ML model calls Amazon Bedrock Titan Embed Text V2 to generate 1024-dimensional embeddings server-side.
+3. The Lambda function calls the OpenSearch Serverless collection — performing a neural/lexical/hybrid query, bulk indexing via the ingest pipeline, or a bulk delete. Lambda functions send and receive plain text only; no client-side embedding generation is needed.
+4. For semantic and hybrid search, and during document indexing, the OpenSearch ML model calls Amazon Bedrock (Amazon Titan Text Embeddings V2) to generate 1024-dimensional embeddings server-side.
 5. For hybrid search, the search pipeline applies min-max score normalization to combine BM25 (lexical) and k-NN (semantic) results with configurable weights (0.3 lexical / 0.7 semantic).
 
 The OpenSearch collection lives inside a NextGen collection group, which enables scale-to-zero behavior. When idle, both indexing and search OCUs (OpenSearch Compute Units) drop to zero. When a request arrives, capacity provisions in approximately 10 seconds. Requests are queued (not dropped) during this window.
 
-Key architectural decisions:
-
-- **IAM authorization** on API Gateway — all endpoints require SigV4-signed requests.
-- **Server-side embeddings** — OpenSearch handles all embedding generation via its ML model connector to Bedrock. Lambda functions send and receive plain text only.
-- **Hybrid search with score normalization** — A search pipeline applies min-max normalization to combine BM25 (lexical) and k-NN (semantic) scores with configurable weights (0.3 lexical / 0.7 semantic).
-- **Custom resources** — The NextGen collection group and ML pipeline setup use Lambda-backed custom resources since CloudFormation doesn't yet natively support the `Generation` parameter.
+The NextGen collection group is created using a Lambda-backed custom resources since CloudFormation doesn't yet natively support the `Generation` parameter.
 
 ## Testing
 

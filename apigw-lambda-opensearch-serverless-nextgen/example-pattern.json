@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an API Gateway REST API backed by three Lambda functions that perform semantic, lexical, and hybrid search against an OpenSearch Serverless NextGen collection.",
-      "OpenSearch Serverless NextGen scales compute to zero when idle and provisions in approximately 10 seconds when traffic arrives. Combined with Lambda's own scale-to-zero, the entire stack incurs zero compute cost when not in use.",
-      "Embeddings are generated server-side by an OpenSearch ML model connected to Amazon Bedrock Titan Embed Text V2 — Lambda functions send and receive plain text only.",
+      "This pattern deploys an Amazon API Gateway REST API backed by three AWS Lambda functions that perform semantic, lexical, and hybrid search against an Amazon OpenSearch Serverless NextGen collection.",
+      "Amazon OpenSearch Serverless NextGen scales compute to zero when idle and provisions in approximately 10 seconds when traffic arrives. Combined with Lambda's own scale-to-zero, the entire stack incurs zero compute cost when not in use.",
+      "Embeddings are generated server-side by an OpenSearch ML model connected to Amazon Bedrock (Amazon Titan Text Embeddings V2) — Lambda functions send and receive plain text only.",
       "A hybrid search pipeline applies min-max score normalization to combine BM25 (lexical) and k-NN (semantic) results with configurable weights."
     ]
   },
@@ -32,7 +32,7 @@
         "link": "https://opensearch.org/docs/latest/search-plugins/neural-search/"
       },
       {
-        "text": "Amazon Bedrock Titan Embeddings",
+        "text": "Amazon Titan Text Embeddings V2",
         "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html"
       }
     ]
