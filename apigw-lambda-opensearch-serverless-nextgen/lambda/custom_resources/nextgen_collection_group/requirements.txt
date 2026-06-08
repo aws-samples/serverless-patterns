@@ -1,0 +1,2 @@
+crhelper
+boto3>=1.43.17

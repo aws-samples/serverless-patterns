@@ -1,0 +1,5 @@
+configure_rules:
+  E3030:
+    # python3.14 is valid but not yet in cfn-lint's schema
+    exceptions:
+      - python3.14
