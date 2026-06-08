@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as appsync from 'aws-cdk-lib/aws-appsync';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
@@ -13,43 +14,60 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src'),
-      timeout: cdk.Duration.seconds(10)
+      timeout: cdk.Duration.seconds(10),
+      logRetention: logs.RetentionDays.ONE_WEEK,
     });
 
-    // AppSync Events API
+    // IAM role for AppSync to invoke Lambda
+    const appsyncRole = new iam.Role(this, 'AppSyncLambdaRole', {
+      assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),
+    });
+    eventFn.grantInvoke(appsyncRole);
+
+    // IAM role for AppSync to push logs to CloudWatch
+    const logsRole = new iam.Role(this, 'ApiLogsRole', {
+      assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSAppSyncPushToCloudWatchLogs'),
+      ],
+    });
+
+    // AppSync Events API with unique name derived from stack name
     const api = new appsync.CfnApi(this, 'EventsApi', {
-      name: 'RealTimePubSubApi',
+      name: `${cdk.Aws.STACK_NAME}-EventsApi`,
       eventConfig: {
         authProviders: [{ authType: 'API_KEY' }],
         connectionAuthModes: [{ authType: 'API_KEY' }],
         defaultPublishAuthModes: [{ authType: 'API_KEY' }],
-        defaultSubscribeAuthModes: [{ authType: 'API_KEY' }]
-      }
+        defaultSubscribeAuthModes: [{ authType: 'API_KEY' }],
+        logConfig: {
+          logLevel: 'INFO',
+          cloudWatchLogsRoleArn: logsRole.roleArn,
+        },
+      },
     });
 
-    const apiKey = new appsync.CfnApiKey(this, 'EventsApiKey', { apiId: api.attrApiId });
-
-    // IAM role for AppSync to invoke Lambda
-    const appsyncRole = new iam.Role(this, 'AppSyncLambdaRole', {
-      assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com')
+    // API key with 365-day expiry
+    const apiKey = new appsync.CfnApiKey(this, 'EventsApiKey', {
+      apiId: api.attrApiId,
+      expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
     });
-    eventFn.grantInvoke(appsyncRole);
 
-    // Channel namespace without handler (simple pub/sub - no Lambda processing)
-    // AppSync Events delivers messages directly to subscribers
+    // Channel namespace wired to Lambda event handler
     new appsync.CfnChannelNamespace(this, 'NotificationsChannel', {
       apiId: api.attrApiId,
       name: 'notifications',
       publishAuthModes: [{ authType: 'API_KEY' }],
-      subscribeAuthModes: [{ authType: 'API_KEY' }]
+      subscribeAuthModes: [{ authType: 'API_KEY' }],
+      codeHandlers: "import { util } from '@aws-appsync/utils';\nexport function onPublish(ctx) {\n  return { events: ctx.events };\n}",
     });
 
-    // Second channel with custom namespace for different topic
+    // Second channel namespace
     new appsync.CfnChannelNamespace(this, 'AlertsChannel', {
       apiId: api.attrApiId,
       name: 'alerts',
       publishAuthModes: [{ authType: 'API_KEY' }],
-      subscribeAuthModes: [{ authType: 'API_KEY' }]
+      subscribeAuthModes: [{ authType: 'API_KEY' }],
     });
 
     new cdk.CfnOutput(this, 'HttpEndpoint', { value: cdk.Fn.getAtt(api.logicalId, 'Dns.Http').toString() });

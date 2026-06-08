@@ -1,5 +1,4 @@
 exports.handler = async (event) => {
-  // AppSync Events handler - processes published messages
   const { events } = event;
 
   if (!events || !Array.isArray(events)) {
@@ -7,14 +6,19 @@ exports.handler = async (event) => {
   }
 
   const processed = events.map(e => {
-    const payload = JSON.parse(e.payload);
+    let payload;
+    try {
+      payload = JSON.parse(e.payload);
+    } catch (err) {
+      return { payload: JSON.stringify({ error: 'Invalid JSON payload' }) };
+    }
     return {
       payload: JSON.stringify({
         ...payload,
         processedAt: new Date().toISOString(),
         enriched: true,
-        messageId: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-      })
+        messageId: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      }),
     };
   });
 

@@ -1,6 +1,6 @@
-# AWS AppSync Events with Lambda
+# AWS AppSync Events with AWS Lambda
 
-This pattern deploys an AppSync Events API for real-time WebSocket pub/sub with Lambda event processing.
+This pattern deploys an AWS AppSync Events API for real-time WebSocket pub/sub with an AWS Lambda event handler.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-events-lambda-cdk
 
@@ -14,32 +14,37 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-┌───────────┐     ┌─────────────────────┐     ┌──────────────┐
-│ Publisher │────▶│  AppSync Events API │────▶│ Subscribers  │
-│ (HTTP)    │     │  (WebSocket)        │     │ (WebSocket)  │
-└───────────┘     └─────────────────────┘     └──────────────┘
-                         │
-                         ▼
-                  ┌──────────────┐
-                  │ AWS Lambda   │
-                  │ (Handler)    │
-                  └──────────────┘
-```
+![Architecture Diagram](architecture.svg)
 
 ## How it works
 
-1. Publishers send events via HTTP POST to the AppSync Events endpoint.
-2. AppSync Events delivers messages to all WebSocket subscribers on that channel.
-3. Channel namespaces (`notifications`, `alerts`) organize topics.
-4. A Lambda handler can process/enrich events before delivery.
+1. Publishers send events via HTTP POST to the AWS AppSync Events endpoint.
+2. The AWS Lambda function processes and enriches events before delivery.
+3. AWS AppSync Events delivers messages to all WebSocket subscribers on that channel.
+4. Channel namespaces (`notifications`, `alerts`) organize topics.
 
 ## Deployment
 
-```bash
-npm install
-cdk deploy
-```
+1. Clone the repository and navigate to the pattern directory:
+   ```bash
+   git clone https://github.com/aws-samples/serverless-patterns
+   cd serverless-patterns/appsync-events-lambda-cdk
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Bootstrap CDK (one-time per account/region):
+   ```bash
+   cdk bootstrap
+   ```
+
+4. Deploy the stack:
+   ```bash
+   cdk deploy
+   ```
 
 ## Testing
 
@@ -48,7 +53,7 @@ cdk deploy
 curl -X POST "https://<HttpEndpoint>/event" \
   -H "x-api-key: <ApiKeyValue>" \
   -H "Content-Type: application/json" \
-  -d '{"channel":"/notifications/general","events":["{\"message\":\"Hello from CDK\"}"]}'
+  -d '{"channel":"notifications/general","events":["{\"message\":\"Hello from CDK\"}"]}'
 ```
 
 ## Cleanup
