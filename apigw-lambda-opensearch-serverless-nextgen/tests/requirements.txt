@@ -3,3 +3,5 @@ requests>=2.34.2
 requests-aws4auth>=1.3.2
 boto3>=1.43
 aws-lambda-powertools[tracer]>=3.0
+crhelper
+opensearch-py>=2.8.0
