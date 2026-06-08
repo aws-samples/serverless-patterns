@@ -24,6 +24,10 @@
   "resources": {
     "bullets": [
       {
+        "text": "Introducing the next generation of Amazon OpenSearch Serverless",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-the-next-generation-of-amazon-opensearch-serverless-for-building-your-agentic-ai-applications/"
+      },
+      {
         "text": "Amazon OpenSearch Serverless",
         "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless.html"
       },
