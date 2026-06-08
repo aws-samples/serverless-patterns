@@ -1,6 +1,6 @@
 # Amazon API Gateway to AWS Lambda to Amazon OpenSearch Serverless NextGen
 
-This pattern deploys a serverless semantic search API using Amazon API Gateway, AWS Lambda, and Amazon OpenSearch Serverless with the NextGen architecture. All three services operate on a pay-per-use model with no minimum baseline cost, meaning the entire stack incurs zero compute charges when idle.
+This pattern deploys a serverless semantic search API using Amazon API Gateway, AWS Lambda, and Amazon OpenSearch Serverless with the NextGen architecture. All three services operate on a pay-per-use model with no minimum baseline cost, meaning the entire stack incurs zero compute charges when idle. You pay only for storage of indexed data.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-opensearch-serverless-nextgen 
 
@@ -48,7 +48,7 @@ Important: this application uses various AWS services and there are costs associ
 
 Figure 1 - Architecture
 
-This pattern creates a REST API backed by three Lambda functions that interact with an OpenSearch Serverless NextGen collection configured for vector search:
+This pattern creates a REST API backed by three AWS Lambda functions that interact with an OpenSearch Serverless NextGen collection configured for vector search:
 
 1. The client sends an HTTPS request (SigV4-signed) to Amazon API Gateway with IAM authorization.
 2. API Gateway routes the request to the appropriate Lambda function based on path: Search (`POST /search`), Index (`POST /index`), or Delete (`DELETE /documents`).
@@ -139,12 +139,14 @@ awscurl --service execute-api --region $AWS_REGION -X DELETE \
 
 ## Cleanup
 
+> **Warning:** This will permanently delete all indexed documents in the OpenSearch collection. Back up any data you need to retain before proceeding.
+
 1. Delete the stack:
     ```bash
     sam delete --stack-name STACK_NAME
     ```
 
-    This removes all resources including the OpenSearch collection, collection group, security policies, and Lambda functions.
+    This removes all resources including the API Gateway, Lambda functions, OpenSearch collection, collection group, security policies, IAM roles, and CloudWatch log groups.
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.

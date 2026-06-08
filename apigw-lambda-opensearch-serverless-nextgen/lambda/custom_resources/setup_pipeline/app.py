@@ -1,7 +1,7 @@
 """Custom Resource handler to set up ML model and pipelines at deploy time.
 
 Creates:
-- A Bedrock Titan V2 ML connector
+- An Amazon Bedrock Titan V2 ML connector
 - A registered and deployed ML model
 - An ingest pipeline with text_embedding processor
 - A hybrid search pipeline with min-max normalization
@@ -81,7 +81,7 @@ def _setup_ml_and_pipelines(event):
 
     # Step 1: Create the Bedrock connector (with retry for policy propagation)
     connector_body = {
-        "name": "Bedrock Titan Embeddings V2",
+        "name": "Amazon Bedrock Titan Embeddings V2",
         "description": "Connector for Amazon Bedrock Titan Text Embeddings V2",
         "version": "1.0",
         "protocol": "aws_sigv4",
