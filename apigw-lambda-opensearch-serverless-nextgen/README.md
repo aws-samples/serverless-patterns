@@ -83,6 +83,10 @@ pytest tests/unit/ -v
 The repository includes integration tests that exercise all three search modes against a 50-product outdoor equipment catalog:
 
 ```bash
+# Set your stack name and region
+export STACK_NAME="your-stack-name"
+export AWS_REGION="your-region"
+
 # Run integration tests (requires a deployed stack)
 pytest tests/integration/ -v -s
 ```

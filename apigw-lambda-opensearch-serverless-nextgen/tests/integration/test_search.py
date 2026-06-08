@@ -21,8 +21,13 @@ import pytest
 import requests
 from requests_aws4auth import AWS4Auth
 
-STACK_NAME = os.environ.get("STACK_NAME", "lambda-opensearch-nextgen")
-REGION = os.environ.get("AWS_REGION", "eu-west-1")
+STACK_NAME = os.environ.get("STACK_NAME")
+REGION = os.environ.get("AWS_REGION")
+
+if not STACK_NAME:
+    raise RuntimeError("STACK_NAME environment variable must be set")
+if not REGION:
+    raise RuntimeError("AWS_REGION environment variable must be set")
 
 
 def _get_auth():
