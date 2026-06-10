@@ -1,4 +1,4 @@
-"""Shared fixtures for CloudFormation template unit tests."""
+"""Shared fixtures for SAM template unit tests."""
 
 import os
 import pytest

@@ -1,4 +1,4 @@
-"""Property-based tests for CloudFormation template compliance.
+"""Property-based tests for SAM template compliance.
 
 Uses hypothesis to verify universal properties hold across all valid inputs.
 Each property test runs 100 iterations with generated inputs.

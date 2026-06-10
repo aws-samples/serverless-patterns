@@ -1,7 +1,7 @@
-"""Unit tests for CloudFormation template validation.
+"""Unit tests for SAM template validation.
 
 Validates API Gateway resources, AgentCore resources, Cognito, Lambda,
-IAM roles, parameters, and outputs defined in the CloudFormation template.
+IAM, parameters, and outputs defined in the SAM template.
 """
 
 import pytest

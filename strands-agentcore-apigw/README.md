@@ -116,7 +116,7 @@ The test script authenticates via Cognito, gets an ID token, and invokes the Lam
 │       └── logging_utils.py           # Structured logging
 ├── tests/
 │   ├── unit/
-│   │   ├── test_cloudformation_template.py
+│   │   ├── test_sam_template.py
 │   │   ├── test_properties.py         # Property-based tests
 │   │   └── conftest.py
 │   └── integration/
