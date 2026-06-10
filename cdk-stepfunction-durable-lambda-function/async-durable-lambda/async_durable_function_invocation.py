@@ -29,10 +29,19 @@ def send_notification(context: StepContext, order_id: str):
 @durable_step
 def send_sfn_task_success(context: StepContext, task_token: str, response: dict):
     sfn_client = boto3.client("stepfunctions")
-    sfn_client.send_task_success(
-        taskToken=task_token,
-        output=json.dumps(response, default=str),
-    )
+    try:
+        sfn_client.send_task_success(
+            taskToken=task_token,
+            output=json.dumps(response, default=str),
+        )
+    except Exception as e:
+        context.logger.error(f"send_task_success failed: {e}. Sending task failure to Step Functions.")
+        sfn_client.send_task_failure(
+            taskToken=task_token,
+            error=type(e).__name__,
+            cause=str(e)[:256]
+        )
+        raise
 
 @durable_execution
 def lambda_handler(event: dict, context: DurableContext) -> dict:

@@ -95,7 +95,7 @@ class CdkStepfunctionDurableLambdaFunctionStack(Stack):
                     "states:SendTaskFailure",
                     "states:SendTaskHeartbeat"
                 ],
-                resources=[f"arn:aws:states:{self.region}:{self.account}:stateMachine:*"]
+                resources=[state_machine.state_machine_arn]
             )
         )
 

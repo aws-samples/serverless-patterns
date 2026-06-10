@@ -4,23 +4,19 @@ This pattern demonstrates how to integrate AWS Lambda durable functions into an 
 
 Announced at re:Invent 2025, [Lambda durable functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) introduce a checkpoint/replay mechanism that allows Lambda executions to run for up to one year, automatically recovering from interruptions. This pattern shows how to combine durable functions with Step Functions in a hybrid architecture: durable functions handle application-level logic within Lambda, while Step Functions coordinates the high-level workflow across multiple AWS services.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [cdk-stepfunction-durable-lambda-function](https://serverlessland.com/patterns/cdk-stepfunction-durable-lambda-function)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## When to Use This Pattern
-Use this pattern when:
-- Your Lambda function execution time exceeds 15 minutes and must be orchestrated by Step Functions
-- You want to keep complex business logic within a Lambda function rather than splitting into a fanout architecture
-- Your team prefers standard programming languages and IDE-based development over visual/JSON workflow designers
-- You need fine-grained control over execution state in code
-
-Use Step Functions alone when:
-- You are orchestrating multiple AWS services with native integrations
-- Non-technical stakeholders need to understand and validate workflow logic
-- You require zero-maintenance, fully managed infrastructure
+Use this pattern when you need both Step Functions workflow orchestration and durable function reliability within individual Lambda functions. Common scenarios include:
+- You have an existing Step Functions workflow and want to add long-running or stateful Lambda logic without splitting it across multiple functions and states
+- You want Step Functions to coordinate high-level workflows across AWS services while keeping complex application logic encapsulated in durable Lambda functions
+- You need to reduce the number of Lambda functions and Step Functions states by consolidating multi-step business logic into a single durable function
 
 Many applications benefit from using both services. A common pattern is using durable functions for application-level logic within Lambda, while Step Functions coordinates high-level workflows across multiple AWS services beyond Lambda functions.
+
+For guidance on choosing between durable functions and Step Functions for standalone use, see [Durable functions or Step Functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-step-functions.html) in the AWS documentation.
 
 
 ## Requirements
@@ -29,6 +25,7 @@ Many applications benefit from using both services. A common pattern is using du
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (AWS CDK >= 2.240.0) Installed
+* [Python](https://www.python.org/downloads/) (3.12 or later)
 
 ## Deployment Instructions
 
@@ -194,6 +191,6 @@ See [this useful workshop](https://cdkworkshop.com/30-python.html) on working wi
  * `cdk docs`        open CDK documentation
 
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

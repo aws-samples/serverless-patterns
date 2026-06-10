@@ -1,5 +1,5 @@
 {
-  "title": "Step Functions to Lambda durable functions",
+  "title": "AWS Step Functions to AWS Lambda durable functions",
   "description": "Create a Step Functions workflow to invoke Lambda durable functions synchronously and asynchronously.",
   "language": "Python",
   "level": "200",
@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to integrate AWS Lambda Durable Functions into an AWS Step Functions workflow. ",
+      "This pattern demonstrates how to integrate AWS Lambda durable functions into an AWS Step Functions workflow. ",
       "This pattern covers both the synchronous invocation (using default Request Response pattern) and asynchronous invocation (using the Step Function Wait for Callback with Task Token integration pattern) of the durable Lambda function.",
       "It addresses the challenge of running long-running Lambda functions (beyond 15 minutes) within a Step Functions orchestration, using asynchronous invocation and durable checkpointing.",
       "This pattern deploys one Step Functions and two Lambda functions along with required IAM policies."
