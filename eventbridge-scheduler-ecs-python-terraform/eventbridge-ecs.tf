@@ -3,11 +3,15 @@
 
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2"
     }
   }
 
@@ -45,17 +49,17 @@ variable "environment" {
 variable "schedule_expression" {
   description = "Cron expression for EventBridge rule (e.g., 'cron(0 12 * * ? *)')"
   type        = string
-  default     = "rate(1 hour)"  # Default: run every hour for demo purposes
+  default     = "rate(1 hour)" # Default: run every hour for demo purposes
   validation {
     condition     = can(regex("^(cron|rate)\\(.*\\)$", var.schedule_expression))
     error_message = "Schedule expression must be a valid cron or rate expression format: cron(minute hour day-of-month month day-of-week year) or rate(value unit)."
   }
   validation {
-    condition = can(regex("^cron\\([0-9*,/-]+\\s+[0-9*,/-]+\\s+[0-9*,?/-]+\\s+[0-9*,/-]+\\s+[0-9*,?/-]+\\s+[0-9*,/-]+\\)$", var.schedule_expression)) || can(regex("^rate\\([0-9]+\\s+(minute|minutes|hour|hours|day|days)\\)$", var.schedule_expression))
+    condition     = can(regex("^cron\\([0-9*,/-]+\\s+[0-9*,/-]+\\s+[0-9*,?/-]+\\s+[0-9*,/-]+\\s+[0-9*,?/-]+\\s+[0-9*,/-]+\\)$", var.schedule_expression)) || can(regex("^rate\\([0-9]+\\s+(minute|minutes|hour|hours|day|days)\\)$", var.schedule_expression))
     error_message = "Invalid cron or rate expression format. Cron format: cron(minute hour day-of-month month day-of-week year). Rate format: rate(value unit) where unit is minute(s), hour(s), or day(s)."
   }
   validation {
-    condition = !can(regex("^cron\\(.*\\s+\\*\\s+.*\\s+\\*\\s+.*\\)$", var.schedule_expression))
+    condition     = !can(regex("^cron\\(.*\\s+\\*\\s+.*\\s+\\*\\s+.*\\)$", var.schedule_expression))
     error_message = "Cron expressions cannot have both day-of-month and day-of-week as wildcards (*). Use ? for one of them."
   }
 }
@@ -66,7 +70,6 @@ variable "task_definition" {
     family                = string
     cpu                   = number
     memory                = number
-    container_image       = string
     container_name        = string
     environment_variables = map(string)
     log_group_name        = string
@@ -75,7 +78,6 @@ variable "task_definition" {
     family                = "eventbridge-ecs-cron-dev-task"
     cpu                   = 256
     memory                = 512
-    container_image       = "public.ecr.aws/amazonlinux/amazonlinux:2"
     container_name        = "eventbridge-ecs-cron-dev-container"
     environment_variables = {}
     log_group_name        = "/aws/ecs/eventbridge-ecs-cron-dev-task"
@@ -107,12 +109,8 @@ variable "task_definition" {
     error_message = "Task family name must be 255 characters or less."
   }
   validation {
-    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/-]*:[a-zA-Z0-9._-]+$", var.task_definition.container_image)) || can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/-]*$", var.task_definition.container_image))
-    error_message = "Container image must be a valid Docker image reference (e.g., 'nginx:latest', 'my-registry.com/my-image:tag', or 'ubuntu')."
-  }
-  validation {
     condition = (
-      (var.task_definition.cpu == 256 && var.task_definition.memory >= 512 && var.task_definition.memory <= 2048) || 
+      (var.task_definition.cpu == 256 && var.task_definition.memory >= 512 && var.task_definition.memory <= 2048) ||
       (var.task_definition.cpu == 512 && var.task_definition.memory >= 1024 && var.task_definition.memory <= 4096) ||
       (var.task_definition.cpu == 1024 && var.task_definition.memory >= 2048 && var.task_definition.memory <= 8192) ||
       (var.task_definition.cpu == 2048 && var.task_definition.memory >= 4096 && var.task_definition.memory <= 16384) ||
@@ -137,7 +135,7 @@ variable "cluster_config" {
     launch_type        = "FARGATE"
     subnet_ids         = []
     security_group_ids = []
-    assign_public_ip   = true  # Enable public IP to improve connectivity
+    assign_public_ip   = true # Enable public IP to improve connectivity
   }
   validation {
     condition     = contains(["FARGATE", "EC2"], var.cluster_config.launch_type)
@@ -170,6 +168,16 @@ variable "additional_tags" {
   description = "Additional tags to apply to all resources"
   type        = map(string)
   default     = {}
+}
+
+variable "image_tag" {
+  description = "Tag applied to the Docker image built from src/ and pushed to the ECR repository created by this module."
+  type        = string
+  default     = "latest"
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$", var.image_tag))
+    error_message = "Image tag must match the Docker tag format (alphanumerics, underscores, periods, hyphens; up to 128 chars)."
+  }
 }
 
 # Local values for consistent naming and tagging
@@ -240,14 +248,14 @@ variable "retry_policy" {
 variable "ecs_task_retry_config" {
   description = "ECS task failure handling configuration"
   type = object({
-    enable_circuit_breaker                = bool
-    circuit_breaker_rollback             = bool
-    deployment_maximum_percent           = number
-    deployment_minimum_healthy_percent   = number
-    enable_execute_command               = bool
+    enable_circuit_breaker             = bool
+    circuit_breaker_rollback           = bool
+    deployment_maximum_percent         = number
+    deployment_minimum_healthy_percent = number
+    enable_execute_command             = bool
   })
   default = {
-    enable_circuit_breaker              = true
+    enable_circuit_breaker             = true
     circuit_breaker_rollback           = true
     deployment_maximum_percent         = 200
     deployment_minimum_healthy_percent = 100
@@ -264,6 +272,61 @@ variable "ecs_task_retry_config" {
 }
 
 
+
+# Data source for the AWS account, used to construct image URIs and ARNs
+data "aws_caller_identity" "current" {}
+
+# ECR repository that holds the application image built from src/.
+# force_delete = true allows `terraform destroy` to remove the repo even if
+# it still contains images, which keeps the demo end-to-end self-contained.
+resource "aws_ecr_repository" "app" {
+  name                 = "${local.name_prefix}-app"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = merge(local.common_tags, {
+    Name         = "${local.name_prefix}-app"
+    ResourceType = "ECR-Repository"
+    Purpose      = "Container-Image-Storage"
+    Component    = "Compute"
+  })
+}
+
+# Build the Python application image from src/ and push it to ECR. This runs
+# locally (Docker must be installed and running). The image is rebuilt and
+# pushed whenever any of the source files or the repo URL change.
+resource "null_resource" "docker_build_push" {
+  triggers = {
+    dockerfile_hash   = filemd5("${path.module}/src/Dockerfile")
+    app_hash          = filemd5("${path.module}/src/app.py")
+    requirements_hash = filemd5("${path.module}/src/requirements.txt")
+    repository_url    = aws_ecr_repository.app.repository_url
+    image_tag         = var.image_tag
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/sh", "-c"]
+    working_dir = "${path.module}/src"
+    command     = <<-EOT
+      set -euo pipefail
+      aws ecr get-login-password --region ${data.aws_region.current.name} \
+        | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com
+      docker build --platform linux/amd64 -t ${aws_ecr_repository.app.repository_url}:${var.image_tag} .
+      docker push ${aws_ecr_repository.app.repository_url}:${var.image_tag}
+    EOT
+  }
+
+  depends_on = [aws_ecr_repository.app]
+}
+
+# Local for the fully-qualified image URI, used by the task definition.
+locals {
+  container_image = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
+}
 
 # CloudWatch Log Group for ECS tasks
 resource "aws_cloudwatch_log_group" "ecs_logs" {
@@ -329,15 +392,11 @@ resource "aws_ecs_task_definition" "main" {
   container_definitions = jsonencode([
     {
       name  = "${local.name_prefix}-container"
-      image = var.task_definition.container_image
+      image = local.container_image
 
       essential = true
 
-      # Simple command that demonstrates the cron job pattern using Amazon Linux tools
-      command = [
-        "sh", "-c", 
-        "echo \"{\\\"timestamp\\\":\\\"$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")\\\",\\\"level\\\":\\\"INFO\\\",\\\"message\\\":\\\"EventBridge ECS Cron Job Started\\\",\\\"task_family\\\":\\\"${local.name_prefix}-task\\\",\\\"cluster_name\\\":\\\"${local.name_prefix}-cluster\\\"}\" && sleep 2 && echo \"{\\\"timestamp\\\":\\\"$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")\\\",\\\"level\\\":\\\"INFO\\\",\\\"message\\\":\\\"Processing sample data\\\",\\\"records_processed\\\":42}\" && sleep 1 && echo \"{\\\"timestamp\\\":\\\"$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")\\\",\\\"level\\\":\\\"INFO\\\",\\\"message\\\":\\\"EventBridge ECS Cron Job Completed Successfully\\\",\\\"duration_seconds\\\":3}\""
-      ]
+      # Use the Dockerfile's CMD ["python", "app.py"]; no override needed.
 
       environment = concat([
         for key, value in var.task_definition.environment_variables : {
@@ -392,6 +451,10 @@ resource "aws_ecs_task_definition" "main" {
     Purpose      = "Scheduled-Task-Execution"
     Component    = "Compute"
   })
+
+  # Ensure the image is built and pushed before the task definition is created
+  # so the first scheduled invocation has an image to pull.
+  depends_on = [null_resource.docker_build_push]
 }
 
 # Data source for current AWS region
@@ -416,13 +479,14 @@ resource "aws_security_group" "ecs_tasks" {
   description = "Security group for ECS tasks in ${local.name_prefix}"
   vpc_id      = data.aws_vpc.default.id
 
-  # Allow outbound internet access for pulling container images and logging
+  # Allow HTTPS outbound for pulling container images from ECR, sending logs to
+  # CloudWatch, and reaching external HTTPS APIs used by the sample task.
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound traffic"
+    description = "Allow HTTPS outbound for ECR, CloudWatch, and external APIs"
   }
 
   tags = merge(local.common_tags, {
@@ -658,6 +722,16 @@ output "cloudwatch_log_group_name" {
 output "eventbridge_log_group_name" {
   description = "Name of the EventBridge log group"
   value       = aws_cloudwatch_log_group.eventbridge_logs.name
+}
+
+output "ecr_repository_url" {
+  description = "URL of the ECR repository that holds the application image"
+  value       = aws_ecr_repository.app.repository_url
+}
+
+output "container_image" {
+  description = "Fully-qualified image URI used by the ECS task definition"
+  value       = local.container_image
 }
 
 
