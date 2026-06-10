@@ -1,0 +1,10 @@
+.DS_Store
+*-deps/
+*-package/
+*.zip
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.so
+*.egg-info/

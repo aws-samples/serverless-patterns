@@ -1,0 +1,93 @@
+{
+  "title": "Serverless AI Weather Agent with AgentCore Gateway and API Gateway Target",
+  "description": "Serverless AI weather agent using Strands SDK and AgentCore Gateway with an API Gateway target. Uses MCP, Cognito JWT auth, and WeatherAPI.com.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The user authenticates with Amazon Cognito and receives a JWT ID token.",
+      "The JWT is passed to an Agent Lambda which uses the Strands Agents SDK to create an AI agent backed by Amazon Bedrock (us.anthropic.claude-sonnet-4-6 cross-region inference profile).",
+      "The Strands Agent connects to an AgentCore Gateway MCP endpoint, dynamically discovering available weather tools via the MCP tools/list protocol.",
+      "AgentCore Gateway auto-discovers operations from the API Gateway REST API via GetExportAPI and presents them as MCP tools to the agent.",
+      "The AgentCore Gateway validates the incoming JWT token using a CUSTOM_JWT authorizer backed by Cognito.",
+      "When the agent selects a tool, AgentCore routes the request to the API Gateway REST API, authenticating with an API key managed by a credential provider backed by Secrets Manager.",
+      "The API Gateway proxies the request to WeatherAPI.com, injecting the WeatherAPI key from a Secrets Manager-backed stage variable.",
+      "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/strands-agentcore-apigw",
+      "templateURL": "serverless-patterns/strands-agentcore-apigw",
+      "projectFolder": "strands-agentcore-apigw",
+      "templateFile": "infrastructure/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Strands Agents SDK",
+        "link": "https://github.com/strands-agents/sdk-python"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+       {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "AgentCore Gateway API Gateway Target",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-target-api-gateway.html"
+      },
+      {
+        "text": "Model Context Protocol (MCP)",
+        "link": "https://modelcontextprotocol.io/"
+      },
+      {
+        "text": "Amazon Cognito JWT Authentication",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html"
+      },
+      {
+        "text": "Amazon Bedrock Cross-Region Inference Profiles",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html"
+      },
+      {
+        "text": "WeatherAPI.com",
+        "link": "https://www.weatherapi.com/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "./scripts/deploy.sh --environment-name dev --weather-api-key YOUR_WEATHERAPI_KEY --region us-east-1"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for detailed testing and end-to-end validation instructions.",
+      "./scripts/test.sh",
+      "./scripts/test.sh 'What is the weather in London, UK?'"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "aws bedrock-agentcore-control delete-api-key-credential-provider --name dev-weather-apigw-key --region us-east-1",
+      "sam delete --stack-name dev-weather-agent --region us-east-1 --no-prompts",
+      "aws secretsmanager delete-secret --secret-id dev/weather-api-key --force-delete-without-recovery --region us-east-1",
+      "aws secretsmanager delete-secret --secret-id dev/apigw-api-key --force-delete-without-recovery --region us-east-1"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mike Hume",
+      "image": "https://serverlessland.com/assets/images/contributors/mike-hume.jpg",
+      "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
+      "linkedin": "michael-hume-4663bb64",
+      "twitter": ""
+    }
+  ]
+}
