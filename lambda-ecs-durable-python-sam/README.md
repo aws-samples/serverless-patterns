@@ -12,7 +12,9 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Docker](https://docs.docker.com/get-docker/) installed (for building Lambda container images)
+* A container runtime for building Lambda container images. Either:
+  * [Docker](https://docs.docker.com/get-docker/) installed and running, OR
+  * [Finch](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-finch.html) installed and running (open-source alternative to Docker). Start Finch with `finch vm start` before running `sam build`.
 * [Python 3.13](https://www.python.org/downloads/) or later
 
 ## Deployment Instructions
