@@ -60,7 +60,6 @@ This pattern creates a REST API backed by three AWS Lambda functions that intera
 
 The OpenSearch collection lives inside a NextGen collection group, which enables scale-to-zero behavior. When idle, both indexing and search OCUs (OpenSearch Compute Units) drop to zero. When a request arrives, capacity provisions in approximately 10 seconds. Requests are queued (not dropped) during this window.
 
-The NextGen collection group is created using a Lambda-backed custom resource since CloudFormation doesn't yet natively support the `Generation` parameter.
 
 ### Scale-to-zero in action
 

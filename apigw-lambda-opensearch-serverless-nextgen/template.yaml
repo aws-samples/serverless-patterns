@@ -117,64 +117,24 @@ Resources:
       BuildArchitecture: arm64
 
   # ============================================================
-  # Custom Resource — NextGen Collection Group
+  # NextGen Collection Group
   # ============================================================
 
-  CollectionGroupFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Delete
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W84
-            reason: "Sample application — KMS encryption not required for demonstration log data"
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-CollectionGroupFunction
-      RetentionInDays: !Ref LogRetentionDays
-
-  CollectionGroupFunction:
-    Type: AWS::Serverless::Function
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W89
-            reason: "Sample application — VPC deployment not required for demonstration purposes"
-          - id: W92
-            reason: "Sample application — reserved concurrency not required for demonstration purposes"
-    Properties:
-      Handler: app.lambda_handler
-      CodeUri: lambda/custom_resources/nextgen_collection_group/
-      Description: Custom resource handler for NextGen collection group
-      Timeout: 60
-      LoggingConfig:
-        LogGroup: !Ref CollectionGroupFunctionLogGroup
-      Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - aoss:CreateCollectionGroup
-                - aoss:UpdateCollectionGroup
-                - aoss:DeleteCollectionGroup
-              Resource: !Sub 'arn:${AWS::Partition}:aoss:${AWS::Region}:${AWS::AccountId}:collection-group/*'
-            - Effect: Allow
-              Action:
-                - aoss:BatchGetCollectionGroup
-              Resource: !Sub 'arn:${AWS::Partition}:aoss:${AWS::Region}:${AWS::AccountId}:collection-group/*'
-      Environment:
-        Variables:
-          POWERTOOLS_SERVICE_NAME: opensearch-nextgen-cr
-
   CollectionGroup:
-    Type: AWS::CloudFormation::CustomResource
+    Type: AWS::OpenSearchServerless::CollectionGroup
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002  # Generation property is valid but not yet in cfn-lint's schema
     Properties:
-      ServiceToken: !GetAtt CollectionGroupFunction.Arn
-      ServiceTimeout: '120'
       Name: !Ref CollectionGroupName
       Description: Collection group for semantic search sample — NextGen with scale-to-zero
-      MaxIndexingCapacityInOCU: '8'
-      MaxSearchCapacityInOCU: '8'
+      Generation: NEXTGEN
+      StandbyReplicas: ENABLED
+      CapacityLimits:
+        MaxIndexingCapacityInOcu: 8
+        MaxSearchCapacityInOcu: 8
 
   # ============================================================
   # OpenSearch Serverless — Security Policies & Collection
@@ -623,7 +583,7 @@ Outputs:
 
   CollectionGroupId:
     Description: NextGen Collection Group ID
-    Value: !GetAtt CollectionGroup.Id
+    Value: !Ref CollectionGroup
 
   MLModelId:
     Description: OpenSearch ML model ID for neural search

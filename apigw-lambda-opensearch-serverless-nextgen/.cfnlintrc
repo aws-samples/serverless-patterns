@@ -3,3 +3,4 @@ configure_rules:
     # python3.14 is valid but not yet in cfn-lint's schema
     exceptions:
       - python3.14
+      - NEXTGEN
