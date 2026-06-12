@@ -18,7 +18,7 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
       logRetention: logs.RetentionDays.ONE_WEEK,
     });
 
-    // IAM role for AppSync to invoke Lambda
+    // Service role AppSync Events assumes to invoke the Lambda data source
     const appsyncRole = new iam.Role(this, 'AppSyncLambdaRole', {
       assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),
     });
@@ -53,14 +53,40 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
       expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
     });
 
-    // Channel namespace wired to Lambda event handler
-    new appsync.CfnChannelNamespace(this, 'NotificationsChannel', {
+    // Lambda data source configured on the Events API. The OnPublish handler
+    // references this data source by name; the ARN lives here, not inline.
+    const lambdaDataSource = new appsync.CfnDataSource(this, 'LambdaDataSource', {
+      apiId: api.attrApiId,
+      name: 'LambdaEventHandler',
+      type: 'AWS_LAMBDA',
+      serviceRoleArn: appsyncRole.roleArn,
+      lambdaConfig: {
+        lambdaFunctionArn: eventFn.functionArn,
+      },
+    });
+
+    // Channel namespace with a Direct Lambda OnPublish interceptor. Every event
+    // published to this namespace is sent to the Lambda (REQUEST_RESPONSE) for
+    // validation/enrichment before AppSync broadcasts it to subscribers.
+    const notificationsChannel = new appsync.CfnChannelNamespace(this, 'NotificationsChannel', {
       apiId: api.attrApiId,
       name: 'notifications',
       publishAuthModes: [{ authType: 'API_KEY' }],
       subscribeAuthModes: [{ authType: 'API_KEY' }],
-      codeHandlers: "import { util } from '@aws-appsync/utils';\nexport function onPublish(ctx) {\n  return { events: ctx.events };\n}",
+      handlerConfigs: {
+        onPublish: {
+          behavior: 'DIRECT',
+          integration: {
+            dataSourceName: lambdaDataSource.name,
+            lambdaConfig: {
+              invokeType: 'REQUEST_RESPONSE',
+            },
+          },
+        },
+      },
     });
+    // dataSourceName is a string reference, so enforce creation ordering explicitly.
+    notificationsChannel.addDependency(lambdaDataSource);
 
     // Second channel namespace
     new appsync.CfnChannelNamespace(this, 'AlertsChannel', {
