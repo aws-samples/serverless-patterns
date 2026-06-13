@@ -1,0 +1,10 @@
+java -classpath <Project_Root_Folder>/rabbitmq_message_sender_json/target/json-rabbitmq-producer-0.0.1-SNAPSHOT.jar rabbitmq.producer.JsonRabbitMQProducer <RabbitMQ Server Host> <RabbitMQ Server Virtual Host> <Exchange Name> <Queue Name> <Message Batch Identifier String> <Number Of Messages in Batch>
+
+Example:
+
+java -classpath /home/ec2-user/JavaExamples/rabbitmq_message_sender_json/target/json-rabbitmq-producer-0.0.1-SNAPSHOT.jar rabbitmq.producer.JsonRabbitMQProducer b-70f77a26-a520-4c7d-bdfe-05z1b885q677aaa.mq.us-west-2.on.aws lambdavhost lambdafanoutexchange lambdaqueue TestMessage021 100
+
+
+Make sure to put the host name without amqps:// and without port at the end (just the hostname of the RabbitMQ server)
+
+Also make sure the security group of the RabbitMQ server allows inbound traffic on port 5671 from the security group of the Cloud9 (or EC2 machine) from where you are running this command
