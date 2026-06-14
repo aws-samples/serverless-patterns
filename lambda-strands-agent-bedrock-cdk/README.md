@@ -15,9 +15,11 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
 * [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for Anthropic Claude Sonnet in your target region
 
-## How it works
+## Architecture
 
-![Architecture](architecture.png)
+The pattern creates an AWS Lambda function with the Strands Agents SDK layer. The function uses Amazon Bedrock (Claude Sonnet) for reasoning and can invoke registered Python tools during the conversation loop.
+
+## How it works
 
 1. A client invokes the Lambda function with a JSON payload containing a `prompt` field.
 2. The Lambda function initializes a Strands Agents SDK agent with the official Lambda layer (no custom packaging required).
@@ -42,6 +44,14 @@ Important: this application uses various AWS services and there are costs associ
     ```bash
     cdk deploy
     ```
+
+## Verification
+
+After deployment, verify the stack outputs:
+
+```bash
+aws cloudformation describe-stacks --stack-name LambdaStrandsAgentBedrockStack --query 'Stacks[0].Outputs'
+```
 
 ## Testing
 

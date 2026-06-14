@@ -7,7 +7,7 @@ export class LambdaStrandsAgentBedrockStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Strands Agents official Lambda layer (Python 3.12, ARM64)
+    // Strands Agents official Lambda layer (Python 3.12, x86_64)
     const strandsLayer = lambda.LayerVersion.fromLayerVersionArn(
       this,
       "StrandsAgentsLayer",
@@ -36,7 +36,10 @@ export class LambdaStrandsAgentBedrockStack extends cdk.Stack {
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
         ],
-        resources: ["*"],
+        resources: [
+          `arn:aws:bedrock:*:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+        ],
       })
     );
 

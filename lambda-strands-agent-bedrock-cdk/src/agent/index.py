@@ -1,6 +1,5 @@
 """Strands Agents SDK agent deployed on AWS Lambda with Amazon Bedrock."""
 
-import json
 import math
 from strands import Agent, tool
 
