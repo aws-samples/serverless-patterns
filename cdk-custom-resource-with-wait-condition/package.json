@@ -13,7 +13,7 @@
     "@tsconfig/node24": "^24.0.3",
     "@types/node": "24.10.1",
     "aws-cdk": "2.1033.0",
-    "esbuild": "^0.27.1",
+    "esbuild": "^0.28.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3"
   },
