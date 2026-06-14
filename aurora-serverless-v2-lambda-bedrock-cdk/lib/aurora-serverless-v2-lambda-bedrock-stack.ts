@@ -9,8 +9,13 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Use default VPC
-    const vpc = ec2.Vpc.fromLookup(this, "DefaultVpc", { isDefault: true });
+    // VPC with isolated subnets for the database
+    const vpc = new ec2.Vpc(this, "Vpc", {
+      maxAzs: 2,
+      subnetConfiguration: [
+        { name: "isolated", subnetType: ec2.SubnetType.PRIVATE_ISOLATED, cidrMask: 24 },
+      ],
+    });
 
     // Aurora Serverless v2 cluster (PostgreSQL, scales to zero)
     const cluster = new rds.DatabaseCluster(this, "AuroraCluster", {
@@ -21,8 +26,9 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
       serverlessV2MaxCapacity: 4,
       writer: rds.ClusterInstance.serverlessV2("writer"),
       vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
       defaultDatabaseName: "appdb",
+      storageEncrypted: true,
       enableDataApi: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -73,7 +79,10 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
     queryFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["bedrock:InvokeModel"],
-        resources: ["*"],
+        resources: [
+          `arn:aws:bedrock:*:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+        ],
       })
     );
 

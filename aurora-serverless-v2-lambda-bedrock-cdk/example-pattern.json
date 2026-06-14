@@ -1,6 +1,6 @@
 {
-  "title": "Aurora Serverless v2 with Lambda and Amazon Bedrock",
-  "description": "Deploy an Aurora Serverless v2 PostgreSQL database that scales to zero, with Lambda functions that query stored knowledge and use Amazon Bedrock for AI-powered answers.",
+  "title": "Amazon Aurora Serverless v2 with AWS Lambda and Amazon Bedrock",
+  "description": "Deploy an Amazon Aurora Serverless v2 PostgreSQL database that scales to zero, with AWS Lambda functions that query stored knowledge and use Amazon Bedrock for AI-powered answers.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",
@@ -11,8 +11,8 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Aurora Serverless v2 PostgreSQL cluster (platform version 4 with up to 30% better performance) that scales to zero when idle. A setup Lambda seeds a knowledge table, and a query Lambda retrieves relevant context from Aurora and sends it to Amazon Bedrock for AI-powered answers.",
-      "Aurora Serverless v2 is ideal for agentic AI workloads with burst patterns and long idle windows. The enhanced scaling algorithm in platform version 4 efficiently handles workloads where multiple tasks compete for resources."
+      "This pattern deploys an Amazon Aurora Serverless v2 PostgreSQL cluster (platform version 4 with up to 30% better performance) that scales to zero when idle. A setup AWS Lambda seeds a knowledge table, and a query AWS Lambda retrieves relevant context from Aurora and sends it to Amazon Bedrock for AI-powered answers.",
+      "Amazon Aurora Serverless v2 is ideal for agentic AI workloads with burst patterns and long idle windows. The enhanced scaling algorithm in platform version 4 efficiently handles workloads where multiple tasks compete for resources."
     ]
   },
   "gitHub": {

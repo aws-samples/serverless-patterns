@@ -1,6 +1,6 @@
-# Aurora Serverless v2 with Lambda and Amazon Bedrock
+# Amazon Aurora Serverless v2 with AWS Lambda and Amazon Bedrock
 
-This pattern deploys an Aurora Serverless v2 PostgreSQL cluster (platform version 4) with Lambda functions that query stored knowledge and use Amazon Bedrock for AI-powered answers. Aurora Serverless v2 scales to zero when idle, making it cost-effective for agentic AI workloads.
+This pattern deploys an Amazon Aurora Serverless v2 PostgreSQL cluster (platform version 4) with AWS Lambda functions that query stored knowledge and use Amazon Bedrock for AI-powered answers. Amazon Aurora Serverless v2 scales to zero when idle, making it cost-effective for agentic AI workloads.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/aurora-serverless-v2-lambda-bedrock-cdk
 
@@ -15,9 +15,11 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
 * [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for Anthropic Claude Sonnet in your target region
 
-## How it works
+## Architecture
 
-![Architecture](architecture.png)
+The pattern creates a VPC with isolated subnets, an Amazon Aurora Serverless v2 PostgreSQL cluster (with encryption at rest), and two AWS Lambda functions. The setup function seeds data via the RDS Data API. The query function retrieves context from Aurora and passes it to Amazon Bedrock for AI-powered answers.
+
+## How it works
 
 1. A setup Lambda creates the `knowledge` table in Aurora PostgreSQL and seeds it with sample data.
 2. A query Lambda receives a question, searches Aurora for relevant context using SQL, and sends the context + question to Amazon Bedrock.
