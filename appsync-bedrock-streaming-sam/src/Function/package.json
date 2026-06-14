@@ -4,7 +4,7 @@
   "type": "module",
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
-    "esbuild": "^0.25.1"
+    "esbuild": "^0.28.1"
   },
   "devDependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.758.0",
