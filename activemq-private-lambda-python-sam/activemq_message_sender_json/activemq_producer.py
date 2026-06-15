@@ -7,15 +7,32 @@ from datetime import datetime
 from pathlib import Path
 
 import boto3
+import requests
 import stomp
+
+
+def get_region():
+    session = boto3.session.Session()
+    if session.region_name:
+        return session.region_name
+    token = requests.put(
+        "http://169.254.169.254/latest/api/token",
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"},
+        timeout=2,
+    ).text
+    az = requests.get(
+        "http://169.254.169.254/latest/meta-data/placement/availability-zone",
+        headers={"X-aws-ec2-metadata-token": token},
+        timeout=2,
+    ).text
+    return az[:-1]
 
 
 def get_credentials():
     secret_name = "AmazonActiveMQCredentials"
-    session = boto3.session.Session()
-    region = session.region_name
+    region = get_region()
     print(f"region = {region}")
-    client = session.client(service_name="secretsmanager", region_name=region)
+    client = boto3.client(service_name="secretsmanager", region_name=region)
     response = client.get_secret_value(SecretId=secret_name)
     secret = json.loads(response["SecretString"])
     return secret["username"], secret["password"]

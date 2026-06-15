@@ -102,7 +102,7 @@ Once the lambda function is deployed, send some messages to the Amazon MQ (Apach
 For your convenience, a Python script and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
 
 ```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/Python/activemq_message_sender_json
+cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
 chmod +x commands.sh
 ```
 

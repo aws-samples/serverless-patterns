@@ -3,5 +3,6 @@
 # Pass a random string as the first command-line argument to this shell script. It will be used to uniquely identify a batch of messages
 # Pass an integer as the second command-line argument to this shell script < 500. For example if you want to send 100 messages, pass 100
 # Example sh commands.sh firstbatch 100
+export AWS_DEFAULT_REGION=AWS_REGION
 
-python3 /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/Python/activemq_message_sender_json/activemq_producer.py ACTIVEMQ_BROKER_ENDPOINT ACTIVEMQ_QUEUE_NAME $1 $2
+PYTHON3_VERSION /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json/activemq_producer.py ACTIVEMQ_BROKER_ENDPOINT ACTIVEMQ_QUEUE_NAME $1 $2
