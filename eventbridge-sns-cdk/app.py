@@ -38,7 +38,7 @@ class EventbridgeSnsCdkStack(Stack):
             detail_type=["message"]
         )
 
-        # SNS topic as target for Eventbridge Rue
+        # SNS topic as target for EventBridge Rue
         rule.add_target(targets.SnsTopic(MySnsTopic))
 
         # CDK Outputs
