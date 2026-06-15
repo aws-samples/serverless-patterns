@@ -595,7 +595,7 @@ Resources:
             cd ./serverless-patterns
             git sparse-checkout set --no-cone /activemq-private-lambda-python-sam
             git checkout
-            cd activemq-private-lambda-python-sam/Python
+            cd activemq-private-lambda-python-sam
             sudo chown -R ec2-user .
 
             #Substitute SAM template variables
@@ -621,7 +621,7 @@ Resources:
             sudo chown -R ec2-user .
 
             #Update Shell script for sending ActiveMQ messages to Lambda function
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/Python/activemq_message_sender_json
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
             sudo chown ec2-user ./commands.sh
             source /home/ec2-user/.bash_profile
             echo "ACTIVEMQ_BROKER_ENDPOINT=$activemq_broker_endpoint"
@@ -629,11 +629,13 @@ Resources:
             sed -i "s/ACTIVEMQ_QUEUE_NAME/$ACTIVEMQ_QUEUE_NAME/g" commands.sh
 
             # Install Python dependencies for the producer
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/Python/activemq_message_sender_json
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
             su -c "pip3 install -r requirements.txt --user" -s /bin/sh ec2-user
+            su -c "$PYTHON3_VERSION -m venv ./myenv && source ./myenv/bin/activate && pip install -r requirements.txt" -s /bin/sh ec2-user
+
 
             #Update Shell script for browsing messages in ActiveMQ queue
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/Python
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam
             sudo chown ec2-user ./activemq_queue_browser.sh
             source /home/ec2-user/.bash_profile
             sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_ONE|${activemq_broker_endpoint1}|g" activemq_queue_browser.sh
