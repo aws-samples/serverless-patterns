@@ -3,6 +3,15 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  Python3Version:
+    Type: String
+    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12. Also Python 3.10 is not available to install on Amazon Linux 2023 so it is not being offered as an option
+    AllowedValues:
+      - python3.11
+      - python3.12
+      - python3.13
+      - python3.14
+    Default: python3.14
   ActiveMQEngineVersion:
     Type: String
     Default: 5.18
@@ -400,6 +409,30 @@ Resources:
             #!/bin/bash
             yum update -y
 
+            #install latest python3
+            PYTHON3_VERSION=${python3_version}
+            
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install"
+                sudo dnf install $PYTHON3_VERSION -y
+                sudo dnf install $PYTHON3_VERSION-pip -y
+                # Check the exit code of the command
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of $PYTHON3_VERSION succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+            
+            echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
+
+
             # install Python 3 and pip
             max_attempts=5
             attempt_num=1
@@ -566,7 +599,7 @@ Resources:
             sudo chown -R ec2-user .
 
             #Substitute SAM template variables
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/Python
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam
             cd activemq_consumer_dynamo_sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
@@ -578,6 +611,7 @@ Resources:
             sed -i "s/ACTIVEMQ_SUBNET_TWO/$ACTIVEMQ_SUBNET_TWO/g" template.yaml
             sed -i "s/ACTIVEMQ_SUBNET_THREE/$ACTIVEMQ_SUBNET_THREE/g" template.yaml
             sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
+            sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" template.yaml
 
             #Install ActiveMQ (needed in case you want to use the CLI as a client to look at queues etc.)
             mkdir /home/ec2-user/activemq_client
@@ -636,6 +670,8 @@ Resources:
             activemq_security_group: !GetAtt ActiveMQSecurityGroup.GroupId
             activemq_broker_admin_user: !Ref ActiveMQBrokerAdminUser
             activemq_broker_password: !Ref ActiveMQBrokerPassword
+            python3_version: !Ref Python3Version
+
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint

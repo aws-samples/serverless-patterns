@@ -395,7 +395,8 @@ Resources:
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Trying yum install"
-                sudo yum install $PYTHON3_VERSION -y
+                sudo dnf install $PYTHON3_VERSION -y
+                sudo dnf install $PYTHON3_VERSION-pip -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
                     echo "Yum install of $PYTHON3_VERSION succeeded"

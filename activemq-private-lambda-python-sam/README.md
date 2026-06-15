@@ -39,7 +39,7 @@ We cloned the serverless-patterns Github repository on the EC2 instance already 
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/activemq-private-lambda-python-sam/Python
+    cd serverless-patterns/activemq-private-lambda-python-sam
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
