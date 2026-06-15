@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     cd ./..
     ```
 3. Before proceed:
-    * Next command, you need to provide the correct AppConfig Lambda extension layer ARN sepcific to the region you are deploying the stack. Refer here to obtain the ARN for your region: https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html#appconfig-integration-lambda-extensions-enabling-x86-64
+    * Next command, you need to provide the correct AppConfig Lambda extension layer ARN specific to the region you are deploying the stack. Refer here to obtain the ARN for your region: https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html#appconfig-integration-lambda-extensions-enabling-x86-64
 
 4. From the command line, run:
     ```
