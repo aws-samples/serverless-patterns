@@ -1,6 +1,6 @@
-# AWS  Fargate, Secrets Manager
+# AWS Fargate, AWS Secrets Manager
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate Task Definition, a Fargate Container, and a Secrets Manager secret.
+This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate Task Definition, a Fargate Container, and a AWS Secrets Manager secret.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-fargate-secrets-manager
 
@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
   - Ensure you have a default [AWS VPC](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-getting-started.html) which contains at least one [public subnet](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured, with a default profile that points to the AWS account to use
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Python 3.6 or later](https://www.python.org/downloads/)
+- [Python 3.10 or later](https://www.python.org/downloads/)
 - [pip and virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html#python-prerequisites)
 - [Node and NPM](https://nodejs.org/en/download/) installed
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
@@ -27,7 +27,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change directory to the pattern directory:
    ```bash
    cd serverless-patterns/fargate-secretsmanager
-
+   ```
 3. From the command line, set Environment variables for your account and region:
    
    **Linux/Mac:**
@@ -67,13 +67,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-- Secrets Manager creates a randomly generated secret which will be injected into the container
-- ECS attaches a default policy to the task execution role when a secret is specified for injection into the container
+- AWS Secrets Manager creates a randomly generated secret which will be injected into the container
+- Amazon ECS attaches a default policy to the task execution role when a secret is specified for injection into the container
   - This default policy auto grants read access to the secret from the container via the following permissions:
      - `secretsmanager:GetSecretValue`
      - `secretsmanager:DescribeSecret`
 - The task execution role doesn't require the `kms:decrypt` permission because the secret uses the default KMS key in the AWS account. A custom key, however, would require such permissions
-- The Fargate Task definition, task execution role, container and Secrets Manager instance are all created when `cdk deploy` is executed
+- The Fargate Task definition, task execution role, container and AWS Secrets Manager instance are all created when `cdk deploy` is executed
 - The 
 - The complete stack is removed when `cdk destroy` is executed
 
@@ -90,19 +90,19 @@ Important: this application uses various AWS services and there are costs associ
 aws ecs run-task --cluster <your-cluster-name> --network-configuration '{"awsvpcConfiguration": {"subnets":["<your-public-subnet>"],"assignPublicIp": "ENABLED"}}' --launch-type 'FARGATE' --task-definition <your-task-definition-and-revision>
 ```
 
-3. Navigate to the AWS CloudWatch console for the log group created as part of the stack. Check that the logs contain the environment variables, including the injected username and password:
+3. Navigate to the Amazon CloudWatch console for the log group created as part of the stack. Check that the logs contain the environment variables, including the injected username and password:
 
 ![image](images/FargateTaskLogs.png)
 
 
-> **Note**: We ran the `printenv` command in the code for demo/testing purposes; to ensure the secret is being passed into the container's environment. Ensure that only trusted admins are able to exec into the container and have access to container/CloudWatch logs.
+> **Note**: We ran the `printenv` command in the code for demo/testing purposes; to ensure the secret is being passed into the container's environment. Ensure that only trusted admins are able to exec into the container and have access to container / Amazon CloudWatch Logs.
 
 
-You should now be able to use the Secrets Manager secret without having to hardcode these values within the container code. For environment variables, consider using [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and for Secrets, consider using [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html) to store all of your container variables.
+You should now be able to use the AWS Secrets Manager secret without having to hardcode these values within the container code. For environment variables, consider using [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) and for Secrets, consider using [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html) to store all of your container variables.
 
 
 ## Cleanup 
-1. Run ```cdk destroy```
+1. Run `cdk destroy`
 2. Ensure a green checkmark appears that indicates the Stack was successfully brought down.
 
 ## Useful commands
