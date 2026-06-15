@@ -1,5 +1,5 @@
 {
-  "name": "bedrock-guardrails-cross-account-cdk",
+  "name": "bedrock-guardrails-enforcement-cdk",
   "version": "1.0.0",
   "bin": {
     "app": "bin/app.ts"

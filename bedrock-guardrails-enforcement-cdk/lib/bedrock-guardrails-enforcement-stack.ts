@@ -3,10 +3,9 @@ import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as bedrock from 'aws-cdk-lib/aws-bedrock';
-import * as cr from 'aws-cdk-lib/custom-resources';
 import * as path from 'path';
 
-export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
+export class BedrockGuardrailsEnforcementStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -16,9 +15,9 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
       description: 'Bedrock model ID for testing',
     });
 
-    // Create Bedrock Guardrail
+    // Create the Bedrock Guardrail (DRAFT) with content and topic filters
     const guardrail = new bedrock.CfnGuardrail(this, 'Guardrail', {
-      name: 'CrossAccountEnforcedGuardrail',
+      name: 'AccountEnforcedGuardrail',
       blockedInputMessaging: 'Your request was blocked by the guardrail.',
       blockedOutputsMessaging: 'The response was blocked by the guardrail.',
       contentPolicyConfig: {
@@ -42,61 +41,26 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
       },
     });
 
-    // Create guardrail version via AwsCustomResource
-    const versionCr = new cr.AwsCustomResource(this, 'GuardrailVersion', {
-      onCreate: {
-        service: 'Bedrock',
-        action: 'createGuardrailVersion',
-        parameters: {
-          guardrailIdentifier: guardrail.attrGuardrailId,
-        },
-        physicalResourceId: cr.PhysicalResourceId.fromResponse('version'),
-      },
-      policy: cr.AwsCustomResourcePolicy.fromStatements([
-        new iam.PolicyStatement({
-          actions: ['bedrock:CreateGuardrailVersion'],
-          resources: [guardrail.attrGuardrailArn],
-        }),
-      ]),
+    // Publish a numbered guardrail version using the native CloudFormation resource
+    const guardrailVersion = new bedrock.CfnGuardrailVersion(this, 'GuardrailVersion', {
+      guardrailIdentifier: guardrail.attrGuardrailId,
+      description: 'Version enforced at the account level',
     });
 
-    // Enable account-level enforcement via AwsCustomResource
-    const enforceCr = new cr.AwsCustomResource(this, 'GuardrailEnforcement', {
-      onCreate: {
-        service: 'Bedrock',
-        action: 'putEnforcedGuardrailConfiguration',
-        parameters: {
-          guardrailInferenceConfig: {
-            guardrailIdentifier: guardrail.attrGuardrailId,
-            guardrailVersion: versionCr.getResponseField('version'),
-            inputTags: 'IGNORE',
-          },
-        },
-        physicalResourceId: cr.PhysicalResourceId.of('enforced-guardrail'),
+    // Enable account-level enforcement using the native AWS::Bedrock::EnforcedGuardrailConfiguration
+    // resource. No custom resource / Lambda-backed workaround is required.
+    const enforcedGuardrail = new cdk.CfnResource(this, 'EnforcedGuardrail', {
+      type: 'AWS::Bedrock::EnforcedGuardrailConfiguration',
+      properties: {
+        GuardrailIdentifier: guardrail.attrGuardrailId,
+        GuardrailVersion: guardrailVersion.attrVersion,
       },
-      onDelete: {
-        service: 'Bedrock',
-        action: 'deleteEnforcedGuardrailConfiguration',
-        parameters: {
-          configId: 'default',
-        },
-      },
-      policy: cr.AwsCustomResourcePolicy.fromStatements([
-        new iam.PolicyStatement({
-          actions: [
-            'bedrock:PutEnforcedGuardrailConfiguration',
-            'bedrock:DeleteEnforcedGuardrailConfiguration',
-          ],
-          resources: ['*'],
-        }),
-      ]),
     });
+    enforcedGuardrail.node.addDependency(guardrailVersion);
 
-    enforceCr.node.addDependency(versionCr);
-
-    // Test Lambda
+    // Test Lambda that calls the Converse API WITHOUT a guardrailIdentifier
     const testFn = new lambda.Function(this, 'TestFunction', {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: new lambda.Runtime('nodejs24.x', lambda.RuntimeFamily.NODEJS),
       handler: 'test.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src')),
       memorySize: 256,
@@ -106,6 +70,8 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
       },
     });
 
+    // Inference profiles route cross-region, so the foundation-model ARN keeps a
+    // wildcard region while the inference-profile ARN is scoped to this account/region.
     testFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
@@ -114,7 +80,14 @@ export class BedrockGuardrailsCrossAccountStack extends cdk.Stack {
       ],
     }));
 
-    testFn.node.addDependency(enforceCr);
+    // With an account-level enforced guardrail active, the caller must be authorized
+    // to apply the guardrail even though no guardrailIdentifier is passed in the call.
+    testFn.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['bedrock:ApplyGuardrail'],
+      resources: [guardrail.attrGuardrailArn],
+    }));
+
+    testFn.node.addDependency(enforcedGuardrail);
 
     // Outputs
     new cdk.CfnOutput(this, 'GuardrailId', {

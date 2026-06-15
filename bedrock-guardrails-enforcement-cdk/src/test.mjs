@@ -10,11 +10,14 @@ async function invokeModel(prompt) {
       messages: [{ role: 'user', content: [{ text: prompt }] }],
     }));
 
+    // An enforced (account-level) guardrail intervenes in-band: the call succeeds
+    // but returns stopReason 'guardrail_intervened' rather than throwing.
+    const stopReason = response.stopReason;
     return {
       prompt,
-      stopReason: response.stopReason,
+      stopReason,
       output: response.output?.message?.content?.[0]?.text || 'No text response',
-      blocked: false,
+      blocked: stopReason === 'guardrail_intervened',
     };
   } catch (error) {
     return {
