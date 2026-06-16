@@ -101,16 +101,16 @@ Once the lambda function is deployed, send some messages to the Amazon MQ (Apach
 
 For your convenience, a Python script and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
 
-```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
-chmod +x commands.sh
-```
-
 You should see a script called commands.sh. Run that script by passing a random string and a number between 1 and 500. Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 100 and MaximumBatchingWindowInSeconds: 5 in the template.yaml file)
 
 ```
-[ec2-user@ip-10-0-0-126 ~]$ sh ./commands.sh firstBatch 10
+cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
+chmod +x commands.sh
+$PYTHON3_VERSION -m venv ./myenv && source ./myenv/bin/activate && pip install -r requirements.txt
+sh ./commands.sh firstBatch 100
+
 ```
+
 
 You should see output similar to what is shown below:
 

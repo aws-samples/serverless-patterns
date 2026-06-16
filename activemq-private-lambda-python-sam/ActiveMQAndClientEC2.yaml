@@ -634,10 +634,6 @@ Resources:
             sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" commands.sh
             sed -i "s/AWS_REGION/$AWS_REGION/g" commands.sh
 
-            # Install Python dependencies for the producer
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
-            su -c "$PYTHON3_VERSION -m venv ./myenv && source ./myenv/bin/activate && pip install -r requirements.txt" -s /bin/sh ec2-user
-
 
             #Update Shell script for browsing messages in ActiveMQ queue
             cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam

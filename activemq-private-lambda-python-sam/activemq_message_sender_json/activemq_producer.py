@@ -65,18 +65,30 @@ def get_person_from_row(row):
     }
 
 
+class ReceiptListener(stomp.ConnectionListener):
+    def __init__(self):
+        self.receipts = {}
+
+    def on_receipt(self, frame):
+        receipt_id = frame.headers.get("receipt-id")
+        if receipt_id:
+            self.receipts[receipt_id] = True
+
+
 def send_messages(endpoint, username, password, queue_name, seeder_key, number_of_messages):
     people = read_data_file()
     num_to_send = min(number_of_messages, len(people) - 1)
 
     host_port_pairs = []
     for ep in endpoint.replace("failover:(", "").replace(")", "").split(","):
-        ep = ep.strip().replace("ssl://", "")
+        ep = ep.strip().replace("stomp+ssl://", "").replace("ssl://", "")
         host, port = ep.split(":")
         host_port_pairs.append((host, int(port)))
 
     conn = stomp.Connection(host_and_ports=host_port_pairs)
     conn.set_ssl(for_hosts=host_port_pairs)
+    listener = ReceiptListener()
+    conn.set_listener("receipt", listener)
     conn.connect(username, password, wait=True)
 
     today = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
@@ -85,13 +97,25 @@ def send_messages(endpoint, username, password, queue_name, seeder_key, number_o
     for i in range(1, num_to_send + 1):
         person = get_person_from_row(people[i])
         person_json = json.dumps(person)
+        receipt_id = f"msg-{i}"
         headers = {
             "correlation-id": f"{message_key}-{i}",
             "type": "TextMessage",
+            "persistent": "true",
+            "receipt": receipt_id,
             "MessageBatchIdentifier": message_key,
             "MessageNumberInBatch": str(i),
         }
         conn.send(destination=f"/queue/{queue_name}", body=person_json, headers=headers)
+
+        timeout = 10
+        start = time.time()
+        while receipt_id not in listener.receipts:
+            if time.time() - start > timeout:
+                print(f"WARNING: No receipt for message {i} after {timeout}s")
+                break
+            time.sleep(0.01)
+
         current_time = int(time.time() * 1000)
         print(f"Sent out one message - Number {i} at time = {current_time}")
 
