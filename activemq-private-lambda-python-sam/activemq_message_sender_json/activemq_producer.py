@@ -75,7 +75,8 @@ def send_messages(endpoint, username, password, queue_name, seeder_key, number_o
         host, port = ep.split(":")
         host_port_pairs.append((host, int(port)))
 
-    conn = stomp.Connection(host_and_ports=host_port_pairs, use_ssl=True)
+    conn = stomp.Connection(host_and_ports=host_port_pairs)
+    conn.set_ssl(for_hosts=host_port_pairs)
     conn.connect(username, password, wait=True)
 
     today = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")

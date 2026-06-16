@@ -319,6 +319,10 @@ Resources:
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
         - IpProtocol: tcp
+          FromPort: 61614
+          ToPort: 61614
+          SourceSecurityGroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
+        - IpProtocol: tcp
           FromPort: 61617
           ToPort: 61617
           SourceSecurityGroupId: !GetAtt ActiveMQClientInstanceSecurityGroup.GroupId
@@ -660,8 +664,8 @@ Resources:
 
           - activemq_broker_id: !Ref ActiveMQBroker
             activemq_broker_arn: !GetAtt ActiveMQBroker.Arn
-            activemq_broker_endpoint1: !Select [ 0, !GetAtt ActiveMQBroker.OpenWireEndpoints ]
-            activemq_broker_endpoint2: !Select [ 1, !GetAtt ActiveMQBroker.OpenWireEndpoints ]
+            activemq_broker_endpoint1: !Select [ 0, !GetAtt ActiveMQBroker.StompEndpoints ]
+            activemq_broker_endpoint2: !Select [ 1, !GetAtt ActiveMQBroker.StompEndpoints ]
             activemq_queue_name: !Ref ActiveMQQueueName
             activemq_secret_arn: !Ref ActiveMQSecret
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
@@ -830,13 +834,13 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-VPCStackName"
   ActiveMQBrokerEndpoint1:
-    Description: ActiveMQ Broker OpenWire Endpoint
-    Value: !Select [0, !GetAtt ActiveMQBroker.OpenWireEndpoints]
+    Description: ActiveMQ Broker STOMP Endpoint
+    Value: !Select [0, !GetAtt ActiveMQBroker.StompEndpoints]
     Export:
       Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint1"
   ActiveMQBrokerEndpoint2:
-    Description: ActiveMQ Broker OpenWire Endpoint
-    Value: !Select [1, !GetAtt ActiveMQBroker.OpenWireEndpoints]
+    Description: ActiveMQ Broker STOMP Endpoint
+    Value: !Select [1, !GetAtt ActiveMQBroker.StompEndpoints]
     Export:
       Name: !Sub "${AWS::StackName}-ActiveMQBrokerEndpoint2"
   ActiveMQBrokerConsoleURL:
