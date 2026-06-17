@@ -1,0 +1,8 @@
+node_modules/
+build/
+cdk.out/
+src/boto3-layer/python/
+*.js
+*.d.ts
+!bin/app.ts
+!lib/*.ts

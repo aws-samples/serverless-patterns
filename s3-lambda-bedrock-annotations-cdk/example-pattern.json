@@ -1,0 +1,88 @@
+{
+  "title": "Automated AI document annotation with Amazon S3 Annotations and Amazon Bedrock",
+  "description": "Automatically enrich S3 objects with AI-generated metadata annotations using Amazon Bedrock. When a file is uploaded, a Lambda function generates a summary, keywords, and content classification, then stores them as a queryable S3 annotation.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When an object is uploaded to the S3 bucket, Amazon EventBridge triggers an AWS Lambda function.",
+      "The Lambda function reads the object content and sends it to Amazon Bedrock (Claude Sonnet) to generate a structured summary, keywords, and content type classification.",
+      "The AI-generated metadata is written back to the object as an S3 annotation using the PutObjectAnnotation API.",
+      "Annotations are mutable, queryable via Amazon Athena (when annotation tables are enabled), and move automatically with the object during copy and replication."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-bedrock-annotations-cdk",
+      "templateURL": "serverless-patterns/s3-lambda-bedrock-annotations-cdk",
+      "projectFolder": "s3-lambda-bedrock-annotations-cdk",
+      "templateFile": "lib/s3-lambda-bedrock-annotations-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 Annotations documentation",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/annotations.html"
+      },
+      {
+        "text": "Amazon S3 Annotations launch blog",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-s3-annotations-attach-rich-queryable-context-directly-to-your-objects/"
+      },
+      {
+        "text": "Amazon Bedrock documentation",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS, focused on SAP workloads and serverless architecture.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "s3",
+      "label": "Amazon S3"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon4": {
+      "x": 110,
+      "y": 50,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    }
+  }
+}
