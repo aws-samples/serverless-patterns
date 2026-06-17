@@ -33,7 +33,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 cd serverless-patterns/s3-lambda-bedrock-annotations-cdk
 ```
 
-2. Build the boto3 layer (required for S3 Annotations API support):
+2. Build the boto3 layer (required for Amazon S3 Annotations API support):
 
 ```bash
 cd src/boto3-layer
@@ -61,7 +61,7 @@ echo "Amazon S3 Annotations is a new feature that allows you to attach rich, que
 aws s3 cp sample.txt s3://$BUCKET_NAME/sample.txt
 ```
 
-2. Wait ~10 seconds for the Lambda to process, then retrieve the annotation:
+2. Wait ~10 seconds for the AWS Lambda function to process, then retrieve the annotation:
 
 ```bash
 aws s3api get-object-annotation \
@@ -106,7 +106,7 @@ aws s3api update-bucket-metadata-annotation-table-configuration \
 
 ## Cleanup
 
-> **Warning**: This will delete the S3 bucket and all objects, including annotations.
+> **Warning**: This will delete the Amazon S3 bucket and all objects, including annotations.
 
 ```bash
 cdk destroy

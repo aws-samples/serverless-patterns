@@ -18,14 +18,14 @@ export class S3LambdaBedrockAnnotationsStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
-    // Lambda layer with latest boto3 (required for put_object_annotation)
+    // AWS Lambda layer with latest boto3 (required for put_object_annotation)
     const boto3Layer = new lambda.LayerVersion(this, 'Boto3Layer', {
       code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src', 'boto3-layer')),
       compatibleRuntimes: [lambda.Runtime.PYTHON_3_12],
       description: 'boto3 >= 1.43.31 with Amazon S3 Annotations support',
     });
 
-    // Lambda function
+    // AWS Lambda function
     const annotator = new lambda.Function(this, 'AnnotatorFunction', {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'index.handler',
