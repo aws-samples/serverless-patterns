@@ -11,7 +11,7 @@ export class S3LambdaBedrockAnnotationsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // S3 bucket with EventBridge notifications enabled
+    // Amazon S3 bucket with Amazon EventBridge notifications enabled
     const bucket = new s3.Bucket(this, 'AnnotationsBucket', {
       eventBridgeEnabled: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -22,7 +22,7 @@ export class S3LambdaBedrockAnnotationsStack extends cdk.Stack {
     const boto3Layer = new lambda.LayerVersion(this, 'Boto3Layer', {
       code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src', 'boto3-layer')),
       compatibleRuntimes: [lambda.Runtime.PYTHON_3_12],
-      description: 'boto3 >= 1.43.31 with S3 Annotations support',
+      description: 'boto3 >= 1.43.31 with Amazon S3 Annotations support',
     });
 
     // Lambda function
@@ -38,7 +38,7 @@ export class S3LambdaBedrockAnnotationsStack extends cdk.Stack {
       },
     });
 
-    // IAM permissions: read S3 objects, write annotations, invoke Bedrock
+    // IAM permissions: read Amazon S3 objects, write annotations, invoke Amazon Bedrock
     bucket.grantRead(annotator);
     annotator.addToRolePolicy(new iam.PolicyStatement({
       actions: ['s3:PutObjectAnnotation'],
@@ -52,7 +52,7 @@ export class S3LambdaBedrockAnnotationsStack extends cdk.Stack {
       ],
     }));
 
-    // EventBridge rule: trigger on S3 Object Created
+    // Amazon EventBridge rule: trigger on Amazon S3 Object Created
     const rule = new events.Rule(this, 'S3ObjectCreatedRule', {
       eventPattern: {
         source: ['aws.s3'],

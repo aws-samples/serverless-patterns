@@ -1,7 +1,7 @@
 """
-S3 Annotations enrichment handler.
-Triggered by S3 Object Created events via EventBridge.
-Reads the object, generates AI summary via Bedrock, writes annotation.
+Amazon S3 Annotations enrichment handler.
+Triggered by Amazon S3 Object Created events via Amazon EventBridge.
+Reads the object, generates AI summary via Amazon Bedrock, writes annotation.
 """
 import json
 import boto3

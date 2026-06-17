@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Amazon S3 sends an Object Created event to Amazon EventBridge.
 3. An Amazon EventBridge rule triggers the AWS Lambda function.
 4. The Lambda function reads the object, invokes Amazon Bedrock (Claude Sonnet) to generate a structured summary, keywords, and content classification.
-5. The AI-generated metadata is written back as an S3 annotation using the `PutObjectAnnotation` API.
+5. The AI-generated metadata is written back as an Amazon S3 annotation using the `PutObjectAnnotation` API.
 
 ## Deployment
 
@@ -82,7 +82,7 @@ Expected output (example):
   "ai_summary": "A brief description of Amazon S3 Annotations, a feature for attaching rich queryable metadata to S3 objects with support for up to 1000 annotations per object.",
   "keywords": ["S3", "annotations", "metadata", "queryable", "objects"],
   "content_type": "article",
-  "model": "anthropic.claude-sonnet-4-20250514"
+  "model": "us.anthropic.claude-sonnet-4-20250514-v1:0"
 }
 ```
 

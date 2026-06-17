@@ -1,15 +1,15 @@
 {
   "title": "Automated AI document annotation with Amazon S3 Annotations and Amazon Bedrock",
-  "description": "Automatically enrich S3 objects with AI-generated metadata annotations using Amazon Bedrock. When a file is uploaded, a Lambda function generates a summary, keywords, and content classification, then stores them as a queryable S3 annotation.",
+  "description": "Automatically enrich Amazon S3 objects with AI-generated metadata annotations using Amazon Bedrock. When a file is uploaded, an AWS Lambda function generates a summary, keywords, and content classification, then stores them as a queryable Amazon S3 annotation.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "When an object is uploaded to the S3 bucket, Amazon EventBridge triggers an AWS Lambda function.",
-      "The Lambda function reads the object content and sends it to Amazon Bedrock (Claude Sonnet) to generate a structured summary, keywords, and content type classification.",
-      "The AI-generated metadata is written back to the object as an S3 annotation using the PutObjectAnnotation API.",
+      "When an object is uploaded to the Amazon S3 bucket, Amazon EventBridge triggers an AWS Lambda function.",
+      "The AWS Lambda function reads the object content and sends it to Amazon Bedrock (Claude Sonnet) to generate a structured summary, keywords, and content type classification.",
+      "The AI-generated metadata is written back to the object as an Amazon S3 annotation using the PutObjectAnnotation API.",
       "Annotations are mutable, queryable via Amazon Athena (when annotation tables are enabled), and move automatically with the object during copy and replication."
     ]
   },
