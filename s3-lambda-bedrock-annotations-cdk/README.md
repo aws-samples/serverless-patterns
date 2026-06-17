@@ -18,8 +18,6 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-![Architecture](architecture.png)
-
 1. A file is uploaded to the Amazon S3 bucket.
 2. Amazon S3 sends an Object Created event to Amazon EventBridge.
 3. An Amazon EventBridge rule triggers the AWS Lambda function.

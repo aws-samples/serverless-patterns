@@ -1,6 +1,7 @@
 node_modules/
 build/
 cdk.out/
+cdk.context.json
 src/boto3-layer/python/
 *.js
 *.d.ts

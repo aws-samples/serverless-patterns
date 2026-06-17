@@ -25,30 +25,35 @@ def handler(event, context):
         print(f'Skipping {key} (size={size}, unsupported type)')
         return {'status': 'skipped', 'key': key}
 
-    # Read object content
-    response = s3.get_object(Bucket=bucket, Key=key)
-    content = response['Body'].read(MAX_CONTENT_BYTES).decode('utf-8', errors='replace')
+    try:
+        # Read object content
+        response = s3.get_object(Bucket=bucket, Key=key)
+        content = response['Body'].read(MAX_CONTENT_BYTES).decode('utf-8', errors='replace')
 
-    # Generate summary via Bedrock
-    summary = _generate_summary(key, content)
+        # Generate summary via Amazon Bedrock
+        summary = _generate_summary(key, content)
 
-    # Write annotation
-    annotation_payload = json.dumps({
-        'ai_summary': summary['summary'],
-        'keywords': summary['keywords'],
-        'content_type': summary['content_type'],
-        'model': MODEL_ID,
-    })
+        # Write annotation
+        annotation_payload = json.dumps({
+            'ai_summary': summary['summary'],
+            'keywords': summary['keywords'],
+            'content_type': summary['content_type'],
+            'model': MODEL_ID,
+        })
 
-    s3.put_object_annotation(
-        Bucket=bucket,
-        Key=key,
-        AnnotationName='ai-enrichment',
-        AnnotationPayload=annotation_payload.encode('utf-8'),
-    )
+        s3.put_object_annotation(
+            Bucket=bucket,
+            Key=key,
+            AnnotationName='ai-enrichment',
+            AnnotationPayload=annotation_payload.encode('utf-8'),
+        )
 
-    print(f'Annotated {key} with {len(annotation_payload)} bytes')
-    return {'status': 'annotated', 'key': key, 'annotation_size': len(annotation_payload)}
+        print(f'Annotated {key} with {len(annotation_payload)} bytes')
+        return {'status': 'annotated', 'key': key, 'annotation_size': len(annotation_payload)}
+
+    except Exception as e:
+        print(f'Error processing {key}: {e}')
+        raise
 
 
 def _generate_summary(key, content):
