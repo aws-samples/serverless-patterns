@@ -133,7 +133,7 @@ This pattern creates:
 
 ## Optional: Update A2A Agent Card URL
 
-By default, the A2A agent card advertises the direct AgentCore Runtime endpoint, which bypasses CloudFront and its benefits (edge caching, DDoS protection, WAF integration). If you want A2A clients to discover your agent via CloudFront instead of the direct AgentCore Runtime URL, run this script after deployment. 
+By default, the A2A agent card advertises the direct AgentCore Runtime endpoint, which bypasses CloudFront and its benefits (DDoS protection, WAF integration). If you want A2A clients to discover your agent via CloudFront instead of the direct AgentCore Runtime URL, run this script after deployment. 
 
 ```shell
 cd ..
