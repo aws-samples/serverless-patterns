@@ -437,24 +437,6 @@ Resources:
             echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
 
 
-            # install Python 3 and pip
-            max_attempts=5
-            attempt_num=1
-            success=false
-            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
-                echo "Trying yum install"
-                yum install python3 python3-pip -y
-                # Check the exit code of the command
-                if [ $? -eq 0 ]; then
-                    echo "Yum install of python3 succeeded"
-                    success=true
-                else
-                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
-                    sleep 3
-                    ((attempt_num++))
-                fi
-            done
-
             max_attempts=5
             attempt_num=1
             success=false

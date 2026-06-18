@@ -4,6 +4,8 @@
 # Pass an integer as the second command-line argument to this shell script < 500. For example if you want to send 100 messages, pass 100
 # Example sh commands.sh firstbatch 100
 
+export AWS_DEFAULT_REGION=AWS_REGION
+
 original_broker_endpoint="RABBITMQ_BROKER_ENDPOINT"
 
 amqps_prefix="amqps://"
@@ -20,4 +22,4 @@ broker_endpoint_without_port="${broker_endpoint_without_amqps%${port_suffix}}"
 echo "broker_endpoint_without_port: $broker_endpoint_without_port"
 
 
-java -classpath /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_message_sender_json/target/json-rabbitmq-producer-0.0.1-SNAPSHOT.jar rabbitmq.producer.JsonRabbitMQProducer $broker_endpoint_without_port RABBITMQ_VIRTUAL_HOST RABBITMQ_EXCHANGE RABBITMQ_QUEUE_NAME $1 $2
+PYTHON3_VERSION /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_message_sender_json/rabbitmq_producer.py $broker_endpoint_without_port RABBITMQ_VIRTUAL_HOST RABBITMQ_EXCHANGE RABBITMQ_QUEUE_NAME $1 $2
