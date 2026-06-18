@@ -7,15 +7,16 @@ Parameters:
     Type: String
     Default: 3.13
     Description: RabbitMQ engine version
-  Python3Version:
+  PythonVersion:
     Type: String
-    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12. Also Python 3.10 is not available to install on Amazon Linux 2023 so it is not being offered as an option
+    Description: Choose the version of Python. Lambda currently supports Python 3.9, 3.10, 3.11, 3.12 and 3.13
     AllowedValues:
+      - python3.9
+      - python3.10
       - python3.11
       - python3.12
       - python3.13
-      - python3.14
-    Default: python3.14
+    Default: python3.12
   RabbitMQBrokerName:
     Type: String
     Default: RabbitMQPythonLambdaBroker
@@ -403,19 +404,18 @@ Resources:
             #!/bin/bash
             yum update -y
 
-            #install latest python3
-            PYTHON3_VERSION=${python3_version}
-            
+            # install Python 3 and pip
             max_attempts=5
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Trying yum install"
-                sudo dnf install $PYTHON3_VERSION -y
-                sudo dnf install $PYTHON3_VERSION-pip -y
+                yum update -y
+
+                sudo yum install python3 python3-pip -y
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
-                    echo "Yum install of $PYTHON3_VERSION succeeded"
+                    echo "Yum install of Python3 succeeded"
                     success=true
                 else
                     echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
@@ -423,8 +423,6 @@ Resources:
                     ((attempt_num++))
                 fi
             done
-            
-            echo "export PYTHON3_VERSION=$PYTHON3_VERSION" >> /home/ec2-user/.bash_profile
 
             max_attempts=5
             attempt_num=1
@@ -571,12 +569,15 @@ Resources:
             cd ./serverless-patterns
             git sparse-checkout set --no-cone /rabbitmq-private-lambda-python-sam
             git checkout
-            cd rabbitmq-private-lambda-python-sam
+            cd rabbitmq-private-lambda-python-sam/Python
             sudo chown -R ec2-user .
 
+            # Install Python dependencies for the producer
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python/rabbitmq_message_sender_json
+            su -c "pip3 install -r requirements.txt --user" -s /bin/sh ec2-user
 
             #Substitute SAM template variables
-            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python
             cd rabbitmq_consumer_dynamo_sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
@@ -589,10 +590,9 @@ Resources:
             sed -i "s/RABBITMQ_SUBNET_TWO/$RABBITMQ_SUBNET_TWO/g" template.yaml
             sed -i "s/RABBITMQ_SUBNET_THREE/$RABBITMQ_SUBNET_THREE/g" template.yaml
             sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
-            sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" template.yaml
 
             #Update Shell script for sending RabbitMQ messages to Lambda function
-            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_message_sender_json
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python/rabbitmq_message_sender_json
             sudo chown ec2-user ./commands.sh
             source /home/ec2-user/.bash_profile
             echo "RABBITMQ_BROKER_ENDPOINT=${rabbitmq_broker_endpoint}"
@@ -600,11 +600,9 @@ Resources:
             sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" commands.sh
             sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" commands.sh
             sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" commands.sh
-            sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" commands.sh
-            sed -i "s/AWS_REGION/$AWS_REGION/g" commands.sh
 
             #Create RabbitMQ Exchange and Queue and link queue to exchange
-            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python
             sudo chown ec2-user ./create_rabbit_queue.sh
             source /home/ec2-user/.bash_profile
             sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" create_rabbit_queue.sh
@@ -617,7 +615,7 @@ Resources:
             sh ./create_rabbit_queue.sh
 
             #Script to check if RabbitMQ Virtual Host, Exchange and Queue have been created properly
-            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam
+            cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python
             sudo chown ec2-user ./query_rabbit_queue.sh
             source /home/ec2-user/.bash_profile
             sed -i "s|RABBITMQ_BROKER_ENDPOINT|${rabbitmq_broker_endpoint}|g" query_rabbit_queue.sh
@@ -656,7 +654,6 @@ Resources:
             rabbitmq_security_group: !GetAtt RabbitMQSecurityGroup.GroupId
             rabbitmq_broker_admin_user: !Ref RabbitMQBrokerAdminUser
             rabbitmq_broker_password: !Ref RabbitMQBrokerPassword
-            python3_version: !Ref Python3Version
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint

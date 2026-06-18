@@ -38,7 +38,7 @@ We cloned the serverless-patterns Github repository on the EC2 instance already 
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/rabbitmq-private-lambda-python-sam
+    cd serverless-patterns/rabbitmq-private-lambda-python-sam/Python
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
@@ -71,7 +71,7 @@ The create_rabbit_queue.sh script is run automatically as part of the AWS CloudF
 There is another shell script file called query_rabbit_queue.sh that has been included. You can run this script to ensure the virtualhost, exchange and queue have been created in the RabbitMQ cluster:
 
 ```bash
-cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python
 sh ./query_rabbit_queue.sh
 ```
 
@@ -120,14 +120,15 @@ You should get a message "Successfully created/updated stack - <StackName> in <R
 Once the lambda function is deployed, send some messages to the Amazon MQ (RabbitMQ) cluster on the queue that has been configured on the lambda function's event listener.
 
 For your convenience, a Python script and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
+```
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python/rabbitmq_message_sender_json
+chmod +x commands.sh
+```
 
 You should see a script called commands.sh. Run that script by passing a random string and a number between 1 and 500. Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 10 and MaximumBatchingWindowInSeconds: 5 in the template.yaml file)
 
 ```
-cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_message_sender_json
-chmod +x commands.sh
-$PYTHON3_VERSION -m venv ./myenv && source ./myenv/bin/activate && pip install -r requirements.txt
-sh ./commands.sh firstBatch 100
+[ec2-user@ip-10-0-0-126 ~]$ sh ./commands.sh firstBatch 10
 ```
 
 You should see output similar to what is shown below:
@@ -168,7 +169,7 @@ aws dynamodb scan --table-name RabbitMQDynamoDBTablePython --select "COUNT"
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/Python/rabbitmq_consumer_dynamo_sam
 sam delete
 
 ```
