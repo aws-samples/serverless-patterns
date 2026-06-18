@@ -1,2 +1,0 @@
-pika
-boto3
