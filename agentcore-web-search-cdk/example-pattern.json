@@ -1,0 +1,85 @@
+{
+  "title": "Amazon Bedrock AgentCore Gateway with Web Search Tool",
+  "description": "This pattern deploys an Amazon Bedrock AgentCore Gateway with a Web Search Tool connector target and an AWS Lambda function that invokes the gateway to perform live web searches.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to use Amazon Bedrock AgentCore Gateway with the managed Web Search Tool connector.",
+      "The Amazon Bedrock AgentCore Gateway hosts the web search tool as a target, enabling agents to retrieve live web data.",
+      "An AWS Lambda function invokes the gateway to perform web searches and return results."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-web-search-cdk",
+      "templateURL": "serverless-patterns/agentcore-web-search-cdk",
+      "projectFolder": "agentcore-web-search-cdk"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Gateway Documentation",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "Web Search Tool as Connector Target",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-target-connector-web-search-tool.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "After deployment, invoke the AWS Lambda function with a query:",
+      "<code>aws lambda invoke --function-name FUNCTION_NAME --payload '{\"query\": \"What is Amazon Bedrock AgentCore?\"}' --cli-binary-format raw-in-base64-out output.json && cat output.json</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Cloud Engineer",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "bedrock",
+      "label": "AgentCore Gateway"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "bedrock",
+      "label": "Web Search Tool"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon3",
+      "to": "icon1"
+    }
+  }
+}
