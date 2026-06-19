@@ -366,7 +366,7 @@ Resources:
             #!/bin/bash
             yum update -y
 
-           #install latest python3
+            #install latest python3
             PYTHON3_VERSION=${python3_version}
             
             max_attempts=5
@@ -605,6 +605,7 @@ Resources:
             sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" commands.sh
             sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" commands.sh
             sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" commands.sh
+            sed -i "s/AWS_REGION/$AWS_REGION/g" commands.sh
 
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -627,7 +628,6 @@ Resources:
             docdb_secret_arn: !Ref DocumentDBSecret
             serverless_land_github_location: !Ref ServerlessLandGithubLocation
             aws_region: !Ref 'AWS::Region'
-            python_version: !Ref PythonVersion
             security_group_id : !GetAtt DocumentDBClientInstanceSecurityGroup.GroupId
             docdb_subnet_one: !Ref PrivateSubnetDocDBOne
             docdb_subnet_two: !Ref PrivateSubnetDocDBTwo
