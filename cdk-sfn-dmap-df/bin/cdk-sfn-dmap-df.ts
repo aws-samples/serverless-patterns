@@ -3,7 +3,8 @@ import * as cdk from 'aws-cdk-lib/core';
 import { CdkSfnDmapDfStack } from '../lib/cdk-sfn-dmap-df-stack';
 
 const app = new cdk.App();
-new CdkSfnDmapDfStack(app, 'CdkSfnDmapDfStack', {
+const description = "Sample app (uksb-1tthgi812) (tag:cdk-sfn-dmap-df)";
+new CdkSfnDmapDfStack(app, 'CdkSfnDmapDfStack', {description
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
