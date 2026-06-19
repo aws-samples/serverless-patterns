@@ -46,7 +46,7 @@ Change directory to the pattern directory:
 Build your application with the `sam build` command.
 
 ```bash
-cd rabbitmq_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_consumer_dynamo_sam
 sam build
 ```
 
@@ -59,6 +59,7 @@ Test a single function by invoking it directly with a test event. An event is a 
 Run functions locally and invoke them with the `sam local invoke` command.
 
 ```bash
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_consumer_dynamo_sam
 sam local invoke --event events/event.json
 ```
 
@@ -88,6 +89,7 @@ sh ./create_rabbit_queue.sh
 To deploy your application for the first time, run the following in your shell:
 
 ```bash
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_consumer_dynamo_sam
 sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name rabbit-lambda-python-sam --guided
 ```
 

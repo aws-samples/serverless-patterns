@@ -17,7 +17,7 @@ Resources:
       FunctionName: python-documentdb-streams-consumer-dynamodb-sam
       CodeUri: documentdb_streams_event_consumer_function
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: PYTHON3_VERSION
       Architectures:
         - x86_64
       MemorySize: 512

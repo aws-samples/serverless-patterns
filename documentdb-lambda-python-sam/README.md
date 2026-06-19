@@ -46,7 +46,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 mac
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/documentdb-lambda-python-sam/python
+    cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam
     ```
 
 ### Build the project with SAM CLI
@@ -56,7 +56,7 @@ Make sure you are connected to the EC2 instance as mentioned in the "Connect to 
 Build your application with the `sam build` command.
 
 ```bash
-cd documentdb_streams_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam
 sam build
 ```
 
@@ -78,6 +78,7 @@ sam local invoke --event events/event.json
 To deploy your application for the first time, run the following in your shell. Make sure the shell variable $AWS_REGION is set. If not, replace $AWS_REGION with the region in which you are deploying the AWS Lambda function:
 
 ```bash
+cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam
 sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name documentdb-lambda-python-sam --guided
 ```
 
@@ -111,17 +112,20 @@ After deployment, create documents in the Collection to generate stream records.
 
 For your convenience, a Python producer script and a shell script are included on the EC2 instance provisioned by CloudFormation.
 
-```
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/python/documentdb_streams_message_sender_python
-
-chmod +x commands.sh
-```
-
 You should see a script called commands.sh. Run that script by passing a random string and a number between 1 and 500. Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 10 and MaximumBatchingWindowInSeconds: 300 in the template.yaml file)
 
+
 ```
-[ec2-user@ip-10-0-0-126 ~]$ sh ./commands.sh firstBatch 10
+cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_message_sender_python
+
+chmod +x commands.sh
+
+$PYTHON3_VERSION -m venv ./myenv && source ./myenv/bin/activate && pip install -r requirements.txt
+
+sh ./commands.sh firstBatch 100
+
 ```
+
 
 The following is sample output:
 ```
