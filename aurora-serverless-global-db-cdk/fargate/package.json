@@ -4,14 +4,13 @@
   "description": "Fargate ECS container to run an express app",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc",
     "start": "node src/index.js"
   },
   "author": "nihilson",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.3",
-    "aws-sdk": "^2.1692.0"
+    "@aws-sdk/client-secrets-manager": "^3.750.0",
+    "express": "^4.21.0",
+    "pg": "^8.11.3"
   }
 }

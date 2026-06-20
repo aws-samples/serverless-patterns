@@ -111,7 +111,7 @@ Resources:
   InvokerLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: "nodejs16.x"
+      Runtime: "nodejs24.x"
       FunctionName: "translator-dev-invokeTranslator"
       Timeout: 300
       MemorySize: 1024
@@ -120,15 +120,7 @@ Resources:
       Environment:
         Variables:
           APIG_ENDPOINT:
-            !Join [
-              "",
-              [
-                !Ref CapstoneWebSocketApi,
-                ".execute-api.",
-                !Ref "AWS::Region",
-                ".${AWS::URLSuffix}/dev",
-              ],
-            ]
+            !Sub "${CapstoneWebSocketApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev"
           statemachine_arn: !Ref Orchestrator
   AuthorizerLambda:
     Type: AWS::Lambda::Function

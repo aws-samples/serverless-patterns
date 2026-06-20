@@ -22,7 +22,7 @@ export class CdkStack extends Stack {
     });
 
     const lambdaFn = new lambda.Function(this, 's3-event-processor', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset('src'),
       functionName: 's3-event-processor',

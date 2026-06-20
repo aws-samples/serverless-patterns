@@ -1,11 +1,12 @@
 import express from "express";
-import AWS from "aws-sdk";
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
 
 const app = express();
 const port = 80;
-AWS.config.update({ region: process.env.region });
-const sns = new AWS.SNS({ apiVersion: "2012-11-05" });
-const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+const region = process.env.region;
+const sns = new SNSClient({ region });
+const sqs = new SQSClient({ region });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -18,13 +19,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/publishmessage", async (req, res) => {
-  const params = {
-    Message: req.body.MessageBody,
-    TopicArn: TOPIC_ARN,
-  };
-
   try {
-    const result = await sns.publish(params).promise();
+    const result = await sns.send(
+      new PublishCommand({
+        Message: req.body.MessageBody,
+        TopicArn: TOPIC_ARN,
+      })
+    );
     return res.status(200).send({
       body: "OK!",
       snsResponse: result,
@@ -35,13 +36,13 @@ app.post("/publishmessage", async (req, res) => {
 });
 
 app.get("/readmessage", async (req, res) => {
-  const params = {
-    QueueUrl: QUEUE_URL,
-    MaxNumberOfMessages: 1,
-  };
-
   try {
-    const result = await sqs.receiveMessage(params).promise();
+    const result = await sqs.send(
+      new ReceiveMessageCommand({
+        QueueUrl: QUEUE_URL,
+        MaxNumberOfMessages: 1,
+      })
+    );
     if (result.Messages) {
       return res.status(200).send({
         body: "OK!",
@@ -57,6 +58,5 @@ app.get("/readmessage", async (req, res) => {
 });
 
 app.listen(port, () => {
-  // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);
 });

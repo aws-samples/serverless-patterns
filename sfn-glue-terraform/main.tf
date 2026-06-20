@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 6.0"
     }
   }
 
@@ -55,7 +55,7 @@ output "aws_cloudwatch_event_rule_arn" {
 }
 
 output "aws_step_function_arn" {
-  value = module.aws_sfn_state_machine.stf_role_arn
+  value = module.aws_sfn_state_machine.stf_arn
 }
 
 output "aws_glue_job_arn" {

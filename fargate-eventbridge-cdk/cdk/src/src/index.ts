@@ -1,10 +1,9 @@
 import express from "express";
-import AWS from "aws-sdk";
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
 
 const app = express();
 const port = 80;
-AWS.config.update({ region: process.env.region });
-const eventbridge = new AWS.EventBridge({apiVersion: '2015-10-07'});
+const eventbridge = new EventBridgeClient({ region: process.env.region });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -16,7 +15,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/putevents", async (req, res) => {
-  const params = {
+  const command = new PutEventsCommand({
     Entries: [
       {
         Detail: JSON.stringify({
@@ -29,10 +28,10 @@ app.post("/putevents", async (req, res) => {
         Time: new Date,
       }
     ]
-  }
+  });
 
   try {
-    const result = await eventbridge.putEvents(params).promise();
+    const result = await eventbridge.send(command);
     return res.status(200).send({
       body: "OK!",
       eventBridgeResponse: result,
@@ -43,6 +42,5 @@ app.post("/putevents", async (req, res) => {
 });
 
 app.listen(port, () => {
-  // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);
 });

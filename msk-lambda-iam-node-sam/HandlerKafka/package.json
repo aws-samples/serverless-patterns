@@ -7,7 +7,7 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
-    "axios": ">=1.12.2"
+    "axios": "^1.15.2"
   },
   "scripts": {
     "test": "mocha tests/unit/"

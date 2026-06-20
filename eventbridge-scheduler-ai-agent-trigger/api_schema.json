@@ -1,0 +1,106 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Scheduled Task Execution API",
+    "version": "1.0.0",
+    "description": "Actions for recording and retrieving scheduled AI agent task executions"
+  },
+  "paths": {
+    "/record-task-execution": {
+      "post": {
+        "operationId": "recordTaskExecution",
+        "summary": "Record a scheduled task execution in the tracking database",
+        "description": "Persists a task execution record with task ID, type, timestamp, and an AI-generated summary to DynamoDB",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "taskId",
+                  "taskType",
+                  "scheduledTime",
+                  "executionSummary"
+                ],
+                "properties": {
+                  "taskId": {
+                    "type": "string",
+                    "description": "Unique identifier for this task execution — combine scheduleName and scheduledTime"
+                  },
+                  "taskType": {
+                    "type": "string",
+                    "description": "The category of the scheduled task (e.g. scheduled-report)"
+                  },
+                  "scheduledTime": {
+                    "type": "string",
+                    "description": "ISO 8601 UTC timestamp when the task was scheduled to run"
+                  },
+                  "executionSummary": {
+                    "type": "string",
+                    "description": "AI-generated summary describing the task execution and its outcome"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution recorded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "taskId": { "type": "string" },
+                    "recordedAt": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get-last-execution": {
+      "get": {
+        "operationId": "getLastExecution",
+        "summary": "Get the most recent task execution for a given task type",
+        "description": "Retrieves the latest execution record from DynamoDB filtered by task type",
+        "parameters": [
+          {
+            "name": "taskType",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Task type to look up (e.g. scheduled-report)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Last execution found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "taskId": { "type": "string" },
+                    "taskType": { "type": "string" },
+                    "scheduledTime": { "type": "string" },
+                    "executionSummary": { "type": "string" },
+                    "recordedAt": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No executions found for the given task type"
+          }
+        }
+      }
+    }
+  }
+}

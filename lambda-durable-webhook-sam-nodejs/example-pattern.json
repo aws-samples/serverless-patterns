@@ -1,0 +1,70 @@
+{
+    "title": "Webhook Receiver with AWS Lambda durable functions - NodeJS",
+    "description": "This serverless pattern demonstrates building a webhook receiver using AWS Lambda durable functions with automatic checkpointing and fault tolerance, implemented in Node.js",
+    "language": "Node.js",
+    "level": "200",
+    "framework": "AWS SAM",
+    "services": ["apigateway","lambda", "dynamoDB"],
+    "introBox": {
+      "headline": "How it works",
+      "text": [
+        "This pattern demonstrates a serverless webhook receiver using AWS Lambda durable functions. When a webhook POST request arrives via API Gateway, it triggers a durable function that processes the webhook in 3 checkpointed steps: Validate → Process → Finalize. Each step is automatically checkpointed, allowing the workflow to resume from the last successful step if interrupted. The pattern provides immediate 202 response while processing continues in the background, stores execution state in DynamoDB with TTL, and offers real-time status tracking via a REST API."
+      ]
+    },
+    "testing": {
+      "headline": "Testing",
+      "text": [
+        "See the GitHub repo for detailed testing instructions."
+      ]
+    },
+    "cleanup": {
+      "headline": "Cleanup",
+      "text": [
+        "Delete the stack: <code>sam delete</code>."
+      ]
+    },
+    "deploy": {
+      "text": [
+        "sam build",
+        "sam deploy --guided"
+      ]
+    },
+    "gitHub": {
+      "template": {
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-webhook-sam-nodejs",
+        "templateURL":"serverless-patterns/lambda-durable-webhook-sam-nodejs",
+        "templateFile": "template.yaml",
+        "projectFolder": "lambda-durable-webhook-sam-nodejs"
+      }
+    },
+    "resources": {
+      "headline": "Additional resources",
+      "bullets": [
+        {
+          "text": "AWS Lambda durable functions Documentation",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+        },
+        {
+          "text": "Event Source Mappings with Lambda durable functions",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking-esm.html"
+        },
+        {
+          "text": "Lambda durable functions Best Practices",
+          "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions-best-practices.html"
+        },
+        {
+          "text": "Node.js AWS SDK Documentation",
+          "link": "https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/"
+        }
+      ]
+    },
+     "authors": [
+        {
+          "name": "Sahithi Ginjupalli",
+          "image": "https://drive.google.com/file/d/1YcKYuGz3LfzSxiwb2lWJfpyi49SbvOSr/view?usp=sharing",
+          "bio": "Cloud Engineer at AWS with a passion for diving deep into cloud and AI services to build innovative serverless applications.",
+          "linkedin": "ginjupalli-sahithi-37460a18b",
+          "twitter": ""
+        }
+      ]
+  }
