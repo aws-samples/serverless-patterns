@@ -1,0 +1,73 @@
+{
+  "title": "Lambda MicroVM Kiro Code Reviewer",
+  "description": "Deploy a Lambda MicroVM that runs Kiro headless to perform AI-powered code reviews on CodeCommit pull requests. The MicroVM clones the repo, generates a diff, sends it to Kiro for review, and posts the feedback as a PR comment.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CLI + CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a long-running Lambda MicroVM with the Kiro CLI installed. The MicroVM exposes an HTTP API (port 8080) that accepts code review requests specifying a CodeCommit repository and pull request ID.",
+      "When a review is triggered, the service clones the repository, computes the diff between the source and destination commits, and invokes Kiro headless to generate a structured code review covering security, bugs, performance, and code quality.",
+      "The Kiro API Key is stored in AWS Secrets Manager and fetched at runtime. The review output is posted back as a comment on the CodeCommit pull request. The MicroVM auto-suspends when idle and resumes on demand with sub-second latency.",
+      "The CloudFormation stack also provisions a sample CodeCommit repository seeded with a deliberately vulnerable 'feature branch' PR, so you can test the reviewer immediately after deployment."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvms-kiro-code-reviewer",
+      "templateURL": "serverless-patterns/lambda-microvms-kiro-code-reviewer",
+      "projectFolder": "lambda-microvms-kiro-code-reviewer",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Kiro - AI-powered development environment",
+        "link": "https://kiro.dev"
+      },
+      {
+        "text": "AWS CodeCommit Pull Request API",
+        "link": "https://docs.aws.amazon.com/codecommit/latest/APIReference/API_CreatePullRequest.html"
+      },
+      {
+        "text": "Firecracker - Secure and fast microVMs for serverless computing",
+        "link": "https://aws.amazon.com/blogs/opensource/firecracker-open-source-secure-fast-microvm-serverless/"
+      }
+    ]
+  },
+  "deploy": {
+    "headline": "Deploy the pattern",
+    "text": [
+      "export KIRO_API_KEY=\"your-kiro-api-key\"",
+      "export KIRO_API_KEY=\"your-kiro-api-key-here\"",
+      "export STACK_NAME=\"your-stack-name-here\"",
+      "export REGION=\"you-region-here\"",
+      "chmod +x scripts/deploy.sh",
+      "./scripts/deploy.sh [stack-name] [region]"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for the full curl command to trigger a review on the sample PR."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "aws cloudformation delete-stack --stack-name kiro-reviewer --region us-east-2"
+    ]
+  },
+  "authors": [
+    {
+        "name": "Ricardo Marques",
+        "image": "./images/rrmarq.jpg",
+        "bio": "Sr Serverless Specialist, AWS",
+        "linkedin": "ricardo-marques-aws"
+	}
+  ]
+}
