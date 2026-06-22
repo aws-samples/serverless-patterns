@@ -1,6 +1,6 @@
 # AWS Lambda Durable Functions to Slack via Bedrock AgentCore
 
-This pattern demonstrates a Slack chatbot that uses AWS Lambda Durable Functions for stateful, multi-turn conversations with human-in-the-loop interactions. The bot collects travel preferences from users via Slack, generates personalized itineraries using Amazon Bedrock (Claude) through AgentCore, and delivers results back to the user — all with automatic state persistence across invocations.
+This pattern demonstrates a Slack chatbot that uses AWS Lambda durable functions for stateful, multi-turn conversations with human-in-the-loop interactions. The bot collects travel preferences from users via Slack, generates personalized itineraries using Amazon Bedrock (Claude) through AgentCore, and delivers results back to the user — all with automatic state persistence across invocations.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-df-slack
 
@@ -9,11 +9,11 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2.30.0+ installed and configured (v2.30.0+ required for Lambda durable functions)
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.5.0 installed
-* [Docker](https://docs.docker.com/get-docker/) or [Finch](https://github.com/runfinch/finch) installed (for building the AgentCore agent container)
-* Amazon Bedrock access enabled for **Anthropic Claude 3.5 Sonnet v2** in us-east-2
+* [Finch](https://github.com/runfinch/finch) installed (for building the AgentCore agent container). Docker users can alias `finch` to `docker` or modify `terraform/main.tf` provisioners.
+* Amazon Bedrock access enabled for **Anthropic Claude Sonnet 4** (`us.anthropic.claude-sonnet-4-6`) in us-east-2
 * A Slack workspace where you can create apps
 
 ## Slack Bot Setup
@@ -68,6 +68,8 @@ Save both values — you'll need them during deployment.
     terraform init
     terraform apply -auto-approve
     ```
+   > **Note:** The build script (`terraform/build.sh`) automatically installs Python dependencies into a `build/` directory during `terraform apply`. No manual dependency installation is needed.
+
    When prompted, enter:
     - **prefix** - this will be the prefix for all resource names
     - **slack_bot_token** - **Bot User OAuth Token** (starts with `xoxb-`)
@@ -89,9 +91,9 @@ Save both values — you'll need them during deployment.
 
 ## How it works
 
-![Architecture.png]
+![Architecture](Architecture.png)
 
-1. **Slack Handler Lambda** receives webhook events from Slack via API Gateway, verifies the request signature, deduplicates events, and starts a new Durable Function execution for new conversations.
+1. **Slack Handler Lambda** receives webhook events from Slack via API Gateway, verifies the request signature, deduplicates events, and starts a new durable function execution for new conversations.
 
 2. **Orchestrator (Durable Function)** manages the multi-turn conversation flow. It uses `wait_for_callback()` to pause execution while waiting for user responses — the Lambda is not running during the wait. When the user replies, the callback resumes the orchestrator exactly where it left off.
 
@@ -137,13 +139,13 @@ Wait for a ~2 minutes for Bedrock to generate the itinerary.
 
 ```bash
 # Check Slack Handler logs
-aws logs tail /aws/lambda/<project>-<env>-slack-handler --follow --region us-east-2
+aws logs tail /aws/lambda/<prefix>-slack-handler --follow --region us-east-2
 
 # Check Orchestrator logs
-aws logs tail /aws/lambda/<project>-<env>-orchestrator --follow --region us-east-2
+aws logs tail /aws/lambda/<prefix>-orchestrator --follow --region us-east-2
 
 # Check DynamoDB for conversation state
-aws dynamodb scan --table-name <project>-<env>-callbacks --region us-east-2
+aws dynamodb scan --table-name <prefix>-callbacks --region us-east-2
 ```
 
 ## Cleanup

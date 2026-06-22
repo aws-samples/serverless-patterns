@@ -2,20 +2,23 @@
 Slack API Client Wrapper
 Handles posting messages to Slack channels
 """
-import os
 import json
+import logging
 import urllib.request
 import urllib.error
 from typing import Optional, Dict, Any
+
+from secrets import get_slack_secrets
+
+logger = logging.getLogger(__name__)
 
 
 class SlackClient:
     """Simple Slack API client"""
 
     def __init__(self):
-        self.bot_token = os.environ.get('SLACK_BOT_TOKEN')
-        if not self.bot_token:
-            raise ValueError("SLACK_BOT_TOKEN environment variable not set")
+        secrets = get_slack_secrets()
+        self.bot_token = secrets['SLACK_BOT_TOKEN']
 
     def post_message(self, channel: str, text: str, blocks: Optional[list] = None) -> Dict[str, Any]:
         """
@@ -56,19 +59,19 @@ class SlackClient:
                 result = json.loads(response.read().decode('utf-8'))
 
                 if not result.get('ok'):
-                    print(f"Slack API error: {result.get('error')}")
+                    logger.error("Slack API error: %s", result.get('error'))
                     raise Exception(f"Slack API error: {result.get('error')}")
 
-                print(f"Posted message to {channel}: {text[:50]}...")
+                logger.info("Posted message to %s: %s...", channel, text[:50])
                 return result
 
         except urllib.error.HTTPError as e:
             error_body = e.read().decode('utf-8')
-            print(f"HTTP error posting to Slack: {e.code} - {error_body}")
+            logger.error("HTTP error posting to Slack: %s - %s", e.code, error_body)
             raise
 
         except Exception as e:
-            print(f"Error posting to Slack: {e}")
+            logger.error("Error posting to Slack: %s", e)
             raise
 
     def post_rich_message(self, channel: str, text: str, sections: list) -> Dict[str, Any]:

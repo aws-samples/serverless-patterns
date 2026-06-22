@@ -136,8 +136,7 @@ locals {
   lambda_source_dir = "${path.module}/../src"
 
   common_lambda_env = {
-    SLACK_BOT_TOKEN      = var.slack_bot_token
-    SLACK_SIGNING_SECRET = var.slack_signing_secret
+    SLACK_SECRETS_ARN    = aws_secretsmanager_secret.slack_secrets.arn
     BEDROCK_MODEL_ID     = var.bedrock_model_id
     BEDROCK_REGION       = var.aws_region
     AGENT_RUNTIME_ARN    = try(trimspace(data.local_file.agent_runtime_arn.content), "")
@@ -174,12 +173,36 @@ resource "aws_dynamodb_table" "callbacks" {
     enabled        = true
   }
 
+  server_side_encryption {
+    enabled = true
+  }
+
   tags = merge(
     local.common_tags,
     {
       Name = "${local.name_prefix}-callbacks"
     }
   )
+}
+
+########################################
+# Secrets Manager - Slack Secrets
+########################################
+
+resource "aws_secretsmanager_secret" "slack_secrets" {
+  name                    = "${local.name_prefix}-slack-secrets"
+  description             = "Slack bot token and signing secret for the travel assistant"
+  recovery_window_in_days = 0
+
+  tags = local.common_tags
+}
+
+resource "aws_secretsmanager_secret_version" "slack_secrets" {
+  secret_id = aws_secretsmanager_secret.slack_secrets.id
+  secret_string = jsonencode({
+    SLACK_BOT_TOKEN      = var.slack_bot_token
+    SLACK_SIGNING_SECRET = var.slack_signing_secret
+  })
 }
 
 ########################################
@@ -258,7 +281,7 @@ resource "aws_iam_role_policy" "orchestrator_bedrock" {
       {
         Effect   = "Allow"
         Action   = ["bedrock-agentcore:InvokeAgentRuntime"]
-        Resource = "*"
+        Resource = [try(trimspace(data.local_file.agent_runtime_arn.content), "*")]
       },
       {
         Effect   = "Allow"
@@ -302,7 +325,10 @@ resource "aws_iam_role_policy" "slack_handler_callback" {
           "lambda:SendDurableExecutionCallbackFailure",
           "lambda:SendDurableExecutionCallbackHeartbeat"
         ]
-        Resource = "*"
+        Resource = [
+          aws_lambda_function.orchestrator.arn,
+          "${aws_lambda_function.orchestrator.arn}:*"
+        ]
       },
       {
         Effect = "Allow"
@@ -315,6 +341,35 @@ resource "aws_iam_role_policy" "slack_handler_callback" {
         Resource = aws_dynamodb_table.callbacks.arn
       }
     ]
+  })
+}
+
+# Secrets Manager Access
+resource "aws_iam_role_policy" "slack_handler_secrets" {
+  name = "${local.name_prefix}-slack-handler-secrets"
+  role = aws_iam_role.slack_handler_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["secretsmanager:GetSecretValue"]
+      Resource = [aws_secretsmanager_secret.slack_secrets.arn]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "orchestrator_secrets" {
+  name = "${local.name_prefix}-orchestrator-secrets"
+  role = aws_iam_role.orchestrator_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["secretsmanager:GetSecretValue"]
+      Resource = [aws_secretsmanager_secret.slack_secrets.arn]
+    }]
   })
 }
 
@@ -335,11 +390,26 @@ resource "aws_iam_role_policy_attachment" "orchestrator_xray" {
 # Lambda Functions
 ########################################
 
-# Create deployment package during terraform apply
+# Build Lambda deployment package (install deps + copy source)
+resource "null_resource" "lambda_build" {
+  triggers = {
+    source_hash       = sha1(join("", [for f in fileset("${path.module}/../src", "**/*.py") : filemd5("${path.module}/../src/${f}")]))
+    requirements_hash = filemd5("${path.module}/../requirements.txt")
+    build_script_hash = filemd5("${path.module}/build.sh")
+  }
+
+  provisioner "local-exec" {
+    command = "bash ${path.module}/build.sh"
+  }
+}
+
+# Create deployment package from build directory
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = local.lambda_source_dir
+  source_dir  = "${path.module}/build"
   output_path = "${path.module}/lambda_deployment.zip"
+
+  depends_on = [null_resource.lambda_build]
 }
 
 # CloudWatch Log Groups
@@ -426,20 +496,18 @@ resource "null_resource" "make_durable" {
   depends_on = [aws_lambda_function.orchestrator]
 
   triggers = {
-    function_name        = aws_lambda_function.orchestrator.function_name
-    source_code_hash     = data.archive_file.lambda_zip.output_base64sha256
-    execution_timeout    = var.durable_execution_timeout
-    retention_days       = var.durable_retention_days
-    role_arn             = aws_iam_role.orchestrator_role.arn
-    timeout              = var.orchestrator_timeout
-    memory_size          = var.lambda_memory_size
-    runtime              = var.lambda_runtime
-    region               = var.aws_region
-    slack_bot_token      = var.slack_bot_token
-    slack_signing_secret = var.slack_signing_secret
-    bedrock_model_id     = var.bedrock_model_id
-    prefix               = var.prefix
-    callbacks_table      = aws_dynamodb_table.callbacks.name
+    function_name     = aws_lambda_function.orchestrator.function_name
+    source_code_hash  = data.archive_file.lambda_zip.output_base64sha256
+    execution_timeout = var.durable_execution_timeout
+    retention_days    = var.durable_retention_days
+    role_arn          = aws_iam_role.orchestrator_role.arn
+    timeout           = var.orchestrator_timeout
+    memory_size       = var.lambda_memory_size
+    runtime           = var.lambda_runtime
+    region            = var.aws_region
+    bedrock_model_id  = var.bedrock_model_id
+    prefix            = var.prefix
+    callbacks_table   = aws_dynamodb_table.callbacks.name
   }
 
   provisioner "local-exec" {
@@ -487,7 +555,7 @@ resource "null_resource" "make_durable" {
 
       # Write environment variables to a temp file to avoid secrets in command line
       cat > /tmp/lambda-env-vars.json <<EOF
-      {"Variables":{"SLACK_BOT_TOKEN":"${var.slack_bot_token}","SLACK_SIGNING_SECRET":"${var.slack_signing_secret}","BEDROCK_MODEL_ID":"${var.bedrock_model_id}","BEDROCK_REGION":"${var.aws_region}","AGENT_RUNTIME_ARN":"${try(trimspace(data.local_file.agent_runtime_arn.content), "")}","CALLBACKS_TABLE_NAME":"${aws_dynamodb_table.callbacks.name}"}}
+      {"Variables":{"SLACK_SECRETS_ARN":"${aws_secretsmanager_secret.slack_secrets.arn}","BEDROCK_MODEL_ID":"${var.bedrock_model_id}","BEDROCK_REGION":"${var.aws_region}","AGENT_RUNTIME_ARN":"${try(trimspace(data.local_file.agent_runtime_arn.content), "")}","CALLBACKS_TABLE_NAME":"${aws_dynamodb_table.callbacks.name}"}}
 EOF
 
       # Recreate with durable config
@@ -774,17 +842,26 @@ resource "aws_iam_role_policy" "agentcore_runtime" {
           "lambda:SendDurableExecutionCallbackFailure",
           "lambda:SendDurableExecutionCallbackHeartbeat"
         ]
+        Resource = [
+          "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.name_prefix}-orchestrator",
+          "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${local.name_prefix}-orchestrator:*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
         Resource = "*"
       },
       {
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage"
         ]
-        Resource = "*"
+        Resource = [aws_ecr_repository.agentcore_agent.arn]
       },
       {
         Effect = "Allow"

@@ -5,7 +5,6 @@ Uses AWS Lambda Durable Functions for stateful, long-running workflows with huma
 import json
 import os
 import boto3
-from datetime import datetime
 from typing import Dict, Any
 
 from aws_durable_execution_sdk_python import durable_execution, DurableContext
@@ -40,7 +39,7 @@ def travel_planning_orchestrator(event: Dict[str, Any], context: DurableContext)
     """
     user_id = event['user_id']
     channel = event['channel']
-    execution_id = event.get('execution_id', f"{user_id}_{int(datetime.now().timestamp())}")
+    execution_id = event['execution_id']
 
     context.logger.info(f"Starting travel planning orchestration for user {user_id}")
 
@@ -57,7 +56,6 @@ def travel_planning_orchestrator(event: Dict[str, Any], context: DurableContext)
             'user_id': user_id,
             'callback_id': callback_id,
             'step': 'destination',
-            'timestamp': int(datetime.now().timestamp())
         })
 
     destination = context.wait_for_callback(
@@ -80,7 +78,6 @@ def travel_planning_orchestrator(event: Dict[str, Any], context: DurableContext)
             'user_id': user_id,
             'callback_id': callback_id,
             'step': 'dates',
-            'timestamp': int(datetime.now().timestamp())
         })
 
     dates = context.wait_for_callback(
@@ -103,7 +100,6 @@ def travel_planning_orchestrator(event: Dict[str, Any], context: DurableContext)
             'user_id': user_id,
             'callback_id': callback_id,
             'step': 'budget',
-            'timestamp': int(datetime.now().timestamp())
         })
 
     budget = context.wait_for_callback(
@@ -126,7 +122,6 @@ def travel_planning_orchestrator(event: Dict[str, Any], context: DurableContext)
             'user_id': user_id,
             'callback_id': callback_id,
             'step': 'interests',
-            'timestamp': int(datetime.now().timestamp())
         })
 
     interests = context.wait_for_callback(

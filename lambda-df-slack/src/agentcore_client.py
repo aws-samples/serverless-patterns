@@ -3,8 +3,12 @@ AgentCore Client - Invokes AgentCore agent runtime
 """
 import os
 import json
+import logging
 import boto3
 from typing import Optional, Dict, Any
+
+logger = logging.getLogger(__name__)
+
 
 class AgentCoreClient:
     """Client for invoking AgentCore agent runtime"""
@@ -21,9 +25,9 @@ class AgentCoreClient:
             raise ValueError("AGENT_RUNTIME_ARN environment variable or parameter required")
 
         # Initialize Bedrock AgentCore client
-        self.client = boto3.client('bedrock-agentcore', region_name=os.environ.get('BEDROCK_REGION', 'us-east-1'))
+        self.client = boto3.client('bedrock-agentcore', region_name=os.environ['AWS_REGION'])
 
-        print(f"[AgentCoreClient] Initialized with runtime: {self.agent_runtime_arn}")
+        logger.info("Initialized with runtime: %s", self.agent_runtime_arn)
 
     def invoke_agent(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -35,7 +39,7 @@ class AgentCoreClient:
         Returns:
             Response from agent runtime (immediate confirmation)
         """
-        print(f"[AgentCoreClient] Invoking agent with payload: {json.dumps(payload, default=str)[:200]}...")
+        logger.info("Invoking agent with payload: %s", json.dumps(payload, default=str)[:200])
 
         try:
             response = self.client.invoke_agent_runtime(
@@ -47,11 +51,11 @@ class AgentCoreClient:
             response_body = response['response'].read().decode('utf-8')
             result = json.loads(response_body)
 
-            print(f"[AgentCoreClient] Agent response: {result}")
+            logger.info("Agent response: %s", result)
             return result
 
         except Exception as e:
-            print(f"[AgentCoreClient] Error invoking agent: {e}")
+            logger.error("Error invoking agent: %s", e)
             raise
 
     def generate_itinerary(
@@ -96,7 +100,7 @@ Make it practical and actionable. Use bullet points and clear sections."""
             "prompt": prompt,
             "callbackId": callback_id,
             "model": {
-                "modelId": "us.anthropic.claude-sonnet-4-6"
+                "modelId": os.environ.get('BEDROCK_MODEL_ID', 'us.anthropic.claude-sonnet-4-6')
             },
             "systemPrompt": """You are a knowledgeable travel advisor who creates detailed,
 personalized travel itineraries. Provide practical, specific recommendations with
