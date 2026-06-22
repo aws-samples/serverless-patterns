@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda MicroVM from a pre-built ECR image
+
+Parameters:
+  S3Bucket:
+    Type: String
+    Description: S3 bucket containing the thin zip artifact (FROM ecr-uri)
+  S3Key:
+    Type: String
+    Description: S3 key for the thin zip artifact
+  ImageName:
+    Type: String
+    Default: from-ecr
+    AllowedPattern: ^[a-zA-Z0-9-_]+$
+
+Resources:
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ImageName}-build-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  MicroVMImage:
+    Type: AWS::Lambda::MicrovmImage
+    DependsOn: MicroVMBuildRole
+    Properties:
+      Name: !Ref ImageName
+      BaseImageArn: !Sub "arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
+      BaseImageVersion: "0"
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub "s3://${S3Bucket}/${S3Key}"
+      CpuConfigurations:
+        - Architecture: ARM_64
+      AdditionalOsCapabilities:
+        - ALL
+      Description: MicroVM from pre-built ECR image
+      EgressNetworkConnectors: []
+      EnvironmentVariables: []
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 60
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 5
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 5
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 5
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 5
+      Logging:
+        CloudWatch:
+          LogGroup: !Sub "/aws/lambda-microvms/${ImageName}"
+      Resources:
+        - MinimumMemoryInMiB: 512
+
+Outputs:
+  ImageArn:
+    Value: !GetAtt MicroVMImage.ImageArn
+  State:
+    Value: !GetAtt MicroVMImage.State
+  BuildRoleArn:
+    Value: !GetAtt MicroVMBuildRole.Arn

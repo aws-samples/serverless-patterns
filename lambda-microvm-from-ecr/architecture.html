@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda MicroVM from ECR Architecture Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'JetBrains Mono', monospace; background: #020617; min-height: 100vh; padding: 2rem; color: white; }
+    .container { max-width: 1240px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot { width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container { background: rgba(15, 23, 42, 0.5); border-radius: 1rem; border: 1px solid #1e293b; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 980px; display: block; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .card { background: rgba(15, 23, 42, 0.5); border-radius: 0.75rem; border: 1px solid #1e293b; padding: 1.25rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card-dot.orange { background: #fb923c; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+    .toolbar { display: flex; gap: 0.5rem; margin-left: auto; flex-shrink: 0; align-items: center; }
+    .toolbar-toggle { background: transparent; border: none; color: #475569; cursor: pointer; font-size: 1.25rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 0.375rem; transition: color 0.2s, background 0.2s; }
+    .toolbar-toggle:hover { color: #94a3b8; background: rgba(30, 41, 59, 0.5); }
+    .toolbar-actions { display: none; gap: 0.5rem; }
+    .toolbar.expanded .toolbar-actions { display: flex; }
+    .toolbar-actions button { background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; color: #94a3b8; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .toolbar-actions button:hover { background: rgba(51, 65, 85, 0.8); color: white; border-color: #475569; }
+    @media print { body { background: #020617; padding: 1rem; } .toolbar { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="container" id="report-container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Lambda MicroVM from ECR</h1>
+        <div class="toolbar">
+          <div class="toolbar-actions">
+            <button onclick="copyAsImage(this)">📋 Copy</button>
+            <button onclick="downloadPNG(this)">🖼️ PNG</button>
+            <button onclick="downloadPDF(this)">📄 PDF</button>
+          </div>
+          <button class="toolbar-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="Export options" aria-label="Export options">⋯</button>
+        </div>
+      </div>
+      <p class="subtitle">Build locally, push to Amazon ECR, and have Lambda pull your image during the server-side MicroVM build</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1040 590">
+        <defs>
+          <marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#64748b" /></marker>
+          <marker id="ah-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" /></marker>
+          <marker id="ah-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24" /></marker>
+          <marker id="ah-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#34d399" /></marker>
+          <marker id="ah-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#fb7185" /></marker>
+          <marker id="ah-slate" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" /></marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/></pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Region boundary -->
+        <rect x="170" y="40" width="850" height="490" rx="12" fill="rgba(251, 191, 36, 0.04)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="186" y="60" fill="#fbbf24" font-size="10" font-weight="600">AWS Region · us-east-2</text>
+
+        <!-- Running MicroVM container -->
+        <rect x="585" y="300" width="280" height="205" rx="10" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="725" y="324" fill="white" font-size="12" font-weight="600" text-anchor="middle">Lambda MicroVM (running)</text>
+        <text x="725" y="340" fill="#67e8f9" font-size="9" text-anchor="middle">Firecracker · auto-suspend 15 min · resume &lt;1s</text>
+
+        <!-- ===== Connection arrows (behind nodes) ===== -->
+
+        <!-- Developer -> ECR (push) and -> S3 (thin zip) -->
+        <line x1="156" y1="116" x2="194" y2="106" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ah-slate)"/>
+        <line x1="156" y1="152" x2="194" y2="172" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ah-slate)"/>
+
+        <!-- ECR + S3 -> Lambda Build -->
+        <line x1="346" y1="112" x2="394" y2="134" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+        <line x1="346" y1="176" x2="394" y2="156" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+
+        <!-- Lambda Build -> MicroVM Image -->
+        <line x1="581" y1="143" x2="634" y2="143" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+
+        <!-- IAM Role -> Lambda Build (assumed) -->
+        <line x1="488" y1="196" x2="488" y2="184" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ah-rose)"/>
+
+        <!-- MicroVM Image -> running MicroVM (run) -->
+        <line x1="725" y1="182" x2="725" y2="300" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+
+        <!-- Client -> MicroVM (request) -->
+        <line x1="156" y1="378" x2="608" y2="378" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#ah-cyan)"/>
+
+        <!-- MicroVM -> CloudWatch Logs -->
+        <line x1="865" y1="378" x2="888" y2="378" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+
+        <!-- ===== Component nodes ===== -->
+
+        <!-- Developer / CI (external) -->
+        <rect x="24" y="92" width="132" height="82" rx="6" fill="#0f172a"/>
+        <rect x="24" y="92" width="132" height="82" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="90" y="116" fill="white" font-size="11" font-weight="600" text-anchor="middle">Developer / CI</text>
+        <text x="90" y="132" fill="#94a3b8" font-size="8" text-anchor="middle">docker buildx</text>
+        <text x="90" y="145" fill="#94a3b8" font-size="8" text-anchor="middle">build linux/arm64</text>
+        <text x="90" y="162" fill="#94a3b8" font-size="8" text-anchor="middle">push image + zip</text>
+
+        <!-- Amazon ECR -->
+        <rect x="196" y="80" width="150" height="56" rx="6" fill="#0f172a"/>
+        <rect x="196" y="80" width="150" height="56" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="271" y="103" fill="white" font-size="11" font-weight="600" text-anchor="middle">Amazon ECR</text>
+        <text x="271" y="117" fill="#94a3b8" font-size="8" text-anchor="middle">microvm-from-ecr:latest</text>
+        <text x="271" y="129" fill="#fbbf24" font-size="8" text-anchor="middle">linux/arm64 image</text>
+
+        <!-- S3 Artifacts -->
+        <rect x="196" y="150" width="150" height="56" rx="6" fill="#0f172a"/>
+        <rect x="196" y="150" width="150" height="56" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="271" y="173" fill="white" font-size="11" font-weight="600" text-anchor="middle">S3 Artifacts</text>
+        <text x="271" y="187" fill="#94a3b8" font-size="8" text-anchor="middle">thin zip</text>
+        <text x="271" y="199" fill="#fbbf24" font-size="8" text-anchor="middle">FROM &lt;ecr-uri&gt;</text>
+
+        <!-- Lambda MicroVM Build -->
+        <rect x="396" y="104" width="185" height="78" rx="6" fill="#0f172a"/>
+        <rect x="396" y="104" width="185" height="78" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="488" y="130" fill="white" font-size="11" font-weight="600" text-anchor="middle">Lambda MicroVM Build</text>
+        <text x="488" y="147" fill="#94a3b8" font-size="8" text-anchor="middle">create-microvm-image</text>
+        <text x="488" y="163" fill="#fbbf24" font-size="8" text-anchor="middle">pulls ECR + reads zip</text>
+
+        <!-- IAM Role -->
+        <rect x="396" y="196" width="185" height="54" rx="6" fill="#0f172a"/>
+        <rect x="396" y="196" width="185" height="54" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="488" y="217" fill="white" font-size="11" font-weight="600" text-anchor="middle">IAM Role · MicroVMRole</text>
+        <text x="488" y="232" fill="#fb7185" font-size="8" text-anchor="middle">ECR + S3 read · CloudWatch</text>
+        <text x="488" y="244" fill="#94a3b8" font-size="8" text-anchor="middle">build + execution</text>
+
+        <!-- MicroVM Image -->
+        <rect x="636" y="104" width="178" height="78" rx="6" fill="#0f172a"/>
+        <rect x="636" y="104" width="178" height="78" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="725" y="130" fill="white" font-size="11" font-weight="600" text-anchor="middle">MicroVM Image</text>
+        <text x="725" y="147" fill="#94a3b8" font-size="8" text-anchor="middle">al2023-0 base</text>
+        <text x="725" y="163" fill="#fbbf24" font-size="8" text-anchor="middle">Firecracker snapshot</text>
+
+        <!-- Health endpoint (inside running MicroVM) -->
+        <rect x="610" y="350" width="230" height="56" rx="6" fill="#0f172a"/>
+        <rect x="610" y="350" width="230" height="56" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="725" y="373" fill="white" font-size="11" font-weight="600" text-anchor="middle">Health endpoint · app.py</text>
+        <text x="725" y="391" fill="#34d399" font-size="9" text-anchor="middle">GET / · port 8080</text>
+
+        <!-- Lifecycle hooks (inside running MicroVM) -->
+        <rect x="610" y="430" width="230" height="56" rx="6" fill="#0f172a"/>
+        <rect x="610" y="430" width="230" height="56" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="725" y="453" fill="white" font-size="11" font-weight="600" text-anchor="middle">Lifecycle hooks · port 9000</text>
+        <text x="725" y="471" fill="#94a3b8" font-size="8" text-anchor="middle">ready · run · suspend · resume · terminate</text>
+
+        <!-- Client (external) -->
+        <rect x="24" y="342" width="132" height="72" rx="6" fill="#0f172a"/>
+        <rect x="24" y="342" width="132" height="72" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="90" y="368" fill="white" font-size="11" font-weight="600" text-anchor="middle">Client</text>
+        <text x="90" y="384" fill="#94a3b8" font-size="9" text-anchor="middle">curl</text>
+        <text x="90" y="400" fill="#94a3b8" font-size="8" text-anchor="middle">+ auth token</text>
+
+        <!-- CloudWatch Logs (external-ish, AWS service) -->
+        <rect x="890" y="342" width="120" height="72" rx="6" fill="#0f172a"/>
+        <rect x="890" y="342" width="120" height="72" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="950" y="368" fill="white" font-size="11" font-weight="600" text-anchor="middle">CloudWatch</text>
+        <text x="950" y="384" fill="#94a3b8" font-size="9" text-anchor="middle">Logs</text>
+        <text x="950" y="400" fill="#fbbf24" font-size="8" text-anchor="middle">structured JSON</text>
+
+        <!-- ===== Arrow labels (on top) ===== -->
+        <text x="158" y="98" fill="#94a3b8" font-size="7" text-anchor="start">push</text>
+        <text x="158" y="170" fill="#94a3b8" font-size="7" text-anchor="start">zip</text>
+        <text x="370" y="108" fill="#fbbf24" font-size="7" text-anchor="middle">pull</text>
+        <text x="370" y="190" fill="#fbbf24" font-size="7" text-anchor="middle">read zip</text>
+        <text x="607" y="137" fill="#fbbf24" font-size="8" text-anchor="middle">build</text>
+        <text x="748" y="246" fill="#fbbf24" font-size="9" text-anchor="start">run-microvm</text>
+        <text x="382" y="370" fill="#22d3ee" font-size="9" text-anchor="middle">GET / · auth token</text>
+        <text x="382" y="390" fill="#94a3b8" font-size="8" text-anchor="middle">→ {status, microvm_id}</text>
+        <text x="876" y="373" fill="#fbbf24" font-size="7" text-anchor="middle">logs</text>
+
+        <!-- ===== Legend (below all boundaries) ===== -->
+        <text x="24" y="557" fill="white" font-size="9" font-weight="600">Legend</text>
+
+        <rect x="78" y="548" width="14" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="97" y="557" fill="#94a3b8" font-size="8">MicroVM / compute</text>
+
+        <rect x="220" y="548" width="14" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+        <text x="239" y="557" fill="#94a3b8" font-size="8">App runtime</text>
+
+        <rect x="350" y="548" width="14" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="369" y="557" fill="#94a3b8" font-size="8">AWS service (ECR / S3 / build)</text>
+
+        <rect x="576" y="548" width="14" height="10" rx="2" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1"/>
+        <text x="595" y="557" fill="#94a3b8" font-size="8">Identity / auth</text>
+
+        <line x1="700" y1="553" x2="716" y2="553" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="721" y="557" fill="#94a3b8" font-size="8">Role assume</text>
+
+        <rect x="820" y="548" width="14" height="10" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="839" y="557" fill="#94a3b8" font-size="8">External / process</text>
+
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Build &amp; Deploy</h3>
+        </div>
+        <ul>
+          <li>• Build locally/CI: docker buildx --platform linux/arm64</li>
+          <li>• Push the image to Amazon ECR (microvm-from-ecr:latest)</li>
+          <li>• Upload a thin zip — just FROM &lt;ecr-uri&gt; — to S3</li>
+          <li>• create-microvm-image: Lambda pulls the ECR image during build</li>
+          <li>• Built on the al2023-0 base, then Firecracker-snapshotted</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>IAM &amp; Access</h3>
+        </div>
+        <ul>
+          <li>• One MicroVMRole assumed at build and at run</li>
+          <li>• AmazonEC2ContainerRegistryReadOnly — ECR pull at build</li>
+          <li>• AmazonS3ReadOnlyAccess — reads the thin zip</li>
+          <li>• CloudWatchLogsFullAccess — execution-time logging</li>
+          <li>• HTTP endpoint gated by an auth token (:8080)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Runtime</h3>
+        </div>
+        <ul>
+          <li>• Minimal app.py — Python stdlib only, no dependencies</li>
+          <li>• GET / health check on port 8080</li>
+          <li>• Lifecycle hooks on port 9000 (/run delivers microVmId)</li>
+          <li>• Auto-suspends after 15 min idle; resumes in under a second</li>
+          <li>• Best for complex builds, private base images, CI/CD · us-east-2</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <p class="footer">
+      Lambda MicroVM from ECR • local / CI build → ECR → Lambda pull during build • us-east-2
+    </p>
+  </div>
+
+  <script>
+    async function copyAsImage(btn) {
+      const orig = btn.textContent;
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        btn.textContent = '✓ Copied!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPNG(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '⏳ ...';
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const link = document.createElement('a');
+        link.download = 'lambda-microvm-from-ecr.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        btn.textContent = '✓ Done!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPDF(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '⏳ ...';
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+        const pdf = new jsPDF({ orientation, unit: 'px', format: [canvas.width, canvas.height], hotfixes: ['px_scaling'] });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('lambda-microvm-from-ecr.pdf');
+        btn.textContent = '✓ Done!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+  </script>
+</body>
+</html>
