@@ -1,0 +1,78 @@
+{
+  "title": "Serverless AI Agent Gateway with Strands SDK and AgentCore",
+  "description": "Serverless AI agent using Strands SDK and AgentCore Gateway MCP with Bedrock, featuring Cognito JWT auth and end-to-end user context propagation.",
+  "language": "Python",
+  "level": "300",
+  "framework": "CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The user authenticates with Amazon Cognito and receives a JWT access token.",
+      "The JWT is passed to an Agent Lambda which uses the Strands Agents SDK to create an AI agent backed by Amazon Bedrock (us.anthropic.claude-sonnet-4-6).",
+      "The Strands Agent connects to an AgentCore Gateway MCP endpoint, dynamically discovering available tools via the MCP tools/list protocol.",
+      "The AgentCore Gateway validates the JWT token using a CUSTOM_JWT authorizer backed by Cognito.",
+      "A Request Interceptor Lambda extracts JWT claims (user_id, username, client_id) and injects them as user_context into the MCP tool arguments.",
+      "The Tool Lambda executes AWS operations (e.g. S3 ListBuckets) with full user attribution, ensuring every action is traceable to the originating user.",
+      "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/strands-agentcore-lambda",
+      "templateURL": "serverless-patterns/strands-agentcore-lambda",
+      "projectFolder": "strands-agentcore-lambda",
+      "templateFile": "infrastructure/cloudformation-template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Strands Agents SDK",
+        "link": "https://github.com/strands-agents/sdk-python"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "Model Context Protocol (MCP)",
+        "link": "https://modelcontextprotocol.io/"
+      },
+      {
+        "text": "Amazon Cognito JWT Authentication",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html"
+      },
+      {
+        "text": "Amazon Bedrock Cross-Region Inference",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "python3 infrastructure/deploy_stack.py",
+      "python3 deploy_all.py",
+      "python3 create_cognito_user.py",
+      "python3 test_e2e_flow.py"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for detailed testing and end-to-end validation instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "aws cloudformation delete-stack --stack-name serverless-ai-agent-gateway-test --region us-east-1"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mike Hume",
+      "image": "https://media.licdn.com/dms/image/D4E03AQEiUfmBiUOw_A/profile-displayphoto-shrink_200_200/0/1718324029612?e=1727308800&v=beta&t=ybhm76l-CP5xcUsHbdq2IaJOlfyycvQ6gNwuCSd3Z0w",
+      "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
+      "linkedin": "michael-hume-4663bb64",
+      "twitter": ""
+    }
+  ]
+}
