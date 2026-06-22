@@ -113,7 +113,7 @@ curl -X POST "https://$ENDPOINT/review" \
 }
 ```
 
-The review is also posted as a comment on the CodeCommit pull request. Check it in the [AWS Console](https://us-east-2.console.aws.amazon.com/codesuite/codecommit/repositories) under CodeCommit > Repositories > kiro-reviewer-code-review > Pull Requests.
+The review is also posted as a comment on the CodeCommit pull request. Check it in the [AWS Console](https://console.aws.amazon.com/codesuite/codecommit/repositories) under CodeCommit > Repositories > kiro-reviewer-code-review > Pull Requests.
 
 ![Kiro message commit](images/Kiro-message-commit.png)
 
