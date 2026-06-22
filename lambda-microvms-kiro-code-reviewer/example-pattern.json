@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a long-running Lambda MicroVM with the Kiro CLI installed. The MicroVM exposes an HTTP API (port 8080) that accepts code review requests specifying a CodeCommit repository and pull request ID.",
+      "This pattern deploys long-running Lambda MicroVMs with the Kiro CLI installed. The MicroVMs expose an HTTP API (port 8080) that accepts code review requests specifying a CodeCommit repository and pull request ID.",
       "When a review is triggered, the service clones the repository, computes the diff between the source and destination commits, and invokes Kiro headless to generate a structured code review covering security, bugs, performance, and code quality.",
       "The Kiro API Key is stored in AWS Secrets Manager and fetched at runtime. The review output is posted back as a comment on the CodeCommit pull request. The MicroVM auto-suspends when idle and resumes on demand with sub-second latency.",
       "The CloudFormation stack also provisions a sample CodeCommit repository seeded with a deliberately vulnerable 'feature branch' PR, so you can test the reviewer immediately after deployment."
