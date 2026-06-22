@@ -15,7 +15,7 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 S3_KEY="deployments/${IMAGE_NAME}-${TIMESTAMP}.zip"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "=== AWS Lambda MicroVM Code Server ==="
+echo "=== AWS Lambda MicroVMs Code Server ==="
 echo "Region:  ${AWS_REGION}"
 echo "Account: ${ACCOUNT_ID}"
 echo "Stack:   ${STACK_NAME}"
