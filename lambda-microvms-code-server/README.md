@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
 
 - Updated [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) (with `lambda-microvms` subcommand available)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- Python 3.8+ — for the local proxy
+- Python 3.14+ — for the local proxy
 - `aiohttp` — for the WebSocket-capable proxy
 
 ### Install proxy dependencies
