@@ -90,7 +90,7 @@ TOKEN=$(aws lambda-microvms create-microvm-auth-token \
   --region "$REGION" \
   --query 'authToken."X-aws-proxy-auth"' --output text)
 
-# 3. Trigger the Kiro code review on the sample PR, this step ca take several minutes.
+# 3. Trigger the Kiro code review on the sample PR, this step can take several minutes.
 curl -X POST "https://$ENDPOINT/review" \
   -H "Content-Type: application/json" \
   -H "X-aws-proxy-auth: $TOKEN" \
