@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 1. **Image Build**: CloudFormation creates the `AWS::Lambda::MicrovmImage` resource. Lambda downloads the zip from S3, executes the Dockerfile (installs code-server, Python, AWS CLI), starts the lifecycle hooks handler on port 9000, and waits for `/ready`. Once ready, Lambda takes a snapshot.
-2. **Run**: The MicroVM resumes from snapshot in under a second. The `/run` hook fires with the `microVmId`.
+2. **Run**: The Lambda MicroVM resumes from snapshot in under a second. The `/run` hook fires with the `microVmId`.
 3. **Connect**: You generate an auth token and use the local proxy (`proxy.py`) to access code-server through your browser.
 4. **Suspend/Resume**: After idle, the VM suspends (the `/suspend` hook fires). On the next request it resumes (the `/resume` hook fires). State is preserved across cycles.
 5. **Terminate**: When the VM is terminated, the `/terminate` hook fires for graceful cleanup.
