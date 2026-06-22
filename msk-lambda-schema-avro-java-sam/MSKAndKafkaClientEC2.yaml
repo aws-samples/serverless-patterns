@@ -461,15 +461,13 @@ Resources:
             
             service docker start
             usermod -a -G docker ec2-user
-            sudo wget https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-            sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
-            
+
             max_attempts=5
             attempt_num=1
             success=false
             while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
                 echo "Trying yum install"
-                sudo yum install -y apache-maven
+                sudo yum install -y maven
                 # Check the exit code of the command
                 if [ $? -eq 0 ]; then
                     echo "Yum install of maven succeeded"
