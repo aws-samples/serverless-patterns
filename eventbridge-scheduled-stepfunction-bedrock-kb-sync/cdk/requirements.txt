@@ -53,7 +53,7 @@ constructs==10.6.0
     #   cdk-nag
 coverage[toml]==7.14.0
     # via pytest-cov
-cryptography==48.0.0
+cryptography==48.0.1
     # via moto
 dill==0.4.1
     # via pylint
