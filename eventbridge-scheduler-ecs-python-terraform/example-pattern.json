@@ -14,10 +14,10 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ecs-python-terraform",
-      "templateURL": "serverless-patterns/eventbridge-ecs-cron-terraform",
-      "projectFolder": "eventbridge-ecs-cron-terraform",
-      "templateFile": "eventbridge-ecs.tf"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-stepfunction-durable-lambda-function",
+      "templateURL": "serverless-patterns/cdk-stepfunction-durable-lambda-function",
+      "projectFolder": "cdk-stepfunction-durable-lambda-function",
+      "templateFile": "cdk_stepfunction_durable_lambda_function/cdk_stepfunction_durable_lambda_function_stack.py"
     }
   },
   "resources": {
@@ -41,11 +41,7 @@
     ]
   },
   "deploy": {
-    "text": [
-      "terraform init",
-      "terraform plan",
-      "terraform apply"
-    ]
+    "text": ["terraform init", "terraform plan", "terraform apply"]
   },
   "testing": {
     "text": [
