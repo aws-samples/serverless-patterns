@@ -1,0 +1,58 @@
+{
+  "title": "AWS Lambda MicroVM Sandboxed Code Execution",
+  "description": "Deploy a Lambda MicroVM that executes arbitrary Python code in an isolated Firecracker VM with sub-second startup via snapshots.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CLI",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda MicroVM running a sandboxed code execution service. Clients submit Python code via HTTP POST, and the MicroVM executes it in an isolated subprocess, returning stdout, stderr, and exit code.",
+      "The MicroVM image is built from a Dockerfile that Lambda executes server-side. During the build, the application starts and signals readiness via the /ready lifecycle hook. Lambda then takes a memory and disk snapshot, enabling sub-second cold starts for all future launches.",
+      "The MicroVM supports suspend/resume — it automatically suspends after idle timeout and resumes in under a second when new traffic arrives. Each MicroVM runs in its own Firecracker VM with hardware-level isolation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-code-execution-sandbox",
+      "templateURL": "serverless-patterns/lambda-microvm-code-execution-sandbox",
+      "projectFolder": "lambda-microvm-code-execution-sandbox",
+      "templateFile": "src/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Firecracker - Secure and fast microVMs for serverless computing",
+        "link": "https://aws.amazon.com/blogs/opensource/firecracker-open-source-secure-fast-microvm-serverless/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "bash deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "bash cleanup.sh"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexander Vladimirov",
+      "image": "https://avatars.githubusercontent.com/u/55249162?v=4",
+      "bio": "Senior Serverless Solutions Architect at AWS, specializing in Agentic AI Workloads.",
+      "linkedin": "avladi"
+    }
+  ]
+}
