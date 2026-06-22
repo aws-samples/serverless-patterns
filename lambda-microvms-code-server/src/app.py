@@ -1,5 +1,5 @@
 """
-app.py — VS Code Server (code-server) service for Lambda MicroVM
+app.py — VS Code Server (code-server) service for AWS Lambda MicroVM
 
 Runs on port 9000 handling MicroVM lifecycle hooks (runtime callbacks).
 The /ready hook waits for code-server to be healthy on port 8080 before
