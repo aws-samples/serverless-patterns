@@ -1,5 +1,5 @@
 """
-app.py — Kiro Code Review Service for Lambda MicroVM
+app.py — Code Review Service using Kiro on AWS Lambda MicroVMs
 
 A long-running HTTP service that accepts code review requests.
 Each request specifies a CodeCommit repo and PR to review.
