@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS Lambda MicroVM with VS Code Server (code-server) in the browser
+Description: VS Code Server (code-server) on AWS Lambda MicroVM
 
 Parameters:
   S3Bucket:
