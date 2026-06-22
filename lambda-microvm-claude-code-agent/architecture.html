@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda MicroVM Claude Code Agent Architecture Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'JetBrains Mono', monospace; background: #020617; min-height: 100vh; padding: 2rem; color: white; }
+    .container { max-width: 1240px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot { width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container { background: rgba(15, 23, 42, 0.5); border-radius: 1rem; border: 1px solid #1e293b; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 980px; display: block; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 2rem; }
+    .card { background: rgba(15, 23, 42, 0.5); border-radius: 0.75rem; border: 1px solid #1e293b; padding: 1.25rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+    .toolbar { display: flex; gap: 0.5rem; margin-left: auto; flex-shrink: 0; align-items: center; }
+    .toolbar-toggle { background: transparent; border: none; color: #475569; cursor: pointer; font-size: 1.25rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 0.375rem; transition: color 0.2s, background 0.2s; }
+    .toolbar-toggle:hover { color: #94a3b8; background: rgba(30, 41, 59, 0.5); }
+    .toolbar-actions { display: none; gap: 0.5rem; }
+    .toolbar.expanded .toolbar-actions { display: flex; }
+    .toolbar-actions button { background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; color: #94a3b8; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .toolbar-actions button:hover { background: rgba(51, 65, 85, 0.8); color: white; border-color: #475569; }
+    @media print { body { background: #020617; padding: 1rem; } .toolbar { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="container" id="report-container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Lambda MicroVM Claude Code Agent</h1>
+        <div class="toolbar">
+          <div class="toolbar-actions">
+            <button onclick="copyAsImage(this)">📋 Copy</button>
+            <button onclick="downloadPNG(this)">🖼️ PNG</button>
+            <button onclick="downloadPDF(this)">📄 PDF</button>
+          </div>
+          <button class="toolbar-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="Export options" aria-label="Export options">⋯</button>
+        </div>
+      </div>
+      <p class="subtitle">Long-running Firecracker MicroVM with the Claude Code CLI — Bedrock-backed, shell-accessible, IAM-scoped AWS access</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1040 600">
+        <defs>
+          <marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#64748b" /></marker>
+          <marker id="ah-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" /></marker>
+          <marker id="ah-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24" /></marker>
+          <marker id="ah-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#34d399" /></marker>
+          <marker id="ah-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#fb923c" /></marker>
+          <marker id="ah-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#fb7185" /></marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/></pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Region boundary (regional AWS services) -->
+        <rect x="160" y="40" width="860" height="480" rx="12" fill="rgba(251, 191, 36, 0.04)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="176" y="60" fill="#fbbf24" font-size="10" font-weight="600">AWS Region · us-east-2</text>
+
+        <!-- MicroVM container (Firecracker isolation) -->
+        <rect x="270" y="196" width="420" height="308" rx="10" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="480" y="220" fill="white" font-size="12" font-weight="600" text-anchor="middle">Lambda MicroVM — Firecracker isolation</text>
+        <text x="480" y="236" fill="#67e8f9" font-size="9" text-anchor="middle">always-on · auto-suspend / resume from snapshot</text>
+
+        <!-- ===== Connection arrows (behind nodes) ===== -->
+
+        <!-- Developer -> MicroVM (interactive shell) -->
+        <line x1="144" y1="289" x2="288" y2="289" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#ah-cyan)"/>
+
+        <!-- Build pipeline: S3 -> Image -> MicroVM -->
+        <line x1="334" y1="122" x2="398" y2="122" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+        <line x1="490" y1="152" x2="490" y2="194" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#ah-amber)"/>
+        <!-- Build Role -> Image (assumed at build time) -->
+        <line x1="646" y1="122" x2="580" y2="122" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ah-rose)"/>
+
+        <!-- Claude CLI -> Bedrock -->
+        <line x1="470" y1="289" x2="790" y2="289" stroke="#34d399" stroke-width="1.5" marker-end="url(#ah-emerald)"/>
+        <!-- Claude CLI -> MCP (spawns subprocess) -->
+        <line x1="356" y1="328" x2="356" y2="348" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ah)"/>
+        <!-- MCP -> AWS APIs -->
+        <line x1="470" y1="387" x2="790" y2="387" stroke="#fb923c" stroke-width="1.5" marker-end="url(#ah-orange)"/>
+
+        <!-- Execution Role -> Claude (Bedrock creds) and -> MCP (boto3 creds) -->
+        <line x1="144" y1="355" x2="288" y2="312" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ah-rose)"/>
+        <line x1="144" y1="387" x2="288" y2="387" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ah-rose)"/>
+
+        <!-- ===== Component nodes ===== -->
+
+        <!-- Developer (external) -->
+        <rect x="24" y="253" width="120" height="72" rx="6" fill="#0f172a"/>
+        <rect x="24" y="253" width="120" height="72" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="84" y="279" fill="white" font-size="11" font-weight="600" text-anchor="middle">Developer</text>
+        <text x="84" y="295" fill="#94a3b8" font-size="9" text-anchor="middle">shell client</text>
+        <text x="84" y="311" fill="#94a3b8" font-size="8" text-anchor="middle">websocat / console</text>
+
+        <!-- Execution Role (account-level IAM, drawn outside region) -->
+        <rect x="24" y="341" width="120" height="92" rx="6" fill="#0f172a"/>
+        <rect x="24" y="341" width="120" height="92" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="84" y="363" fill="white" font-size="11" font-weight="600" text-anchor="middle">Execution Role</text>
+        <text x="84" y="379" fill="#94a3b8" font-size="8" text-anchor="middle">MicroVMClaude</text>
+        <text x="84" y="391" fill="#94a3b8" font-size="8" text-anchor="middle">ExecutionRole</text>
+        <text x="84" y="408" fill="#fb7185" font-size="8" text-anchor="middle">Bedrock Invoke</text>
+        <text x="84" y="421" fill="#fb7185" font-size="8" text-anchor="middle">+ ReadOnly · no keys</text>
+
+        <!-- S3 Artifacts -->
+        <rect x="206" y="92" width="128" height="60" rx="6" fill="#0f172a"/>
+        <rect x="206" y="92" width="128" height="60" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="270" y="118" fill="white" font-size="11" font-weight="600" text-anchor="middle">S3 Artifacts</text>
+        <text x="270" y="134" fill="#94a3b8" font-size="9" text-anchor="middle">app.zip · src/</text>
+
+        <!-- MicroVM Image -->
+        <rect x="402" y="92" width="176" height="60" rx="6" fill="#0f172a"/>
+        <rect x="402" y="92" width="176" height="60" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="490" y="113" fill="white" font-size="11" font-weight="600" text-anchor="middle">MicroVM Image</text>
+        <text x="490" y="128" fill="#94a3b8" font-size="8" text-anchor="middle">Dockerfile build · /ready hook</text>
+        <text x="490" y="142" fill="#fbbf24" font-size="8" text-anchor="middle">snapshot (sub-second resume)</text>
+
+        <!-- Build Role -->
+        <rect x="648" y="92" width="150" height="60" rx="6" fill="#0f172a"/>
+        <rect x="648" y="92" width="150" height="60" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="723" y="113" fill="white" font-size="11" font-weight="600" text-anchor="middle">Build Role</text>
+        <text x="723" y="128" fill="#94a3b8" font-size="8" text-anchor="middle">MicroVMBuildRole</text>
+        <text x="723" y="142" fill="#94a3b8" font-size="8" text-anchor="middle">S3 read-only</text>
+
+        <!-- Claude Code CLI (inside MicroVM) -->
+        <rect x="290" y="250" width="180" height="78" rx="6" fill="#0f172a"/>
+        <rect x="290" y="250" width="180" height="78" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="380" y="276" fill="white" font-size="11" font-weight="600" text-anchor="middle">Claude Code CLI</text>
+        <text x="380" y="293" fill="#94a3b8" font-size="9" text-anchor="middle">claude · /workspace</text>
+        <text x="380" y="311" fill="#67e8f9" font-size="8" text-anchor="middle">CLAUDE_CODE_USE_BEDROCK=1</text>
+
+        <!-- AWS API MCP server (inside MicroVM) -->
+        <rect x="290" y="350" width="180" height="74" rx="6" fill="#0f172a"/>
+        <rect x="290" y="350" width="180" height="74" rx="6" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="380" y="375" fill="white" font-size="11" font-weight="600" text-anchor="middle">AWS API MCP</text>
+        <text x="380" y="391" fill="#94a3b8" font-size="8" text-anchor="middle">awslabs.aws-api-mcp-server</text>
+        <text x="380" y="407" fill="#fb923c" font-size="8" text-anchor="middle">READ_OPERATIONS_ONLY=true</text>
+
+        <!-- app.py keep-alive (inside MicroVM) -->
+        <rect x="290" y="440" width="380" height="52" rx="6" fill="#0f172a"/>
+        <rect x="290" y="440" width="380" height="52" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="480" y="462" fill="white" font-size="11" font-weight="600" text-anchor="middle">app.py — keep-alive process</text>
+        <text x="480" y="478" fill="#94a3b8" font-size="8" text-anchor="middle">health endpoint :8080 · lifecycle hooks :9000</text>
+
+        <!-- Amazon Bedrock -->
+        <rect x="792" y="250" width="190" height="78" rx="6" fill="#0f172a"/>
+        <rect x="792" y="250" width="190" height="78" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="887" y="276" fill="white" font-size="11" font-weight="600" text-anchor="middle">Amazon Bedrock</text>
+        <text x="887" y="293" fill="#94a3b8" font-size="9" text-anchor="middle">Claude Haiku 4.5</text>
+        <text x="887" y="311" fill="#a78bfa" font-size="8" text-anchor="middle">cross-region inference profile</text>
+
+        <!-- AWS APIs -->
+        <rect x="792" y="350" width="190" height="74" rx="6" fill="#0f172a"/>
+        <rect x="792" y="350" width="190" height="74" rx="6" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="887" y="376" fill="white" font-size="11" font-weight="600" text-anchor="middle">AWS APIs</text>
+        <text x="887" y="393" fill="#94a3b8" font-size="9" text-anchor="middle">read-only</text>
+        <text x="887" y="411" fill="#fbbf24" font-size="8" text-anchor="middle">ReadOnlyAccess</text>
+
+        <!-- ===== Arrow labels (on top) ===== -->
+        <text x="216" y="273" fill="#22d3ee" font-size="8" text-anchor="middle">WebSocket</text>
+        <text x="216" y="283" fill="#22d3ee" font-size="8" text-anchor="middle">SHELL_INGRESS</text>
+        <text x="366" y="116" fill="#94a3b8" font-size="8" text-anchor="middle">fetch</text>
+        <text x="525" y="180" fill="#94a3b8" font-size="8" text-anchor="middle">resume</text>
+        <text x="613" y="116" fill="#fb7185" font-size="8" text-anchor="middle">build</text>
+        <text x="628" y="283" fill="#34d399" font-size="9" text-anchor="middle">InvokeModel</text>
+        <text x="628" y="381" fill="#fb923c" font-size="9" text-anchor="middle">validated CLI/API</text>
+        <text x="372" y="343" fill="#94a3b8" font-size="7" text-anchor="start">spawns</text>
+        <text x="202" y="360" fill="#fb7185" font-size="7" text-anchor="middle">creds (no keys)</text>
+
+        <!-- ===== Legend (below all boundaries) ===== -->
+        <text x="24" y="562" fill="white" font-size="9" font-weight="600">Legend</text>
+
+        <rect x="78" y="553" width="14" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="97" y="562" fill="#94a3b8" font-size="8">MicroVM / compute</text>
+
+        <rect x="220" y="553" width="14" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+        <text x="239" y="562" fill="#94a3b8" font-size="8">Agent runtime (Claude)</text>
+
+        <rect x="392" y="553" width="14" height="10" rx="2" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1"/>
+        <text x="411" y="562" fill="#94a3b8" font-size="8">MCP connector</text>
+
+        <rect x="520" y="553" width="14" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="539" y="562" fill="#94a3b8" font-size="8">AI model (Bedrock)</text>
+
+        <rect x="676" y="553" width="14" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="695" y="562" fill="#94a3b8" font-size="8">AWS service</text>
+
+        <line x1="800" y1="558" x2="816" y2="558" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="821" y="562" fill="#94a3b8" font-size="8">Identity / auth</text>
+
+        <rect x="930" y="553" width="14" height="10" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="949" y="562" fill="#94a3b8" font-size="8">External</text>
+
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>Security &amp; Identity</h3>
+        </div>
+        <ul>
+          <li>• No secrets baked into the image — only non-secret config (region, model id)</li>
+          <li>• Execution role supplies all credentials via the boto3 default chain</li>
+          <li>• Two read-only layers: IAM ReadOnlyAccess + MCP READ_OPERATIONS_ONLY</li>
+          <li>• Firecracker VM isolation contains the blast radius</li>
+          <li>• SHELL_INGRESS shell access gated by a 30-min auth token</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Runtime &amp; Lifecycle</h3>
+        </div>
+        <ul>
+          <li>• Image built server-side from a Dockerfile, then snapshotted</li>
+          <li>• Resumes from snapshot in under a second</li>
+          <li>• Auto-suspends after 1h idle; auto-resumes on demand</li>
+          <li>• Terminates after 30 min in suspended state</li>
+          <li>• Lifecycle hooks on :9000 · health endpoint on :8080</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>AI &amp; AWS Access</h3>
+        </div>
+        <ul>
+          <li>• Claude Code CLI baked in via the native installer (no Node.js)</li>
+          <li>• Amazon Bedrock — Claude Haiku 4.5</li>
+          <li>• US cross-region inference profile (Haiku unavailable in-region)</li>
+          <li>• AWS API MCP server turns natural language into validated API calls</li>
+          <li>• Project-scope .mcp.json pre-approved in /workspace</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <p class="footer">
+      Lambda MicroVM Claude Code Agent • Amazon Bedrock (Claude Haiku 4.5) • AWS API MCP (read-only) • us-east-2
+    </p>
+  </div>
+
+  <script>
+    async function copyAsImage(btn) {
+      const orig = btn.textContent;
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        btn.textContent = '✓ Copied!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPNG(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '⏳ ...';
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const link = document.createElement('a');
+        link.download = 'lambda-microvm-claude-code-agent.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        btn.textContent = '✓ Done!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPDF(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '⏳ ...';
+      try {
+        const el = document.getElementById('report-container');
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: '#020617', scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains('toolbar'), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+        const pdf = new jsPDF({ orientation, unit: 'px', format: [canvas.width, canvas.height], hotfixes: ['px_scaling'] });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('lambda-microvm-claude-code-agent.pdf');
+        btn.textContent = '✓ Done!';
+      } catch (e) {
+        btn.textContent = '✗ Failed';
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+  </script>
+</body>
+</html>
