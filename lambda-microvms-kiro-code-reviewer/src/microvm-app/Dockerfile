@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install AWS CLI v2 (aarch64 — Lambda MicroVMs use ARM64 during private preview)
+# Install AWS CLI v2
 RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o awscliv2.zip \
     && unzip -q awscliv2.zip \
     && ./aws/install \
