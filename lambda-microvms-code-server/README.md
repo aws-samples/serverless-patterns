@@ -106,7 +106,7 @@ aws cloudformation deploy \
 
 #### Step 5: Run the MicroVM
 
-Start the MicroVM with the `HTTP_INGRESS` connector for browser access.
+Start the Lambda MicroVM with the `HTTP_INGRESS` connector for browser access.
 
 ```bash
 IMAGE_ARN=$(aws cloudformation describe-stacks \
