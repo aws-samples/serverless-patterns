@@ -1,2 +1,2 @@
 # Minimal dependencies for the sample cron job application
-requests==2.31.0
+requests==2.33.0
