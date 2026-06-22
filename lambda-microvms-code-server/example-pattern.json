@@ -1,5 +1,5 @@
 {
-  "title": "Lambda MicroVM VS Code Server (code-server)",
+  "title": "VS Code Server (code-server) in Lambda MicroVMs",
   "description": "Deploy VS Code Server (code-server) inside a Lambda MicroVM for a full browser-based IDE running in an isolated Firecracker sandbox. Includes Python, AWS CLI, and persistent workspace with automatic suspend/resume lifecycle management.",
   "language": "Python",
   "level": "200",
