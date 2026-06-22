@@ -1,0 +1,278 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Mount an Amazon S3 Bucket as a file system on AWS Lambda using Amazon S3 Files. Read
+  CSV files using standard Python file I/O at /mnt/s3data.
+
+Globals:
+  Function:
+    Runtime: python3.14
+    Architectures:
+      - x86_64
+    Timeout: 60
+    MemorySize: 512
+    Environment:
+      Variables:
+        MOUNT_PATH: /mnt/s3data
+        LOG_LEVEL: INFO
+
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+
+  PrivateSubnetCidr:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: CIDR for the private subnet (Lambda and mount target)
+
+Resources:
+
+  # -----------------------------------------------------------------------
+  # VPC
+  # -----------------------------------------------------------------------
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-vpc"
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnetCidr
+      AvailabilityZone: !Select ["0", !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-private-subnet"
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  # -----------------------------------------------------------------------
+  # Security Groups
+  # -----------------------------------------------------------------------
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda function
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref VpcCidr
+          Description: HTTPS outbound to VPC endpoints
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          CidrIp: !Ref VpcCidr
+          Description: NFS outbound to S3 Files mount target
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-lambda-sg"
+
+  MountTargetSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for S3 Files mount target
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+          Description: NFS inbound from Lambda
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-mount-target-sg"
+
+  # -----------------------------------------------------------------------
+  # VPC Endpoints — keep all traffic on the AWS network
+  # -----------------------------------------------------------------------
+
+  # S3 Gateway Endpoint — free, routes S3 API traffic via the route table
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+
+  # S3 Files Interface Endpoint — for NFS mount operations
+  S3FilesInterfaceEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3-outposts"
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref LambdaSecurityGroup
+      PrivateDnsEnabled: true
+
+  # -----------------------------------------------------------------------
+  # S3 Bucket
+  # -----------------------------------------------------------------------
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Pattern
+          Value: s3files-lambda
+
+  # -----------------------------------------------------------------------
+  # IAM Role — grants S3 Files service access to the S3 bucket
+  # -----------------------------------------------------------------------
+  S3FilesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowS3FilesAssumeRole
+            Effect: Allow
+            Principal:
+              Service: elasticfilesystem.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub "arn:aws:s3files:${AWS::Region}:${AWS::AccountId}:file-system/*"
+      Policies:
+        - PolicyName: S3FilesAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:HeadObject
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                  - s3:GetBucketVersioning
+                  - s3:ListBucketVersions
+                  - s3:GetObjectVersion
+                  - s3:DeleteObjectVersion
+                Resource:
+                  - !GetAtt DataBucket.Arn
+                  - !Sub "${DataBucket.Arn}/*"
+
+  # -----------------------------------------------------------------------
+  # S3 Files resources
+  # -----------------------------------------------------------------------
+  S3FileSystem:
+    Type: AWS::S3Files::FileSystem
+    Properties:
+      Bucket: !GetAtt DataBucket.Arn
+      RoleArn: !GetAtt S3FilesRole.Arn
+      Tags:
+        - Key: Pattern
+          Value: s3files-lambda
+
+  MountTarget:
+    Type: AWS::S3Files::MountTarget
+    Properties:
+      FileSystemId: !GetAtt S3FileSystem.FileSystemId
+      SubnetId: !Ref PrivateSubnet
+      SecurityGroups:
+        - !Ref MountTargetSecurityGroup
+
+  AccessPoint:
+    Type: AWS::S3Files::AccessPoint
+    Properties:
+      FileSystemId: !GetAtt S3FileSystem.FileSystemId
+      PosixUser:
+        Uid: "1000"
+        Gid: "1000"
+      RootDirectory:
+        Path: /lambda
+        CreationPermissions:
+          OwnerUid: "1000"
+          OwnerGid: "1000"
+          Permissions: "755"
+      Tags:
+        - Key: Pattern
+          Value: s3files-lambda
+
+  # -----------------------------------------------------------------------
+  # Lambda Function
+  # -----------------------------------------------------------------------
+  S3FilesReaderFunction:
+    Type: AWS::Serverless::Function
+    DependsOn: MountTarget
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-s3files-reader"
+      CodeUri: src/
+      Handler: handler.lambda_handler
+      Description: >
+        Reads a CSV from /mnt/s3data/input/ using Python's built-in csv module
+        and returns the row count, column names, and a preview of the first 5
+        rows — all via standard file I/O through the Amazon S3 Files mount.
+      FileSystemConfigs:
+        - Arn: !GetAtt AccessPoint.AccessPointArn
+          LocalMountPath: /mnt/s3data
+      VpcConfig:
+        SubnetIds:
+          - !Ref PrivateSubnet
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+      Policies:
+        - Statement:
+            - Sid: S3FilesMount
+              Effect: Allow
+              Action:
+                - s3files:ClientMount
+                - s3files:ClientWrite
+              Resource: "*"
+            - Sid: S3DirectRead
+              Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:GetObjectVersion
+              Resource: !Sub "${DataBucket.Arn}/*"
+      Tags:
+        Pattern: s3files-lambda
+
+Outputs:
+  DataBucketName:
+    Description: S3 bucket linked to the file system — upload CSV files here
+    Value: !Ref DataBucket
+
+  S3FileSystemId:
+    Description: S3 file system ID
+    Value: !GetAtt S3FileSystem.FileSystemId
+
+  S3FilesReaderFunctionName:
+    Description: Lambda function name — use this to invoke for testing
+    Value: !Ref S3FilesReaderFunction
+
+  S3FilesReaderFunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt S3FilesReaderFunction.Arn
+
+  MountPath:
+    Description: Local mount path inside Lambda
+    Value: /mnt/s3data
