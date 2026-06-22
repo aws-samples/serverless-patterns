@@ -122,7 +122,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub "${StackLabel}-seed-repo"
-      Runtime: python3.12
+      Runtime: python3.14
       Handler: index.handler
       Timeout: 60
       Role: !GetAtt SeedRepoRole.Arn
