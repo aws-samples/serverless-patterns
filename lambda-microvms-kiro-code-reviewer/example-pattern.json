@@ -3,7 +3,7 @@
   "description": "Deploy a Lambda MicroVM that runs Kiro headless to perform AI-powered code reviews on AWS CodeCommit pull requests. The MicroVM clones the repo, generates a diff, sends it to Kiro for review, and posts the feedback as a PR comment.",
   "language": "Python",
   "level": "300",
-  "framework": "AWS CLI + CloudFormation",
+  "framework": "AWS CloudFormation",
   "introBox": {
     "headline": "How it works",
     "text": [
