@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Lambda MicroVM with VS Code Server (code-server) in the browser
+
+Parameters:
+  S3Bucket:
+    Type: String
+    Description: S3 bucket containing the code artifact zip
+  S3Key:
+    Type: String
+    Description: S3 key for the code artifact zip
+  ImageName:
+    Type: String
+    Default: code-server
+    AllowedPattern: ^[a-zA-Z0-9-_]+$
+
+Resources:
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ImageName}-build-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ImageName}-execution-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  MicroVMImage:
+    Type: AWS::Lambda::MicrovmImage
+    DependsOn:
+      - MicroVMBuildRole
+      - MicroVMExecutionRole
+    Properties:
+      Name: !Ref ImageName
+      BaseImageArn: !Sub "arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
+      BaseImageVersion: "0"
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub "s3://${S3Bucket}/${S3Key}"
+      CpuConfigurations:
+        - Architecture: ARM_64
+      AdditionalOsCapabilities:
+        - ALL
+      Description: VS Code Server (code-server) in a Lambda MicroVM
+      EgressNetworkConnectors: []
+      EnvironmentVariables: []
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 300
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 5
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 5
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 5
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 5
+      Logging:
+        CloudWatch:
+          LogGroup: !Sub "/aws/lambda-microvms/${ImageName}"
+      Resources:
+        - MinimumMemoryInMiB: 1024
+
+Outputs:
+  ImageArn:
+    Value: !GetAtt MicroVMImage.ImageArn
+  State:
+    Value: !GetAtt MicroVMImage.State
+  BuildRoleArn:
+    Value: !GetAtt MicroVMBuildRole.Arn
+  ExecutionRoleArn:
+    Value: !GetAtt MicroVMExecutionRole.Arn
