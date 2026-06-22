@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy the AWS Lambda MicroVM Kiro Code Reviewer sample application.
+# Deploy the AWS Lambda MicroVMs Kiro code reviewer sample application.
 #
 # Prerequisites:
 #   - AWS CLI v2 with lambda-microvms subcommand available
