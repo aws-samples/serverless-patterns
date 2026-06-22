@@ -1,4 +1,4 @@
-FROM codercom/code-server:4.96.2
+FROM codercom/code-server:latest
 
 # Use root only for installing packages
 USER root
