@@ -1,0 +1,57 @@
+{
+  "title": "AWS Lambda MicroVM from Zip",
+  "description": "Deploy a Lambda MicroVM from a zip artifact containing a Dockerfile and application code, built server-side with sub-second startup via Firecracker snapshots.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CLI",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda MicroVM from a zip artifact uploaded to S3. The zip contains a Dockerfile and application code. Lambda builds the image server-side on the al2023 base image, waits for the /ready lifecycle hook, and takes a Firecracker snapshot.",
+      "The MicroVM resumes from the snapshot in under a second, exposing an HTTP endpoint on port 8080 gated by an auth token. It automatically suspends after idle timeout and resumes on next request — each MicroVM runs in its own Firecracker VM with hardware-level isolation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-from-zip",
+      "templateURL": "serverless-patterns/lambda-microvm-from-zip",
+      "projectFolder": "lambda-microvm-from-zip",
+      "templateFile": "src/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Firecracker - Secure and fast microVMs for serverless computing",
+        "link": "https://aws.amazon.com/blogs/opensource/firecracker-open-source-secure-fast-microvm-serverless/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "bash deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "bash cleanup.sh"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexander Vladimirov",
+      "image": "https://avatars.githubusercontent.com/u/55249162?v=4",
+      "bio": "Senior Serverless Solutions Architect at AWS, specializing in Agentic AI Workloads.",
+      "linkedin": "avladi"
+    }
+  ]
+}
