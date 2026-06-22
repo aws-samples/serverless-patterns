@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Local HTTP + WebSocket reverse proxy for Lambda MicroVM browser access.
+Local HTTP + WebSocket reverse proxy for Lambda MicroVMs browser access.
 
 code-server (VS Code) requires WebSocket support. This proxy uses aiohttp
 to properly handle both HTTP requests and WebSocket upgrade/relay, injecting
