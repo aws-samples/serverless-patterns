@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys VS Code Server (code-server) inside Lambda MicroVMs, giving you a full IDE accessible from your browser running in an isolated Firecracker sandbox.",
-      "The MicroVM image is built declaratively via CloudFormation using the AWS::Lambda::MicrovmImage resource. During the build, Lambda executes the Dockerfile server-side (installs code-server, Python, AWS CLI), waits for the /ready lifecycle hook on port 9000, and takes a snapshot for sub-second resume.",
+      "The Lambda MicroVM image is built declaratively via CloudFormation using the AWS::Lambda::MicrovmImage resource. During the build, Lambda executes the Dockerfile server-side (installs code-server, Python, AWS CLI), waits for the /ready lifecycle hook on port 9000, and takes a snapshot for sub-second resume.",
       "Lifecycle hooks (run, suspend, resume, terminate) on port 9000 manage the MicroVM state transitions — enabling graceful suspend/resume without losing IDE state. The VM auto-suspends after idle and resumes on demand.",
       "A local Python proxy (proxy.py) injects the auth token header so your browser can reach the MicroVM endpoint over HTTP and WebSocket, giving you a seamless VS Code experience."
     ]
