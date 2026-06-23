@@ -1,6 +1,6 @@
 # Sandboxed AI Code Reviewer with Kiro on AWS Lambda MicroVMs
 
-This sample deploys a **Kiro-powered AI code reviewer** running inside an AWS Lambda MicroVM. It uses Kiro in headless mode to review pull requests on CodeCommit, posting structured feedback directly as PR comments.
+This sample deploys a **Kiro-powered AI code reviewer** running inside an AWS Lambda MicroVM. It uses Kiro in headless mode to review pull requests on AWS CodeCommit, posting structured feedback directly as PR comments.
 
 
 ## Prerequisites
