@@ -29,6 +29,7 @@ Important: this application uses various AWS services and there are costs associ
 
 - Recent version of the [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- `zip` CLI utility (pre-installed on most Linux/macOS; on Windows run `scoop install zip` or `choco install zip`)
 
 ## Using deploy.sh
 
@@ -43,9 +44,11 @@ bash deploy.sh
 
 ### Step 1: Set configuration
 
+Check [AWS Lambda MicroVMs region availability](https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html) before selecting a region.
+
 ```bash
 export ACCOUNT_ID="YOUR-ACCOUNT-ID"
-export AWS_REGION="us-east-2"
+export AWS_REGION="$(aws configure get region)"
 export S3_BUCKET="microvm-artifacts-${ACCOUNT_ID}"
 ```
 
