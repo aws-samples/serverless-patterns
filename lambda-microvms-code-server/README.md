@@ -1,4 +1,4 @@
-# AWS Lambda MicroVMs — VS Code Server (code-server)
+# VS Code Server (code-server) on AWS Lambda MicroVMs
 
 This pattern deploys **VS Code Server (code-server)** inside an AWS Lambda MicroVMs. It gives you a full VS Code IDE accessible from your browser, running in a Firecracker-isolated sandbox with Python, AWS CLI, and project persistence.
 
