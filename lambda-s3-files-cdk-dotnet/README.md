@@ -60,7 +60,9 @@ Multiple Lambda functions can connect to the same S3 Files file system simultane
 
 ## Testing
 
-After deployment, invoke the Lambda function with different payloads to test file operations:
+After deployment, invoke the Lambda function with different payloads to test file operations.
+
+> **Note:** Replace `<FunctionName>` in the commands below with the actual function name from the `FunctionName` output of the CloudFormation stack (visible after `cdk deploy` completes).
 
 ### Write a file
 
@@ -104,8 +106,6 @@ Expected response:
 {"status":"listed","path":"/mnt/s3data","count":1,"entries":[{"name":"hello.txt","type":"file"}]}
 ```
 
-Replace `<FunctionName>` with the value from the `FunctionName` output of the CloudFormation stack.
-
 ## Cleanup
 
 Delete the stack:
@@ -115,6 +115,6 @@ cdk destroy
 ```
 
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
