@@ -1,0 +1,68 @@
+{
+  "title": "API Gateway to Lambda to OpenSearch Serverless NextGen",
+  "description": "Deploy a serverless semantic search API with zero baseline compute cost using Lambda and OpenSearch Serverless NextGen (scale-to-zero).",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API backed by three AWS Lambda functions that perform semantic, lexical, and hybrid search against an Amazon OpenSearch Serverless NextGen collection.",
+      "Amazon OpenSearch Serverless NextGen scales compute to zero when idle and provisions in approximately 10 seconds when traffic arrives. Combined with Lambda's own scale-to-zero, the entire stack incurs zero compute cost when not in use.",
+      "Embeddings are generated server-side by an OpenSearch ML model connected to Amazon Bedrock (Amazon Titan Text Embeddings V2) — Lambda functions send and receive plain text only.",
+      "A hybrid search pipeline applies min-max score normalization to combine BM25 (lexical) and k-NN (semantic) results with configurable weights."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-opensearch-serverless-nextgen",
+      "templateURL": "serverless-patterns/apigw-lambda-opensearch-serverless-nextgen",
+      "projectFolder": "apigw-lambda-opensearch-serverless-nextgen",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing the next generation of Amazon OpenSearch Serverless",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-the-next-generation-of-amazon-opensearch-serverless-for-building-your-agentic-ai-applications/"
+      },
+      {
+        "text": "Amazon OpenSearch Serverless",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless.html"
+      },
+      {
+        "text": "OpenSearch neural search",
+        "link": "https://opensearch.org/docs/latest/search-plugins/neural-search/"
+      },
+      {
+        "text": "Amazon Titan Text Embeddings V2",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pete Davis",
+      "image": "https://github.com/pjdavis-aws.png",
+      "bio": "Senior Partner Solution Architect at AWS",
+      "linkedin": "peter-davis-2676585"
+    }
+  ]
+}
