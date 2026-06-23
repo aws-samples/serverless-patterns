@@ -29,6 +29,7 @@ Important: this application uses various AWS services and there are costs associ
 - Recent version of the [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker with `buildx` (Docker Desktop includes it)
+- `zip` CLI utility (pre-installed on most Linux/macOS; on Windows run `scoop install zip` or `choco install zip`)
 
 ## Architecture note
 
@@ -55,7 +56,7 @@ Check [AWS Lambda MicroVMs region availability](https://docs.aws.amazon.com/lamb
 
 ```bash
 export ACCOUNT_ID="YOUR-ACCOUNT-ID"
-export AWS_REGION="us-east-2"
+export AWS_REGION="$(aws configure get region)"
 export S3_BUCKET="microvm-artifacts-${ACCOUNT_ID}"
 export ECR_REPO="microvm-from-ecr"
 export ECR_URI="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
