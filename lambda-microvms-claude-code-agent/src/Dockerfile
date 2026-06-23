@@ -29,8 +29,7 @@ RUN ln -sf /root/.local/bin/claude /usr/local/bin/claude && \
       'export PATH="$PATH:/root/.local/bin"' \
       'export CLAUDE_CODE_USE_BEDROCK=1' \
       'export AWS_REGION=us-east-2' \
-      'export ANTHROPIC_MODEL=us.anthropic.claude-sonnet-4-20250514-v1:0' \
-      'export ANTHROPIC_SMALL_FAST_MODEL=us.anthropic.claude-sonnet-4-20250514-v1:0' \
+      'export ANTHROPIC_MODEL=us.anthropic.claude-sonnet-4-6' \
       '[ -n "$PS1" ] && cd /workspace' \
       > /etc/profile.d/claude-agent.sh && \
     echo '. /etc/profile.d/claude-agent.sh' >> /root/.bashrc && \

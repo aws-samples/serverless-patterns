@@ -3,7 +3,7 @@ app.py — Claude Code Agent service for AWS Lambda MicroVMs
 
 The MicroVM bakes in the Claude Code CLI and is launched with the
 SHELL_INGRESS network connector. You connect via an interactive shell
-and run `claude` directly inside the VM (Bedrock + Haiku, authenticated
+and run `claude` directly inside the VM (Bedrock + Sonnet 4.6, authenticated
 through the execution role).
 
 This process keeps the MicroVM alive and answers the runtime callbacks:

@@ -48,18 +48,18 @@ Resources:
         - arn:aws:iam::aws:policy/ReadOnlyAccess
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
       Policies:
-        - PolicyName: BedrockInvokeHaiku
+        - PolicyName: BedrockInvokeSonnet
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: InvokeHaikuCrossRegion
+              - Sid: InvokeSonnetCrossRegion
                 Effect: Allow
                 Action:
                   - bedrock:InvokeModel
                   - bedrock:InvokeModelWithResponseStream
                 Resource:
-                  - !Sub "arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0"
-                  - arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0
+                  - !Sub "arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/us.anthropic.claude-sonnet-4-6"
+                  - arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6
 
   MicroVMImage:
     Type: AWS::Lambda::MicrovmImage
