@@ -1,0 +1,90 @@
+{
+  "title": "Active-active multi-region serverless PostgreSQL with Amazon Aurora DSQL and AWS Lambda",
+  "description": "Deploy Amazon Aurora DSQL linked clusters across two regions with an AWS Lambda function that demonstrates active-active reads and writes using IAM authentication. No passwords, no connection pooling, no VPC required.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Aurora DSQL is a serverless, distributed SQL database with active-active multi-region support and PostgreSQL compatibility.",
+      "This pattern deploys linked Amazon Aurora DSQL clusters in two AWS regions that replicate writes automatically with strong consistency.",
+      "The AWS Lambda function connects using IAM authentication tokens (no passwords to manage) and demonstrates writing in one region and reading the replicated data in the peer region.",
+      "Unlike traditional Amazon RDS or Amazon Aurora, Amazon Aurora DSQL requires no VPC, no connection pooling (Amazon RDS Proxy), and no credential rotation -- IAM auth handles everything."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-dsql-multi-region-cdk",
+      "templateURL": "serverless-patterns/lambda-dsql-multi-region-cdk",
+      "projectFolder": "lambda-dsql-multi-region-cdk",
+      "templateFile": "lib/lambda-dsql-multi-region-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Aurora DSQL documentation",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/what-is-aurora-dsql.html"
+      },
+      {
+        "text": "Amazon Aurora DSQL multi-region clusters",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/mr-cluster-setup.html"
+      },
+      {
+        "text": "Connecting to Amazon Aurora DSQL with IAM authentication",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/authentication.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 30,
+      "service": "aurora",
+      "label": "Aurora DSQL (Region 1)"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 30,
+      "service": "aurora",
+      "label": "Aurora DSQL (Region 2)"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    }
+  }
+}

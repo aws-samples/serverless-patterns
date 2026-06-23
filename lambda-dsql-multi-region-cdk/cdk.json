@@ -1,0 +1,6 @@
+{
+  "app": "node build/bin/app.js",
+  "context": {
+    "peerRegion": "us-west-2"
+  }
+}
