@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-AWS_REGION="${AWS_REGION:-us-east-2}"
+AWS_REGION="${AWS_REGION:-$(aws configure get region)}"
 ACCOUNT_ID="${ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text)}"
 S3_BUCKET="${S3_BUCKET:-microvm-artifacts-${ACCOUNT_ID}}"
 IMAGE_NAME="from-zip"
