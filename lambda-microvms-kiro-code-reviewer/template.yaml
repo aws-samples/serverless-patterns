@@ -1,0 +1,415 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AWS Lambda MicroVMs Kiro Code Reviewer - Setup Stack
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PARAMETERS
+# ──────────────────────────────────────────────────────────────────────────────
+
+Parameters:
+  StackLabel:
+    Type: String
+    Default: kiro-reviewer
+    Description: "A label used to name all resources in this stack."
+    AllowedPattern: "^[a-z0-9][a-z0-9\\-]{1,40}[a-z0-9]$"
+    ConstraintDescription: "Must be 3-42 characters, lowercase alphanumeric and hyphens only, cannot start/end with hyphen."
+
+  StagingBucket:
+    Type: String
+    Description: "S3 bucket containing the pre-staged MicroVM artifact."
+
+  ArtifactKey:
+    Type: String
+    Default: microvm-app/artifact.zip
+    Description: "S3 key for the MicroVM artifact zip."
+
+  KiroSecretArn:
+    Type: String
+    Description: "ARN of the pre-created Secrets Manager secret containing the Kiro API Key."
+
+# ──────────────────────────────────────────────────────────────────────────────
+# RESOURCES
+# ──────────────────────────────────────────────────────────────────────────────
+
+Resources:
+
+  # ── CloudWatch Log Group for MicroVM ────────────────────────────────────────
+
+  MicroVMLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda-microvms/${StackLabel}"
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+
+  # ── IAM Role: MicroVM Build Role ────────────────────────────────────────────
+
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      Policies:
+        - PolicyName: MicroVMBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:${AWS::Partition}:s3:::${StagingBucket}/*"
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:${AWS::Partition}:logs:*:${AWS::AccountId}:*"
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref KiroSecretArn
+
+  # ── IAM Role: MicroVM Execution Role ────────────────────────────────────────
+
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodeCommitFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      Policies:
+        - PolicyName: SecretsManagerRead
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref KiroSecretArn
+
+  # ── CodeCommit Repository for Code Review Lab ────────────────────────────────
+
+  CodeReviewRepo:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: !Sub "${StackLabel}-code-review"
+      RepositoryDescription: "Sample repository for Lambda MicroVMs Kiro code reviewer"
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+
+  # ── Lambda to seed the repo with code and create a PR ───────────────────────
+
+  SeedRepoFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${StackLabel}-seed-repo"
+      Runtime: python3.14
+      Handler: index.handler
+      Timeout: 60
+      Role: !GetAtt SeedRepoRole.Arn
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import json
+
+          def handler(event, context):
+              if event['RequestType'] == 'Delete':
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                  return
+
+              repo_name = event['ResourceProperties']['RepoName']
+              cc = boto3.client('codecommit')
+
+              try:
+                  # 1. Commit clean code to main branch
+                  good_code = '''"""User authentication module."""
+          import hashlib
+          import secrets
+
+
+          def hash_password(password: str) -> str:
+              """Hash a password using SHA-256 with a random salt."""
+              salt = secrets.token_hex(16)
+              hashed = hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
+              return f"{salt}:{hashed}"
+
+
+          def verify_password(password: str, stored: str) -> bool:
+              """Verify a password against a stored hash."""
+              salt, expected_hash = stored.split(":")
+              actual_hash = hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
+              return actual_hash == expected_hash
+
+
+          def create_user(username: str, password: str, email: str) -> dict:
+              """Create a new user with validated inputs."""
+              if not username or len(username) < 3:
+                  raise ValueError("Username must be at least 3 characters")
+              if not email or "@" not in email:
+                  raise ValueError("Invalid email address")
+              if len(password) < 8:
+                  raise ValueError("Password must be at least 8 characters")
+
+              return {
+                  "username": username,
+                  "email": email,
+                  "password_hash": hash_password(password),
+              }
+          '''
+
+                  main_commit = cc.create_commit(
+                      repositoryName=repo_name,
+                      branchName='main',
+                      putFiles=[{
+                          'filePath': 'auth.py',
+                          'fileContent': good_code.encode()
+                      }],
+                      authorName='Workshop Setup',
+                      email='workshop@example.com',
+                      commitMessage='Initial commit: clean auth module'
+                  )
+                  main_commit_id = main_commit['commitId']
+
+                  # 2. Create feature branch with bad code
+                  bad_code = '''"""User authentication module."""
+          import hashlib
+          import os
+          import subprocess
+
+
+          def hash_password(password):
+              # Using MD5 (insecure!) and no salt
+              return hashlib.md5(password.encode()).hexdigest()
+
+
+          def verify_password(password, stored):
+              return hashlib.md5(password.encode()).hexdigest() == stored
+
+
+          def create_user(username, password, email):
+              # No input validation at all
+              # SQL injection vulnerable string concatenation
+              query = "INSERT INTO users VALUES ('" + username + "', '" + password + "', '" + email + "')"
+              
+              # Executing shell command with user input (command injection!)
+              subprocess.run(f"echo 'New user: {username}' >> /tmp/users.log", shell=True)
+              
+              # Storing password in plaintext
+              return {
+                  "username": username,
+                  "email": email,
+                  "password": password,
+                  "query": query,
+              }
+
+
+          def delete_user(username):
+              # Dangerous: runs user input as shell command
+              os.system(f"rm -rf /data/users/{username}")
+              return True
+
+
+          def get_user_token(user_id):
+              # Hardcoded secret key
+              secret = "super_secret_key_12345"
+              return hashlib.sha256(f"{secret}{user_id}".encode()).hexdigest()
+
+
+          # Global mutable state (not thread-safe)
+          active_sessions = []
+
+          def login(username, password):
+              # No rate limiting, no account lockout
+              if verify_password(password, hash_password(password)):
+                  active_sessions.append(username)
+                  return True
+              return False
+          '''
+
+                  cc.create_branch(
+                      repositoryName=repo_name,
+                      branchName='feature/bad-code',
+                      commitId=main_commit_id
+                  )
+
+                  bad_commit = cc.create_commit(
+                      repositoryName=repo_name,
+                      branchName='feature/bad-code',
+                      parentCommitId=main_commit_id,
+                      putFiles=[{
+                          'filePath': 'auth.py',
+                          'fileContent': bad_code.encode()
+                      }],
+                      authorName='Junior Developer',
+                      email='junior@example.com',
+                      commitMessage='feat: refactor auth module for simplicity'
+                  )
+                  bad_commit_id = bad_commit['commitId']
+
+                  # 3. Create a pull request
+                  pr = cc.create_pull_request(
+                      title='Refactor auth module for simplicity',
+                      description='Simplified the authentication module to reduce complexity.',
+                      targets=[{
+                          'repositoryName': repo_name,
+                          'sourceReference': 'feature/bad-code',
+                          'destinationReference': 'main'
+                      }]
+                  )
+                  pr_id = pr['pullRequest']['pullRequestId']
+
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {
+                      'PullRequestId': pr_id,
+                      'SourceCommit': bad_commit_id,
+                      'DestinationCommit': main_commit_id,
+                  })
+
+              except Exception as e:
+                  print(f"Error: {e}")
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {
+                      'Error': str(e)
+                  })
+
+  SeedRepoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSCodeCommitFullAccess
+
+  SeedRepoCustomResource:
+    Type: Custom::SeedRepo
+    Properties:
+      ServiceToken: !GetAtt SeedRepoFunction.Arn
+      RepoName: !GetAtt CodeReviewRepo.Name
+
+  # ── MicroVM Image ───────────────────────────────────────────────────────────
+
+  MicroVMImage:
+    Type: AWS::Lambda::MicrovmImage
+    DependsOn:
+      - MicroVMBuildRole
+      - MicroVMLogGroup
+    Properties:
+      Name: !Ref StackLabel
+      BaseImageArn: !Sub "arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
+      BaseImageVersion: "0"
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub "s3://${StagingBucket}/${ArtifactKey}"
+      CpuConfigurations:
+        - Architecture: ARM_64
+      AdditionalOsCapabilities:
+        - ALL
+      Description: Sandboxed code reviewer for Kiro AI
+      EgressNetworkConnectors: []
+      EnvironmentVariables:
+        - Key: APP_PORT
+          Value: "8080"
+        - Key: KIRO_API_KEY_SECRET_ARN
+          Value: !Ref KiroSecretArn
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref MicroVMLogGroup
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 300
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 60
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 60
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 60
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 60
+      Resources:
+        - MinimumMemoryInMiB: 2048
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+        - Key: Purpose
+          Value: kiro-code-reviewer
+
+# ──────────────────────────────────────────────────────────────────────────────
+# OUTPUTS
+# ──────────────────────────────────────────────────────────────────────────────
+
+Outputs:
+
+  MicroVMImageArn:
+    Description: "ARN of the MicroVM image"
+    Value: !GetAtt MicroVMImage.ImageArn
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMImageArn"
+
+  MicroVMLogGroupName:
+    Description: "CloudWatch Log Group for MicroVM logs"
+    Value: !Ref MicroVMLogGroup
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMLogGroupName"
+
+  MicroVMBuildRoleArn:
+    Description: "IAM role ARN for building MicroVM images"
+    Value: !GetAtt MicroVMBuildRole.Arn
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMBuildRoleArn"
+
+  MicroVMExecutionRoleArn:
+    Description: "IAM role ARN for MicroVM runtime execution"
+    Value: !GetAtt MicroVMExecutionRole.Arn
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMExecutionRoleArn"
+
+  CodeReviewRepoName:
+    Description: "CodeCommit repository name for code review lab"
+    Value: !GetAtt CodeReviewRepo.Name
+    Export:
+      Name: !Sub "${StackLabel}-CodeReviewRepoName"
+
+  CodeReviewRepoCloneUrl:
+    Description: "CodeCommit HTTPS clone URL"
+    Value: !GetAtt CodeReviewRepo.CloneUrlHttp
+    Export:
+      Name: !Sub "${StackLabel}-CodeReviewRepoCloneUrl"
+
+  PullRequestId:
+    Description: "Pull Request ID created for the code review"
+    Value: !GetAtt SeedRepoCustomResource.PullRequestId
+
+  SourceCommitId:
+    Description: "Source commit ID (bad code) for the code review PR"
+    Value: !GetAtt SeedRepoCustomResource.SourceCommit
+
+  DestinationCommitId:
+    Description: "Destination commit ID (clean code) for the code review PR"
+    Value: !GetAtt SeedRepoCustomResource.DestinationCommit
