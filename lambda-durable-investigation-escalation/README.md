@@ -1,6 +1,6 @@
-# Investigation Failure Escalation Workflow with AWS Lambda durable functions
+# AWS DevOps Agent → EventBridge → Lambda Durable Functions Escalation Workflow
 
-This pattern demonstrates an investigation failure escalation workflow using AWS Lambda durable functions. When a DevOps Agent's investigation fails or times out, the durable function gathers failure context, creates an incident ticket in DynamoDB, pages on-call personnel via SNS, and uses durable function callbacks to wait for human acknowledgment. The function incurs no compute charges while waiting for a response.
+This pattern demonstrates an event-driven escalation workflow that automatically triggers when an AWS DevOps Agent investigation fails or times out. An EventBridge rule captures the failure events and routes them to a Lambda durable function that orchestrates the escalation: creating an incident ticket, paging on-call personnel, and waiting for human acknowledgment — all without compute charges during the wait.
 
 **Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
@@ -8,27 +8,73 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## Architecture
 
-The pattern uses two Lambda functions, two DynamoDB tables, an SNS topic, and an API Gateway endpoint:
+```
+┌──────────────────┐       ┌──────────────────┐       ┌──────────────────────────┐
+│  AWS DevOps Agent│──────▶│ Amazon EventBridge│──────▶│ Lambda Durable Function  │
+│  (Investigation  │ emits │ Rule (matches     │invokes│ (Escalation workflow:    │
+│   Failed/Timed   │ event │  aws.aidevops     │       │  incident → notify →     │
+│   Out events)    │       │  failure events)  │       │  wait for ack)           │
+└──────────────────┘       └──────────────────┘       └──────────────────────────┘
+```
 
-- **Escalation_Function** (Durable Lambda) — Orchestrates the entire workflow: validates the event, gathers context, creates an incident, pages on-call personnel, and tracks resolution. Pauses execution (no compute charges) while waiting for acknowledgment.
-- **Callback_Handler** (Standard Lambda) — Receives acknowledgment clicks via API Gateway and sends durable execution callbacks to resume the paused Escalation_Function.
-- **Incident_Table** (DynamoDB) — Stores incident records with failure context, escalation history, and resolution status.
-- **Callback_Table** (DynamoDB) — Maps short UUIDs to durable function callback IDs for clean acknowledgment URLs.
-- **Notification_Topic** (SNS) — Sends escalation email notifications to on-call personnel.
-- **Escalation_API** (API Gateway) — Provides the `GET /{uuid}` acknowledgment endpoint.
+The pattern deploys the following resources:
+
+- **EventBridge Rule** — Captures `Investigation Failed` and `Investigation Timed Out` events from AWS DevOps Agent (source: `aws.aidevops`) on the default event bus and invokes the Escalation Function.
+- **Escalation Function** (Durable Lambda) — Orchestrates the workflow: parses the DevOps Agent event, gathers context, creates an incident, pages on-call personnel, and tracks resolution. Pauses execution (no compute charges) while waiting for acknowledgment.
+- **Callback Handler** (Standard Lambda) — Receives acknowledgment clicks via API Gateway and sends durable execution callbacks to resume the paused Escalation Function.
+- **Incident Table** (DynamoDB) — Stores incident records with failure context, escalation history, and resolution status.
+- **Callback Table** (DynamoDB) — Maps short UUIDs to durable function callback IDs for clean acknowledgment URLs.
+- **Notification Topic** (SNS) — Sends escalation email notifications to on-call personnel.
+- **Escalation API** (API Gateway) — Provides the `GET /{uuid}` acknowledgment endpoint.
 
 ### Workflow Steps
 
-1. **gather-context** — The DevOps Agent invokes the Escalation_Function directly via `aws lambda invoke`. The function validates the incoming event and extracts failure context (investigation ID, failure type, service, region, error details, timestamp), generating a unique incident ID.
-2. **create-incident** — Writes an incident record to the Incident_Table with status `open` and an empty escalation history. *(Integration Point)*
-3. **notify-oncall** — Creates a durable callback with a configurable timeout, stores the UUID-to-callback mapping, and publishes a notification via SNS with an acknowledgment link. The function then pauses, incurring no compute charges while waiting. *(Integration Point)*
-4. **resolve-incident** — When an on-call responder clicks the acknowledgment link, the Callback_Handler sends a durable callback, resuming the function. The incident is updated to `status: acknowledged`. *(Integration Point)*
-5. **resolve-unacknowledged** — If the timeout expires without acknowledgment, the incident is updated to `status: unacknowledged` and the workflow completes. *(Integration Point)*
+1. **DevOps Agent Event** — AWS DevOps Agent emits an `Investigation Failed` or `Investigation Timed Out` event to the EventBridge default event bus.
+2. **EventBridge Routing** — The EventBridge rule matches the event pattern (`source: aws.aidevops`, filtered by detail-type) and invokes the Escalation Function.
+3. **gather-context** — The Escalation Function parses the EventBridge event, extracting the task ID, execution ID, agent space ID, priority, and failure status.
+4. **create-incident** — Writes an incident record to the Incident Table with status `open`. *(Integration Point)*
+5. **notify-oncall** — Creates a durable callback with a configurable timeout, stores the UUID-to-callback mapping, and publishes a notification via SNS with an acknowledgment link. The function then pauses, incurring no compute charges while waiting. *(Integration Point)*
+6. **resolve-incident** — When an on-call responder clicks the acknowledgment link, the Callback Handler sends a durable callback, resuming the function. The incident is updated to `acknowledged`. *(Integration Point)*
+7. **resolve-unacknowledged** — If the timeout expires without acknowledgment, the incident is updated to `unacknowledged` and the workflow completes. *(Integration Point)*
+
+### DevOps Agent Event Format
+
+The EventBridge rule matches events with this structure:
+
+```json
+{
+  "source": "aws.aidevops",
+  "detail-type": "Investigation Failed",
+  "account": "123456789012",
+  "region": "us-east-1",
+  "time": "2026-03-12T18:10:00Z",
+  "resources": [
+    "arn:aws:aidevops:us-east-1:123456789012:agentspace/your-agent-space-id"
+  ],
+  "detail": {
+    "version": "1.0.0",
+    "metadata": {
+      "agent_space_id": "your-agent-space-id",
+      "task_id": "a1b2c3d4-5678-90ab-cdef-example11111",
+      "execution_id": "b2c3d4e5-6789-01ab-cdef-example22222"
+    },
+    "data": {
+      "task_type": "INVESTIGATION",
+      "priority": "CRITICAL",
+      "status": "FAILED",
+      "created_at": "2026-03-12T18:00:00Z",
+      "updated_at": "2026-03-12T18:10:00Z"
+    }
+  }
+}
+```
 
 ## Key Features
 
+- ✅ **Fully Event-Driven** — Automatically triggered by DevOps Agent events via EventBridge; no manual invocation required
 - ✅ **No Compute Charges During Wait** — Function is suspended while waiting for human response
 - ✅ **Configurable Timeout** — Acknowledgment timeout duration configurable via SAM template parameter
+- ✅ **Agent Space Filtering** — Optionally filter events to a specific DevOps Agent space
 - ✅ **Extensible Integration Points** — Incident ticket and notification operations are isolated as helper functions that can be replaced with calls to Jira, ServiceNow, PagerDuty, Opsgenie, or other ITSM tools
 
 ## Prerequisites
@@ -36,6 +82,7 @@ The pattern uses two Lambda functions, two DynamoDB tables, an SNS topic, and an
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) >= 1.150.0 (required for `DurableConfig` support)
 * Python 3.14 runtime (automatically provided by Lambda)
+* An active [AWS DevOps Agent](https://docs.aws.amazon.com/devopsagent/latest/userguide/) agent space with investigations configured
 
 ## Deployment
 
@@ -57,71 +104,56 @@ The pattern uses two Lambda functions, two DynamoDB tables, an SNS topic, and an
    During the guided deployment, provide the required values:
    - **OncallEmail**: Email address to receive escalation notifications
    - **AckTimeout**: Timeout in seconds to wait for acknowledgment (default: 900)
+   - **AgentSpaceId**: (Optional) Restrict to a specific DevOps Agent space ID
    - Allow SAM CLI to create IAM roles when prompted
 
 4. **Confirm SNS subscription**: Check your email and click the confirmation link from Amazon SNS
 
-5. Note the `ApiEndpoint` and `EscalationFunctionArn` from the outputs
-
-## Input Payload Format
-
-The Escalation_Function expects the following JSON payload when invoked:
-
-```json
-{
-  "investigationId": "INV-2025-001",
-  "failureType": "investigation_failed",
-  "service": "payment-service",
-  "region": "us-east-1",
-  "errorDetails": "Connection timeout after 3 retries to downstream API",
-  "timestamp": "2025-01-15T10:30:00Z"
-}
-```
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `investigationId` | string | Yes | Unique identifier for the failed investigation |
-| `failureType` | string | Yes | One of `investigation_failed` or `investigation_timed_out` |
-| `service` | string | Yes | The service that was being investigated |
-| `region` | string | Yes | The AWS region where the failure occurred |
-| `errorDetails` | string | Yes | Description of the error or failure |
-| `timestamp` | string | Yes | ISO 8601 timestamp of the failure |
-
-If any required field is missing or `failureType` is invalid, the function records a validation failure in the Incident_Table and terminates without sending notifications.
+5. Note the outputs: `ApiEndpoint`, `EscalationFunctionArn`, and `EventBridgeRuleArn`
 
 ## Testing
 
-### Trigger an Escalation
+### Option 1: Wait for a Real DevOps Agent Investigation Failure
 
-Invoke the Escalation_Function directly using the Lambda CLI:
+If you have a DevOps Agent space with active investigations, the escalation will trigger automatically when an investigation fails or times out. No manual action is needed.
+
+### Option 2: Simulate with a Test EventBridge Event
+
+Send a test event to EventBridge that mimics a DevOps Agent investigation failure:
 
 ```bash
-aws lambda invoke \
-  --function-name <EscalationFunctionArn> \
-  --invocation-type Event \
+aws events put-events \
   --region us-east-2 \
-  --cli-binary-format raw-in-base64-out \
-  --payload '{
-    "investigationId": "INV-2025-001",
-    "failureType": "investigation_failed",
-    "service": "payment-service",
-    "region": "us-east-1",
-    "errorDetails": "Connection timeout after 3 retries to downstream API",
-    "timestamp": "2025-01-15T10:30:00Z"
-  }' \
-  /dev/null
+  --entries '[{
+    "Source": "aws.aidevops",
+    "DetailType": "Investigation Failed",
+    "Detail": "{\"version\":\"1.0.0\",\"metadata\":{\"agent_space_id\":\"test-space-123\",\"task_id\":\"task-abc-001\",\"execution_id\":\"exec-xyz-002\"},\"data\":{\"task_type\":\"INVESTIGATION\",\"priority\":\"CRITICAL\",\"status\":\"FAILED\",\"created_at\":\"2026-01-15T10:00:00Z\",\"updated_at\":\"2026-01-15T10:30:00Z\"}}"
+  }]'
+```
+
+You can also test with a timeout event:
+
+```bash
+aws events put-events \
+  --region us-east-2 \
+  --entries '[{
+    "Source": "aws.aidevops",
+    "DetailType": "Investigation Timed Out",
+    "Detail": "{\"version\":\"1.0.0\",\"metadata\":{\"agent_space_id\":\"test-space-123\",\"task_id\":\"task-abc-002\",\"execution_id\":\"exec-xyz-003\"},\"data\":{\"task_type\":\"INVESTIGATION\",\"priority\":\"HIGH\",\"status\":\"TIMED_OUT\",\"created_at\":\"2026-01-15T11:00:00Z\",\"updated_at\":\"2026-01-15T11:45:00Z\"}}"
+  }]'
 ```
 
 ### Check Your Email
 
 You will receive an escalation notification email containing:
-- Incident ID and investigation details
-- Failure type, service, region, and error details
+- Incident ID and investigation task details
+- Execution ID and Agent Space
+- Failure type, priority, and region
 - An **acknowledgment link**
 
 ### Acknowledge the Incident
 
-Click the acknowledgment link in the email. You will see an HTML confirmation page indicating the incident has been acknowledged. The Escalation_Function resumes and updates the incident record to `acknowledged`.
+Click the acknowledgment link in the email. You will see an HTML confirmation page indicating the incident has been acknowledged. The Escalation Function resumes and updates the incident record to `acknowledged`.
 
 If you do not click the link within the timeout (default 15 minutes), the incident is marked `unacknowledged`.
 
@@ -131,61 +163,23 @@ If you do not click the link within the timeout (default 15 minutes), the incide
 aws dynamodb scan --table-name <stack-name>-incidents --region us-east-2
 ```
 
-## Integrating with a DevOps Agent
+### Verify EventBridge Rule
 
-The Escalation_Function is designed to be invoked programmatically by a DevOps Agent when an investigation fails. The agent calls `lambda:Invoke` with `InvocationType: Event` (async, non-blocking) and passes the payload described above.
+Confirm the rule is active and receiving events:
 
-### Example: Python (boto3)
-
-```python
-import boto3
-import json
-from datetime import datetime, timezone
-
-lambda_client = boto3.client('lambda', region_name='us-east-2')
-
-def trigger_escalation(investigation_id, failure_type, service, region, error_details):
-    lambda_client.invoke(
-        FunctionName='<EscalationFunctionArn>',
-        InvocationType='Event',
-        Payload=json.dumps({
-            'investigationId': investigation_id,
-            'failureType': failure_type,
-            'service': service,
-            'region': region,
-            'errorDetails': str(error_details),
-            'timestamp': datetime.now(timezone.utc).isoformat()
-        })
-    )
-```
-
-Call this from your agent's error handler:
-
-```python
-try:
-    result = run_investigation(issue)
-except TimeoutError:
-    trigger_escalation('INV-123', 'investigation_timed_out', 'my-service', 'us-east-1', 'Timed out')
-except Exception as e:
-    trigger_escalation('INV-123', 'investigation_failed', 'my-service', 'us-east-1', str(e))
-```
-
-### IAM Permission
-
-The agent's execution role needs `lambda:InvokeFunction` on the Escalation Function:
-
-```yaml
-- Effect: Allow
-  Action: lambda:InvokeFunction
-  Resource: <EscalationFunctionArn>
+```bash
+aws events describe-rule \
+  --name <stack-name>-devops-agent-escalation \
+  --region us-east-2
 ```
 
 ## Configuration
 
 | Parameter | Default | Description |
 |---|---|---|
-| `AckTimeout` | 900 (15 min) | Seconds to wait for on-call acknowledgment before marking unacknowledged |
 | `OncallEmail` | — | Email address subscribed to the SNS notification topic |
+| `AckTimeout` | 900 (15 min) | Seconds to wait for on-call acknowledgment before marking unacknowledged |
+| `AgentSpaceId` | (empty) | Optional. Restrict the EventBridge rule to events from a specific DevOps Agent space |
 
 To change values after deployment:
 
@@ -203,23 +197,10 @@ The incident ticket and notification operations are isolated into dedicated help
 
 | Function | Default Behavior | Replacement Example |
 |---|---|---|
-| `create_incident_ticket(incident)` | DynamoDB `put_item` to Incident_Table | Jira, ServiceNow, Zendesk, or any ITSM platform with a REST API |
-| `resolve_incident(incident_id, status, details)` | DynamoDB `update_item` on Incident_Table | Jira issue transition, ServiceNow resolve, or Zendesk ticket update |
-| `send_escalation_notification(topic_arn, message)` | SNS `publish` to Notification_Topic | PagerDuty Events API v2, Opsgenie Alert API, Slack, or Microsoft Teams webhook |
-| `store_callback_mapping(uuid, callback_id, incident_id, tier, ttl)` | DynamoDB `put_item` to Callback_Table | Typically not replaced |
-
-### Swapping DynamoDB for an ITSM Tool
-
-1. Replace `create_incident_ticket()` to call the external API and create a ticket.
-2. Replace `resolve_incident()` to transition the external ticket to a resolved state.
-3. Add API keys or credentials as environment variables or AWS Secrets Manager references.
-4. Update the SAM template IAM policies to allow outbound HTTPS calls if running in a VPC.
-
-### Swapping SNS for an Alerting Service
-
-1. Replace `send_escalation_notification()` to call the external API (e.g., PagerDuty, Opsgenie, Slack).
-2. Pass the acknowledgment URL in the notification payload so responders can still click to acknowledge.
-3. Add the API integration key as an environment variable or Secrets Manager reference.
+| `create_incident_ticket(incident)` | DynamoDB `put_item` to Incident Table | Jira, ServiceNow, Zendesk, or any ITSM platform with a REST API |
+| `resolve_incident(incident_id, status, details)` | DynamoDB `update_item` on Incident Table | Jira issue transition, ServiceNow resolve, or Zendesk ticket update |
+| `send_escalation_notification(topic_arn, message)` | SNS `publish` to Notification Topic | PagerDuty Events API v2, Opsgenie Alert API, Slack, or Microsoft Teams webhook |
+| `store_callback_mapping(uuid, callback_id, incident_id, tier, ttl)` | DynamoDB `put_item` to Callback Table | Typically not replaced |
 
 ## Monitoring
 
@@ -233,6 +214,12 @@ aws logs tail /aws/lambda/<stack-name>-CallbackHandlerFunction \
   --region us-east-2 --follow
 ```
 
+### EventBridge Metrics
+
+Monitor the rule invocations in CloudWatch:
+- `Invocations` — Number of times the rule matched an event
+- `FailedInvocations` — Failed target invocations
+
 ## Cleanup
 
 ```bash
@@ -241,10 +228,11 @@ sam delete --stack-name <your-stack-name> --region us-east-2
 
 ## Learn More
 
+- [AWS DevOps Agent EventBridge Integration](https://docs.aws.amazon.com/devopsagent/latest/userguide/configuring-integrations-and-knowledge-integrating-devops-agent-into-event-driven-applications-using-amazon-eventbridge-index.html)
+- [AWS DevOps Agent Events Detail Reference](https://docs.aws.amazon.com/devopsagent/latest/userguide/integrating-devops-agent-into-event-driven-applications-using-amazon-eventbridge-devops-agent-events-detail-reference.html)
 - [Lambda durable functions Documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Durable Execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-python)
 - [Callback Operations](https://docs.aws.amazon.com/lambda/latest/dg/durable-callback.html)
-- [SendDurableExecutionCallbackSuccess API](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/send_durable_execution_callback_success.html)
 
 ---
 

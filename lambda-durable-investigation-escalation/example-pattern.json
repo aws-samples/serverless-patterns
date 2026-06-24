@@ -1,29 +1,33 @@
 {
-  "title": "AWS Lambda durable functions Investigation Failure Escalation Workflow",
-  "description": "Tiered investigation failure escalation workflow using Lambda durable functions with callback-based pausing, automatic tier escalation, and human acknowledgment handling",
+  "title": "AWS DevOps Agent to Amazon EventBridge to AWS Lambda Durable Functions Escalation",
+  "description": "Event-driven investigation failure escalation using AWS DevOps Agent events routed through EventBridge to Lambda durable functions with callback-based pausing and human acknowledgment handling",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern implements a tiered escalation workflow using Lambda durable functions. When a DevOps Agent's investigation fails or times out, the Escalation Function gathers failure context and creates an incident ticket in DynamoDB.",
-      "The workflow pages Tier 1 on-call personnel via SNS and pauses execution using create_callback(), incurring no compute charges while waiting for human acknowledgment.",
-      "If no acknowledgment is received within a configurable timeout (default 15 minutes), the workflow automatically escalates to Tier 2 by paging the next responder and waiting again.",
-      "On-call responders acknowledge incidents by clicking a link in the notification, which triggers an API Gateway endpoint that resumes the paused durable function via callback.",
+      "AWS DevOps Agent emits events to the Amazon EventBridge default event bus whenever an investigation lifecycle state changes. This pattern captures 'Investigation Failed' and 'Investigation Timed Out' events using an EventBridge rule.",
+      "The EventBridge rule routes matching events to a Lambda durable function that orchestrates the escalation workflow: parsing the DevOps Agent event, creating an incident ticket in DynamoDB, and paging on-call personnel via SNS.",
+      "The durable function pauses execution using create_callback(), incurring no compute charges while waiting for human acknowledgment. On-call responders acknowledge by clicking a link in the notification email.",
+      "If no acknowledgment is received within a configurable timeout (default 15 minutes), the incident is marked as unacknowledged and the workflow completes.",
       "The incident ticket creation and notification steps are designed as extensible integration points, allowing customers to replace DynamoDB and SNS with external services such as Jira, ServiceNow, PagerDuty, or Opsgenie."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-investigation-escalation-sam",
-      "templateURL": "serverless-patterns/lambda-durable-investigation-escalation-sam",
-      "projectFolder": "lambda-durable-investigation-escalation-sam",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-investigation-escalation",
+      "templateURL": "serverless-patterns/lambda-durable-investigation-escalation",
+      "projectFolder": "lambda-durable-investigation-escalation",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
+      {
+        "text": "AWS DevOps Agent EventBridge Integration",
+        "link": "https://docs.aws.amazon.com/devopsagent/latest/userguide/configuring-integrations-and-knowledge-integrating-devops-agent-into-event-driven-applications-using-amazon-eventbridge-index.html"
+      },
       {
         "text": "Lambda durable functions Documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
@@ -43,7 +47,8 @@
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the GitHub repo for detailed testing instructions.",
+      "You can simulate DevOps Agent events using: aws events put-events --entries with source aws.aidevops and detail-type 'Investigation Failed'"
     ]
   },
   "cleanup": {

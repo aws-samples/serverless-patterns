@@ -1,11 +1,11 @@
 """
 Durable execution handler for the Investigation Failure Escalation workflow.
 
-This Lambda function orchestrates an escalation workflow using the
-aws_durable_execution_sdk_python SDK. When a DevOps Agent's investigation
-fails or times out, this function:
+This Lambda function is triggered by an Amazon EventBridge rule that captures
+AWS DevOps Agent investigation failure and timeout events (source: aws.aidevops).
 
-1. Validates the incoming event
+Workflow:
+1. Parses the EventBridge event from AWS DevOps Agent
 2. Gathers failure context and generates an incident ID
 3. Creates an incident ticket (Integration Point)
 4. Pages on-call personnel and waits for acknowledgment
@@ -28,55 +28,80 @@ import boto3
 
 import helpers
 
-# Valid failure types for the Investigation_Event
-VALID_FAILURE_TYPES = {'investigation_failed', 'investigation_timed_out'}
-
-# Required fields in the Investigation_Event payload
-REQUIRED_FIELDS = [
-    'investigationId',
-    'failureType',
-    'service',
-    'region',
-    'errorDetails',
-    'timestamp',
-]
+# Mapping from DevOps Agent event detail-type to internal failure types
+DETAIL_TYPE_TO_FAILURE_TYPE = {
+    'Investigation Failed': 'investigation_failed',
+    'Investigation Timed Out': 'investigation_timed_out',
+}
 
 
-def validate_event(event):
+def parse_devops_agent_event(event):
     """
-    Validate the Investigation_Event payload.
+    Parse an EventBridge event from AWS DevOps Agent.
 
-    Checks that all required fields are present and that failureType
-    is one of the allowed enum values.
+    Expected event structure (source: aws.aidevops):
+    {
+      "source": "aws.aidevops",
+      "detail-type": "Investigation Failed" | "Investigation Timed Out",
+      "account": "123456789012",
+      "region": "us-east-1",
+      "time": "2026-03-12T18:10:00Z",
+      "resources": ["arn:aws:aidevops:..."],
+      "detail": {
+        "version": "1.0.0",
+        "metadata": {
+          "agent_space_id": "...",
+          "task_id": "...",
+          "execution_id": "..."
+        },
+        "data": {
+          "task_type": "INVESTIGATION",
+          "priority": "CRITICAL",
+          "status": "FAILED" | "TIMED_OUT",
+          "created_at": "...",
+          "updated_at": "..."
+        }
+      }
+    }
+
+    Returns a normalized context dict, or (None, error_message) if invalid.
     """
-    missing = [f for f in REQUIRED_FIELDS if f not in event or event[f] is None]
-    if missing:
-        return False, f"Missing required fields: {', '.join(missing)}"
+    # Validate this is a DevOps Agent event
+    source = event.get('source')
+    detail_type = event.get('detail-type')
+    detail = event.get('detail', {})
+    metadata = detail.get('metadata', {})
+    data = detail.get('data', {})
 
-    if event.get('failureType') not in VALID_FAILURE_TYPES:
-        return False, (
-            f"Invalid failureType: '{event.get('failureType')}'. "
-            f"Must be one of: {', '.join(sorted(VALID_FAILURE_TYPES))}"
+    if source != 'aws.aidevops':
+        return None, f"Unexpected event source: '{source}'. Expected 'aws.aidevops'."
+
+    failure_type = DETAIL_TYPE_TO_FAILURE_TYPE.get(detail_type)
+    if not failure_type:
+        return None, (
+            f"Unsupported detail-type: '{detail_type}'. "
+            f"Expected one of: {list(DETAIL_TYPE_TO_FAILURE_TYPE.keys())}"
         )
 
-    return True, None
+    task_id = metadata.get('task_id')
+    if not task_id:
+        return None, "Missing metadata.task_id in event detail."
 
-
-def build_context_summary(event):
-    """
-    Build a context summary from a validated Investigation_Event.
-
-    Extracts all required fields and generates a new incidentId (UUID v4).
-    """
-    return {
+    context_summary = {
         'incidentId': str(uuid.uuid4()),
-        'investigationId': event['investigationId'],
-        'failureType': event['failureType'],
-        'service': event['service'],
-        'region': event['region'],
-        'errorDetails': event['errorDetails'],
-        'timestamp': event['timestamp'],
+        'investigationId': task_id,
+        'executionId': metadata.get('execution_id', 'unknown'),
+        'agentSpaceId': metadata.get('agent_space_id', 'unknown'),
+        'failureType': failure_type,
+        'priority': data.get('priority', 'UNKNOWN'),
+        'service': 'devops-agent',
+        'region': event.get('region', 'unknown'),
+        'errorDetails': f"DevOps Agent investigation {data.get('status', 'UNKNOWN').lower()} "
+                        f"(task: {task_id}, priority: {data.get('priority', 'UNKNOWN')})",
+        'timestamp': data.get('updated_at', event.get('time', datetime.now(timezone.utc).isoformat())),
     }
+
+    return context_summary, None
 
 
 def build_incident_record(context_summary):
@@ -88,7 +113,7 @@ def build_incident_record(context_summary):
     """
     now = datetime.now(timezone.utc)
     created_at = now.isoformat()
-    ttl = int(now.timestamp()) + 604800  # 7 days in seconds
+    ttl = int(now.timestamp()) + 604800  # 7 days
 
     return {
         **context_summary,
@@ -107,11 +132,14 @@ def build_notification_message(incident_data, ack_url):
         f"INVESTIGATION ESCALATION ALERT\n"
         f"\n"
         f"Incident ID: {incident_data['incidentId']}\n"
-        f"Investigation ID: {incident_data['investigationId']}\n"
+        f"Investigation (Task ID): {incident_data['investigationId']}\n"
+        f"Execution ID: {incident_data.get('executionId', 'N/A')}\n"
+        f"Agent Space: {incident_data.get('agentSpaceId', 'N/A')}\n"
         f"Failure Type: {incident_data['failureType']}\n"
-        f"Service: {incident_data['service']}\n"
+        f"Priority: {incident_data.get('priority', 'UNKNOWN')}\n"
         f"Region: {incident_data['region']}\n"
         f"Error Details: {incident_data['errorDetails']}\n"
+        f"Timestamp: {incident_data['timestamp']}\n"
         f"\n"
         f"Acknowledge this incident:\n"
         f"{ack_url}\n"
@@ -120,7 +148,7 @@ def build_notification_message(incident_data, ack_url):
 
 def build_final_result(incident_id, investigation_id, status, escalation_history):
     """
-    Build the final result object returned by the Escalation_Function.
+    Build the final result object returned by the Escalation Function.
     """
     return {
         'incidentId': incident_id,
@@ -135,44 +163,44 @@ def lambda_handler(event, context: DurableContext):
     """
     Durable execution handler for the investigation failure escalation workflow.
 
-    Gathers context, creates an incident, pages on-call personnel,
-    waits for acknowledgment, and tracks the final resolution.
+    Triggered by EventBridge when AWS DevOps Agent emits an investigation
+    failure or timeout event.
     """
-    # --- Input Validation ---
-    is_valid, error_message = validate_event(event)
-    if not is_valid:
+    # --- Parse EventBridge Event from DevOps Agent ---
+    context_summary, error_message = parse_devops_agent_event(event)
+
+    if error_message:
         now = datetime.now(timezone.utc)
         validation_record = {
             'incidentId': str(uuid.uuid4()),
-            'investigationId': event.get('investigationId', 'unknown'),
-            'failureType': event.get('failureType', 'unknown'),
-            'service': event.get('service', 'unknown'),
+            'investigationId': event.get('detail', {}).get('metadata', {}).get('task_id', 'unknown'),
+            'failureType': 'parse_error',
+            'service': 'devops-agent',
             'region': event.get('region', 'unknown'),
             'errorDetails': error_message,
-            'timestamp': event.get('timestamp', now.isoformat()),
+            'timestamp': event.get('time', now.isoformat()),
             'status': 'validation_failed',
             'escalationHistory': [],
             'createdAt': now.isoformat(),
             'ttl': int(now.timestamp()) + 604800,
         }
         helpers.create_incident_ticket(validation_record)
-        print(f"Validation failed: {error_message}")
+        print(f"Event parsing failed: {error_message}")
         return {'error': error_message, 'status': 'validation_failed'}
 
     # --- Step 1: Gather Context ---
     def gather_context(_):
-        summary = build_context_summary(event)
-        print(f"Context gathered — incidentId: {summary['incidentId']}")
-        return summary
+        print(f"Context gathered — incidentId: {context_summary['incidentId']}")
+        return context_summary
 
-    context_summary = context.step(gather_context, name='gather-context')
+    gathered = context.step(gather_context, name='gather-context')
 
-    incident_id = context_summary['incidentId']
-    investigation_id = context_summary['investigationId']
+    incident_id = gathered['incidentId']
+    investigation_id = gathered['investigationId']
 
     # --- Step 2: Create Incident ---
     def create_incident(_):
-        record = build_incident_record(context_summary)
+        record = build_incident_record(gathered)
         helpers.create_incident_ticket(record)
         print(f"Incident created: {incident_id}")
         return record
@@ -198,7 +226,7 @@ def lambda_handler(event, context: DurableContext):
 
     topic_arn = os.environ['NOTIFICATION_TOPIC_ARN']
 
-    # --- Create Callback, Store Mapping, Notify On-Call ---
+    # --- Step 3: Create Callback, Store Mapping, Notify On-Call ---
     callback = context.create_callback(
         name='wait-for-ack',
         config=CallbackConfig(timeout=Duration.from_seconds(ack_timeout)),
@@ -215,7 +243,7 @@ def lambda_handler(event, context: DurableContext):
 
     def notify_oncall(_):
         ack_url = f"{api_base_url}/{callback_uuid}"
-        message = build_notification_message(context_summary, ack_url)
+        message = build_notification_message(gathered, ack_url)
         helpers.send_escalation_notification(topic_arn, message)
         print(f"On-call notification sent — ack URL: {ack_url}")
 
