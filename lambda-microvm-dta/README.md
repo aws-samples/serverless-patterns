@@ -64,7 +64,7 @@ A MicroVM image carries the sandbox supervisor. For each analysis the orchestrat
 * A region where AWS Lambda MicroVMs is available.
 * [Terraform](https://developer.hashicorp.com/terraform/downloads) installed.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Python 3.11+](https://www.python.org/downloads/) for the orchestrator CLI.
+* [Python 3.11+](https://www.python.org/downloads/) for the orchestrator CLI. For the local `dry-run`, also install PyYAML (`pip install pyyaml`); without it the bundled fallback parser cannot read the default rule pack.
 
 ## Deployment Instructions
 
@@ -125,6 +125,8 @@ A benign target produces `summary.status: passed` and `summary.verdict: clean`. 
 ```bash
 microvm-dta dry-run --target-config src/examples/targets/benign-command.yaml --workspace out/analysis
 ```
+
+> Note: the local `dry-run` runs the supervisor on your host, so `strace`-dependent rules (e.g. R004 shell-exec, R002 high-confidence canary) only fire on Linux where `strace` is present — on macOS the `strace` collector fails and those behaviors read as `clean`. Run on a MicroVM (or Linux) to exercise them.
 
 ## Cleanup
 
