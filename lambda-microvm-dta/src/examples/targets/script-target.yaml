@@ -1,0 +1,23 @@
+# A script target: the supervisor copies the script into the workspace, marks it
+# executable, and runs it. Demonstrates the 'script' target type.
+target:
+  type: script
+  source: "sample_target.py"
+  argv: ["python3", "sample_target.py"]
+  timeoutSeconds: 30
+  workingDirectory: "workspace"
+  environment: {}
+
+collectors:
+  process: true
+  filesystem: true
+  canary: true
+  strace: false
+  network:
+    procNet: true
+    vpcFlowLogs: false
+
+policy:
+  failOnSeverity: high
+  failOnPolicyViolation: true
+  failClosed: false
