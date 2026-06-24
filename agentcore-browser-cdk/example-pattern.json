@@ -1,0 +1,76 @@
+{
+  "title": "AI agent web browsing with Amazon Bedrock AgentCore Browser",
+  "description": "Deploy Amazon Bedrock AgentCore Browser with an AWS Lambda function that starts browser sessions, navigates web pages, and extracts content for AI agents.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Bedrock AgentCore Browser provides managed headless browser sessions for AI agents to interact with web pages.",
+      "The AWS Lambda function starts a browser session, navigates to a URL, and extracts the page content.",
+      "Agents can browse, click, fill forms, and extract structured data from any public web page.",
+      "Sessions are isolated and automatically cleaned up, with optional recording for debugging."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-browser-cdk",
+      "templateURL": "serverless-patterns/agentcore-browser-cdk",
+      "projectFolder": "agentcore-browser-cdk",
+      "templateFile": "lib/agentcore-browser-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Browser documentation",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/browser.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore CDK construct library",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_bedrockagentcore-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon2": {
+      "x": 80,
+      "y": 50,
+      "service": "bedrock",
+      "label": "AgentCore Browser"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    }
+  }
+}
