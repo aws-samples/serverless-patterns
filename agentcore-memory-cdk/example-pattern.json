@@ -1,0 +1,98 @@
+{
+<<<<<<< Updated upstream:agentcore-memory-cdk/example-pattern.json
+  "title": "Persistent AI agent memory with Amazon Bedrock AgentCore Memory",
+  "description": "Deploy Amazon Bedrock AgentCore Memory with an AWS Lambda function that stores conversation events and retrieves memory records, enabling AI agents to maintain context across sessions.",
+=======
+  "title": "Structured intelligence extraction from JavaScript-rendered pages with Amazon Bedrock AgentCore Browser and Amazon Bedrock",
+  "description": "Deploy an AWS Lambda function that navigates JavaScript-rendered web pages via Amazon Bedrock AgentCore Browser, extracts dynamic content that simple HTTP GET cannot reach, and uses Amazon Bedrock to analyze and structure the data.",
+>>>>>>> Stashed changes:agentcore-browser-cdk/example-pattern.json
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+<<<<<<< Updated upstream:agentcore-memory-cdk/example-pattern.json
+      "Amazon Bedrock AgentCore Memory provides managed short-term and long-term memory for AI agents.",
+      "The AWS Lambda function stores conversation events (messages, tool calls) as short-term memory.",
+      "AgentCore asynchronously extracts long-term memory (facts, preferences, summaries) from stored events using configurable strategies.",
+      "Agents retrieve relevant memory records using semantic search to maintain personalized, consistent experiences across sessions."
+=======
+      "The AWS Lambda function starts a managed Amazon Bedrock AgentCore Browser session and navigates to a target URL.",
+      "Unlike simple HTTP requests, the Browser renders JavaScript, executes SPAs, and waits for dynamic content to load — handling React, Angular, and framework-rendered pages.",
+      "The fully rendered page content is extracted and passed to Amazon Bedrock for structured analysis.",
+      "Amazon Bedrock extracts key facts, prices, dates, and entities — returning structured JSON intelligence from pages that would otherwise require a headless browser infrastructure."
+>>>>>>> Stashed changes:agentcore-browser-cdk/example-pattern.json
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-memory-cdk",
+      "templateURL": "serverless-patterns/agentcore-memory-cdk",
+      "projectFolder": "agentcore-memory-cdk",
+      "templateFile": "lib/agentcore-memory-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Memory documentation",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModel API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon2": {
+      "x": 55,
+      "y": 30,
+      "service": "bedrock",
+      "label": "AgentCore Memory"
+    },
+    "icon3": {
+      "x": 55,
+      "y": 70,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon1",
+      "to": "icon3"
+    }
+  }
+}
