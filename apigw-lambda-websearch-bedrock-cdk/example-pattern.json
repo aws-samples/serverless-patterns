@@ -1,0 +1,96 @@
+{
+  "title": "Grounded AI answers with Amazon Bedrock AgentCore Web Search and Amazon Bedrock",
+  "description": "Deploy an Amazon API Gateway REST API backed by an AWS Lambda function that searches the live web via Amazon Bedrock AgentCore Web Search, then uses Amazon Bedrock to synthesize accurate, cited answers grounded in current facts.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A user sends a question to the Amazon API Gateway REST API endpoint.",
+      "The AWS Lambda function searches the live web via Amazon Bedrock AgentCore Gateway's Web Search connector using the MCP protocol with SigV4 authentication.",
+      "Web search results (titles, URLs, snippets) are formatted as context and sent to Amazon Bedrock (Claude) for inference.",
+      "Amazon Bedrock synthesizes a grounded answer with numbered citation references, returned to the user with source URLs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-websearch-bedrock-cdk",
+      "templateURL": "serverless-patterns/apigw-lambda-websearch-bedrock-cdk",
+      "projectFolder": "apigw-lambda-websearch-bedrock-cdk",
+      "templateFile": "lib/apigw-lambda-websearch-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Web Search documentation",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-target-connector-web-search-tool.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModel API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "apigateway",
+      "label": "Amazon API Gateway"
+    },
+    "icon2": {
+      "x": 35,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon3": {
+      "x": 60,
+      "y": 30,
+      "service": "bedrock",
+      "label": "AgentCore Web Search"
+    },
+    "icon4": {
+      "x": 60,
+      "y": 70,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon2",
+      "to": "icon4"
+    }
+  }
+}
