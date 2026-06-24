@@ -1,6 +1,6 @@
 {
-  "title": "Amazon API Gateway with Lambda authorizer, Amazon Cognito, & Amazon DynamoDB for Tenant API Key Authentication",
-  "description": "Implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB. Cognito issues JWTs with a custom tenantId claim, and the Lambda authorizer maps tenants to API keys via DynamoDB.",
+  "title": "Amazon API Gateway with AWS Lambda authorizer, & Amazon DynamoDB for Tenant API Key Authentication",
+  "description": "Implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB.",
 
   "language": "TypeScript",
   "level": "200",
@@ -10,7 +10,7 @@
     "text": [
       "This pattern demonstrates how to implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, Lambda Authorizer, and Amazon DynamoDB.",
       "Amazon Cognito authenticates users and issues JWTs (ID tokens) containing a custom tenantId claim.",
-      "The client sends the JWT in the Authorization header. API Gateway forwards the token to the Lambda authorizer, which decodes the JWT, extracts the custom:tenantId claim, and queries DynamoDB to retrieve the corresponding API key.",
+      "The client sends the JWT in the Authorization header. API Gateway forwards the token to the Lambda authorizer, which validates and decodes the JWT, extracts the custom:tenantId claim, and queries DynamoDB to retrieve the corresponding API key.",
       "The authorizer returns a policy document with the usageIdentifierKey set to the API key, enabling API Gateway usage plan integration.",
       "The API Gateway then allows or denies access to the protected endpoint based on the policy returned by the authorizer."
     ]
@@ -63,16 +63,7 @@
     "text": [
       "Delete the CDK stack: <code>cdk destroy</code>"
     ]
-  },  
-  "patternArch": {
-    "icon1": { "x": 20, "y": 50, "service": "cognito",  "label": "Amazon Cognito" },
-    "icon2": { "x": 45, "y": 50, "service": "apigw",    "label": "Amazon API Gateway" },
-    "icon3": { "x": 70, "y": 30, "service": "lambda",   "label": "Lambda authorizer" },
-    "icon4": { "x": 70, "y": 70, "service": "dynamodb", "label": "Amazon DynamoDB" },
-    "line1": { "from": "icon1", "to": "icon2", "label": "JWT (tenantId)" },
-    "line2": { "from": "icon2", "to": "icon3", "label": "Authorize" },
-    "line3": { "from": "icon3", "to": "icon4", "label": "Lookup API key" }
-  }, 
+  },    
   "authors": [
     {
       "name": "Lavanya Tangutur",           

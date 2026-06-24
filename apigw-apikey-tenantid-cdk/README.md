@@ -19,6 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 
 Before using this pattern, you must create API Gateway [Usage Plans](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) and an [API Key](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html) associated with it. The usage plan must be associated with the API and stage created by this CDK stack. 
 The usage plan must be associated with the API and stage created by this CDK stack. The API key value stored in the DynamoDB table must match a valid API key linked to a usage plan in API Gateway — otherwise, requests will be rejected even if the Lambda authorizer returns a successful policy.
+The above pre requeisites are required to successfully test this pattern.
 
 For guidance on creating and configuring usage plans and API keys, see:
 - [Create and use usage plans with API keys](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html)
@@ -102,7 +103,7 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
       --enabled \
       --value "tenant-usage-api-key-123"
     ```
-    Note the `id` from the output — this is your API_KEY_ID.
+    The API key value should be >= 20 char. Note the `id` from the output — this is your API_KEY_ID.
 
 1. Associate the API key with the usage plan:
     ```bash

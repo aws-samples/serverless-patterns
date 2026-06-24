@@ -2,7 +2,7 @@
   "name": "apigw-dynamodb-apikey-cdk",
   "version": "0.1.0",
   "bin": {
-    "apigw-dynamodb-apikey-cdk": "src/bin/apigw-apikey-tenantid-cdk.js"
+    "apigw-dynamodb-apikey-cdk": "src/bin/apigw-dynamodb-apikey-cdk.ts"
   },
   "scripts": {
     "build": "tsc",
