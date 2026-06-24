@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda to DynamoDB with error handling pattern.
+  SQS triggers Lambda with ReportBatchItemFailures.
+  Failed messages route to a Dead Letter Queue.
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 128
+    Architectures:
+      - arm64
+
+Resources:
+  # DynamoDB Table
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-items"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  # Dead Letter Queue
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  # Source Queue
+  SourceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-queue"
+      VisibilityTimeout: 180  # 6x Lambda timeout
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  # Lambda Function
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-processor"
+      Handler: app.handler
+      CodeUri: src/
+      Description: Processes SQS messages and writes to DynamoDB with error handling
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ItemsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SourceQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+Outputs:
+  QueueUrl:
+    Description: URL of the source SQS queue
+    Value: !GetAtt SourceQueue.QueueUrl
+
+  DeadLetterQueueUrl:
+    Description: URL of the Dead Letter Queue
+    Value: !GetAtt DeadLetterQueue.QueueUrl
+
+  TableName:
+    Description: Name of the DynamoDB table
+    Value: !Ref ItemsTable
+
+  FunctionName:
+    Description: Name of the Lambda function
+    Value: !Ref ProcessorFunction

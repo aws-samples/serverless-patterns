@@ -1,0 +1,64 @@
+{
+  "title": "AWS Lambda to Amazon DynamoDB with Amazon SQS Partial Batch Error Handling",
+  "description": "Process SQS messages with Lambda, write to DynamoDB, and handle partial batch failures with ReportBatchItemFailures and a Dead Letter Queue.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates best-practice error handling when processing SQS messages with Lambda and writing to DynamoDB.",
+      "The Lambda function uses ReportBatchItemFailures to return only failed message IDs, so successfully processed messages are not retried.",
+      "Messages that fail after 3 retries are automatically routed to a Dead Letter Queue for investigation.",
+      "IAM permissions follow least-privilege: the Lambda function has only DynamoDBCrudPolicy scoped to the specific table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-dynamodb-error-handling-sam",
+      "templateURL": "serverless-patterns/lambda-dynamodb-error-handling-sam",
+      "projectFolder": "lambda-dynamodb-error-handling-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon SQS \u2014 Reporting batch item failures",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-batchfailurereporting"
+      },
+      {
+        "text": "Error handling and automatic retries in AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-retries.html"
+      },
+      {
+        "text": "Amazon SQS Dead-Letter Queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ajaya Shrestha",
+      "image": "",
+      "bio": "Cloud Support Engineer at AWS specializing in Lambda and serverless architectures.",
+      "linkedin": ""
+    }
+  ]
+}
