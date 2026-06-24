@@ -13,7 +13,7 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   MSKKafkaVersion:
     Type: String
-    Default: 3.5.1
+    Default: 3.9.x
   JavaVersion:
     Type: String
     Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21

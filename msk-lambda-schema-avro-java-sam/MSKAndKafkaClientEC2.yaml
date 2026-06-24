@@ -24,7 +24,7 @@ Parameters:
     Default: java21
   ApacheKafkaInstallerLocation:
     Type: String
-    Default: https://dlcdn.apache.org/kafka/3.9.1/kafka_2.13-3.9.1.tgz
+    Default: https://www.apache.org/dyn/closer.lua/kafka/3.9.2/kafka_2.13-3.9.2.tgz
   KafkaTopicForLambda:
     Type: String
     Default: MskIamJavaLambdaTopic
