@@ -64,6 +64,15 @@
       "Delete the CDK stack: <code>cdk destroy</code>"
     ]
   },  
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "cognito",  "label": "Amazon Cognito" },
+    "icon2": { "x": 45, "y": 50, "service": "apigw",    "label": "Amazon API Gateway" },
+    "icon3": { "x": 70, "y": 30, "service": "lambda",   "label": "Lambda authorizer" },
+    "icon4": { "x": 70, "y": 70, "service": "dynamodb", "label": "Amazon DynamoDB" },
+    "line1": { "from": "icon1", "to": "icon2", "label": "JWT (tenantId)" },
+    "line2": { "from": "icon2", "to": "icon3", "label": "Authorize" },
+    "line3": { "from": "icon3", "to": "icon4", "label": "Lookup API key" }
+  }, 
   "authors": [
     {
       "name": "Lavanya Tangutur",           
