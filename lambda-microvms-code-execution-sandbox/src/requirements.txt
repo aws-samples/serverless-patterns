@@ -1,5 +1,0 @@
-# No external dependencies for this example.
-# Add your packages here, e.g.:
-# numpy==1.26.4
-# pandas==2.2.0
-# boto3==1.34.0
