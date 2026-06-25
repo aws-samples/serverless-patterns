@@ -72,7 +72,7 @@ The EC2 machine that was created by running the CloudFormation template has all 
 Change directory to the pattern directory:
 
 ```bash
-cd serverless-patterns/msk-lambda-schema-avro-java-sam
+cd ~/serverless-patterns/msk-lambda-schema-avro-java-sam
 ```
 
 ## Build the application
