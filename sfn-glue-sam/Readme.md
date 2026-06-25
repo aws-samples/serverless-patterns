@@ -80,13 +80,9 @@ The output should be the description and status of Glue Job run:
 ## Cleanup
 1. Delete the stack: 
 ```bash
-> aws cloudformation delete-stack --stack-name STACK_NAME
+> sam delete
 ```
-2. Confirm the stack has been deleted: 
-```bash
-> aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-```
-3. Delete the S3 buckets created in the Deploy step:
+2. Delete the S3 buckets created in the Deploy step:
 ```bash
 > aws s3 rb s3://<ARTIFACTS_BUCKET> --force
 > aws s3 rb s3://<DATA_BUCKET> --force
