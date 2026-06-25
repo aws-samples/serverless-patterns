@@ -8,8 +8,6 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-![Lambda MicroVM from Zip diagram](images/lambda-microvm-from-zip.png)
-
 1. You upload a zip (Dockerfile + app) to S3.
 2. CloudFormation creates the IAM role and calls `CreateMicrovmImage` — Lambda builds the Dockerfile on top of the `al2023-1` base image, waits for the `/ready` lifecycle hook, and takes a Firecracker snapshot.
 3. You run the MicroVM — it resumes rapidly from the snapshot.
@@ -24,7 +22,6 @@ src/
 
 ## Requirements
 
-- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - Recent version of the [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - `zip` CLI utility (pre-installed on most Linux/macOS; on Windows run `scoop install zip` or `choco install zip`)
