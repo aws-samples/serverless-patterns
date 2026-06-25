@@ -8,8 +8,6 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-![Lambda MicroVM from ECR diagram](images/lambda-microvm-from-ecr.png)
-
 1. You build your Docker image locally and push to ECR.
 2. A thin zip containing only `FROM <ecr-uri>` is uploaded to S3.
 3. CloudFormation creates the IAM role (with ECR pull permissions) and builds the MicroVM image — Lambda pulls your ECR image during the server-side build.
@@ -25,10 +23,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - Recent version of the [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- Docker with `buildx` (Docker Desktop includes it)
+- Docker with `buildx` (Docker Desktop includes it; [Finch](https://github.com/runfinch/finch) also works)
 - `zip` CLI utility (pre-installed on most Linux/macOS; on Windows run `scoop install zip` or `choco install zip`)
 
 ## Architecture note
