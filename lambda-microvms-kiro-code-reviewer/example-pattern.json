@@ -45,7 +45,6 @@
     "headline": "Deploy the pattern",
     "text": [
       "export KIRO_API_KEY=\"your-kiro-api-key\"",
-      "export KIRO_API_KEY=\"your-kiro-api-key-here\"",
       "export STACK_NAME=\"your-stack-name-here\"",
       "export REGION=\"you-region-here\"",
       "chmod +x scripts/deploy.sh",
