@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda MicroVM Claude Code Agent",
+  "title": "Claude Code Agent on AWS Lambda MicroVMs",
   "description": "Deploy an AWS Lambda MicroVM with the Claude Code CLI, powered by Amazon Bedrock and reachable through an interactive shell.",
   "language": "Python",
   "level": "200",

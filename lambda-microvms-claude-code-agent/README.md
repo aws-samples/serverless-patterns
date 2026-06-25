@@ -112,10 +112,6 @@ Note the `microvmId` from the output.
 ./connect.sh "${MICROVM_ID}"
 ```
 
-### Using a different model
-
-The model is set via the `ANTHROPIC_MODEL` environment variable in the [Dockerfile](src/Dockerfile). To use a different Claude model, change this value to another inference profile ID available in your account and update the Bedrock policy resources in `template.yaml` accordingly.
-
 ## Connecting from your terminal
 
 The VM is reachable via WebSocket (`SHELL_INGRESS`). The included `connect.sh` script handles token generation and launches an interactive shell using [websocat](https://github.com/vi/websocat) — giving you a raw terminal experience like SSH.
