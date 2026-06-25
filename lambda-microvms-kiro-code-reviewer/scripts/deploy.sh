@@ -65,8 +65,7 @@ if ! aws s3api head-bucket --bucket "$STAGING_BUCKET" --region "$REGION" 2>/dev/
   echo "Creating staging bucket: $STAGING_BUCKET"
   aws s3api create-bucket \
     --bucket "$STAGING_BUCKET" \
-    --region "$REGION" \
-    --create-bucket-configuration LocationConstraint="$REGION"
+    --region "$REGION" 
   aws s3api put-public-access-block \
     --bucket "$STAGING_BUCKET" \
     --region "$REGION" \
@@ -166,7 +165,7 @@ echo "============================================"
 echo "Deployment Complete!"
 echo "============================================"
 echo ""
-echo "The following environment variables are now exported:"
+echo "Export the following environment variables:"
 echo ""
 echo "  export IMAGE_ARN=\"$IMAGE_ARN\""
 echo "  export EXECUTION_ROLE_ARN=\"$EXECUTION_ROLE_ARN\""
