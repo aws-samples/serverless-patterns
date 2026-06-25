@@ -10,6 +10,8 @@ The SAM template deploys:
 * A Glue Job
 * IAM roles required to run the application.
 
+> [!NOTE]
+> This pattern uses a Python shell job (Python 3.9), which is the latest Python version available for Python shell jobs. If you need a newer Python version, consider other options described in [Migrate from AWS Glue Python shell jobs](https://docs.aws.amazon.com/glue/latest/dg/pyshell-migration.html).
 
 ## Download
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
