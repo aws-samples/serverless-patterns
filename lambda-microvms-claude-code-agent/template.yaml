@@ -98,7 +98,7 @@ Resources:
         CloudWatch:
           LogGroup: !Sub "/aws/lambda-microvms/${ImageName}"
       Resources:
-        - MinimumMemoryInMiB: 1024
+        - MinimumMemoryInMiB: 4096
 
 Outputs:
   ImageArn:

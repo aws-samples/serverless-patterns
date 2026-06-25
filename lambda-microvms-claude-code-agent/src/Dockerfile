@@ -44,6 +44,12 @@ RUN pip install --no-cache-dir uv
 # the uv cache so the first spawn inside the VM is fast.
 RUN uv tool install awslabs.aws-api-mcp-server@latest
 
+# Pre-warm: send a full MCP initialize handshake so Python compiles all .pyc
+# bytecode at build time. Without this, the first spawn inside the VM takes ~6s
+# (vs ~2s warm) and can exceed Claude Code's MCP connection timeout.
+RUN echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"warmup","version":"1.0"}}}' \
+    | /root/.local/bin/awslabs.aws-api-mcp-server > /dev/null 2>&1 || true
+
 # Bake Claude Code's project-scope MCP config into /workspace (the directory the
 # shell lands in). The MCP command points at the pre-installed shim from
 # `uv tool install` — starts in ~5s from the ready-made tool venv, eliminating
