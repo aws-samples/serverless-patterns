@@ -1,6 +1,6 @@
 # AWS Step Functions with Amazon Bedrock AgentCore Harness Optimized Integration (CDK)
 
-This pattern invokes an Amazon Bedrock AgentCore harness directly from AWS Step Functions using the optimized integration — no AWS Lambda function required. The harness handles model inference, tool use, and multi-turn conversations, returning a Converse-shaped response with aggregated token metrics.
+This pattern invokes an Amazon Bedrock AgentCore harness directly from AWS Step Functions using the optimized integration — with a 15-minute timeout (vs 60 seconds for the SDK integration), Converse-shaped responses, aggregated token metrics, and CloudWatch reasoning traces.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-bedrockagentcore-harness-cdk
 
@@ -48,11 +48,11 @@ This pattern creates an AWS Step Functions state machine that:
 | Feature | SDK Integration | Optimized Integration (this pattern) |
 |---|---|---|
 | Resource URI | `arn:aws:states:::aws-sdk:bedrockagentcore:InvokeHarness` | `arn:aws:states:::bedrockagentcore:invokeHarness` |
-| AWS Lambda required | Yes (for streaming/parsing) | No |
+| AWS Lambda required | No (but needed for streaming/parsing) | No |
 | Response format | Raw API response | Converse-shaped (text only, tool use omitted) |
 | Token metrics | Manual calculation | Aggregated across all turns automatically |
 | CloudWatch traces | Not available | Turn-by-turn reasoning deep-links |
-| Max timeout | AWS Lambda timeout (15 min) | 15 minutes (Task state limit) |
+| Max timeout | 60 seconds (API call limit) | 15 minutes (Task state limit) |
 
 ### Architecture
 
