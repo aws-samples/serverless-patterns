@@ -53,7 +53,7 @@
   },
   "cleanup": {
     "text": [
-      "bash cleanup.sh"
+      "<code>bash cleanup.sh</code>"
     ]
   },
   "authors": [

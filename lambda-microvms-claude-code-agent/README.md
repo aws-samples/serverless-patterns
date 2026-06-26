@@ -1,6 +1,6 @@
 # Claude Code Agent on AWS Lambda MicroVMs
 
-This pattern deploys a long-running Lambda MicroVM with the [Claude Code](https://code.claude.com) CLI baked into the image. The Lambda MicroVM is launched with the `SHELL_INGRESS` network connector, so you connect via an interactive shell and run `claude` directly inside the MicroVM. Claude Code is preconfigured to use [Amazon Bedrock](https://aws.amazon.com/bedrock/) with Claude Sonnet 4.6 — credentials are supplied at runtime by the Lambda MicroVM execution role, so no API key is ever stored in the image.
+This pattern deploys a Lambda MicroVM with the [Claude Code](https://code.claude.com) CLI baked into the image. The Lambda MicroVM is launched with the `SHELL_INGRESS` network connector, so you connect via an interactive shell and run `claude` directly inside the MicroVM. Claude Code is preconfigured to use [Amazon Bedrock](https://aws.amazon.com/bedrock/) with Claude Sonnet 4.6 — credentials are supplied at runtime by the Lambda MicroVM execution role, so no API key is ever stored in the image.
 
 The image also bakes in the [AWS API MCP server](https://awslabs.github.io/mcp/servers/aws-api-mcp-server) (`awslabs.aws-api-mcp-server`), so Claude can run **live AWS API calls** from inside the VM — for example "list my S3 buckets" or "how many Lambda functions are in us-east-2?". The MCP server authenticates with the **same execution-role credentials** (the standard boto3 credential chain — no keys), and is configured **read-only** by default.
 
