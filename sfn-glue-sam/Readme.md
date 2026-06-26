@@ -6,15 +6,17 @@ This pattern deploys a Step Functions that includes a Glue Job as one of its ste
 
 The SAM template deploys:
 * A Step Functions State Machine
-* An EventBridge rule that triggers the Step Functions every 2 days
+* An EventBridge rule that triggers the Step Functions every 2 days (disabled by default)
 * A Glue Job
 * IAM roles required to run the application.
 
+> [!NOTE]
+> This pattern uses a Python shell job (Python 3.9), which is the latest Python version available for Python shell jobs. If you need a newer Python version, consider other options described in [Migrate from AWS Glue Python shell jobs](https://docs.aws.amazon.com/glue/latest/dg/pyshell-migration.html).
 
 ## Download
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
 ```bash
-> git clone https://github.com/NicoliAraujo/serverless-patterns.git
+> git clone https://github.com/aws-samples/serverless-patterns.git
 ```
 
 2. Change directory to the pattern directory:
@@ -24,19 +26,25 @@ The SAM template deploys:
 
 
 ## Deploy
-1. Copy glue job script and libs:
+1. Manually create two Amazon S3 buckets:
+- `ARTIFACTS_BUCKET` — stores the AWS Glue job script.
+- `DATA_BUCKET` — stores the source data for the AWS Glue job.
+
+```bash
+> aws s3 mb s3://<ARTIFACTS_BUCKET>
+> aws s3 mb s3://<DATA_BUCKET>
+```
+
+2. Copy AWS Glue job script:
 
 ```bash
 > aws s3 cp code/glue s3://<ARTIFACTS_BUCKET>/glue --recursive
 ```
 
-2. Build and deploy stack: 
+3. Build and deploy stack. During the `sam deploy --guided` prompts, pass the bucket names to `ArtifactsBucket` and `SourceBucket`:
 
 ```bash
-
 > sam build --template code/cloudformation/stack.yaml
-
-
 > sam deploy --guided
 ```
 
@@ -58,6 +66,7 @@ The output should be the description and status of Glue Job run:
     "ExecutionTime": 49,
     "GlueVersion": "1.0",
     "Id": "jr_ee276c9398f2d981c850f79cb7b54a28b57d9f6484deb8a9051db4bcbbc12d1f",
+    "JobMode": "SCRIPT",
     "JobName": "Feature Engineering",
     "JobRunState": "SUCCEEDED",
     "LastModifiedOn": 1638296059130,
@@ -73,9 +82,10 @@ The output should be the description and status of Glue Job run:
 ## Cleanup
 1. Delete the stack: 
 ```bash
-> aws cloudformation delete-stack --stack-name STACK_NAME
+> sam delete
 ```
-2. Confirm the stack has been deleted: 
+2. Delete the S3 buckets created in the Deploy step:
 ```bash
-> aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+> aws s3 rb s3://<ARTIFACTS_BUCKET> --force
+> aws s3 rb s3://<DATA_BUCKET> --force
 ```
