@@ -1,0 +1,69 @@
+{
+    "title": "AWS Lambda MicroVM from Amazon ECR image",
+    "description": "Deploy an AWS Lambda MicroVM from a pre-built Docker image stored in Amazon ECR.",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS CLI",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys a Lambda MicroVM from a pre-built Docker image stored in Amazon ECR. You build and push your container image to ECR, then upload a thin zip containing only a FROM directive referencing the ECR image. Lambda pulls the image during the server-side build.",
+            "This approach is ideal for complex builds, private base images, and CI/CD pipelines where you want full control over the Docker build process. MicroVMs offer snapshot-based rapid startup speeds and automatically suspend after idle timeout."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvms-from-ecr",
+            "templateURL": "serverless-patterns/lambda-microvms-from-ecr",
+            "projectFolder": "lambda-microvms-from-ecr",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Lambda MicroVMs Documentation",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+            },
+            {
+                "text": "Amazon Elastic Container Registry (ECR)",
+                "link": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html"
+            },
+            {
+                "text": "Firecracker - Secure and fast microVMs for serverless computing",
+                "link": "https://aws.amazon.com/blogs/opensource/firecracker-open-source-secure-fast-microvm-serverless/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "bash deploy.sh"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>bash cleanup.sh</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Alexander Vladimirov",
+            "image": "https://avatars.githubusercontent.com/u/55249162?v=4",
+            "bio": "Senior Serverless Solutions Architect at AWS, specializing in Agentic AI Workloads.",
+            "linkedin": "avladi"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda-microvms",
+            "label": "AWS Lambda MicroVMs"
+        }
+    }
+}
