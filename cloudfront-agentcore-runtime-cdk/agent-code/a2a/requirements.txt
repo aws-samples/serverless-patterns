@@ -1,0 +1,4 @@
+strands-agents[a2a]
+bedrock-agentcore
+uvicorn
+fastapi
