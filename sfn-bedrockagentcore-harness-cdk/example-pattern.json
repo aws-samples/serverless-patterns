@@ -1,6 +1,6 @@
 {
   "title": "AWS Step Functions with Amazon Bedrock AgentCore Harness Optimized Integration (CDK)",
-  "description": "Invoke Amazon Bedrock AgentCore harness directly from AWS Step Functions using the optimized integration — zero Lambda, Converse-shaped responses, aggregated token metrics, and CloudWatch reasoning traces.",
+  "description": "Invoke Amazon Bedrock AgentCore harness from AWS Step Functions using the optimized integration — zero Lambda, Converse-shaped responses, and token metrics.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",

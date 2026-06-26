@@ -107,6 +107,6 @@ cdk destroy
 ```
 
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
