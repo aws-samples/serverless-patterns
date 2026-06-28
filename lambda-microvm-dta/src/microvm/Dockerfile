@@ -1,6 +1,5 @@
 # Lambda MicroVM application image. The MicroVM operating-system base image is
 # selected separately by the Lambda MicroVMs create/update API via --base-image-arn.
-# Lambda MicroVM application image. The MicroVM operating-system base image is
 # selected separately by the Lambda MicroVMs create/update API via --base-image-arn.
 # strace provides the user-space syscall collector (no eBPF/Tracee/Falco in v0.2).
 FROM python:3.13-slim
