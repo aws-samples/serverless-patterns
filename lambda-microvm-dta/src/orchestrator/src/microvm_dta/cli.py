@@ -167,7 +167,7 @@ def cmd_wait_image(args: argparse.Namespace) -> int:
         if raw_vs is None:
             raw_vs = resp.get("latestVersionState")
         version_state = "" if raw_vs is None else str(raw_vs)
-        print(f"image state={state} versionState={version_state or 'n/a'}")
+        print(f"image state={state} versionState={version_state or 'n/a'}", file=sys.stderr)
         terminal_success = {"CREATED", "UPDATED", "ACTIVE"}
         if state in terminal_success and version_state in {"", "SUCCESSFUL", "ACTIVE"}:
             _print_json(resp)
@@ -190,7 +190,7 @@ def _wait_microvm_running(aws: AwsCli, microvm_id: str, timeout_seconds: int, po
             raise RuntimeError("Unexpected non-JSON response")
         last = resp
         state = str(resp.get("state"))
-        print(f"microvm state={state}")
+        print(f"microvm state={state}", file=sys.stderr)
         if state == "RUNNING":
             return resp
         if state in {"FAILED", "TERMINATED"}:

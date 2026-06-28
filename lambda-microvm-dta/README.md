@@ -2,7 +2,7 @@
 
 This pattern runs an **untrusted artifact** inside an isolated AWS Lambda MicroVM and decides whether to pass or fail a CI/CD pipeline based on **how the artifact actually behaves** — not on what it claims about itself. A sandbox supervisor launches the artifact and a set of collectors observe it from the outside; a small rule engine turns those observations into a deterministic verdict.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-microvm-dta
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
