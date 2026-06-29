@@ -48,7 +48,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. **Map State** — AWS Step Functions iterates over each Invoice Unit in parallel (max concurrency 5), processing them independently.
 
-3. **FetchInvoicesTask** — For each unit, an AWS Lambda function calls `ListInvoiceSummaries` filtered by that unit, retrieving the last 90 days of invoice data.
+3. **FetchInvoicesTask** — For each unit, an AWS Lambda function calls `ListInvoiceSummaries` filtered by account, retrieving the last 30 days of invoice data.
 
 4. **AnalysisTask** — An AWS Lambda function sends the invoice data to Amazon Bedrock (Claude Sonnet) for FinOps analysis: total spend calculation, month-over-month trend detection, chargeback allocation recommendations, and cost optimization opportunities. Results are written to Amazon DynamoDB.
 

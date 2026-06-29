@@ -5,39 +5,48 @@
 
 import json
 import boto3
+import os
 from datetime import datetime, timedelta
 
 
 def handler(event, context):
     """Fetch invoice summaries for one invoice unit (called per-unit by Map state)."""
     client = boto3.client('invoicing')
+    sts = boto3.client('sts')
 
     invoice_unit_id = event.get('invoiceUnitId', '')
     unit_name = event.get('name', 'Unknown')
 
-    # Fetch invoices from the last 90 days
+    # Get current account ID for selector
+    account_id = sts.get_caller_identity()['Account']
+
+    # Fetch invoices from the last 30 days (API limit: max 1 month)
     end_date = datetime.utcnow()
-    start_date = end_date - timedelta(days=90)
+    start_date = end_date - timedelta(days=30)
 
     try:
         response = client.list_invoice_summaries(
+            Selector={
+                'ResourceType': 'ACCOUNT_ID',
+                'Value': account_id,
+            },
             Filter={
-                'InvoiceUnitId': invoice_unit_id,
-                'TimeRange': {
-                    'StartDate': start_date.strftime('%Y-%m-%d'),
-                    'EndDate': end_date.strftime('%Y-%m-%d'),
+                'TimeInterval': {
+                    'StartDate': start_date.strftime('%Y-%m-%dT00:00:00Z'),
+                    'EndDate': end_date.strftime('%Y-%m-%dT00:00:00Z'),
                 },
-            }
+            },
         )
 
         invoices = []
         for summary in response.get('InvoiceSummaries', []):
             invoices.append({
                 'invoiceId': summary.get('InvoiceId', ''),
-                'issuedDate': summary.get('IssuedDate', ''),
-                'totalAmount': str(summary.get('TotalAmount', {}).get('Amount', '0')),
-                'currency': summary.get('TotalAmount', {}).get('Currency', 'USD'),
-                'status': summary.get('Status', ''),
+                'accountId': summary.get('AccountId', ''),
+                'billingPeriod': str(summary.get('BillingPeriod', {})),
+                'totalAmount': str(summary.get('BaseCurrencyAmount', {}).get('Amount', '0')),
+                'currency': summary.get('BaseCurrencyAmount', {}).get('Currency', 'USD'),
+                'invoiceType': summary.get('InvoiceType', ''),
             })
 
         return {

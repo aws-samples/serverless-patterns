@@ -49,7 +49,7 @@ export class SfnInvoicingBedrockChargebackStack extends cdk.Stack {
     });
 
     fetchInvoicesFn.addToRolePolicy(new iam.PolicyStatement({
-      actions: ['invoicing:ListInvoiceSummaries'],
+      actions: ['invoicing:ListInvoiceSummaries', 'sts:GetCallerIdentity'],
       resources: ['*'], // Invoicing API does not support resource-level permissions
     }));
 
