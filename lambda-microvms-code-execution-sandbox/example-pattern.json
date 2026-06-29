@@ -3,7 +3,7 @@
   "description": "Deploy an AWS Lambda MicroVM that executes Python code in an isolated VM with snapshot-based rapid startup.",
   "language": "Python",
   "level": "200",
-  "framework": "AWS CLI",
+  "framework": "AWS CloudFormation",
   "introBox": {
     "headline": "How it works",
     "text": [
