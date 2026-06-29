@@ -3,7 +3,7 @@
   "description": "Deploy an AWS Lambda MicroVM with the Claude Code CLI, powered by Amazon Bedrock and reachable through an interactive shell.",
   "language": "Python",
   "level": "200",
-  "framework": "AWS CLI",
+  "framework": "AWS CloudFormation",
   "introBox": {
     "headline": "How it works",
     "text": [
