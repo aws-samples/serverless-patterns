@@ -32,7 +32,11 @@ def validate_template(template_path):
     
     try:
         with open(template_path, 'r') as f:
-            template = yaml.load(f, Loader=CFNLoader)
+            loader = CFNLoader(f)
+            try:
+                template = loader.get_single_data()
+            finally:
+                loader.dispose()
         
         errors = []
         warnings = []
