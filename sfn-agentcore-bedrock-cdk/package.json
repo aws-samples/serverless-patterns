@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-agentcore": "^3.1032.0",
-    "aws-cdk-lib": "2.246.0",
-    "constructs": "10.4.2"
+    "aws-cdk-lib": "2.260.0",
+    "constructs": "10.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

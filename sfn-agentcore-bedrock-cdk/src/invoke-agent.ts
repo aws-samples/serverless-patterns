@@ -2,7 +2,7 @@ import { BedrockAgentCoreClient, InvokeAgentRuntimeCommand } from '@aws-sdk/clie
 
 const client = new BedrockAgentCoreClient();
 
-export const handler = async (event) => {
+export const handler = async (event: { agentRuntimeArn: string; prompt: string }) => {
   const { agentRuntimeArn, prompt } = event;
 
   const response = await client.send(new InvokeAgentRuntimeCommand({
@@ -16,12 +16,12 @@ export const handler = async (event) => {
   let fullResponse = '';
   if (response.response) {
     const reader = response.response;
-    if (typeof reader[Symbol.asyncIterator] === 'function') {
-      for await (const chunk of reader) {
-        fullResponse += typeof chunk === 'string' ? chunk : new TextDecoder().decode(chunk);
+    if (typeof (reader as any)[Symbol.asyncIterator] === 'function') {
+      for await (const chunk of reader as any) {
+        fullResponse += typeof chunk === 'string' ? chunk : new TextDecoder().decode(chunk as Uint8Array);
       }
     } else {
-      fullResponse = reader.toString();
+      fullResponse = String(reader);
     }
   }
 
