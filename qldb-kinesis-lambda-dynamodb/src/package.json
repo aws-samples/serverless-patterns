@@ -12,11 +12,10 @@
   "author": "Matt Lewis",
   "license": "MIT",
   "dependencies": {
-    "amazon-qldb-driver-nodejs": "^2.2.0",
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0",
+    "amazon-qldb-driver-nodejs": "^3.0.0",
     "aws-kinesis-agg": "^4.2.2",
-    "aws-sdk": "^2.1058.0",
-    "aws-xray-sdk": "^3.3.4",
-    "aws-xray-sdk-core": "^3.3.4",
     "ion-js": "^4.2.1",
     "jsbi": "^4.1.0"
   }

@@ -9,9 +9,7 @@
   "author": "Matt Lewis",
   "license": "MIT",
   "dependencies": {
-    "amazon-qldb-driver-nodejs": "^2.2.0",
-    "aws-sdk": "^2.1048.0",
-    "cfn-response-promise": "^1.1.0",
+    "amazon-qldb-driver-nodejs": "^3.0.0",
     "ion-js": "^4.2.1",
     "jsbi": "^4.1.0"
   }

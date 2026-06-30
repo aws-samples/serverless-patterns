@@ -1,10 +1,8 @@
-// see https://theburningmonk.com/2019/03/just-how-expensive-is-the-full-aws-sdk/
-const DynamoDB = require('aws-sdk/clients/dynamodb');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 
-const dynamodb = new DynamoDB.DocumentClient();
-
-const AWSXRay = require('aws-xray-sdk-core');
-AWSXRay.captureAWS(require('aws-sdk'));
+const client = new DynamoDBClient();
+const dynamodb = DynamoDBDocumentClient.from(client);
 
 const { TABLE_NAME } = process.env;
 
@@ -21,8 +19,8 @@ const deleteLicence = async (id, version) => {
   };
 
   try {
-    await dynamodb.update(params).promise();
-    console.log(`Successful deleted id ${id} with version ${version}`);    
+    await dynamodb.send(new UpdateCommand(params));
+    console.log(`Successful deleted id ${id} with version ${version}`);
   } catch(err) {
     console.log(`Unable to update licence: ${id}. Error: ${err}`);
   }
@@ -44,8 +42,8 @@ const updateLicence = async (id, firstName, lastName, email, address, version) =
   };
 
   try {
-    await dynamodb.update(params).promise();
-    console.log(`Successfully created/updated id ${id}`);    
+    await dynamodb.send(new UpdateCommand(params));
+    console.log(`Successfully created/updated id ${id}`);
   } catch(err) {
     console.log(`Unable to update licence: ${id}. Error: ${err}`);
   }

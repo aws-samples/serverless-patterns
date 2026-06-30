@@ -5,6 +5,6 @@
     "private": true,
     "license": "MIT",
     "dependencies": {
-        "aws-sdk": "^2.1692.0"
+        "@aws-sdk/client-rekognition": "^3.700.0"
     }
 }
