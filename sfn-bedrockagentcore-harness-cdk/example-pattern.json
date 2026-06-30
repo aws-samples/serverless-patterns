@@ -1,0 +1,81 @@
+{
+  "title": "AWS Step Functions with Amazon Bedrock AgentCore Harness Optimized Integration (CDK)",
+  "description": "Invoke Amazon Bedrock AgentCore harness from AWS Step Functions using the optimized integration — zero Lambda, Converse-shaped responses, and token metrics.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses the AWS Step Functions optimized integration for Amazon Bedrock AgentCore to invoke a harness directly — no Lambda function required.",
+      "The harness orchestrates model inference, tool use, and multi-turn conversations. Step Functions receives a Converse-shaped response with aggregated token usage metrics.",
+      "The optimized integration provides CloudWatch deep-links for turn-by-turn agent reasoning traces, built-in retry/catch for throttling, and a 15-minute execution timeout.",
+      "The state machine includes error handling with specific catches for ResourceNotFoundException and ThrottlingException with exponential backoff."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-bedrockagentcore-harness-cdk",
+      "templateURL": "serverless-patterns/sfn-bedrockagentcore-harness-cdk",
+      "projectFolder": "sfn-bedrockagentcore-harness-cdk",
+      "templateFile": "lib/sfn-bedrockagentcore-harness-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke Amazon Bedrock AgentCore harness with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-bedrockagentcore.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Harness",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk bootstrap</code>",
+      "<code>npm install</code>",
+      "<code>cdk deploy --parameters HarnessArn=arn:aws:bedrock-agentcore:us-east-1:ACCOUNT:harness/YOUR-HARNESS</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Start an execution with a prompt:",
+      "<code>aws stepfunctions start-execution --state-machine-arn $(aws cloudformation describe-stacks --stack-name SfnBedrockagentcoreHarnessStack --query 'Stacks[0].Outputs[?OutputKey==`StateMachineArn`].OutputValue' --output text) --input '{\"prompt\": \"What is Amazon Bedrock AgentCore?\"}'</code>",
+      "Check execution output (wait 10-30 seconds for agent reasoning):",
+      "<code>aws stepfunctions describe-execution --execution-arn EXECUTION_ARN --query 'output'</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "sfn",
+      "label": "AWS Step Functions"
+    },
+    "icon2": {
+      "x": 80,
+      "y": 50,
+      "service": "bedrock",
+      "label": "Amazon Bedrock AgentCore"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    }
+  }
+}
