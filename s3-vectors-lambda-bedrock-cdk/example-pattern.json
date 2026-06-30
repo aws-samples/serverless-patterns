@@ -1,0 +1,61 @@
+{
+  "title": "S3 Vectors with Lambda and Amazon Bedrock RAG",
+  "description": "Build a serverless RAG pipeline using Amazon S3 Vectors for cost-optimized vector storage, Lambda for orchestration, and Amazon Bedrock for embeddings and generation.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys two Lambda functions backed by Amazon S3 Vectors and Amazon Bedrock to implement a serverless Retrieval-Augmented Generation (RAG) pipeline.",
+      "The Ingest function takes text documents, generates vector embeddings using Bedrock Titan Embeddings V2, and stores them in an S3 vector index with metadata. The Query function takes a natural language question, embeds it, performs a similarity search against S3 Vectors, and uses Bedrock Claude to generate an answer grounded in the retrieved context.",
+      "S3 Vectors provides purpose-built, cost-optimized vector storage with sub-second query latency \u2014 no vector database infrastructure to manage."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-vectors-lambda-bedrock-cdk",
+      "templateURL": "serverless-patterns/s3-vectors-lambda-bedrock-cdk",
+      "projectFolder": "s3-vectors-lambda-bedrock-cdk",
+      "templateFile": "lib/s3-vectors-lambda-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 Vectors Documentation",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html"
+      },
+      {
+        "text": "Getting started with S3 Vectors",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-getting-started.html"
+      },
+      {
+        "text": "Amazon Bedrock Titan Embeddings",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
