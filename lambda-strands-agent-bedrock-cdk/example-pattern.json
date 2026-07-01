@@ -1,0 +1,51 @@
+{
+  "title": "AWS Lambda with Strands Agents SDK and Amazon Bedrock",
+  "description": "Deploy a Strands Agents SDK agent on AWS Lambda using the official Lambda layer, with Amazon Bedrock as the model provider and custom tool use.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "services": {
+    "from": "lambda",
+    "to": "bedrock"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS Lambda function running a Strands Agents SDK agent with Amazon Bedrock as the model provider. The agent uses custom Python tools that the model can invoke autonomously during reasoning.",
+      "The Strands Agents SDK is an open source framework from AWS that takes a model-driven approach to building AI agents. Instead of hardcoding task flows, the SDK lets the LLM handle planning and tool usage. The official Lambda layer provides the SDK without custom packaging."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-strands-agent-bedrock-cdk",
+      "templateURL": "serverless-patterns/lambda-strands-agent-bedrock-cdk",
+      "projectFolder": "lambda-strands-agent-bedrock-cdk",
+      "templateFile": "lib/lambda-strands-agent-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Strands Agents SDK", "link": "https://strandsagents.com/" },
+      { "text": "Deploying Strands Agents to AWS Lambda", "link": "https://strandsagents.com/docs/user-guide/deploy/deploy_to_aws_lambda/" },
+      { "text": "Amazon Bedrock", "link": "https://aws.amazon.com/bedrock/" },
+      { "text": "Serverless ICYMI Q1 2026", "link": "https://aws.amazon.com/blogs/compute/serverless-icymi-q1-2026/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"],
+    "file": "lib/lambda-strands-agent-bedrock-stack.ts"
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
