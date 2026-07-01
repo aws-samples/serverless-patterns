@@ -1,6 +1,6 @@
 # Amazon Bedrock Guardrails Account-Level Enforcement
 
-This pattern deploys an Amazon Bedrock Guardrail with content and topic filters, enforces it at the account level so ALL Bedrock API calls are automatically guarded, and provides a test AWS Lambda function that demonstrates the enforcement without specifying any guardrail identifier.
+This pattern deploys an Amazon Bedrock Guardrail with content and topic filters, enforces it at the account level so ALL Amazon Bedrock API calls are automatically guarded, and provides a test AWS Lambda function that demonstrates the enforcement without specifying any guardrail identifier.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-guardrails-enforcement-cdk
 
@@ -22,11 +22,11 @@ Important: this application uses various AWS services and there are costs associ
 │  CDK Deploy  │────▶│  1. CfnGuardrail (content + topic filters)               │
 └─────────────┘     │  2. CfnGuardrailVersion (publishes a numbered version)    │
                     │  3. AWS::Bedrock::EnforcedGuardrailConfiguration          │
-                    │  4. Lambda (test function)                                 │
+                    │  4. AWS Lambda (test function)                             │
                     └──────────────────────────────────────────────────────────┘
 
 ┌─────────────┐     ┌──────────────────────────────────────────────────────────┐
-│  Test Lambda │────▶│  Bedrock Converse API (no guardrailIdentifier specified)  │
+│ Test Lambda  │────▶│  Amazon Bedrock Converse API (no guardrailIdentifier)     │
 │  Invocation  │     │                                                          │
 └─────────────┘     │  Safe prompt: "What is Amazon S3?" → ✅ passes through    │
                     │  Violating prompt: "What stocks should I buy?" → ❌ blocked│
@@ -35,13 +35,13 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-1. **CDK creates a Bedrock Guardrail** with content policy filters (hate, insults, sexual, violence, misconduct, prompt attacks at MEDIUM strength) and a topic policy that denies investment advice.
+1. **CDK creates an Amazon Bedrock Guardrail** with content policy filters (hate, insults, sexual, violence, misconduct, prompt attacks at MEDIUM strength) and a topic policy that denies investment advice.
 
 2. **A `CfnGuardrailVersion` publishes a numbered version** — required before enforcement can be enabled.
 
 3. **An `AWS::Bedrock::EnforcedGuardrailConfiguration` resource enables account-level enforcement.** This makes the guardrail apply to ALL Bedrock API calls in the account automatically.
 
-4. **The test Lambda calls the Bedrock Converse API** without specifying any `guardrailIdentifier` or `guardrailVersion`. The enforced guardrail is applied automatically:
+4. **The test AWS Lambda calls the Amazon Bedrock Converse API** without specifying any `guardrailIdentifier` or `guardrailVersion`. The enforced guardrail is applied automatically:
    - A safe prompt ("What is Amazon S3?") passes through and returns a normal response with `stopReason: "end_turn"`.
    - A violating prompt ("What stocks should I buy for maximum returns?") is blocked by the guardrail.
 
@@ -69,7 +69,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-1. Invoke the test Lambda:
+1. Invoke the test AWS Lambda function:
     ```bash
     aws lambda invoke \
       --function-name <TestFunctionName> \
@@ -119,7 +119,7 @@ cdk destroy
 
 - **Union with request-level guardrails:** If a Bedrock call also specifies a `guardrailIdentifier`, both the enforced guardrail and the request-level guardrail are applied. The results are a union — content blocked by either guardrail is blocked in the response.
 
-- **IAM requirements:** CloudFormation provisions the guardrail, version, and enforced configuration, so the CDK deployment role needs `bedrock:CreateGuardrail`, `bedrock:CreateGuardrailVersion`, and `bedrock:PutEnforcedGuardrailConfiguration` / `bedrock:DeleteEnforcedGuardrailConfiguration`. The test Lambda needs `bedrock:InvokeModel` and `bedrock:ApplyGuardrail` — with an enforced guardrail active, the caller must be authorized to apply it even though no `guardrailIdentifier` is passed.
+- **IAM requirements:** CloudFormation provisions the guardrail, version, and enforced configuration, so the CDK deployment role needs `bedrock:CreateGuardrail`, `bedrock:CreateGuardrailVersion`, and `bedrock:PutEnforcedGuardrailConfiguration` / `bedrock:DeleteEnforcedGuardrailConfiguration`. The test AWS Lambda function needs `bedrock:InvokeModel` and `bedrock:ApplyGuardrail` — with an enforced guardrail active, the caller must be authorized to apply it even though no `guardrailIdentifier` is passed.
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.

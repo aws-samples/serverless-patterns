@@ -48,7 +48,7 @@ export class BedrockGuardrailsEnforcementStack extends cdk.Stack {
     });
 
     // Enable account-level enforcement using the native AWS::Bedrock::EnforcedGuardrailConfiguration
-    // resource. No custom resource / Lambda-backed workaround is required.
+    // resource.
     const enforcedGuardrail = new cdk.CfnResource(this, 'EnforcedGuardrail', {
       type: 'AWS::Bedrock::EnforcedGuardrailConfiguration',
       properties: {
@@ -58,7 +58,7 @@ export class BedrockGuardrailsEnforcementStack extends cdk.Stack {
     });
     enforcedGuardrail.node.addDependency(guardrailVersion);
 
-    // Test Lambda that calls the Converse API WITHOUT a guardrailIdentifier
+    // Test AWS Lambda that calls the Converse API WITHOUT a guardrailIdentifier
     const testFn = new lambda.Function(this, 'TestFunction', {
       runtime: new lambda.Runtime('nodejs24.x', lambda.RuntimeFamily.NODEJS),
       handler: 'test.handler',
@@ -70,13 +70,13 @@ export class BedrockGuardrailsEnforcementStack extends cdk.Stack {
       },
     });
 
-    // Inference profiles route cross-region, so the foundation-model ARN keeps a
+    // Inference profiles route cross-region, so the foundation-model ARN uses a
     // wildcard region while the inference-profile ARN is scoped to this account/region.
     testFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
         `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
-        'arn:aws:bedrock:*::foundation-model/*',
+        `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
       ],
     }));
 

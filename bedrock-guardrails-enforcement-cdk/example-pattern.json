@@ -1,6 +1,6 @@
 {
   "title": "Amazon Bedrock Guardrails Account-Level Enforcement",
-  "description": "Deploy an Amazon Bedrock Guardrail with content and topic filters to demonstrate automatic enforcement on all Bedrock calls without specifying guardrailIdentifier.",
+  "description": "Deploy an Amazon Bedrock Guardrail with content and topic filters to demonstrate automatic enforcement on all Amazon Bedrock calls without specifying guardrailIdentifier.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
@@ -38,7 +38,7 @@
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      "<code>cdk deploy</code>"
     ]
   },
   "testing": {
