@@ -1,6 +1,7 @@
 import json
 import boto3
 import os
+import hashlib
 from aws_durable_execution_sdk_python import (
     DurableContext,
     durable_execution,
@@ -13,13 +14,18 @@ def start_ecs_task_with_callback(cluster, task_definition, subnet1, subnet2, sec
     """
     Starts an ECS task and passes the callback token via environment variable.
     The ECS task will call Lambda durable execution callback APIs when complete.
+    Uses callback_token as idempotency token to prevent duplicate tasks on retry.
     """
     print(f"[CALLBACK] Starting ECS task with callback token")
+    
+    # Use callback token hash as clientToken for idempotency (max 64 chars)
+    client_token = hashlib.sha256(callback_token.encode()).hexdigest()[:64]
     
     response = ecs_client.run_task(
         cluster=cluster,
         taskDefinition=task_definition,
         launchType='FARGATE',
+        clientToken=client_token,
         networkConfiguration={
             'awsvpcConfiguration': {
                 'subnets': [subnet1, subnet2],

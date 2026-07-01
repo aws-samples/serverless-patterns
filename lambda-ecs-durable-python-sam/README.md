@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to invoke Amazon ECS tasks from AWS Lambda durable functions using Python. The workflow starts an ECS task, waits for a callback, and resumes based on the task result while maintaining state across the pause/resume cycle.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-ecs-python-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-ecs-durable-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -12,7 +12,9 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Docker](https://docs.docker.com/get-docker/) installed (for building Lambda container images)
+* A container runtime for building Lambda container images. Either:
+  * [Docker](https://docs.docker.com/get-docker/) installed and running, OR
+  * [Finch](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-finch.html) installed and running (open-source alternative to Docker). Start Finch with `finch vm start` before running `sam build`.
 * [Python 3.13](https://www.python.org/downloads/) or later
 
 ## Deployment Instructions
