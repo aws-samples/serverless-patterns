@@ -1,0 +1,25 @@
+{
+  "name": "apigw-dynamodb-apikey-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "apigw-dynamodb-apikey-cdk": "src/bin/apigw-dynamodb-apikey-cdk.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.9",
+    "aws-cdk": "2.1003.0",
+    "esbuild": "^0.25.1",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.6.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1034.0",
+    "aws-cdk-lib": "2.189.1",
+    "aws-jwt-verify": "^4.0.1",
+    "constructs": "^10.0.0"
+  }
+}
