@@ -1,0 +1,13 @@
+{
+  "version": "2018-05-29",
+  "operation": "PutItem",
+  "key": {
+    "NoteId": $util.dynamodb.toDynamoDBJson($ctx.args.NoteId)
+  },
+  "attributeValues": {
+    "title": $util.dynamodb.toDynamoDBJson($ctx.args.title),
+    "content": $util.dynamodb.toDynamoDBJson($ctx.args.content),
+    "attachmentKey": $util.dynamodb.toDynamoDBJson($ctx.prev.result.attachmentKey),
+    "uploadUrl": $util.dynamodb.toDynamoDBJson($ctx.prev.result.uploadUrl)
+  }
+}
