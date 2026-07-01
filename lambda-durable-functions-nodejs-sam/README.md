@@ -43,13 +43,15 @@ This pattern demonstrates AWS Lambda durable functions using Node.js. It impleme
 
 The orchestrator function uses the `@aws/durable-execution-sdk-js` to implement:
 - Checkpointed steps with `context.step()`
+- Durable Lambda invocation with `context.invoke()` and `withRetry()`
 - Durable waits with `context.wait()`
 - Automatic recovery from failures
-- Structured JSON logging
+- Replay-aware logging with `context.logger`
+- Explicit retry strategies with exponential backoff
 
 The workflow:
 1. Validates input (checkpointed)
-2. Executes enrichment step (checkpointed) by invoking the OrderEnricher Lambda
+2. Invokes the OrderEnricher Lambda via `context.invoke()` with retry (checkpointed, suspends without compute cost)
 3. Waits 5 seconds (durable wait - no compute charges)
 4. Executes finalization step (checkpointed)
 5. Returns result
