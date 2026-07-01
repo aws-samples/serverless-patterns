@@ -1,0 +1,25 @@
+# A target that reads the canary files — should trigger R002 (policy_violation).
+# Uses strace so canary access is detected with higher confidence than atime.
+target:
+  type: command
+  argv:
+    - "python3"
+    - "-c"
+    - "import pathlib,glob;[print(open(p).read()[:0]) for p in glob.glob('../canary/*')]"
+  timeoutSeconds: 30
+  workingDirectory: "workspace"
+  environment: {}
+
+collectors:
+  process: true
+  filesystem: true
+  canary: true
+  strace: true
+  network:
+    procNet: true
+    vpcFlowLogs: false
+
+policy:
+  failOnSeverity: high
+  failOnPolicyViolation: true
+  failClosed: false
