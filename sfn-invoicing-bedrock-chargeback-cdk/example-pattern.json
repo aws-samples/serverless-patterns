@@ -1,0 +1,69 @@
+{
+  "title": "Multi-BU Invoice Reconciliation with AWS Step Functions, Amazon Bedrock, and Amazon DynamoDB",
+  "description": "Deploy an AWS Step Functions Map state that iterates Invoice Units, fetches per-BU invoices, runs Amazon Bedrock chargeback analysis, and writes to Amazon DynamoDB.",
+  "language": "Python",
+  "level": "400",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS Step Functions state machine with a Map state that processes each AWS Invoice Unit in parallel. For each business unit, it fetches invoice summaries via the AWS Invoicing APIs, sends the data to Amazon Bedrock for FinOps analysis (spend trends, chargeback allocation, optimization recommendations), and writes the results to an Amazon DynamoDB ledger.",
+      "The composition is non-reducible: AWS Step Functions orchestrates parallel processing across units, AWS Invoicing APIs provide the financial data, Amazon Bedrock generates intelligent chargeback allocations that no rule-based system can replicate, and Amazon DynamoDB provides the durable audit trail. Removing any component breaks the architecture."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-invoicing-bedrock-chargeback-cdk",
+      "templateURL": "serverless-patterns/sfn-invoicing-bedrock-chargeback-cdk",
+      "projectFolder": "sfn-invoicing-bedrock-chargeback-cdk",
+      "templateFile": "cdk/lib/sfn-invoicing-bedrock-chargeback-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Invoicing APIs",
+        "link": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-invoice-units.html"
+      },
+      {
+        "text": "AWS Step Functions Map State",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html"
+      },
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd sfn-invoicing-bedrock-chargeback-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Start a Step Functions execution: <code>aws stepfunctions start-execution --state-machine-arn &lt;StateMachineArn&gt; --input '{}'</code>",
+      "Monitor: <code>aws stepfunctions describe-execution --execution-arn &lt;executionArn&gt;</code>",
+      "Check results: <code>aws dynamodb scan --table-name &lt;ChargebackTableName&gt;</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>.",
+      "Warning: This deletes the Amazon DynamoDB chargeback ledger and all history."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
