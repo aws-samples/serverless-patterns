@@ -34,29 +34,38 @@ pip3 install aiohttp
 
 ### Quick Start (deploy.sh)
 
-`deploy.sh` automates the entire deployment (bucket creation, packaging, CloudFormation deploy, and running the MicroVM):
+`deploy.sh` handles first-time setup: creates the S3 bucket, packages the source, deploys the CloudFormation stack (image build takes 3–5 min), then automatically calls `connect.sh` to launch a MicroVM and open code-server in your browser.
 
 ```bash
 export ACCOUNT_ID="YOUR-ACCOUNT-ID"
 export AWS_REGION="us-east-2"          # optional, defaults to us-east-2
-chmod +x deploy.sh
+export AWS_PROFILE="your-profile"      # optional, uses default credentials if unset
+chmod +x deploy.sh connect.sh
 ./deploy.sh
 ```
 
-The script prints the MicroVM ID and endpoint when complete. Then get a token and connect:
+After the first deploy, you only need `connect.sh` to reconnect.
+
+### Connecting (connect.sh)
+
+After the initial deployment, use `connect.sh` to connect. It handles finding a running MicroVM (or launching a new one), getting a fresh auth token, and starting the proxy.
 
 ```bash
-MICROVM_ID="<from deploy output>"
-ENDPOINT="<from deploy output>"
+./connect.sh
+```
 
-TOKEN=$(aws lambda-microvms create-microvm-auth-token \
-  --microvm-identifier "${MICROVM_ID}" \
-  --expiration-in-minutes 60 \
-  --allowed-ports allPorts={} \
-  --region "${AWS_REGION}" \
-  --query 'authToken."X-aws-proxy-auth"' --output text)
+This is the script you run when you want to open code-server. It handles all reconnection scenarios:
 
-python3 proxy.py "https://${ENDPOINT}" "${TOKEN}"
+- **MicroVM is RUNNING** → gets a token, starts the proxy
+- **MicroVM is SUSPENDED** → gets a token, starts the proxy (auto-resumes on first request)
+- **MicroVM is TERMINATED** (or none exist) → launches a new one, waits for it, connects
+
+Options:
+
+```bash
+./connect.sh --region us-west-2       # different region
+./connect.sh --profile my-profile     # specific AWS profile
+./connect.sh --port 9090              # different local port
 ```
 
 ### Manual Step-by-Step
@@ -143,7 +152,7 @@ TOKEN=$(aws lambda-microvms create-microvm-auth-token \
   --query 'authToken."X-aws-proxy-auth"' --output text)
 
 # Open code-server in your browser via local proxy
-python3 proxy.py "https://${ENDPOINT}" "${TOKEN}"
+python3 proxy.py "https://${MICROVM_EP}" "${TOKEN}"
 ```
 
 The proxy opens `http://127.0.0.1:8080` in your browser with VS Code ready.
@@ -167,7 +176,8 @@ The `app.py` handler responds to these hooks and logs each transition for observ
 ```
 ├── README.md                       # This file
 ├── template.yaml                   # CloudFormation (IAM + MicrovmImage with hooks)
-├── deploy.sh                       # Full deployment script
+├── deploy.sh                       # One-time infrastructure + first launch
+├── connect.sh                      # Day-to-day: find/launch MicroVM, get token, start proxy
 ├── proxy.py                        # Local HTTP+WebSocket proxy for browser access
 ├── example-pattern.json            # Serverless Land pattern metadata
 └── src/
@@ -180,37 +190,50 @@ The `app.py` handler responds to these hooks and logs each transition for observ
 
 1. Deploy the stack and run a MicroVM (see above).
 
-2. Get a token and start the proxy:
+2. Connect:
    ```bash
-   python3 proxy.py "https://${ENDPOINT}" "${TOKEN}"
+   ./connect.sh
    ```
 
-3. Open `http://127.0.0.1:8080` — you should see VS Code.
+3. Open `http://127.0.0.1:8080` — you should see VS Code in the browser.
 
-4. Open a terminal inside VS Code and verify:
+4. Inside the browser VS Code, open the integrated terminal (Ctrl+`` ` `` or **Terminal → New Terminal**). This shell runs inside the MicroVM. Verify the environment:
    ```bash
    python3 --version
    aws --version
    ```
 
-5. Test health endpoint:
+5. Test health endpoint (in a separate terminal):
    ```bash
-   curl "https://${ENDPOINT}/healthz" -H "X-aws-proxy-auth: ${TOKEN}"
+   curl "https://${MICROVM_EP}/healthz" -H "X-aws-proxy-auth: ${TOKEN}"
    ```
 
 ## Cleanup
 
 ```bash
-# 1. Terminate the running MicroVM
-aws lambda-microvms terminate-microvm \
-  --microvm-identifier "${MICROVM_ID}" \
-  --region us-east-2
+# Set your values (or export before running)
+AWS_REGION="${AWS_REGION:-us-east-2}"
+ACCOUNT_ID="${ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text)}"
+STACK_NAME="${STACK_NAME:-microvm-lambda-mvm-code-server}"
+
+# 1. Terminate any running MicroVMs
+aws lambda-microvms list-microvms --region "${AWS_REGION}" --output json \
+  | python3 -c "
+import sys, json
+for vm in json.load(sys.stdin).get('items', []):
+    if vm['state'] in ('RUNNING', 'SUSPENDED'):
+        print(vm['microvmId'])
+" | while read -r ID; do
+    echo "Terminating ${ID}..."
+    aws lambda-microvms terminate-microvm \
+      --microvm-identifier "${ID}" --region "${AWS_REGION}"
+done
 
 # 2. Delete the CloudFormation stack (removes IAM roles + image)
-aws cloudformation delete-stack --stack-name microvm-code-server --region us-east-2
+aws cloudformation delete-stack --stack-name "${STACK_NAME}" --region "${AWS_REGION}"
 
 # 3. Delete S3 artifacts
-aws s3 rm "s3://${S3_BUCKET}/deployments/" --recursive
+aws s3 rm "s3://microvm-artifacts-${ACCOUNT_ID}/deployments/" --recursive
 ```
 
 ---
