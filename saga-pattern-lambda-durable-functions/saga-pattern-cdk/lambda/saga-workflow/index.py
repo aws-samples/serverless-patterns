@@ -23,10 +23,8 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
     Uses context.invoke() calls which are checkpointed durable operations.
     """
     context.logger.info("Saga workflow started")
-    context.logger.info(f"Received event: {json.dumps(event)}")
-    
+
     # Generate unique IDs inside a step to ensure determinism during replay
-    # Non-deterministic operations like uuid.uuid4() must be wrapped in steps
     generated_ids = context.step(
         lambda _: {
             "transaction_id": str(uuid.uuid4()),
@@ -38,12 +36,12 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
         },
         name="generate-ids"
     )
-    
+
     transaction_id = generated_ids["transaction_id"]
     booking_id = None
     reservation_id = None
     rental_id = None
-    
+
     try:
         # Step 1: Reserve the flight
         context.logger.info("Step 1: Reserving flight...")
@@ -56,34 +54,16 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
             "price": event.get("flightPrice", 299.99),
             "failBookFlight": event.get("failBookFlight", False)
         }
-        
+
         flight_result = context.invoke(
             function_name=RESERVE_FLIGHT_FUNCTION,
             payload=flight_data,
             name="reserve_flight_invocation"
         )
 
-        if flight_result is None:
-            context.logger.error("Flight reservation returned None - invocation may have failed")
-            raise Exception("Flight reservation returned None - invocation may have failed")
-        
-        # If it's a string, parse it first
-        if isinstance(flight_result, str):
-            flight_result = json.loads(flight_result)
-        
-        # Parse the Lambda response format
-        if isinstance(flight_result, dict) and 'body' in flight_result:
-            flight_body = json.loads(flight_result['body']) if isinstance(flight_result['body'], str) else flight_result['body']
-            if flight_result.get('statusCode') != 200:
-                raise Exception(f"Flight reservation failed: {flight_body.get('message')}")
-            booking_id = flight_body.get('bookingId')
-        elif isinstance(flight_result, dict):
-            booking_id = flight_result.get('bookingId')
-        else:
-            raise Exception(f"Unexpected flight result format: {type(flight_result)}")
-            
+        booking_id = flight_result.get('bookingId')
         context.logger.info(f"Flight reserved successfully: {booking_id}")
-        
+
         # Step 2: Reserve hotel
         context.logger.info("Step 2: Reserving hotel...")
         hotel_data = {
@@ -96,35 +76,16 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
             "price": event.get("hotelPrice", 199.99),
             "failBookHotel": event.get("failBookHotel", False)
         }
-        
+
         hotel_result = context.invoke(
             function_name=RESERVE_HOTEL_FUNCTION,
             payload=hotel_data,
             name="reserve_hotel_invocation"
         )
-        
-        context.logger.info(f"Hotel result after invoke: {hotel_result}")
-        
-        if hotel_result is None:
-            raise Exception("Hotel reservation returned None - invocation may have failed")
-        
-        # If it's a string, parse it first
-        if isinstance(hotel_result, str):
-            hotel_result = json.loads(hotel_result)
-        
-        # parse the Lambda response format
-        if isinstance(hotel_result, dict) and 'body' in hotel_result:
-            hotel_body = json.loads(hotel_result['body']) if isinstance(hotel_result['body'], str) else hotel_result['body']
-            if hotel_result.get('statusCode') != 200:
-                raise Exception(f"Hotel reservation failed: {hotel_body.get('message')}")
-            reservation_id = hotel_body.get('reservationId')
-        elif isinstance(hotel_result, dict):
-            reservation_id = hotel_result.get('reservationId')
-        else:
-            raise Exception(f"Unexpected hotel result format: {type(hotel_result)}")
-            
+
+        reservation_id = hotel_result.get('reservationId')
         context.logger.info(f"Hotel reserved successfully: {reservation_id}")
-        
+
         # Step 3: Reserve car
         context.logger.info("Step 3: Reserving car...")
         car_data = {
@@ -138,38 +99,19 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
             "price": event.get("carPrice", 89.99),
             "failBookCar": event.get("failBookCar", False)
         }
-        
+
         car_result = context.invoke(
             function_name=RESERVE_CAR_FUNCTION,
             payload=car_data,
             name="reserve_car_invocation"
         )
-        
-        context.logger.info(f"Car result after invoke: {car_result}")
-        
-        if car_result is None:
-            raise Exception("Car reservation returned None - invocation may have failed")
-        
-        # If it's a string, parse it first
-        if isinstance(car_result, str):
-            car_result = json.loads(car_result)
-        
-        # Parse the Lambda response format
-        if isinstance(car_result, dict) and 'body' in car_result:
-            car_body = json.loads(car_result['body']) if isinstance(car_result['body'], str) else car_result['body']
-            if car_result.get('statusCode') != 200:
-                raise Exception(f"Car reservation failed: {car_body.get('message')}")
-            rental_id = car_body.get('rentalId')
-        elif isinstance(car_result, dict):
-            rental_id = car_result.get('rentalId')
-        else:
-            raise Exception(f"Unexpected car result format: {type(car_result)}")
-            
+
+        rental_id = car_result.get('rentalId')
         context.logger.info(f"Car reserved successfully: {rental_id}")
-        
+
         # All reservations successful
         context.logger.info("All reservations completed successfully!")
-        
+
         return {
             "success": True,
             "transactionId": transaction_id,
@@ -180,20 +122,19 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
                 "car": rental_id
             }
         }
-        
+
     except Exception as e:
-        # Saga compensation: rollback all successful reservations
+        # Saga compensation: rollback all successful reservations in reverse order
         context.logger.error(f"Error in saga workflow: {str(e)}")
         context.logger.info("Starting compensation (rollback) process...")
-        
+
         compensation_results = []
-        
+
         # Cancel car if it was reserved
         if rental_id:
             try:
                 context.logger.info(f"Compensating: Cancelling car rental {rental_id}")
-                # Direct invoke call for cancellation
-                cancel_car_result = context.invoke(
+                context.invoke(
                     function_name=CANCEL_CAR_FUNCTION,
                     payload={"rentalId": rental_id},
                     name="cancel_car_invocation"
@@ -202,13 +143,12 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
             except Exception as cancel_error:
                 context.logger.error(f"Failed to cancel car: {str(cancel_error)}")
                 compensation_results.append({"car": "cancellation_failed", "error": str(cancel_error)})
-        
+
         # Cancel hotel if it was reserved
         if reservation_id:
             try:
                 context.logger.info(f"Compensating: Cancelling hotel reservation {reservation_id}")
-                # Direct invoke call for cancellation
-                cancel_hotel_result = context.invoke(
+                context.invoke(
                     function_name=CANCEL_HOTEL_FUNCTION,
                     payload={"reservationId": reservation_id},
                     name="cancel_hotel_invocation"
@@ -217,13 +157,12 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
             except Exception as cancel_error:
                 context.logger.error(f"Failed to cancel hotel: {str(cancel_error)}")
                 compensation_results.append({"hotel": "cancellation_failed", "error": str(cancel_error)})
-        
+
         # Cancel flight if it was reserved
         if booking_id:
             try:
                 context.logger.info(f"Compensating: Cancelling flight booking {booking_id}")
-                # Direct invoke call for cancellation
-                cancel_flight_result = context.invoke(
+                context.invoke(
                     function_name=CANCEL_FLIGHT_FUNCTION,
                     payload={"bookingId": booking_id},
                     name="cancel_flight_invocation"
@@ -232,15 +171,14 @@ def lambda_handler(event: dict, context: DurableContext) -> dict:
             except Exception as cancel_error:
                 context.logger.error(f"Failed to cancel flight: {str(cancel_error)}")
                 compensation_results.append({"flight": "cancellation_failed", "error": str(cancel_error)})
-        
+
         context.logger.info("Compensation process completed")
-        
-        # Raise an exception with compensation details
+
         error_details = {
             "transactionId": transaction_id,
             "originalError": str(e),
             "compensations": compensation_results,
             "message": f"Transaction failed and rolled back: {str(e)}"
         }
-        
+
         raise Exception(f"Saga transaction failed and compensated. Details: {json.dumps(error_details)}")
