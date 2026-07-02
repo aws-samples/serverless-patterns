@@ -1,6 +1,6 @@
 {
-  "title": "AWS DevOps Agent to Amazon EventBridge to AWS Lambda Durable Functions Escalation",
-  "description": "Event-driven investigation failure escalation using AWS DevOps Agent events routed through EventBridge to Lambda durable functions with callback-based pausing and human acknowledgment handling",
+  "title": "DevOps Agent to EventBridge to Lambda durable functions escalation",
+  "description": "Event-driven escalation using DevOps Agent events routed via EventBridge to Lambda durable functions with callback-based human acknowledgment",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
@@ -25,15 +25,15 @@
   "resources": {
     "bullets": [
       {
-        "text": "AWS DevOps Agent EventBridge Integration",
+        "text": "Integrating AWS DevOps Agent with Amazon EventBridge",
         "link": "https://docs.aws.amazon.com/devopsagent/latest/userguide/configuring-integrations-and-knowledge-integrating-devops-agent-into-event-driven-applications-using-amazon-eventbridge-index.html"
       },
       {
-        "text": "Lambda durable functions Documentation",
+        "text": "Lambda durable functions",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
-        "text": "Durable Execution SDK for Python",
+        "text": "AWS Durable Execution SDK for Python",
         "link": "https://github.com/aws/aws-durable-execution-sdk-python"
       }
     ]
@@ -42,27 +42,25 @@
     "text": [
       "Note: Lambda durable functions have limited regional availability. Please check the AWS documentation for current regional support.",
       "sam build",
-      "sam deploy --guided --region us-east-2"
+      "sam deploy --guided --region us-east-1"
     ]
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions.",
-      "You can simulate DevOps Agent events using: aws events put-events --entries with source aws.aidevops and detail-type 'Investigation Failed'"
+      "See the GitHub repo for detailed testing instructions."    
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete --region us-east-2</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
-      "name": "Your name",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Your bio.",
-      "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "name": "Ridhima Bhalerao",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQGSDtz8pQt-bg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1585665543851?e=1784764800&v=beta&t=1T_rxVsgH1xDeXf0co4ab3kahJOEK9IYQeSTxJcFRPY",
+      "bio": "Technical Account Manager and a Serverless Enthusiast at AWS",
+      "linkedin": "ridhimabhalerao"
     }
   ]
 }

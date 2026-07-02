@@ -51,7 +51,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'text/html; charset=utf-8'},
-            'body': f"""
+            'body': """
 <!DOCTYPE html>
 <html>
 <head>
@@ -60,7 +60,7 @@ def lambda_handler(event, context):
 </head>
 <body style="font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center;">
     <h1 style="color: #dc3545;">Error</h1>
-    <p>{str(e)}</p>
+    <p>An unexpected error occurred while processing your request. Please try again later.</p>
 </body>
 </html>
 """
@@ -124,6 +124,49 @@ def lambda_handler(event, context):
 """
         }
 
+    except lambda_client.exceptions.CallbackTimeoutException:
+        print(f"Callback timed out or already completed for incident: {incident_id}")
+        return {
+            'statusCode': 410,
+            'headers': {'Content-Type': 'text/html; charset=utf-8'},
+            'body': f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Link Expired</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }}
+        .expired {{ color: #856404; }}
+        .card {{
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 40px;
+            background: #fff3cd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        h1 {{ margin-top: 0; font-size: 2em; }}
+        .icon {{ font-size: 4em; margin-bottom: 20px; }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">&#9203;</div>
+        <h1 class="expired">Link Expired</h1>
+        <p style="font-size: 1.2em;">This incident has already timed out or been previously acknowledged.</p>
+        <p>No further action is needed from this link.</p>
+    </div>
+</body>
+</html>
+"""
+        }
+
     except Exception as e:
         print(f"Error sending callback: {str(e)}")
         return {
@@ -138,7 +181,7 @@ def lambda_handler(event, context):
 </head>
 <body style="font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center;">
     <h1 style="color: #dc3545;">Error Processing Acknowledgment</h1>
-    <p>{str(e)}</p>
+    <p>An unexpected error occurred. Please contact your operations team.</p>
 </body>
 </html>
 """

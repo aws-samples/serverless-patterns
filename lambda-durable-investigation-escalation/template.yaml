@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  AWS DevOps Agent → EventBridge → Lambda durable functions escalation pattern.
-  Automatically triggers an escalation workflow when a DevOps Agent investigation
-  fails or times out.
+  DevOps Agent EventBridge Lambda durable functions escalation with callback-based pausing and human acknowledgment(uksb-1tthgi812) (tag:lambda-durable-investigation-escalation)
 
 Parameters:
   OncallEmail:
@@ -191,12 +189,8 @@ Resources:
         - Statement:
           - Effect: Allow
             Action:
-              - dynamodb:GetItem
-            Resource: !GetAtt CallbackTable.Arn
-          - Effect: Allow
-            Action:
               - lambda:SendDurableExecutionCallbackSuccess
-            Resource: '*'
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-EscalationFunction*'
 
   # Lambda Permission for API Gateway — CallbackHandlerFunction
   CallbackHandlerInvokePermission:
@@ -252,6 +246,20 @@ Outputs:
   EscalationFunctionArn:
     Description: Escalation Durable Function ARN
     Value: !GetAtt EscalationFunction.Arn
+
+  IncidentTableName:
+    Description: DynamoDB Incident Table name
+    Value: !Ref IncidentTable
+
+  EventBridgeRuleName:
+    Description: EventBridge rule name that routes DevOps Agent events
+    Condition: NoAgentSpaceFilter
+    Value: !Sub '${AWS::StackName}-devops-agent-escalation'
+
+  EventBridgeRuleFilteredName:
+    Description: EventBridge rule name that routes DevOps Agent events (filtered)
+    Condition: HasAgentSpaceFilter
+    Value: !Sub '${AWS::StackName}-devops-agent-escalation'
 
   EventBridgeRuleArn:
     Description: EventBridge rule ARN that routes DevOps Agent events

@@ -28,6 +28,9 @@ import boto3
 
 import helpers
 
+# Module-level clients — reuse connections across invocations
+ssm = boto3.client('ssm')
+
 # Mapping from DevOps Agent event detail-type to internal failure types
 DETAIL_TYPE_TO_FAILURE_TYPE = {
     'Investigation Failed': 'investigation_failed',
@@ -213,7 +216,6 @@ def lambda_handler(event, context: DurableContext):
     if not param_name:
         raise ValueError("API_GATEWAY_PARAM environment variable is not set")
 
-    ssm = boto3.client('ssm')
     response = ssm.get_parameter(Name=param_name)
     api_base_url = response['Parameter']['Value']
     print(f"API Base URL: {api_base_url}")

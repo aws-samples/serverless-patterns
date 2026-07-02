@@ -1,6 +1,6 @@
-# AWS DevOps Agent → EventBridge → Lambda Durable Functions Escalation Workflow
+# AWS DevOps Agent → EventBridge → Lambda durable functions escalation workflow
 
-This pattern demonstrates an event-driven escalation workflow that automatically triggers when an AWS DevOps Agent investigation fails or times out. An EventBridge rule captures the failure events and routes them to a Lambda durable function that orchestrates the escalation: creating an incident ticket, paging on-call personnel, and waiting for human acknowledgment — all without compute charges during the wait.
+This pattern demonstrates an event-driven escalation workflow that automatically triggers when an AWS DevOps Agent investigation fails or times out. An EventBridge rule captures the failure events and routes them to a Lambda durable function that orchestrates the escalation: creating an incident record, paging on-call personnel, and waiting for human acknowledgment — all without compute charges during the wait.
 
 **Important:** Please check the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html) for regions currently supported by AWS Lambda durable functions.
 
@@ -20,7 +20,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 The pattern deploys the following resources:
 
 - **EventBridge Rule** — Captures `Investigation Failed` and `Investigation Timed Out` events from AWS DevOps Agent (source: `aws.aidevops`) on the default event bus and invokes the Escalation Function.
-- **Escalation Function** (Durable Lambda) — Orchestrates the workflow: parses the DevOps Agent event, gathers context, creates an incident, pages on-call personnel, and tracks resolution. Pauses execution (no compute charges) while waiting for acknowledgment.
+- **Escalation Function** (Durable Lambda) — Orchestrates the workflow: parses the DevOps Agent event, gathers context, creates an incident, pages on-call personnel, and tracks resolution. The workflow pauses execution (no compute charges) while waiting for acknowledgment.
 - **Callback Handler** (Standard Lambda) — Receives acknowledgment clicks via API Gateway and sends durable execution callbacks to resume the paused Escalation Function.
 - **Incident Table** (DynamoDB) — Stores incident records with failure context, escalation history, and resolution status.
 - **Callback Table** (DynamoDB) — Maps short UUIDs to durable function callback IDs for clean acknowledgment URLs.
@@ -72,7 +72,7 @@ The EventBridge rule matches events with this structure:
 ## Key Features
 
 - ✅ **Fully Event-Driven** — Automatically triggered by DevOps Agent events via EventBridge; no manual invocation required
-- ✅ **No Compute Charges During Wait** — Function is suspended while waiting for human response
+- ✅ **No Compute Charges During Wait** — Function is suspended while waiting for a human response
 - ✅ **Configurable Timeout** — Acknowledgment timeout duration configurable via SAM template parameter
 - ✅ **Agent Space Filtering** — Optionally filter events to a specific DevOps Agent space
 - ✅ **Extensible Integration Points** — Incident ticket and notification operations are isolated as helper functions that can be replaced with calls to Jira, ServiceNow, PagerDuty, Opsgenie, or other ITSM tools
@@ -98,7 +98,7 @@ The EventBridge rule matches events with this structure:
 
 3. Deploy the application:
    ```bash
-   sam deploy --guided --region us-east-2
+   sam deploy --guided --region us-east-1
    ```
 
    During the guided deployment, provide the required values:
@@ -109,7 +109,7 @@ The EventBridge rule matches events with this structure:
 
 4. **Confirm SNS subscription**: Check your email and click the confirmation link from Amazon SNS
 
-5. Note the outputs: `ApiEndpoint`, `EscalationFunctionArn`, and `EventBridgeRuleArn`
+5. Note the outputs: `ApiEndpoint`, `EscalationFunctionArn`, `IncidentTableName`, and `EventBridgeRuleName`
 
 ## Testing
 
@@ -119,28 +119,70 @@ If you have a DevOps Agent space with active investigations, the escalation will
 
 ### Option 2: Simulate with a Test EventBridge Event
 
-Send a test event to EventBridge that mimics a DevOps Agent investigation failure:
+The `aws.aidevops` source prefix is reserved for AWS services, so you cannot use `aws events put-events` with that source directly. Instead, invoke the Escalation Function directly with a simulated event payload:
 
 ```bash
-aws events put-events \
-  --region us-east-2 \
-  --entries '[{
-    "Source": "aws.aidevops",
-    "DetailType": "Investigation Failed",
-    "Detail": "{\"version\":\"1.0.0\",\"metadata\":{\"agent_space_id\":\"test-space-123\",\"task_id\":\"task-abc-001\",\"execution_id\":\"exec-xyz-002\"},\"data\":{\"task_type\":\"INVESTIGATION\",\"priority\":\"CRITICAL\",\"status\":\"FAILED\",\"created_at\":\"2026-01-15T10:00:00Z\",\"updated_at\":\"2026-01-15T10:30:00Z\"}}"
-  }]'
+aws lambda invoke \
+  --function-name <stack-name>-EscalationFunction \
+  --qualifier live \
+  --region us-east-1 \
+  --invocation-type Event \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{
+    "source": "aws.aidevops",
+    "detail-type": "Investigation Failed",
+    "account": "123456789012",
+    "region": "us-east-1",
+    "time": "2026-01-15T10:30:00Z",
+    "detail": {
+      "version": "1.0.0",
+      "metadata": {
+        "agent_space_id": "test-space-123",
+        "task_id": "task-abc-001",
+        "execution_id": "exec-xyz-002"
+      },
+      "data": {
+        "task_type": "INVESTIGATION",
+        "priority": "CRITICAL",
+        "status": "FAILED",
+        "created_at": "2026-01-15T10:00:00Z",
+        "updated_at": "2026-01-15T10:30:00Z"
+      }
+    }
+  }' response.json
 ```
 
 You can also test with a timeout event:
 
 ```bash
-aws events put-events \
-  --region us-east-2 \
-  --entries '[{
-    "Source": "aws.aidevops",
-    "DetailType": "Investigation Timed Out",
-    "Detail": "{\"version\":\"1.0.0\",\"metadata\":{\"agent_space_id\":\"test-space-123\",\"task_id\":\"task-abc-002\",\"execution_id\":\"exec-xyz-003\"},\"data\":{\"task_type\":\"INVESTIGATION\",\"priority\":\"HIGH\",\"status\":\"TIMED_OUT\",\"created_at\":\"2026-01-15T11:00:00Z\",\"updated_at\":\"2026-01-15T11:45:00Z\"}}"
-  }]'
+aws lambda invoke \
+  --function-name <stack-name>-EscalationFunction \
+  --qualifier live \
+  --region us-east-1 \
+  --invocation-type Event \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{
+    "source": "aws.aidevops",
+    "detail-type": "Investigation Timed Out",
+    "account": "123456789012",
+    "region": "us-east-1",
+    "time": "2026-01-15T11:45:00Z",
+    "detail": {
+      "version": "1.0.0",
+      "metadata": {
+        "agent_space_id": "test-space-123",
+        "task_id": "task-abc-002",
+        "execution_id": "exec-xyz-003"
+      },
+      "data": {
+        "task_type": "INVESTIGATION",
+        "priority": "HIGH",
+        "status": "TIMED_OUT",
+        "created_at": "2026-01-15T11:00:00Z",
+        "updated_at": "2026-01-15T11:45:00Z"
+      }
+    }
+  }' response.json
 ```
 
 ### Check Your Email
@@ -159,18 +201,20 @@ If you do not click the link within the timeout (default 15 minutes), the incide
 
 ### Verify in DynamoDB
 
+Use the `IncidentTableName` from the stack deployment output:
+
 ```bash
-aws dynamodb scan --table-name <stack-name>-incidents --region us-east-2
+aws dynamodb scan --table-name <IncidentTableName-from-output> --region us-east-1
 ```
 
 ### Verify EventBridge Rule
 
-Confirm the rule is active and receiving events:
+Use the `EventBridgeRuleName` from the stack deployment output:
 
 ```bash
 aws events describe-rule \
-  --name <stack-name>-devops-agent-escalation \
-  --region us-east-2
+  --name <EventBridgeRuleName-from-output> \
+  --region us-east-1
 ```
 
 ## Configuration
@@ -184,7 +228,7 @@ aws events describe-rule \
 To change values after deployment:
 
 ```bash
-sam deploy --parameter-overrides AckTimeout=600 OncallEmail=oncall@example.com --region us-east-2
+sam deploy --parameter-overrides AckTimeout=600 OncallEmail=oncall@example.com --region us-east-1
 ```
 
 The timeout must be less than the overall `DurableConfig.ExecutionTimeout` of 3600 seconds (1 hour) defined in the SAM template.
@@ -208,10 +252,10 @@ The incident ticket and notification operations are isolated into dedicated help
 
 ```bash
 aws logs tail /aws/lambda/<stack-name>-EscalationFunction \
-  --region us-east-2 --follow
+  --region us-east-1 --follow
 
 aws logs tail /aws/lambda/<stack-name>-CallbackHandlerFunction \
-  --region us-east-2 --follow
+  --region us-east-1 --follow
 ```
 
 ### EventBridge Metrics
@@ -223,7 +267,7 @@ Monitor the rule invocations in CloudWatch:
 ## Cleanup
 
 ```bash
-sam delete --stack-name <your-stack-name> --region us-east-2
+sam delete --stack-name <your-stack-name> --region us-east-1
 ```
 
 ## Learn More
