@@ -4,7 +4,7 @@ import { HitlLambdaDurableFunctionCdkStack } from '../lib/hitl-lambda-durable-fu
 
 const app = new cdk.App();
 new HitlLambdaDurableFunctionCdkStack(app, 'HitlLambdaDurableFunctionCdkStack', {
-  description: "This is a human in the loop pattern using AWS Lambda Durable Functions."
+  description: "Human-in-the-loop pattern using AWS Lambda durable functions, Amazon SNS, Amazon DynamoDB, and Amazon API Gateway."
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
