@@ -12,6 +12,9 @@ DB_NAME = os.environ["DB_NAME"]
 
 
 def execute(sql, params=None):
+    """Execute a statement via RDS Data API with retry for Aurora resume from zero."""
+    import time
+
     kwargs = {
         "resourceArn": CLUSTER_ARN,
         "secretArn": SECRET_ARN,
@@ -20,7 +23,17 @@ def execute(sql, params=None):
     }
     if params:
         kwargs["parameters"] = params
-    return rds_data.execute_statement(**kwargs)
+
+    for attempt in range(4):
+        try:
+            return rds_data.execute_statement(**kwargs)
+        except rds_data.exceptions.DatabaseResumingException:
+            if attempt < 3:
+                wait = 10 * (attempt + 1)
+                print(f"Aurora resuming from zero, retrying in {wait}s (attempt {attempt + 1}/3)")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def handler(event, _context):

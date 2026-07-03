@@ -48,7 +48,7 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
       DB_NAME: "appdb",
     };
 
-    // Setup Lambda — initializes the knowledge table
+    // Setup AWS Lambda function — initializes the knowledge table
     const setupFn = new lambda.Function(this, "SetupFn", {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: "index.handler",
@@ -61,7 +61,7 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
     cluster.secret!.grantRead(setupFn);
     setupFn.addToRolePolicy(dataApiPolicy);
 
-    // Query Lambda — queries Aurora, sends context to Bedrock
+    // Query AWS Lambda function — queries Amazon Aurora, sends context to Amazon Bedrock
     const queryFn = new lambda.Function(this, "QueryFn", {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: "index.handler",
@@ -70,7 +70,7 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
       memorySize: 512,
       environment: {
         ...envVars,
-        MODEL_ID: "us.anthropic.claude-sonnet-4-20250514-v1:0",
+        MODEL_ID: `${this.region.startsWith('eu') ? 'eu' : this.region.startsWith('ap') ? 'apac' : 'us'}.anthropic.claude-sonnet-4-6`,
       },
       description: "Queries Aurora knowledge base and sends to Bedrock",
     });
@@ -80,8 +80,8 @@ export class AuroraServerlessV2LambdaBedrockStack extends cdk.Stack {
       new iam.PolicyStatement({
         actions: ["bedrock:InvokeModel"],
         resources: [
-          `arn:aws:bedrock:*:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0`,
-          `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:aws:bedrock:*:${this.account}:inference-profile/*anthropic.claude-sonnet-4-6*`,
+          `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6*`,
         ],
       })
     );

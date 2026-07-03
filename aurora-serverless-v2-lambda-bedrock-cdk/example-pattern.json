@@ -1,6 +1,6 @@
 {
   "title": "Amazon Aurora Serverless v2 with AWS Lambda and Amazon Bedrock",
-  "description": "Deploy an Amazon Aurora Serverless v2 PostgreSQL database that scales to zero, with AWS Lambda functions that query stored knowledge and use Amazon Bedrock for AI-powered answers.",
+  "description": "Deploy Aurora Serverless v2 with scale-to-zero, RDS Data API, and AWS Lambda functions that query stored knowledge and use Amazon Bedrock for AI answers",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",
@@ -25,20 +25,35 @@
   },
   "resources": {
     "bullets": [
-      { "text": "Aurora Serverless v2 platform version 4", "link": "https://aws.amazon.com/about-aws/whats-new/2026/04/aurora-serverless-smarter-scaling/" },
-      { "text": "Amazon Aurora Serverless", "link": "https://aws.amazon.com/rds/aurora/serverless/" },
-      { "text": "Amazon Bedrock", "link": "https://aws.amazon.com/bedrock/" }
+      {
+        "text": "Aurora Serverless v2 platform version 4",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2026/04/aurora-serverless-smarter-scaling/"
+      },
+      {
+        "text": "Amazon Aurora Serverless",
+        "link": "https://aws.amazon.com/rds/aurora/serverless/"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      }
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"],
+    "text": [
+      "<code>cdk deploy</code>"
+    ],
     "file": "lib/aurora-serverless-v2-lambda-bedrock-stack.ts"
   },
   "testing": {
-    "text": ["See the README for testing instructions."]
+    "text": [
+      "See the README for testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["cdk destroy"]
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {

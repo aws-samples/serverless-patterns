@@ -17,11 +17,26 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-The pattern creates a VPC with isolated subnets, an Amazon Aurora Serverless v2 PostgreSQL cluster (with encryption at rest), and two AWS Lambda functions. The setup function seeds data via the RDS Data API. The query function retrieves context from Aurora and passes it to Amazon Bedrock for AI-powered answers.
+```
+┌──────────┐       ┌────────────────────┐       ┌──────────────────────────┐
+│          │       │ AWS Lambda (Query)  │       │ Amazon Aurora Serverless  │
+│  Client  │──────▶│                    │──────▶│ v2 (PostgreSQL, Data API) │
+│          │       │ 1. Search context   │       │ Scale-to-zero capable     │
+└──────────┘       │ 2. Call Bedrock     │       └──────────────────────────┘
+                   └────────┬───────────┘
+                            │
+                            ▼
+                   ┌─────────────────┐
+                   │ Amazon Bedrock   │
+                   │ (Claude Sonnet)  │
+                   └─────────────────┘
+```
+
+The pattern creates a VPC with isolated subnets, an Amazon Aurora Serverless v2 PostgreSQL cluster (with encryption at rest), and two AWS Lambda functions. The setup function seeds data via the RDS Data API. The query function retrieves context from Aurora and passes it to Amazon Bedrock for AI-powered answers. The model ID is derived from the deploy region (`us.`, `eu.`, or `apac.` prefix) so the pattern works in any supported region. Aurora scale-to-zero resume is handled with automatic retries.
 
 ## How it works
 
-1. A setup Lambda creates the `knowledge` table in Aurora PostgreSQL and seeds it with sample data.
+1. A setup AWS Lambda function creates the `knowledge` table in Aurora PostgreSQL and seeds it with sample data.
 2. A query Lambda receives a question, searches Aurora for relevant context using SQL, and sends the context + question to Amazon Bedrock.
 3. Bedrock (Claude Sonnet) generates an answer grounded in the database context.
 4. Aurora Serverless v2 (platform version 4) automatically scales capacity based on demand and scales to zero when idle.
@@ -44,13 +59,14 @@ The pattern creates a VPC with isolated subnets, an Amazon Aurora Serverless v2 
     cdk deploy
     ```
 
-4. Seed the database:
+4. Seed the database (note: if Aurora is resuming from zero, the first call may take 10-30s while the cluster wakes up):
     ```bash
     aws lambda invoke \
       --function-name $(aws cloudformation describe-stacks \
         --stack-name AuroraServerlessV2LambdaBedrockStack \
         --query 'Stacks[0].Outputs[?OutputKey==`SetupFunctionName`].OutputValue' \
         --output text) \
+      --cli-binary-format raw-in-base64-out \
       --payload '{}' setup-output.json
     ```
 
