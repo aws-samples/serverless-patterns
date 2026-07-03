@@ -247,7 +247,11 @@ for _multi_tag in ("!Sub", "!Join", "!Select", "!Split", "!If", "!Equals"):
 
 def _load_cfn_template() -> dict:
     """Load and parse the CloudFormation template (handling CFN intrinsic tags)."""
-    return yaml.load(CFN_TEMPLATE_PATH.read_text(), Loader=_CfnLoader)
+    loader = _CfnLoader(CFN_TEMPLATE_PATH.read_text())
+    try:
+        return loader.get_single_data()
+    finally:
+        loader.dispose()
 
 
 def _get_agent_lambda_role_statements(template: dict) -> list[dict]:
