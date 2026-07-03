@@ -1,0 +1,63 @@
+# Default v0.2 DTA rule pack. Conservative and explainable — no malware verdicts.
+# Verdicts: clean | suspicious | policy_violation | unknown | error
+rules:
+  - id: R001
+    name: executable-created-in-workspace
+    when:
+      eventType: file.executable_created
+    severity: medium
+    verdict: suspicious
+
+  # Only high-confidence canary reads (strace-confirmed) are a policy violation.
+  # canary.file_touched_suspected (low-confidence atime) is intentionally NOT
+  # here; it appears in evidence but does not fail the build on its own.
+  - id: R002
+    name: canary-file-read
+    when:
+      eventTypeAny:
+        - canary.file_read_observed
+        - canary.aws_credential_path_touched
+    severity: high
+    verdict: policy_violation
+
+  - id: R003
+    name: unexpected-network-egress
+    when:
+      eventType: network.egress_policy_violation
+    severity: high
+    verdict: policy_violation
+
+  - id: R004
+    name: shell-executed-by-target
+    when:
+      eventType: syscall.execve
+      argvContainsAny:
+        - "/bin/sh"
+        - "/bin/bash"
+        - "sh"
+        - "bash"
+    severity: medium
+    verdict: suspicious
+
+  - id: R005
+    name: privilege-change-attempt
+    when:
+      eventTypeAny:
+        - syscall.privilege_change_attempt
+        - syscall.capability_change_attempt
+    severity: high
+    verdict: policy_violation
+
+  - id: R006
+    name: process-timeout
+    when:
+      eventType: process.timeout
+    severity: medium
+    verdict: suspicious
+
+  - id: R007
+    name: nonzero-exit
+    when:
+      eventType: process.nonzero_exit
+    severity: low
+    verdict: unknown

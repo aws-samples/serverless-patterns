@@ -1,0 +1,59 @@
+{
+  "title": "CI/CD dynamic threat analysis in AWS Lambda MicroVMs",
+  "description": "Run an untrusted artifact inside an isolated Lambda MicroVM and observe its behavior from outside the process to produce a deterministic CI verdict.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates a dynamic-threat-analysis (DTA) style CI/CD gate built on AWS Lambda MicroVMs. A MicroVM image carries a small sandbox supervisor. For each analysis the orchestrator runs a fresh MicroVM, the supervisor launches an untrusted target as a child process (argv only, never a shell), and a set of collectors observe the target entirely from the outside: the process tree via /proc, a before/after filesystem diff, fake canary files and environment variables, syscalls via strace, and network connections via /proc/net.",
+      "The target never reports on its own behavior. A simple, explainable rule engine turns the observed events into a deterministic verdict (clean, suspicious, policy_violation, unknown, or error) and a machine-readable report, and CI passes or fails on policy. The MicroVM is always terminated, even when the job fails.",
+      "The Terraform deploys the least-privilege IAM build and execution roles plus an artifact S3 bucket that the orchestrator uses to build the MicroVM image and run the analysis (the same configuration that was applied and destroyed against GA Lambda MicroVMs during testing). The default scenarios are benign and canary-based, so the sample is safe to run in a dedicated sandbox account."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-dta",
+      "templateURL": "serverless-patterns/lambda-microvm-dta",
+      "projectFolder": "lambda-microvm-dta",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html"
+      },
+      {
+        "text": "Run a MicroVM, create an auth token, and call the endpoint",
+        "link": "https://docs.aws.amazon.com/lambda/latest/microvm-api/API_RunMicrovm.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Terminate any running MicroVM with <code>microvm-dta ... terminate</code> (the orchestrator also does this in a finally block), then run <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ryota Yamada",
+      "image": "https://avatars.githubusercontent.com/u/42636694",
+      "bio": "Global Automotive Solutions Architect at AWS",
+      "linkedin": "riita10069",
+      "twitter": "riita10069"
+    }
+  ]
+}
