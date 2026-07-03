@@ -14,9 +14,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-dta",
-      "templateURL": "serverless-patterns/lambda-microvm-dta",
-      "projectFolder": "lambda-microvm-dta",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-dta-terraform",
+      "templateURL": "serverless-patterns/lambda-microvm-dta-terraform",
+      "projectFolder": "lambda-microvm-dta-terraform",
       "templateFile": "main.tf"
     }
   },
