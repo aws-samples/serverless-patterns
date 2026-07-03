@@ -25,21 +25,39 @@
   },
   "resources": {
     "bullets": [
-      { "text": "Strands Agents SDK", "link": "https://strandsagents.com/" },
-      { "text": "Deploying Strands Agents to AWS Lambda", "link": "https://strandsagents.com/docs/user-guide/deploy/deploy_to_aws_lambda/" },
-      { "text": "Amazon Bedrock", "link": "https://aws.amazon.com/bedrock/" },
-      { "text": "Serverless ICYMI Q1 2026", "link": "https://aws.amazon.com/blogs/compute/serverless-icymi-q1-2026/" }
+      {
+        "text": "Strands Agents SDK",
+        "link": "https://strandsagents.com/"
+      },
+      {
+        "text": "Deploying Strands Agents to AWS Lambda",
+        "link": "https://strandsagents.com/docs/user-guide/deploy/deploy_to_aws_lambda/"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "Serverless ICYMI Q1 2026",
+        "link": "https://aws.amazon.com/blogs/compute/serverless-icymi-q1-2026/"
+      }
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"],
+    "text": [
+      "<code>cdk deploy</code>"
+    ],
     "file": "lib/lambda-strands-agent-bedrock-stack.ts"
   },
   "testing": {
-    "text": ["See the README for testing instructions."]
+    "text": [
+      "See the README for testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["cdk destroy"]
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {

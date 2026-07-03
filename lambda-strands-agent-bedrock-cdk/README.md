@@ -17,12 +17,22 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-The pattern creates an AWS Lambda function with the Strands Agents SDK layer. The function uses Amazon Bedrock (Claude Sonnet) for reasoning and can invoke registered Python tools during the conversation loop.
+```
+┌──────────┐       ┌───────────────────────────────────────────┐       ┌─────────────────┐
+│          │       │            AWS Lambda                      │       │                 │
+│  Client  │──────▶│  Strands Agents SDK                       │◀─────▶│ Amazon Bedrock  │
+│          │       │  ┌─────────┐  ┌────────────────────────┐  │       │ (Claude Sonnet) │
+└──────────┘       │  │ Agent   │  │ Tools: calculate, ...  │  │       └─────────────────┘
+                   │  └─────────┘  └────────────────────────┘  │
+                   └───────────────────────────────────────────┘
+```
+
+The pattern creates an AWS Lambda function with the Strands Agents SDK layer. The function uses Amazon Bedrock (Claude Sonnet 4.6) for reasoning and can invoke registered Python tools during the conversation loop. The model ID is derived from the deploy region (`us.`, `eu.`, or `apac.` prefix) so the pattern works in any supported region.
 
 ## How it works
 
-1. A client invokes the Lambda function with a JSON payload containing a `prompt` field.
-2. The Lambda function initializes a Strands Agents SDK agent with the official Lambda layer (no custom packaging required).
+1. A client invokes the AWS Lambda function with a JSON payload containing a `prompt` field.
+2. The AWS Lambda function initializes a Strands Agents SDK agent with the official AWS Lambda layer (no custom packaging required).
 3. The agent uses Amazon Bedrock (Claude Sonnet) as its reasoning engine.
 4. When the model decides a tool is needed, the SDK automatically invokes the registered Python tool (e.g., `calculate`) and feeds the result back to the model.
 5. The agent returns the final response to the caller.
@@ -55,7 +65,7 @@ aws cloudformation describe-stacks --stack-name LambdaStrandsAgentBedrockStack -
 
 ## Testing
 
-Invoke the Lambda function with a prompt:
+Invoke the AWS Lambda function with a prompt:
 
 ```bash
 aws lambda invoke \

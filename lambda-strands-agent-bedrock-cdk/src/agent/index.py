@@ -31,11 +31,15 @@ Always show your work by explaining what calculation you performed."""
 
 def handler(event, _context):
     """Lambda handler that runs a Strands agent."""
+    import os
+
     prompt = event.get("prompt", "What is 25 * 47 + 13?")
+    model_id = os.environ.get("MODEL_ID", "us.anthropic.claude-sonnet-4-6")
 
     agent = Agent(
         system_prompt=SYSTEM_PROMPT,
         tools=[calculate],
+        model=model_id,
     )
 
     response = agent(prompt)

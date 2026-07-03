@@ -7,14 +7,14 @@ export class LambdaStrandsAgentBedrockStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Strands Agents official Lambda layer (Python 3.12, x86_64)
+    // Strands Agents official AWS Lambda layer (Python 3.12, x86_64)
     const strandsLayer = lambda.LayerVersion.fromLayerVersionArn(
       this,
       "StrandsAgentsLayer",
       `arn:aws:lambda:${this.region}:856699698935:layer:strands-agents-py3_12-x86_64:1`
     );
 
-    // Agent Lambda function
+    // Agent AWS Lambda function
     const agentFn = new lambda.Function(this, "StrandsAgentFn", {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: "index.handler",
@@ -24,12 +24,12 @@ export class LambdaStrandsAgentBedrockStack extends cdk.Stack {
       architecture: lambda.Architecture.X86_64,
       layers: [strandsLayer],
       environment: {
-        MODEL_ID: "us.anthropic.claude-sonnet-4-20250514-v1:0",
+        MODEL_ID: `${this.region.startsWith('eu') ? 'eu' : this.region.startsWith('ap') ? 'apac' : 'us'}.anthropic.claude-sonnet-4-6`,
       },
-      description: "Strands Agents SDK agent on Lambda with Bedrock",
+      description: "Strands Agents SDK agent on AWS Lambda with Amazon Bedrock",
     });
 
-    // Bedrock invoke permissions
+    // Bedrock invoke permissions — wildcard region covers cross-region inference profile routing
     agentFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: [
@@ -37,8 +37,8 @@ export class LambdaStrandsAgentBedrockStack extends cdk.Stack {
           "bedrock:InvokeModelWithResponseStream",
         ],
         resources: [
-          `arn:aws:bedrock:*:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0`,
-          `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:aws:bedrock:*:${this.account}:inference-profile/*anthropic.claude-sonnet-4-6*`,
+          `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6*`,
         ],
       })
     );
