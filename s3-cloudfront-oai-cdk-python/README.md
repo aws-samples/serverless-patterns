@@ -1,6 +1,6 @@
-# S3 Hosted Website Served by a CloudFront Distribution restricted by Cloudfront Origin Access Identity (OAI)
+# S3 Hosted Website Served by a CloudFront Distribution restricted by CloudFront Origin Access Control (OAC)
 
-This repo contains serverless patterns showing how to setup a S3 website hosting bucket that is served by a CloudFront distribution that also obfuscates the CloudFront Distribution domain via Cloudfront Origin Access Identity (OAI).
+This repo contains serverless patterns showing how to setup a S3 website hosting bucket that is served by a CloudFront distribution that also obfuscates the CloudFront Distribution domain via CloudFront Origin Access Control (OAC).
 
 ![Demo Project Solution Architecture Diagram](diagram.PNG)
 
@@ -11,32 +11,67 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* AWS Account
-* AWS CLI already configured with Administrator permission
-* [NodeJS 14.x installed](https://nodejs.org/en/download/)
-* CDK v2 installed: See Getting Started With the AWS CDK
-* Python CDK required libraries: (install with pip install -r requirements.txt)
-* Clone this repo!
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (AWS CDK) Installed and account bootstrapped
 
 ## Deployment Instructions
 
-1. Within your CDK Python module directory(where all your cdk stacks are located) create a constructs folder
-2. Place the `s3_cloudfront_oai_cdk.py` file in the constructs folder you created 
-3. Import the construct into the desired stack you would like to use this construct (ex.`from .constructs.s3_website import S3CloudFrontOAI`)
-4. Use this construct in your stack by defining it in your stack (ex. `myS3HostedWebsite = S3CloudFrontOAI(self, 's3-hosted-website')`)
-5. In your terminal run `CDK Deploy` for the specified stack that uses this construct
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    ```
+2. Change directory to the pattern directory:
+    ```bash
+    cd s3-cloudfront-oac-cdk-python
+    ```
+3. Create a virtual environment for python:
+    ```bash
+    python3 -m venv .venv
+    ```
+4. Activate the virtual environment:
+    ```bash
+    source .venv/bin/activate
+    ```
+5. Install python modules:
+    ```bash
+    python3 -m pip install -r requirements.txt
+    ```
+6. From the command line, use CDK to synthesize the CloudFormation template and check for errors:
+    ```bash
+    cdk synth
+    ```
+7. From the command line, use CDK to deploy the stack:
+    ```bash
+    cdk deploy
+    ```
 
-### Removing the resources
+## How it works
 
-1. run `CDK Destroy <stack id>` for the specified stack that used this construct
+This CDK app creates a private S3 bucket, uploads a sample `index.html` to it, and creates a CloudFront distribution in front of the bucket. CloudFront reads the bucket content through Origin Access Control (OAC), so the bucket stays private and is only accessible via CloudFront.
 
-```
-git clone https://github.com/aws-samples/serverless-patterns/s3-cloudfront-oai-cdk-python
-```
+## Testing
 
-Each subdirectory contains additional installation and usage instructions. 
+1. Note the `DistributionId` and `DistributionDomainName` values from the outputs of the CDK deployment process.
+2. Open `https://<DistributionDomainName>` in your browser. You should see the sample `index.html` page saying `Hello from S3 + CloudFront!`.
+3. Confirm that the distribution accesses the S3 origin via Origin Access Control (OAC).
+    ```bash
+    aws cloudfront get-distribution-config --id <DistributionId> --query 'DistributionConfig.Origins.Items[0].OriginAccessControlId'
+    ```
+
+## Cleanup
+
+1. Delete the stack
+    ```bash
+    cdk destroy
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'S3CloudFrontOACStack')].StackStatus"
+    ```
 
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-----
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
+SPDX-License-Identifier: MIT-0
