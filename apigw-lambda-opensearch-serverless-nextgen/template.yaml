@@ -218,7 +218,7 @@ Resources:
               "Description": "Index pipeline and ML full access",
               "Rules": [{"ResourceType": "collection", "Resource": ["collection/${CollectionName}"], "Permission": ["aoss:CreateCollectionItems", "aoss:DescribeCollectionItems", "aoss:UpdateCollectionItems"]}, {"ResourceType": "model", "Resource": ["model/${CollectionName}/*"], "Permission": ["aoss:CreateMLResource", "aoss:DescribeMLResource", "aoss:UpdateMLResource", "aoss:DeleteMLResource", "aoss:ExecuteMLResource"]}],
               "Principal": ["${IndexRoleArn}"]
-            },
+            }
           ]
         - SearchRoleArn: !GetAtt SearchFunctionRole.Arn
           IndexRoleArn: !GetAtt IndexFunctionRole.Arn
