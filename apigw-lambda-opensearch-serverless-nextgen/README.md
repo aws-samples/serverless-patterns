@@ -162,7 +162,7 @@ awscurl --service execute-api --region $AWS_REGION -X DELETE \
   "$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $AWS_REGION --query 'Stacks[0].Outputs[?OutputKey==`DeleteApiUrl`].OutputValue' --output text)"
 ```
 
-> **Note:** The first request after an idle period takes approximately 10 seconds while OpenSearch provisions compute from zero. Subsequent requests respond at normal latency.
+> **Note:** The first request after an idle period takes approximately 10 seconds while OpenSearch provisions compute from zero. If provisioning exceeds the API Gateway 29-second timeout, the caller receives a 504 response. Simply retry the request. Subsequent requests respond at normal latency. For production workloads where 504 responses on cold start are unacceptable, request a quota increase to raise the API Gateway integration timeout above 29 seconds.
 
 ## Cleanup
 
