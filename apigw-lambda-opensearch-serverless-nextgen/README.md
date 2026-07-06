@@ -31,6 +31,11 @@ Important: this application uses various AWS services and there are costs associ
     ```
     sam build
     ```
+1. Identify your deployment role name. The template needs the name of the IAM role your CLI session is using, so that CloudFormation can create the OpenSearch index on your behalf:
+    ```
+    aws sts get-caller-identity --query 'Arn' --output text
+    ```
+    From the output ARN, take the role name (the segment after `role/`). For example, if the ARN is `arn:aws:sts::123456789012:assumed-role/PowerUser/session`, the role name is `PowerUser`.
 1. Deploy the application:
     ```
     sam deploy --guided
@@ -38,7 +43,8 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Accept the default parameter values or customize them
+    * For `DeploymentRoleName`, enter the role name from the previous step
+    * Accept the remaining default parameter values or customize them
     * Allow SAM CLI to create IAM roles with the required permissions
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.

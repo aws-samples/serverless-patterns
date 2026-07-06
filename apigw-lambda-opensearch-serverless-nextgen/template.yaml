@@ -5,6 +5,13 @@ Description: >
   Demonstrates zero-baseline cost with both Lambda and OpenSearch scaling to zero when idle.
 
 Parameters:
+  DeploymentRoleName:
+    Type: String
+    Description: >
+      Name of the IAM role used to deploy this stack. CloudFormation uses this role
+      to create the OpenSearch index. Run 'aws sts get-caller-identity' and use the
+      role name from the ARN (the part after 'role/').
+
   CollectionName:
     Type: String
     Default: semantic-search
@@ -218,6 +225,11 @@ Resources:
               "Description": "Index pipeline and ML full access",
               "Rules": [{"ResourceType": "collection", "Resource": ["collection/${CollectionName}"], "Permission": ["aoss:CreateCollectionItems", "aoss:DescribeCollectionItems", "aoss:UpdateCollectionItems"]}, {"ResourceType": "model", "Resource": ["model/${CollectionName}/*"], "Permission": ["aoss:CreateMLResource", "aoss:DescribeMLResource", "aoss:UpdateMLResource", "aoss:DeleteMLResource", "aoss:ExecuteMLResource"]}],
               "Principal": ["${IndexRoleArn}"]
+            },
+            {
+              "Description": "Deployment role - allows CloudFormation to create and manage the vector index",
+              "Rules": [{"ResourceType": "index", "Resource": ["index/${CollectionName}/*"], "Permission": ["aoss:CreateIndex", "aoss:DescribeIndex", "aoss:UpdateIndex", "aoss:DeleteIndex"]}],
+              "Principal": ["arn:aws:iam::${AWS::AccountId}:role/${DeploymentRoleName}"]
             }
           ]
         - SearchRoleArn: !GetAtt SearchFunctionRole.Arn
