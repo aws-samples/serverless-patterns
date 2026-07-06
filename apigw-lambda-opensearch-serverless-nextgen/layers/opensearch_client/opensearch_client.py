@@ -30,4 +30,7 @@ def get_client(endpoint: str, region: str) -> OpenSearch:
         verify_certs=True,
         connection_class=RequestsHttpConnection,
         timeout=25,
+        max_retries=3,
+        retry_on_timeout=True,
+        retry_on_status=(502, 503),
     )
