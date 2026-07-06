@@ -219,11 +219,6 @@ Resources:
               "Rules": [{"ResourceType": "collection", "Resource": ["collection/${CollectionName}"], "Permission": ["aoss:CreateCollectionItems", "aoss:DescribeCollectionItems", "aoss:UpdateCollectionItems"]}, {"ResourceType": "model", "Resource": ["model/${CollectionName}/*"], "Permission": ["aoss:CreateMLResource", "aoss:DescribeMLResource", "aoss:UpdateMLResource", "aoss:DeleteMLResource", "aoss:ExecuteMLResource"]}],
               "Principal": ["${IndexRoleArn}"]
             },
-            {
-              "Description": "Admin full access",
-              "Rules": [{"ResourceType": "index", "Resource": ["index/${CollectionName}/*"], "Permission": ["aoss:CreateIndex", "aoss:DescribeIndex", "aoss:UpdateIndex", "aoss:DeleteIndex", "aoss:ReadDocument", "aoss:WriteDocument"]}, {"ResourceType": "model", "Resource": ["model/${CollectionName}/*"], "Permission": ["aoss:CreateMLResource", "aoss:DescribeMLResource", "aoss:UpdateMLResource", "aoss:DeleteMLResource", "aoss:ExecuteMLResource"]}],
-              "Principal": ["arn:aws:iam::${AWS::AccountId}:role/Admin"]
-            }
           ]
         - SearchRoleArn: !GetAtt SearchFunctionRole.Arn
           IndexRoleArn: !GetAtt IndexFunctionRole.Arn
