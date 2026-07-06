@@ -1,6 +1,6 @@
 {
   "title": "Serverless AI Weather Agent with AgentCore Gateway and API Gateway Target",
-  "description": "Serverless AI weather agent using Strands SDK and AgentCore Gateway with an API Gateway target. Uses MCP, Cognito JWT auth, and WeatherAPI.com.",
+  "description": "Serverless AI weather agent using Strands SDK and AgentCore Gateway with an API Gateway target. Uses MCP, Cognito JWT auth, and key-less Open-Meteo.",
   "language": "Python",
   "level": "300",
   "framework": "SAM",
@@ -13,8 +13,8 @@
       "AgentCore Gateway auto-discovers operations from the API Gateway REST API via GetExportAPI and presents them as MCP tools to the agent.",
       "The AgentCore Gateway validates the incoming JWT token using a CUSTOM_JWT authorizer backed by Cognito.",
       "When the agent selects a tool, AgentCore routes the request to the API Gateway REST API, authenticating with an API key managed by a credential provider backed by Secrets Manager.",
-      "The API Gateway proxies the request to WeatherAPI.com, injecting the WeatherAPI key from a Secrets Manager-backed stage variable.",
-      "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call."
+      "The API Gateway proxies the request to Open-Meteo, a free key-less weather API — one path for geocoding (city name to coordinates) and one for the forecast.",
+      "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call. For a place name the agent chains both tools: geocode first, then forecast."
     ]
   },
   "gitHub": {
@@ -35,10 +35,6 @@
         "text": "Amazon Bedrock AgentCore Gateway",
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
       },
-       {
-        "text": "Amazon Bedrock AgentCore Gateway",
-        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
-      },
       {
         "text": "AgentCore Gateway API Gateway Target",
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-target-api-gateway.html"
@@ -56,14 +52,14 @@
         "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html"
       },
       {
-        "text": "WeatherAPI.com",
-        "link": "https://www.weatherapi.com/"
+        "text": "Open-Meteo (free key-less weather API)",
+        "link": "https://open-meteo.com/"
       }
     ]
   },
   "deploy": {
     "text": [
-      "./scripts/deploy.sh --environment-name dev --weather-api-key YOUR_WEATHERAPI_KEY --region us-east-1"
+      "./scripts/deploy.sh --environment-name dev --region us-east-1"
     ]
   },
   "testing": {
@@ -77,7 +73,6 @@
     "text": [
       "aws bedrock-agentcore-control delete-api-key-credential-provider --name dev-weather-apigw-key --region us-east-1",
       "sam delete --stack-name dev-weather-agent --region us-east-1 --no-prompts",
-      "aws secretsmanager delete-secret --secret-id dev/weather-api-key --force-delete-without-recovery --region us-east-1",
       "aws secretsmanager delete-secret --secret-id dev/apigw-api-key --force-delete-without-recovery --region us-east-1"
     ]
   },

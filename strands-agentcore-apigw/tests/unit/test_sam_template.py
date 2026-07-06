@@ -53,25 +53,87 @@ class TestGetCurrentWeatherMethod:
         props = resources["GetCurrentWeatherMethod"]["Properties"]
         assert props["AuthorizationType"] == "NONE"
 
-    def test_integration_type_http_proxy(self, resources):
+    def test_integration_type_http_non_proxy(self, resources):
+        # Non-proxy HTTP (not HTTP_PROXY): only mapped params are forwarded, so
+        # the inbound x-api-key header is not leaked to Open-Meteo (which would
+        # otherwise 303-redirect to its commercial endpoint).
         integration = resources["GetCurrentWeatherMethod"]["Properties"]["Integration"]
-        assert integration["Type"] == "HTTP_PROXY"
+        assert integration["Type"] == "HTTP"
 
-    def test_integration_uri_weatherapi(self, resources):
+    def test_integration_uri_open_meteo_forecast(self, resources):
         integration = resources["GetCurrentWeatherMethod"]["Properties"]["Integration"]
-        assert "api.weatherapi.com" in integration["Uri"]
+        assert "api.open-meteo.com/v1/forecast" in integration["Uri"]
 
-    def test_integration_maps_q_param(self, resources):
+    def test_declares_lat_lon_method_params(self, resources):
+        # Declared as required method request params, which also drives the
+        # discovered tool schema the model sees.
+        req_params = resources["GetCurrentWeatherMethod"]["Properties"]["RequestParameters"]
+        assert req_params.get("method.request.querystring.latitude") is True
+        assert req_params.get("method.request.querystring.longitude") is True
+
+    def test_lat_lon_mapped_to_integration(self, resources):
+        # Non-proxy integration forwards nothing unless explicitly mapped, so the
+        # caller's latitude/longitude must be mapped through to the backend.
+        integration = resources["GetCurrentWeatherMethod"]["Properties"]["Integration"]
+        req_params = integration.get("RequestParameters", {})
+        assert req_params.get("integration.request.querystring.latitude") == "method.request.querystring.latitude"
+        assert req_params.get("integration.request.querystring.longitude") == "method.request.querystring.longitude"
+
+    def test_integration_has_responses(self, resources):
+        # Non-proxy integrations require an IntegrationResponses mapping.
+        integration = resources["GetCurrentWeatherMethod"]["Properties"]["Integration"]
+        status_codes = [r["StatusCode"] for r in integration.get("IntegrationResponses", [])]
+        assert "200" in status_codes
+
+    def test_integration_injects_current_fields_server_side(self, resources):
+        # The 'current' field list is injected as a static integration param so
+        # the discovered tool only asks the model for latitude/longitude.
         integration = resources["GetCurrentWeatherMethod"]["Properties"]["Integration"]
         req_params = integration["RequestParameters"]
-        assert "integration.request.querystring.q" in req_params
-        assert req_params["integration.request.querystring.q"] == "method.request.querystring.q"
+        assert "integration.request.querystring.current" in req_params
+        assert "temperature_2m" in str(req_params["integration.request.querystring.current"])
 
-    def test_integration_injects_weather_api_key_via_stage_variable(self, resources):
+    def test_no_api_key_injection(self, resources):
+        # Open-Meteo requires no key — there should be no downstream key param.
         integration = resources["GetCurrentWeatherMethod"]["Properties"]["Integration"]
         req_params = integration["RequestParameters"]
-        assert "integration.request.querystring.key" in req_params
-        assert "stageVariables.weatherApiKey" in str(req_params["integration.request.querystring.key"])
+        assert "integration.request.querystring.key" not in req_params
+
+
+class TestGeocodingMethod:
+    def test_method_exists(self, resources):
+        assert "GeocodingMethod" in resources
+        assert resources["GeocodingMethod"]["Type"] == "AWS::ApiGateway::Method"
+
+    def test_resource_path(self, resources):
+        assert resources["GeocodingResource"]["Properties"]["PathPart"] == "geocoding"
+
+    def test_api_key_required(self, resources):
+        assert resources["GeocodingMethod"]["Properties"]["ApiKeyRequired"] is True
+
+    def test_integration_uri_open_meteo_geocoding(self, resources):
+        integration = resources["GeocodingMethod"]["Properties"]["Integration"]
+        assert "geocoding-api.open-meteo.com/v1/search" in integration["Uri"]
+
+    def test_declares_name_method_param(self, resources):
+        req_params = resources["GeocodingMethod"]["Properties"]["RequestParameters"]
+        assert req_params.get("method.request.querystring.name") is True
+
+    def test_integration_type_http_non_proxy(self, resources):
+        integration = resources["GeocodingMethod"]["Properties"]["Integration"]
+        assert integration["Type"] == "HTTP"
+
+    def test_name_mapped_to_integration(self, resources):
+        # Non-proxy integration forwards nothing unless mapped — the caller's
+        # `name` must be mapped through to the geocoding backend.
+        integration = resources["GeocodingMethod"]["Properties"]["Integration"]
+        req_params = integration.get("RequestParameters", {})
+        assert req_params.get("integration.request.querystring.name") == "method.request.querystring.name"
+
+    def test_integration_has_responses(self, resources):
+        integration = resources["GeocodingMethod"]["Properties"]["Integration"]
+        status_codes = [r["StatusCode"] for r in integration.get("IntegrationResponses", [])]
+        assert "200" in status_codes
 
 
 class TestApiDeployment:
@@ -79,11 +141,12 @@ class TestApiDeployment:
         assert "ApiDeployment" in resources
         assert resources["ApiDeployment"]["Type"] == "AWS::ApiGateway::Deployment"
 
-    def test_deployment_depends_on_method(self, resources):
+    def test_deployment_depends_on_methods(self, resources):
         depends = resources["ApiDeployment"]["DependsOn"]
         if isinstance(depends, str):
             depends = [depends]
         assert "GetCurrentWeatherMethod" in depends
+        assert "GeocodingMethod" in depends
 
 
 class TestApiStage:
@@ -91,16 +154,10 @@ class TestApiStage:
         assert "ApiStage" in resources
         assert resources["ApiStage"]["Type"] == "AWS::ApiGateway::Stage"
 
-    def test_stage_has_weather_api_key_variable(self, resources):
-        variables = resources["ApiStage"]["Properties"]["Variables"]
-        assert "weatherApiKey" in variables
-
-    def test_stage_weather_api_key_uses_secret_reference(self, resources):
-        value = resources["ApiStage"]["Properties"]["Variables"]["weatherApiKey"]
-        # Should be !Sub with secretsmanager dynamic reference using the parameter
-        assert isinstance(value, dict) and "Sub" in value
-        assert "resolve:secretsmanager" in value["Sub"]
-        assert "WeatherApiKeySecretArn" in value["Sub"]
+    def test_stage_has_no_downstream_key_variable(self, resources):
+        # Open-Meteo needs no key, so no downstream-secret stage variable.
+        variables = resources["ApiStage"]["Properties"].get("Variables", {})
+        assert "weatherApiKey" not in variables
 
 
 class TestApiKeyAndUsagePlan:
@@ -153,28 +210,28 @@ class TestAgentCoreGateway:
 
 class TestGatewayTarget:
     def test_target_exists(self, resources):
-        assert "WeatherAPITarget" in resources
-        assert resources["WeatherAPITarget"]["Type"] == "AWS::BedrockAgentCore::GatewayTarget"
+        assert "OpenMeteoTarget" in resources
+        assert resources["OpenMeteoTarget"]["Type"] == "AWS::BedrockAgentCore::GatewayTarget"
 
     def test_target_uses_mcp_api_gateway_block(self, resources):
-        target_config = resources["WeatherAPITarget"]["Properties"]["TargetConfiguration"]
+        target_config = resources["OpenMeteoTarget"]["Properties"]["TargetConfiguration"]
         assert "Mcp" in target_config
         assert "ApiGateway" in target_config["Mcp"]
 
     def test_target_does_not_use_openapi_schema(self, resources):
-        mcp = resources["WeatherAPITarget"]["Properties"]["TargetConfiguration"]["Mcp"]
+        mcp = resources["OpenMeteoTarget"]["Properties"]["TargetConfiguration"]["Mcp"]
         assert "OpenApiSchema" not in mcp
 
     def test_target_references_rest_api(self, resources):
-        api_gw = resources["WeatherAPITarget"]["Properties"]["TargetConfiguration"]["Mcp"]["ApiGateway"]
+        api_gw = resources["OpenMeteoTarget"]["Properties"]["TargetConfiguration"]["Mcp"]["ApiGateway"]
         assert "RestApiId" in api_gw
 
     def test_target_references_stage(self, resources):
-        api_gw = resources["WeatherAPITarget"]["Properties"]["TargetConfiguration"]["Mcp"]["ApiGateway"]
+        api_gw = resources["OpenMeteoTarget"]["Properties"]["TargetConfiguration"]["Mcp"]["ApiGateway"]
         assert "Stage" in api_gw
 
     def test_target_has_tool_configuration(self, resources):
-        api_gw = resources["WeatherAPITarget"]["Properties"]["TargetConfiguration"]["Mcp"]["ApiGateway"]
+        api_gw = resources["OpenMeteoTarget"]["Properties"]["TargetConfiguration"]["Mcp"]["ApiGateway"]
         assert "ApiGatewayToolConfiguration" in api_gw
         tool_config = api_gw["ApiGatewayToolConfiguration"]
         assert "ToolFilters" in tool_config
@@ -399,9 +456,9 @@ class TestParameters:
         assert "EnvironmentName" in parameters
         assert parameters["EnvironmentName"]["Type"] == "String"
 
-    def test_weather_api_key_secret_arn_param(self, parameters):
-        assert "WeatherApiKeySecretArn" in parameters
-        assert parameters["WeatherApiKeySecretArn"]["Type"] == "String"
+    def test_no_weather_api_key_param(self, parameters):
+        # Open-Meteo needs no key, so the WeatherAPI secret param was removed.
+        assert "WeatherApiKeySecretArn" not in parameters
 
     def test_credential_provider_arn_param(self, parameters):
         assert "CredentialProviderArn" in parameters

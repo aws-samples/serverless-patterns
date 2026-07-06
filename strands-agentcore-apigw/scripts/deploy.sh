@@ -11,7 +11,6 @@
 # Usage:
 #   ./scripts/deploy.sh \
 #     --environment-name dev \
-#     --weather-api-key YOUR_WEATHERAPI_KEY \
 #     --region us-east-1 \
 #     --s3-bucket my-deploy-bucket
 # =============================================================================
@@ -23,7 +22,6 @@ set -e
 REGION="us-east-1"
 S3_BUCKET=""
 ENVIRONMENT_NAME=""
-WEATHER_API_KEY=""
 BEDROCK_MODEL_ID="us.anthropic.claude-sonnet-4-6"
 TEMPLATE_FILE="infrastructure/template.yaml"
 
@@ -34,10 +32,6 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --environment-name)
       ENVIRONMENT_NAME="$2"
-      shift 2
-      ;;
-    --weather-api-key)
-      WEATHER_API_KEY="$2"
       shift 2
       ;;
     --region)
@@ -54,7 +48,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       echo "Unknown parameter: $1"
-      echo "Usage: $0 --environment-name NAME --weather-api-key KEY [--region REGION] [--s3-bucket BUCKET] [--bedrock-model-id MODEL_ID]"
+      echo "Usage: $0 --environment-name NAME [--region REGION] [--s3-bucket BUCKET] [--bedrock-model-id MODEL_ID]"
       exit 1
       ;;
   esac
@@ -68,11 +62,6 @@ if [[ -z "$ENVIRONMENT_NAME" ]]; then
   exit 1
 fi
 
-if [[ -z "$WEATHER_API_KEY" ]]; then
-  echo "ERROR: --weather-api-key is required"
-  exit 1
-fi
-
 if ! command -v sam > /dev/null 2>&1; then
   echo "ERROR: AWS SAM CLI is not installed."
   echo "       Install it: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html"
@@ -80,7 +69,6 @@ if ! command -v sam > /dev/null 2>&1; then
 fi
 
 STACK_NAME="${ENVIRONMENT_NAME}-weather-agent"
-WEATHER_SECRET_NAME="${ENVIRONMENT_NAME}/weather-api-key"
 APIGW_SECRET_NAME="${ENVIRONMENT_NAME}/apigw-api-key"
 LAMBDA_FUNCTION_NAME="${ENVIRONMENT_NAME}-weather-agent"
 BUILD_DIR=".aws-sam/build"
@@ -134,31 +122,13 @@ echo "    Template validation passed."
 
 # =============================================================================
 # Step 2: Create/update Secrets Manager secrets
+#
+# Only the API Gateway key secret is needed — it holds the API key the
+# AgentCore credential provider uses to call API Gateway. The Open-Meteo
+# backend requires no key, so there is no downstream API secret.
 # =============================================================================
 echo ""
 echo ">>> Step 2: Creating/updating Secrets Manager secrets..."
-
-# --- WeatherAPI key secret ---
-if aws secretsmanager describe-secret --secret-id "${WEATHER_SECRET_NAME}" --region "${REGION}" > /dev/null 2>&1; then
-  echo "    Updating existing WeatherAPI key secret..."
-  aws secretsmanager put-secret-value \
-    --secret-id "${WEATHER_SECRET_NAME}" \
-    --secret-string "${WEATHER_API_KEY}" \
-    --region "${REGION}" > /dev/null
-else
-  echo "    Creating WeatherAPI key secret..."
-  aws secretsmanager create-secret \
-    --name "${WEATHER_SECRET_NAME}" \
-    --description "WeatherAPI.com API key for ${ENVIRONMENT_NAME}" \
-    --secret-string "${WEATHER_API_KEY}" \
-    --region "${REGION}" > /dev/null
-fi
-
-WEATHER_SECRET_ARN=$(aws secretsmanager describe-secret \
-  --secret-id "${WEATHER_SECRET_NAME}" \
-  --region "${REGION}" \
-  --query 'ARN' --output text)
-echo "    WeatherAPI secret ARN: ${WEATHER_SECRET_ARN}"
 
 # --- Placeholder APIGW key secret ---
 if aws secretsmanager describe-secret --secret-id "${APIGW_SECRET_NAME}" --region "${REGION}" > /dev/null 2>&1; then
@@ -196,7 +166,7 @@ echo "    Build complete."
 # =============================================================================
 echo ""
 echo ">>> Step 4: Deploying stack '${STACK_NAME}' (initial)..."
-sam_deploy "EnvironmentName=${ENVIRONMENT_NAME} WeatherApiKeySecretArn=${WEATHER_SECRET_ARN} BedrockModelId=${BEDROCK_MODEL_ID}"
+sam_deploy "EnvironmentName=${ENVIRONMENT_NAME} BedrockModelId=${BEDROCK_MODEL_ID}"
 echo "    Stack deployment complete."
 
 # Retrieve stack outputs
@@ -321,7 +291,7 @@ if [[ -n "${CRED_PROVIDER_ARN}" && "${CRED_PROVIDER_ARN}" != "None" ]]; then
   echo "    Credential provider verified (last updated: ${VERIFY_TIME})"
   echo ""
   echo ">>> Step 7b: Re-deploying stack with credential provider ARN..."
-  sam_deploy "EnvironmentName=${ENVIRONMENT_NAME} WeatherApiKeySecretArn=${WEATHER_SECRET_ARN} BedrockModelId=${BEDROCK_MODEL_ID} CredentialProviderArn=${CRED_PROVIDER_ARN}"
+  sam_deploy "EnvironmentName=${ENVIRONMENT_NAME} BedrockModelId=${BEDROCK_MODEL_ID} CredentialProviderArn=${CRED_PROVIDER_ARN}"
   echo "    Stack updated with credential provider."
 else
   echo ""
@@ -358,7 +328,6 @@ else
   echo "     --resolve-s3 \\"
   echo "     --parameter-overrides \\"
   echo "       EnvironmentName=${ENVIRONMENT_NAME} \\"
-  echo "       WeatherApiKeySecretArn=${WEATHER_SECRET_ARN} \\"
   echo "       CredentialProviderArn=<YOUR_CREDENTIAL_PROVIDER_ARN>"
   echo ""
   echo "============================================="

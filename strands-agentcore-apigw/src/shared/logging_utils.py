@@ -4,7 +4,7 @@ import logging
 import json
 import re
 from typing import Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .models import UserContext
 
@@ -60,7 +60,7 @@ def log_with_user_context(
 ) -> None:
     """Log message with user context, request ID, and additional fields."""
     log_data = {
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'message': message
     }
 
