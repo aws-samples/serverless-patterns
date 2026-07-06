@@ -63,7 +63,7 @@ The OpenSearch collection lives inside a NextGen collection group, which enables
 
 ### Scale-to-zero in action
 
-The chart below shows the OCU (OpenSearch Compute Unit) metrics from CloudWatch during a test run:
+The chart below shows the OCU (OpenSearch Compute Unit) metrics from Amazon CloudWatch during a test run:
 
 ![CloudWatch metrics showing Search and Indexing OCUs scaling from zero, handling traffic, then returning to zero](images/search-acu-scaling.png)
 
