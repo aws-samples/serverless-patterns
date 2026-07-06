@@ -46,7 +46,8 @@ description = "Deploy the SAM application to AWS without requiring changeset con
 depends = "sam:build"
 run = """
     sam deploy --stack-name ${STACK_NAME} \
-               --parameter-overrides EnableApiAccessLogs=${ENABLE_API_ACCESS_LOGS} \
+               --parameter-overrides DeploymentRoleName=Admin \
+                                     EnableApiAccessLogs=${ENABLE_API_ACCESS_LOGS} \
                                      CollectionGroupName=${COLLECTION_GROUP_NAME} \
                                      CollectionName=${COLLECTION_NAME}
 """
@@ -55,7 +56,8 @@ run = """
 description = "Watch for file changes and automatically sync code and infra to AWS"
 run = """sam sync --stack-name ${STACK_NAME} \
                   --watch \
-                  --parameter-overrides EnableApiAccessLogs=${ENABLE_API_ACCESS_LOGS} \
+                  --parameter-overrides DeploymentRoleName=Admin \
+                                        EnableApiAccessLogs=${ENABLE_API_ACCESS_LOGS} \
                                         CollectionGroupName=${COLLECTION_GROUP_NAME} \
                                         CollectionName=${COLLECTION_NAME}
 """
