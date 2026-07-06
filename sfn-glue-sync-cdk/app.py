@@ -54,7 +54,7 @@ class SfnGlueCdkStack(Stack):
             role=glue_job_role.role_arn,
             command=glue.CfnJob.JobCommandProperty(
                 name='pythonshell',
-                python_version='3',
+                python_version='3.9',
                 script_location=scriptLocation
             ))
 
