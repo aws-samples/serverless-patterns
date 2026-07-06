@@ -59,6 +59,9 @@ You can call the `StartJobRun` API from a Task state with
 
 Task `GlueStartJobRun` defined in the `app.py` triggers a glue job and wait for job completion before transitioning to next step.
 Python-shell glue job is defined with `glue.CfnJob` in `app.py` which triggers a python script `hello.py`
+
+> [!NOTE]
+> This pattern uses a Python shell job (Python 3.9), which is the latest Python version available for Python shell jobs. If you need a newer Python version, consider other options described in [Migrate from AWS Glue Python shell jobs](https://docs.aws.amazon.com/glue/latest/dg/pyshell-migration.html).
  
 ## Steps for Testing
 
