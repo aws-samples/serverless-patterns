@@ -37,11 +37,17 @@ Important: this application uses various AWS services and there are costs associ
     ```
     From the output ARN, take the role name (the segment after `role/`). For example, if the ARN is `arn:aws:sts::123456789012:assumed-role/PowerUser/session`, the role name is `PowerUser`.
 1. Deploy the application:
+    ```bash
+    export STACK_NAME=lambda-aoss-nextgen
+    sam deploy --stack-name ${STACK_NAME} --guided 
     ```
-    sam deploy --guided
+    On Windows (PowerShell):
+    ```powershell
+    $env:STACK_NAME = "lambda-aoss-nextgen"
+    sam deploy --stack-name $env:STACK_NAME --guided
     ```
 1. During the prompts:
-    * Enter a stack name
+    * Accept the Stack Name provided
     * Enter the desired AWS Region
     * For `DeploymentRoleName`, enter the role name from the previous step
     * Accept the remaining default parameter values or customize them
@@ -105,10 +111,19 @@ The repository includes integration tests that exercise all three search modes a
 
 ```bash
 # Set your stack name and region
-export STACK_NAME="your-stack-name"
+export STACK_NAME="your-stack-name"  # not required if set during deploy
 export AWS_REGION="your-region"
 
 # Run integration tests (requires a deployed stack)
+pytest tests/integration/ -v -s
+```
+
+On Windows (PowerShell):
+
+```powershell
+$env:STACK_NAME = "your-stack-name"  # not required if set during deploy
+$env:AWS_REGION = "your-region"
+
 pytest tests/integration/ -v -s
 ```
 
@@ -127,6 +142,13 @@ Set your stack name and region (if not already set):
 ```bash
 STACK_NAME="your-stack-name"
 AWS_REGION="your-region"
+```
+
+On Windows (PowerShell):
+
+```powershell
+$env:STACK_NAME = "your-stack-name"
+$env:AWS_REGION = "your-region"
 ```
 
 Index a document:
