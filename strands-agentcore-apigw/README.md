@@ -1,4 +1,4 @@
-# AgentCore API Gateway Weather Agent
+# Amazon Bedrock AgentCore API Gateway Weather Agent
 
 A serverless AI weather agent built on Amazon Bedrock AgentCore. Uses the Strands SDK to orchestrate an LLM (Claude Sonnet 4.6) that calls weather tools exposed through an Amazon Bedrock AgentCore Gateway backed by Amazon API Gateway and [Open-Meteo](https://open-meteo.com/) (a free, key-less weather API). Authentication is handled by Amazon Cognito, and the agent runs on AWS Lambda.
 
@@ -100,12 +100,19 @@ The script handles everything in order:
 
 ### Step 4: Test
 
+No input or arguments are required — just run the script. It's fully self-contained (the Cognito client ID, region, and test-user credentials were baked in during deploy):
+
 ```bash
 ./scripts/test.sh
+```
+
+This uses the default prompt (`What is the weather in London, UK?`). To ask about a different location, pass your own prompt as the single argument:
+
+```bash
 ./scripts/test.sh 'What is the weather in Liverpool, England?'
 ```
 
-The test script authenticates via Amazon Cognito, gets an ID token, and invokes the AWS Lambda function with your prompt.
+The test script authenticates via Amazon Cognito, gets an ID token, and invokes the AWS Lambda function with the prompt. There are no interactive prompts to answer.
 
 ## Parameters
 
