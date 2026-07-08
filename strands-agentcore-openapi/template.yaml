@@ -1,0 +1,225 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'OpenAPI Agent Gateway - Serverless AI agent system with dynamic OpenAPI tool discovery (AWS SAM)'
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Description: Environment name prefix for all resources
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+  WeatherApiKeySecretArn:
+    Type: String
+    Description: ARN of the Secrets Manager secret containing the WeatherAPI.com API key
+    Default: ''
+
+  CredentialProviderArn:
+    Type: String
+    Description: ARN of the API Key credential provider for WeatherAPI (created outside CloudFormation)
+    Default: ''
+
+  BedrockModelId:
+    Type: String
+    Description: Bedrock model ID for the Agent Lambda
+    Default: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
+
+Conditions:
+  HasCredentialProvider: !Not [!Equals [!Ref CredentialProviderArn, '']]
+
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${EnvironmentName}-openapi-agent-user-pool'
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${EnvironmentName}-openapi-agent-client'
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  GatewayExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-gateway-execution-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      Policies:
+        - PolicyName: GatewayOutboundAuth
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: GetWorkloadAccessToken
+                Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetWorkloadAccessToken
+                Resource:
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/${EnvironmentName}-openapi-agent-gateway-*'
+              - Sid: GetResourceApiKey
+                Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetResourceApiKey
+                Resource:
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default/apikeycredentialprovider/*'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/${EnvironmentName}-openapi-agent-gateway-*'
+              - Sid: GetSecretValue
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:bedrock-agentcore-identity!default/apikey/*'
+
+  AgentCoreGateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      Name: !Sub '${EnvironmentName}-openapi-agent-gateway'
+      AuthorizerType: CUSTOM_JWT
+      AuthorizerConfiguration:
+        CustomJWTAuthorizer:
+          DiscoveryUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/openid-configuration'
+          AllowedClients:
+            - !Ref CognitoUserPoolClient
+      ProtocolType: MCP
+      ProtocolConfiguration:
+        Mcp:
+          SupportedVersions:
+            - '2025-03-26'
+      RoleArn: !GetAtt GatewayExecutionRole.Arn
+
+  AgentFunction:
+    Type: AWS::Serverless::Function
+    # Built via src/Makefile so binary deps (e.g. cryptography) are installed
+    # as Linux manylinux wheels without needing Docker. See BuildMethod below.
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      FunctionName: !Sub '${EnvironmentName}-agent-lambda'
+      CodeUri: src/
+      Handler: agent.handler.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 120
+      MemorySize: 1024
+      Environment:
+        Variables:
+          COGNITO_JWKS_URL: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/jwks.json'
+          GATEWAY_ID: !Ref AgentCoreGateway
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Policies:
+        - Statement:
+            - Sid: BedrockInvoke
+              Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+                - bedrock:Converse
+                - bedrock:ConverseStream
+              Resource: '*'
+            - Sid: AgentCoreGatewayRead
+              Effect: Allow
+              Action:
+                - bedrock-agentcore:ListGatewayTargets
+                - bedrock-agentcore:GetGatewayTarget
+                - bedrock-agentcore:GetGateway
+              Resource: '*'
+
+  AgentFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${EnvironmentName}-agent-lambda'
+      RetentionInDays: 30
+
+  # Gateway Target for WeatherAPI.com — created once the API Key credential
+  # provider ARN is available (see scripts/deploy.sh).
+  WeatherAPITarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    Condition: HasCredentialProvider
+    Properties:
+      GatewayIdentifier: !Ref AgentCoreGateway
+      Name: weatherapi-current-weather
+      Description: WeatherAPI.com current weather data via OpenAPI target
+      CredentialProviderConfigurations:
+        - CredentialProviderType: API_KEY
+          CredentialProvider:
+            ApiKeyCredentialProvider:
+              ProviderArn: !Ref CredentialProviderArn
+              CredentialLocation: QUERY_PARAMETER
+              CredentialParameterName: key
+      TargetConfiguration:
+        Mcp:
+          OpenApiSchema:
+            InlinePayload: |
+              openapi: 3.0.0
+              info:
+                title: WeatherAPI.com
+                version: 1.0.0
+                description: Real-time weather data API
+              servers:
+                - url: https://api.weatherapi.com/v1
+              paths:
+                /current.json:
+                  get:
+                    operationId: getCurrentWeather
+                    summary: Get current weather
+                    description: Get real-time weather data for a location including temperature, conditions, wind, and humidity
+                    parameters:
+                      - name: q
+                        in: query
+                        required: true
+                        schema:
+                          type: string
+                        description: Location query (city name, coordinates, IP, etc)
+                      - name: aqi
+                        in: query
+                        required: false
+                        schema:
+                          type: string
+                          enum:
+                            - "yes"
+                            - "no"
+                        description: Include air quality data
+                    responses:
+                      "200":
+                        description: Current weather data
+
+Outputs:
+  GatewayId:
+    Description: AgentCore Gateway ID
+    Value: !Ref AgentCoreGateway
+
+  CognitoUserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref CognitoUserPool
+
+  CognitoClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref CognitoUserPoolClient
+
+  AgentLambdaArn:
+    Description: Agent Lambda Function ARN
+    Value: !GetAtt AgentFunction.Arn
