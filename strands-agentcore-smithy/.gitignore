@@ -1,0 +1,15 @@
+*-deps/
+*-package/
+*.zip
+.aws-sam/
+samconfig.toml
+.kiro/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.so
+*.egg-info/
+.pytest_cache/
+.hypothesis/
+.DS_Store
