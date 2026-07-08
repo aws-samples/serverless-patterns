@@ -59,21 +59,21 @@ Save both values — you'll need them during deployment.
 1. Clone the repository and navigate to the project directory:
     ```bash
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/lambda-df-slack
-    cd terraform
+    cd serverless-patterns/lambda-df-slack/terraform
     ```
 
 2. Initialize and deploy:
     ```bash
     terraform init
-    terraform apply -auto-approve
+    terraform apply
     ```
-   > **Note:** The build script (`terraform/build.sh`) automatically installs Python dependencies into a `build/` directory during `terraform apply`. No manual dependency installation is needed.
 
    When prompted, enter:
     - **prefix** - this will be the prefix for all resource names
     - **slack_bot_token** - **Bot User OAuth Token** (starts with `xoxb-`)
     - **slack_signing_secret** - **Signing Secret** copied earlier from **"App Credentials"**
+
+   > **What happens during apply:** Terraform automatically runs `build.sh` to install Python dependencies and package the Lambda code, then builds and pushes the AgentCore container image to ECR using Finch. See [Troubleshooting](#troubleshooting) if either step fails.
 
 3. Get the API Gateway URL from the output:
     ```bash
@@ -147,6 +147,35 @@ aws logs tail /aws/lambda/<prefix>-orchestrator --follow --region us-east-2
 # Check DynamoDB for conversation state
 aws dynamodb scan --table-name <prefix>-callbacks --region us-east-2
 ```
+
+## Troubleshooting
+
+### `pip: command not found` during apply
+
+The `build.sh` script uses `pip` to install Python dependencies. If your system uses a different command:
+
+- **macOS with Homebrew Python:** Replace `pip` with `pip3` or `python3.13 -m pip` in `terraform/build.sh` (line 22)
+- **uv users:** Replace the `pip install --target ...` line with `uv pip install --target "$BUILD_DIR" -r /dev/stdin`
+
+The Lambda runtime requires **Python 3.11+**, so ensure your pip points to a 3.11+ installation.
+
+### Finch errors during container build
+
+The AgentCore image build uses [Finch](https://github.com/runfinch/finch). Common issues:
+
+- **`finch: command not found`** — Install Finch or, if you use Docker, replace `finch` with `docker` in the `null_resource.agentcore_image_build` provisioner in `terraform/main.tf`
+- **`instance "finch" does not exist`** — Run `finch vm init && finch vm start` before applying
+- **Permission errors** — Ensure `aws ecr get-login-password` works with your configured AWS credentials
+
+### Re-running a failed build
+
+If `terraform apply` fails mid-way through a provisioner, fix the underlying issue and re-run:
+
+```bash
+terraform apply
+```
+
+Terraform will re-trigger the failed provisioner on the next apply since the resource was not marked as created.
 
 ## Cleanup
 

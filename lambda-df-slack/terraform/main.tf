@@ -833,7 +833,10 @@ resource "aws_iam_role_policy" "agentcore_runtime" {
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream"
         ]
-        Resource = "*"
+        Resource = [
+          "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+          "arn:aws:bedrock:*:*:inference-profile/*"
+        ]
       },
       {
         Effect = "Allow"
