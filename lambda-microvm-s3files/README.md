@@ -9,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) **v2.35.0 or newer**, installed and configured. The `aws lambda-microvms` and `aws s3files` commands this pattern uses are only present in recent CLI builds — older releases (e.g. 2.32.x) fail with `Invalid choice: 'lambda-microvms'`. Check with `aws --version` and [upgrade](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) if needed.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) **v2.35.0 or newer**, installed and configured. Check with `aws --version` and [upgrade](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) if needed.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * `python3` and `zip` on your `PATH`
@@ -174,9 +174,6 @@ curl "https://<endpoint>/files/local.txt" -H "X-aws-proxy-auth: <token>" -H "X-a
       aws s3api delete-objects --bucket "$BUCKET" --region us-west-2 --delete "$BATCH" >/dev/null
     done
     ```
-    (The `grep` guard matters: on an already-empty bucket the query returns
-    `{"Objects": null}`, and passing that to `delete-objects` errors — the guard
-    turns that into a clean exit instead.)
 5. Re-run the stack delete; with the bucket empty it now removes the bucket and
    completes:
     ```
@@ -189,27 +186,7 @@ curl "https://<endpoint>/files/local.txt" -H "X-aws-proxy-auth: <token>" -H "X-a
       --query "StackSummaries[?StackName=='<stack-name>' && StackStatus!='DELETE_COMPLETE'].StackStatus"
     ```
 7. **If you created a dedicated VPC/subnet for this pattern**, it is *not* part of
-   the stack — delete it separately once the stack is gone, e.g.:
-    ```
-    aws ec2 delete-subnet --subnet-id <SubnetId> --region us-west-2
-    aws ec2 delete-vpc    --vpc-id    <VpcId>    --region us-west-2
-    ```
-    (The account's **default VPC** is shared infrastructure — leave it in place.)
-    You may also want to delete the artifact bucket from step 3 of deployment
-    (`aws s3 rb s3://<your-artifact-bucket> --force --region us-west-2`) if you
-    created it solely for this pattern.
-
-## Repository layout
-
-```
-lambda-microvm-s3files/
-├── template.yaml          # SAM/CloudFormation template (everything provisionable)
-├── example-pattern.json   # Serverless Land pattern metadata
-└── src/
-    ├── app.py             # Flask app: filesystem browser + 6 lifecycle hooks
-    ├── Dockerfile         # AL2023 + amazon-efs-utils (the mount -t s3files helper)
-    └── run.sh             # data-plane helper: package / run / prove / terminate
-```
+   the stack, delete it separately once the stack is gone.
 
 ----
 SPDX-License-Identifier: MIT-0
