@@ -1,0 +1,91 @@
+{
+    "title": "AWS Lambda MicroVMs with Amazon S3 Files",
+    "description": "Mount an Amazon S3 bucket as a POSIX file system inside a Lambda MicroVM, reachable over NFS through a VPC egress network connector.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern runs a containerized application inside an AWS Lambda MicroVM — a Firecracker-isolated, snapshot-resumable serverless compute environment — and mounts an Amazon S3 bucket as a local POSIX file system using Amazon S3 Files (NFS 4.2). The application reads and writes files on a mount path and S3 Files synchronizes changes to and from the bucket in both directions, with no GetObject/PutObject plumbing in the code.",
+            "Because the file system lives in your VPC (not on a public endpoint), the MicroVM reaches the mount target over a VPC egress network connector that provisions elastic network interfaces. The mount itself happens at run time inside the MicroVM's /run lifecycle hook — the network path and execution-role credentials only exist once the MicroVM is running, so they cannot be baked into the image snapshot.",
+            "CloudFormation provisions the data bucket, the S3 Files file system, mount target, and access point, the VPC egress connector, all IAM roles, and the MicroVM image (AWS::Lambda::MicrovmImage). The MicroVM itself is launched afterwards with the included run.sh helper, since RunMicrovm is a runtime API rather than a CloudFormation resource."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-s3files",
+            "templateURL": "serverless-patterns/lambda-microvm-s3files",
+            "projectFolder": "lambda-microvm-s3files",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Lambda MicroVMs",
+                "link": "https://docs.aws.amazon.com/lambda/"
+            },
+            {
+                "text": "Amazon S3 Files",
+                "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files.html"
+            },
+            {
+                "text": "AWS::Lambda::MicrovmImage CloudFormation resource",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "./src/run.sh package <artifact-bucket>",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the README for full testing instructions (run.sh run / run.sh prove)."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "see the README Cleanup section"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ben Freiberg",
+            "image": "https://serverlessland.com/assets/images/contributors/ben-freiberg.jpg",
+            "bio": "",
+            "linkedin": "benfreiberg"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "Lambda MicroVM"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "s3",
+            "label": "S3 Files"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "s3",
+            "label": "S3 Bucket"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}
