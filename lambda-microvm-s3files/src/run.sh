@@ -55,6 +55,37 @@ wait_for_200() {
   echo "$code"; return 1
 }
 
+# Wait until the /run lifecycle hook has finished mounting. The hook records a
+# "run" event with detail.mounted only AFTER the S3 Files mount is usable (a real
+# I/O round trip succeeded, not just findmnt registering the mountpoint). Gating
+# on this — instead of the first HTTP 200 — is what keeps an immediately-following
+# `prove` from writing before the efs-proxy tunnel is ready and losing the file.
+# Returns 0 once mounted, 1 on an observed mount failure, 2 if it never appeared.
+wait_for_mount() {
+  local endpoint=$1 token=$2 tries=${3:-40} slp=${4:-3} i body mounted
+  for ((i=0; i<tries; i++)); do
+    body=$(curl -sS "https://${endpoint}/lifecycle" \
+             -H "X-aws-proxy-auth: $token" -H "X-aws-proxy-port: ${APP_PORT}" \
+             --max-time 5 2>/dev/null || true)
+    if [[ -n "$body" ]]; then
+      mounted=$(printf '%s' "$body" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+runs = [e for e in d.get("events", []) if e.get("event") == "run"]
+if runs:
+    print("true" if (runs[-1].get("detail") or {}).get("mounted") else "false")
+' 2>/dev/null || true)
+      [[ "$mounted" == "true" ]] && return 0
+      [[ "$mounted" == "false" ]] && return 1
+    fi
+    sleep "$slp"
+  done
+  return 2
+}
+
 # ── package: zip src/ and upload to the artifact bucket ──────────────────────
 package() {
   local bucket="${1:?usage: run.sh package <artifact-bucket> [key]}" key="${2:-app.zip}"
@@ -93,12 +124,25 @@ run() {
   [[ -n "$mt_ip" && "$mt_ip" != "None" ]] \
     || die "could not resolve mount-target IP for $OUT_MountTargetId (is the file system AVAILABLE?)"
 
+  # The access point roots the mount at a sub-directory (e.g. /microvm), so files
+  # written on the mount land under that prefix in the bucket. Look the path up and
+  # pass it so the app reports correct s3:// locations (bucket + AP prefix + file).
+  local ap_path
+  ap_path=$(aws s3files get-access-point --access-point-id "$OUT_AccessPointId" --region "$REGION" \
+              --query 'rootDirectory.path' --output text 2>/dev/null || echo "")
+  [[ "$ap_path" == "None" ]] && ap_path=""
+
   local payload
-  payload=$(python3 - "$OUT_FileSystemId" "$OUT_AccessPointId" "$mt_ip" "$REGION" "$OUT_DataBucket" <<'PY'
+  payload=$(python3 - "$OUT_FileSystemId" "$OUT_AccessPointId" "$mt_ip" "$REGION" "$OUT_DataBucket" "$ap_path" <<'PY'
 import json, sys
-fsid, apid, mt_ip, region, bucket = sys.argv[1:6]
-print(json.dumps({"fileSystemId": fsid, "accessPointId": apid,
-                  "mountTargetIp": mt_ip, "region": region, "bucket": bucket}))
+fsid, apid, mt_ip, region, bucket, ap_path = sys.argv[1:7]
+payload = {"fileSystemId": fsid, "accessPointId": apid,
+           "mountTargetIp": mt_ip, "region": region, "bucket": bucket}
+# The access-point root directory becomes the bucket-side prefix for synced files.
+prefix = ap_path.strip("/")
+if prefix:
+    payload["prefix"] = prefix
+print(json.dumps(payload))
 PY
 )
   log "running MicroVM from $OUT_ImageArn"
@@ -122,6 +166,15 @@ PY
   local token; token=$(mint_token "$mvm_id")
   log "polling app until first 200…"
   wait_for_200 "https://${endpoint}/" "$token" /dev/null 40 2 5 >/dev/null || true
+  # Do NOT return on the first 200: the app answers before the /run hook has
+  # finished mounting. Wait for the mount to be usable so a following `prove`
+  # (or any write) does not race the efs-proxy tunnel and silently lose data.
+  log "waiting for the S3 Files mount to become usable…"
+  if wait_for_mount "$endpoint" "$token" 40 3; then
+    log "mount ready"
+  else
+    log "WARNING: mount did not report ready — check /lifecycle and CloudWatch (last GET / below)"
+  fi
   log "GET / →"
   curl -sS "https://${endpoint}/" -H "X-aws-proxy-auth: $token" \
     -H "X-aws-proxy-port: ${APP_PORT}" | python3 -m json.tool
@@ -141,8 +194,6 @@ prove() {
   # shellcheck disable=SC1090
   source "$STATE_FILE"   # provides MVM_ID, MVM_ENDPOINT, DATA_BUCKET
   local token; token=$(mint_token "$MVM_ID")
-  # The access point scopes the mount to /microvm, so files land under that prefix.
-  local prefix="s3://${DATA_BUCKET}/microvm/sync-proof/"
 
   # The VM may have idle-suspended; the first request auto-resumes it and can
   # cold-path time out. Retry /sync-proof until it returns a 200 body.
@@ -153,16 +204,22 @@ prove() {
     || die "/sync-proof did not return 200 (last code: ${code})"
   python3 -m json.tool < "$body"
 
-  log "polling ${prefix} for the synced file (S3 export is async)…"
-  local i listing
+  # Poll for the EXACT s3:// object this call just wrote (from the response's
+  # will_appear_in_s3_at), not merely a non-empty prefix — otherwise a re-run
+  # would "pass" instantly on a file left by a previous run.
+  local s3_uri
+  s3_uri=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("will_appear_in_s3_at",""))' "$body" 2>/dev/null || true)
+  [[ "$s3_uri" == s3://* ]] || die "could not determine the written object's S3 URI from the response"
+
+  log "polling ${s3_uri} for the synced file (S3 export is async)…"
+  local i
   for i in $(seq 1 24); do
-    listing=$(aws s3 ls "$prefix" --region "$REGION" 2>/dev/null || true)
-    if [[ -n "$listing" ]]; then
-      log "synced to S3:"; printf '%s\n' "$listing"; return 0
+    if aws s3 ls "$s3_uri" --region "$REGION" 2>/dev/null | grep -q .; then
+      log "synced to S3:"; aws s3 ls "$s3_uri" --region "$REGION"; return 0
     fi
     sleep 5
   done
-  log "not visible yet — sync can lag; re-check: aws s3 ls ${prefix}"
+  log "not visible yet — sync can lag; re-check: aws s3 ls ${s3_uri}"
 }
 
 # ── terminate ────────────────────────────────────────────────────────────────

@@ -98,6 +98,27 @@ def _is_mounted() -> bool:
         return False
 
 
+def _mount_usable(timeout: int = 5) -> bool:
+    """True once the mount actually carries I/O, not just once findmnt sees it.
+
+    amazon-efs-utils registers the mountpoint (so `findmnt` reports it) a few
+    seconds before the efs-proxy TLS tunnel is fully carrying data. A file written
+    in that window lands *under* the not-yet-ready mount and never syncs to S3.
+    Do a write -> read -> delete round trip on the mount (bounded by `timeout` via
+    subprocess so a stuck tunnel can't hang the run hook) and only treat the mount
+    as ready once it succeeds. The probe file is a hidden dotfile that is removed
+    immediately, so it leaves nothing behind in the bucket."""
+    probe = f"{MOUNT_PATH}/.s3files-readycheck-{secrets.token_hex(4)}"
+    try:
+        res = subprocess.run(
+            ["sh", "-c", f'echo ready > "{probe}" && cat "{probe}" >/dev/null && rm -f "{probe}"'],
+            capture_output=True, text=True, timeout=timeout,
+        )
+        return res.returncode == 0
+    except Exception:
+        return False
+
+
 def mount_s3files() -> bool:
     """Mount the S3 file system at MOUNT_PATH using the amazon-efs-utils helper.
 
@@ -131,13 +152,33 @@ def mount_s3files() -> bool:
     cmd = ["mount", "-t", "s3files", "-o", ",".join(opts), f"{fsid}:/", MOUNT_PATH]
     log("mount_attempt", cmd=" ".join(cmd))
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
-        if res.returncode == 0 and _is_mounted():
-            MOUNT["last_error"] = None
-            log("mount_ok", path=MOUNT_PATH)
-            return True
-        MOUNT["last_error"] = (res.stderr or res.stdout or "mount failed").strip()
-        log("mount_failed", rc=res.returncode, err=MOUNT["last_error"])
+        # This whole function runs inside the /run (or /resume) hook, which the
+        # platform bounds by RunTimeoutInSeconds (60, the max). Keep the worst
+        # case comfortably under that: mount is capped at 35s and the readiness
+        # probe below at a ~12s deadline (~50s worst case). If either stage runs
+        # long, we return False and the app reports mounted:false rather than
+        # letting the hook get killed mid-mount.
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=35)
+        if res.returncode != 0 or not _is_mounted():
+            MOUNT["last_error"] = (res.stderr or res.stdout or "mount failed").strip()
+            log("mount_failed", rc=res.returncode, err=MOUNT["last_error"])
+            return False
+        # The mount is registered, but the efs-proxy TLS tunnel may still be
+        # coming up. Block until a real I/O round trip succeeds so callers (and
+        # run.sh) never see mounted=true before the mount can actually carry data
+        # — otherwise a write issued immediately after run can be lost. Bound by a
+        # monotonic deadline (not an iteration count) because each probe can hang
+        # up to its own timeout when the tunnel is not yet carrying I/O; in the
+        # happy path the very first probe succeeds in well under a second.
+        probe_deadline = time.monotonic() + 12
+        while time.monotonic() < probe_deadline:
+            if _mount_usable(timeout=3):
+                MOUNT["last_error"] = None
+                log("mount_ok", path=MOUNT_PATH)
+                return True
+            time.sleep(1)
+        MOUNT["last_error"] = "mount registered but not usable (efs-proxy tunnel not ready)"
+        log("mount_not_usable", err=MOUNT["last_error"])
         return False
     except Exception as e:  # noqa: BLE001
         MOUNT["last_error"] = str(e)

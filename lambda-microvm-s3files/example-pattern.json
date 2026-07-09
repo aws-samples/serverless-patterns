@@ -50,7 +50,9 @@
   "cleanup": {
     "text": [
       "Terminate the MicroVM: <code>./src/run.sh terminate &lt;stack-name&gt;</code>.",
-      "Delete the stack: <code>sam delete --stack-name &lt;stack-name&gt;</code>."
+      "Delete the stack: <code>sam delete --stack-name &lt;stack-name&gt;</code> (it fails on the versioned data bucket, but removes the S3 Files file system and everything else).",
+      "Empty the now-static data bucket (all object versions and delete markers), then re-run the stack delete so it removes the bucket — see the README Cleanup section.",
+      "If you created a dedicated VPC/subnet for this pattern, delete it separately."
     ]
   },
   "authors": [

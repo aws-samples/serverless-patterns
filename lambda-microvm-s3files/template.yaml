@@ -223,12 +223,39 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Effect: Allow
+              # Scope ENI creation to THIS subnet and security group (i.e. to the
+              # VPC you deployed into) by listing the exact subnet/SG ARNs the
+              # connector is allowed to create interfaces in. The connector cannot
+              # place ENIs in any other subnet or attach any other SG.
+              #
+              # NOTE: scoping via the `ec2:Vpc` condition key (the intuitive choice)
+              # does NOT work here — CreateNetworkConnector pre-validates this role
+              # WITHOUT the VPC request context, so a condition on ec2:Vpc evaluates
+              # false and the connector fails to create with "invalid
+              # ConnectorOperatorRole permissions". Resource-ARN scoping is validated
+              # correctly and provisions the ENIs. See README "How it works".
+              - Sid: CreateEniInThisSubnet
+                Effect: Allow
+                Action: ec2:CreateNetworkInterface
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${SubnetId}
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:security-group/${NfsSecurityGroup.GroupId}
+              # Delete/tag apply to the ENIs the connector manages (ENI IDs are
+              # created dynamically and are unpredictable, so the resource is the
+              # network-interface wildcard within this account/region).
+              - Sid: ManageConnectorEnis
+                Effect: Allow
                 Action:
-                  - ec2:CreateNetworkInterface
                   - ec2:DeleteNetworkInterface
-                  - ec2:DescribeNetworkInterfaces
                   - ec2:CreateTags
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+              # ec2:Describe* actions do NOT support resource-level scoping — they
+              # must use "*". They are read-only.
+              - Sid: DescribeNetworkResources
+                Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
                   - ec2:DescribeSubnets
                   - ec2:DescribeSecurityGroups
                   - ec2:DescribeVpcs
@@ -341,9 +368,13 @@ Resources:
           ValidateTimeoutInSeconds: 30
         MicrovmHooks:
           Run: ENABLED
-          RunTimeoutInSeconds: 30
+          # The /run hook mounts S3 Files and blocks until the mount is usable
+          # (mount ~15s + efs-proxy tunnel readiness probe). app.py bounds its own
+          # work to ~51s worst case (35s mount cap + ~16s probe deadline), so give
+          # the hook the max 60s. Same for /resume, which re-mounts after a suspend.
+          RunTimeoutInSeconds: 60
           Resume: ENABLED
-          ResumeTimeoutInSeconds: 30
+          ResumeTimeoutInSeconds: 60
           Suspend: ENABLED
           SuspendTimeoutInSeconds: 5
           Terminate: ENABLED
