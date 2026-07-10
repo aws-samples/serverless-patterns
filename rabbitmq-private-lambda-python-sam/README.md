@@ -47,7 +47,7 @@ Build your application with the `sam build` command.
 
 ```bash
 cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_consumer_dynamo_sam
-sam build
+sam build --use-container
 ```
 
 The SAM CLI installs dependencies defined in `rabbitmq_consumer_dynamo_sam/rabbitmq_event_consumer_function/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
