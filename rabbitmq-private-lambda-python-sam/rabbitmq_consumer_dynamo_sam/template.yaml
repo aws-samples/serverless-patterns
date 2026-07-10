@@ -16,7 +16,7 @@ Resources:
       FunctionName: python-rabbitmq-consumer-dynamodb-sam
       CodeUri: rabbitmq_event_consumer_function
       Handler: lambda_function.lambda_handler
-      Runtime: PYTHON3_VERSION
+      Runtime: python3.13
       Architectures:
         - x86_64
       MemorySize: 512
