@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Serverless Search API — Lambda + OpenSearch Serverless NextGen.
-  Demonstrates zero-baseline cost with both Lambda and OpenSearch scaling to zero when idle.
+  Demonstrates zero-baseline cost with both Lambda and OpenSearch scaling to zero when idle.(uksb-1tthgi812) (tag:apigw-lambda-opensearch-serverless-nextgen)
 
 Parameters:
   DeploymentRoleName:
