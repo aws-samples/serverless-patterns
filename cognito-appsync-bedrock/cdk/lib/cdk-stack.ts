@@ -77,9 +77,21 @@ export class CdkStack extends cdk.Stack {
     });
 
     // --- AWS Lambda Function for Bedrock Invocation ---
-    // IMPORTANT: Update MODEL_ID to your specific Claude 3 model if different.
-    const modelIdForLambda = "anthropic.claude-3-sonnet-20240229-v1:0"; // Or your specific ID: "anthropic.claude-3-7-sonnet-20250219-v1:0"
-    // if you've confirmed it's correct and accessible.
+    // Default to a Nova inference profile so the pattern works in accounts that
+    // do not yet have Anthropic use-case approval configured.
+    const modelIdForLambda = "apac.amazon.nova-lite-v1:0";
+    const isInferenceProfile = modelIdForLambda.startsWith("apac.");
+    const inferredFoundationModelId = isInferenceProfile
+      ? modelIdForLambda.replace(/^apac\./, "")
+      : modelIdForLambda;
+    const bedrockResourceArns = isInferenceProfile
+      ? [
+          `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelIdForLambda}`,
+          // Inference profiles can route across regions, so the execution role
+          // also needs permission on the underlying foundation model ARN.
+          `arn:aws:bedrock:*::foundation-model/${inferredFoundationModelId}`,
+        ]
+      : [`arn:aws:bedrock:${this.region}::foundation-model/${modelIdForLambda}`];
 
     const bedrockInvokeLambda = new NodejsFunction(
       this,
@@ -95,6 +107,7 @@ export class CdkStack extends cdk.Stack {
           sourceMap: true,
         },
         environment: {
+          BEDROCK_REGION: this.region,
           MODEL_ID: modelIdForLambda,
           ANTHROPIC_VERSION: "bedrock-2023-05-31", // Required for Claude 3 Messages API
           // You can add more env vars here to configure temperature, max_tokens etc.
@@ -108,10 +121,7 @@ export class CdkStack extends cdk.Stack {
     bedrockInvokeLambda.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
-        resources: [
-          // IMPORTANT: Ensure this ARN matches the modelIdForLambda
-          `arn:aws:bedrock:${this.region}::foundation-model/${modelIdForLambda}`,
-        ],
+        resources: bedrockResourceArns,
         actions: ["bedrock:InvokeModel"],
       })
     );

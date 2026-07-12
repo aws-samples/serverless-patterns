@@ -4,9 +4,6 @@ import {
   InvokeModelCommandInput,
 } from "@aws-sdk/client-bedrock-runtime";
 
-const region = process.env.AWS_REGION || "us-east-1";
-const client = new BedrockRuntimeClient({ region });
-
 interface AppSyncEvent {
   arguments: {
     prompt: string;
@@ -25,6 +22,35 @@ interface Claude3MessagesResponseBody {
   model: string;
   stop_reason: string;
   // other fields might exist
+}
+
+interface NovaResponseBody {
+  output?: {
+    message?: {
+      content?: Array<{
+        text?: string;
+      }>;
+    };
+  };
+}
+
+export function resolveBedrockRegion(): string {
+  const region =
+    process.env.BEDROCK_REGION ||
+    process.env.AWS_REGION ||
+    process.env.AWS_DEFAULT_REGION;
+
+  if (!region) {
+    throw new Error(
+      "AWS region is not configured. Set BEDROCK_REGION or deploy the Lambda with AWS_REGION."
+    );
+  }
+
+  return region;
+}
+
+function getBedrockClient(): BedrockRuntimeClient {
+  return new BedrockRuntimeClient({ region: resolveBedrockRegion() });
 }
 
 export const handler = async (event: AppSyncEvent): Promise<string> => {
@@ -60,27 +86,43 @@ export const handler = async (event: AppSyncEvent): Promise<string> => {
   const topP = process.env.TOP_P ? parseFloat(process.env.TOP_P) : 0.999;
   const topK = process.env.TOP_K ? parseInt(process.env.TOP_K) : 250;
   // const stopSequences = process.env.STOP_SEQUENCES ? JSON.parse(process.env.STOP_SEQUENCES) : [];
+  const client = getBedrockClient();
 
-  // Construct the payload for Claude 3 Messages API
-  const bedrockRequestBody = {
-    anthropic_version: anthropicVersion,
-    max_tokens: maxTokens,
-    temperature: temperature,
-    top_p: topP,
-    top_k: topK,
-    // stop_sequences: stopSequences, // Bedrock API expects an array of strings
-    messages: [
-      {
-        role: "user",
-        content: [
+  const isNovaModel = modelId.includes(".nova");
+  const bedrockRequestBody = isNovaModel
+    ? {
+        messages: [
           {
-            type: "text",
-            text: userPrompt,
+            role: "user",
+            content: [{ text: userPrompt }],
           },
         ],
-      },
-    ],
-  };
+        inferenceConfig: {
+          maxTokens: maxTokens,
+          temperature: temperature,
+          topP: topP,
+        },
+      }
+    : {
+        // Anthropic Claude Messages API
+        anthropic_version: anthropicVersion,
+        max_tokens: maxTokens,
+        temperature: temperature,
+        top_p: topP,
+        top_k: topK,
+        // stop_sequences: stopSequences, // Bedrock API expects an array of strings
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: userPrompt,
+              },
+            ],
+          },
+        ],
+      };
 
   const invokeParams: InvokeModelCommandInput = {
     modelId: modelId,
@@ -99,16 +141,33 @@ export const handler = async (event: AppSyncEvent): Promise<string> => {
     const response = await client.send(command);
 
     const responseBodyString = new TextDecoder().decode(response.body);
-    const responseBody = JSON.parse(
-      responseBodyString
-    ) as Claude3MessagesResponseBody;
+    const responseBody = JSON.parse(responseBodyString) as
+      | Claude3MessagesResponseBody
+      | NovaResponseBody;
 
     console.log(
       "Bedrock raw response body:",
       JSON.stringify(responseBody, null, 2)
     );
 
+    if (isNovaModel) {
+      const novaResponseBody = responseBody as NovaResponseBody;
+      const novaText = novaResponseBody.output?.message?.content?.[0]?.text;
+      if (!novaText) {
+        console.error(
+          "Bedrock response error: Nova response text is missing or invalid.",
+          responseBody
+        );
+        throw new Error(
+          "Bedrock response error: Nova response text is missing or invalid in model output."
+        );
+      }
+
+      return novaText.trim();
+    }
+
     if (
+      !("content" in responseBody) ||
       !responseBody.content ||
       !Array.isArray(responseBody.content) ||
       responseBody.content.length === 0 ||

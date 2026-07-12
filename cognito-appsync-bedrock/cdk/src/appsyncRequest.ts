@@ -27,7 +27,53 @@ export interface GraphQLResult<T = object> {
   extensions?: { [key: string]: any };
 }
 
-export const AppSyncRequestIAM = async (params: RequestParams) => {
+const executeAppSyncRequest = <T = object>(
+  request: HttpRequest,
+  endpoint: URL
+) =>
+  new Promise<GraphQLResult<T>>((resolve, reject) => {
+    const httpRequest = https.request(
+      { ...request, host: endpoint.hostname },
+      (result) => {
+        const responseChunks: Buffer[] = [];
+
+        // AppSync responses can be streamed in multiple chunks, so wait until
+        // the response has fully ended before attempting to parse the payload.
+        result.on("data", (chunk) => {
+          responseChunks.push(
+            Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk))
+          );
+        });
+
+        result.on("end", () => {
+          const responseBody = Buffer.concat(responseChunks).toString("utf8");
+
+          if (!responseBody) {
+            resolve({});
+            return;
+          }
+
+          try {
+            resolve(JSON.parse(responseBody) as GraphQLResult<T>);
+          } catch (error) {
+            reject(
+              new Error(
+                `Failed to parse AppSync response as JSON: ${responseBody}`
+              )
+            );
+          }
+        });
+
+        result.on("error", reject);
+      }
+    );
+
+    httpRequest.on("error", reject);
+    httpRequest.write(request.body);
+    httpRequest.end();
+  });
+
+export const AppSyncRequestIAM = async <T = object>(params: RequestParams) => {
   const endpoint = new URL(params.config.url);
   const signer = new SignatureV4({
     credentials: defaultProvider(),
@@ -50,18 +96,7 @@ export const AppSyncRequestIAM = async (params: RequestParams) => {
 
   const signedRequest = await signer.sign(requestToBeSigned);
 
-  return new Promise((resolve, reject) => {
-    const httpRequest = https.request(
-      { ...signedRequest, host: endpoint.hostname },
-      (result) => {
-        result.on("data", (data) => {
-          resolve(JSON.parse(data.toString()));
-        });
-      }
-    );
-    httpRequest.write(signedRequest.body);
-    httpRequest.end();
-  });
+  return executeAppSyncRequest<T>(signedRequest as HttpRequest, endpoint);
 };
 
 export const AppSyncRequestApiKey = async <T = object>(
@@ -82,18 +117,7 @@ export const AppSyncRequestApiKey = async <T = object>(
     body: JSON.stringify(params.operation),
   });
 
-  return new Promise<GraphQLResult<T>>((resolve, reject) => {
-    const httpRequest = https.request(
-      { ...request, host: endpoint.hostname },
-      (result) => {
-        result.on("data", (data) => {
-          resolve(JSON.parse(data.toString()));
-        });
-      }
-    );
-    httpRequest.write(request.body);
-    httpRequest.end();
-  });
+  return executeAppSyncRequest<T>(request, endpoint);
 };
 
 export const appSyncRequestCognito = async <T = object>(
@@ -115,16 +139,5 @@ export const appSyncRequestCognito = async <T = object>(
     body: JSON.stringify(params.operation),
   });
 
-  return new Promise<GraphQLResult<T>>((resolve, reject) => {
-    const httpRequest = https.request(
-      { ...request, host: endpoint.hostname },
-      (result) => {
-        result.on("data", (data) => {
-          resolve(JSON.parse(data.toString()));
-        });
-      }
-    );
-    httpRequest.write(request.body);
-    httpRequest.end();
-  });
+  return executeAppSyncRequest<T>(request, endpoint);
 };

@@ -1,6 +1,6 @@
-# AWS AppSync and Amazon Cognito to Amazon Bedrock via AWS Lambda 
+# AWS AppSync and Amazon Cognito to Amazon Bedrock via AWS Lambda
 
-This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync using a AWS Lambda resolver, with user authentication handled by Amazon Cognito.
+This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync using an AWS Lambda resolver, with user authentication handled by Amazon Cognito.
 
 > **Note**: This application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +11,9 @@ This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync u
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Node and NPM](https://nodejs.org/en/download/) installed (Node.js 20.x recommended as used by the Lambda function)
 - [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed
-- Make sure to enable the **Anthropic Claude 3 Sonnet** model (e.g., `anthropic.claude-3-sonnet-20240229-v1:0`) in the [Amazon Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess) for the AWS region you intend to deploy this stack
+- This pattern is region-driven. Deploy it in the AWS region where your Bedrock model or inference profile is available.
+- The default Bedrock target is the Amazon Nova inference profile `apac.amazon.nova-lite-v1:0`
+- If you switch the pattern back to an Anthropic model, make sure the account already has the required model access and any provider-specific approval completed
 
 ## Architecture
 
@@ -23,13 +25,13 @@ This pattern sets up an AWS AppSync GraphQL API configured with Amazon Cognito U
 
 1. **Authentication**: Users are authenticated against an Amazon Cognito User Pool
 2. **AppSync Mutation**: The client sends a GraphQL mutation including the prompt and a valid Cognito ID token
-3. **AWS Lambda **: AppSync uses a AWS Lambda to process the `invoke` mutation
-4. **Bedrock Invocation**: The AWS Lambda function (`src/lambda/invokeBedrock/index.ts`) receives the prompt from AppSync. It then constructs a request and invokes the specified Amazon Bedrock model (defaulting to Anthropic Claude 3 Sonnet). The Lambda function has the necessary IAM permissions to call the Bedrock `InvokeModel` API
+3. **Lambda resolver**: AppSync uses an AWS Lambda resolver to process the `invoke` mutation
+4. **Bedrock Invocation**: The AWS Lambda function receives the prompt from AppSync, builds the correct Bedrock payload for the configured model family, and invokes Bedrock. The default deployment uses the Nova inference profile and includes IAM permission both for the inference profile ARN and the routed foundation-model ARNs.
 5. **Response**: The Bedrock model processes the prompt and returns a response. The Lambda function forwards this response back to AppSync, which then relays it to the client
 
 ### Resources
 
-The AWS CDK script (`lib/cdk-stack.ts`) provisions the following resources:
+The AWS CDK project under `cognito-appsync-bedrock/cdk` provisions the following resources:
 
 - An Amazon Cognito User Pool and User Pool Client
 - An AWS AppSync GraphQL API (`schema.gql`) with Cognito User Pool as the default authorization mode
@@ -37,37 +39,155 @@ The AWS CDK script (`lib/cdk-stack.ts`) provisions the following resources:
 - An AppSync Lambda Data Source and a Resolver connecting the `invoke` mutation to the Lambda function
 - CloudFormation outputs for easy access to API endpoints and Cognito identifiers
 
-The Bedrock model ID, Anthropic API version, and other inference parameters (like `max_tokens`, `temperature`) can be configured via environment variables in the Lambda function, as defined in `lib/cdk-stack.ts` and used in `src/lambda/invokeBedrock/index.ts`.
+The Bedrock model ID and inference parameters can be configured in `cognito-appsync-bedrock/cdk/lib/cdk-stack.ts` and consumed in `cognito-appsync-bedrock/cdk/src/lambda/invokeBedrock/index.ts`.
 
-## Deployment
+## Step-By-Step Deployment
 
-1. Clone the repository:
-
-   ```bash
-     git clone https://github.com/aws-samples/serverless-patterns
-   ```
-
-2. Navigate to the project directory:
+1. Clone the repository and move into the CDK project:
 
    ```bash
-   cd cognito-appsync-bedrock/cdk
+   git clone https://github.com/aws-samples/serverless-patterns
+   cd serverless-patterns/cognito-appsync-bedrock/cdk
    ```
 
-3. Install dependencies inside cdk subfolder:
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-4. Deploy the stack:
+3. Verify that your AWS CLI is pointed at the account and region you want to use:
+
+   ```bash
+   aws sts get-caller-identity
+   aws configure get region
+   ```
+
+4. Bootstrap the target account and region if this environment has not been bootstrapped yet:
+
+   ```bash
+   ./node_modules/.bin/cdk bootstrap aws://YOUR_ACCOUNT_ID/YOUR_AWS_REGION
+   ```
+
+5. Build the TypeScript project:
+
+   ```bash
+   npm run build
+   ```
+
+6. Deploy the stack:
+
    ```bash
    npm run deploy
    ```
-   This will generate a `cdk-outputs.json` file containing the stack outputs.
+
+7. Confirm that `cdk-outputs.json` was created:
+
+   ```bash
+   cat cdk-outputs.json
+   ```
+
+8. Verify that the output file contains these values under `AppsyncBedrockCognitoStack`:
+
+   - `GraphQLApiUrl`
+   - `AWSRegion`
+   - `CognitoUserPoolId`
+   - `CognitoUserPoolClientId`
+   - `BedrockModelIdUsed`
+
+9. For the most detailed instructions, troubleshooting notes, and exact test flow, continue with [`cognito-appsync-bedrock/cdk/README.md`](cdk/README.md).
+
+## Using A Different Bedrock Model
+
+You can use a different Amazon Bedrock model with this pattern, but you need to verify three things before deploying:
+
+1. The model or inference profile is available in your target AWS region
+2. Your AWS account has access to that model
+3. The Lambda request and response handling matches that model family
+
+### Step 1: Find the model or inference profile you want to use
+
+- Open the Amazon Bedrock console for your target region
+- Check model availability and access status
+- If the model is invoked through an inference profile, use the inference profile ID instead of the raw foundation model ID
+
+Examples:
+
+- Default model used by this pattern: `apac.amazon.nova-lite-v1:0`
+- Example Anthropic model: `anthropic.claude-3-sonnet-20240229-v1:0`
+- Example Anthropic inference profile: `apac.anthropic.claude-3-5-sonnet-20240620-v1:0`
+
+### Step 2: Verify model access
+
+- In the Bedrock console, confirm the model is enabled for your account
+- If the provider requires additional approval, complete that process before deployment
+- If you prefer the CLI, list models and inference profiles in the region:
+
+```bash
+aws bedrock list-foundation-models --region YOUR_AWS_REGION
+aws bedrock list-inference-profiles --region YOUR_AWS_REGION
+```
+
+### Step 3: Update the model configured by this pattern
+
+Change the `modelIdForLambda` value in `cognito-appsync-bedrock/cdk/lib/cdk-stack.ts`.
+
+Examples:
+
+- Amazon Nova inference profile:
+
+  ```ts
+  const modelIdForLambda = "apac.amazon.nova-lite-v1:0";
+  ```
+
+- Anthropic foundation model:
+
+  ```ts
+  const modelIdForLambda = "anthropic.claude-3-sonnet-20240229-v1:0";
+  ```
+
+### Step 4: Confirm the Lambda payload format matches the model family
+
+The Lambda handler in `cognito-appsync-bedrock/cdk/src/lambda/invokeBedrock/index.ts` currently supports:
+
+- Amazon Nova-style payloads and responses
+- Anthropic-style Messages API payloads and responses
+
+If you change to another provider or another model family with a different request schema, update:
+
+- The request body sent in `InvokeModelCommand`
+- The response parsing logic
+- Any model-specific inference parameters
+
+### Step 5: Confirm the IAM permissions match the model type
+
+- Foundation models require permission on the foundation-model ARN
+- Inference profiles require permission on the inference-profile ARN
+- Some inference profiles can route requests across regions, so the Lambda role may also need permission on the underlying foundation-model ARNs
+
+This pattern already handles the current default Nova inference profile correctly.
+
+### Step 6: Redeploy and verify
+
+After changing the model:
+
+```bash
+npm run build
+npm run deploy
+cat cdk-outputs.json
+npm run test
+```
+
+Verify that `BedrockModelIdUsed` in `cdk-outputs.json` matches the model you selected.
 
 ## Testing
 
-The project includes integration tests in `test/cdk.test.ts`. These tests will:
+The CDK project includes:
+
+- `test/appsyncRequest.test.ts` for the AppSync transport helper
+- `test/cdk.test.ts` for the live Cognito + AppSync + Lambda + Bedrock flow
+
+The integration test will:
 
 1. Read deployed stack outputs from `cdk-outputs.json`
 2. Programmatically sign up a new user in the Cognito User Pool
@@ -82,15 +202,49 @@ To run the tests:
 npm run test
 ```
 
-> **Note**: The tests require the CDK stack to be deployed first, as they rely on the cdk-outputs.json file. Ensure the AWS region and credentials configured for your AWS CLI (and thus for the tests) match where the stack was deployed.
+Important notes:
+
+- The integration test requires `cdk-outputs.json`
+- If `cdk-outputs.json` is missing, only the transport unit test runs and the deployment-backed test is skipped
+- The integration test uses a longer timeout because Bedrock invocation is a live network call
+- The test creates a temporary Cognito user and deletes it during cleanup
+
+## Troubleshooting
+
+- If deployment fails with `No bucket named cdk-hnb659fds-assets-ACCOUNT-REGION`, rerun CDK bootstrap for the target account and region
+- If Bedrock returns a model approval or access error, verify that the configured model is actually allowed in the target AWS account and region
+- If AppSync returns a GraphQL error during testing, inspect the Lambda logs and the test output together
+- If Cognito sign-up or login fails, verify your AWS CLI credentials, region, and generated `cdk-outputs.json`
 
 ## Cleanup
 
-To delete the stack and all associated resources:
+To delete the stack and remove the resources created by this pattern:
 
 ```bash
-cdk destroy --all
+cd cognito-appsync-bedrock/cdk
+./node_modules/.bin/cdk destroy AppsyncBedrockCognitoStack
 ```
+
+Recommended cleanup flow:
+
+1. Move into the CDK project directory
+2. Make sure your AWS CLI is still pointing to the same account and region used for deployment
+3. Run the destroy command
+4. Confirm the destroy operation when CDK prompts you
+5. After the stack is deleted, verify in the CloudFormation console that `AppsyncBedrockCognitoStack` no longer exists
+
+What this cleanup removes:
+
+- The AppSync API
+- The Cognito User Pool and User Pool Client
+- The Lambda function and related IAM roles created by this stack
+- The AppSync resolver and Lambda data source
+
+What to keep in mind:
+
+- `cdk-outputs.json` is a local file and is not deleted automatically
+- Shared CDK bootstrap resources are not removed by destroying this application stack
+- If you created additional users or changed resources manually outside this stack, those manual changes may need separate cleanup
 
 ---
 

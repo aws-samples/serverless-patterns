@@ -5,11 +5,11 @@
     "cdk": "bin/cdk.js"
   },
   "scripts": {
-    "deploy": "cdk deploy --outputs-file ./cdk-outputs.json",
+    "deploy": "./node_modules/.bin/cdk deploy --outputs-file ./cdk-outputs.json",
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest",
-    "cdk": "cdk"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "cdk": "./node_modules/.bin/cdk"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
