@@ -9,7 +9,6 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as sns from 'aws-cdk-lib/aws-sns';
-import * as snsSubs from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as sfnTasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import * as logs from 'aws-cdk-lib/aws-logs';
@@ -71,7 +70,15 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     const streamManagerFn = new lambda.Function(this, 'CdcStreamManagerFn', {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'handler.on_event',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambdas/cdc-stream-manager')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambdas/cdc-stream-manager'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_12.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && cp handler.py /asset-output/',
+          ],
+        },
+      }),
       timeout: cdk.Duration.minutes(5),
       memorySize: 256,
       description: 'Custom Resource: manages Amazon Aurora DSQL CDC stream lifecycle',

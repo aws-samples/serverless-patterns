@@ -21,18 +21,23 @@ def lambda_handler(event, context):
     if not records:
         return {'statusCode': 200, 'processed': 0}
 
+    # DSQL CDC JSON format:
+    # {"type":"full","op":"c|u|d","before":null|{...},"after":{...}|null,"source":{...}}
+    OP_MAP = {'c': 'INSERT', 'u': 'UPDATE', 'd': 'DELETE'}
+
     entries = []
     for record in records:
         try:
             payload = base64.b64decode(record['kinesis']['data'])
             cdc_event = json.loads(payload)
 
-            # DSQL CDC JSON format contains: operation, tableName, newImage, oldImage
-            operation = cdc_event.get('operation', 'UNKNOWN').upper()
-            table_name = cdc_event.get('tableName', 'unknown')
+            # Map DSQL CDC op codes to human-readable operation types
+            raw_op = cdc_event.get('op', '').lower()
+            operation = OP_MAP.get(raw_op, 'UNKNOWN')
+            table_name = cdc_event.get('source', {}).get('table', 'unknown')
 
-            # Map to EventBridge detail-type for routing
-            detail_type = operation  # INSERT, UPDATE, DELETE
+            # Use operation as EventBridge detail-type for content-based routing
+            detail_type = operation
 
             entry = {
                 'Source': SOURCE,
@@ -40,9 +45,9 @@ def lambda_handler(event, context):
                 'Detail': json.dumps({
                     'tableName': table_name,
                     'operation': operation,
-                    'newImage': cdc_event.get('newImage'),
-                    'oldImage': cdc_event.get('oldImage'),
-                    'timestamp': cdc_event.get('commitTimestamp',
+                    'newImage': cdc_event.get('after'),
+                    'oldImage': cdc_event.get('before'),
+                    'timestamp': cdc_event.get('source', {}).get('ts_ms',
                                                datetime.now(timezone.utc).isoformat()),
                     'sequenceNumber': record['kinesis'].get('sequenceNumber'),
                 }),
