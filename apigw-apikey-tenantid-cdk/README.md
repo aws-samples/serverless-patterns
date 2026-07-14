@@ -15,13 +15,43 @@ What this pattern solves:
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-## Prerequisites: Usage Plan and API Key
+## Stacks Overview
 
-Before using this pattern, you must create API Gateway [Usage Plans](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) and an [API Key](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html) associated with it. The usage plan must be associated with the API and stage created by this CDK stack. 
-The usage plan must be associated with the API and stage created by this CDK stack. The API key value stored in the DynamoDB table must match a valid API key linked to a usage plan in API Gateway — otherwise, requests will be rejected even if the Lambda authorizer returns a successful policy.
-The above pre requeisites are required to successfully test this pattern.
+This pattern includes two independent CDK stacks that can be deployed separately or together:
 
-For guidance on creating and configuring usage plans and API keys, see:
+### ApigwUsagePlanApiKeyCdkStack (Optional)
+
+Creates an API Gateway [Usage Plan](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) and [API Key](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html). This stack is optional — you can skip it if you already have a usage plan and API key, or if you want to create them separately.
+
+```bash
+cdk deploy ApigwUsagePlanApiKeyCdkStack
+```
+
+### ApigwDynamodbApikeyCdkStack
+
+Creates the API Gateway, Lambda Authorizer, DynamoDB table, and Cognito User Pool. This stack can be deployed independently without `ApigwUsagePlanApiKeyCdkStack`.
+
+```bash
+cdk deploy ApigwDynamodbApikeyCdkStack
+```
+
+To associate an existing usage plan with the API stage, pass the usage plan ID via CDK context:
+
+```bash
+cdk deploy ApigwDynamodbApikeyCdkStack -c usagePlanId=<USAGE_PLAN_ID>
+```
+
+### Deploy both stacks together
+
+```bash
+cdk deploy --all
+```
+
+> **Note:** When deploying both stacks, they are independent — there is no required deployment order. However, to link the usage plan to the API stage, deploy `ApigwUsagePlanApiKeyCdkStack` first, note the Usage Plan ID from the output, then deploy the API stack with the context parameter above.
+
+The API key value stored in the DynamoDB table must match the API key used by your usage plan — otherwise, requests will be rejected even if the Lambda authorizer returns a successful policy.
+
+For more information on usage plans and API keys, see:
 - [Create and use usage plans with API keys](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html)
 - [Setting up API keys using the API Gateway console](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-key-with-console.html)
 
@@ -53,10 +83,10 @@ For guidance on creating and configuring usage plans and API keys, see:
     ```
 1. Deploy the stack:
     ```
-    cdk deploy
+    cdk deploy --all
     ```
 
-Note the outputs from the CDK deployment process. The output will include the API Gateway URL, DynamoDB table name, Cognito User Pool ID, and User Pool Client ID.
+Note the outputs from the CDK deployment process. The output will include the Usage Plan ID, API Key ID, API Gateway URL, DynamoDB table name, Cognito User Pool ID, and User Pool Client ID.
 
 ## How it works
 
@@ -81,36 +111,12 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
 1. Get the outputs from the deployment:
     ```bash
     # The outputs will be similar to
+    ApigwUsagePlanApiKeyCdkStack.UsagePlanId = abc123
+    ApigwUsagePlanApiKeyCdkStack.ApiKeyId = def456
     ApigwDynamodbApikeyCdkStack.ApiUrl = https://abc123def.execute-api.us-east-1.amazonaws.com/prod/
     ApigwDynamodbApikeyCdkStack.TableName = ApigwDynamodbApikeyCdkStack-TenantApiKeyTableXXXXXX-YYYYYY
     ApigwDynamodbApikeyCdkStack.UserPoolId = us-east-1_XXXXXXXXX
     ApigwDynamodbApikeyCdkStack.UserPoolClientId = XXXXXXXXXXXXXXXXXXXXXXXXXX
-    ```
-
-1. Create a usage plan:
-    ```bash
-    aws apigateway create-usage-plan \
-      --name "TenantUsagePlan" \
-      --throttle burstLimit=50,rateLimit=100 \
-      --api-stages apiId=API_ID,stage=prod
-    ```
-    Note the `id` from the output — this is your USAGE_PLAN_ID.
-
-1. Create an API key:
-    ```bash
-    aws apigateway create-api-key \
-      --name "SampleTenantKey" \
-      --enabled \
-      --value "tenant-usage-api-key-123"
-    ```
-    The API key value should be >= 20 char. Note the `id` from the output — this is your API_KEY_ID.
-
-1. Associate the API key with the usage plan:
-    ```bash
-    aws apigateway create-usage-plan-key \
-      --usage-plan-id USAGE_PLAN_ID \
-      --key-id API_KEY_ID \
-      --key-type "API_KEY"
     ```
 
 1. Create a Cognito user with a tenantId:
@@ -119,7 +125,7 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
       --user-pool-id USER_POOL_ID \
       --username user@example.com \
       --user-attributes Name=email,Value=user@example.com Name=custom:tenantId,Value=sample-tenant \
-      --temporary-password "TempPass1!"
+      --temporary-password "TempPass1@2345"
     ```
 
 1. Set a permanent password for the user:
@@ -127,7 +133,7 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
     aws cognito-idp admin-set-user-password \
       --user-pool-id USER_POOL_ID \
       --username user@example.com \
-      --password "MySecurePass1!" \
+      --password "MySecurePass1@2345" \
       --permanent
     ```
 
@@ -137,11 +143,12 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
       --table-name TABLE_NAME \
       --item '{"tenantId": {"S": "sample-tenant"}, "apiKey": {"S": "tenant-usage-api-key-123"}}'
     ```
+    > **Important:** The `apiKey` value must match the API key created by `ApigwUsagePlanApiKeyCdkStack` (default: `tenant-usage-api-key-123`).
 
 1. Get a token and call the API using the helper script:
     ```bash
         node get-token.js --user-pool-id USER_POOL_ID --client-id CLIENT_ID \
-        --username user@example.com --password "MySecurePass1!" \
+        --username user@example.com --password "MySecurePass1@2345" \
         --api-url https://REPLACE_WITH_API_URL/protected
     ```
     If successful, you should receive a response like:
@@ -159,7 +166,7 @@ The DynamoDB table uses `tenantId` as the partition key and stores the correspon
 
 1. Delete the stack:
     ```bash
-    cdk destroy
+    cdk destroy --all
     ```
 
 ----

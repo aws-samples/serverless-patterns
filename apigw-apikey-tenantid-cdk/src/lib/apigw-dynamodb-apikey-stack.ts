@@ -7,8 +7,17 @@ import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as path from "path";
 import { Construct } from "constructs";
 
+export interface ApigwDynamodbApikeyStackProps extends cdk.StackProps {
+  /**
+   * Optional: An existing Usage Plan ID to associate with this API's stage.
+   * If provided, the stack will import the usage plan and associate it with the API stage.
+   * If not provided, the usage plan association is skipped.
+   */
+  usagePlanId?: string;
+}
+
 export class ApigwDynamodbApikeyStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: ApigwDynamodbApikeyStackProps) {
     super(scope, id, props);
 
     // DynamoDB table mapping tenantId -> apiKey
@@ -74,6 +83,52 @@ export class ApigwDynamodbApikeyStack extends cdk.Stack {
       description: "API protected with DynamoDB-based API key authorization",
       apiKeySourceType: apigateway.ApiKeySourceType.AUTHORIZER,
     });
+
+    // Associate an existing usage plan with this API's deployment stage (if provided)
+    const usagePlanId = props?.usagePlanId || this.node.tryGetContext("usagePlanId");
+    if (usagePlanId) {
+      new cdk.custom_resources.AwsCustomResource(this, "UsagePlanStageAssociation", {
+        onCreate: {
+          service: "APIGateway",
+          action: "updateUsagePlan",
+          parameters: {
+            usagePlanId: usagePlanId,
+            patchOperations: [
+              {
+                op: "add",
+                path: "/apiStages",
+                value: `${api.restApiId}:${api.deploymentStage.stageName}`,
+              },
+            ],
+          },
+          physicalResourceId: cdk.custom_resources.PhysicalResourceId.of(
+            `${usagePlanId}-${api.restApiId}-stage`,
+          ),
+        },
+        onDelete: {
+          service: "APIGateway",
+          action: "updateUsagePlan",
+          parameters: {
+            usagePlanId: usagePlanId,
+            patchOperations: [
+              {
+                op: "remove",
+                path: "/apiStages",
+                value: `${api.restApiId}:${api.deploymentStage.stageName}`,
+              },
+            ],
+          },
+        },
+        policy: cdk.custom_resources.AwsCustomResourcePolicy.fromStatements([
+          new cdk.aws_iam.PolicyStatement({
+            actions: ["apigateway:PATCH"],
+            resources: [
+              `arn:aws:apigateway:${this.region}::/usageplans/${usagePlanId}`,
+            ],
+          }),
+        ]),
+      });
+    }
 
     // Token authorizer using Authorization header (Cognito JWT)
     const lambdaAuthorizer = new apigateway.TokenAuthorizer(this, "TokenAuthorizer", {
