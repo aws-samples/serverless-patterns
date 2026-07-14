@@ -1,0 +1,69 @@
+{
+  "title": "Amazon EventBridge Pipes with Amazon Bedrock AI Enrichment",
+  "description": "Enrich messages in-flight with AI classification and entity extraction using Amazon EventBridge Pipes and Amazon Bedrock",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Messages arrive in an Amazon SQS queue and are read by Amazon EventBridge Pipes.",
+      "The Pipe invokes an AWS Lambda enrichment function that calls Amazon Bedrock (Claude Sonnet 4.6) to classify sentiment, extract entities, and summarize the message.",
+      "The enriched message is written to Amazon DynamoDB with AI-generated metadata for downstream analytics."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-bedrock-enrichment-cdk",
+      "templateURL": "serverless-patterns/eventbridge-pipes-bedrock-enrichment-cdk",
+      "projectFolder": "eventbridge-pipes-bedrock-enrichment-cdk",
+      "templateFile": "cdk/lib/eventbridge-pipes-bedrock-enrichment-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes enrichment",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-enrichment.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModel API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd eventbridge-pipes-bedrock-enrichment-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a message to the Amazon SQS source queue.",
+      "Wait a few seconds for the Pipe to process.",
+      "Query the Amazon DynamoDB table to see the enriched result with sentiment, entities, and summary."
+    ]
+  },
+  "cleanup": {
+    "text": ["<code>npx cdk destroy</code>"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 10, "y": 50, "service": "sqs", "label": "Amazon SQS" },
+    "icon2": { "x": 35, "y": 50, "service": "eventbridge", "label": "Amazon EventBridge Pipes" },
+    "icon3": { "x": 55, "y": 50, "service": "lambda", "label": "AWS Lambda" },
+    "icon4": { "x": 75, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
+    "icon5": { "x": 95, "y": 50, "service": "dynamodb", "label": "Amazon DynamoDB" }
+  },
+  "patternType": "Serverless"
+}
