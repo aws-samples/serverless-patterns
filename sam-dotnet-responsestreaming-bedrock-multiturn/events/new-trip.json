@@ -1,0 +1,24 @@
+{
+  "resource": "/plan",
+  "path": "/plan",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Host": "abc123.execute-api.us-east-1.amazonaws.com"
+  },
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "abc123",
+    "resourcePath": "/plan",
+    "httpMethod": "POST",
+    "requestId": "test-request-id",
+    "accountId": "123456789012",
+    "stage": "prod",
+    "identity": { "sourceIp": "127.0.0.1", "userAgent": "curl/8.0" },
+    "apiId": "abc123"
+  },
+  "body": "{\"destination\": \"Rome, Italy\", \"days\": 4, \"interests\": \"history, pasta, and architecture\"}",
+  "isBase64Encoded": false
+}
