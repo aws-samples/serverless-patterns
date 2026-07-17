@@ -1,0 +1,11 @@
+{
+  "body": "{\"decidedBy\":\"john.manager@example.com\",\"reason\":\"Amount exceeds per-diem limit\"}",
+  "httpMethod": "POST",
+  "path": "/expenses/EXP-001/reject",
+  "pathParameters": {
+    "expenseId": "EXP-001"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}

@@ -1,0 +1,16 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## SAM
+.aws-sam/
+samconfig.toml
+
+## IDE
+.idea/
+.vs/
+*.swp

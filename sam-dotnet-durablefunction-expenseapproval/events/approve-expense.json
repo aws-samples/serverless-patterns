@@ -1,0 +1,11 @@
+{
+  "body": "{\"decidedBy\":\"john.manager@example.com\"}",
+  "httpMethod": "POST",
+  "path": "/expenses/EXP-001/approve",
+  "pathParameters": {
+    "expenseId": "EXP-001"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}
