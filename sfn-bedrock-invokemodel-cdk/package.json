@@ -4,8 +4,8 @@
   "bin": { "app": "bin/app.ts" },
   "scripts": { "build": "tsc", "cdk": "cdk" },
   "dependencies": {
-    "aws-cdk-lib": "2.236.0",
-    "constructs": "10.4.2"
+    "aws-cdk-lib": "2.261.0",
+    "constructs": "10.5.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
