@@ -51,7 +51,7 @@
   "deploy": {
     "text": [
       "Change to the CDK project folder: <code>cd cognito-appsync-bedrock/cdk</code> and install dependencies with <code>npm install</code>.",
-      "Verify the active AWS account and region used by your AWS CLI, and bootstrap the environment if needed: <code>aws sts get-caller-identity</code>, <code>aws configure get region</code>, <code>./node_modules/.bin/cdk bootstrap aws://YOUR_ACCOUNT_ID/YOUR_AWS_REGION</code>.",
+      "Verify the active AWS account and Region used by your AWS CLI, and bootstrap the environment if needed. For example: <code>aws sts get-caller-identity</code>, <code>aws configure get region</code>, <code>./node_modules/.bin/cdk bootstrap aws://123456789012/us-east-1</code>. Replace the example account ID and Region code for your environment.",
       "Build and deploy with <code>npm run build</code> and <code>npm run deploy</code>.",
       "Verify that <code>cdk-outputs.json</code> was created because the integration tests depend on that file."
     ]
@@ -59,7 +59,7 @@
   "testing": {
     "text": [
       "Run the full test suite from the CDK project folder with <code>npm run test</code>.",
-      "When <code>cdk-outputs.json</code> exists, the live Cognito-AppSync-Bedrock integration test runs; otherwise only the local transport unit test runs."
+      "When <code>cdk-outputs.json</code> exists, the live Cognito-AppSync-Bedrock integration test runs; otherwise the local AppSync transport, CDK stack, and Lambda region-selection unit tests run."
     ]
   },
   "cleanup": {

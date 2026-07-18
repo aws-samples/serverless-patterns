@@ -77,12 +77,14 @@ export class CdkStack extends cdk.Stack {
     });
 
     // --- AWS Lambda Function for Bedrock Invocation ---
-    // Default to a Nova inference profile so the pattern works in accounts that
-    // do not yet have Anthropic use-case approval configured.
-    const modelIdForLambda = "apac.amazon.nova-lite-v1:0";
-    const isInferenceProfile = modelIdForLambda.startsWith("apac.");
+    // Nova 2 Lite's global system-defined inference profile is available from
+    // ap-south-1 and the other supported commercial source Regions documented
+    // by Amazon Bedrock.
+    const modelIdForLambda = "global.amazon.nova-2-lite-v1:0";
+    const inferenceProfilePrefix = /^(global|us|eu|apac|jp|au)\./;
+    const isInferenceProfile = inferenceProfilePrefix.test(modelIdForLambda);
     const inferredFoundationModelId = isInferenceProfile
-      ? modelIdForLambda.replace(/^apac\./, "")
+      ? modelIdForLambda.replace(inferenceProfilePrefix, "")
       : modelIdForLambda;
     const bedrockResourceArns = isInferenceProfile
       ? [
@@ -133,7 +135,7 @@ export class CdkStack extends cdk.Stack {
       bedrockInvokeLambda,
       {
         name: "BedrockLambdaDataSource",
-        description: "Lambda function to invoke Bedrock models (Claude 3)",
+        description: "Lambda function to invoke an Amazon Bedrock model",
       }
     );
 

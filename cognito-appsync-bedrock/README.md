@@ -11,9 +11,9 @@ This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync u
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Node and NPM](https://nodejs.org/en/download/) installed (Node.js 20.x recommended as used by the Lambda function)
 - [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed
-- This pattern is region-driven. Deploy it in the AWS region where your Bedrock model or inference profile is available.
-- The default Bedrock target is the Amazon Nova inference profile `apac.amazon.nova-lite-v1:0`
-- If you switch the pattern back to an Anthropic model, make sure the account already has the required model access and any provider-specific approval completed
+- This pattern is region-driven. Deploy it in an AWS Region that supports the selected Bedrock model or inference profile.
+- The default Bedrock target is the global Amazon Nova 2 Lite inference profile `global.amazon.nova-2-lite-v1:0`, which is available from `ap-south-1` and other [documented source Regions](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-amazon-nova-2-lite.html#model-card-amazon-nova-2-lite-regions).
+- Access to Amazon Bedrock foundation models is enabled by default when the caller has the required AWS Marketplace and IAM permissions. Anthropic models additionally require a one-time use-case submission before first use.
 
 ## Architecture
 
@@ -66,7 +66,8 @@ The Bedrock model ID and inference parameters can be configured in `cognito-apps
 4. Bootstrap the target account and region if this environment has not been bootstrapped yet:
 
    ```bash
-   ./node_modules/.bin/cdk bootstrap aws://YOUR_ACCOUNT_ID/YOUR_AWS_REGION
+   # Example account ID and AWS Region code; replace both values for your environment.
+   ./node_modules/.bin/cdk bootstrap aws://123456789012/us-east-1
    ```
 
 5. Build the TypeScript project:
@@ -102,30 +103,33 @@ The Bedrock model ID and inference parameters can be configured in `cognito-apps
 You can use a different Amazon Bedrock model with this pattern, but you need to verify three things before deploying:
 
 1. The model or inference profile is available in your target AWS region
-2. Your AWS account has access to that model
+2. Your deployment role and Lambda execution role have the required IAM and AWS Marketplace permissions
 3. The Lambda request and response handling matches that model family
 
 ### Step 1: Find the model or inference profile you want to use
 
 - Open the Amazon Bedrock console for your target region
-- Check model availability and access status
+- Check model and inference-profile availability in the deployment Region
 - If the model is invoked through an inference profile, use the inference profile ID instead of the raw foundation model ID
 
 Examples:
 
-- Default model used by this pattern: `apac.amazon.nova-lite-v1:0`
+- Default model used by this pattern: `global.amazon.nova-2-lite-v1:0`
 - Example Anthropic model: `anthropic.claude-3-sonnet-20240229-v1:0`
-- Example Anthropic inference profile: `apac.anthropic.claude-3-5-sonnet-20240620-v1:0`
+- Example US Anthropic inference profile: `us.anthropic.claude-3-5-sonnet-20240620-v1:0`
 
-### Step 2: Verify model access
+### Step 2: Verify permissions and regional availability
 
-- In the Bedrock console, confirm the model is enabled for your account
-- If the provider requires additional approval, complete that process before deployment
-- If you prefer the CLI, list models and inference profiles in the region:
+- Access to Amazon Bedrock foundation models is enabled by default when the caller has the required AWS Marketplace and IAM permissions.
+- Anthropic models require a one-time use-case submission before their first invocation.
+- Use the CLI to confirm that a model or inference-profile ID exists in the deployment Region:
 
 ```bash
-aws bedrock list-foundation-models --region YOUR_AWS_REGION
-aws bedrock list-inference-profiles --region YOUR_AWS_REGION
+aws bedrock list-foundation-models --region us-east-1
+aws bedrock list-inference-profiles --region us-east-1
+aws bedrock get-inference-profile \
+  --inference-profile-identifier global.amazon.nova-2-lite-v1:0 \
+  --region us-east-1
 ```
 
 ### Step 3: Update the model configured by this pattern
@@ -134,10 +138,10 @@ Change the `modelIdForLambda` value in `cognito-appsync-bedrock/cdk/lib/cdk-stac
 
 Examples:
 
-- Amazon Nova inference profile:
+- Amazon Nova 2 Lite global inference profile:
 
   ```ts
-  const modelIdForLambda = "apac.amazon.nova-lite-v1:0";
+  const modelIdForLambda = "global.amazon.nova-2-lite-v1:0";
   ```
 
 - Anthropic foundation model:
@@ -165,7 +169,7 @@ If you change to another provider or another model family with a different reque
 - Inference profiles require permission on the inference-profile ARN
 - Some inference profiles can route requests across regions, so the Lambda role may also need permission on the underlying foundation-model ARNs
 
-This pattern already handles the current default Nova inference profile correctly.
+This pattern handles `global.`, `us.`, `eu.`, `apac.`, `jp.`, and `au.` system-defined inference-profile IDs and grants access to the routed foundation-model ARNs.
 
 ### Step 6: Redeploy and verify
 
@@ -185,6 +189,8 @@ Verify that `BedrockModelIdUsed` in `cdk-outputs.json` matches the model you sel
 The CDK project includes:
 
 - `test/appsyncRequest.test.ts` for the AppSync transport helper
+- `test/cdk-stack.test.ts` for the synthesized Lambda model and IAM configuration
+- `test/invokeBedrock.test.ts` for the Lambda region-selection helper
 - `test/cdk.test.ts` for the live Cognito + AppSync + Lambda + Bedrock flow
 
 The integration test will:
@@ -212,7 +218,9 @@ Important notes:
 ## Troubleshooting
 
 - If deployment fails with `No bucket named cdk-hnb659fds-assets-ACCOUNT-REGION`, rerun CDK bootstrap for the target account and region
-- If Bedrock returns a model approval or access error, verify that the configured model is actually allowed in the target AWS account and region
+- If Bedrock reports an invalid model identifier, confirm the exact model or inference-profile ID in the deployment Region with `aws bedrock get-inference-profile` or `aws bedrock list-inference-profiles`
+- If Bedrock returns an authorization error, verify the Lambda role's IAM permissions, required AWS Marketplace permissions, and any applicable organization SCPs
+- For an Anthropic model's first invocation, complete the one-time use-case submission if requested
 - If AppSync returns a GraphQL error during testing, inspect the Lambda logs and the test output together
 - If Cognito sign-up or login fails, verify your AWS CLI credentials, region, and generated `cdk-outputs.json`
 
@@ -248,6 +256,6 @@ What to keep in mind:
 
 ---
 
-Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

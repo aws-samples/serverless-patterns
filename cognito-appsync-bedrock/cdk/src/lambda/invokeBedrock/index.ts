@@ -69,10 +69,10 @@ export const handler = async (event: AppSyncEvent): Promise<string> => {
     throw new Error("Prompt is required and must be a non-empty string.");
   }
 
-  // Model ID from environment variable, defaults to a common Claude 3 Sonnet ID.
-  // IMPORTANT: Replace with your specific model ID if different and verified.
+  // The CDK stack supplies MODEL_ID. Keep the fallback aligned with the stack so
+  // direct handler invocations use the same request and response format.
   const modelId =
-    process.env.MODEL_ID || "anthropic.claude-3-sonnet-20240229-v1:0";
+    process.env.MODEL_ID || "global.amazon.nova-2-lite-v1:0";
   const anthropicVersion =
     process.env.ANTHROPIC_VERSION || "bedrock-2023-05-31";
 
