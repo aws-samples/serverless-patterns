@@ -1,0 +1,31 @@
+.DS_Store
+
+# Editor / IDE
+.vscode/
+
+# Kiro (local spec/steering tooling — not part of the deployable pattern)
+.kiro/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.so
+*.egg-info/
+
+# Test caches (regenerated on every run)
+.hypothesis/
+.pytest_cache/
+
+# AWS SAM build output
+.aws-sam/
+
+# Legacy manual-packaging artifacts (pre-SAM deploy)
+*-deps/
+*-package/
+*.zip
+
+# Generated at deploy time by scripts/deploy.sh (contains environment-specific
+# values and the test user's password)
+scripts/test.sh

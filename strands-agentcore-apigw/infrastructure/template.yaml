@@ -1,0 +1,391 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AgentCore API Gateway Weather Agent — AWS SAM Stack
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Description: Environment name for resource namespacing
+    Default: dev
+  CredentialProviderArn:
+    Type: String
+    Description: ARN of the manually-created AgentCore credential provider
+    Default: ''
+  BedrockModelId:
+    Type: String
+    Description: Bedrock model ID for the agent LLM
+    Default: 'us.anthropic.claude-sonnet-4-6'
+
+Conditions:
+  HasCredentialProvider: !Not [!Equals [!Ref CredentialProviderArn, '']]
+
+Resources:
+  # ============================================================
+  # API Gateway Resources
+  # ============================================================
+
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${EnvironmentName}-weather-api'
+      Description: Weather API proxying to Open-Meteo (forecast + geocoding)
+      ApiKeySourceType: HEADER
+
+  # --- /weather/current → Open-Meteo forecast (takes latitude/longitude) ---
+  WeatherResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: weather
+
+  WeatherCurrentResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !Ref WeatherResource
+      PathPart: current
+
+  GetCurrentWeatherMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref WeatherCurrentResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      RequestParameters:
+        method.request.querystring.latitude: true
+        method.request.querystring.longitude: true
+      MethodResponses:
+        - StatusCode: '200'
+      Integration:
+        # Non-proxy HTTP integration (not HTTP_PROXY): only the parameters mapped
+        # below are forwarded to Open-Meteo. This is deliberate — HTTP_PROXY also
+        # forwards the inbound `x-api-key` header (used to authenticate to API
+        # Gateway), and Open-Meteo treats any request carrying `x-api-key` as a
+        # commercial-tier call and 303-redirects to customer-api.open-meteo.com,
+        # which the agent does not follow. A non-proxy integration forwards no
+        # headers, so the key never leaks downstream.
+        Type: HTTP
+        IntegrationHttpMethod: GET
+        Uri: 'https://api.open-meteo.com/v1/forecast'
+        RequestParameters:
+          integration.request.querystring.latitude: method.request.querystring.latitude
+          integration.request.querystring.longitude: method.request.querystring.longitude
+          # `current` is injected server-side, so the discovered tool schema only
+          # needs latitude/longitude from the model.
+          integration.request.querystring.current: "'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,precipitation'"
+        IntegrationResponses:
+          - StatusCode: '200'
+
+  # --- /geocoding → Open-Meteo geocoding (resolves a place name to coordinates) ---
+  GeocodingResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: geocoding
+
+  GeocodingMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref GeocodingResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      RequestParameters:
+        method.request.querystring.name: true
+      MethodResponses:
+        - StatusCode: '200'
+      Integration:
+        # Non-proxy HTTP integration — see the note on the forecast method above.
+        # Only the mapped params are forwarded; the inbound `x-api-key` header is
+        # not, avoiding Open-Meteo's 303 redirect to its commercial endpoint.
+        Type: HTTP
+        IntegrationHttpMethod: GET
+        Uri: 'https://geocoding-api.open-meteo.com/v1/search'
+        RequestParameters:
+          integration.request.querystring.name: method.request.querystring.name
+          integration.request.querystring.count: "'1'"
+          integration.request.querystring.format: "'json'"
+        IntegrationResponses:
+          - StatusCode: '200'
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - GetCurrentWeatherMethod
+      - GeocodingMethod
+    Properties:
+      RestApiId: !Ref RestApi
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref RestApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: !Ref EnvironmentName
+
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: ApiStage
+    Properties:
+      Name: !Sub '${EnvironmentName}-agentcore-key'
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref RestApi
+          StageName: !Ref EnvironmentName
+
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn: ApiStage
+    Properties:
+      UsagePlanName: !Sub '${EnvironmentName}-agentcore-plan'
+      ApiStages:
+        - ApiId: !Ref RestApi
+          Stage: !Ref EnvironmentName
+
+  UsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
+
+  # ============================================================
+  # AgentCore Resources
+  # ============================================================
+
+  AgentCoreGateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      Name: !Sub '${EnvironmentName}-weather-gateway'
+      ProtocolType: MCP
+      AuthorizerType: CUSTOM_JWT
+      AuthorizerConfiguration:
+        CustomJWTAuthorizer:
+          DiscoveryUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/openid-configuration'
+          AllowedAudience:
+            - !Ref CognitoUserPoolClient
+      RoleArn: !GetAtt GatewayExecutionRole.Arn
+
+  OpenMeteoTarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    Properties:
+      GatewayIdentifier: !Ref AgentCoreGateway
+      Name: !Sub '${EnvironmentName}-weather-api-target'
+      TargetConfiguration:
+        Mcp:
+          ApiGateway:
+            RestApiId: !Ref RestApi
+            Stage: !Ref EnvironmentName
+            ApiGatewayToolConfiguration:
+              ToolFilters:
+                - FilterPath: '/weather/*'
+                  Methods:
+                    - GET
+                - FilterPath: '/geocoding'
+                  Methods:
+                    - GET
+              ToolOverrides:
+                - Path: '/weather/current'
+                  Method: GET
+                  Name: getCurrentWeather
+                  Description: Get current weather conditions for a set of coordinates. Requires latitude and longitude (use geocodeLocation first to resolve a place name).
+                - Path: '/geocoding'
+                  Method: GET
+                  Name: geocodeLocation
+                  Description: Resolve a place or city name to latitude and longitude coordinates.
+      CredentialProviderConfigurations: !If
+        - HasCredentialProvider
+        - - CredentialProviderType: API_KEY
+            CredentialProvider:
+              ApiKeyCredentialProvider:
+                ProviderArn: !Ref CredentialProviderArn
+                CredentialLocation: HEADER
+                CredentialParameterName: x-api-key
+        - !Ref 'AWS::NoValue'
+
+  # ============================================================
+  # Cognito Resources
+  # ============================================================
+
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${EnvironmentName}-weather-agent-users'
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${EnvironmentName}-weather-agent-client'
+      UserPoolId: !Ref CognitoUserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
+
+  # ============================================================
+  # Lambda Resources (SAM)
+  #
+  # AWS::Serverless::Function auto-generates the execution role
+  # (including CloudWatch Logs permissions via the managed basic
+  # execution policy) and the log group. Additional permissions
+  # are declared inline via the Policies property below.
+  #
+  # `sam build` packages the code under CodeUri (including the
+  # dependencies in src/requirements.txt) and `sam deploy` uploads
+  # it — no separate packaging/upload step is required.
+  # ============================================================
+
+  AgentLambdaFunction:
+    Type: AWS::Serverless::Function
+    # Ensure the log group (with retention) exists before the function, so Lambda
+    # writes to it rather than auto-creating one with indefinite retention.
+    DependsOn: AgentLambdaLogGroup
+    # BuildMethod: makefile lets `sam build` use the Makefile in CodeUri
+    # (src/Makefile) instead of Docker or a host pip install. The Makefile
+    # downloads prebuilt manylinux wheels so binary dependencies match the
+    # Lambda runtime on any host OS — no Docker and no local python3.12 needed.
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      FunctionName: !Sub '${EnvironmentName}-weather-agent'
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Handler: agent/handler.lambda_handler
+      CodeUri: ../src/
+      Timeout: 120
+      MemorySize: 1024
+      Environment:
+        Variables:
+          GATEWAY_ID: !Ref AgentCoreGateway
+          COGNITO_JWKS_URL: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/jwks.json'
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          AWS_REGION_NAME: !Ref 'AWS::Region'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+                - bedrock:Converse
+                - bedrock:ConverseStream
+              # Invoking via a cross-region inference profile requires access to
+              # both the inference profile ARN and the underlying foundation
+              # models in every region the profile can route to (hence the
+              # wildcard region on foundation-model).
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                - !Sub 'arn:aws:bedrock:*::foundation-model/*'
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock-agentcore:GetGateway
+              Resource: !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:gateway/${AgentCoreGateway}'
+
+  # Explicit log group with a retention policy. Without this, Lambda auto-creates
+  # the log group with indefinite retention, which accumulates cost over time —
+  # the Strands agent logs verbosely (model reasoning, tool calls). Using the
+  # conventional /aws/lambda/<function-name> name means the function writes here
+  # instead of creating its own.
+  AgentLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${EnvironmentName}-weather-agent'
+      RetentionInDays: 14
+
+  # ============================================================
+  # IAM Resources
+  #
+  # The Agent Lambda execution role is generated automatically by
+  # SAM from the Policies property above. Only the AgentCore Gateway
+  # execution role is declared explicitly here, as it is assumed by
+  # the bedrock-agentcore service principal (not a Lambda).
+  # ============================================================
+
+  GatewayExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-weather-gateway-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: WorkloadAccessToken
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetWorkloadAccessToken
+                Resource:
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/${EnvironmentName}-weather-gateway-*'
+        - PolicyName: GetResourceApiKey
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetResourceApiKey
+                Resource:
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default/apikeycredentialprovider/*'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/${EnvironmentName}-weather-gateway-*'
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:bedrock-agentcore-identity!default/apikey/*'
+        - PolicyName: ApiGatewayExport
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - apigateway:GET
+                Resource: !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis/${RestApi}/stages/${EnvironmentName}/exports/*'
+
+Outputs:
+  GatewayId:
+    Description: AgentCore Gateway ID
+    Value: !Ref AgentCoreGateway
+  RestApiId:
+    Description: API Gateway REST API ID
+    Value: !Ref RestApi
+  ApiKeyId:
+    Description: API Gateway API Key ID
+    Value: !Ref ApiKey
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref CognitoUserPool
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref CognitoUserPoolClient
+  CognitoJwksUrl:
+    Description: Cognito JWKS URL for JWT validation
+    Value: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/jwks.json'
+  AgentLambdaArn:
+    Description: Agent Lambda function ARN
+    Value: !GetAtt AgentLambdaFunction.Arn
+  ApiEndpointUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentName}'
