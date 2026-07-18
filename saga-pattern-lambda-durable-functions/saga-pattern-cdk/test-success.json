@@ -1,0 +1,20 @@
+{
+  "passengerName": "Michael Johnson",
+  "flightNumber": "AA456",
+  "departure": "LAX",
+  "destination": "MIA",
+  "flightPrice": 380.00,
+  "guestName": "Michael Johnson",
+  "hotelName": "Hilton Downtown Miami",
+  "roomType": "Ocean View Suite",
+  "checkIn": "2026-04-10",
+  "checkOut": "2026-04-15",
+  "hotelPrice": 320.00,
+  "driverName": "Michael Johnson",
+  "carType": "Convertible",
+  "pickupLocation": "Miami Airport",
+  "dropoffLocation": "Miami Airport",
+  "pickupDate": "2026-04-10",
+  "dropoffDate": "2026-04-15",
+  "carPrice": 150.00
+}
