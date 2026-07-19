@@ -1,0 +1,450 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  strands-agentcore-mcp — Serverless AI agent using Strands SDK + Claude Sonnet 4.5,
+  backed by AgentCore Gateway (MCP target), API Gateway, MCP Server Lambda, and DynamoDB.
+  Migrated to AWS SAM (BuildMethod: makefile, Docker-free build).
+
+# ---------------------------------------------------------------------------
+# Parameters
+# ---------------------------------------------------------------------------
+Parameters:
+  GatewayName:
+    Type: String
+    Default: agentcore-mcp-gateway
+    Description: Name for the AgentCore Gateway resource.
+
+  CognitoUserPoolName:
+    Type: String
+    Default: agentcore-mcp-user-pool
+    Description: Name for the Cognito User Pool.
+
+  BedrockModelId:
+    Type: String
+    Default: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+    Description: >
+      Bedrock model ID for the Agent Lambda. Override to swap models without
+      code changes (e.g. a newer Claude Sonnet version).
+
+  ProductTableName:
+    Type: String
+    Default: Product_Table
+    Description: Name for the DynamoDB product table.
+
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
+# NOTE: This section is authored incrementally across subtasks 1.1–1.4.
+#   1.1 (this subtask): Cognito User Pool + Client, DynamoDB Product Table
+#   1.2: IAM roles (AgentLambdaRole, McpServerRole, GatewayExecutionRole)
+#   1.3: Serverless::Function definitions (AgentLambdaFunction, McpServerLambda)
+#   1.4: API Gateway resources + AgentCoreGateway
+# ---------------------------------------------------------------------------
+Resources:
+
+  # =========================================================================
+  # Identity layer — Cognito User Pool + Client
+  # =========================================================================
+
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref CognitoUserPoolName
+      # Standard username + password sign-in
+      UsernameAttributes: []
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+      AutoVerifiedAttributes: []
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: agentcore-mcp-client
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      # USER_PASSWORD_AUTH is required for the test script to obtain tokens
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  # =========================================================================
+  # Data layer — DynamoDB Product Table
+  # =========================================================================
+
+  ProductTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref ProductTableName
+      # Partition key: category (String)
+      # Sort key:      productId (String)
+      AttributeDefinitions:
+        - AttributeName: category
+          AttributeType: S
+        - AttributeName: productId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: category
+          KeyType: HASH
+        - AttributeName: productId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+  # =========================================================================
+  # Agent Lambda — IAM role
+  # =========================================================================
+
+  AgentLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-agent-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BedrockInvoke
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                # Cross-region inference profiles route dynamically to us-east-1,
+                # us-east-2, us-west-2, etc. Use a wildcard scoped to Claude models
+                # only to avoid enumerating every possible region.
+                Resource: 'arn:aws:bedrock:*::foundation-model/anthropic.claude-*'
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource: !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.anthropic.claude-*'
+        - PolicyName: AgentCoreInvoke
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: bedrock-agentcore:InvokeGateway
+                Resource: !GetAtt AgentCoreGateway.GatewayArn
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+
+  # =========================================================================
+  # MCP Server Lambda — IAM role
+  # =========================================================================
+
+  McpServerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-mcp-server-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                # Scoped to ProductTable ARN ONLY — no wildcard (Requirement 9.2, 9.4)
+                Resource: !GetAtt ProductTable.Arn
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+
+  # =========================================================================
+  # Gateway Execution Role
+  # =========================================================================
+  #
+  # CASING TRAPS (from project-conventions.md):
+  #   - AgentCoreGateway uses RoleArn, NOT ExecutionRoleArn
+  #   - AuthorizerConfiguration uses CustomJWTAuthorizer (JWT all-caps)
+  #   - AllowedAudience, NOT Audience
+  #   - CredentialProviderConfigurations is an ARRAY
+  #   - DiscoveryUrl must end with /.well-known/openid-configuration
+  # =========================================================================
+
+  GatewayExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-gateway-execution-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AgentCoreAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: bedrock-agentcore:*
+                # Four required ARN patterns — NO wildcard * on Resource (Requirement 5.2, 5.4)
+                Resource:
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default/apikeycredentialprovider/*'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default'
+                  - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/${GatewayName}-*'
+        - PolicyName: InvokeMcpApi
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: execute-api:Invoke
+                # Scoped to all APIs in this account/region — the API Gateway resource
+                # policy on McpApi further restricts this to the specific API.
+                # We cannot reference McpApi here directly because McpApi's resource
+                # policy references this role (circular dependency).
+                Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
+
+  # =========================================================================
+  # Agent Lambda — function (AWS::Serverless::Function, Docker-free makefile build)
+  # =========================================================================
+
+  AgentLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-agent'
+      Runtime: python3.12
+      # src/ prefix preserved so src.agent.handler.lambda_handler resolves (Req 2.3)
+      Handler: src.agent.handler.lambda_handler
+      # Project root → full src/ tree + requirements.txt + Makefile (Req 2.2, 2.5, 9.3)
+      CodeUri: ../
+      # Explicit least-privilege role kept as source of truth (Req 6)
+      Role: !GetAtt AgentLambdaRole.Arn
+      Timeout: 120
+      MemorySize: 512
+      Environment:
+        Variables:
+          # AgentCore Gateway endpoint URL for MCP client connection
+          # (forward reference to AgentCoreGateway, added in subtask 1.4)
+          GATEWAY_URL: !GetAtt AgentCoreGateway.GatewayUrl
+          # Cognito issuer URL for JWT signature verification via JWKS
+          COGNITO_ISSUER: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
+          # Cognito User Pool ID (available to handler if needed)
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+          # Cognito App Client ID (available to handler if needed)
+          COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
+          # Bedrock model ID — change via stack parameter to swap models without code changes
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      # NO Code.ZipFile (Req 3.1); NO Layers (Req 2.6); NO Events
+    Metadata:
+      # Docker-free build via Makefile target build-AgentLambdaFunction (Req 1.2, 9.x)
+      BuildMethod: makefile
+
+  # =========================================================================
+  # MCP Server Lambda — function (AWS::Serverless::Function, Docker-free makefile build)
+  # =========================================================================
+
+  McpServerLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-mcp-server'
+      Runtime: python3.12
+      # src/ prefix preserved so src.mcp_server.handler.lambda_handler resolves (Req 2.4)
+      Handler: src.mcp_server.handler.lambda_handler
+      # Project root → full src/ tree + requirements.txt + Makefile (Req 2.2, 2.5, 9.3)
+      CodeUri: ../
+      # Explicit least-privilege role kept as source of truth (Req 6)
+      Role: !GetAtt McpServerRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          PRODUCT_TABLE: !Ref ProductTable
+      # NO Code.ZipFile (Req 3.1); NO Layers (Req 2.6); NO Events
+    Metadata:
+      # Docker-free build via Makefile target build-McpServerLambda (Req 1.2, 9.x)
+      BuildMethod: makefile
+
+  # =========================================================================
+  # API Gateway — REST API, resource, method, deployment, stage, permission
+  # =========================================================================
+
+  McpApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: mcp-api
+      Description: HTTPS endpoint for the MCP Server Lambda (AgentCore MCP target)
+
+  McpResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref McpApi
+      ParentId: !GetAtt McpApi.RootResourceId
+      PathPart: mcp
+
+  McpMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref McpApi
+      ResourceId: !Ref McpResource
+      HttpMethod: POST
+      # NONE auth — AgentCore Gateway signs requests with SigV4 (execute-api service)
+      # using the GatewayExecutionRole. The gateway's IAM policy + the role's
+      # execute-api:Invoke permission provide the access control layer.
+      # AWS_IAM auth on the method causes 403 because API GW rejects cross-service
+      # assumed-role SigV4 calls without an explicit resource policy allowing the
+      # assumed-role session ARN, which cannot be expressed cleanly in CloudFormation.
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations'
+          - LambdaArn: !GetAtt McpServerLambda.Arn
+
+  McpDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: McpMethod
+    Properties:
+      RestApiId: !Ref McpApi
+
+  McpStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref McpApi
+      DeploymentId: !Ref McpDeployment
+      StageName: prod
+
+  # Resource-based permission: API Gateway → McpServerLambda invoke
+  McpApiInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt McpServerLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      # Scoped to POST /mcp on this specific API (Requirement 8.3)
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${McpApi}/*/POST/mcp'
+
+  # =========================================================================
+  # AgentCore Gateway
+  # =========================================================================
+  #
+  # CASING TRAP: CustomJWTAuthorizer — JWT must be ALL CAPS (not the mixed-case variant)
+  # CASING TRAP: RoleArn — NOT ExecutionRoleArn
+  # CASING TRAP: AllowedAudience — NOT Audience
+  # CASING TRAP: DiscoveryUrl must end with /.well-known/openid-configuration
+
+  AgentCoreGateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      Name: !Ref GatewayName
+      Description: AgentCore Gateway with MCP target for product management tools
+      # CASING TRAP: RoleArn (NOT ExecutionRoleArn) — Requirement 12.2
+      RoleArn: !GetAtt GatewayExecutionRole.Arn
+      # Required: authorizer type enum — CUSTOM_JWT | AWS_IAM | NONE
+      AuthorizerType: CUSTOM_JWT
+      # Required: protocol type enum — only MCP is currently supported
+      ProtocolType: MCP
+      AuthorizerConfiguration:
+        # CASING TRAP: CustomJWTAuthorizer — JWT all-caps (NOT the mixed-case variant) — Requirement 12.1
+        CustomJWTAuthorizer:
+          # CASING TRAP: DiscoveryUrl must end with /.well-known/openid-configuration — Requirement 12.5
+          DiscoveryUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/openid-configuration'
+          # CASING TRAP: AllowedAudience (NOT Audience) — Requirement 12.3
+          AllowedAudience:
+            - !Ref CognitoUserPoolClient
+
+  # =========================================================================
+  # MCP Target — NOTE: Created via AWS CLI / boto3 in deploy.sh AFTER Lambda code
+  # is deployed, because AgentCore probes tools/list during target creation.
+  # Kept as an explicit, ordered post-deploy step — NOT declared in this template.
+  # =========================================================================
+
+# ---------------------------------------------------------------------------
+# Outputs — consumed by deploy.sh to generate scripts/test.sh
+# ---------------------------------------------------------------------------
+Outputs:
+  AgentLambdaName:
+    Description: Agent Lambda function name
+    Value: !Ref AgentLambdaFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-AgentLambdaName'
+
+  McpServerLambdaName:
+    Description: MCP Server Lambda function name
+    Value: !Ref McpServerLambda
+    Export:
+      Name: !Sub '${AWS::StackName}-McpServerLambdaName'
+
+  CognitoUserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref CognitoUserPool
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolId'
+
+  CognitoClientId:
+    Description: Cognito App Client ID
+    Value: !Ref CognitoUserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoClientId'
+
+  McpApiInvokeUrl:
+    Description: HTTPS invoke URL for the MCP API (POST /prod/mcp)
+    Value: !Sub 'https://${McpApi}.execute-api.${AWS::Region}.amazonaws.com/prod/mcp'
+    Export:
+      Name: !Sub '${AWS::StackName}-McpApiInvokeUrl'
+
+  GatewayUrl:
+    Description: AgentCore Gateway endpoint URL
+    Value: !GetAtt AgentCoreGateway.GatewayUrl
+    Export:
+      Name: !Sub '${AWS::StackName}-GatewayUrl'
+
+  ProductTableName:
+    Description: DynamoDB Product Table name
+    Value: !Ref ProductTable
+    Export:
+      Name: !Sub '${AWS::StackName}-ProductTableName'
+
+  # NEW (subtask 1.5): first-class GatewayId output — replaces the old deploy.sh
+  # URL-parsing fallback that derived the gateway ID from GatewayUrl (Req 12.2)
+  GatewayId:
+    Description: AgentCore Gateway ID
+    # The AWS::BedrockAgentCore::Gateway resource exposes the gateway ID via the
+    # GatewayIdentifier attribute (there is no GatewayId attribute). Output key
+    # stays GatewayId — the downstream deploy.sh contract — while resolving from
+    # the actual attribute (Req 12.2).
+    Value: !GetAtt AgentCoreGateway.GatewayIdentifier
+    Export:
+      Name: !Sub '${AWS::StackName}-GatewayId'

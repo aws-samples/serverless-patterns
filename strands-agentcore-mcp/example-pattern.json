@@ -1,0 +1,86 @@
+{
+  "title": "Serverless AI Agent with AgentCore MCP Gateway on Lambda",
+  "description": "Strands SDK agent on Lambda routes tool calls via AgentCore Gateway (MCP) to a Lambda MCP Server backed by DynamoDB, with Cognito JWT auth.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The user authenticates with Amazon Cognito and receives a JWT token.",
+      "The JWT is passed to an Agent Lambda which uses the Strands Agents SDK to create an AI agent backed by Amazon Bedrock (Claude Sonnet 4.5 cross-region inference profile).",
+      "The Strands Agent connects to an AgentCore Gateway MCP endpoint, dynamically discovering available product management tools via the MCP tools/list protocol.",
+      "The AgentCore Gateway validates the JWT token using a CUSTOM_JWT authorizer backed by Cognito, then routes MCP tool calls to the MCP Server Lambda via API Gateway.",
+      "The MCP Server Lambda implements the Model Context Protocol (JSON-RPC 2.0 over HTTP) and exposes three tools: list_products, get_product, and put_product, backed by a DynamoDB table.",
+      "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call.",
+      "The model used by the agent is configurable via the BEDROCK_MODEL_ID environment variable on the Agent Lambda, set from the BedrockModelId SAM template parameter."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/strands-agentcore-mcp",
+      "templateURL": "serverless-patterns/strands-agentcore-mcp",
+      "projectFolder": "strands-agentcore-mcp",
+      "templateFile": "infrastructure/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Strands Agents SDK",
+        "link": "https://github.com/strands-agents/sdk-python"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "AgentCore Gateway MCP Target",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-target-MCPservers.html"
+      },  
+      {
+        "text": "Model Context Protocol (MCP)",
+        "link": "https://modelcontextprotocol.io/"
+      },
+      {
+        "text": "Amazon Cognito JWT Authentication",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html"
+      },
+      {
+        "text": "Amazon Bedrock Cross-Region Inference",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html"
+      },
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "./scripts/deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "./scripts/test.sh",
+      "./scripts/test.sh 'List all products in Electronics'",
+      "./scripts/test.sh 'Get product ELEC-001 details'",
+      "./scripts/test.sh 'Add a new product called Widget Pro in Electronics for $49.99'"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "./scripts/terminate.sh"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mike Hume",
+      "image": "https://serverlessland.com/assets/images/contributors/mike-hume.jpg",
+      "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
+      "linkedin": "michael-hume-4663bb64",
+      "twitter": ""
+    }
+  ]
+}
