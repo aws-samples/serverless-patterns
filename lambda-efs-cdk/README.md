@@ -1,4 +1,4 @@
-# Amazon API Gateway to Lambda to Amazon EFS
+# Amazon API Gateway to AWS Lambda to Amazon EFS
 
 This pattern attaches an EFS file system to your Lambda function to give it expandable, persistent storage. Having this level of storage in a Lambda function opens the door to many new possibilities (multiple functions can even use the same file system)
 
@@ -43,10 +43,8 @@ Important: this application uses various AWS services and there are costs associ
     ```bash
     cdk deploy
     ```
-1. Cleanup
-    
-1. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
+Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -66,8 +64,13 @@ The Lambda Function will behave differently based on the RESTful verb you use:
 The URL for the HTTP API to use these commands will be printed in the CloudFormation stack output after you deploy.
 Postman can be used to read/write text using API URL printed in output of the cdk deploy command.
 
-Note - After deployment you may need to wait 60-90 seconds before the implementation works as expected. There are a lot of network configurations happening so you need to wait on propagation
+```bash
+curl -X POST -H 'Content-Type: text/plain' -d 'Hello!' ${APIUrl}
+curl ${APIUrl}
+curl -X DELETE ${APIUrl}
+```
 
+Note - After deployment you may need to wait 60-90 seconds before the implementation works as expected. There are a lot of network configurations happening so you need to wait on propagation
 
 ## Useful commands
 
@@ -77,12 +80,18 @@ Note - After deployment you may need to wait 60-90 seconds before the implementa
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
+## Cleanup
+
+1. Run the given command to delete the resources that were created.
+    ```bash
+    cdk destroy
+    ```
 
 ## Useful References
-[Using Amazon EFS with Lambda] (https://docs.aws.amazon.com/lambda/latest/dg/services-efs.html)
-[[Configuring file system access for Lambda functions] https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html
-Using Amazon EFS for AWS Lambda in your serverless applications] (https://aws.amazon.com/blogs/compute/[using-amazon-efs-for-aws-lambda-in-your-serverless-applications/
-Danilo Poccia - A Shared File System for Your Lambda Functions] https://aws.amazon.com/blogs/aws/new-a-shared-file-system-for-your-lambda-functions/)
+- [Using Amazon EFS with Lambda](https://docs.aws.amazon.com/lambda/latest/dg/services-efs.html)
+- [Configuring file system access for Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html)
+- [Using Amazon EFS for AWS Lambda in your serverless applications](https://aws.amazon.com/blogs/compute/using-amazon-efs-for-aws-lambda-in-your-serverless-applications/)
+- [Danilo Poccia - A Shared File System for Your Lambda Functions](https://aws.amazon.com/blogs/aws/new-a-shared-file-system-for-your-lambda-functions/)
 
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
