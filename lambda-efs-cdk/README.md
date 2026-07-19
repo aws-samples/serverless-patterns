@@ -66,8 +66,13 @@ The Lambda Function will behave differently based on the RESTful verb you use:
 The URL for the HTTP API to use these commands will be printed in the CloudFormation stack output after you deploy.
 Postman can be used to read/write text using API URL printed in output of the cdk deploy command.
 
-Note - After deployment you may need to wait 60-90 seconds before the implementation works as expected. There are a lot of network configurations happening so you need to wait on propagation
+```bash
+curl -X POST -H 'Content-Type: text/plain' -d 'Hello!' ${APIUrl}
+curl ${APIUrl}
+curl -X DELETE ${APIUrl}
+```
 
+Note - After deployment you may need to wait 60-90 seconds before the implementation works as expected. There are a lot of network configurations happening so you need to wait on propagation
 
 ## Useful commands
 
