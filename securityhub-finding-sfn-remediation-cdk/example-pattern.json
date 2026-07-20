@@ -1,0 +1,71 @@
+{
+  "title": "AWS Security Hub Auto-Remediation with AWS Step Functions",
+  "description": "Auto-remediate HIGH/CRITICAL Security Hub findings using AWS Step Functions and AWS Lambda to close open security groups and block public S3 access",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "AWS Security Hub detects HIGH or CRITICAL findings such as open security groups or public Amazon S3 buckets.",
+      "Amazon EventBridge captures the finding and triggers an AWS Step Functions workflow that classifies the finding type.",
+      "AWS Lambda executes targeted remediation (revoke open ingress rules, enable S3 public access block) and Amazon SNS notifies the security team."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/securityhub-finding-sfn-remediation-cdk",
+      "templateURL": "serverless-patterns/securityhub-finding-sfn-remediation-cdk",
+      "projectFolder": "securityhub-finding-sfn-remediation-cdk",
+      "templateFile": "cdk/lib/securityhub-finding-sfn-remediation-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Security Hub automated response and remediation",
+        "link": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html"
+      },
+      {
+        "text": "AWS Step Functions service integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-supported-services.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd securityhub-finding-sfn-remediation-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Create an intentionally open security group (0.0.0.0/0 on port 22).",
+      "Wait for AWS Security Hub to detect the finding (~15 minutes).",
+      "Verify the AWS Step Functions execution completed and the security group was closed.",
+      "Subscribe to the Amazon SNS topic to receive remediation alerts."
+    ]
+  },
+  "cleanup": {
+    "text": ["<code>npx cdk destroy</code>"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 10, "y": 50, "service": "securityhub", "label": "AWS Security Hub" },
+    "icon2": { "x": 30, "y": 50, "service": "eventbridge", "label": "Amazon EventBridge" },
+    "icon3": { "x": 50, "y": 50, "service": "sfn", "label": "AWS Step Functions" },
+    "icon4": { "x": 70, "y": 50, "service": "lambda", "label": "AWS Lambda" },
+    "icon5": { "x": 90, "y": 25, "service": "sns", "label": "Amazon SNS" },
+    "icon6": { "x": 90, "y": 75, "service": "ec2", "label": "Amazon EC2 / Amazon S3" }
+  },
+  "patternType": "Serverless"
+}
