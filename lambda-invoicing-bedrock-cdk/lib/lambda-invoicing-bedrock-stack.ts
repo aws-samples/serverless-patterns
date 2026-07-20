@@ -37,7 +37,7 @@ export class LambdaInvoicingBedrockStack extends cdk.Stack {
       memorySize: 512,
       environment: {
         BUCKET_NAME: invoiceBucket.bucketName,
-        MODEL_ID: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+        MODEL_ID: this.node.tryGetContext('modelId') || 'us.anthropic.claude-sonnet-4-6',
       },
     });
 
@@ -53,12 +53,12 @@ export class LambdaInvoicingBedrockStack extends cdk.Stack {
       resources: ['*'],
     }));
 
-    // Grant Bedrock model invocation
+    // Grant Amazon Bedrock model invocation
     invoiceFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
-        `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
-        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-20250514-v1:0`,
+        `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6`,
+        `arn:aws:bedrock:*:${this.account}:inference-profile/*`,
       ],
     }));
 

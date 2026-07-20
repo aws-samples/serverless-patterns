@@ -37,6 +37,11 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy
     ```
 
+    To use a different Amazon Bedrock model or deploy in a different region, pass the model ID as context:
+    ```bash
+    cdk deploy --context modelId=eu.anthropic.claude-sonnet-4-6
+    ```
+
 ## How it works
 
 This pattern uses four AWS services in composition:
