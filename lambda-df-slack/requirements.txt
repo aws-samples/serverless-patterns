@@ -1,0 +1,13 @@
+# AWS SDK
+boto3>=1.28.0
+
+# AWS Lambda Durable Functions SDK
+aws-durable-execution-sdk-python>=1.0.0
+
+# Testing
+aws-durable-execution-sdk-python-testing>=1.0.0
+
+# No additional dependencies needed - using standard library for HTTP requests
+# In production, consider:
+# - slack-sdk for official Slack client
+# - requests for more robust HTTP handling
