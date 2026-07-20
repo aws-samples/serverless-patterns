@@ -1,6 +1,6 @@
 {
   "title": "AI data analyst with Amazon Bedrock and Amazon Bedrock AgentCore Code Interpreter",
-  "description": "Deploy an Amazon API Gateway REST API backed by an AWS Lambda function that uses Amazon Bedrock to generate Python analysis code from natural language questions, then executes it safely in Amazon Bedrock AgentCore Code Interpreter.",
+  "description": "Amazon API Gateway + AWS Lambda + Amazon Bedrock generates Python code from questions, Amazon Bedrock AgentCore Code Interpreter executes it safely.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",

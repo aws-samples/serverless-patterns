@@ -24,7 +24,7 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(90),
       environment: {
         CODE_INTERPRETER_ID: (codeInterpreter.node.defaultChild as cdk.CfnResource).ref,
-        MODEL_ID: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+        MODEL_ID: 'us.anthropic.claude-sonnet-4-6',
       },
     });
 
