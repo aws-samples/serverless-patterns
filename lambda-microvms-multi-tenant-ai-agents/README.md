@@ -4,7 +4,7 @@ This pattern runs a self-hosted AI agent ([OpenClaw](https://github.com/openclaw
 
 Most AI agents sit idle most of the time, yet an "always-on" deployment bills 24/7. Lambda MicroVMs flip that model: an idle tenant's VM auto-suspends (barely billed), a fully idle tenant is terminated with its state parked on EFS for ≈$0, and a returning tenant resumes from a Firecracker snapshot in seconds — memory intact. Each tenant gets a dedicated micro-VM, so isolation is a hard security boundary by design, and the workload obtains AWS credentials from the MicroVM's IMDSv2 execution role with no static keys.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-microvms-multi-tenant-ai-agents](https://serverlessland.com/patterns/lambda-microvms-multi-tenant-ai-agents)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
