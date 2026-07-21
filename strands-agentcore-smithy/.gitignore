@@ -1,9 +1,6 @@
 *-deps/
 *-package/
 *.zip
-.aws-sam/
-samconfig.toml
-.kiro/
 .venv/
 venv/
 __pycache__/

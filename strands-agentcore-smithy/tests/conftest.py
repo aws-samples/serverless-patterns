@@ -40,8 +40,8 @@ _CfnLoader.add_multi_constructor("!", _cfn_tag_constructor)
 
 @pytest.fixture(scope="session")
 def cfn_template():
-    """Load and return the parsed SAM/CloudFormation template."""
-    path = os.path.join(_ROOT, "infrastructure", "template.yaml")
+    """Load and return the parsed CloudFormation template."""
+    path = os.path.join(_ROOT, "infrastructure", "cloudformation-template.yaml")
     with open(path) as fh:
         return yaml.load(fh, Loader=_CfnLoader)
 

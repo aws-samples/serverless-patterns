@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
 Description: >
-  AgentCore Smithy Bedrock Runtime - Serverless AI agent exposing Bedrock Runtime
-  operations through AWS Bedrock AgentCore Gateway using a Smithy model target.
-  Built and deployed with AWS SAM (Makefile build, no Docker required).
+  AgentCore Smithy Amazon Bedrock Runtime - Serverless AI agent exposing Amazon Bedrock Runtime
+  operations through Amazon Bedrock AgentCore Gateway using a Smithy model target.
 
 Parameters:
   GatewayName:
@@ -12,6 +10,7 @@ Parameters:
     Description: Name for the AgentCore Gateway
 
 Resources:
+  # ============================================================
   # ============================================================
   # Cognito User Pool and Client
   # ============================================================
@@ -49,17 +48,30 @@ Resources:
             Principal:
               Service: bedrock-agentcore.amazonaws.com
             Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:*'
       Policies:
         - PolicyName: AgentCoreAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Effect: Allow
+              - Sid: TokenVaultApiKeyAccess
+                Effect: Allow
                 Action:
-                  - bedrock-agentcore:*
+                  - bedrock-agentcore:GetResourceApiKey
                 Resource:
                   - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default'
                   - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:token-vault/default/apikeycredentialprovider/*'
+              - Sid: WorkloadIdentityTokenAccess
+                Effect: Allow
+                Action:
+                  - bedrock-agentcore:GetWorkloadAccessToken
+                  - bedrock-agentcore:GetWorkloadAccessTokenForJWT
+                  - bedrock-agentcore:GetWorkloadAccessTokenForUserId
+                Resource:
                   - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default'
                   - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:workload-identity-directory/default/workload-identity/${GatewayName}-*'
         - PolicyName: BedrockRuntimeAccess
@@ -73,9 +85,8 @@ Resources:
                   - bedrock:Converse
                   - bedrock:ConverseStream
                 Resource:
-                  - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
+                  - 'arn:aws:bedrock:*::foundation-model/*'
                   - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
-                  - '*'
         - PolicyName: SmithyModelS3Access
           PolicyDocument:
             Version: '2012-10-17'
@@ -144,7 +155,9 @@ Resources:
                   - bedrock:InvokeModelWithResponseStream
                   - bedrock:Converse
                   - bedrock:ConverseStream
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:bedrock:*::foundation-model/*'
+                  - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
         - PolicyName: AgentCoreAccess
           PolicyDocument:
             Version: '2012-10-17'
@@ -161,24 +174,26 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-AgentFunction'
+              - Effect: Allow
+                Action:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-AgentFunction:*'
 
   # ============================================================
-  # Agent Lambda Function (SAM Serverless Function, Makefile build)
+  # Agent Lambda Function
   # ============================================================
   AgentLambdaFunction:
-    Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: makefile
+    Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub '${AWS::StackName}-AgentFunction'
-      CodeUri: ../
-      Handler: src.agent.handler.lambda_handler
       Runtime: python3.12
       Architectures:
         - x86_64
+      Handler: src.agent.handler.lambda_handler
       Role: !GetAtt AgentLambdaRole.Arn
       Timeout: 120
       MemorySize: 1024
@@ -189,6 +204,10 @@ Resources:
           COGNITO_USER_POOL_ID: !Ref CognitoUserPool
           COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
           AWS_REGION_NAME: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {"statusCode": 200, "body": "Placeholder - deploy script will update with actual code"}
 
 # ============================================================
 # Stack Outputs

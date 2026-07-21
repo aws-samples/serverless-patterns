@@ -1,7 +1,7 @@
 """Factory functions for Strands SDK client configuration.
 
 Target-type agnostic factories for creating MCP clients and Bedrock model
-instances. These functions connect to AgentCore Gateway via MCP protocol
+instances. These functions connect to Amazon Bedrock AgentCore Gateway via MCP protocol
 and are unaware of the target type behind the gateway.
 """
 
@@ -21,14 +21,14 @@ DEFAULT_REGION = "us-east-1"
 
 
 def create_mcp_client(gateway_url: str, token: str) -> MCPClient:
-    """Create an MCP client configured to connect to AgentCore Gateway.
+    """Create an MCP client configured to connect to Amazon Bedrock AgentCore Gateway.
 
     Uses streamable HTTP transport with a Bearer token for authentication.
     The returned client is NOT used as a context manager — the Agent manages
     the MCP session lifecycle, and cleanup should occur in a finally block.
 
     Args:
-        gateway_url: The AgentCore Gateway endpoint URL.
+        gateway_url: The Amazon Bedrock AgentCore Gateway endpoint URL.
         token: JWT token for gateway authentication.
 
     Returns:
@@ -52,10 +52,10 @@ def create_bedrock_model(
 ) -> BedrockModel:
     """Create a Bedrock model instance for the Strands Agent.
 
-    Configures Claude 3 Sonnet as the LLM provider via AWS Bedrock.
+    Configures Claude Sonnet 4.6 as the LLM provider via AWS Bedrock.
 
     Args:
-        model_id: Bedrock model identifier. Defaults to Claude 3 Sonnet.
+        model_id: Bedrock model identifier. Defaults to Claude Sonnet 4.6.
         region_name: AWS region for Bedrock API calls. Defaults to us-east-1.
 
     Returns:

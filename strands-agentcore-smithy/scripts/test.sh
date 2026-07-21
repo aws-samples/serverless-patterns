@@ -7,9 +7,9 @@ set -euo pipefail
 # ============================================================
 
 REGION="us-east-1"
-GATEWAY_ID="smithy-bedrock-gateway-2icnnwzik5"
-COGNITO_USER_POOL_ID="us-east-1_d0B5LdMQN"
-COGNITO_CLIENT_ID="c2ns12guk72f41kvsqs9oqs6u"
+GATEWAY_ID="smithy-bedrock-gateway-8oh0kf7tje"
+COGNITO_USER_POOL_ID="us-east-1_UNquXQKHg"
+COGNITO_CLIENT_ID="2j56oaad81l9nid0lssick0tsl"
 LAMBDA_FUNCTION_NAME="agentcore-smithy-bedrock-AgentFunction"
 TEST_USERNAME="testuser"
 TEST_PASSWORD="TestPass123!"

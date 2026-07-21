@@ -46,7 +46,7 @@ _CfnLoader.add_multi_constructor("!", _cfn_tag_constructor)
 # ---------------------------------------------------------------------------
 
 _TEMPLATE_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "..", "infrastructure", "template.yaml"
+    os.path.dirname(__file__), "..", "..", "infrastructure", "cloudformation-template.yaml"
 )
 
 with open(_TEMPLATE_PATH) as _fh:

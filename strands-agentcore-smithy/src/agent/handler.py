@@ -6,6 +6,7 @@ agent_processor module. Returns AgentResponse as a dict suitable for
 Lambda response serialization.
 """
 
+import json
 from dataclasses import asdict
 
 from src.agent.agent_processor import process_request
@@ -87,7 +88,6 @@ def lambda_handler(event: dict, context) -> dict:
         if isinstance(body, dict):
             prompt = body.get("prompt", "")
         elif isinstance(body, str):
-            import json
             try:
                 body = json.loads(body)
                 prompt = body.get("prompt", "")

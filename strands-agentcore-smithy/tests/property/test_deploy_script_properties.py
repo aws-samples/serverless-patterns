@@ -1,12 +1,8 @@
-"""Property-based tests for the Makefile build (Property 7).
+"""Property-based tests for deploy script (Property 7).
 
 Feature: agentcore-smithy-bedrock
-Property 7: Lambda packaging uses pip3 exclusively
-  Validates: pip3-only packaging
-
-After the migration to AWS SAM, Lambda packaging (the pip install steps)
-lives in the root Makefile, invoked by `sam build` via BuildMethod: makefile.
-This property verifies every pip install invocation uses pip3, not bare pip.
+Property 7: Deploy script uses pip3 exclusively
+  Validates: Requirements 9.7
 """
 
 import os
@@ -16,26 +12,34 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
-# Load Makefile content (packaging now lives here, not in deploy.sh)
+# Load deploy script content
 # ---------------------------------------------------------------------------
 
-_MAKEFILE_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "..", "Makefile"
+_SCRIPT_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "..", "scripts", "deploy.sh"
 )
 
-with open(_MAKEFILE_PATH) as _fh:
-    _MAKEFILE_CONTENT = _fh.read()
+with open(_SCRIPT_PATH) as _fh:
+    _SCRIPT_CONTENT = _fh.read()
 
-# Find all pip/pip3 install invocations
-_PIP_INVOCATIONS = re.findall(r"\b(pip3?)\s+install\b", _MAKEFILE_CONTENT)
+# Extract all lines that contain pip install commands (pip or pip3)
+_PIP_COMMAND_PATTERN = re.compile(r"^\s*(pip3?|pip)\s+install\b", re.MULTILINE)
+_PIP_LINES = [
+    (i + 1, line)
+    for i, line in enumerate(_SCRIPT_CONTENT.splitlines())
+    if _PIP_COMMAND_PATTERN.search(line)
+]
 
-assert len(_PIP_INVOCATIONS) > 0, "No pip install commands found in Makefile"
+# Also find continuation lines that start a pip/pip3 command
+_PIP_INVOCATIONS = re.findall(r"\b(pip3?)\s+install\b", _SCRIPT_CONTENT)
+
+assert len(_PIP_INVOCATIONS) > 0, "No pip install commands found in deploy script"
 
 pip_invocation_st = st.sampled_from(_PIP_INVOCATIONS)
 
 # ---------------------------------------------------------------------------
-# Property 7: Lambda packaging uses pip3 exclusively
-# Tag: Feature: agentcore-smithy-bedrock, Property 7: Lambda packaging uses
+# Property 7: Deploy script uses pip3 exclusively
+# Tag: Feature: agentcore-smithy-bedrock, Property 7: Deploy script uses
 #      pip3 exclusively
 # ---------------------------------------------------------------------------
 
@@ -43,8 +47,8 @@ pip_invocation_st = st.sampled_from(_PIP_INVOCATIONS)
 @given(invocation=pip_invocation_st)
 @settings(max_examples=100)
 def test_property7_all_pip_commands_use_pip3(invocation):
-    """For all pip install commands in the Makefile, each command shall
+    """For all pip install commands in the deploy script, each command shall
     use pip3 (not pip) as the executable name."""
     assert invocation == "pip3", (
-        "Found bare 'pip' instead of 'pip3' in Makefile"
+        f"Found bare 'pip' instead of 'pip3' in deploy script"
     )
