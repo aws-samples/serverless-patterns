@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys a complete multi-tenant control plane for self-hosted AI agents on AWS Lambda MicroVMs. Each tenant gets a dedicated Firecracker micro-VM running the agent, so tenant isolation is a hard security boundary by design rather than a shared runtime with guardrails.",
-      "The entire system is declared in one CloudFormation template: a VPC with an Amazon EFS file system, Bedrock VPC endpoints (runtime for inference and control plane for live model discovery), and NAT internet egress for the agent's web tools, the MicroVM image itself (built server-side by CloudFormation via the AWS::Lambda::MicrovmImage resource — no local Docker required), a VPC egress network connector (AWS::Lambda::NetworkConnector), all IAM roles, a DynamoDB tenant registry, an orchestrator Lambda behind an API Gateway HTTP API, and an EventBridge sweeper rule. The deploy script only uploads two zip artifacts to S3 (under content-hashed keys, so redeploys reliably pick up code changes) and runs a single cloudformation deploy.",
+      "The entire system is declared in one CloudFormation template: a VPC with an Amazon EFS file system, Bedrock VPC endpoints (runtime for inference and control plane for live model discovery), and NAT internet egress for the agent's web tools, the MicroVM image itself (built server-side by CloudFormation via the AWS::Lambda::MicrovmImage resource — no local Docker required), a VPC egress network connector (AWS::Lambda::NetworkConnector), all IAM roles, an Amazon DynamoDB tenant registry, an orchestrator Lambda behind an Amazon API Gateway HTTP API, and an Amazon EventBridge sweeper rule. The deploy script only uploads two zip artifacts to Amazon S3 (under content-hashed keys, so redeploys reliably pick up code changes) and runs a single cloudformation deploy.",
       "When a message for a tenant arrives, the orchestrator's router acknowledges immediately and hands off to an async worker. The worker looks the tenant up in the registry: if the tenant's MicroVM is alive it forwards the turn (a suspended VM auto-resumes from its Firecracker snapshot in seconds, memory intact); if the tenant is cold it launches a fresh MicroVM under a conditional-write lock, waits for the VM to mount the tenant's own subdirectory on EFS, and then forwards the turn. Inside the VM, a sidecar passes the turn to the agent gateway over a persistent WebSocket bridge, which keeps agent state warm in memory — a warm turn completes in about two seconds instead of re-reading state over NFS on every message.",
       "The agent calls Amazon Bedrock through the VPC interface endpoint, authenticating with temporary credentials from the MicroVM's IMDSv2 execution role — no static keys are baked into the image or environment. The available model catalog is discovered live from Bedrock at each cold start, so newly launched models are usable without a redeploy. Every tenant's full agent state (configuration and conversation memory) lives on EFS and survives suspend, resume, termination, and the MicroVM's 8-hour maximum lifetime: a relaunched VM adopts the existing state and the agent remembers everything.",
       "An EventBridge rule invokes the sweeper every 10 minutes to terminate long-idle VMs and reconcile the registry, so tenants flow hot (RUNNING) to warm (SUSPENDED, barely billed) to cold (TERMINATED, state parked on EFS for near zero cost) automatically. You pay for conversations, not for waiting — the economics that make one-agent-per-tenant viable at scale. Optionally, each tenant can be bound to its own Telegram bot for a push-based chat front-end through the same API Gateway webhook path, with streaming replies, image understanding, and per-tenant model switching."
@@ -45,20 +45,20 @@
   "deploy": {
     "headline": "Deploy the pattern",
     "text": [
-      "./deploy.sh <stack-name> <region>",
-      "./add-tenant.sh <stack-name> <region> tenant1"
+      "./deploy.sh <region> <stack-name>",
+      "./add-tenant.sh <region> <stack-name> tenant1"
     ]
   },
   "testing": {
     "text": [
-      "./chat.sh <stack-name> <region> tenant1 \"Remember my lucky number is 7777.\"",
-      "./chat.sh <stack-name> <region> tenant1 \"What's my lucky number?\"",
+      "./chat.sh <region> <stack-name> tenant1 \"Remember my lucky number is 7777.\"",
+      "./chat.sh <region> <stack-name> tenant1 \"What's my lucky number?\"",
       "See the README for cross-generation persistence and tenant-isolation tests."
     ]
   },
   "cleanup": {
     "text": [
-      "./teardown.sh <stack-name> <region>"
+      "./teardown.sh <region> <stack-name>"
     ]
   },
   "authors": [

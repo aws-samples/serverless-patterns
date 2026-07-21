@@ -18,6 +18,10 @@ const http = require("http");
 const crypto = require("node:crypto");
 const WebSocket = require("/app/node_modules/ws");
 
+// DEMO FALLBACK ONLY: the template injects OPENCLAW_GATEWAY_TOKEN into every MicroVM
+// (deploy.sh mints a random one), so this literal is never used in a real deploy. It
+// stays as a last-resort so the bridge still starts if the var is somehow unset. For a
+// hardened build, drop the default and fail fast on a missing token.
 const TOKEN = process.env.OPENCLAW_GATEWAY_TOKEN || "poc-microvm-token-42";
 const GW = "ws://127.0.0.1:18789";
 const PORT = 8090;

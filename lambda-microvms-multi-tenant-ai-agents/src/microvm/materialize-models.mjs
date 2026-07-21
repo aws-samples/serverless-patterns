@@ -31,6 +31,19 @@ try {
 
   const discovery =
     cfg?.plugins?.entries?.["amazon-bedrock"]?.config?.discovery ?? {};
+
+  // Honor the actual deploy region. AWS_REGION is injected into the MicroVM at
+  // runtime (same reserved var efs-monitor.sh uses for the mount-target DNS). The
+  // static config ships a us-east-1 baseUrl / discovery region; without this rewrite
+  // a VM launched in any other supported region (us-east-2, us-west-2, eu-west-1,
+  // ap-northeast-1) would send inference to us-east-1 instead of its own in-region
+  // Bedrock VPC endpoint. Persist the region fixes FIRST so they hold even if model
+  // discovery below fails and we fall back to the static seed list.
+  const region = process.env.AWS_REGION || discovery.region || "us-east-1";
+  provider.baseUrl = `https://bedrock-runtime.${region}.amazonaws.com`;
+  if (discovery.region) discovery.region = region;
+  writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 1));
+
   if (discovery.enabled === false) {
     console.log("[materialize-models] discovery disabled; keeping static list");
     process.exit(0);
@@ -40,7 +53,7 @@ try {
     `${findPluginDir()}/dist/discovery.js`
   );
   const models = await discoverBedrockModels({
-    region: discovery.region || process.env.AWS_REGION || "us-east-1",
+    region,
     config: { ...discovery, refreshInterval: 0 },
   });
   if (!Array.isArray(models) || models.length === 0)

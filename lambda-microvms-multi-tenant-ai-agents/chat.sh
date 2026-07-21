@@ -2,12 +2,14 @@
 # Synchronous test chat for a tenant (cold-starts the VM if needed). Invokes the
 # orchestrator worker directly so it isn't bound by API Gateway's 30s timeout —
 # handy for validating cold starts (~90s) from a terminal.
-# Usage: ./chat.sh STACK REGION TENANT_ID "message" [sessionKey]
+# Usage: ./chat.sh REGION STACK TENANT_ID "message" [sessionKey]
+#   e.g. ./chat.sh us-east-1 openclaw-mt tenant1 "Remember my lucky number is 7777."
+# Region is first (see deploy.sh) so switching region reads consistently across scripts.
 set -euo pipefail
 if [ $# -lt 4 ]; then
-  echo "usage: $0 STACK REGION TENANT_ID \"message\" [sessionKey]" >&2; exit 1
+  echo "usage: $0 REGION STACK TENANT_ID \"message\" [sessionKey]" >&2; exit 1
 fi
-STACK="$1"; REGION="$2"; TID="$3"; MSG="$4"; SESS="${5:-cli}"
+REGION="$1"; STACK="$2"; TID="$3"; MSG="$4"; SESS="${5:-cli}"
 FN="${STACK}-orchestrator"
 
 # Heads-up before the blocking invoke: a cold tenant means a ~90s MicroVM cold start,

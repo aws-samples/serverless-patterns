@@ -2,6 +2,10 @@
 # MicroVM entrypoint (EFS variant): hook sidecar (8080) + EFS mount daemon +
 # supervised OpenClaw gateway (18789). Runs as root so we can mount NFS.
 set -u
+# DEMO FALLBACK ONLY: the template injects OPENCLAW_GATEWAY_TOKEN into every MicroVM
+# (deploy.sh mints a random one), so this literal is never used in a real deploy. It
+# stays as a last-resort so the VM still boots if the var is somehow unset. For a
+# hardened build, drop the default so an unset token fails the boot loudly.
 export OPENCLAW_GATEWAY_TOKEN="${OPENCLAW_GATEWAY_TOKEN:-poc-microvm-token-42}"
 export HOME=/home/node
 

@@ -444,10 +444,13 @@ def router(event):
         item = get_tenant(tid)
         if not item:
             return {"statusCode": 404, "body": "unknown tenant"}
-        # verify Telegram secret token
+        # Verify the Telegram secret token. Fail closed: a Telegram-bound tenant
+        # (one with a botToken) MUST present a matching secret. add-tenant.sh
+        # enforces that such tenants are always registered with a webhookSecret,
+        # so a missing 'want' here means a misconfigured tenant, not a public one.
         want = item.get("webhookSecret")
         got = headers.get("x-telegram-bot-api-secret-token")
-        if want and got != want:
+        if item.get("botToken") and (not want or got != want):
             return {"statusCode": 403, "body": "bad secret"}
         update = json.loads(body or "{}")
         # hand off to worker asynchronously; ACK Telegram immediately
@@ -456,6 +459,21 @@ def router(event):
         return {"statusCode": 200, "body": "ok"}
 
     # /chat/<tenantId>?m=... — synchronous test entry (no Telegram); ensures VM + runs a turn inline.
+    #
+    # SECURITY NOTE — this route is intentionally UNAUTHENTICATED for demo ergonomics.
+    # It cold-starts a billable MicroVM and drives Bedrock inference, so an exposed
+    # endpoint is a denial-of-wallet vector: anyone who learns the API URL + a tenant
+    # id can run turns on your account. We deliberately keep it open here to make the
+    # HTTP path trivially curl-testable in a throwaway demo stack.
+    #   WHAT GOOD LOOKS LIKE (do this before any real/shared deployment):
+    #     * put an Amazon API Gateway authorizer (IAM / JWT-Cognito / Lambda authorizer)
+    #       in front of the HTTP API, OR
+    #     * require a per-tenant shared-secret header here, mirroring the /tg check
+    #       (e.g. compare headers['x-chat-secret'] to a value stored on the tenant),
+    #     * and/or drop this route entirely and test only via chat.sh, which invokes
+    #       the Lambda directly (aws lambda invoke) and never touches this public path.
+    # The documented test flow (chat.sh) uses the direct-invoke path, so removing or
+    # locking down /chat does NOT break the pattern's happy path. See README "Security".
     if len(parts) == 2 and parts[0] == "chat":
         tid = parts[1]
         item = get_tenant(tid)
@@ -485,9 +503,26 @@ def router(event):
 
 
 # ---------- SWEEPER (EventBridge) ----------
+def scan_all_tenants():
+    """Yield every tenant, paging past DynamoDB's 1 MB-per-Scan limit.
+
+    A single Scan returns at most 1 MB; without this loop the sweeper would only
+    ever see the first page and silently stop reaping/reconciling the rest, leaking
+    idle MicroVMs (and their cost) once the registry outgrows one page.
+    """
+    kwargs = {}
+    while True:
+        resp = ddb.scan(**kwargs)
+        yield from resp.get("Items", [])
+        lek = resp.get("LastEvaluatedKey")
+        if not lek:
+            break
+        kwargs["ExclusiveStartKey"] = lek
+
+
 def sweeper():
     reaped, reconciled = [], []
-    for item in ddb.scan().get("Items", []):
+    for item in scan_all_tenants():
         tid, mid = item["tenantId"], item.get("microvmId")
         if not mid:
             continue
@@ -509,8 +544,10 @@ def sweeper():
                                 ExpressionAttributeNames={"#s": "state"},
                                 ExpressionAttributeValues={":c": "COLD"})
                 reaped.append(tid)
-            except Exception:
-                pass
+            except Exception as e:
+                # Don't drop silently: a failed reap (permissions, throttling) leaves
+                # a billable VM running and the registry unreconciled — surface it.
+                print(f"[sweeper] terminate failed for {tid}: {e}", flush=True)
     return {"reaped": reaped, "reconciled": reconciled}
 
 

@@ -354,6 +354,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions: [{ AttributeName: tenantId, AttributeType: S }]
       KeySchema: [{ AttributeName: tenantId, KeyType: HASH }]
+      # The registry holds per-tenant secrets (botToken, webhookSecret). DynamoDB
+      # encrypts at rest by default with an AWS-owned key; we opt into the AWS managed
+      # KMS key (aws/dynamodb) so encryption is explicit and shows up in CloudTrail /
+      # key policies. Swap to a customer-managed CMK for rotation/audit control.
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
 
   # ---------- IAM: orchestrator Lambda role ----------
   OrchestratorRole:
@@ -390,6 +397,13 @@ Resources:
                 Effect: Allow
                 Action: iam:PassRole
                 Resource: !GetAtt MicroVMExecutionRole.Arn
+                # Defense-in-depth: only allow passing this role to Lambda (the service
+                # that runs MicroVMs). Matches MicroVMExecutionRole's trust principal
+                # (lambda.amazonaws.com); if a future MicroVM API uses a different
+                # service principal, widen or drop this condition.
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: lambda.amazonaws.com
               - Sid: PassConnectors
                 Effect: Allow
                 Action: lambda:PassNetworkConnector

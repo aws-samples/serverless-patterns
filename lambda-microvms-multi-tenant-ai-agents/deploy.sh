@@ -11,11 +11,15 @@
 # Prereqs: AWS CLI v2 >= 2.35 (has the lambda-microvms models), python3, uv (or a modern
 # pip), zip. Credentials for a MicroVMs launch region with Bedrock Claude access.
 #
-# Usage:  ./deploy.sh [STACK_NAME] [REGION]
+# Usage:  ./deploy.sh [REGION] [STACK_NAME]   (both optional; sensible defaults)
+#   e.g.  ./deploy.sh                     -> us-east-1 / openclaw-mt
+#         ./deploy.sh eu-west-1           -> eu-west-1 / openclaw-mt
+#         ./deploy.sh eu-west-1 mystack   -> eu-west-1 / mystack
+# Region is first: switching region is far more common than renaming the stack.
 set -euo pipefail
 
-STACK="${1:-openclaw-mt}"
-REGION="${2:-us-east-1}"
+REGION="${1:-us-east-1}"
+STACK="${2:-openclaw-mt}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 say(){ printf '\n\033[1;36m== %s ==\033[0m\n' "$*"; }
@@ -137,7 +141,7 @@ cat <<EOF
 
   API endpoint : ${API}
   Gateway token: ${GATEWAY_TOKEN}  ${TOKEN_NOTE}
-  Add a tenant : ./add-tenant.sh ${STACK} ${REGION} <tenantId> [telegramBotToken] [webhookSecret]
-  Test (HTTP)  : ./chat.sh ${STACK} ${REGION} <tenantId> "your message"
-  Teardown     : ./teardown.sh ${STACK} ${REGION}
+  Add a tenant : ./add-tenant.sh ${REGION} ${STACK} <tenantId> [telegramBotToken] [webhookSecret]
+  Test (chat)  : ./chat.sh ${REGION} ${STACK} <tenantId> "your message"
+  Teardown     : ./teardown.sh ${REGION} ${STACK}
 EOF

@@ -4,12 +4,10 @@
 # first (they're created imperatively by the orchestrator at runtime, NOT stack-managed,
 # and their ENIs/connector use would block stack deletion), then (b) delete the stack,
 # then (c) empty & drop the artifact bucket (also not stack-managed).
-# Usage: ./teardown.sh STACK REGION
+# Usage: ./teardown.sh [REGION] [STACK]   (region first; both default to us-east-1 / openclaw-mt)
+#   e.g. ./teardown.sh eu-west-1 mystack
 set -uo pipefail
-if [ $# -lt 2 ]; then
-  echo "usage: $0 STACK REGION" >&2; exit 1
-fi
-STACK="$1"; REGION="$2"
+REGION="${1:-us-east-1}"; STACK="${2:-openclaw-mt}"
 ACCOUNT="$(aws sts get-caller-identity --query Account --output text)"
 BUCKET="${STACK}-artifact-${ACCOUNT}-${REGION}"
 say(){ printf '\n== %s ==\n' "$*"; }
