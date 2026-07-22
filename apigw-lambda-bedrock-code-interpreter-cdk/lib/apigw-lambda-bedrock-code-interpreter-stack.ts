@@ -13,7 +13,7 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
     const codeInterpreter = new agentcore.CodeInterpreterCustom(this, 'CodeInterpreter', {
       codeInterpreterCustomName: 'data_analyst',
       description: 'Sandboxed Python execution for AI-generated data analysis code',
-      networkConfiguration: agentcore.CodeInterpreterNetworkConfiguration.usingPublicNetwork(),
+      networkConfiguration: agentcore.CodeInterpreterNetworkConfiguration.usingSandboxNetwork(),
     });
 
     // AWS Lambda function: Bedrock generates code, Code Interpreter executes it
@@ -21,22 +21,24 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src/handler'),
-      timeout: cdk.Duration.seconds(90),
+      timeout: cdk.Duration.seconds(29),
       environment: {
         CODE_INTERPRETER_ID: (codeInterpreter.node.defaultChild as cdk.CfnResource).ref,
-        MODEL_ID: 'us.anthropic.claude-sonnet-4-6',
+        MODEL_ID: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
       },
     });
 
     // Grant permissions for Amazon Bedrock AgentCore Code Interpreter
     codeInterpreter.grantUse(fn);
 
-    // Grant permission to invoke Amazon Bedrock models
+    // Grant permission to invoke Amazon Bedrock models (least privilege)
     fn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
-        `arn:aws:bedrock:*::foundation-model/*`,
-        `arn:aws:bedrock:*:${this.account}:inference-profile/*`,
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-5-20250929-v1:0`,
+        `arn:aws:bedrock:${this.region}::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0`,
+        `arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0`,
+        `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-5-20250929-v1:0`,
       ],
     }));
 
