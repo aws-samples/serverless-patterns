@@ -1,0 +1,22 @@
+{
+  "name": "waf-cloudfront-ai-monetization-cdk",
+  "version": "1.0.0",
+  "bin": {
+    "app": "bin/app.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.260.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "~5.4.0",
+    "aws-cdk": "^2.260.0",
+    "ts-node": "^10.9.0"
+  }
+}
