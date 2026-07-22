@@ -9,7 +9,7 @@
     "text": [
       "This pattern deploys an AWS WAF WebACL that protects an Amazon Bedrock AgentCore Gateway from common web exploits and abuse.",
       "The WebACL includes rate-based rules (100 requests per 5 minutes per IP), AWS Managed Rules for common threats and known bad inputs, Bot Control for detecting automated traffic, and an IP allowlist for trusted agents.",
-      "The AgentCore Gateway uses the MCP protocol to route tool invocations to an AWS Lambda function that invokes Amazon Bedrock Claude Sonnet 4 for AI inference.",
+      "The AgentCore Gateway uses the MCP protocol to route tool invocations to an AWS Lambda function that invokes Amazon Bedrock Claude Sonnet 4.6 for AI inference.",
       "All AWS WAF decisions are logged to Amazon CloudWatch Logs for security monitoring and incident response."
     ]
   },
