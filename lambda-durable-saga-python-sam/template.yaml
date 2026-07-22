@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Saga pattern with Lambda Durable Functions (Python).
+  Multi-step order processing with compensating transactions on failure.
+  If any step fails, previous steps are rolled back in reverse order.
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Timeout: 30
+    MemorySize: 256
+    Architectures:
+      - arm64
+
+Resources:
+  # Orders table — tracks order state
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-orders"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: order_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: order_id
+          KeyType: HASH
+
+  # Payments table — tracks payment reservations
+  PaymentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-payments"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: payment_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: payment_id
+          KeyType: HASH
+
+  # Inventory table — tracks inventory reservations
+  InventoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-inventory"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: item_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: item_id
+          KeyType: HASH
+
+  # Durable Function — orchestrates the saga
+  SagaOrchestratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-orchestrator"
+      Handler: orchestrator.lambda_handler
+      CodeUri: src/
+      Description: Durable saga orchestrator with compensating transactions
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 3
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+          PAYMENTS_TABLE: !Ref PaymentsTable
+          INVENTORY_TABLE: !Ref InventoryTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PaymentsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref InventoryTable
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-orchestrator*"
+
+Outputs:
+  OrchestratorFunctionName:
+    Description: Name of the saga orchestrator function
+    Value: !Ref SagaOrchestratorFunction
+
+  OrdersTableName:
+    Description: Name of the orders table
+    Value: !Ref OrdersTable
+
+  PaymentsTableName:
+    Description: Name of the payments table
+    Value: !Ref PaymentsTable
+
+  InventoryTableName:
+    Description: Name of the inventory table
+    Value: !Ref InventoryTable
