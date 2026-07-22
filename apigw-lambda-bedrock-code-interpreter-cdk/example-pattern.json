@@ -1,0 +1,96 @@
+{
+  "title": "AI data analyst with Amazon Bedrock and Amazon Bedrock AgentCore Code Interpreter",
+  "description": "Amazon API Gateway + AWS Lambda + Amazon Bedrock generates Python code from questions, Amazon Bedrock AgentCore Code Interpreter executes it safely.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A user submits a data analysis question in natural language via the Amazon API Gateway REST API.",
+      "The AWS Lambda function sends the question to Amazon Bedrock, which generates Python code to answer it.",
+      "The generated code is executed in Amazon Bedrock AgentCore Code Interpreter \u2014 a sandboxed environment with no access to the host system.",
+      "Results are returned to the user along with the generated code for transparency."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-bedrock-code-interpreter-cdk",
+      "templateURL": "serverless-patterns/apigw-lambda-bedrock-code-interpreter-cdk",
+      "projectFolder": "apigw-lambda-bedrock-code-interpreter-cdk",
+      "templateFile": "lib/apigw-lambda-bedrock-code-interpreter-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Code Interpreter documentation",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModel API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "apigateway",
+      "label": "Amazon API Gateway"
+    },
+    "icon2": {
+      "x": 35,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon3": {
+      "x": 60,
+      "y": 30,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    },
+    "icon4": {
+      "x": 60,
+      "y": 70,
+      "service": "bedrock",
+      "label": "Code Interpreter"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon2",
+      "to": "icon4"
+    }
+  }
+}
