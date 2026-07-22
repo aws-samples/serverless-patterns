@@ -1,139 +1,107 @@
 {
-  "title": "Amazon CloudWatch Log Alarm with AWS Lambda Auto-Remediation",
-  "description": "Monitor application logs with CloudWatch Logs Insights queries and auto-remediate via AWS Lambda and AWS Systems Manager when error thresholds are breached",
-  "language": "TypeScript",
-  "level": "300",
-  "framework": "AWS CDK",
-  "introBox": {
-    "headline": "How it works",
-    "text": [
-      "Amazon CloudWatch Log Alarm runs a CloudWatch Logs Insights query on a schedule to count ERROR messages in application logs.",
-      "When the error count exceeds the threshold (5 errors in 5 minutes), the alarm transitions to ALARM state and publishes to Amazon SNS.",
-      "Amazon SNS triggers an AWS Lambda function that sends a remediation command via AWS Systems Manager RunCommand to restart the application service on tagged Amazon EC2 instances."
-    ]
-  },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-log-alarm-lambda-remediation-cdk",
-      "templateURL": "serverless-patterns/cloudwatch-log-alarm-lambda-remediation-cdk",
-      "projectFolder": "cloudwatch-log-alarm-lambda-remediation-cdk",
-      "templateFile": "cdk/lib/cloudwatch-log-alarm-lambda-remediation-stack.ts"
+    "title": "Amazon CloudWatch Log Alarm with AWS Lambda Auto-Remediation",
+    "description": "Monitor application logs with CloudWatch Logs Insights queries and auto-remediate via AWS Lambda and AWS Systems Manager when error thresholds are breached",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Amazon CloudWatch Log Alarm runs a CloudWatch Logs Insights query on a schedule to count ERROR messages in application logs.",
+            "When the error count exceeds the threshold (5 errors in 5 minutes), the alarm transitions to ALARM state and publishes to Amazon SNS.",
+            "Amazon SNS triggers an AWS Lambda function that sends a remediation command via AWS Systems Manager RunCommand to restart the application service on tagged Amazon EC2 instances."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-log-alarm-lambda-remediation-cdk",
+            "templateURL": "serverless-patterns/cloudwatch-log-alarm-lambda-remediation-cdk",
+            "projectFolder": "cloudwatch-log-alarm-lambda-remediation-cdk",
+            "templateFile": "cdk/lib/cloudwatch-log-alarm-lambda-remediation-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon CloudWatch Log Alarm documentation",
+                "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-log.html"
+            },
+            {
+                "text": "AWS::CloudWatch::LogAlarm CloudFormation reference",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudwatch-logalarm.html"
+            },
+            {
+                "text": "AWS Systems Manager RunCommand",
+                "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/run-command.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>cd cloudwatch-log-alarm-lambda-remediation-cdk/cdk</code>",
+            "<code>npm install</code>",
+            "<code>npx cdk deploy</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Write ERROR log messages to the monitored log group to trigger the alarm.",
+            "Wait 5 minutes for the scheduled query to evaluate.",
+            "Check alarm state transitions to ALARM.",
+            "Verify AWS Lambda remediation function was invoked via Amazon CloudWatch Logs."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>npx cdk destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nithin Chandran R",
+            "image": "",
+            "bio": "Technical Account Manager at AWS",
+            "linkedin": "nithin-chandran-r",
+            "twitter": ""
+        }
+    ],
+    "patternType": "Serverless",
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "cloudwatch",
+            "label": "Amazon CloudWatch"
+        },
+        "icon3": {
+            "x": 35,
+            "y": 50,
+            "service": "sns",
+            "label": "Amazon SNS"
+        },
+        "icon4": {
+            "x": 55,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "icon5": {
+            "x": 80,
+            "y": 50,
+            "service": "ssm",
+            "label": "AWS Systems Manager"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon3"
+        },
+        "line2": {
+            "from": "icon3",
+            "to": "icon4"
+        },
+        "line3": {
+            "from": "icon4",
+            "to": "icon5"
+        }
     }
-  },
-  "resources": {
-    "bullets": [
-      {
-        "text": "Amazon CloudWatch Log Alarm documentation",
-        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-log.html"
-      },
-      {
-        "text": "AWS::CloudWatch::LogAlarm CloudFormation reference",
-        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudwatch-logalarm.html"
-      },
-      {
-        "text": "AWS Systems Manager RunCommand",
-        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/run-command.html"
-      }
-    ]
-  },
-  "deploy": {
-    "text": [
-      "<code>cd cloudwatch-log-alarm-lambda-remediation-cdk/cdk</code>",
-      "<code>npm install</code>",
-      "<code>npx cdk deploy</code>"
-    ]
-  },
-  "testing": {
-    "text": [
-      "Write ERROR log messages to the monitored log group to trigger the alarm.",
-      "Wait 5 minutes for the scheduled query to evaluate.",
-      "Check alarm state transitions to ALARM.",
-      "Verify AWS Lambda remediation function was invoked via Amazon CloudWatch Logs."
-    ]
-  },
-  "cleanup": {
-    "text": [
-      "<code>npx cdk destroy</code>"
-    ]
-  },
-  "authors": [
-    {
-      "name": "Nithin Chandran R",
-      "image": "",
-      "bio": "Technical Account Manager at AWS",
-      "linkedin": "nithin-chandran-r",
-      "twitter": ""
-    }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 10,
-      "y": 50,
-      "service": "cloudwatch",
-      "label": "Amazon CloudWatch Logs"
-    },
-    "icon2": {
-      "x": 30,
-      "y": 50,
-      "service": "cloudwatch",
-      "label": "Log Alarm"
-    },
-    "icon3": {
-      "x": 50,
-      "y": 50,
-      "service": "sns",
-      "label": "Amazon SNS"
-    },
-    "icon4": {
-      "x": 70,
-      "y": 50,
-      "service": "lambda",
-      "label": "AWS Lambda"
-    },
-    "icon5": {
-      "x": 90,
-      "y": 50,
-      "service": "ssm",
-      "label": "AWS Systems Manager"
-    }
-  },
-  "patternType": "Serverless",
-  "graph": {
-    "icon1": {
-      "x": 15,
-      "y": 50,
-      "service": "cloudwatch",
-      "label": "Amazon CloudWatch"
-    },
-    "icon3": {
-      "x": 35,
-      "y": 50,
-      "service": "sns",
-      "label": "Amazon SNS"
-    },
-    "icon4": {
-      "x": 55,
-      "y": 50,
-      "service": "lambda",
-      "label": "AWS Lambda"
-    },
-    "icon5": {
-      "x": 80,
-      "y": 50,
-      "service": "ssm",
-      "label": "AWS Systems Manager"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon3"
-    },
-    "line2": {
-      "from": "icon3",
-      "to": "icon4"
-    },
-    "line3": {
-      "from": "icon4",
-      "to": "icon5"
-    }
-  }
 }
