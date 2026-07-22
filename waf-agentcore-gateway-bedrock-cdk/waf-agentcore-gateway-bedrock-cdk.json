@@ -1,0 +1,92 @@
+{
+    "title": "AWS WAF Protection for Amazon Bedrock AgentCore Gateway",
+    "description": "Deploy AWS WAF with rate limiting, managed rules, and bot control to protect an Amazon Bedrock AgentCore Gateway routing tool calls to AWS Lambda and Amazon Bedrock",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern deploys an AWS WAF WebACL that protects an Amazon Bedrock AgentCore Gateway from common web exploits and abuse.",
+            "The WebACL includes rate-based rules (100 requests per 5 minutes per IP), AWS Managed Rules for common threats and known bad inputs, Bot Control for detecting automated traffic, and an IP allowlist for trusted agents.",
+            "The AgentCore Gateway uses the MCP protocol to route tool invocations to an AWS Lambda function that invokes Amazon Bedrock Claude Sonnet 4.6 for AI inference.",
+            "All AWS WAF decisions are logged to Amazon CloudWatch Logs for security monitoring and incident response."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-agentcore-gateway-bedrock-cdk",
+            "templateURL": "serverless-patterns/waf-agentcore-gateway-bedrock-cdk",
+            "projectFolder": "waf-agentcore-gateway-bedrock-cdk",
+            "templateFile": "cdk/lib/waf-agentcore-gateway-bedrock-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS WAF Developer Guide - Protecting resources",
+                "link": "https://docs.aws.amazon.com/waf/latest/developerguide/how-aws-waf-works-resources.html"
+            },
+            {
+                "text": "Amazon Bedrock AgentCore Gateway documentation",
+                "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+            },
+            {
+                "text": "AWS WAF rate-based rules",
+                "link": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-rate-based.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>cd waf-agentcore-gateway-bedrock-cdk/cdk</code>",
+            "<code>npm install</code>",
+            "<code>cdk deploy</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Invoke the AWS Lambda tool to verify Amazon Bedrock connectivity and check AWS WAF metrics in Amazon CloudWatch."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>cdk destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nithin Chandran R",
+            "bio": "Technical Account Manager at AWS",
+            "linkedin": "nithin-chandran-r"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "waf",
+            "label": "AWS WAF"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "bedrock-agentcore",
+            "label": "AgentCore Gateway"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "lambda",
+            "label": "AWS Lambda"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}

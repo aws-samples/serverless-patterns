@@ -1,0 +1,8 @@
+*.js
+!jest.config.js
+!lambda/**/*.js
+*.d.ts
+node_modules
+cdk.out
+cdk.context.json
+build
