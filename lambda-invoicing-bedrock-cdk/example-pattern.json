@@ -1,0 +1,101 @@
+{
+  "title": "Automated AWS Invoice Retrieval and Analysis with Amazon Bedrock",
+  "description": "Retrieve AWS invoices programmatically, archive PDFs to Amazon S3, and generate cost analysis summaries using Amazon Bedrock.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon EventBridge scheduled rule triggers an AWS Lambda function on the 2nd of each month.",
+      "The AWS Lambda function calls the AWS Invoicing API to list invoice summaries and download invoice PDFs via presigned URLs.",
+      "Invoice PDFs are archived to Amazon S3 with date-partitioned prefixes and lifecycle transitions to Infrequent Access.",
+      "Amazon Bedrock analyzes the invoice data and generates an executive summary with cost optimization recommendations.",
+      "The analysis results are stored alongside the PDFs in Amazon S3 for historical tracking and audit compliance."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-invoicing-bedrock-cdk",
+      "templateURL": "serverless-patterns/lambda-invoicing-bedrock-cdk",
+      "projectFolder": "lambda-invoicing-bedrock-cdk",
+      "templateFile": "lib/lambda-invoicing-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Automate AWS Invoice Retrieval with New Programmatic APIs",
+        "link": "https://aws.amazon.com/blogs/aws-cloud-financial-management/automate-aws-invoice-retrieval-with-new-programmatic-apis/"
+      },
+      {
+        "text": "AWS Invoicing API Reference",
+        "link": "https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_invoicing_ListInvoiceSummaries.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cdk bootstrap</code>",
+      "<code>npm install</code>",
+      "<code>cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Invoke the AWS Lambda function manually to test invoice retrieval:",
+      "<code>aws lambda invoke --function-name $(aws cloudformation describe-stacks --stack-name LambdaInvoicingBedrockStack --query 'Stacks[0].Outputs[?OutputKey==`FunctionName`].OutputValue' --output text) --payload '{}' response.json && cat response.json</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Warning: This will delete the Amazon S3 bucket and all archived invoices.",
+      "<code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon2": {
+      "x": 35,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon3": {
+      "x": 60,
+      "y": 30,
+      "service": "s3",
+      "label": "Amazon S3"
+    },
+    "icon4": {
+      "x": 60,
+      "y": 70,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon2",
+      "to": "icon4"
+    }
+  }
+}
