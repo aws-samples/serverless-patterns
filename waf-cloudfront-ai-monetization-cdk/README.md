@@ -115,6 +115,6 @@ cdk destroy
 **Warning**: The Amazon S3 bucket has a DESTROY removal policy. All objects in the bucket will be permanently deleted when the stack is destroyed.
 
 ----
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

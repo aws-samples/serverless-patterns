@@ -1,5 +1,5 @@
 {
-  "title": "AWS WAF AI Traffic Monetization with Amazon CloudFront (CDK)",
+  "title": "AWS WAF AI Traffic Monetization with Amazon CloudFront",
   "description": "Deploy AWS WAF AI traffic monetization with Amazon CloudFront to automatically charge AI bots for content access using the x402 payment protocol.",
   "language": "TypeScript",
   "level": "200",
@@ -10,7 +10,7 @@
       "This pattern deploys an Amazon CloudFront distribution protected by an AWS WAF WebACL configured with Bot Control and AI traffic monetization.",
       "When AI bots (crawlers, scrapers, LLM training agents) request content, AWS WAF classifies them using Bot Control's machine learning and returns an HTTP 402 Payment Required response with a price manifest.",
       "Bots that complete payment via the x402 protocol (USDC on Base or Solana) are granted access. Bots that don't pay are blocked.",
-      "The pattern deploys in TEST mode using Base Sepolia testnet — no real money is involved until you switch to production mode."
+      "The pattern deploys in TEST mode using Base Sepolia testnet \u2014 no real money is involved until you switch to production mode."
     ]
   },
   "gitHub": {
@@ -46,12 +46,7 @@
   },
   "testing": {
     "text": [
-      "Upload sample content to the Amazon S3 bucket:",
-      "<code>aws s3 cp index.html s3://$(aws cloudformation describe-stacks --stack-name WafCloudfrontAiMonetizationStack --query 'Stacks[0].Outputs[?OutputKey==`ContentBucketName`].OutputValue' --output text)/index.html</code>",
-      "Test with a normal browser request (should succeed):",
-      "<code>curl -s https://$(aws cloudformation describe-stacks --stack-name WafCloudfrontAiMonetizationStack --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)/index.html</code>",
-      "Test with an AI bot User-Agent (should return HTTP 402 with x402 payment manifest):",
-      "<code>curl -s -D - -H 'User-Agent: GPTBot/1.0' https://$(aws cloudformation describe-stacks --stack-name WafCloudfrontAiMonetizationStack --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)/index.html</code>"
+      "See the README for detailed testing instructions."
     ]
   },
   "cleanup": {
