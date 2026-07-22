@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Async job processing with Lambda Durable Functions.
+  Submit a job via API, get a job ID back immediately,
+  then poll for status. No SQS, no extra state machine needed.
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Timeout: 30
+    MemorySize: 256
+    Architectures:
+      - arm64
+
+Resources:
+  # DynamoDB table for job status tracking
+  JobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-jobs"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: job_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: job_id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # Durable Function — processes the job asynchronously with checkpoints
+  JobProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-processor"
+      Handler: processor.lambda_handler
+      CodeUri: src/
+      Description: Durable function that processes jobs with automatic checkpointing
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 3
+      Environment:
+        Variables:
+          JOBS_TABLE: !Ref JobsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-processor*"
+
+  # Standard Function — submits jobs and queries status via API
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-api"
+      Handler: api.lambda_handler
+      CodeUri: src/
+      Description: API handler for submitting and polling job status
+      Environment:
+        Variables:
+          JOBS_TABLE: !Ref JobsTable
+          PROCESSOR_FUNCTION_NAME: !Ref JobProcessorFunction
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+        - LambdaInvokePolicy:
+            FunctionName: !Ref JobProcessorFunction
+      Events:
+        SubmitJob:
+          Type: HttpApi
+          Properties:
+            Path: /jobs
+            Method: POST
+        GetJobStatus:
+          Type: HttpApi
+          Properties:
+            Path: /jobs/{job_id}
+            Method: GET
+
+Outputs:
+  ApiEndpoint:
+    Description: HTTP API endpoint URL
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+  JobsTableName:
+    Description: Name of the DynamoDB jobs table
+    Value: !Ref JobsTable
+
+  ProcessorFunctionName:
+    Description: Name of the durable processor function
+    Value: !Ref JobProcessorFunction
