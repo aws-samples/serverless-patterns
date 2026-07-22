@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timezone
 
 import boto3
+from botocore.exceptions import ClientError
 
 lambda_client = boto3.client('lambda')
 dynamodb = boto3.resource('dynamodb')
@@ -124,12 +125,14 @@ def lambda_handler(event, context):
 """
         }
 
-    except lambda_client.exceptions.CallbackTimeoutException:
-        print(f"Callback timed out or already completed for incident: {incident_id}")
-        return {
-            'statusCode': 410,
-            'headers': {'Content-Type': 'text/html; charset=utf-8'},
-            'body': f"""
+    except ClientError as e:
+        error_code = e.response['Error']['Code']
+        if error_code in ('CallbackTimeoutException', 'ResourceNotFoundException'):
+            print(f"Callback unavailable ({error_code}) for incident: {incident_id}")
+            return {
+                'statusCode': 410,
+                'headers': {'Content-Type': 'text/html; charset=utf-8'},
+                'body': """
 <!DOCTYPE html>
 <html>
 <head>
@@ -162,6 +165,26 @@ def lambda_handler(event, context):
         <p style="font-size: 1.2em;">This incident has already timed out or been previously acknowledged.</p>
         <p>No further action is needed from this link.</p>
     </div>
+</body>
+</html>
+"""
+            }
+
+        # Other ClientError — unexpected
+        print(f"ClientError sending callback: {str(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'text/html; charset=utf-8'},
+            'body': """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+</head>
+<body style="font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; text-align: center;">
+    <h1 style="color: #dc3545;">Error Processing Acknowledgment</h1>
+    <p>An unexpected error occurred. Please contact your operations team.</p>
 </body>
 </html>
 """

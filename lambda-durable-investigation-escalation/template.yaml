@@ -244,7 +244,7 @@ Outputs:
     Value: !Sub 'https://${EscalationApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
 
   EscalationFunctionArn:
-    Description: Escalation Durable Function ARN
+    Description: Escalation durable function ARN
     Value: !GetAtt EscalationFunction.Arn
 
   IncidentTableName:

@@ -111,8 +111,8 @@ def build_incident_record(context_summary):
     """
     Build a full incident record from a context summary.
 
-    Adds default fields: status=open, empty escalationHistory,
-    createdAt timestamp, and TTL set to 7 days from creation.
+    Adds default fields: status=open, createdAt timestamp,
+    and TTL set to 7 days from creation.
     """
     now = datetime.now(timezone.utc)
     created_at = now.isoformat()
@@ -121,7 +121,6 @@ def build_incident_record(context_summary):
     return {
         **context_summary,
         'status': 'open',
-        'escalationHistory': [],
         'createdAt': created_at,
         'ttl': ttl,
     }
@@ -149,7 +148,7 @@ def build_notification_message(incident_data, ack_url):
     )
 
 
-def build_final_result(incident_id, investigation_id, status, escalation_history):
+def build_final_result(incident_id, investigation_id, status):
     """
     Build the final result object returned by the Escalation Function.
     """
@@ -157,7 +156,6 @@ def build_final_result(incident_id, investigation_id, status, escalation_history
         'incidentId': incident_id,
         'investigationId': investigation_id,
         'status': status,
-        'escalationHistory': escalation_history,
     }
 
 
@@ -183,7 +181,6 @@ def lambda_handler(event, context: DurableContext):
             'errorDetails': error_message,
             'timestamp': event.get('time', now.isoformat()),
             'status': 'validation_failed',
-            'escalationHistory': [],
             'createdAt': now.isoformat(),
             'ttl': int(now.timestamp()) + 604800,
         }
@@ -209,15 +206,19 @@ def lambda_handler(event, context: DurableContext):
         return record
 
     incident_record = context.step(create_incident, name='create-incident')
-    escalation_history = incident_record.get('escalationHistory', [])
 
     # --- Read API Gateway URL from SSM ---
     param_name = os.environ.get('API_GATEWAY_PARAM')
     if not param_name:
         raise ValueError("API_GATEWAY_PARAM environment variable is not set")
 
-    response = ssm.get_parameter(Name=param_name)
-    api_base_url = response['Parameter']['Value']
+    try:
+        response = ssm.get_parameter(Name=param_name)
+        api_base_url = response['Parameter']['Value']
+    except Exception as e:
+        print(f"Failed to retrieve API Gateway URL from SSM parameter '{param_name}': {str(e)}")
+        raise
+
     print(f"API Base URL: {api_base_url}")
 
     # --- Read configurable timeout ---
@@ -257,7 +258,11 @@ def lambda_handler(event, context: DurableContext):
 
         # Acknowledged
         if isinstance(result, str):
-            ack_data = json.loads(result)
+            try:
+                ack_data = json.loads(result)
+            except (json.JSONDecodeError, TypeError) as e:
+                print(f"Failed to parse callback result as JSON: {str(e)}. Raw result: {result}")
+                ack_data = {'timestamp': datetime.now(timezone.utc).isoformat()}
         else:
             ack_data = result
 
@@ -267,16 +272,12 @@ def lambda_handler(event, context: DurableContext):
             helpers.resolve_incident(incident_id, 'acknowledged', {
                 'acknowledgedAt': ack_timestamp,
             })
-            escalation_history.append({
-                'action': 'acknowledged',
-                'timestamp': ack_timestamp,
-            })
             print(f"Incident {incident_id} acknowledged")
 
         context.step(resolve_acknowledged, name='resolve-incident')
 
         return build_final_result(
-            incident_id, investigation_id, 'acknowledged', escalation_history
+            incident_id, investigation_id, 'acknowledged'
         )
 
     except CallbackError:
@@ -284,16 +285,11 @@ def lambda_handler(event, context: DurableContext):
 
     # --- Timeout → Resolve Unacknowledged ---
     def resolve_unacknowledged(_):
-        timeout_timestamp = datetime.now(timezone.utc).isoformat()
         helpers.resolve_incident(incident_id, 'unacknowledged', {})
-        escalation_history.append({
-            'action': 'timeout',
-            'timestamp': timeout_timestamp,
-        })
         print(f"Incident {incident_id} unacknowledged — timeout expired")
 
     context.step(resolve_unacknowledged, name='resolve-unacknowledged')
 
     return build_final_result(
-        incident_id, investigation_id, 'unacknowledged', escalation_history
+        incident_id, investigation_id, 'unacknowledged'
     )

@@ -7,8 +7,11 @@ can replace the default implementation with calls to third-party services
 (e.g., Jira, ServiceNow, PagerDuty) without modifying the core orchestration logic.
 """
 
+import logging
 import os
 import boto3
+
+logger = logging.getLogger(__name__)
 
 # Module-level clients initialized from environment variables
 dynamodb = boto3.resource('dynamodb')
@@ -28,9 +31,16 @@ def create_incident_ticket(incident):
     Args:
         incident (dict): The full incident record containing incidentId,
             investigationId, failureType, service, region, errorDetails,
-            timestamp, status, escalationHistory, createdAt, and ttl.
+            timestamp, status, createdAt, and ttl.
     """
-    incident_table.put_item(Item=incident)
+    try:
+        incident_table.put_item(Item=incident)
+    except Exception as e:
+        logger.error(
+            "Failed to create incident ticket for incidentId=%s: %s",
+            incident.get('incidentId', 'unknown'), str(e),
+        )
+        raise
 
 
 def resolve_incident(incident_id, status, details):
@@ -60,12 +70,19 @@ def resolve_incident(incident_id, status, details):
         update_expr += ', acknowledgedTier = :ack_tier'
         expr_values[':ack_tier'] = details['acknowledgedTier']
 
-    incident_table.update_item(
-        Key={'incidentId': incident_id},
-        UpdateExpression=update_expr,
-        ExpressionAttributeNames=expr_names,
-        ExpressionAttributeValues=expr_values,
-    )
+    try:
+        incident_table.update_item(
+            Key={'incidentId': incident_id},
+            UpdateExpression=update_expr,
+            ExpressionAttributeNames=expr_names,
+            ExpressionAttributeValues=expr_values,
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to resolve incident incidentId=%s to status=%s: %s",
+            incident_id, status, str(e),
+        )
+        raise
 
 
 def send_escalation_notification(topic_arn, message):
@@ -79,11 +96,18 @@ def send_escalation_notification(topic_arn, message):
         topic_arn (str): The ARN of the SNS topic to publish to.
         message (str): The formatted notification message body.
     """
-    sns.publish(
-        TopicArn=topic_arn,
-        Subject='Investigation Escalation Alert',
-        Message=message,
-    )
+    try:
+        sns.publish(
+            TopicArn=topic_arn,
+            Subject='Investigation Escalation Alert',
+            Message=message,
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to publish escalation notification to topic %s: %s",
+            topic_arn, str(e),
+        )
+        raise
 
 
 def store_callback_mapping(uuid, callback_id, incident_id, tier, ttl):
@@ -101,12 +125,19 @@ def store_callback_mapping(uuid, callback_id, incident_id, tier, ttl):
         tier (int): The escalation tier (1 or 2).
         ttl (int): TTL in epoch seconds for automatic cleanup.
     """
-    callback_table.put_item(
-        Item={
-            'uuid': uuid,
-            'callbackId': callback_id,
-            'incidentId': incident_id,
-            'tier': tier,
-            'ttl': ttl,
-        }
-    )
+    try:
+        callback_table.put_item(
+            Item={
+                'uuid': uuid,
+                'callbackId': callback_id,
+                'incidentId': incident_id,
+                'tier': tier,
+                'ttl': ttl,
+            }
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to store callback mapping uuid=%s for incidentId=%s: %s",
+            uuid, incident_id, str(e),
+        )
+        raise

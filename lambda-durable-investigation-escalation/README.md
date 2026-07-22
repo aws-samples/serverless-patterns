@@ -8,21 +8,14 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 ## Architecture
 
-```
-┌──────────────────┐       ┌──────────────────┐       ┌──────────────────────────┐
-│  AWS DevOps Agent│──────▶│ Amazon EventBridge│──────▶│ Lambda Durable Function  │
-│  (Investigation  │ emits │ Rule (matches     │invokes│ (Escalation workflow:    │
-│   Failed/Timed   │ event │  aws.aidevops     │       │  incident → notify →     │
-│   Out events)    │       │  failure events)  │       │  wait for ack)           │
-└──────────────────┘       └──────────────────┘       └──────────────────────────┘
-```
+![Architecture Diagram](architecture.png)
 
 The pattern deploys the following resources:
 
 - **EventBridge Rule** — Captures `Investigation Failed` and `Investigation Timed Out` events from AWS DevOps Agent (source: `aws.aidevops`) on the default event bus and invokes the Escalation Function.
-- **Escalation Function** (Durable Lambda) — Orchestrates the workflow: parses the DevOps Agent event, gathers context, creates an incident, pages on-call personnel, and tracks resolution. The workflow pauses execution (no compute charges) while waiting for acknowledgment.
-- **Callback Handler** (Standard Lambda) — Receives acknowledgment clicks via API Gateway and sends durable execution callbacks to resume the paused Escalation Function.
-- **Incident Table** (DynamoDB) — Stores incident records with failure context, escalation history, and resolution status.
+- **Escalation Function** (Lambda durable function) — Orchestrates the workflow: parses the DevOps Agent event, gathers context, creates an incident, pages on-call personnel, and tracks resolution. The workflow pauses execution (no compute charges) while waiting for acknowledgment.
+- **Callback Handler** (Lambda function [standard]) — Receives acknowledgment clicks via API Gateway and sends durable execution callbacks to resume the paused Escalation Function.
+- **Incident Table** (DynamoDB) — Stores incident records with failure context and resolution status.
 - **Callback Table** (DynamoDB) — Maps short UUIDs to durable function callback IDs for clean acknowledgment URLs.
 - **Notification Topic** (SNS) — Sends escalation email notifications to on-call personnel.
 - **Escalation API** (API Gateway) — Provides the `GET /{uuid}` acknowledgment endpoint.
@@ -107,7 +100,7 @@ The EventBridge rule matches events with this structure:
    - **AgentSpaceId**: (Optional) Restrict to a specific DevOps Agent space ID
    - Allow SAM CLI to create IAM roles when prompted
 
-4. **Confirm SNS subscription**: Check your email and click the confirmation link from Amazon SNS
+4. **Confirm SNS subscription**: Check your email and click the confirmation link from Amazon SNS.
 
 5. Note the outputs: `ApiEndpoint`, `EscalationFunctionArn`, `IncidentTableName`, and `EventBridgeRuleName`
 
