@@ -1,6 +1,6 @@
 # Amazon CloudWatch Log Alarm with AWS Lambda Auto-Remediation
 
-This pattern deploys a self-healing architecture using the new Amazon CloudWatch Log Alarm resource (`AWS::CloudWatch::LogAlarm`) to monitor application logs with CloudWatch Logs Insights queries and automatically trigger remediation through AWS Lambda and AWS Systems Manager when error thresholds are breached.
+This pattern deploys a self-healing architecture using the Amazon CloudWatch Log Alarm resource (`AWS::CloudWatch::LogAlarm`) to monitor application logs with CloudWatch Logs Insights queries and automatically trigger remediation through AWS Lambda and AWS Systems Manager when error thresholds are breached.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudwatch-log-alarm-lambda-remediation-cdk
 
@@ -22,7 +22,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 4. The alarm publishes to Amazon SNS, which invokes the AWS Lambda remediation function
 5. AWS Lambda sends a command via AWS Systems Manager to restart the application service on tagged Amazon EC2 instances
 
-**Key innovation:** The `AWS::CloudWatch::LogAlarm` resource (launched July 2026) eliminates the need for metric filters. Previously, monitoring log content required creating a CloudWatch Metric Filter, waiting for metric data points, then creating a standard alarm on that metric. Log Alarms run Logs Insights queries directly on schedule and evaluate results against thresholds — a single resource replaces a three-resource workaround.
+The `AWS::CloudWatch::LogAlarm` resource eliminates the need for metric filters. Previously, monitoring log content required creating a CloudWatch Metric Filter, waiting for metric data points, then creating a standard alarm on that metric. Log Alarms run Logs Insights queries directly on schedule and evaluate results against thresholds.
 
 ## Requirements
 
@@ -77,7 +77,7 @@ aws cloudwatch describe-alarms \
   --query 'LogAlarms[0].{State:StateValue,Reason:StateReason}'
 ```
 
-### 3. Verify AWS Lambda was invoked
+### 3. Verify the AWS Lambda function was invoked
 
 ```bash
 aws logs filter-log-events \
@@ -115,5 +115,5 @@ npx cdk destroy
 | AWS Systems Manager | Execute commands on tagged Amazon EC2 instances |
 
 ----
-Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 SPDX-License-Identifier: MIT-0

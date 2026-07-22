@@ -97,5 +97,43 @@
       "label": "AWS Systems Manager"
     }
   },
-  "patternType": "Serverless"
+  "patternType": "Serverless",
+  "graph": {
+    "icon1": {
+      "x": 15,
+      "y": 50,
+      "service": "cloudwatch",
+      "label": "Amazon CloudWatch"
+    },
+    "icon3": {
+      "x": 35,
+      "y": 50,
+      "service": "sns",
+      "label": "Amazon SNS"
+    },
+    "icon4": {
+      "x": 55,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon5": {
+      "x": 80,
+      "y": 50,
+      "service": "ssm",
+      "label": "AWS Systems Manager"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon3"
+    },
+    "line2": {
+      "from": "icon3",
+      "to": "icon4"
+    },
+    "line3": {
+      "from": "icon4",
+      "to": "icon5"
+    }
+  }
 }
