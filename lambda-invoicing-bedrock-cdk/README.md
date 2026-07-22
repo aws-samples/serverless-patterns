@@ -83,6 +83,8 @@ Expected output shows invoices retrieved, PDFs archived, and Bedrock analysis:
 }
 ```
 
+**Note:** If your account has no invoices for the current billing period, the response will be `"No invoices found for period YYYY-MM"`. This is expected. Invoices are generated monthly after the billing cycle closes. To verify the full pipeline, invoke after the 2nd of the month when the previous month's invoice is available.
+
 Check the Amazon S3 bucket for archived PDFs and analysis:
 
 ```bash
