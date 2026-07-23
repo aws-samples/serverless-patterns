@@ -1,0 +1,40 @@
+{
+  "title": "Amazon EventBridge Data Plane Logging with AWS CloudTrail",
+  "description": "Monitor EventBridge PutEvents API calls using CloudTrail data plane logging with Lambda alerting for security and operational visibility.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern enables CloudTrail data plane logging for Amazon EventBridge (launched May 2026).",
+      "CloudTrail captures PutEvents API calls and delivers them as events to EventBridge.",
+      "An EventBridge rule matches these CloudTrail events and triggers a Lambda function for alerting.",
+      "This provides visibility into who is putting events, from where, and how many — essential for security auditing."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-cloudtrail-dataplane-cdk",
+      "templateURL": "serverless-patterns/eventbridge-cloudtrail-dataplane-cdk",
+      "projectFolder": "eventbridge-cloudtrail-dataplane-cdk",
+      "templateFile": "lib/eventbridge-cloudtrail-dataplane-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "EventBridge Data Plane CloudTrail Logging", "link": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-eventbridge-data-aws-cloudtrail/" },
+      { "text": "CloudTrail Data Events", "link": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html" }
+    ]
+  },
+  "deploy": { "text": ["cdk deploy"] },
+  "testing": { "text": ["See the README for testing instructions."] },
+  "cleanup": { "text": ["cdk destroy"] },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS, passionate about serverless and AI/ML.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
