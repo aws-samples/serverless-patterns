@@ -1,0 +1,107 @@
+{
+  "title": "Amazon GuardDuty Sensitive File Modification with AWS Step Functions Incident Response",
+  "description": "Detect sensitive file modifications with Amazon GuardDuty, classify severity, and auto-isolate compromised instances via AWS Step Functions and AWS Lambda",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon GuardDuty detects sensitive file modifications or unauthorized access on Amazon EC2 instances and publishes findings to Amazon EventBridge.",
+      "Amazon EventBridge triggers an AWS Step Functions workflow that classifies finding severity: HIGH (≥7) isolates the instance, MEDIUM (4-6) notifies only, LOW (<4) logs only.",
+      "For HIGH severity findings, AWS Lambda replaces the instance security group (network isolation), creates forensic EBS snapshots, and tags the instance. Amazon SNS delivers alerts to the security team."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/guardduty-file-modification-sfn-response-cdk",
+      "templateURL": "serverless-patterns/guardduty-file-modification-sfn-response-cdk",
+      "projectFolder": "guardduty-file-modification-sfn-response-cdk",
+      "templateFile": "cdk/lib/guardduty-file-modification-sfn-response-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon GuardDuty Runtime Monitoring",
+        "link": "https://docs.aws.amazon.com/guardduty/latest/ug/runtime-monitoring.html"
+      },
+      {
+        "text": "Automating incident response with Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings_cloudwatch.html"
+      },
+      {
+        "text": "AWS Step Functions service integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-supported-services.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd guardduty-file-modification-sfn-response-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Generate sample Amazon GuardDuty findings using the create-sample-findings API.",
+      "Verify AWS Step Functions execution was triggered via the list-executions API.",
+      "For HIGH severity, confirm the instance security group was replaced and forensic snapshots were created.",
+      "Subscribe to the Amazon SNS topic to receive incident alerts."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "guardduty",
+      "label": "Amazon GuardDuty"
+    },
+    "icon2": {
+      "x": 30,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon3": {
+      "x": 50,
+      "y": 50,
+      "service": "sfn",
+      "label": "AWS Step Functions"
+    },
+    "icon4": {
+      "x": 70,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon5": {
+      "x": 90,
+      "y": 25,
+      "service": "sns",
+      "label": "Amazon SNS"
+    },
+    "icon6": {
+      "x": 90,
+      "y": 75,
+      "service": "ec2",
+      "label": "Amazon EC2"
+    }
+  },
+  "patternType": "Serverless"
+}
