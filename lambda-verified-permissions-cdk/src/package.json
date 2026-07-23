@@ -1,0 +1,7 @@
+{
+  "name": "lambda-verified-permissions-authorizer",
+  "version": "1.0.0",
+  "dependencies": {
+    "@aws-sdk/client-verifiedpermissions": "^3.700.0"
+  }
+}
