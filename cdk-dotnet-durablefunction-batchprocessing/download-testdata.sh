@@ -4,74 +4,60 @@ set -euo pipefail
 # ──────────────────────────────────────────────────────────────────────────────
 # download-testdata.sh
 #
-# Downloads public domain books from Project Gutenberg and splits them into
-# individual chapter/section files for batch processing. Each file becomes
-# one parallel task in the durable function workflow.
+# Downloads NOAA Global Historical Climatology Network Daily (GHCN-D) CSV files
+# from the public S3 bucket s3://noaa-ghcn-pds/csv/by_year/.
+#
+# Only files smaller than 100KB are downloaded — this keeps the test dataset
+# lightweight while still providing real-world data for batch processing.
 #
 # Files are saved to ./testdata/ which is excluded from source control.
 #
 # Usage:
-#   ./download-testdata.sh
+#   ./download-testdata.sh          # Downloads up to 20 files
+#   ./download-testdata.sh 50       # Downloads up to 50 files
+#   MAX_FILES=10 ./download-testdata.sh
 # ──────────────────────────────────────────────────────────────────────────────
 
 OUTPUT_DIR="testdata"
+SOURCE_BUCKET="noaa-ghcn-pds"
+SOURCE_PREFIX="csv/by_year/"
+MAX_SIZE_BYTES=102400  # 100KB
+MAX_FILES="${1:-${MAX_FILES:-20}}"
 
-# Project Gutenberg plain text URLs (public domain books)
-declare -a BOOKS=(
-    "https://www.gutenberg.org/cache/epub/1342/pg1342.txt"   # Pride and Prejudice
-    "https://www.gutenberg.org/cache/epub/84/pg84.txt"       # Frankenstein
-    "https://www.gutenberg.org/cache/epub/11/pg11.txt"       # Alice in Wonderland
-    "https://www.gutenberg.org/cache/epub/1661/pg1661.txt"   # Sherlock Holmes
-    "https://www.gutenberg.org/cache/epub/2701/pg2701.txt"   # Moby Dick
-    "https://www.gutenberg.org/cache/epub/98/pg98.txt"       # A Tale of Two Cities
-)
-
-declare -a NAMES=(
-    "pride-and-prejudice"
-    "frankenstein"
-    "alice-in-wonderland"
-    "sherlock-holmes"
-    "moby-dick"
-    "tale-of-two-cities"
-)
-
-echo "▶ Downloading books from Project Gutenberg and splitting into files..."
+echo "▶ Downloading up to ${MAX_FILES} NOAA GHCN-D CSV files < 100KB from s3://${SOURCE_BUCKET}/${SOURCE_PREFIX}"
 echo "  Target: ./${OUTPUT_DIR}/"
 echo ""
 
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
-TOTAL_FILES=0
+FILE_COUNT=0
 
-for i in "${!BOOKS[@]}"; do
-    URL="${BOOKS[$i]}"
-    NAME="${NAMES[$i]}"
-    TEMP_FILE="/tmp/${NAME}.txt"
+# List all objects under the prefix, filter to files under 100KB, then download up to MAX_FILES
+aws s3api list-objects-v2 \
+    --bucket "$SOURCE_BUCKET" \
+    --prefix "$SOURCE_PREFIX" \
+    --no-sign-request \
+    --query "Contents[?Size<\`${MAX_SIZE_BYTES}\`].[Key,Size]" \
+    --output text | head -n "$MAX_FILES" | while IFS=$'\t' read -r key size; do
 
-    echo "  Downloading: ${NAME}..."
-    curl -sL "$URL" -o "$TEMP_FILE"
+    # Skip empty lines or the prefix directory itself
+    if [[ -z "$key" || "$key" == "$SOURCE_PREFIX" ]]; then
+        continue
+    fi
 
-    # Split the book into chunks of ~500 lines each
-    # This produces roughly 10-15 files per book, giving us 60-90 total
-    CHUNK_NUM=0
-    while IFS= read -r line; do
-        CHUNK_FILE="${OUTPUT_DIR}/${NAME}-$(printf '%03d' $CHUNK_NUM).txt"
-        echo "$line" >> "$CHUNK_FILE"
+    FILENAME=$(basename "$key")
+    DEST_PATH="${OUTPUT_DIR}/${FILENAME}"
 
-        # Start a new chunk every 500 lines
-        if [[ $(wc -l < "$CHUNK_FILE" | tr -d ' ') -ge 500 ]]; then
-            CHUNK_NUM=$((CHUNK_NUM + 1))
-        fi
-    done < "$TEMP_FILE"
+    echo "  Downloading: ${FILENAME} ($(numfmt --to=iec-i --suffix=B "$size" 2>/dev/null || echo "${size} bytes"))"
+    aws s3 cp "s3://${SOURCE_BUCKET}/${key}" "$DEST_PATH" --no-sign-request --quiet
 
-    CHUNK_COUNT=$((CHUNK_NUM + 1))
-    TOTAL_FILES=$((TOTAL_FILES + CHUNK_COUNT))
-    echo "    → Split into ${CHUNK_COUNT} files"
-
-    rm -f "$TEMP_FILE"
+    FILE_COUNT=$((FILE_COUNT + 1))
 done
 
+# Count files actually downloaded (the while loop runs in a subshell)
+ACTUAL_COUNT=$(find "$OUTPUT_DIR" -type f | wc -l | tr -d ' ')
+
 echo ""
-echo "✓ Created ${TOTAL_FILES} files in ./${OUTPUT_DIR}/"
+echo "✓ Downloaded ${ACTUAL_COUNT} files to ./${OUTPUT_DIR}/"
 echo "  Total size: $(du -sh "$OUTPUT_DIR" | cut -f1)"

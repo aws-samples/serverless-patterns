@@ -10,12 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.Core" Version="3.1.1" />
-    <PackageReference Include="Amazon.Lambda.DurableExecution" Version="0.1.1-preview" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="3.2.0" />
+    <PackageReference Include="Amazon.Lambda.DurableExecution" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="2.1.2" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="3.0.0" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.101.1" />
-    <PackageReference Include="AWSSDK.S3" Version="4.0.100.3" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.101.4" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.101.4" />
   </ItemGroup>
 
 </Project>

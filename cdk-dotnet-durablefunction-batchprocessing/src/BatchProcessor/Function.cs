@@ -51,7 +51,13 @@ internal sealed class BatchProcessorHandler
     private async Task<BatchSummary> Workflow(BatchInput input, IDurableContext ctx)
     {
         var bucket = input.Bucket ?? BucketName;
-        var batchId = $"batch-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
+
+        // Capture current time inside a step so it's checkpointed for deterministic replay.
+        var startTime = await ctx.StepAsync(
+            (_, _) => Task.FromResult(DateTime.UtcNow),
+            name: "capture-start-time");
+
+        var batchId = $"batch-{startTime:yyyyMMdd-HHmmss}";
 
         // ──────────────────────────────────────────────────────────────────
         // Step 1: List all files under the prefix (checkpointed).
@@ -74,7 +80,7 @@ internal sealed class BatchProcessorHandler
                 SuccessCount: 0,
                 FailureCount: 0,
                 ReportKey: "",
-                CompletedAt: DateTime.UtcNow);
+                CompletedAt: startTime);
         }
 
         // ──────────────────────────────────────────────────────────────────
@@ -128,7 +134,9 @@ internal sealed class BatchProcessorHandler
             SuccessCount: batch.SuccessCount,
             FailureCount: batch.FailureCount,
             ReportKey: "",
-            CompletedAt: DateTime.UtcNow);
+            CompletedAt: await ctx.StepAsync(
+                (_, _) => Task.FromResult(DateTime.UtcNow),
+                name: "capture-completion-time"));
 
         // Write the JSON summary report to S3
         var reportKey = await ctx.StepAsync(
