@@ -128,6 +128,8 @@ aws lambda invoke \
 
 The monitor starts and waits 30 seconds for the first heartbeat.
 
+> **Note:** After a fresh `cdk deploy`, API Gateway API key associations may take 1–2 minutes to propagate. If you receive `{"message":"Forbidden"}` immediately after deployment despite having a valid API key, wait a minute and try again.
+
 ### Send heartbeats (simulate a device)
 
 ```bash
