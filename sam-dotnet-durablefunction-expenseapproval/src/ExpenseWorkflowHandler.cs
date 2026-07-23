@@ -102,9 +102,12 @@ public class ExpenseWorkflowHandler
                 name: "handle-timeout",
                 config: new StepConfig { RetryStrategy = RetryStrategy.Default });
 
+            var timedOutAt = await ctx.StepAsync(
+                (_, _) => Task.FromResult(DateTime.UtcNow),
+                name: "get-timeout-timestamp");
             result = new ExpenseResult(
                 expense.ExpenseId, "timed_out", null,
-                "Approval timed out after 72 hours", null, DateTime.UtcNow);
+                "Approval timed out after 72 hours", null, timedOutAt);
         }
         else if (decision?.Decision == "approved")
         {
@@ -121,9 +124,12 @@ public class ExpenseWorkflowHandler
                 name: "process-reimbursement",
                 config: new StepConfig { RetryStrategy = RetryStrategy.Default });
 
+            var approvedAt = await ctx.StepAsync(
+                (_, _) => Task.FromResult(DateTime.UtcNow),
+                name: "get-approved-timestamp");
             result = new ExpenseResult(
                 expense.ExpenseId, "approved", decision.DecidedBy,
-                null, reimbursementId, DateTime.UtcNow);
+                null, reimbursementId, approvedAt);
         }
         else
         {
@@ -134,9 +140,12 @@ public class ExpenseWorkflowHandler
                 name: "handle-rejection",
                 config: new StepConfig { RetryStrategy = RetryStrategy.Default });
 
+            var rejectedAt = await ctx.StepAsync(
+                (_, _) => Task.FromResult(DateTime.UtcNow),
+                name: "get-rejected-timestamp");
             result = new ExpenseResult(
                 expense.ExpenseId, "rejected", decision?.DecidedBy,
-                decision?.Reason, null, DateTime.UtcNow);
+                decision?.Reason, null, rejectedAt);
         }
 
         return new APIGatewayProxyResponse
