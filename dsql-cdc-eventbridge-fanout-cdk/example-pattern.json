@@ -1,0 +1,113 @@
+{
+  "title": "Amazon Aurora DSQL CDC to Amazon EventBridge Fan-out",
+  "description": "Stream real-time database changes from Amazon Aurora DSQL via CDC to Amazon EventBridge for content-based routing to multiple consumers",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Aurora DSQL captures committed row-level changes (INSERT, UPDATE, DELETE) and streams them as JSON records to Amazon Kinesis Data Streams.",
+      "AWS Lambda consumes the stream, classifies each CDC event by operation type, and publishes typed events to an Amazon EventBridge custom event bus.",
+      "Amazon EventBridge routes events to three independent consumers: Amazon SQS (audit trail for ALL events), AWS Step Functions (validation workflow for INSERTs), and Amazon SNS (alerting for DELETEs)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dsql-cdc-eventbridge-fanout-cdk",
+      "templateURL": "serverless-patterns/dsql-cdc-eventbridge-fanout-cdk",
+      "projectFolder": "dsql-cdc-eventbridge-fanout-cdk",
+      "templateFile": "cdk/lib/dsql-cdc-eventbridge-fanout-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Aurora DSQL CDC documentation",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/cdc-streams.html"
+      },
+      {
+        "text": "Amazon EventBridge content-based filtering",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html"
+      },
+      {
+        "text": "AWS CDK Custom Resources",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd dsql-cdc-eventbridge-fanout-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy --parameters DsqlClusterId=your-cluster-id</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Insert data into your Amazon Aurora DSQL cluster to generate CDC events.",
+      "Check the Amazon SQS audit queue for all change events.",
+      "Check AWS Step Functions executions for INSERT validation workflows.",
+      "Subscribe to the Amazon SNS topic to receive DELETE alerts."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "dsql",
+      "label": "Amazon Aurora DSQL"
+    },
+    "icon2": {
+      "x": 30,
+      "y": 50,
+      "service": "kinesis",
+      "label": "Amazon Kinesis"
+    },
+    "icon3": {
+      "x": 50,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda"
+    },
+    "icon4": {
+      "x": 70,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon5": {
+      "x": 90,
+      "y": 25,
+      "service": "sqs",
+      "label": "Amazon SQS"
+    },
+    "icon6": {
+      "x": 90,
+      "y": 50,
+      "service": "sfn",
+      "label": "AWS Step Functions"
+    },
+    "icon7": {
+      "x": 90,
+      "y": 75,
+      "service": "sns",
+      "label": "Amazon SNS"
+    }
+  },
+  "patternType": "Serverless"
+}
