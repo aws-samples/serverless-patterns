@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Expense Approval workflow using Lambda Durable Functions.
+  Submits an expense report, waits for manager approval via callback,
+  then processes reimbursement or rejection.
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: dotnet10
+    Architectures:
+      - x86_64
+
+Resources:
+  # ─────────────────────────────────────────────────────────────────────
+  # DynamoDB Table — stores expense reports and their status
+  # ─────────────────────────────────────────────────────────────────────
+  ExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ExpenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ExpenseId
+          KeyType: HASH
+    DeletionPolicy: Delete
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Durable Function — expense approval workflow
+  # ─────────────────────────────────────────────────────────────────────
+  ExpenseWorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ExpenseApproval::ExpenseApproval.ExpenseWorkflowHandler::Handler
+      CodeUri: ./src/
+      Description: Durable Function - expense approval workflow with callback
+      DurableConfig:
+        ExecutionTimeout: 604800  # 7 days — allows time for human approval
+        RetentionPeriodInDays: 14
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          EXPENSE_TABLE_NAME: !Ref ExpenseTable
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpenseTable
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Starter Function — thin API handler that starts the durable workflow
+  # ─────────────────────────────────────────────────────────────────────
+  ExpenseStarterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ExpenseApproval::ExpenseApproval.ExpenseStarterHandler::Handler
+      CodeUri: ./src/
+      Description: Starts the expense workflow durable execution asynchronously
+      Environment:
+        Variables:
+          WORKFLOW_FUNCTION_NAME: !Ref ExpenseWorkflowFunctionAliaslive
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ExpenseWorkflowFunction
+      Events:
+        SubmitExpense:
+          Type: Api
+          Properties:
+            Path: /expenses
+            Method: post
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Approver Function — called by manager to approve/reject
+  # ─────────────────────────────────────────────────────────────────────
+  ApproverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ExpenseApproval::ExpenseApproval.ApproverHandler::Handler
+      CodeUri: ./src/
+      Description: Handles manager approval/rejection of expense reports
+      Environment:
+        Variables:
+          EXPENSE_TABLE_NAME: !Ref ExpenseTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpenseTable
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ExpenseWorkflowFunction
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:SendDurableExecutionCallbackSuccess
+                - lambda:SendDurableExecutionCallbackFailure
+              Resource: !Sub "${ExpenseWorkflowFunction.Arn}*"
+      Events:
+        ApproveExpense:
+          Type: Api
+          Properties:
+            Path: /expenses/{expenseId}/approve
+            Method: post
+        RejectExpense:
+          Type: Api
+          Properties:
+            Path: /expenses/{expenseId}/reject
+            Method: post
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  ExpenseWorkflowFunctionArn:
+    Description: Expense workflow Lambda function ARN
+    Value: !GetAtt ExpenseWorkflowFunction.Arn
+  ExpenseTableName:
+    Description: DynamoDB table for expense reports
+    Value: !Ref ExpenseTable
