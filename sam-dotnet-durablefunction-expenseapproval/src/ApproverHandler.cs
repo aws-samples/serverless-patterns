@@ -80,8 +80,8 @@ public class ApproverHandler
                 Result = new MemoryStream(Encoding.UTF8.GetBytes(resultJson))
             });
 
-        // Update DynamoDB status
-        await _repository.UpdateStatusAsync(expenseId, decisionType, decidedBy, reason, CancellationToken.None);
+        // Note: the workflow owns the DynamoDB status transition when it resumes,
+        // so we don't write status here to avoid a racy double-write.
 
         context.Logger.LogInformation($"Expense {expenseId} {decisionType} by {decidedBy}");
 

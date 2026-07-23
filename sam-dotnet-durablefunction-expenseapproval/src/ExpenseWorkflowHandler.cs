@@ -112,9 +112,11 @@ public class ExpenseWorkflowHandler
             var reimbursementId = await ctx.StepAsync(
                 async (_, ct) =>
                 {
+                    var id = $"REIMB-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
                     await _repository.UpdateStatusAsync(
-                        expense.ExpenseId, "approved", decision.DecidedBy, null, ct);
-                    return $"REIMB-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
+                        expense.ExpenseId, "approved", decision.DecidedBy, null, ct,
+                        reimbursementId: id);
+                    return id;
                 },
                 name: "process-reimbursement",
                 config: new StepConfig { RetryStrategy = RetryStrategy.Default });

@@ -1,13 +1,13 @@
 {
-  "title": "Lambda Durable Function — Expense Approval with Human Interaction (.NET)",
+  "title": "AWS Lambda durable functions - Human in the loop",
   "description": "A durable function expense approval workflow that pauses execution to wait for a manager's approval callback, with a 72-hour durable timer fallback.",
   "language": ".NET",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a Lambda durable function that implements an expense approval workflow. After an expense is submitted, the function creates a callback token and suspends execution — consuming zero compute while waiting for a manager's decision.",
+      "This pattern deploys a Lambda durable function that implements an expense approval workflow. After an expense is submitted, the function creates a callback token and suspends execution — incurring zero compute cost while waiting for a manager's decision.",
       "A manager can approve or reject the expense via a separate API endpoint that sends the callback. If no response arrives within 72 hours, a durable timer automatically rejects the expense.",
       "This demonstrates the human-in-the-loop pattern with Lambda durable functions: WaitForCallback for external events, durable timers for deadlines, and DynamoDB for persisting expense state."
     ]
@@ -23,7 +23,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Lambda Durable Functions Documentation",
+        "text": "AWS Lambda durable functions documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
@@ -31,7 +31,7 @@
         "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
       },
       {
-        "text": "Lambda Durable Functions .NET SDK",
+        "text": "Lambda durable functions .NET SDK",
         "link": "https://github.com/aws/aws-lambda-dotnet"
       }
     ]

@@ -32,12 +32,18 @@ public class ExpenseStarterHandler
             });
         }
 
-        if (expense is null || string.IsNullOrEmpty(expense.ExpenseId) || expense.Amount <= 0)
+        if (expense is null
+            || string.IsNullOrEmpty(expense.ExpenseId)
+            || expense.Amount <= 0
+            || string.IsNullOrEmpty(expense.SubmittedBy)
+            || string.IsNullOrEmpty(expense.Description)
+            || string.IsNullOrEmpty(expense.Currency)
+            || string.IsNullOrEmpty(expense.ManagerEmail))
         {
             return new APIGatewayProxyResponse
             {
                 StatusCode = 400,
-                Body = JsonSerializer.Serialize(new { message = "Invalid expense report. Provide an ExpenseId and a positive Amount." }),
+                Body = JsonSerializer.Serialize(new { message = "Invalid expense report. Provide ExpenseId, Amount (positive), SubmittedBy, Description, Currency, and ManagerEmail." }),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }

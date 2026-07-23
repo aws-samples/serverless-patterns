@@ -1,6 +1,6 @@
 # AWS Lambda Durable Function — Expense Approval (Human Interaction / Wait for Event)
 
-This sample demonstrates how to build an expense approval workflow using **AWS Lambda Durable Functions** for .NET with **AWS SAM**. The workflow submits an expense report, pauses execution to wait for a manager's approval via an external callback, then proceeds with reimbursement or rejection.
+This sample demonstrates how to build an expense approval workflow using **AWS Lambda durable functions** for .NET with **AWS SAM**. The workflow submits an expense report, pauses execution to wait for a manager's approval via an external callback, then proceeds with reimbursement or rejection.
 
 ## Architecture
 
@@ -112,7 +112,18 @@ curl -X POST "$API_URL/expenses" \
     }'
 ```
 
-The workflow starts, saves the expense, and suspends waiting for approval. The API returns HTTP 200 with the execution ARN.
+The workflow starts, saves the expense, and suspends waiting for approval. The API returns HTTP 202 with a confirmation body:
+
+```json
+{
+    "ExpenseId": "EXP-001",
+    "SubmittedBy": "jane.doe@example.com",
+    "Description": "Client dinner - Q3 planning",
+    "Amount": 142.50,
+    "Currency": "USD",
+    "ManagerEmail": "john.manager@example.com"
+}
+```
 
 ### 2. Check the pending expense in DynamoDB
 
@@ -127,7 +138,7 @@ aws dynamodb get-item \
     --key '{"ExpenseId":{"S":"EXP-001"}}'
 ```
 
-You'll see `Status: "pending_approval"` and a `CallbackId`.
+You'll see `Status: "pending_approval"` and a `CallbackId`. After approval, the item will also contain `Status: "approved"` and a `ReimbursementId`.
 
 ### 3. Approve the expense (manager action)
 
@@ -205,21 +216,8 @@ sam delete
 
 ---
 
-## Useful Commands
-
-| Command | Description |
-|---------|-------------|
-| `sam build` | Build the Lambda function |
-| `sam deploy --guided` | Deploy with interactive prompts |
-| `sam deploy` | Deploy with saved config |
-| `sam logs --tail` | Tail CloudWatch logs |
-| `sam delete` | Tear down the stack |
-| `dotnet build src/` | Build locally without SAM |
-
----
-
 ## References
 
-- [Amazon.Lambda.DurableExecution SDK](https://github.com/aws/aws-lambda-dotnet/tree/master/Libraries/src/Amazon.Lambda.DurableExecution)
+- [AWS Lambda Durable Execution SDK for .NET](https://github.com/aws/aws-lambda-dotnet/tree/master/Libraries/src/Amazon.Lambda.DurableExecution)
 - [Callbacks documentation](https://github.com/aws/aws-lambda-dotnet/blob/master/Libraries/src/Amazon.Lambda.DurableExecution/docs/core/callbacks.md)
 - [AWS SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/)

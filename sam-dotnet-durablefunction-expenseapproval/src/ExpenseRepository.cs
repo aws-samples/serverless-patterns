@@ -15,6 +15,11 @@ public sealed class ExpenseRepository(IAmazonDynamoDB dynamoDb, string tableName
     public async Task SaveExpenseAsync(ExpenseReport expense, string callbackId, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(expense);
+        ArgumentException.ThrowIfNullOrEmpty(expense.ExpenseId, nameof(expense.ExpenseId));
+        ArgumentException.ThrowIfNullOrEmpty(expense.SubmittedBy, nameof(expense.SubmittedBy));
+        ArgumentException.ThrowIfNullOrEmpty(expense.Description, nameof(expense.Description));
+        ArgumentException.ThrowIfNullOrEmpty(expense.Currency, nameof(expense.Currency));
+        ArgumentException.ThrowIfNullOrEmpty(expense.ManagerEmail, nameof(expense.ManagerEmail));
 
         var item = new Dictionary<string, AttributeValue>
         {
@@ -48,10 +53,11 @@ public sealed class ExpenseRepository(IAmazonDynamoDB dynamoDb, string tableName
             ProjectionExpression = "CallbackId"
         }, ct);
 
-        return response.Item.TryGetValue("CallbackId", out var attr) ? attr.S : null;
+        return response.Item is not null
+            && response.Item.TryGetValue("CallbackId", out var attr) ? attr.S : null;
     }
 
-    public async Task UpdateStatusAsync(string expenseId, string status, string? decidedBy, string? reason, CancellationToken ct)
+    public async Task UpdateStatusAsync(string expenseId, string status, string? decidedBy, string? reason, CancellationToken ct, string? reimbursementId = null)
     {
         var expressionValues = new Dictionary<string, AttributeValue>
         {
@@ -71,6 +77,12 @@ public sealed class ExpenseRepository(IAmazonDynamoDB dynamoDb, string tableName
         {
             expressionValues[":reason"] = new() { S = reason };
             updateExpression += ", Reason = :reason";
+        }
+
+        if (reimbursementId is not null)
+        {
+            expressionValues[":reimbursementId"] = new() { S = reimbursementId };
+            updateExpression += ", ReimbursementId = :reimbursementId";
         }
 
         await _dynamoDb.UpdateItemAsync(new UpdateItemRequest
