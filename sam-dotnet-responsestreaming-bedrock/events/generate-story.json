@@ -1,0 +1,31 @@
+{
+  "resource": "/story",
+  "path": "/story",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept": "*/*",
+    "Host": "abc123.execute-api.us-east-1.amazonaws.com"
+  },
+  "queryStringParameters": {
+    "genre": "science fiction",
+    "setting": "a space station orbiting Jupiter",
+    "theme": "finding home in unexpected places"
+  },
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "abc123",
+    "resourcePath": "/story",
+    "httpMethod": "GET",
+    "requestId": "test-request-id",
+    "accountId": "123456789012",
+    "stage": "prod",
+    "identity": {
+      "sourceIp": "127.0.0.1",
+      "userAgent": "curl/8.0"
+    },
+    "apiId": "abc123"
+  },
+  "body": null,
+  "isBase64Encoded": false
+}
