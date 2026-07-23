@@ -158,3 +158,8 @@ Confirm the delete by selecting Y at both prompts.
 AWS SAM confirms the stack deletion with the "Deleted successfully" message in the terminal.
 
 Next you need to delete the AWS CloudFormation template that created the Amazon MQ (Apache ActiveMQ) cluster and the EC2 instance. Open the Amazon CloudFormation console, select the stack, then choose Delete. The delete will take some time.
+
+----
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
