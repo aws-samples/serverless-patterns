@@ -10,8 +10,8 @@
 
   <ItemGroup>
     <!-- CDK Construct Library dependencies -->
-    <PackageReference Include="Amazon.CDK.Lib" Version="[2.251.0,3.0.0)" />
-    <PackageReference Include="Constructs" Version="10.*" />
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.262.0" />
+    <PackageReference Include="Constructs" Version="10.7.1" />
   </ItemGroup>
 
 </Project>
