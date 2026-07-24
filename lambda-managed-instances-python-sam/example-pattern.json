@@ -1,0 +1,54 @@
+{
+  "title": "Lambda Managed Instances with SAM (Python)",
+  "description": "Deploy a Python Lambda function on AWS-managed EC2 instances with multi-concurrency, Graviton4 support, and EC2 pricing advantages.",
+  "language": "Python",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Lambda Capacity Provider with VPC configuration and deploys a Python function that runs on managed EC2 instances.",
+      "Lambda handles instance lifecycle, OS patching, routing, and auto-scaling while you benefit from EC2 pricing models.",
+      "Multi-concurrency allows one execution environment to handle multiple invocations simultaneously."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-python-sam",
+      "templateURL": "serverless-patterns/lambda-managed-instances-python-sam",
+      "projectFolder": "lambda-managed-instances-python-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Managed Instances",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
+      },
+      {
+        "text": "Build high-performance apps with Lambda Managed Instances",
+        "link": "https://aws.amazon.com/blogs/compute/build-high-performance-apps-with-aws-lambda-managed-instances/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"],
+    "file": "template.yaml"
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."],
+    "file": "README.md"
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>sam delete</code>"],
+    "file": "template.yaml"
+  },
+  "authors": [
+    {
+      "name": "Ajaya Shrestha",
+      "bio": "Cloud Support Engineer at AWS",
+      "linkedin": "ajaya-shrestha"
+    }
+  ]
+}
