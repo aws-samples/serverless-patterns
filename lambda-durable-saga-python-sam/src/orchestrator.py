@@ -1,5 +1,5 @@
 """
-Saga orchestrator using Lambda Durable Functions (Python).
+Saga orchestrator using Lambda durable functions (Python).
 
 Processes an order through 3 steps:
   1. Reserve inventory

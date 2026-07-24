@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Saga pattern with Lambda Durable Functions (Python).
@@ -54,6 +54,12 @@ Resources:
           KeyType: HASH
 
   # Durable Function — orchestrates the saga
+  SagaOrchestratorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-orchestrator"
+      RetentionInDays: 14
+
   SagaOrchestratorFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -76,12 +82,12 @@ Resources:
             TableName: !Ref PaymentsTable
         - DynamoDBCrudPolicy:
             TableName: !Ref InventoryTable
-        - Version: '2012-10-17'
+        - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
                 - lambda:InvokeFunction
-              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-orchestrator*"
+              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-orchestrator:*"
 
 Outputs:
   OrchestratorFunctionName:
