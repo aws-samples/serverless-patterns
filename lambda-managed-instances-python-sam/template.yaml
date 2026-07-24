@@ -1,0 +1,184 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda Managed Instances with SAM (Python).
+  Runs a Lambda function on EC2 instances managed by AWS, with EC2 pricing
+  advantages (Savings Plans, Reserved Instances) and multi-concurrency support.
+
+Parameters:
+  VpcCIDR:
+    Type: String
+    Default: "10.0.0.0/16"
+    Description: CIDR block for the VPC
+
+Resources:
+  # VPC for Managed Instances
+  ManagedInstancesVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-vpc"
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      CidrBlock: "10.0.1.0/24"
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-private-1"
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      CidrBlock: "10.0.2.0/24"
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-private-2"
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda Managed Instances
+      VpcId: !Ref ManagedInstancesVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-sg"
+
+  # IAM role for Capacity Provider operator
+  CapacityProviderOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-cp-operator-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaManagedEC2ResourceOperator
+
+  # Lambda Capacity Provider — defines where functions run
+  LambdaCapacityProvider:
+    Type: AWS::Lambda::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub "${AWS::StackName}-capacity-provider"
+      VpcConfig:
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+      InstanceRequirements:
+        Architectures:
+          - arm64
+      PermissionsConfig:
+        CapacityProviderOperatorRoleArn: !GetAtt CapacityProviderOperatorRole.Arn
+
+  # CloudWatch Logs
+  ApiHandlerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-api-handler"
+      RetentionInDays: 14
+
+  # Lambda execution role
+  ApiHandlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Lambda function running on Managed Instances
+  ApiHandlerFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - ApiHandlerLogGroup
+      - LambdaCapacityProvider
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-api-handler"
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      Code:
+        ZipFile: |
+          import json
+          import threading
+          from datetime import datetime, timezone
+
+          _lock = threading.Lock()
+          _count = 0
+
+          def lambda_handler(event, context):
+              global _count
+              with _lock:
+                  _count += 1
+                  count = _count
+              name = event.get("name", "Managed Instances")
+              return {
+                  "statusCode": 200,
+                  "body": json.dumps({
+                      "message": f"Hello, {name}!",
+                      "invocation": count,
+                      "timestamp": datetime.now(timezone.utc).isoformat(),
+                      "version": context.function_version
+                  })
+              }
+      Architectures:
+        - arm64
+      MemorySize: 2048
+      Timeout: 30
+      Description: Python API handler running on Lambda Managed Instances
+      Role: !GetAtt ApiHandlerRole.Arn
+      CapacityProviderConfig:
+        LambdaManagedInstancesCapacityProviderConfig:
+          CapacityProviderArn: !GetAtt LambdaCapacityProvider.Arn
+      LoggingConfig:
+        LogGroup: !Ref ApiHandlerLogGroup
+
+  # Publish a version (required for Managed Instances invocation)
+  ApiHandlerVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref ApiHandlerFunction
+      Description: Initial version for Managed Instances
+
+  # Alias for stable invocation endpoint
+  ApiHandlerAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ApiHandlerFunction
+      FunctionVersion: !GetAtt ApiHandlerVersion.Version
+      Name: live
+
+Outputs:
+  FunctionName:
+    Description: Lambda function name
+    Value: !Ref ApiHandlerFunction
+
+  FunctionAlias:
+    Description: Function alias ARN for invocation
+    Value: !Ref ApiHandlerAlias
+
+  CapacityProviderArn:
+    Description: Capacity provider ARN
+    Value: !GetAtt LambdaCapacityProvider.Arn
+
+  VpcId:
+    Description: VPC ID
+    Value: !Ref ManagedInstancesVPC
