@@ -1,0 +1,95 @@
+[env]
+_.python.venv = { path = ".venv", create = true }
+AWS_REGION = "eu-west-1"
+STACK_NAME = "lambda-aoss-nextgen"
+ENABLE_API_ACCESS_LOGS = "false"
+COLLECTION_GROUP_NAME = "{{exec(command='echo cg-$STACK_NAME | tr A-Z a-z')}}"
+COLLECTION_NAME = "{{exec(command='echo col-$STACK_NAME | tr A-Z a-z')}}"
+
+[tools]
+python = "3.14"
+uv = "latest"
+aws-sam = "latest"
+
+[tasks]
+
+[tasks.init]
+description = "Install all Lambda, layer, and test dependencies into the local .venv"
+run = """
+find lambda layers tests -name 'requirements.txt' | while read -r req; do
+    echo "Installing ${req}..."
+    uv pip install --upgrade -r "${req}"
+done
+echo "Installing ./requirements.txt"
+uv pip install --upgrade -r requirements.txt
+"""
+
+[tasks.clean]
+description = "Remove all generated and temporary files"
+run = """
+rm -rf .aws-sam/ .pytest_cache/ __pycache__/ .venv/
+find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+find . -type f -name '*.py[cod]' -delete 2>/dev/null || true
+"""
+
+[tasks."sam:validate"]
+description = "Validate the SAM template against AWS CloudFormation rules and lint for best practices"
+run = "sam validate --lint"
+
+[tasks."sam:build"]
+description = "Build the SAM application artifacts (validates template first)"
+depends = "sam:validate"
+run = "sam build"
+
+[tasks."sam:deploy"]
+description = "Deploy the SAM application to AWS without requiring changeset confirmation (builds first)"
+depends = "sam:build"
+run = """
+    sam deploy --stack-name ${STACK_NAME} \
+               --parameter-overrides DeploymentRoleName=Admin \
+                                     EnableApiAccessLogs=${ENABLE_API_ACCESS_LOGS} \
+                                     CollectionGroupName=${COLLECTION_GROUP_NAME} \
+                                     CollectionName=${COLLECTION_NAME}
+"""
+
+[tasks."sam:sync"]
+description = "Watch for file changes and automatically sync code and infra to AWS"
+run = """sam sync --stack-name ${STACK_NAME} \
+                  --watch \
+                  --parameter-overrides DeploymentRoleName=Admin \
+                                        EnableApiAccessLogs=${ENABLE_API_ACCESS_LOGS} \
+                                        CollectionGroupName=${COLLECTION_GROUP_NAME} \
+                                        CollectionName=${COLLECTION_NAME}
+"""
+
+[tasks."sam:delete"]
+description = "Delete the SAM stack and all associated resources from AWS"
+depends_post = "clean:loggroups"
+run = "sam delete --no-prompts --stack-name ${STACK_NAME}"
+
+[tasks."clean:loggroups"]
+description = "Delete log groups that may have been recreated as part of the delete process"
+run = """
+aws logs describe-log-groups \
+    --log-group-name-prefix "/aws/lambda/${STACK_NAME}-" \
+    --query 'logGroups[].logGroupName' --output text \
+    | tr '\t' '\n' \
+    | while read -r lg; do
+        [ -z "${lg}" ] && continue
+        echo "Deleting log group ${lg}"
+        aws logs delete-log-group --log-group-name "${lg}"
+    done
+"""
+
+[tasks."test:unit"]
+description = "Run unit tests"
+run = "pytest tests/unit/ -v"
+
+[tasks."test:integration"]
+description = "Run integration tests against the deployed stack"
+run = "pytest tests/integration/ -v -s"
+
+[tasks.test]
+description = "Run all tests (unit and integration)"
+depends = "test:unit"
+depends_post = "test:integration"

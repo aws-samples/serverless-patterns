@@ -1,0 +1,10 @@
+# Checkov suppressions for sample application
+# These controls are intentionally skipped as this is a demonstration/sample project.
+# Production workloads should implement these controls.
+
+skip-checks:
+  - CKV_AWS_115  # Lambda reserved concurrency — not required for sample application
+  - CKV_AWS_116  # Lambda DLQ — not required for sample application with synchronous API handlers
+  - CKV_AWS_117  # Lambda in VPC — not required for sample application
+  - CKV_AWS_158  # CloudWatch LogGroup KMS encryption — not required for sample application log data
+  - CKV_AWS_173  # Lambda env var encryption — no secrets stored, only configuration values in sample application
