@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Saga pattern with Lambda Durable Functions (Python).
   Multi-step order processing with compensating transactions on failure.
-  If any step fails, previous steps are rolled back in reverse order.
+  If any step fails, previous steps are rolled back in reverse order.(uksb-1tthgi812) (tag:lambda-durable-saga-python-sam)
 
 Globals:
   Function:
