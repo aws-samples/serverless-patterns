@@ -73,13 +73,13 @@ def send_messages(endpoint, username, password, virtual_host, exchange, queue, s
     channel.queue_declare(queue=queue, durable=True)
     channel.queue_bind(queue=queue, exchange=exchange, routing_key=f"{exchange}-{queue}")
 
-    for i in range(1, num_to_send + 1):
+    for i in range(num_to_send):
         person = get_person_from_row(people[i])
         person_json = json.dumps(person)
 
         headers = {
             'MessageBatchIdentifier': seeder_key,
-            'MessageNumberInBatch': i,
+            'MessageNumberInBatch': i + 1,
         }
 
         properties = pika.BasicProperties(
@@ -87,11 +87,11 @@ def send_messages(endpoint, username, password, virtual_host, exchange, queue, s
             cluster_id=endpoint,
             content_encoding='UTF-8',
             content_type='text/plain',
-            correlation_id=f"{seeder_key}-{i}",
+            correlation_id=f"{seeder_key}-{i + 1}",
             delivery_mode=2,
             expiration='60000',
             headers=headers,
-            message_id=f"{seeder_key}:{i}",
+            message_id=f"{seeder_key}:{i + 1}",
             priority=1,
             timestamp=int(time.time()),
             type='PythonRabbitMQProducer',
@@ -104,7 +104,7 @@ def send_messages(endpoint, username, password, virtual_host, exchange, queue, s
             body=person_json.encode('utf-8'),
             properties=properties,
         )
-        print(f"Sent out one message - Number {i} at time = {int(time.time() * 1000)}")
+        print(f"Sent out one message - Number {i + 1} at time = {int(time.time() * 1000)}")
 
     connection.close()
 

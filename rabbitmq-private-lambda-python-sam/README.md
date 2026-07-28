@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Run the AWS CloudFormation template using the file RabbitMQAndClientEC2.yaml] - You can go to the AWS CloudFormation console, create a new stack by specifying the template file. You can keep the defaults for input parameters or modify them as necessary. Wait for the AWS CloudFormation stack to be created. This AWS CloudFormation template will create an Amazon MQ (RabbitMQ) cluster. It will also create an EC2 instance that you can use as a client.
 
-* [Connect to the EC2 instance] - Once the AWS CloudFormation stack is created, you can go to the EC2 console and log into the instance using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab. In case you are using SSM Instance connect, you are not initially placed in the home directory. If you connect as ssm-user, you need to sudo su to ec2-user for this to work.
+* [Connect to the EC2 instance] - Once the AWS CloudFormation stack is created, you can go to the EC2 console and log into the instance using either "Connect using EC2 Instance Connect" or "Connect using EC2 Instance Connect Endpoint" option under the "EC2 Instance Connect" tab. In case you are using SSM Instance connect, you are not initially placed in the home directory. If you connect as ssm-user, you need to `sudo su` to `ec2-user` for this to work.
 Note: You may need to wait for some time after the CloudFormation stack is created, as some UserData scripts continue running post creation.
 
 ## Pre-requisites to Deploy the sample Lambda function
@@ -65,11 +65,11 @@ sam local invoke --event events/event.json
 
 ## Check RabbitMQ Queue Creation
 
-We have included a shell script file called create_rabbit_queue.sh. This shell script creates a VirtualHost, an Exchange and a Queue in the RabbitMQ cluster. It also binds the queue to the exchange. This step is necessary before the Lambda function can be deployed.
+We have included a shell script file called `create_rabbit_queue.sh`. This shell script creates a VirtualHost, an Exchange and a Queue in the RabbitMQ cluster. It also binds the queue to the exchange. This step is necessary before the Lambda function can be deployed.
 
-The create_rabbit_queue.sh script is run automatically as part of the AWS CloudFormation script.
+The `create_rabbit_queue.sh` script is run automatically as part of the AWS CloudFormation script.
 
-There is another shell script file called query_rabbit_queue.sh that has been included. You can run this script to ensure the virtualhost, exchange and queue have been created in the RabbitMQ cluster:
+There is another shell script file called `query_rabbit_queue.sh` that has been included. You can run this script to ensure the virtualhost, exchange and queue have been created in the RabbitMQ cluster:
 
 ```bash
 cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam
@@ -148,7 +148,7 @@ Sent out one message - Number 10 at time = 1760937987919
 
 Once the messages have been sent, check Amazon CloudWatch logs and you should see messages for the Amazon CloudWatch Log Group with the name of the deployed Lambda function.
 
-When you run the above script, it sends messages with JSON records to the Amazon MQ (RabbitMQ) cluster on the queue on which the lambda function is listening on. The Lambda function listens on the published Amazon MQ (RabbitMQ) messages on the queue.
+When you run the above script, it sends messages with JSON records to the Amazon MQ (RabbitMQ) cluster on the queue on which the Lambda function is listening on.
 
 The Lambda function code parses the Amazon MQ (RabbitMQ) messages and outputs the fields in the messages to Amazon CloudWatch logs
 
@@ -178,3 +178,8 @@ Confirm the delete by selecting Y at both prompts.
 AWS SAM confirms the stack deletion with the "Deleted successfully" message in the terminal.
 
 Next you need to delete the Cloudformation template that created the Amazon MQ (RabbitMQ) cluster and the EC2 instance. Open the Amazon CloudFormation console, select the stack, then choose Delete. The delete will take some time.
+
+----
+Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0

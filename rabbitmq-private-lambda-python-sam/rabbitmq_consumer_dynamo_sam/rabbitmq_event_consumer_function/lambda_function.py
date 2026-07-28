@@ -17,82 +17,82 @@ def decode_header_value(header_value):
 
 
 def lambda_handler(event, context):
-    try:
-        print("Begin Event *************")
-        print(json.dumps(event))
-        print("End Event ***************")
+    print("Begin Event *************")
+    print(json.dumps(event))
+    print("End Event ***************")
 
-        event_source = event.get('eventSource', '')
-        event_source_arn = event.get('eventSourceArn', '')
-        print(f"EventSource = {event_source}")
-        print(f"EventSourceARN = {event_source_arn}")
+    event_source = event.get('eventSource', '')
+    event_source_arn = event.get('eventSourceArn', '')
+    print(f"EventSource = {event_source}")
+    print(f"EventSourceARN = {event_source_arn}")
 
-        print("Now iterating through Map of all queues")
-        rmq_messages_by_queue = event.get('rmqMessagesByQueue', {})
+    print("Now iterating through Map of all queues")
+    rmq_messages_by_queue = event.get('rmqMessagesByQueue', {})
 
-        for queue_key, messages in rmq_messages_by_queue.items():
-            queue_name = queue_key.split("::")[0]
-            print(f"Current Queue Name = {queue_name}")
-            print(f"Now iterating through each message in this queue - {queue_name}")
+    for queue_key, messages in rmq_messages_by_queue.items():
+        queue_name = queue_key.split("::")[0]
+        print(f"Current Queue Name = {queue_name}")
+        print(f"Now iterating through each message in this queue - {queue_name}")
 
-            for message in messages:
-                print("Now logging a new message")
-                encoded_data = message.get('data', '')
-                print(f"EncodedData = {encoded_data}")
+        for message in messages:
+            print("Now logging a new message")
+            encoded_data = message.get('data', '')
+            print(f"EncodedData = {encoded_data}")
 
-                decoded_data = base64.b64decode(encoded_data).decode('utf-8')
-                print(f"DecodedData = {decoded_data}")
+            decoded_data = base64.b64decode(encoded_data).decode('utf-8')
+            print(f"DecodedData = {decoded_data}")
 
-                person = json.loads(decoded_data)
-                print(f"This person = {person}")
+            person = json.loads(decoded_data)
+            print(f"This person = {person}")
 
-                redelivered = message.get('redelivered', False)
-                print(f"Whether Redelivered = {redelivered}")
+            redelivered = message.get('redelivered', False)
+            print(f"Whether Redelivered = {redelivered}")
 
-                basic_properties = message.get('basicProperties', {})
-                print(f"AppID = {basic_properties.get('appId')}")
-                print(f"BodySize = {basic_properties.get('bodySize')}")
-                print(f"ClusterId = {basic_properties.get('clusterId')}")
-                print(f"ContentEncoding = {basic_properties.get('contentEncoding')}")
-                print(f"ContentType = {basic_properties.get('contentType')}")
-                print(f"CorrelationId = {basic_properties.get('correlationId')}")
-                print(f"DeliveryMode = {basic_properties.get('deliveryMode')}")
-                print(f"Expiration = {basic_properties.get('expiration')}")
-                print(f"MessageId = {basic_properties.get('messageId')}")
-                print(f"Priority = {basic_properties.get('priority')}")
-                print(f"ReplyTo = {basic_properties.get('replyTo')}")
-                print(f"Timestamp = {basic_properties.get('timestamp')}")
-                print(f"Type = {basic_properties.get('type')}")
-                print(f"UserId = {basic_properties.get('userId')}")
+            basic_properties = message.get('basicProperties', {})
+            print(f"AppID = {basic_properties.get('appId')}")
+            print(f"BodySize = {basic_properties.get('bodySize')}")
+            print(f"ClusterId = {basic_properties.get('clusterId')}")
+            print(f"ContentEncoding = {basic_properties.get('contentEncoding')}")
+            print(f"ContentType = {basic_properties.get('contentType')}")
+            print(f"CorrelationId = {basic_properties.get('correlationId')}")
+            print(f"DeliveryMode = {basic_properties.get('deliveryMode')}")
+            print(f"Expiration = {basic_properties.get('expiration')}")
+            print(f"MessageId = {basic_properties.get('messageId')}")
+            print(f"Priority = {basic_properties.get('priority')}")
+            print(f"ReplyTo = {basic_properties.get('replyTo')}")
+            print(f"Timestamp = {basic_properties.get('timestamp')}")
+            print(f"Type = {basic_properties.get('type')}")
+            print(f"UserId = {basic_properties.get('userId')}")
 
-                print("Now iterating through the headers in this message")
-                headers = basic_properties.get('headers', {})
-                for header_name, header_value in headers.items():
-                    decoded_header = decode_header_value(header_value)
-                    print(f"Header Name = {header_name} and Header Value = {decoded_header}")
-                print("Now done iterating through the headers in this message")
-                print("Now done logging a new message")
+            print("Now iterating through the headers in this message")
+            headers = basic_properties.get('headers', {})
+            for header_name, header_value in headers.items():
+                decoded_header = decode_header_value(header_value)
+                print(f"Header Name = {header_name} and Header Value = {decoded_header}")
+            print("Now done iterating through the headers in this message")
+            print("Now done logging a new message")
 
-                aws_sam_local = os.environ.get('AWS_SAM_LOCAL')
-                if aws_sam_local is None:
-                    insert_into_dynamodb(
-                        message, person, queue_name,
-                        event_source, event_source_arn
-                    )
+            aws_sam_local = os.environ.get('AWS_SAM_LOCAL')
+            if aws_sam_local is None:
+                insert_into_dynamodb(
+                    message, person, queue_name,
+                    event_source, event_source_arn
+                )
 
-            print("Now done iterating through each message in this queue")
+        print("Now done iterating through each message in this queue")
 
-        print("Done iterating through Map of all queues")
-        return "200"
-
-    except Exception as e:
-        print(f"An exception occurred - {str(e)}")
-        return "500"
+    print("Done iterating through Map of all queues")
+    return "200"
 
 
 def insert_into_dynamodb(message, person, queue_name, event_source, event_source_arn):
     basic_properties = message.get('basicProperties', {})
     message_id = basic_properties.get('messageId', '')
+
+    if not message_id:
+        print("WARNING: Skipping message with empty messageId - cannot use as DynamoDB partition key")
+        return
+
     print(f"Now inserting a row in DynamoDB for messageID = {message_id}")
 
     item = {
@@ -113,7 +113,7 @@ def insert_into_dynamodb(message, person, queue_name, event_source, event_source
         'Email': person.get('email', ''),
         'Website': person.get('website', ''),
         'CorrelationID': basic_properties.get('correlationId', ''),
-        'MessageType': message_id,
+        'MessageType': basic_properties.get('type', ''),
         'WhetherRedelivered': message.get('redelivered', False),
         'AppID': basic_properties.get('appId', ''),
         'BodySize': basic_properties.get('bodySize', 0),

@@ -9,7 +9,7 @@ Parameters:
     Description: RabbitMQ engine version
   Python3Version:
     Type: String
-    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12. Also Python 3.10 is not available to install on Amazon Linux 2023 so it is not being offered as an option
+    Description: Choose the version of Python 3. Available options are 3.11, 3.12, 3.13, and 3.14. Note that Python 3.10 is not available on Amazon Linux 2023 so it is not offered as an option.
     AllowedValues:
       - python3.11
       - python3.12
@@ -36,11 +36,6 @@ Parameters:
     Type: String
     Description: Username for the RabbitMQ Broker
     Default: rabbitmqadmin
-  RabbitMQBrokerPassword:
-    Type: String
-    Description: Password for the RabbitMQ Broker
-    Default: rabbitmqPassword123
-    NoEcho: true
   ServerlessLandGithubLocation:
     Type: String
     Default: https://github.com/aws-samples/serverless-patterns.git
@@ -70,11 +65,11 @@ Resources:
     Properties:
       Name: 'AmazonRabbitMQCredentials'
       Description: RabbitMQ broker master user credentials
-      SecretString: !Sub |
-        {
-          "username": "${RabbitMQBrokerAdminUser}",
-          "password": "${RabbitMQBrokerPassword}"
-        }
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${RabbitMQBrokerAdminUser}"}'
+        GenerateStringKey: 'password'
+        PasswordLength: 24
+        ExcludePunctuation: true
 
   VPC:
     Type: AWS::EC2::VPC
@@ -334,10 +329,16 @@ Resources:
           FromPort: 443
           ToPort: 443
           SourceSecurityGroupId: !GetAtt RabbitMQClientInstanceSecurityGroup.GroupId
-        - IpProtocol: tcp
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+  RabbitMQBrokerSelfIngressAllowRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: RabbitMQSecurityGroup
+    Properties:
+      GroupId: !GetAtt RabbitMQSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 5671
+      ToPort: 5671
+      SourceSecurityGroupId: !GetAtt RabbitMQSecurityGroup.GroupId
 
   RabbitMQClientSelfIngressAllowRule:
     Type: AWS::EC2::SecurityGroupIngress
@@ -362,7 +363,7 @@ Resources:
       AutoMinorVersionUpgrade: true
       Users:
         - Username: !Ref RabbitMQBrokerAdminUser
-          Password: !Ref RabbitMQBrokerPassword
+          Password: !Sub '{{resolve:secretsmanager:${RabbitMQSecret}:SecretString:password}}'
           ConsoleAccess: true
       SubnetIds:
         - !Ref PrivateSubnetRabbitMQOne
@@ -544,7 +545,7 @@ Resources:
             RABBITMQ_SUBNET_THREE=${rabbitmq_subnet_three}
             RABBITMQ_SECURITY_GROUP=${rabbitmq_security_group}
             RABBITMQ_BROKER_ADMIN_USER=${rabbitmq_broker_admin_user}
-            RABBITMQ_BROKER_PASSWORD=${rabbitmq_broker_password}
+            RABBITMQ_BROKER_PASSWORD=$(aws secretsmanager get-secret-value --secret-id AmazonRabbitMQCredentials --region ${aws_region} --query SecretString --output text | jq -r .password)
             SECURITY_GROUP=${security_group_id}
             RABBITMQ_VIRTUAL_HOST=${rabbitmq_virtual_host}
             RABBITMQ_EXCHANGE=${rabbitmq_exchange}
@@ -611,8 +612,6 @@ Resources:
             sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" create_rabbit_queue.sh
             sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" create_rabbit_queue.sh
-            sed -i "s/RABBITMQ_BROKER_ADMIN_USER/$RABBITMQ_BROKER_ADMIN_USER/g" create_rabbit_queue.sh
-            sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" create_rabbit_queue.sh
 
             sh ./create_rabbit_queue.sh
 
@@ -624,8 +623,6 @@ Resources:
             sed -i "s/RABBITMQ_QUEUE_NAME/$RABBITMQ_QUEUE_NAME/g" query_rabbit_queue.sh
             sed -i "s/RABBITMQ_VIRTUAL_HOST/$RABBITMQ_VIRTUAL_HOST/g" query_rabbit_queue.sh
             sed -i "s/RABBITMQ_EXCHANGE/$RABBITMQ_EXCHANGE/g" query_rabbit_queue.sh
-            sed -i "s/RABBITMQ_BROKER_ADMIN_USER/$RABBITMQ_BROKER_ADMIN_USER/g" query_rabbit_queue.sh
-            sed -i "s/RABBITMQ_BROKER_PASSWORD/$RABBITMQ_BROKER_PASSWORD/g" query_rabbit_queue.sh
 
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -655,7 +652,6 @@ Resources:
             rabbitmq_subnet_three: !Ref PrivateSubnetRabbitMQThree
             rabbitmq_security_group: !GetAtt RabbitMQSecurityGroup.GroupId
             rabbitmq_broker_admin_user: !Ref RabbitMQBrokerAdminUser
-            rabbitmq_broker_password: !Ref RabbitMQBrokerPassword
             python3_version: !Ref Python3Version
 
   EC2InstanceEndpoint:
@@ -680,56 +676,113 @@ Resources:
       Path: "/"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonMQFullAccess
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess
-        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
-        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess_v2
       Policies:
-        - PolicyName: RabbitMQAccess
-          PolicyDocument: !Sub '{
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-                      "Sid": "RabbitMQFullAccess",
-                      "Effect": "Allow",
-                      "Action": [
-                          "mq:*"
-                      ],
-                      "Resource": "*"
-                  }
-              ]
-          }'
-        - PolicyName: SecretsManagerAccess
-          PolicyDocument: !Sub '{
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-                      "Effect": "Allow",
-                      "Action": [
-                          "secretsmanager:GetSecretValue",
-                          "secretsmanager:PutSecretValue",
-                          "secretsmanager:DescribeSecret"
-                      ],
-                      "Resource": "${RabbitMQSecret}"
-                  }
-              ]
-          }'
-        - PolicyName: CloudformationDeploy
-          PolicyDocument: !Sub '{
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-            "Effect": "Allow",
-            "Action": [
-                "iam:*"
-            ],
-            "Resource": "*"
-        }
-              ]
-          }'
+        - PolicyName: SAMDeployPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: CloudFormationDeploy
+                Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeStackResources
+                  - cloudformation:GetTemplate
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:ValidateTemplate
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:ListStackResources
+                Resource: '*'
+              - Sid: LambdaDeploy
+                Effect: Allow
+                Action:
+                  - lambda:CreateFunction
+                  - lambda:UpdateFunctionCode
+                  - lambda:UpdateFunctionConfiguration
+                  - lambda:DeleteFunction
+                  - lambda:GetFunction
+                  - lambda:GetFunctionConfiguration
+                  - lambda:ListTags
+                  - lambda:TagResource
+                  - lambda:UntagResource
+                  - lambda:AddPermission
+                  - lambda:RemovePermission
+                  - lambda:CreateEventSourceMapping
+                  - lambda:DeleteEventSourceMapping
+                  - lambda:GetEventSourceMapping
+                  - lambda:UpdateEventSourceMapping
+                Resource: '*'
+              - Sid: IAMRoleManagement
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:PassRole
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:GetRolePolicy
+                  - iam:TagRole
+                  - iam:UntagRole
+                Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+              - Sid: S3ArtifactAccess
+                Effect: Allow
+                Action:
+                  - s3:CreateBucket
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                  - s3:GetBucketLocation
+                  - s3:PutBucketPolicy
+                  - s3:DeleteBucket
+                Resource: '*'
+              - Sid: DynamoDBAccess
+                Effect: Allow
+                Action:
+                  - dynamodb:CreateTable
+                  - dynamodb:DeleteTable
+                  - dynamodb:DescribeTable
+                  - dynamodb:UpdateTable
+                  - dynamodb:TagResource
+                  - dynamodb:UntagResource
+                  - dynamodb:Scan
+                  - dynamodb:GetItem
+                Resource: '*'
+              - Sid: CloudWatchLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource: '*'
+              - Sid: EC2NetworkingForLambda
+                Effect: Allow
+                Action:
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeSecurityGroupRules
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeTags
+                Resource: '*'
+              - Sid: SecretsManagerAccess
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:PutSecretValue
+                  - secretsmanager:DescribeSecret
+                Resource: '*'
         - PolicyName: SecurityGroupsPolicy
           PolicyDocument: !Sub '{
             "Version": "2012-10-17",
