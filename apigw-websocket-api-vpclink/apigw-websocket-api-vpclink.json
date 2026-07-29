@@ -64,8 +64,8 @@
         "icon3": {
             "x": 80,
             "y": 50,
-            "service": "alb",
-            "label": "NLB"
+            "service": "nlb",
+            "label": "Network Load Balancer"
         },
         "line1": {
             "from": "icon1",
