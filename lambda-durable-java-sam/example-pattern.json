@@ -49,7 +49,7 @@
     {
       "name": "Indranil Banerjee",
       "bio": "AWS - Senior Solutions Architect",
-      "image": "https://media.licdn.com/dms/image/v2/C5603AQEL3BG6JZca6A/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1653972622784?e=1762992000&v=beta&t=a9gnmtxyWBhfEfqDF3HiPHWDoc4KZjG2sdNsIakcJXw",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQEL3BG6JZca6A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1653972622784?e=1787184000&v=beta&t=02c8Cs3dvk26XyKhsvieC9FcPEXa8toJnWlUk-rDsU0",
       "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
     },
     {
@@ -63,6 +63,12 @@
       "bio": "AWS - Senior Solutions Architect",
       "image": "https://media.licdn.com/dms/image/v2/D5603AQETCOkwv00Lag/profile-displayphoto-crop_800_800/B56ZuQzht7GwAU-/0/1767660985531?e=1785974400&v=beta&t=HoKdUUL1BBmr0OpLFn9nnGwJclVB2UPh_4cxtP7XA_s",
       "linkedin": "https://www.linkedin.com/in/ajjaykumar/"
-    }
+    },
+    {
+      "name": "Greg Medard",
+      "bio": "AWS - Solutions Architect",
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQGveSDnRH9aCg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1565226836110?e=1787184000&v=beta&t=XYi5wg0YCeRS5kigIA58hKRYrogUahMkzzLFtzowm5o",
+      "linkedin": "https://www.linkedin.com/in/gregorymedard/"
+    }    
   ]
 }
