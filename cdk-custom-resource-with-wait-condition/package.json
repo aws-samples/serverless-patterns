@@ -20,7 +20,7 @@
   "dependencies": {
     "@aws-sdk/client-sfn": "^3.946.0",
     "@types/aws-lambda": "^8.10.159",
-    "aws-cdk-lib": "2.246.0",
+    "aws-cdk-lib": "2.260.0",
     "constructs": "^10.4.3"
   }
 }
