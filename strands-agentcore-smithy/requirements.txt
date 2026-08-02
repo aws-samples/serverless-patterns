@@ -1,0 +1,4 @@
+strands-agents
+mcp
+requests
+PyJWT[crypto]

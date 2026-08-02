@@ -1,0 +1,86 @@
+{
+  "title": "Strands Agent on AWS Lambda with Amazon Bedrock AgentCore Smithy Amazon Bedrock Target",
+  "description": "Strands SDK agent on AWS Lambda calls Amazon Bedrock Runtime via Amazon Bedrock AgentCore Gateway using a Smithy model target, with Cognito JWT auth and IAM role signing.",
+  "language": "Python",
+  "level": "300",
+  "framework": "CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The user authenticates with Amazon Cognito and receives a JWT token.",
+      "The JWT is passed to an AWS Lambda function which uses the Strands Agents SDK to create an AI agent backed by Amazon Bedrock (Claude Sonnet 4.6 cross-region inference profile).",
+      "The Strands Agent connects to an Amazon Bedrock AgentCore Gateway MCP endpoint, dynamically discovering available Amazon Bedrock Runtime operations via the MCP tools/list protocol.",
+      "The Amazon Bedrock AgentCore Gateway validates the JWT token using a CUSTOM_JWT authorizer backed by Amazon Cognito, then routes MCP tool calls to the Smithy model target.",
+      "The gateway target uses the official Amazon Bedrock Runtime Smithy model (loaded from S3) to expose Amazon Bedrock Runtime operations as MCP tools.",
+      "The gateway uses its IAM execution role (GATEWAY_IAM_ROLE) to sign requests to Amazon Bedrock Runtime — no API keys or Secrets Manager secrets are required.",
+      "The outer agent (Claude Sonnet 4.6) calls the Converse tool, which invokes Claude Haiku 4.5 as the inner model to generate the response.",
+      "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/strands-agentcore-smithy",
+      "templateURL": "serverless-patterns/strands-agentcore-smithy",
+      "projectFolder": "strands-agentcore-smithy",
+      "templateFile": "infrastructure/cloudformation-template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Strands Agents SDK",
+        "link": "https://github.com/strands-agents/sdk-python"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "AgentCore Gateway Smithy Model Target",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-building-smithy-targets.html"
+      },
+      {
+        "text": "Model Context Protocol (MCP)",
+        "link": "https://modelcontextprotocol.io/"
+      },
+      {
+        "text": "Amazon Cognito JWT Authentication",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html"
+      },
+      {
+        "text": "Amazon Bedrock Cross-Region Inference",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "bash scripts/deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "./scripts/test.sh",
+      "./scripts/test.sh 'Ask Haiku to write a short poem about the Beatles'"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "aws cloudformation delete-stack --stack-name agentcore-smithy-bedrock --region us-east-1",
+      "aws s3 rb s3://agentcore-smithy-bedrock-smithy-models --force --region us-east-1"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mike Hume",
+      "image": "https://serverlessland.com/assets/images/contributors/mike-hume.jpg",
+      "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
+      "linkedin": "michael-hume-4663bb64",
+      "twitter": ""
+    }
+  ]
+}
