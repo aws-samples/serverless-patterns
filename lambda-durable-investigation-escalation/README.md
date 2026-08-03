@@ -273,6 +273,6 @@ sam delete --stack-name <your-stack-name> --region us-east-1
 
 ---
 
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
