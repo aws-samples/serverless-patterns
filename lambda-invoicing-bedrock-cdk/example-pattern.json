@@ -59,43 +59,5 @@
       "bio": "Technical Account Manager at AWS",
       "linkedin": "nithin-chandran-r"
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 10,
-      "y": 50,
-      "service": "eventbridge",
-      "label": "Amazon EventBridge"
-    },
-    "icon2": {
-      "x": 35,
-      "y": 50,
-      "service": "lambda",
-      "label": "AWS Lambda"
-    },
-    "icon3": {
-      "x": 60,
-      "y": 30,
-      "service": "s3",
-      "label": "Amazon S3"
-    },
-    "icon4": {
-      "x": 60,
-      "y": 70,
-      "service": "bedrock",
-      "label": "Amazon Bedrock"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3"
-    },
-    "line3": {
-      "from": "icon2",
-      "to": "icon4"
-    }
-  }
+  ]
 }
