@@ -23,7 +23,7 @@ Learn more at Serverless Land Patterns: https://serverlessland.com/patterns/bedr
 - **Cost-sensitive, high-volume assistants.** Every hit is one fewer Bedrock invocation and does **not** count against your Bedrock TPM/RPM limits (throttle relief under load).
 - **Any model / provider.** The cache is model-agnostic; the on-miss call is a drop-in for Bedrock or an external model.
 
-## Where it will not shine (be honest)
+## Where it will not shine
 
 - **Unique, one-off prompts.** No repetition -> ~0 hits -> you pay a tiny per-request overhead for nothing. Skip it here.
 - **Answers that must be exact or fresh.** A similar-but-not-identical prompt can return a subtly different prior answer. Mitigate with a higher threshold + TTL, or bypass the cache for such routes.
