@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  DynamoDB Streams to Lambda Durable Function (Python).
+  Change data capture triggers a multi-step processing pipeline
+  with automatic checkpointing. Each record is processed through
+  validate, enrich, and notify steps without re-execution on replay.
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Timeout: 30
+    MemorySize: 256
+    Architectures:
+      - arm64
+
+Resources:
+  # Source table — when items are written here, streams trigger processing
+  SourceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-source"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # Processed records table — enriched data lands here
+  ProcessedTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-processed"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+
+  # Notifications table — audit trail of notifications sent
+  NotificationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-notifications"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: notification_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: notification_id
+          KeyType: HASH
+
+  # Durable Function — processes stream records with checkpoints
+  StreamProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-processor"
+      Handler: processor.lambda_handler
+      CodeUri: src/
+      Description: Durable function processing DynamoDB stream events with checkpoints
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 900
+        RetentionPeriodInDays: 3
+      Environment:
+        Variables:
+          PROCESSED_TABLE: !Ref ProcessedTable
+          NOTIFICATIONS_TABLE: !Ref NotificationsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProcessedTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref NotificationsTable
+        - DynamoDBStreamReadPolicy:
+            TableName: !Ref SourceTable
+            StreamName: !Select [3, !Split ["/", !GetAtt SourceTable.StreamArn]]
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-processor*"
+      Events:
+        DDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt SourceTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 5
+            MaximumRetryAttempts: 3
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+Outputs:
+  SourceTableName:
+    Description: Source table — write items here to trigger the pipeline
+    Value: !Ref SourceTable
+
+  ProcessedTableName:
+    Description: Table where enriched records are stored
+    Value: !Ref ProcessedTable
+
+  NotificationsTableName:
+    Description: Audit trail of notifications
+    Value: !Ref NotificationsTable
+
+  ProcessorFunctionName:
+    Description: Name of the durable stream processor
+    Value: !Ref StreamProcessorFunction
