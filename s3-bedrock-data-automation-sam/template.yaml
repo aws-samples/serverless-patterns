@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Extract structured data from unstructured files (documents, images, video, audio)
+  using Amazon Bedrock Data Automation (BDA). Upload a file to the input/ prefix of the
+  S3 bucket; an AWS Lambda function starts an asynchronous BDA job; BDA writes structured
+  JSON to the output/ prefix. The extraction is fully managed by BDA - no ML code.
+  (s3-bedrock-data-automation-sam)
+
+Parameters:
+  DataBucketName:
+    Type: String
+    Description: Globally-unique name for the S3 bucket that holds input files and BDA output.
+
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DataBucketName
+
+  # Bedrock Data Automation project - a native CloudFormation resource. This standard-output
+  # config returns each document as Markdown text plus a generative summary. Swap in Image/
+  # Video/Audio blocks (or a CustomOutputConfiguration blueprint) to change what is extracted.
+  BDAProject:
+    Type: AWS::Bedrock::DataAutomationProject
+    Properties:
+      ProjectName: !Sub "${AWS::StackName}-project"
+      ProjectDescription: Standard document extraction (Markdown text + generative summary).
+      ProjectType: ASYNC
+      ProjectStage: LIVE
+      StandardOutputConfiguration:
+        Document:
+          Extraction:
+            Granularity:
+              Types:
+                - DOCUMENT
+                - PAGE
+            BoundingBox:
+              State: DISABLED
+          GenerativeField:
+            State: ENABLED
+          OutputFormat:
+            TextFormat:
+              Types:
+                - MARKDOWN
+            AdditionalFileFormat:
+              State: DISABLED
+
+  StartBdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: BdaAndS3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: S3ReadWrite
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub "arn:aws:s3:::${DataBucketName}/*"
+              - Sid: InvokeBda
+                Effect: Allow
+                Action: bedrock:InvokeDataAutomationAsync
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:data-automation-project/*"
+                  # us.data-automation-v1 is a cross-region (US geo) profile: BDA may route the
+                  # job to any US region, so the profile ARN region must be wildcarded here.
+                  - !Sub "arn:aws:bedrock:*:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+
+  StartBdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-start-bda"
+      CodeUri: src/
+      Handler: handler.handler
+      Runtime: python3.13
+      Architectures:
+        - arm64
+      Timeout: 30
+      MemorySize: 128
+      Role: !GetAtt StartBdaFunctionRole.Arn
+      Environment:
+        Variables:
+          BDA_PROJECT_ARN: !GetAtt BDAProject.ProjectArn
+          BDA_PROFILE_ARN: !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+          OUTPUT_PREFIX: output
+      Events:
+        InputUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref DataBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: input/
+
+Outputs:
+  DataBucketName:
+    Description: Upload files to the input/ prefix; read results from the output/ prefix.
+    Value: !Ref DataBucket
+  BDAProjectArn:
+    Description: ARN of the Bedrock Data Automation project.
+    Value: !GetAtt BDAProject.ProjectArn
+  StartBdaFunctionName:
+    Description: Lambda function that starts BDA jobs on upload.
+    Value: !Ref StartBdaFunction
