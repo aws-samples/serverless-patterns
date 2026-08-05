@@ -1,6 +1,6 @@
 {
   "title": "Grounded AI answers with Amazon Bedrock AgentCore Web Search and Amazon Bedrock",
-  "description": "Deploy an Amazon API Gateway REST API backed by an AWS Lambda function that searches the live web via Amazon Bedrock AgentCore Web Search, then uses Amazon Bedrock to synthesize accurate, cited answers grounded in current facts.",
+  "description": "Ground AI responses in live web data using Amazon Bedrock AgentCore Web Search and Amazon Bedrock for model-agnostic cited answers",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",

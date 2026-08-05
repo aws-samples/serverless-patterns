@@ -45,6 +45,14 @@ This pattern demonstrates **Retrieval-Augmented Generation (RAG) using live web 
 
 This eliminates the need for maintaining a vector database, embedding pipeline, or data ingestion — the web IS the knowledge base, always current.
 
+## Why AgentCore Gateway for Web Search?
+
+Amazon Bedrock also offers a built-in Web Search tool via the Responses API on the bedrock-mantle endpoint. That approach is limited to OpenAI GPT models. This pattern uses Amazon Bedrock AgentCore Gateway with the Web Search connector instead, which provides:
+
+- **Model-agnostic grounding**: Use any Amazon Bedrock model (Claude, Nova, Llama, Mistral) with web search results, not just OpenAI GPT.
+- **Composable MCP architecture**: The same AgentCore Gateway can host additional tool connectors alongside Web Search, enabling multi-tool agents.
+- **Full control over prompting**: Search results are passed as structured context to your model call, giving you control over citation format, answer length, and system prompts.
+
 ## Testing
 
 ```bash
