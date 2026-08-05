@@ -1,0 +1,74 @@
+{
+  "title": "Amazon API Gateway with AWS Lambda authorizer, & Amazon DynamoDB for Tenant API Key Authentication",
+  "description": "Implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, AWS Lambda Authorizer, and Amazon DynamoDB.",
+
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to implement a secure tenant-based API key authorization system using Amazon Cognito, Amazon API Gateway, Lambda Authorizer, and Amazon DynamoDB.",
+      "Amazon Cognito authenticates users and issues JWTs (ID tokens) containing a custom tenantId claim.",
+      "The client sends the JWT in the Authorization header. API Gateway forwards the token to the Lambda authorizer, which validates and decodes the JWT, extracts the custom:tenantId claim, and queries DynamoDB to retrieve the corresponding API key.",
+      "The authorizer returns a policy document with the usageIdentifierKey set to the API key, enabling API Gateway usage plan integration.",
+      "The API Gateway then allows or denies access to the protected endpoint based on the policy returned by the authorizer."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-apikey-tenantid-cdk",
+      "templateURL": "serverless-patterns/apigw-apikey-tenantid-cdk",
+      "projectFolder": "apigw-apikey-tenantid-cdk",
+      "templateFile": "src/lib/apigw-dynamodb-apikey-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda authorizers for Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+      },
+      {
+        "text": "Amazon API Gateway - REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      },
+      {
+        "text": "Amazon Cognito Developer Guide",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+      },      
+      {
+        "text": "Amazon DynamoDB Developer Guide",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      },      
+      {
+        "text": "API Gateway Usage Plans",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["npm install", "cdk deploy"]
+  },
+  "testing": {
+    "text": [
+      "Create a Cognito user: <code>aws cognito-idp admin-create-user --user-pool-id USER_POOL_ID --username user@example.com --user-attributes Name=email,Value=user@example.com Name=custom:tenantId,Value=sample-tenant --temporary-password \"TempPass1!\"</code>",
+      "Set a permanent password: <code>aws cognito-idp admin-set-user-password --user-pool-id USER_POOL_ID --username user@example.com --password \"MySecurePass1!\" --permanent</code>",
+      "Insert a tenant mapping into the DynamoDB table: <code>aws dynamodb put-item --table-name TABLE_NAME --item '{\"tenantId\": {\"S\": \"sample-tenant\"}, \"apiKey\": {\"S\": \"my-api-key-123\"}}'</code>",
+      "Get a token and call the API: <code>node get-token.js --user-pool-id USER_POOL_ID --client-id CLIENT_ID --username user@example.com --password \"MySecurePass1!\" --api-url https://REPLACE_WITH_API_URL/protected</code>",
+      "If successful, you should receive a response: <code>{ \"message\": \"Access granted\" }</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the CDK stack: <code>cdk destroy</code>"
+    ]
+  },    
+  "authors": [
+    {
+      "name": "Lavanya Tangutur",           
+      "bio": "Lavanya Tangutur serves as a Senior Technical Account Manager at Amazon Web Services (AWS) focused on helping customers build, deploy, and run secure, resilient, and cost-effective workloads on AWS.",
+      "linkedin": "lavanyatangutur"
+    }
+  ]
+}
