@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Serverless patterns - Orchestrating a Spring AI agent on Amazon Bedrock AgentCore with an AWS
+  Lambda durable function (uksb-1tthgi812) (tag:lambda-durable-agentcore-springai-sam-java)
+
+Parameters:
+  AgentImageUri:
+    Type: String
+    Description: >-
+      ECR URI of the Spring AI agent image, including the tag. Run
+      scripts/build-agent-image.sh first - it creates the repository, builds the ARM64 image,
+      pushes it, and prints the value to use here.
+    AllowedPattern: '^\d{12}\.dkr\.ecr\.[a-z0-9-]+\.amazonaws\.com/.+:.+$'
+    ConstraintDescription: Must be a full ECR image URI including a tag.
+
+  AgentRuntimeName:
+    Type: String
+    Default: document_review_agent
+    Description: >-
+      Name of the AgentCore runtime. Only letters, digits and underscores are allowed -
+      the service rejects hyphens.
+    AllowedPattern: '^[a-zA-Z][a-zA-Z0-9_]{0,47}$'
+    ConstraintDescription: Letters, digits and underscores only (no hyphens), max 48 characters.
+
+  BedrockModelId:
+    Type: String
+    Default: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+    Description: Bedrock model (or inference profile) the Spring AI agent calls.
+
+Resources:
+
+  # ------------------------------------------------------------------------------------------
+  # The Spring AI agent, hosted on AgentCore Runtime
+  #
+  # AgentCore can host plain source code, but only for Python and Node runtimes, so a Java agent
+  # must be supplied as an ARM64 container image. scripts/build-agent-image.sh builds and pushes
+  # it before this stack is deployed, and passes the URI in as AgentImageUri.
+  # ------------------------------------------------------------------------------------------
+
+  AgentExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+            # Confused-deputy protection: only this account's AgentCore resources may assume
+            # this role.
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:*'
+      Policies:
+        - PolicyName: AgentRuntimePermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: InvokeBedrockModels
+                Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                  - bedrock:Converse
+                  - bedrock:ConverseStream
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:bedrock:*::foundation-model/*'
+                  - !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+              - Sid: PullAgentImage
+                Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                Resource: !Sub 'arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/*'
+              - Sid: EcrAuthorization
+                Effect: Allow
+                # GetAuthorizationToken cannot be scoped to a repository.
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Sid: WriteAgentLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/bedrock-agentcore/runtimes/*'
+
+  AgentRuntime:
+    Type: AWS::BedrockAgentCore::Runtime
+    Properties:
+      AgentRuntimeName: !Ref AgentRuntimeName
+      Description: Spring AI document review agent
+      AgentRuntimeArtifact:
+        ContainerConfiguration:
+          ContainerUri: !Ref AgentImageUri
+      NetworkConfiguration:
+        NetworkMode: PUBLIC
+      ProtocolConfiguration: HTTP
+      RoleArn: !GetAtt AgentExecutionRole.Arn
+      EnvironmentVariables:
+        BEDROCK_MODEL_ID: !Ref BedrockModelId
+
+  # ------------------------------------------------------------------------------------------
+  # The durable function that orchestrates the review
+  # ------------------------------------------------------------------------------------------
+
+  ReviewWorkflowFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-review-workflow'
+      CodeUri: orchestrator
+      Handler: com.example.durableagent.DocumentReviewWorkflow::handleRequest
+      Runtime: java21
+      Architectures:
+        - arm64
+      MemorySize: 1024
+      # Bounds a single invocation. The workflow's overall lifetime is governed by
+      # DurableConfig.ExecutionTimeout below, and no compute is billed while it is suspended
+      # waiting for a human.
+      Timeout: 300
+      # Durable functions must be invoked through a qualified ARN, so publish an alias.
+      AutoPublishAlias: live
+      DurableConfig:
+        # 7 days. Must exceed the 24h callback timeout in DocumentReviewWorkflow, otherwise the
+        # execution would expire before the approval window closes.
+        ExecutionTimeout: 604800
+        # How long the execution's checkpoints, history and result stay queryable after it ends.
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          AGENT_RUNTIME_ARN: !GetAtt AgentRuntime.AgentRuntimeArn
+          JAVA_TOOL_OPTIONS: '-XX:+TieredCompilation -XX:TieredStopAtLevel=1'
+      Policies:
+        # Grants lambda:CheckpointDurableExecution and lambda:GetDurableExecutionState alongside
+        # basic Lambda execution permissions.
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+        - Statement:
+            - Sid: InvokeAgent
+              Effect: Allow
+              Action: bedrock-agentcore:InvokeAgentRuntime
+              Resource:
+                - !GetAtt AgentRuntime.AgentRuntimeArn
+                - !Sub '${AgentRuntime.AgentRuntimeArn}/*'
+
+Outputs:
+  WorkflowFunctionAlias:
+    Description: >-
+      Qualified function name to invoke. Start a review with
+      aws lambda invoke --function-name <this> --invocation-type Event
+      --durable-execution-name <id> --payload fileb://events/submit-document.json out.json
+    Value: !Sub '${AWS::StackName}-review-workflow:live'
+
+  WorkflowFunctionName:
+    Description: Function name, for the aws lambda durable-execution commands.
+    Value: !Ref ReviewWorkflowFunction
+
+  AgentRuntimeArn:
+    Description: ARN of the Spring AI agent runtime on AgentCore.
+    Value: !GetAtt AgentRuntime.AgentRuntimeArn
