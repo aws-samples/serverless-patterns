@@ -1,0 +1,129 @@
+{
+    "title": "AWS Lambda Durable Functions to Slack via Amazon Bedrock AgentCore",
+    "description": "Slack chatbot using AWS Lambda Durable Functions for stateful, multi-turn conversations with HITL interactions, generating travel itineraries via Amazon Bedrock AgentCore.",
+    "language": "Python",
+    "level": "400",
+    "framework": "Terraform",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "The Slack Handler Lambda receives webhook events from Slack via API Gateway, verifies the request signature, deduplicates events, and starts a new Durable Function execution for new conversations.",
+            "The Orchestrator (Durable Function) manages the multi-turn conversation flow using wait_for_callback() to pause execution while waiting for user responses — the Lambda is not running during the wait.",
+            "When the user replies, the callback resumes the orchestrator exactly where it left off. The AgentCore Agent invokes Amazon Bedrock (Claude) via the Strands framework to generate a personalized itinerary.",
+            "The key innovation is the wait-for-callback pattern: the orchestrator suspends (costs nothing while waiting) and automatically resumes when the user responds — enabling multi-turn conversations without managing state manually."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-df-slack",
+            "templateURL": "serverless-patterns/lambda-df-slack",
+            "projectFolder": "lambda-df-slack",
+            "templateFile": "terraform/main.tf"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Lambda Durable Functions",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+            },
+            {
+                "text": "Amazon Bedrock AgentCore",
+                "link": "https://aws.amazon.com/bedrock/agentcore/"
+            },
+            {
+                "text": "Amazon Bedrock",
+                "link": "https://aws.amazon.com/bedrock/"
+            },
+            {
+                "text": "Slack API Documentation",
+                "link": "https://api.slack.com/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "terraform init",
+            "terraform apply -auto-approve"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Change directory: cd terraform",
+            "Delete the stack: terraform destroy -auto-approve",
+            "Confirm all resources have been deleted: terraform show"
+        ]
+    },
+    "services": {
+        "from": {
+            "serviceName": "Amazon API Gateway",
+            "serviceURL": "/api-gateway/"
+        },
+        "to": {
+            "serviceName": "AWS Lambda",
+            "serviceURL": "/lambda/"
+        }
+    },
+    "patternArch": {
+        "icon1": {
+            "x": 15,
+            "y": 50,
+            "service": "apigw",
+            "label": "Amazon API Gateway"
+        },
+        "icon2": {
+            "x": 35,
+            "y": 50,
+            "service": "lambda",
+            "label": "Slack Handler"
+        },
+        "icon3": {
+            "x": 55,
+            "y": 50,
+            "service": "lambda",
+            "label": "Orchestrator (Durable)"
+        },
+        "icon4": {
+            "x": 80,
+            "y": 30,
+            "service": "dynamodb",
+            "label": "Callbacks Table"
+        },
+        "icon5": {
+            "x": 80,
+            "y": 70,
+            "service": "bedrock",
+            "label": "Bedrock AgentCore"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        },
+        "line4": {
+            "from": "icon3",
+            "to": "icon5"
+        }
+    },
+    "patternType": "Serverless",
+    "authors": [
+        {
+            "name": "Rajil Paloth",
+            "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
+            "bio": "ProServ Delivery Consultant at AWS",
+            "linkedin": "paloth"
+        }
+    ]
+}
