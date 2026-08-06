@@ -1,0 +1,69 @@
+{
+  "title": "Serverless semantic cache for Amazon Bedrock with Amazon S3 Vectors",
+  "description": "Cut Amazon Bedrock cost and latency by returning cached answers for semantically-similar prompts, using AWS Lambda and Amazon S3 Vectors.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "lambda", "label": "AWS Lambda (semantic cache)" },
+    "icon2": { "x": 55, "y": 30, "service": "bedrock", "label": "Amazon Bedrock (embeddings + LLM)" },
+    "icon3": { "x": 55, "y": 70, "service": "s3", "label": "Amazon S3 Vectors (cache store)" },
+    "line1": { "from": "icon1", "to": "icon2" },
+    "line2": { "from": "icon1", "to": "icon3" }
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Large language model (LLM) calls are slow and expensive, yet a large share of production prompts are paraphrases of ones already answered. This pattern places an AWS Lambda function in front of Amazon Bedrock that returns a cached answer whenever an incoming prompt is semantically similar to a previous one - so you skip the LLM call entirely on repeats and near-repeats.",
+      "When a request arrives, the Lambda function embeds the prompt with an Amazon Bedrock embeddings model (Amazon Titan Text Embeddings v2, 1024 dimensions). It then queries an Amazon S3 Vectors index for the nearest stored prompt using cosine similarity. Amazon S3 Vectors returns the closest match together with its distance and metadata in a single call, and the cached answer is stored directly in that metadata - so no separate database is required.",
+      "On a cache HIT (cosine similarity at or above a configurable threshold, the entry still within its freshness TTL, the current cache epoch, and passing a negation-parity guard) the function returns the stored answer in milliseconds at zero LLM cost. On a MISS, the function calls the Bedrock text model to generate the answer, stores the prompt embedding plus the answer, model, timestamp and epoch back into Amazon S3 Vectors, and returns the fresh result.",
+      "Correctness is designed, not assumed. A tunable similarity threshold trades precision for hit rate. A freshness TTL bounds staleness. A one-call force-invalidation bumps a global epoch stored in AWS Systems Manager Parameter Store, so every previously cached answer instantly becomes a miss without deleting or scanning anything - ideal for a policy or data change that cannot wait for the TTL. A negation-parity guard prevents the classic semantic-cache trap where a prompt and its negation ('is X' versus 'is NOT X') embed almost identically but mean the opposite. The query uses top-K retrieval and iterates candidates, so a stale duplicate near-neighbour never blocks a valid hit.",
+      "Amazon S3 Vectors is what makes this economical and fully serverless: pay-per-use vector storage and search that scales to zero, instead of an always-on vector database. The AWS Lambda function is stateless - the cache persists entirely in Amazon S3 Vectors, so it survives cold starts, redeploys, and execution-environment recycling. Access is over an IAM-signed Lambda function URL, with an optional application-level API key. IAM permissions follow least privilege: bedrock:InvokeModel is scoped to foundation models; s3vectors actions (QueryVectors, GetVectors, ListVectors, PutVectors, GetIndex) are scoped to the specific vector bucket and index; and ssm:GetParameter/PutParameter is scoped to the single epoch parameter.",
+      "The embeddings model and the answer model are both configurable, and the on-miss call is a drop-in for any model provider - the caching layer itself is model-agnostic. Best fit: FAQ and support assistants, documentation Q&A, and high-traffic assistants where users ask the same things in different words. Not intended for answers that must be exact, fresh, or per-user unless combined with namespacing, invalidation, or an equivalence-verification step."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-semantic-cache-s3vectors-sam",
+      "templateURL": "serverless-patterns/bedrock-semantic-cache-s3vectors-sam",
+      "projectFolder": "bedrock-semantic-cache-s3vectors-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      { "text": "Amazon S3 Vectors - vector storage in Amazon S3", "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html" },
+      { "text": "Amazon Bedrock - Titan Text Embeddings", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html" },
+      { "text": "Amazon Bedrock prompt caching (native, prefix-based) - complements this pattern", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html" },
+      { "text": "AWS Lambda function URLs", "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html" }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the README for the two S3 Vectors setup commands, then: sam build && sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions (miss, exact hit, semantic hit, force-invalidate)."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete</code>.",
+      "2. Delete the S3 Vectors index and bucket: <code>aws s3vectors delete-index ...</code> then <code>aws s3vectors delete-vector-bucket ...</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manish S",
+      "image": "",
+      "bio": "",
+      "linkedin": "",
+      "twitter": ""
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless semantic cache for Amazon Bedrock. A Lambda function embeds each prompt,
+  finds semantically-similar prior prompts in Amazon S3 Vectors, and returns the cached
+  answer on a hit (skipping the LLM) or calls Amazon Bedrock and caches the result on a miss.
+  (bedrock-semantic-cache-s3vectors-sam)
+
+Parameters:
+  VectorBucket:
+    Type: String
+    Description: Name of the S3 Vectors vector bucket that stores the cache (create before deploy - see README).
+  VectorIndex:
+    Type: String
+    Default: prompt-cache
+    Description: Name of the S3 Vectors index (dimension 1024, distance metric cosine).
+  SimThreshold:
+    Type: String
+    Default: "0.85"
+    Description: Cosine-similarity threshold for a cache hit (0-1). Higher = stricter matching.
+  TtlSeconds:
+    Type: String
+    Default: "86400"
+    Description: Freshness window in seconds. Entries older than this are treated as a miss.
+  ApiKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+    Description: Optional app-level API key checked in the x-api-key header. Leave blank to rely only on IAM auth.
+  EmbedModel:
+    Type: String
+    Default: amazon.titan-embed-text-v2:0
+    Description: Bedrock embeddings model used for semantic matching (must be consistent; matches the index dimension).
+  LlmModel:
+    Type: String
+    Default: amazon.nova-lite-v1:0
+    Description: Bedrock model used to generate the answer on a cache miss.
+
+Resources:
+  # Global cache epoch for one-call force-invalidation (bump this to invalidate everything).
+  CacheEpoch:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /semantic-cache/epoch
+      Type: String
+      Value: "1"
+
+  SemanticCacheFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: semantic-cache
+      Runtime: python3.13
+      Handler: cache.handler
+      CodeUri: src/
+      Timeout: 60
+      MemorySize: 512
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          VECTOR_BUCKET: !Ref VectorBucket
+          VECTOR_INDEX: !Ref VectorIndex
+          EMBED_MODEL: !Ref EmbedModel
+          LLM_MODEL: !Ref LlmModel
+          SIM_THRESHOLD: !Ref SimThreshold
+          TTL_SECONDS: !Ref TtlSeconds
+          API_KEY: !Ref ApiKey
+          EPOCH_PARAM: /semantic-cache/epoch
+      FunctionUrlConfig:
+        AuthType: AWS_IAM
+      Policies:
+        - Statement:
+            - Sid: BedrockInvoke
+              Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource: "arn:aws:bedrock:*::foundation-model/*"
+            - Sid: S3Vectors
+              Effect: Allow
+              Action:
+                - s3vectors:QueryVectors
+                - s3vectors:GetVectors
+                - s3vectors:ListVectors
+                - s3vectors:PutVectors
+                - s3vectors:GetIndex
+              Resource:
+                - !Sub "arn:aws:s3vectors:${AWS::Region}:${AWS::AccountId}:bucket/${VectorBucket}"
+                - !Sub "arn:aws:s3vectors:${AWS::Region}:${AWS::AccountId}:bucket/${VectorBucket}/index/*"
+            - Sid: EpochParam
+              Effect: Allow
+              Action:
+                - ssm:GetParameter
+                - ssm:PutParameter
+              Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/semantic-cache/epoch"
+
+Outputs:
+  FunctionUrl:
+    Description: IAM-signed HTTPS endpoint of the semantic cache.
+    Value: !GetAtt SemanticCacheFunctionUrl.FunctionUrl
+  FunctionName:
+    Description: Lambda function name (for aws lambda invoke testing).
+    Value: !Ref SemanticCacheFunction
