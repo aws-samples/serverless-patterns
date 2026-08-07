@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AI Trip Planner agent using Amazon Bedrock (Claude Sonnet) with Lambda Response Streaming
+  through API Gateway. The agent uses tool calling to build a day-by-day itinerary,
+  streaming each day's plan to the client as it's generated.
+
+Globals:
+  Function:
+    Timeout: 120
+    MemorySize: 512
+    Runtime: dotnet10
+    Architectures:
+      - x86_64
+
+Resources:
+  # ─────────────────────────────────────────────────────────────────────
+  # REST API with response streaming
+  # ─────────────────────────────────────────────────────────────────────
+  TripApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: trip-planner-streaming-api
+      Description: REST API with response streaming for AI trip planner
+
+  TripResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TripApi
+      ParentId: !GetAtt TripApi.RootResourceId
+      PathPart: plan
+
+  TripMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TripApi
+      ResourceId: !Ref TripResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        ResponseTransferMode: STREAM
+        TimeoutInMillis: 120000
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${TripPlannerFunction.Arn}/response-streaming-invocations
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: TripMethod
+    Properties:
+      RestApiId: !Ref TripApi
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref TripApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: prod
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Lambda Function — AI trip planner agent with tool use
+  # ─────────────────────────────────────────────────────────────────────
+  TripPlannerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: TripPlannerStreaming
+      CodeUri: ./src/
+      Description: AI trip planner agent that streams day-by-day itineraries via Bedrock tool use
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModelWithResponseStream
+                - bedrock:InvokeModel
+              Resource: "*"
+
+  # Permission for API Gateway to invoke the function via response streaming
+  TripPlannerFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt TripPlannerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TripApi}/*
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL for the trip planner
+    Value: !Sub "https://${TripApi}.execute-api.${AWS::Region}.amazonaws.com/prod/plan"
+  TripPlannerFunctionArn:
+    Description: Trip planner Lambda function ARN
+    Value: !GetAtt TripPlannerFunction.Arn
