@@ -1,0 +1,81 @@
+{
+  "title": "AWS AppSync and Amazon Cognito to Amazon Bedrock via AWS Lambda",
+  "description": "Create an AWS AppSync GraphQL API protected by Amazon Cognito that invokes Amazon Bedrock through an AWS Lambda resolver.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to secure an AWS AppSync GraphQL API with Amazon Cognito User Pools and route an authenticated mutation to an AWS Lambda resolver.",
+      "The Lambda function uses the AWS SDK for JavaScript v3 to invoke an Amazon Bedrock foundation model and returns the generated response back through AppSync to the caller.",
+      "This pattern deploys a Cognito User Pool and client, an AppSync API, a Lambda data source and resolver, and the IAM permissions required for Bedrock model invocation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-appsync-bedrock",
+      "templateURL": "serverless-patterns/cognito-appsync-bedrock",
+      "projectFolder": "cognito-appsync-bedrock/cdk",
+      "templateFile": "lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync - Build GraphQL APIs with managed resolvers",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "Amazon Cognito - User sign-up and sign-in for web and mobile apps",
+        "link": "https://aws.amazon.com/cognito/"
+      },
+      {
+        "text": "AWS Lambda - Run resolver logic without managing servers",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon Bedrock - Access foundation models through a managed API",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "AWS CDK - Define cloud infrastructure in TypeScript",
+        "link": "https://aws.amazon.com/cdk/"
+      },
+      {
+        "text": "Amazon Bedrock model parameters",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Change to the CDK project folder: <code>cd cognito-appsync-bedrock/cdk</code> and install dependencies with <code>npm install</code>.",
+      "Verify the active AWS account and Region used by your AWS CLI, and bootstrap the environment if needed. For example: <code>aws sts get-caller-identity</code>, <code>aws configure get region</code>, <code>./node_modules/.bin/cdk bootstrap aws://123456789012/us-east-1</code>. Replace the example account ID and Region code for your environment.",
+      "Build and deploy with <code>npm run build</code> and <code>npm run deploy</code>.",
+      "Verify that <code>cdk-outputs.json</code> was created because the integration tests depend on that file."
+    ]
+  },
+  "testing": {
+    "text": [
+      "Run the full test suite from the CDK project folder with <code>npm run test</code>.",
+      "When <code>cdk-outputs.json</code> exists, the live Cognito-AppSync-Bedrock integration test runs; otherwise the local AppSync transport, CDK stack, and Lambda region-selection unit tests run."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack from the CDK project folder with <code>cd cognito-appsync-bedrock/cdk</code> and <code>./node_modules/.bin/cdk destroy AppsyncBedrockCognitoStack</code>.",
+      "Confirm the destroy prompt, then verify in CloudFormation that <code>AppsyncBedrockCognitoStack</code> no longer exists.",
+      "Local files such as <code>cdk-outputs.json</code> and shared CDK bootstrap resources are not removed automatically."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vidit Shah",
+      "bio": "Software Engineer working @ServerlessCreed,making Serverless Courses and workshops",
+      "linkedin": "vidit-shah",
+      "twitter": "Vidit_210",
+      "image": "https://media.licdn.com/dms/image/v2/D4D03AQHbL_7ZCYfUGQ/profile-displayphoto-shrink_200_200/B4DZUXcQlTGkAY-/0/1739855039564?e=2147483647&v=beta&t=MhOEFqsUDaKnLypK8eYYRqqD8Uq9xHUnijO5tN-fMpc"
+    }
+  ]
+}
