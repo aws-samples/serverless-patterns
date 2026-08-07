@@ -1,0 +1,13 @@
+is_global = true
+
+# CA2007: Do not directly await a Task without ConfigureAwait
+# Not applicable in application code running on default synchronization context (Lambda, console apps).
+dotnet_diagnostic.CA2007.severity = none
+
+# CA1711: Identifiers should not have incorrect suffix
+# 'Stack' is the standard naming convention for AWS CDK stacks.
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1806: Do not ignore method results
+# CDK constructs register themselves with the construct tree via side-effects in constructors.
+dotnet_diagnostic.CA1806.severity = none
