@@ -1,0 +1,61 @@
+{
+  "title": "Amazon Bedrock Guardrails Account-Level Enforcement",
+  "description": "Deploy an Amazon Bedrock Guardrail with content and topic filters to demonstrate automatic enforcement on all Bedrock calls without specifying guardrailIdentifier.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon Bedrock Guardrail with content filters (hate, insults, violence, sexual, misconduct, prompt attacks) and a topic filter (investment advice), then enforces it at the account level so ALL Amazon Bedrock API calls are automatically guarded.",
+      "The workflow: (1) CDK creates a CfnGuardrail with content and topic policies, (2) a CfnGuardrailVersion publishes a numbered version, (3) an AWS::Bedrock::EnforcedGuardrailConfiguration resource enables account-wide enforcement, (4) a test AWS Lambda function demonstrates that safe prompts pass through while violating prompts are blocked - without specifying any guardrailIdentifier in the Converse API call.",
+      "Enforced guardrails apply to every Amazon Bedrock invocation in the account. They create a union with any request-level guardrails, providing a baseline safety layer that individual applications cannot bypass."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-guardrails-enforcement-cdk",
+      "templateURL": "serverless-patterns/bedrock-guardrails-enforcement-cdk",
+      "projectFolder": "bedrock-guardrails-enforcement-cdk",
+      "templateFile": "lib/bedrock-guardrails-enforcement-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock Guardrails",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html"
+      },
+      {
+        "text": "Enforced Guardrails - Account-Level Configuration",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/enforced-guardrails.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
