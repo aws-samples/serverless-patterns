@@ -1,0 +1,1 @@
+{"name":"apigw-lambda-bedrock-code-interpreter-cdk","version":"1.0.0","bin":{"app":"build/bin/app.js"},"scripts":{"build":"tsc","synth":"cdk synth"},"dependencies":{"aws-cdk-lib":"^2.260.0","constructs":"^10.3.0"},"devDependencies":{"aws-cdk":"^2.1128.0","typescript":"~5.4.0"}}
