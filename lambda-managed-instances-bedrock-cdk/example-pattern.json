@@ -1,0 +1,51 @@
+{
+  "title": "Lambda Managed Instances with Amazon Bedrock",
+  "description": "Run Amazon Bedrock model invocations on Lambda Managed Instances (EC2-backed compute) using AWS CDK, combining serverless simplicity with EC2 flexibility.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function on Managed Instances (EC2-backed compute) that invokes Amazon Bedrock (Claude) for text generation.",
+      "Lambda Managed Instances provide EC2 flexibility (Graviton, GPU, specialized hardware) with serverless operational simplicity — AWS handles provisioning, scaling, and maintenance.",
+      "The function runs on dedicated EC2 capacity in your VPC via a CapacityProvider, enabling access to EC2 pricing models (Savings Plans, Reserved Instances) while maintaining the Lambda programming model."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-bedrock-cdk",
+      "templateURL": "serverless-patterns/lambda-managed-instances-bedrock-cdk",
+      "projectFolder": "lambda-managed-instances-bedrock-cdk",
+      "templateFile": "lib/lambda-managed-instances-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Lambda Managed Instances documentation", "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html" },
+      { "text": "Lambda Managed Instances launch blog", "link": "https://aws.amazon.com/blogs/aws/introducing-aws-lambda-managed-instances-serverless-simplicity-with-ec2-flexibility/" },
+      { "text": "Amazon Bedrock documentation", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/" }
+    ]
+  },
+  "deploy": {
+    "text": ["cdk deploy"]
+  },
+  "testing": {
+    "text": ["See the README for testing instructions."]
+  },
+  "cleanup": {
+    "text": ["cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "lambda", "label": "Lambda (Managed Instances)" },
+    "icon2": { "x": 80, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
+    "line1": { "from": "icon1", "to": "icon2" }
+  }
+}
