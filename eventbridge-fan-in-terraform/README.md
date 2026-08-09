@@ -88,6 +88,11 @@ Note: To test this pattern, you will need a minimum of 2 existing event buses in
      ```
     terraform destroy
     ```
+2. If you created the Eventbuses in the deployment step 4, delete them:
+    ```
+    aws events delete-event-bus --name eventBus1 --region us-east-2
+    aws events delete-event-bus --name eventBus2 --region us-east-2
+    ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
