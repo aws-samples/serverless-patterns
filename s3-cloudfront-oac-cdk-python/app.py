@@ -18,25 +18,18 @@ class S3CloudFrontOAC(Construct):
             "My-Website-Bucket",
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             encryption=s3.BucketEncryption.S3_MANAGED,
             enforce_ssl=True,
             versioned=True
-        )
-        
-        website_bucket.add_cors_rule(
-            allowed_methods=[s3.HttpMethods.GET],
-            allowed_origins=["*"],
-            allowed_headers=["*"],
-            exposed_headers=["Access-Control-Allow-Origin"]
         )
 
         distribution = cloudfront.Distribution(self, "myCloudFrontDistribution",
             default_root_object='index.html',
             default_behavior=cloudfront.BehaviorOptions(
                 origin=origins.S3BucketOrigin.with_origin_access_control(website_bucket),
-                origin_request_policy=cloudfront.OriginRequestPolicy.CORS_S3_ORIGIN,
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-                response_headers_policy=cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS,
+                response_headers_policy=cloudfront.ResponseHeadersPolicy.SECURITY_HEADERS,
                 cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
                 allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL
             )
