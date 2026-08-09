@@ -29,13 +29,19 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. In the provider.tf file, add the Regions where the Eventbuses exist in the provider block with alias "others". Also add the Region where you want the central Eventbus to be created in the provider block with alias "central"
 
-4. In the terraform.tfvars file, add the ARNs of the existing Eventbuses you want to aggregate. Note that all of these fan-in Eventbuses should exist in the same Region. 
+4. If you do not already have Eventbuses to aggregate, create a minimum of 2 Eventbuses in the fan-in Region:
+    ```
+    aws events create-event-bus --name eventBus1 --region us-east-2
+    aws events create-event-bus --name eventBus2 --region us-east-2
+    ```
 
-5. From the command line, initialize Terraform:
+5. In the terraform.tfvars file, add the ARNs of the existing Eventbuses you want to aggregate. Note that all of these fan-in Eventbuses should exist in the same Region.
+
+6. From the command line, initialize Terraform:
     ```
     terraform init
     ```
-6. From the command line, apply the configuration in the main.tf file and follow the prompts:
+7. From the command line, apply the configuration in the main.tf file and follow the prompts:
      ```
     terraform apply
     ```
