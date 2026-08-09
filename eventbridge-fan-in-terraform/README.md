@@ -54,7 +54,32 @@ This application picks the configurations from terraform.tfvars files to create 
 
 Note: To test this pattern, you will need a minimum of 2 existing event buses in the fan-in Region. 
 
-Login to the AWS account where the terraform is deployed. Publish an event on any of the fan-in Eventbuses. Switch to the Region where the central Eventbus is created and navigate to Cloudwatch logs. You should see the event you published in the log group of the Central Eventbus.
+1. Publish a test event on each of the fan-in Eventbuses:
+    ```
+    aws events put-events --region us-east-2 --entries '[
+      {
+        "EventBusName": "eventBus1",
+        "Source": "demo.test",
+        "DetailType": "TestEvent",
+        "Detail": "{\"message\": \"hello from eventBus1\"}"
+      }
+    ]'
+    aws events put-events --region us-east-2 --entries '[
+      {
+        "EventBusName": "eventBus2",
+        "Source": "demo.test",
+        "DetailType": "TestEvent",
+        "Detail": "{\"message\": \"hello from eventBus2\"}"
+      }
+    ]'
+    ```
+    Each command should return `"FailedEntryCount": 0`.
+
+2. After a few seconds, check the log group of the central Eventbus in the central Region:
+    ```
+    aws logs tail /aws/events/central-bus-logs/logs --region ca-central-1 --since 10m
+    ```
+    You should see both published events as JSON, including `"source": "demo.test"` and `"region": "us-east-2"`. You can also view the log group `/aws/events/central-bus-logs/logs` in the Cloudwatch console.
 
 
 ## Cleanup
