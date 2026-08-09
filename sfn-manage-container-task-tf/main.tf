@@ -112,19 +112,6 @@ resource "aws_ecs_cluster" "fargate_cluster" {
   name = "FargateTaskNotification-${random_string.random.result}"
 }
 
-resource "aws_ecs_service" "example" {
-  name            = "example-service"
-  cluster         = aws_ecs_cluster.fargate_cluster.id
-  task_definition = aws_ecs_task_definition.fargate_task.arn
-  launch_type     = "FARGATE"
-  desired_count   = 1
-
-  network_configuration {
-    security_groups = [aws_security_group.fargate_sg.id]
-    subnets         = [module.vpc.public_subnet_1_id, module.vpc.public_subnet_2_id]
-  }
-}
-
 # Define SNS topic
 resource "aws_sns_topic" "sns_topic" {
   name = "FargateTaskNotification-${random_string.random.result}"
