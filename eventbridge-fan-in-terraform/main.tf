@@ -12,7 +12,7 @@ resource "aws_cloudwatch_event_rule" "ebrule" {
       local.account_id
     ]
   })
-  is_enabled = true
+  state = "ENABLED"
 }
 
 //IAM role and policy for Event rule
@@ -95,7 +95,8 @@ module "central_eventbridge" {
   providers = {
     aws = aws.central
   }
-  source = "terraform-aws-modules/eventbridge/aws"
+  source  = "terraform-aws-modules/eventbridge/aws"
+  version = "~> 4.3"
 
   bus_name = "central-event-bus"
 
