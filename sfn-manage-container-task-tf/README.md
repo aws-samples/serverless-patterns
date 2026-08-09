@@ -38,9 +38,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This sample project demonstrates how to submit an AWS Batch job, and then send an Amazon SNS notification based on whether that job succeeds or fails. Deploying this sample project creates an AWS Step Functions state machine, an AWS Batch job, and an Amazon SNS topic.
+This sample project demonstrates how to run an AWS Fargate task, and then send an Amazon SNS notification based on whether that task succeeds or fails.
 
-In this project, Step Functions uses a state machine to call the AWS Batch job synchronously. It then waits for the job to succeed or fail, and it sends an Amazon SNS topic with a message about whether the job succeeded or failed.
+The state machine runs the Fargate task synchronously and waits for it to complete. The task simply runs an `echo` command in a container and exits. Based on the result, the state machine publishes a message to the Amazon SNS topic to notify whether the task succeeded or failed.
 
 ## Image
 

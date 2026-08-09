@@ -132,7 +132,7 @@ resource "aws_sns_topic" "sns_topic" {
 
 #SFN
 resource "aws_iam_role" "sfn_container_task_role" {
-  name = "start-batch-job-${random_string.random.result}"
+  name = "sfn-container-task-role-${random_string.random.result}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -149,7 +149,7 @@ resource "aws_iam_role" "sfn_container_task_role" {
 }
 
 resource "aws_iam_policy" "sfn_container_task_policy" {
-  name = "sfn-conteiner-task-policy-${random_string.random.result}"
+  name = "sfn-container-task-policy-${random_string.random.result}"
 
   policy = jsonencode({
     "Version" : "2012-10-17",

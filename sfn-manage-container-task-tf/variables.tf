@@ -12,13 +12,13 @@ variable "aws_profile_name" {
 
 variable "vpc_cidr" {
   type        = string
-  description = "CIDR block for Batch VPC"
+  description = "CIDR block for the VPC"
   default     = "10.0.0.0/16"
 }
 
 variable "subnet_cidr" {
   type        = string
-  description = "CIDR block for the Batch subnet"
+  description = "CIDR block for the subnet"
   default     = "10.0.0.0/24"
 }
 
