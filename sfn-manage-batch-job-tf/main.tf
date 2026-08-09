@@ -254,7 +254,7 @@ resource "aws_iam_instance_profile" "ecs_profile" {
 }
 
 resource "aws_batch_compute_environment" "batch_compute_env" {
-  compute_environment_name = "BatchComputeEnvironment-${random_string.random.result}"
+  name = "BatchComputeEnvironment-${random_string.random.result}"
   type         = "MANAGED"
   service_role = aws_iam_role.batch_role.arn
   compute_resources {
@@ -283,9 +283,10 @@ resource "aws_batch_job_queue" "batch_job_queue" {
   name     = "StepFunctions-BatchJobManagementQueue-${random_string.random.result}"
   state    = "ENABLED"
   priority = 1
-  compute_environments = [
-    aws_batch_compute_environment.batch_compute_env.arn
-  ]
+  compute_environment_order {
+    order               = 1
+    compute_environment = aws_batch_compute_environment.batch_compute_env.arn
+  }
 }
 
 resource "aws_iam_role" "sfn_batch_job_role" {
