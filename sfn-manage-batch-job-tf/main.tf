@@ -218,7 +218,11 @@ resource "aws_iam_role" "batch_role" {
       },
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"]
+}
+
+resource "aws_iam_role_policy_attachment" "batch_role" {
+  role       = aws_iam_role.batch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
 }
 
 #Create the ECS instance role
@@ -236,7 +240,11 @@ resource "aws_iam_role" "batch_ecs_role" {
       },
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"]
+}
+
+resource "aws_iam_role_policy_attachment" "batch_ecs_role" {
+  role       = aws_iam_role.batch_ecs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
 # Create the ECS instance profile
@@ -264,10 +272,10 @@ resource "aws_batch_compute_environment" "batch_compute_env" {
     ]
   }
   depends_on = [
-    aws_iam_role.batch_ecs_role,
+    aws_iam_role_policy_attachment.batch_ecs_role,
     aws_subnet.subnet,
     aws_security_group.batch_sg,
-    aws_iam_role.batch_role
+    aws_iam_role_policy_attachment.batch_role
   ]
 }
 
