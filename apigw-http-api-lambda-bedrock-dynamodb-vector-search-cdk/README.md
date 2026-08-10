@@ -47,7 +47,7 @@ The table uses on-demand capacity, which is required for DynamoDB vector indexes
 
 The HTTP API is intentionally unauthenticated to keep the integration focused. Add an authorizer and stricter CORS configuration before adapting this sample for production.
 
-## Deployment instructions
+## Deployment Instructions
 
 1. Clone the repository and change to the pattern directory:
 
@@ -77,6 +77,18 @@ The HTTP API is intentionally unauthenticated to keep the integration focused. A
 5. Note the `ApiEndpoint`, `TableName`, `VectorIndexName`, and `VectorSearchFunctionName` stack outputs.
 
 The custom resource completes only after the vector index reports `ACTIVE` and `Backfilling` is false. It checks every 10 seconds and times out after 13 minutes. This bounded wait is intended for the new, empty table created by this pattern.
+
+### Optional CI/CD deployment pipeline
+
+For automated deployments, use short-lived credentials from your CI/CD provider's OpenID Connect integration instead of storing AWS access keys. Configure the deployment role and Region outside the repository, then run these stages:
+
+1. Check out the repository and configure Node.js 22.
+2. Install dependencies with `npm install`.
+3. Run `npm run build`, `npm test`, and `npm run synth` as validation gates.
+4. Assume the deployment role through OpenID Connect.
+5. Run `npx cdk deploy --require-approval never` only after the validation stages pass.
+
+Scope the deployment role to the CDK bootstrap resources and permissions required by this stack. Protect the deployment environment with branch rules and approvals appropriate to your organization. Do not commit account IDs, role ARNs, profiles, access keys, CDK output files, or API endpoints.
 
 ## Testing
 
