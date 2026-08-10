@@ -60,7 +60,9 @@
     {
       "name": "Vidit Shah",
       "image": "https://avatars.githubusercontent.com/u/80155713?v=4",
-      "bio": "Builder interested in serverless architecture, infrastructure as code, and generative AI patterns on AWS."
+      "bio": "Builder interested in serverless architecture, infrastructure as code, and generative AI patterns on AWS.",
+      "linkedin": "vidit-shah",
+      "twitter": "Vidit_210"
     }
   ]
 }

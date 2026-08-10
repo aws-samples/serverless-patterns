@@ -17,38 +17,29 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```text
-                                    ┌─────────────────────────┐
-                                    │ Amazon Bedrock          │
-                                    │ Titan Text Embeddings V2│
-                                    └───────────▲─────────────┘
-                                                │ InvokeModel
-Client ──POST /documents or /search──► API Gateway HTTP API
-                                                │
-                                                ▼
-                                    ┌─────────────────────────┐
-                                    │ AWS Lambda              │
-                                    │ embed, store, search    │
-                                    └───────────┬─────────────┘
-                                                │ PutItem / SearchVectors
-                                                ▼
-                                    ┌─────────────────────────┐
-                                    │ Amazon DynamoDB         │
-                                    │ table + vector index    │
-                                    └─────────────────────────┘
-```
+![Architecture diagram showing the runtime semantic-search request flow and the CDK custom-resource provisioning flow](diagram.png)
+
+### Flow
+
+1. A client sends a document to `POST /documents` or a natural-language query to `POST /search` through the API Gateway HTTP API.
+2. API Gateway passes the request to the vector-search Lambda function.
+3. Lambda invokes Amazon Titan Text Embeddings V2 to generate a normalized 1,024-dimensional vector.
+4. For document ingestion, Lambda stores the source content, metadata, and embedding together in DynamoDB with `PutItem`.
+5. For search, Lambda calls `SearchVectors` using the query embedding, required `tenantId` partition, optional `category` filter, and requested `topK`.
+6. DynamoDB returns projected document attributes ordered by cosine distance, where lower scores indicate closer semantic matches.
+7. During deployment, the CDK custom resource calls `UpdateTable` and polls `DescribeTable` until the vector index is active and backfilling is complete.
+
+### Resources
+
+- An Amazon API Gateway HTTP API with `POST /documents` and `POST /search` routes.
+- An AWS Lambda function that validates requests, invokes Bedrock, stores documents, and performs vector searches.
+- Amazon Bedrock with Amazon Titan Text Embeddings V2 for document and query embeddings.
+- An on-demand Amazon DynamoDB table with a native vector index, tenant partitioning, inline category filtering, and projected content attributes.
+- A CloudFormation custom-resource provider implemented with Lambda to create, monitor, replace, and delete the DynamoDB vector index.
 
 The CDK application also deploys a CloudFormation custom-resource provider to create the DynamoDB vector index and wait for asynchronous backfilling to finish. This deployment plumbing is required until DynamoDB vector indexes are available as native CDK/CloudFormation table properties.
 
 ## How it works
-
-1. `POST /documents` accepts a document containing `documentId`, `title`, `content`, `tenantId`, and `category`.
-2. Lambda invokes Amazon Titan Text Embeddings V2 to generate a normalized 1,024-dimensional vector from `content`.
-3. Lambda writes the document, metadata, and vector to the DynamoDB table with `PutItem`.
-4. `POST /search` accepts a natural-language `query`, required `tenantId`, optional `category`, and optional `topK`.
-5. Lambda embeds the query with the same model and calls the DynamoDB `SearchVectors` API.
-6. Every search is scoped to one `tenantId` vector partition. When supplied, `category` is applied as an inline equality filter.
-7. DynamoDB returns projected document attributes ordered by cosine distance. Lower scores are more similar.
 
 The table uses on-demand capacity, which is required for DynamoDB vector indexes. The vector index projects only `title` and `content`; the table key and inline filter attributes are available automatically. The Lambda execution role can put items in this table, search only this vector index, and invoke only the selected Bedrock embedding model.
 
