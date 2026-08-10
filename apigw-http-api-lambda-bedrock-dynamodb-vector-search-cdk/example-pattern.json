@@ -1,0 +1,66 @@
+{
+  "title": "API Gateway to Bedrock and DynamoDB vector search",
+  "description": "Build a semantic search API with API Gateway, Lambda, Bedrock embeddings, and a native DynamoDB vector index.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a serverless semantic-search API using Amazon API Gateway HTTP API, AWS Lambda, Amazon Bedrock, and Amazon DynamoDB. A single Lambda function handles two POST routes so that the sample remains focused on the service integration. The /documents route accepts text and metadata, invokes Amazon Titan Text Embeddings V2 to generate a normalized 1,024-dimensional embedding, and stores the source document, metadata, and vector together in one DynamoDB item. The /search route embeds a natural-language query with the same model and calls DynamoDB SearchVectors to retrieve semantically similar documents. Keeping operational attributes and vectors together removes the need to copy DynamoDB records to a separate vector database or maintain an external synchronization pipeline.",
+      "The DynamoDB table uses on-demand capacity, which is required for vector indexes. Its native vector index uses cosine distance, tenantId as the vector partition key, and category as an optional inline equality filter. Every search supplies one tenantId, limiting the vector space searched and providing a natural multi-tenant access pattern. The index projects only title and content to control storage and search-response size. Search results also include the table key and inline filter attributes, together with a cosine-distance score where a lower value indicates a closer semantic match. The query accepts a configurable topK from 1 through 100 and defaults to five results.",
+      "Because DynamoDB vector indexes are not yet represented by native CDK or CloudFormation table properties, the application includes a bounded custom-resource provider. It calls UpdateTable to create or delete the vector index and polls DescribeTable until the index is ACTIVE and backfilling has completed. The provider is idempotent, uses table-scoped permissions, and protects existing indexes from unsupported in-place changes. Application permissions are also narrowly scoped: Lambda can put items only in the created table, call SearchVectors only on the created vector-index ARN, and invoke only the selected Bedrock embedding model. The HTTP API is deliberately unauthenticated for concise testing; production adaptations should add authorization and restrict CORS. CDK outputs expose the API endpoint, table, vector index, and function names for the supplied command-line and JSON tests. Stack deletion removes the vector index before deleting the DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
+      "templateURL": "serverless-patterns/apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
+      "projectFolder": "apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
+      "templateFile": "lib/vector-search-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using vector indexes in DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/VectorSearch.html"
+      },
+      {
+        "text": "Amazon DynamoDB now supports real-time vector search at any scale",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-dynamodb-now-supports-real-time-vector-search-at-any-scale/"
+      },
+      {
+        "text": "Amazon Titan Text Embeddings models",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html"
+      },
+      {
+        "text": "Working with HTTP APIs for API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Use POST /documents to embed and store the supplied sample documents, then use POST /search to run the sample semantic query. See the README for curl commands and direct Lambda JSON events."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vidit Shah",
+      "image": "https://avatars.githubusercontent.com/u/80155713?v=4",
+      "bio": "Builder interested in serverless architecture, infrastructure as code, and generative AI patterns on AWS."
+    }
+  ]
+}

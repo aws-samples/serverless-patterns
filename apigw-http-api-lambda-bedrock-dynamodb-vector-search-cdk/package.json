@@ -1,0 +1,29 @@
+{
+  "name": "apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "synth": "cdk synth"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "3.1106.0",
+    "@aws-sdk/client-dynamodb": "3.1106.0",
+    "@aws-sdk/util-dynamodb": "3.996.7",
+    "aws-cdk-lib": "2.263.0",
+    "constructs": "10.6.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.152",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.0.0",
+    "aws-cdk": "2.1135.1",
+    "aws-sdk-client-mock": "4.1.0",
+    "esbuild": "^0.25.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.0"
+  }
+}
