@@ -58,6 +58,7 @@ describe("VectorSearchStack", () => {
       RouteKey: "POST /search",
     });
     template.resourceCountIs("AWS::StepFunctions::StateMachine", 0);
+    template.resourceCountIs("AWS::Logs::LogGroup", 3);
     template.hasResourceProperties("AWS::IAM::Policy", {
       PolicyDocument: {
         Statement: Match.arrayWith([

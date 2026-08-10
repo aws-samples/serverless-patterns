@@ -126,6 +126,10 @@ class VectorIndexProvider extends Construct {
 
     const provider = new customResources.Provider(this, "Framework", {
       onEventHandler: this.onEventHandler,
+      logGroup: new logs.LogGroup(this, "FrameworkLogs", {
+        retention: logs.RetentionDays.ONE_WEEK,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }),
     });
     this.serviceToken = provider.serviceToken;
   }
