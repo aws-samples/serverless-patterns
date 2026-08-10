@@ -108,6 +108,41 @@ describe("vector search handler", () => {
     expect(dynamodbMock.calls()).toHaveLength(0);
     expect(bedrockMock.calls()).toHaveLength(0);
   });
+
+  test("rejects text that exceeds the embedding model character limit", async () => {
+    const response = await handler(
+      apiEvent("POST /documents", {
+        documentId: "doc-1",
+        title: "Oversized document",
+        content: "a".repeat(50_001),
+        tenantId: "tenant-1",
+        category: "aws",
+      }),
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body ?? "{}")).toEqual({
+      message: "content must not exceed 50000 characters",
+    });
+    expect(dynamodbMock.calls()).toHaveLength(0);
+    expect(bedrockMock.calls()).toHaveLength(0);
+  });
+
+  test("validates DynamoDB key sizes using UTF-8 bytes", async () => {
+    const response = await handler(
+      apiEvent("POST /search", {
+        query: "query",
+        tenantId: "é".repeat(1_025),
+      }),
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body ?? "{}")).toEqual({
+      message: "tenantId must not exceed 2048 UTF-8 bytes",
+    });
+    expect(dynamodbMock.calls()).toHaveLength(0);
+    expect(bedrockMock.calls()).toHaveLength(0);
+  });
 });
 
 function apiEvent(routeKey: string, body: unknown): APIGatewayProxyEventV2 {

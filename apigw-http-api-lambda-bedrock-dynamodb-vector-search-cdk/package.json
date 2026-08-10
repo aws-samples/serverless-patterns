@@ -2,6 +2,9 @@
   "name": "apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "tsc --noEmit",
     "test": "jest --runInBand",

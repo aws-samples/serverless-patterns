@@ -15,6 +15,11 @@ import type {
 
 const bedrock = new BedrockRuntimeClient({});
 const dynamodb = new DynamoDBClient({});
+const MAX_EMBEDDING_INPUT_CHARACTERS = 50_000;
+const MAX_TENANT_ID_BYTES = 2_048;
+const MAX_DOCUMENT_ID_BYTES = 1_024;
+const MAX_TITLE_CHARACTERS = 1_000;
+const MAX_CATEGORY_CHARACTERS = 256;
 
 interface DocumentRequest {
   readonly documentId: string;
@@ -156,11 +161,13 @@ function parseJsonBody(event: APIGatewayProxyEventV2): unknown {
 function validateDocument(value: unknown): DocumentRequest {
   const body = requireObject(value);
   return {
-    documentId: requireString(body, "documentId"),
-    title: requireString(body, "title"),
-    content: requireString(body, "content"),
-    tenantId: requireString(body, "tenantId"),
-    category: requireString(body, "category"),
+    documentId: requireString(body, "documentId", { maxBytes: MAX_DOCUMENT_ID_BYTES }),
+    title: requireString(body, "title", { maxCharacters: MAX_TITLE_CHARACTERS }),
+    content: requireString(body, "content", {
+      maxCharacters: MAX_EMBEDDING_INPUT_CHARACTERS,
+    }),
+    tenantId: requireString(body, "tenantId", { maxBytes: MAX_TENANT_ID_BYTES }),
+    category: requireString(body, "category", { maxCharacters: MAX_CATEGORY_CHARACTERS }),
   };
 }
 
@@ -171,9 +178,11 @@ function validateSearch(value: unknown): SearchRequest {
     throw new RequestValidationError("topK must be an integer between 1 and 100");
   }
   return {
-    query: requireString(body, "query"),
-    tenantId: requireString(body, "tenantId"),
-    category: optionalString(body, "category"),
+    query: requireString(body, "query", {
+      maxCharacters: MAX_EMBEDDING_INPUT_CHARACTERS,
+    }),
+    tenantId: requireString(body, "tenantId", { maxBytes: MAX_TENANT_ID_BYTES }),
+    category: optionalString(body, "category", { maxCharacters: MAX_CATEGORY_CHARACTERS }),
     topK: topK === undefined ? undefined : Number(topK),
   };
 }
@@ -185,19 +194,41 @@ function requireObject(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-function requireString(value: Record<string, unknown>, key: string): string {
+interface StringConstraints {
+  readonly maxBytes?: number;
+  readonly maxCharacters?: number;
+}
+
+function requireString(
+  value: Record<string, unknown>,
+  key: string,
+  constraints: StringConstraints = {},
+): string {
   const result = value[key];
   if (typeof result !== "string" || !result.trim()) {
     throw new RequestValidationError(`${key} must be a non-empty string`);
   }
-  return result.trim();
+  const trimmed = result.trim();
+  if (constraints.maxCharacters && Array.from(trimmed).length > constraints.maxCharacters) {
+    throw new RequestValidationError(
+      `${key} must not exceed ${constraints.maxCharacters} characters`,
+    );
+  }
+  if (constraints.maxBytes && Buffer.byteLength(trimmed, "utf8") > constraints.maxBytes) {
+    throw new RequestValidationError(`${key} must not exceed ${constraints.maxBytes} UTF-8 bytes`);
+  }
+  return trimmed;
 }
 
-function optionalString(value: Record<string, unknown>, key: string): string | undefined {
+function optionalString(
+  value: Record<string, unknown>,
+  key: string,
+  constraints: StringConstraints = {},
+): string | undefined {
   if (value[key] === undefined) {
     return undefined;
   }
-  return requireString(value, key);
+  return requireString(value, key, constraints);
 }
 
 function requiredEnvironmentVariable(name: string): string {

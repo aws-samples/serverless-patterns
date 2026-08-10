@@ -45,6 +45,8 @@ The CDK application also deploys a CloudFormation custom-resource provider to cr
 
 The table uses on-demand capacity, which is required for DynamoDB vector indexes. Its composite primary key uses `tenantId` as the partition key and `documentId` as the sort key, so different tenants can safely reuse document identifiers. The vector index projects only `title` and `content`; the table key and inline filter attributes are available automatically. The Lambda execution role can put items in this table, search only this vector index, and invoke only the selected Bedrock embedding model.
 
+The handler validates required fields, DynamoDB key byte limits, the `topK` range, and the Titan Text Embeddings V2 maximum input length before calling AWS services. Requests that fail validation return HTTP 400 without invoking Bedrock or DynamoDB.
+
 The HTTP API is intentionally unauthenticated to keep the integration focused. Add an authorizer and stricter CORS configuration before adapting this sample for production.
 
 ## Deployment Instructions
@@ -159,7 +161,9 @@ aws lambda invoke \
   --function-name YOUR_VECTOR_SEARCH_FUNCTION_NAME \
   --cli-binary-format raw-in-base64-out \
   --payload fileb://events/ingest-event.json \
-  ingest-output.json
+  /tmp/ingest-output.json
+
+cat /tmp/ingest-output.json
 ```
 
 Then invoke the search event after the item has propagated to the vector index:
@@ -169,7 +173,9 @@ aws lambda invoke \
   --function-name YOUR_VECTOR_SEARCH_FUNCTION_NAME \
   --cli-binary-format raw-in-base64-out \
   --payload fileb://events/search-event.json \
-  search-output.json
+  /tmp/search-output.json
+
+cat /tmp/search-output.json
 ```
 
 ## Local validation
@@ -193,6 +199,13 @@ npx cdk destroy
 ```
 
 The custom resource deletes the vector index before CloudFormation deletes the DynamoDB table.
+
+Confirm that no active stack with this name remains; the expected result is an empty array:
+
+```bash
+aws cloudformation list-stacks \
+  --query "StackSummaries[?StackName=='DynamoDbVectorSearchPatternStack' && StackStatus!='DELETE_COMPLETE']"
+```
 
 ----
 
