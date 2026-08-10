@@ -43,7 +43,7 @@ The CDK application also deploys a CloudFormation custom-resource provider to cr
 
 ## How it works
 
-The table uses on-demand capacity, which is required for DynamoDB vector indexes. The vector index projects only `title` and `content`; the table key and inline filter attributes are available automatically. The Lambda execution role can put items in this table, search only this vector index, and invoke only the selected Bedrock embedding model.
+The table uses on-demand capacity, which is required for DynamoDB vector indexes. Its composite primary key uses `tenantId` as the partition key and `documentId` as the sort key, so different tenants can safely reuse document identifiers. The vector index projects only `title` and `content`; the table key and inline filter attributes are available automatically. The Lambda execution role can put items in this table, search only this vector index, and invoke only the selected Bedrock embedding model.
 
 The HTTP API is intentionally unauthenticated to keep the integration focused. Add an authorizer and stricter CORS configuration before adapting this sample for production.
 

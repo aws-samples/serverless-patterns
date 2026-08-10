@@ -25,6 +25,10 @@ export class VectorSearchStack extends cdk.Stack {
 
     const table = new dynamodb.Table(this, "Documents", {
       partitionKey: {
+        name: "tenantId",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
         name: "documentId",
         type: dynamodb.AttributeType.STRING,
       },

@@ -10,7 +10,10 @@ describe("VectorSearchStack", () => {
 
     template.hasResourceProperties("AWS::DynamoDB::Table", {
       BillingMode: "PAY_PER_REQUEST",
-      KeySchema: [{ AttributeName: "documentId", KeyType: "HASH" }],
+      KeySchema: [
+        { AttributeName: "tenantId", KeyType: "HASH" },
+        { AttributeName: "documentId", KeyType: "RANGE" },
+      ],
       PointInTimeRecoverySpecification: {
         PointInTimeRecoveryEnabled: true,
       },
