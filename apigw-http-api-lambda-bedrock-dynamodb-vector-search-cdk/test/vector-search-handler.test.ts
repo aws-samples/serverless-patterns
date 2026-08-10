@@ -118,7 +118,7 @@ function apiEvent(routeKey: string, body: unknown): APIGatewayProxyEventV2 {
     rawQueryString: "",
     headers: { "content-type": "application/json" },
     requestContext: {
-      accountId: "123456789012",
+      accountId: "test-account",
       apiId: "api-id",
       domainName: "example.execute-api.us-east-1.amazonaws.com",
       domainPrefix: "example",

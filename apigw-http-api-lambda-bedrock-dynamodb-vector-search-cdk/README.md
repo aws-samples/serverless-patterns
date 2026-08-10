@@ -19,6 +19,8 @@ Important: this application uses various AWS services and there are costs associ
 
 ![Architecture diagram showing the runtime semantic-search request flow and the CDK custom-resource provisioning flow](diagram.png)
 
+The diagram uses the official [AWS Architecture Icons](https://aws.amazon.com/architecture/icons/).
+
 ### Flow
 
 1. A client sends a document to `POST /documents` or a natural-language query to `POST /search` through the API Gateway HTTP API.
