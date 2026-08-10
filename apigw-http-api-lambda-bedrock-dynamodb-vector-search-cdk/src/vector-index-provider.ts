@@ -71,11 +71,7 @@ async function createIndexIfNeeded(properties: VectorIndexProperties): Promise<v
     return;
   }
 
-  const existingAttributes = new Set(
-    (table.AttributeDefinitions ?? []).map((definition) => definition.AttributeName),
-  );
   const attributeDefinitions: AttributeDefinition[] = (properties.SearchSchema ?? [])
-    .filter((element) => !existingAttributes.has(element.AttributeName))
     .map((element) => ({
       AttributeName: element.AttributeName,
       AttributeType: element.AttributeType,
@@ -93,6 +89,8 @@ async function createIndexIfNeeded(properties: VectorIndexProperties): Promise<v
   await dynamodb.send(
     new UpdateTableCommand({
       TableName: properties.TableName,
+      // DynamoDB requires every SearchSchema attribute in this UpdateTable
+      // request, including attributes already used by the base table key.
       AttributeDefinitions: attributeDefinitions.length ? attributeDefinitions : undefined,
       VectorIndexUpdates: [{ Create: create }],
     }),

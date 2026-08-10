@@ -22,6 +22,11 @@ const resourceProperties = {
       SearchSchemaElementType: "HASH",
       AttributeType: "S",
     },
+    {
+      AttributeName: "category",
+      SearchSchemaElementType: "INLINE_FILTER",
+      AttributeType: "S",
+    },
   ],
   Projection: {
     ProjectionType: "INCLUDE",
@@ -32,13 +37,16 @@ const resourceProperties = {
 describe("vector index provider", () => {
   beforeEach(() => dynamodbMock.reset());
 
-  test("starts vector index creation with missing attribute definitions", async () => {
+  test("includes every search-schema attribute definition when creating the index", async () => {
     dynamodbMock
       .on(DescribeTableCommand)
       .resolvesOnce({
         Table: {
           TableName: "Documents",
-          AttributeDefinitions: [{ AttributeName: "documentId", AttributeType: "S" }],
+          AttributeDefinitions: [
+            { AttributeName: "tenantId", AttributeType: "S" },
+            { AttributeName: "documentId", AttributeType: "S" },
+          ],
           VectorIndexes: [],
         },
       })
@@ -58,7 +66,10 @@ describe("vector index provider", () => {
     const update = dynamodbMock.commandCalls(UpdateTableCommand)[0].args[0].input;
     expect(update).toEqual({
       TableName: "Documents",
-      AttributeDefinitions: [{ AttributeName: "tenantId", AttributeType: "S" }],
+      AttributeDefinitions: [
+        { AttributeName: "tenantId", AttributeType: "S" },
+        { AttributeName: "category", AttributeType: "S" },
+      ],
       VectorIndexUpdates: [
         {
           Create: {
@@ -70,6 +81,10 @@ describe("vector index provider", () => {
               {
                 AttributeName: "tenantId",
                 SearchSchemaElementType: "HASH",
+              },
+              {
+                AttributeName: "category",
+                SearchSchemaElementType: "INLINE_FILTER",
               },
             ],
             Projection: {
