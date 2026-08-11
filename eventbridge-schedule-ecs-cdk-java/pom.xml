@@ -9,7 +9,7 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <cdk.version>2.70.0</cdk.version>
+        <cdk.version>2.264.0</cdk.version>
         <sdk.version>2.20.34</sdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.7.1</junit.version>
