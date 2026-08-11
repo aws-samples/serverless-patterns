@@ -6,12 +6,6 @@ import * as kinesis from 'aws-cdk-lib/aws-kinesis';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as events from 'aws-cdk-lib/aws-events';
-import * as targets from 'aws-cdk-lib/aws-events-targets';
-import * as sqs from 'aws-cdk-lib/aws-sqs';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
-import * as sfnTasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import * as logs from 'aws-cdk-lib/aws-logs';
 import * as cr from 'aws-cdk-lib/custom-resources';
 import * as kinesisEvtSrc from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Construct } from 'constructs';
@@ -41,7 +35,7 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     });
 
     // =========================================================
-    // 2. IAM Role for DSQL to write to Kinesis
+    // 2. IAM Role for Amazon Aurora DSQL to write to Amazon Kinesis
     // =========================================================
     const dsqlCdcRole = new iam.Role(this, 'DsqlCdcRole', {
       assumedBy: new iam.ServicePrincipal('dsql.amazonaws.com'),
@@ -133,7 +127,7 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     });
 
     // =========================================================
-    // 5. AWS Lambda: CDC Processor (Kinesis → EventBridge)
+    // 5. AWS Lambda: CDC Processor (Amazon Kinesis → Amazon EventBridge)
     // =========================================================
     const cdcProcessorFn = new lambda.Function(this, 'CdcProcessorFn', {
       runtime: lambda.Runtime.PYTHON_3_12,
@@ -141,7 +135,7 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambdas/cdc-processor')),
       timeout: cdk.Duration.seconds(60),
       memorySize: 256,
-      description: 'Processes Amazon Aurora DSQL CDC events and fans out to Amazon EventBridge',
+      description: 'Processes Amazon Aurora DSQL CDC events and publishes to Amazon EventBridge',
       environment: {
         EVENT_BUS_NAME: cdcEventBus.eventBusName,
       },
@@ -162,94 +156,6 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     }));
 
     // =========================================================
-    // 6. Fan-out Target A: Amazon SQS (Audit Queue)
-    // =========================================================
-    const auditDlq = new sqs.Queue(this, 'AuditDlq', {
-      queueName: 'dsql-cdc-audit-dlq',
-      retentionPeriod: cdk.Duration.days(14),
-      encryption: sqs.QueueEncryption.SQS_MANAGED,
-    });
-
-    const auditQueue = new sqs.Queue(this, 'AuditQueue', {
-      queueName: 'dsql-cdc-audit',
-      visibilityTimeout: cdk.Duration.seconds(30),
-      encryption: sqs.QueueEncryption.SQS_MANAGED,
-      deadLetterQueue: { queue: auditDlq, maxReceiveCount: 3 },
-    });
-
-    new events.Rule(this, 'AuditRule', {
-      eventBus: cdcEventBus,
-      ruleName: 'route-all-changes-to-audit',
-      description: 'Route ALL CDC events to Amazon SQS audit queue',
-      eventPattern: {
-        source: ['dsql.cdc'],
-      },
-      targets: [new targets.SqsQueue(auditQueue)],
-    });
-
-    // =========================================================
-    // 7. Fan-out Target B: AWS Step Functions (Data Validation)
-    // =========================================================
-    const validatePass = new sfn.Pass(this, 'ValidationPassed', {
-      result: sfn.Result.fromObject({ validated: true }),
-    });
-
-    const validateFail = new sfn.Pass(this, 'ValidationFailed', {
-      result: sfn.Result.fromObject({ validated: false }),
-    });
-
-    const validationChoice = new sfn.Choice(this, 'HasRequiredFields')
-      .when(
-        sfn.Condition.isPresent('$.detail.newImage'),
-        validatePass,
-      )
-      .otherwise(validateFail);
-
-    const validationStateMachine = new sfn.StateMachine(this, 'ValidationWorkflow', {
-      definitionBody: sfn.DefinitionBody.fromChainable(validationChoice),
-      timeout: cdk.Duration.minutes(5),
-      tracingEnabled: true,
-      logs: {
-        destination: new logs.LogGroup(this, 'ValidationLogGroup', {
-          logGroupName: '/aws/stepfunctions/dsql-cdc-validation',
-          retention: logs.RetentionDays.ONE_WEEK,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
-        }),
-        level: sfn.LogLevel.ERROR,
-      },
-    });
-
-    new events.Rule(this, 'ValidationRule', {
-      eventBus: cdcEventBus,
-      ruleName: 'route-inserts-to-validation',
-      description: 'Route INSERT events to AWS Step Functions for validation',
-      eventPattern: {
-        source: ['dsql.cdc'],
-        detailType: ['INSERT'],
-      },
-      targets: [new targets.SfnStateMachine(validationStateMachine)],
-    });
-
-    // =========================================================
-    // 8. Fan-out Target C: Amazon SNS (Real-time Alerts)
-    // =========================================================
-    const alertTopic = new sns.Topic(this, 'AlertTopic', {
-      topicName: 'dsql-cdc-delete-alerts',
-      displayName: 'Amazon Aurora DSQL CDC - DELETE Alerts',
-    });
-
-    new events.Rule(this, 'DeleteAlertRule', {
-      eventBus: cdcEventBus,
-      ruleName: 'route-deletes-to-alert',
-      description: 'Route DELETE events to Amazon SNS for alerting',
-      eventPattern: {
-        source: ['dsql.cdc'],
-        detailType: ['DELETE'],
-      },
-      targets: [new targets.SnsTopic(alertTopic)],
-    });
-
-    // =========================================================
     // Outputs
     // =========================================================
     new cdk.CfnOutput(this, 'KinesisStreamArn', {
@@ -259,22 +165,12 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'EventBusArn', {
       value: cdcEventBus.eventBusArn,
-      description: 'Amazon EventBridge custom event bus ARN',
+      description: 'Amazon EventBridge custom event bus ARN — add rules and targets to consume CDC events',
     });
 
-    new cdk.CfnOutput(this, 'AuditQueueUrl', {
-      value: auditQueue.queueUrl,
-      description: 'Amazon SQS audit queue URL',
-    });
-
-    new cdk.CfnOutput(this, 'ValidationStateMachineArn', {
-      value: validationStateMachine.stateMachineArn,
-      description: 'AWS Step Functions validation workflow ARN',
-    });
-
-    new cdk.CfnOutput(this, 'AlertTopicArn', {
-      value: alertTopic.topicArn,
-      description: 'Amazon SNS alert topic ARN',
+    new cdk.CfnOutput(this, 'CdcProcessorFunctionName', {
+      value: cdcProcessorFn.functionName,
+      description: 'AWS Lambda CDC processor function name',
     });
 
     new cdk.CfnOutput(this, 'CdcStreamId', {
