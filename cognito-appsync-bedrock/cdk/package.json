@@ -28,7 +28,7 @@
     "@aws-sdk/credential-provider-node": "^3.817.0",
     "@aws-sdk/protocol-http": "^3.374.0",
     "@aws-sdk/signature-v4": "^3.374.0",
-    "aws-cdk-lib": "2.181.1",
+    "aws-cdk-lib": "2.260.0",
     "constructs": "^10.0.0"
   }
 }
