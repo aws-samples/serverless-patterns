@@ -88,11 +88,18 @@ export class SfnEntityResolutionDynamodbStack extends cdk.Stack {
     outputBucket.grantWrite(entityResolutionRole);
 
     entityResolutionRole.addToPolicy(new iam.PolicyStatement({
-      actions: ['glue:GetTable', 'glue:GetDatabase'],
+      actions: [
+        'glue:GetTable',
+        'glue:GetTableVersion',
+        'glue:GetTableVersions',
+        'glue:GetPartitions',
+        'glue:GetDatabase',
+        'glue:BatchGetPartition',
+      ],
       resources: [
         `arn:aws:glue:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:catalog`,
         `arn:aws:glue:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:database/entity_resolution_db`,
-        `arn:aws:glue:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:table/entity_resolution_db/customer_records`,
+        `arn:aws:glue:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:table/entity_resolution_db/*`,
       ],
     }));
 
@@ -141,6 +148,9 @@ export class SfnEntityResolutionDynamodbStack extends cdk.Stack {
       },
     });
     matchingWorkflow.addDependency(glueTable);
+    // Ensure IAM role policy is fully propagated before Entity Resolution validates access
+    const roleDefaultPolicy = entityResolutionRole.node.findChild('DefaultPolicy') as iam.Policy;
+    matchingWorkflow.node.addDependency(roleDefaultPolicy);
 
     // Step Functions state machine
     // Step 1: Start the matching job
