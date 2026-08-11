@@ -9,14 +9,14 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Amazon Bedrock AgentCore Gateway with Web Search connector
+    // Amazon Bedrock AgentCore Gateway with Web Search Tool connector
     const gateway = new agentcore.Gateway(this, 'WebSearchGateway', {
       gatewayName: 'grounded-search-gateway',
       description: 'Amazon Bedrock AgentCore Gateway with Web Search for grounded AI answers',
       authorizerConfiguration: agentcore.GatewayAuthorizer.usingAwsIam(),
     });
 
-    // Web Search connector target
+    // Web Search Tool connector target
     new cdk.CfnResource(this, 'WebSearchTarget', {
       type: 'AWS::BedrockAgentCore::GatewayTarget',
       properties: {
@@ -36,23 +36,23 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
       },
     });
 
-    // Grant gateway role permission to invoke Web Search
+    // Grant gateway role permission to invoke Web Search Tool
     gateway.role.addToPrincipalPolicy(new iam.PolicyStatement({
       actions: ['bedrock-agentcore:InvokeWebSearch'],
       resources: [`arn:aws:bedrock-agentcore:${this.region}:aws:tool/web-search.v1`],
     }));
 
-    // AWS Lambda function that orchestrates Web Search + Amazon Bedrock inference
+    // AWS Lambda function that orchestrates Web Search Tool + Amazon Bedrock inference
     const fn = new lambda.Function(this, 'GroundedAnswerFunction', {
       runtime: lambda.Runtime.PYTHON_3_12,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src/handler'),
-      timeout: cdk.Duration.seconds(60),
+      timeout: cdk.Duration.seconds(28),
       memorySize: 256,
       environment: {
         GATEWAY_ID: gateway.gatewayId,
         GATEWAY_URL: gateway.gatewayUrl ?? '',
-        MODEL_ID: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+        MODEL_ID: 'us.anthropic.claude-sonnet-4-20250514-v1:0',  // Update to latest model as needed
       },
     });
 
@@ -63,8 +63,8 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
     fn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
-        `arn:aws:bedrock:*::foundation-model/*`,
-        `arn:aws:bedrock:*:${this.account}:inference-profile/*`,
+        `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4*`,
+        `arn:aws:bedrock:*:${this.account}:inference-profile/us.anthropic.claude-sonnet-4*`,
       ],
     }));
 

@@ -1,6 +1,6 @@
-# Grounded AI Answers with Amazon Bedrock AgentCore Web Search and Amazon Bedrock (CDK)
+# Grounded AI Answers with Web Search Tool and Amazon Bedrock (CDK)
 
-This pattern deploys an Amazon API Gateway REST API backed by an AWS Lambda function that searches the live web via Amazon Bedrock AgentCore Web Search, then uses Amazon Bedrock to synthesize accurate, cited answers grounded in current facts.
+This pattern deploys an Amazon API Gateway REST API backed by an AWS Lambda function that searches the live web via the Web Search Tool on Amazon Bedrock AgentCore Gateway, then uses Amazon Bedrock to synthesize accurate, cited answers grounded in current facts.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-websearch-bedrock-cdk
 
@@ -27,7 +27,12 @@ Important: this application uses various AWS services and there are costs associ
     npm install
     ```
 
-3. Deploy:
+3. Build the project:
+    ```bash
+    npm run build
+    ```
+
+4. Deploy:
     ```bash
     npx cdk deploy
     ```
@@ -38,34 +43,29 @@ This pattern demonstrates **Retrieval-Augmented Generation (RAG) using live web 
 
 1. **Amazon API Gateway** receives user questions via POST /ask
 2. **AWS Lambda** orchestrates the two-step process:
-   - Searches the live web via Amazon Bedrock AgentCore Gateway's Web Search connector (MCP protocol + SigV4)
+   - Searches the live web via the Web Search Tool on Amazon Bedrock AgentCore Gateway (MCP protocol + SigV4)
    - Passes search results as context to Amazon Bedrock (Claude Sonnet 4) for inference
 3. **Amazon Bedrock** synthesizes a grounded answer with numbered citation references
 4. Response includes the answer text and source URLs for verification
 
 This eliminates the need for maintaining a vector database, embedding pipeline, or data ingestion — the web IS the knowledge base, always current.
 
-## Why AgentCore Gateway for Web Search?
+## Why AgentCore Gateway with Web Search Tool?
 
-Amazon Bedrock also offers a built-in Web Search tool via the Responses API on the bedrock-mantle endpoint. That approach is limited to OpenAI GPT models. This pattern uses Amazon Bedrock AgentCore Gateway with the Web Search connector instead, which provides:
+Amazon Bedrock also offers a built-in Web Search tool via the Responses API on the bedrock-mantle endpoint. That approach is limited to OpenAI GPT models. This pattern uses the Web Search Tool on Amazon Bedrock AgentCore Gateway instead, which provides:
 
 - **Model-agnostic grounding**: Use any Amazon Bedrock model (Claude, Nova, Llama, Mistral) with web search results, not just OpenAI GPT.
-- **Composable MCP architecture**: The same AgentCore Gateway can host additional tool connectors alongside Web Search, enabling multi-tool agents.
+- **Composable MCP architecture**: The same AgentCore Gateway can host additional tool connectors alongside the Web Search Tool, enabling multi-tool agents.
 - **Full control over prompting**: Search results are passed as structured context to your model call, giving you control over citation format, answer length, and system prompts.
 
 ## Testing
+
+After deployment, replace `YOUR_API_ID` with the API Gateway ID from the stack output (`ApiEndpoint`):
 
 ```bash
 curl -X POST https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/ask \
   -H "Content-Type: application/json" \
   -d '{"question": "What was announced at AWS Summit NYC 2026?"}'
-```
-
-Or via AWS Lambda directly:
-```bash
-aws lambda invoke --function-name FUNCTION_NAME \
-  --payload '{"body": "{\"question\": \"What is Amazon Aurora DSQL?\"}"}' \
-  --cli-binary-format raw-in-base64-out output.json && cat output.json
 ```
 
 ## Example Response

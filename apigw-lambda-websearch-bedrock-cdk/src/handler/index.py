@@ -1,7 +1,7 @@
 """
 AWS Lambda function that grounds AI responses in live web data.
-Orchestrates Amazon Bedrock AgentCore Web Search for facts, then
-Amazon Bedrock for inference to produce cited, accurate answers.
+Orchestrates the Web Search Tool on Amazon Bedrock AgentCore Gateway for facts,
+then Amazon Bedrock for inference to produce cited, accurate answers.
 """
 
 import json
