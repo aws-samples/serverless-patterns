@@ -63,43 +63,44 @@ Return ONLY the Python code, no explanation. No markdown code fences."""
         )
         session_id = session['sessionId']
 
-        exec_response = agentcore_client.invoke_code_interpreter(
-            codeInterpreterIdentifier=code_interpreter_id,
-            sessionId=session_id,
-            name='executeCode',
-            arguments={
-                'code': generated_code,
-                'language': 'python',
-            },
-        )
+        try:
+            exec_response = agentcore_client.invoke_code_interpreter(
+                codeInterpreterIdentifier=code_interpreter_id,
+                sessionId=session_id,
+                name='executeCode',
+                arguments={
+                    'code': generated_code,
+                    'language': 'python',
+                },
+            )
 
-        # Parse EventStream response
-        result_text = ''
-        error_text = ''
-        event_stream = exec_response.get('body', {})
-        for event in event_stream:
-            if 'chunk' in event:
-                chunk = event['chunk']
-                sc = chunk.get('structuredContent', {})
-                if sc.get('stdout'):
-                    result_text += sc['stdout']
-                if sc.get('stderr'):
-                    error_text += sc['stderr']
-            elif 'result' in event:
-                r = event['result']
-                sc = r.get('structuredContent', {})
-                if sc.get('stdout'):
-                    result_text += sc['stdout']
-                if sc.get('stderr'):
-                    error_text += sc['stderr']
+            # Parse EventStream response
+            result_text = ''
+            error_text = ''
+            event_stream = exec_response.get('body', {})
+            for event in event_stream:
+                if 'chunk' in event:
+                    chunk = event['chunk']
+                    sc = chunk.get('structuredContent', {})
+                    if sc.get('stdout'):
+                        result_text += sc['stdout']
+                    if sc.get('stderr'):
+                        error_text += sc['stderr']
+                elif 'result' in event:
+                    r = event['result']
+                    sc = r.get('structuredContent', {})
+                    if sc.get('stdout'):
+                        result_text += sc['stdout']
+                    if sc.get('stderr'):
+                        error_text += sc['stderr']
 
-        stdout = result_text or 'Code executed successfully (no stdout output)'
-        stderr = error_text
-
-        agentcore_client.stop_code_interpreter_session(
-            codeInterpreterIdentifier=code_interpreter_id,
-            sessionId=session_id,
-        )
+            stdout = result_text or 'Code executed successfully (no stdout output)'
+            stderr = error_text
+        finally:
+            agentcore_client.stop_code_interpreter_session(
+                codeInterpreterIdentifier=code_interpreter_id,
+                sessionId=session_id,
+            )
 
         return {
             'statusCode': 200,

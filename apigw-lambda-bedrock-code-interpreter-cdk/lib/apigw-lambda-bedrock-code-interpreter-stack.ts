@@ -4,6 +4,7 @@ import * as agentcore from 'aws-cdk-lib/aws-bedrockagentcore';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as logs from 'aws-cdk-lib/aws-logs';
 
 export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -22,6 +23,7 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src/handler'),
       timeout: cdk.Duration.seconds(29),
+      logRetention: logs.RetentionDays.ONE_WEEK,
       environment: {
         CODE_INTERPRETER_ID: (codeInterpreter.node.defaultChild as cdk.CfnResource).ref,
         MODEL_ID: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',

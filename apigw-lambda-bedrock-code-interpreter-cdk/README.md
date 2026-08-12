@@ -45,7 +45,12 @@ Neither Amazon Bedrock nor Amazon Bedrock AgentCore Code Interpreter alone can s
     npm install
     ```
 
-3. Deploy the stack:
+3. Build the project:
+    ```bash
+    npm run build
+    ```
+
+4. Deploy the stack:
     ```bash
     cdk deploy
     ```
