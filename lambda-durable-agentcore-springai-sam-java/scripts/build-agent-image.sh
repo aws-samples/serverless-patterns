@@ -82,7 +82,7 @@ cat <<EOF
 
 ==> Done.
 
-Image: ${IMAGE_URI}:${TAG}
+AgentImageUri: ${IMAGE_URI}:${TAG}
 
 Deploy with:
 
