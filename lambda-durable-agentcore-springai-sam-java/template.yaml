@@ -25,7 +25,7 @@ Parameters:
 
   BedrockModelId:
     Type: String
-    Default: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+    Default: us.anthropic.claude-sonnet-5
     Description: Bedrock model (or inference profile) the Spring AI agent calls.
 
 Resources:
@@ -68,8 +68,14 @@ Resources:
                   - bedrock:Converse
                   - bedrock:ConverseStream
                 Resource:
-                  - !Sub 'arn:${AWS::Partition}:bedrock:*::foundation-model/*'
-                  - !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                  # Foundation model ARNs have no account ID (AWS-owned resources, not
+                  # customer-owned), so the account segment must be wildcarded. The region
+                  # is also wildcarded because cross-region inference profiles route across
+                  # regions internally. Scoped to Anthropic models only.
+                  - !Sub 'arn:${AWS::Partition}:bedrock:*::foundation-model/anthropic.*'
+                  # Inference profiles are customer-account resources, so the account ID
+                  # can be pinned. Scoped to us.anthropic.* cross-region profiles.
+                  - !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.anthropic.*'
               - Sid: PullAgentImage
                 Effect: Allow
                 Action:

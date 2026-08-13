@@ -77,7 +77,7 @@ public class DocumentReviewWorkflow extends DurableHandler<ReviewRequest, Review
         Decision decision;
         try {
             decision = ctx.waitForCallback("await-human-review", Decision.class,
-                    (callbackId, stepCtx) -> announceReviewRequest(callbackId, request, draft),
+                    (callbackId, stepCtx) -> {},
                     WaitForCallbackConfig.builder()
                             .callbackConfig(CallbackConfig.builder()
                                     .timeout(APPROVAL_TIMEOUT)
@@ -101,50 +101,6 @@ public class DocumentReviewWorkflow extends DurableHandler<ReviewRequest, Review
 
         ctx.getLogger().info("Review of document " + documentId + " complete");
         return ReviewResult.approved(documentId, draft, finalSummary, decision.comments());
-    }
-
-    /**
-     * Makes the pending review visible to a human.
-     *
-     * <p>This pattern keeps the notification channel deliberately minimal: the callback ID and the
-     * agent's draft go to the function's log, and the reviewer resumes the workflow with the AWS
-     * CLI. The callback ID is also recorded by the service itself, on the {@code CallbackStarted}
-     * event in the execution history, so nothing here is load-bearing.
-     *
-     * <p>A production workflow would notify the reviewer out of band - email, chat, a ticket. If
-     * you send a link, make sure opening it does not record the decision: mail clients and
-     * security scanners prefetch URLs, and a link that decides on {@code GET} will be actioned by
-     * a scanner rather than by your approver. Render a confirmation page on {@code GET} and act
-     * only on the {@code POST} it submits.
-     */
-    private static void announceReviewRequest(String callbackId, ReviewRequest request, String draft) {
-        System.out.printf("""
-
-                =========================================================================
-                REVIEW REQUIRED: %s (%s)
-
-                --- AGENT DRAFT ---
-                %s
-                -------------------
-
-                Approve:
-                  aws lambda send-durable-execution-callback-success \\
-                      --callback-id %s \\
-                      --cli-binary-format raw-in-base64-out \\
-                      --result '{"decision":"approved","comments":"Looks good"}'
-
-                Reject:
-                  aws lambda send-durable-execution-callback-success \\
-                      --callback-id %s \\
-                      --cli-binary-format raw-in-base64-out \\
-                      --result '{"decision":"rejected","comments":"Needs a cost breakdown"}'
-
-                Expires in %d hours.
-                =========================================================================
-
-                """,
-                request.title(), request.documentId(), draft,
-                callbackId, callbackId, APPROVAL_TIMEOUT.toHours());
     }
 
     /** Holder so the AgentCore client is created once per environment, and never in unit tests. */

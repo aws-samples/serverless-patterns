@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed, **version 1.161.0 or later**
 * [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) and [Apache Maven](https://maven.apache.org/install.html) 3.9 or later
 * [Docker](https://docs.docker.com/get-docker/), [Finch](https://runfinch.com/), nerdctl or Podman, to build the agent container image
-* An Amazon Bedrock model available in the target Region. The default is `us.anthropic.claude-sonnet-4-5-20250929-v1:0`. Check availability with `aws bedrock get-foundation-model-availability --model-id <id> --region <region>`; if it reports anything other than `AUTHORIZED`, enable it under **Model access** in the Amazon Bedrock console.
+* An Amazon Bedrock model available in the target Region. The default is `us.anthropic.claude-sonnet-5`. Check availability with `aws bedrock get-foundation-model-availability --model-id <id> --region <region>`; if it reports anything other than `AUTHORIZED`, enable it under **Model access** in the Amazon Bedrock console.
 
 ## Deployment Instructions
 
@@ -93,17 +93,20 @@ The name is how replay matches a new invocation to previously checkpointed state
 
 ```java
 Decision decision = ctx.waitForCallback("await-human-review", Decision.class,
-        (callbackId, stepCtx) -> announceReviewRequest(callbackId, request, draft),
+        (callbackId, stepCtx) -> {},
         WaitForCallbackConfig.builder()
                 .callbackConfig(CallbackConfig.builder()
                         .timeout(Duration.ofHours(24))
                         .build())
+                .stepConfig(StepConfig.builder()
+                        .retryStrategy(RetryStrategies.fixedDelay(3, Duration.ofSeconds(30)))
+                        .build())
                 .build());
 ```
 
-Note that `WaitForCallbackConfig` nests a `CallbackConfig` rather than taking a timeout directly. Because the submitter runs as a step, the SDK retries it if it fails.
+`WaitForCallbackConfig` nests a `CallbackConfig` (for the callback wait timeout) and an optional `StepConfig` (for the submitter step). The submitter runs as a durable step, so the SDK automatically retries transient failures. The `StepConfig` above makes that explicit: up to 3 attempts, 30 seconds apart. `RetryStrategies` also provides `linearBackoff` and `exponentialBackoff` for more sophisticated policies.
 
-To keep the pattern focused, the submitter simply writes the callback ID and the agent's draft to the function log, and you resume the workflow with the AWS CLI. A production workflow would notify the reviewer out of band - email, chat, a ticket.
+To keep the pattern focused, the submitter is empty — the callback ID is retrieved from the execution history (see Testing below), and you resume the workflow with the AWS CLI. A production workflow would use the submitter to notify the reviewer out of band: email, chat, a ticket.
 
 If you add a notification with an approval link, do not let the link itself record the decision. Mail clients and security scanners prefetch URLs, so a `GET` that decides will be actioned by a scanner rather than by your approver. Render a confirmation page on `GET` and act only on the `POST` it submits.
 
@@ -150,7 +153,7 @@ Note that the AgentCore starter is a community project under `org.springaicommun
 The durable execution SDK ships an in-memory test runner, so all three outcomes can be verified with no AWS account:
 
 ```bash
-cd orchestrator && mvn test
+cd orchestrator && mvn test && cd ..
 ```
 
 These drive the workflow through approve, reject and timeout, and assert that the agent's analyze step runs exactly once even though the handler body executes again after the callback resumes it - that is, that replay really does skip completed work.
@@ -181,6 +184,8 @@ ARN=$(aws lambda list-durable-executions-by-function \
     --region <your-region> \
     --durable-execution-name review-001 \
     --query 'DurableExecutions[0].DurableExecutionArn' --output text)
+# Note: use the unqualified function name here (no :live suffix).
+# Passing a qualifier together with --durable-execution-name causes an InvalidParameterValueException.
 
 aws lambda get-durable-execution-history \
     --durable-execution-arn "$ARN" \
@@ -196,11 +201,13 @@ aws lambda get-durable-execution --durable-execution-arn "$ARN" \
     --region <your-region> --query 'Status' --output text
 ```
 
-The agent's draft is also printed to the function log, along with ready-to-paste approve and reject commands:
+To read the agent's draft while the execution is suspended, check the function log:
 
 ```bash
-sam logs --stack-name <your-stack-name> --region <your-region> --tail
+sam logs --stack-name <your-stack-name> --region <your-region>
 ```
+
+Or read it from the completed execution result after approving or rejecting (see **Read the result** below).
 
 ### Approve
 
@@ -291,6 +298,6 @@ This needs AWS credentials in the shell, because the agent calls Amazon Bedrock.
 
 ----
 
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
