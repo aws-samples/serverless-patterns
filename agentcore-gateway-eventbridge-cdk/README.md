@@ -23,7 +23,15 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-## Why Gateway over direct SDK?
+## Why route through AgentCore Gateway instead of calling EventBridge directly?
+
+In a mesh of tens or hundreds of agents, Gateway acts as a governed chokepoint between agent reasoning and infrastructure side effects. Three properties make it worth the extra hop:
+
+- **Policy-based access control** — Cedar policies attached to the Gateway evaluate every tool call against its input before it reaches the Lambda target. You can restrict which agents emit which event types, or block specific `detail_type` values during a production freeze, without redeploying any agent.
+- **Per-caller rate limiting** — set different throughput budgets per agent identity so a misbehaving agent can't flood the bus while high-priority agents keep running.
+- **Single IAM blast radius** — only the Gateway's Lambda backend holds `events:PutEvents`. Agents authenticate with scoped, revocable credentials (JWT or IAM/SigV4), and the Gateway centrally logs every tool invocation for audit.
+
+The tradeoff is roughly 200ms of added latency per emission — negligible for asynchronous event-driven workflows, and often more than offset by removing per-agent IAM churn as the mesh grows.
 
 | Concern | Direct SDK | Via AgentCore Gateway |
 |---------|-----------|----------------------|
