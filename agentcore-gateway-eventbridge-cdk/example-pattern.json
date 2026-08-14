@@ -4,6 +4,54 @@
   "language": "TypeScript",
   "level": "300",
   "framework": "CDK",
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "bedrock",
+      "label": "AgentCore Runtime"
+    },
+    "icon2": {
+      "x": 35,
+      "y": 20,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    },
+    "icon3": {
+      "x": 40,
+      "y": 50,
+      "service": "bedrock",
+      "label": "AgentCore Gateway"
+    },
+    "icon4": {
+      "x": 70,
+      "y": 50,
+      "service": "lambda",
+      "label": "emit_event Lambda"
+    },
+    "icon5": {
+      "x": 95,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon1",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon3",
+      "to": "icon4"
+    },
+    "line4": {
+      "from": "icon4",
+      "to": "icon5"
+    }
+  },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -57,7 +105,8 @@
     "headline": "Testing",
     "text": [
       "See the GitHub repo README.md for detailed testing instructions.",
-      "Invoke the agent with a prompt asking it to use emit_event, then check the Runtime's CloudWatch Logs for a 200 OK from the Gateway and the EventBridge event ID."
+      "Sample invocation payload: {\"prompt\":\"Use the emit_event tool to emit an event with source=agent.claims-processor, detail_type=ClaimApproved, detail={claimId: CLM-001, decision: approved, confidence: 0.94}\"}",
+      "After invoking, check the Runtime's CloudWatch Logs for a 200 OK from the Gateway MCP endpoint and the EventBridge event ID returned by the Lambda."
     ]
   },
   "cleanup": {
