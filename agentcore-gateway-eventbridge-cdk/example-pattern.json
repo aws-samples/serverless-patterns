@@ -1,6 +1,6 @@
 {
   "title": "Amazon Bedrock AgentCore Runtime to Amazon EventBridge via AgentCore Gateway",
-  "description": "An AI agent on AgentCore Runtime emits business events to EventBridge through a governed AgentCore Gateway MCP tool, with schema validation and fan-out to DynamoDB and SNS.",
+  "description": "An AI agent on AgentCore Runtime emits business events to EventBridge through a governed AgentCore Gateway MCP tool, authenticated with IAM SigV4.",
   "language": "TypeScript",
   "level": "300",
   "framework": "CDK",
@@ -8,11 +8,10 @@
     "headline": "How it works",
     "text": [
       "This pattern shows an AI agent emitting structured business events to Amazon EventBridge through a governed Amazon Bedrock AgentCore Gateway MCP tool.",
-      "The agent runs on AgentCore Runtime and connects to the Gateway using the MCP Streamable HTTP transport (2025-03-26 spec). The Gateway exposes an emit_event tool backed by an AWS Lambda function.",
-      "When the agent decides to emit an event, it calls emit_event with a source, detail type, and payload. The Lambda validates the source prefix (only agent.* allowed) and publishes to EventBridge via PutEvents.",
-      "EventBridge routes agent events to downstream consumers: a DynamoDB table (decision log with 30-day TTL) and an SNS topic (for events with notify=true).",
-      "The Gateway provides governance: the tool schema constrains what the agent can emit, rate limiting prevents abuse, and every invocation is logged automatically. Schema changes require only a Gateway update, not an agent redeploy.",
-      "IAM permissions follow least privilege: the Gateway role can only invoke the specific Lambda, the Lambda can only PutEvents to the specific bus, and the Runtime execution role is scoped to ECR, logs, and Bedrock model access."
+      "The agent runs on AgentCore Runtime and connects to the Gateway using the MCP Streamable HTTP transport (2025-03-26 spec). The Gateway's inbound authorization is AWS_IAM, so every request must carry a valid AWS SigV4 signature for the bedrock-agentcore service.",
+      "No MCP client SDK signs streamable-HTTP requests with SigV4 natively, so this pattern signs requests manually: a small helper wraps botocore's SigV4Auth as an httpx.Auth implementation, passed directly to the MCP client's transport.",
+      "The Gateway exposes an emit_event tool backed by an AWS Lambda function. When the agent calls emit_event with a source, detail type, and payload, the Lambda validates the source prefix (only agent.* allowed) and publishes to EventBridge via PutEvents.",
+      "IAM permissions follow least privilege: the Runtime execution role has bedrock-agentcore:InvokeGateway scoped to the specific Gateway ARN, the Gateway role can only invoke the specific Lambda, and the Lambda can only PutEvents to the specific bus."
     ]
   },
   "gitHub": {
@@ -28,6 +27,10 @@
       {
         "text": "Amazon Bedrock AgentCore Gateway",
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "Set up inbound authorization for your gateway (IAM/SigV4)",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-inbound-auth.html"
       },
       {
         "text": "Amazon Bedrock AgentCore Runtime",
@@ -54,7 +57,7 @@
     "headline": "Testing",
     "text": [
       "See the GitHub repo README.md for detailed testing instructions.",
-      "Invoke the agent with a prompt asking it to use emit_event, then verify the event in DynamoDB: aws dynamodb scan --table-name agent-decision-log --region us-east-1"
+      "Invoke the agent with a prompt asking it to use emit_event, then check the Runtime's CloudWatch Logs for a 200 OK from the Gateway and the EventBridge event ID."
     ]
   },
   "cleanup": {

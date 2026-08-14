@@ -2,9 +2,13 @@
 Strands Agent on AgentCore Runtime that connects to an AgentCore Gateway
 to discover and use the emit_event MCP tool.
 
-The agent connects to the Gateway using the Streamable HTTP MCP transport.
-Authentication: authorizerType=NONE on the Gateway trusts callers within
-the same account via the AgentCore platform's workload identity.
+The agent connects to the Gateway using the MCP Streamable HTTP transport.
+Authentication: the Gateway's authorizerType is AWS_IAM, so every MCP
+request must be signed with SigV4 (service "bedrock-agentcore"). The
+Runtime's execution role is granted bedrock-agentcore:InvokeGateway
+scoped to this Gateway's ARN. See sigv4.py for the signing implementation
+— no MCP client SDK signs streamable-HTTP requests natively, so this is
+done manually by wrapping botocore's SigV4Auth as an httpx.Auth.
 """
 import os
 import logging
@@ -14,19 +18,23 @@ from strands import Agent
 from strands.tools.mcp import MCPClient
 from mcp.client.streamable_http import streamablehttp_client
 
+from sigv4 import SigV4HTTPXAuth
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = BedrockAgentCoreApp()
 
 GATEWAY_URL = os.environ.get("GATEWAY_MCP_URL", "")
+AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
 
 
 def create_mcp_client():
-    """Create a fresh MCP client instance per invocation."""
+    """Create a fresh, SigV4-authenticated MCP client per invocation."""
     if not GATEWAY_URL:
         return None
-    return MCPClient(lambda: streamablehttp_client(GATEWAY_URL))
+    sigv4_auth = SigV4HTTPXAuth(region=AWS_REGION)
+    return MCPClient(lambda: streamablehttp_client(GATEWAY_URL, auth=sigv4_auth))
 
 
 @app.entrypoint

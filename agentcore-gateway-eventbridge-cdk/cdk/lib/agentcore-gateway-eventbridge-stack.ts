@@ -1,13 +1,10 @@
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as bedrockagentcore from 'aws-cdk-lib/aws-bedrockagentcore';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as events from 'aws-cdk-lib/aws-events';
-import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as sns from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
 
 /**
@@ -19,7 +16,6 @@ import { Construct } from 'constructs';
  * Flow:
  *   Strands Agent (Runtime) → emit_event tool (Gateway MCP, Streamable HTTP)
  *     → Lambda tool backend → events:PutEvents → Custom Bus
- *       → Fan-out rules → DynamoDB (decision log) + SNS (notifications)
  *
  * Why Gateway over direct SDK:
  * - Governance: Gateway tool definition constrains allowed event schemas
@@ -29,12 +25,15 @@ import { Construct } from 'constructs';
  * - Multi-agent consistency: All agents use the same governed tool
  *
  * Auth model:
- * - Runtime → Gateway: authorizerType=NONE (same-account trust via
- *   AgentCore workload identity). The Gateway and Runtime are both
- *   managed by AgentCore within the same account.
+ * - Runtime → Gateway: authorizerType=AWS_IAM (SigV4). The Runtime's
+ *   execution role is granted bedrock-agentcore:InvokeGateway scoped to
+ *   this Gateway's ARN. The agent code signs each MCP HTTP request with
+ *   SigV4 (service "bedrock-agentcore") since no MCP client SDK does this
+ *   natively for the streamable-HTTP transport — see agent-code/agent.py.
  * - Runtime invocation (external caller): IAM SigV4 — caller needs
  *   bedrock-agentcore:InvokeAgentRuntime permission.
- * - Gateway → Lambda: Gateway IAM role has lambda:InvokeFunction.
+ * - Gateway → Lambda: Gateway IAM role has lambda:InvokeFunction, scoped
+ *   to the specific Lambda ARN.
  */
 export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -65,7 +64,7 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
     eventBus.grantPutEventsTo(emitEventFn);
 
     // -------------------------------------------------------------------
-    // 3. AgentCore Gateway (MCP server with Lambda target)
+    // 3. AgentCore Gateway (MCP server with Lambda target, IAM/SigV4 auth)
     // -------------------------------------------------------------------
     const gatewayRole = new iam.Role(this, 'GatewayRole', {
       assumedBy: new iam.ServicePrincipal('bedrock-agentcore.amazonaws.com', {
@@ -92,7 +91,7 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
 
     const gateway = new bedrockagentcore.CfnGateway(this, 'EventEmitterGateway', {
       name: 'event-emitter-gateway',
-      authorizerType: 'NONE',
+      authorizerType: 'AWS_IAM',
       protocolType: 'MCP',
       protocolConfiguration: {
         mcp: {
@@ -100,7 +99,7 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
         },
       },
       roleArn: gatewayRole.roleArn,
-      description: 'MCP Gateway exposing emit_event tool for agents to publish events to EventBridge',
+      description: 'MCP Gateway (IAM/SigV4 auth) exposing emit_event tool for agents to publish events to EventBridge',
     });
 
     emitEventFn.addPermission('GatewayInvoke', {
@@ -130,7 +129,6 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
                       source: { type: 'string', description: "Event source identifier. Must start with 'agent.'" },
                       detail_type: { type: 'string', description: "Event type (e.g. 'ClaimApproved', 'RiskAssessed')" },
                       detail: { type: 'object', description: 'Event payload with business data' },
-                      notify: { type: 'boolean', description: 'If true, downstream rules also send an SNS notification' },
                     },
                     required: ['source', 'detail_type', 'detail'],
                   },
@@ -170,6 +168,11 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
             new iam.PolicyStatement({ actions: ['cloudwatch:PutMetricData'], resources: ['*'], conditions: { StringEquals: { 'cloudwatch:namespace': 'bedrock-agentcore' } } }),
             new iam.PolicyStatement({ sid: 'GetAgentAccessToken', actions: ['bedrock-agentcore:GetWorkloadAccessToken', 'bedrock-agentcore:GetWorkloadAccessTokenForJWT', 'bedrock-agentcore:GetWorkloadAccessTokenForUserId'], resources: [`arn:aws:bedrock-agentcore:${this.region}:${this.account}:workload-identity-directory/default`, `arn:aws:bedrock-agentcore:${this.region}:${this.account}:workload-identity-directory/default/workload-identity/${agentRuntimeName}-*`] }),
             new iam.PolicyStatement({ sid: 'BedrockModelInvocation', actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'], resources: ['arn:aws:bedrock:*::foundation-model/*', `arn:aws:bedrock:${this.region}:${this.account}:*`] }),
+            new iam.PolicyStatement({
+              sid: 'InvokeGateway',
+              actions: ['bedrock-agentcore:InvokeGateway'],
+              resources: [gateway.attrGatewayArn],
+            }),
           ],
         }),
       },
@@ -184,66 +187,13 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
     });
 
     // -------------------------------------------------------------------
-    // 5. Downstream Consumers (fan-out from EventBridge)
-    // -------------------------------------------------------------------
-    const decisionLog = new dynamodb.Table(this, 'AgentDecisionLog', {
-      tableName: 'agent-decision-log',
-      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      timeToLiveAttribute: 'ttl',
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
-    const notifyTopic = new sns.Topic(this, 'AgentNotifyTopic', {
-      topicName: 'agent-event-notifications',
-    });
-
-    const allAgentEventsRule = new events.Rule(this, 'AllAgentEventsRule', {
-      ruleName: 'agent-events-to-dynamodb',
-      eventBus,
-      eventPattern: { source: [{ prefix: 'agent.' }] as any },
-    });
-
-    const logWriterFn = new lambda.Function(this, 'LogWriterFunction', {
-      functionName: 'agent-decision-log-writer',
-      runtime: lambda.Runtime.PYTHON_3_12,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-import boto3, json, time, os
-table = boto3.resource('dynamodb').Table(os.environ['TABLE_NAME'])
-def handler(event, ctx):
-    table.put_item(Item={
-        'pk': f"{event['source']}#{event['detail-type']}",
-        'sk': event['time'],
-        'detail': json.dumps(event['detail']),
-        'eventId': event['id'],
-        'ttl': int(time.time()) + 30*86400
-    })
-    return {'statusCode': 200}
-`),
-      environment: { TABLE_NAME: decisionLog.tableName },
-      timeout: cdk.Duration.seconds(10),
-    });
-    decisionLog.grantWriteData(logWriterFn);
-    allAgentEventsRule.addTarget(new eventsTargets.LambdaFunction(logWriterFn));
-
-    const notifyRule = new events.Rule(this, 'NotifyRule', {
-      ruleName: 'agent-notify-events-to-sns',
-      eventBus,
-      eventPattern: { source: [{ prefix: 'agent.' }] as any, detail: { notify: [true] } },
-    });
-    notifyRule.addTarget(new eventsTargets.SnsTopic(notifyTopic));
-
-    // -------------------------------------------------------------------
     // Outputs
     // -------------------------------------------------------------------
     new cdk.CfnOutput(this, 'GatewayUrl', { value: gateway.attrGatewayUrl, description: 'AgentCore Gateway MCP endpoint URL' });
     new cdk.CfnOutput(this, 'GatewayId', { value: gateway.attrGatewayIdentifier, description: 'Gateway identifier' });
+    new cdk.CfnOutput(this, 'GatewayArn', { value: gateway.attrGatewayArn, description: 'Gateway ARN' });
     new cdk.CfnOutput(this, 'AgentRuntimeId', { value: agentRuntime.attrAgentRuntimeId, description: 'AgentCore Runtime ID' });
     new cdk.CfnOutput(this, 'AgentRuntimeArn', { value: agentRuntime.attrAgentRuntimeArn, description: 'AgentCore Runtime ARN (use for SigV4 invocation)' });
     new cdk.CfnOutput(this, 'EventBusName', { value: eventBus.eventBusName, description: 'EventBridge custom bus for agent-emitted events' });
-    new cdk.CfnOutput(this, 'DecisionLogTableName', { value: decisionLog.tableName, description: 'DynamoDB table storing agent decision log' });
-    new cdk.CfnOutput(this, 'NotifyTopicArn', { value: notifyTopic.topicArn, description: 'SNS topic for agent event notifications' });
   }
 }
