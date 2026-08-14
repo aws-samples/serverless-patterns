@@ -25,20 +25,17 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Why route through AgentCore Gateway instead of calling EventBridge directly?
 
-In a mesh of tens or hundreds of agents, Gateway acts as a governed chokepoint between agent reasoning and infrastructure side effects. Three properties make it worth the extra hop:
+In a mesh of many agents, Gateway is a governed chokepoint between agent reasoning and infrastructure side effects:
 
-- **Policy-based access control** — Cedar policies attached to the Gateway evaluate every tool call against its input before it reaches the Lambda target. You can restrict which agents emit which event types, or block specific `detail_type` values during a production freeze, without redeploying any agent.
-- **Per-caller rate limiting** — set different throughput budgets per agent identity so a misbehaving agent can't flood the bus while high-priority agents keep running.
-- **Single IAM blast radius** — only the Gateway's Lambda backend holds `events:PutEvents`. Agents authenticate with scoped, revocable credentials (JWT or IAM/SigV4), and the Gateway centrally logs every tool invocation for audit.
+- **Single point of schema enforcement** — one tool definition constrains what every agent in the mesh can emit.
+- **Centralized rate limiting across the fleet** — throughput budgets are enforced at the Gateway, not per agent.
+- **Blast radius containment** — only the Gateway's backend touches EventBridge; a misbehaving agent can't take down the bus.
+- **Credential isolation** — agents authenticate with scoped, revocable identities
+- **Tool discovery in the mesh** — agents find the `emit_event` capability over MCP without any hardcoded SDK dependency.
+- **Observability without per-agent instrumentation** — every tool invocation is logged centrally, out of the box.
+- **Policy evolution without redeployment** — schema tightening, freezes, or scope changes ship at the Gateway, not in agent code.
 
-The tradeoff is roughly 200ms of added latency per emission — negligible for asynchronous event-driven workflows, and often more than offset by removing per-agent IAM churn as the mesh grows.
-
-| Concern | Direct SDK | Via AgentCore Gateway |
-|---------|-----------|----------------------|
-| Governance | Agent can emit any event schema | Gateway tool definition constrains allowed schemas |
-| Observability | Must instrument yourself | Gateway logs every tool invocation automatically |
-| Schema evolution | Redeploy agent container to change | Update Gateway tool definition only |
-| Multi-agent consistency | Each agent implements PutEvents differently | All agents use the same governed tool |
+The tradeoff is added network latency per emission, which is generally negligible for asynchronous event-driven workflows.
 
 ## How it works
 
