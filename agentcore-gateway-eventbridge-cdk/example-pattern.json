@@ -1,0 +1,71 @@
+{
+  "title": "Amazon Bedrock AgentCore Runtime to Amazon EventBridge via AgentCore Gateway",
+  "description": "An AI agent on AgentCore Runtime emits business events to EventBridge through a governed AgentCore Gateway MCP tool, with schema validation and fan-out to DynamoDB and SNS.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows an AI agent emitting structured business events to Amazon EventBridge through a governed Amazon Bedrock AgentCore Gateway MCP tool.",
+      "The agent runs on AgentCore Runtime and connects to the Gateway using the MCP Streamable HTTP transport (2025-03-26 spec). The Gateway exposes an emit_event tool backed by an AWS Lambda function.",
+      "When the agent decides to emit an event, it calls emit_event with a source, detail type, and payload. The Lambda validates the source prefix (only agent.* allowed) and publishes to EventBridge via PutEvents.",
+      "EventBridge routes agent events to downstream consumers: a DynamoDB table (decision log with 30-day TTL) and an SNS topic (for events with notify=true).",
+      "The Gateway provides governance: the tool schema constrains what the agent can emit, rate limiting prevents abuse, and every invocation is logged automatically. Schema changes require only a Gateway update, not an agent redeploy.",
+      "IAM permissions follow least privilege: the Gateway role can only invoke the specific Lambda, the Lambda can only PutEvents to the specific bus, and the Runtime execution role is scoped to ECR, logs, and Bedrock model access."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-gateway-eventbridge-cdk",
+      "templateURL": "serverless-patterns/agentcore-gateway-eventbridge-cdk",
+      "projectFolder": "agentcore-gateway-eventbridge-cdk",
+      "templateFile": "cdk/lib/agentcore-gateway-eventbridge-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Runtime",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html"
+      },
+      {
+        "text": "MCP Streamable HTTP Transport",
+        "link": "https://modelcontextprotocol.io/specification/2025-03-26/basic/transports"
+      },
+      {
+        "text": "Amazon EventBridge PutEvents",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo README.md for detailed testing instructions.",
+      "Invoke the agent with a prompt asking it to use emit_event, then verify the event in DynamoDB: aws dynamodb scan --table-name agent-decision-log --region us-east-1"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": ["cd cdk", "cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Antoine Boucherie",
+      "bio": "Principal Solutions Architect, AWS Global Financial Services",
+      "linkedin": "antoineboucherie"
+    }
+  ]
+}
