@@ -7,9 +7,9 @@ set -euo pipefail
 # ============================================================
 
 REGION="us-east-1"
-GATEWAY_ID="smithy-bedrock-gateway-8oh0kf7tje"
-COGNITO_USER_POOL_ID="us-east-1_UNquXQKHg"
-COGNITO_CLIENT_ID="2j56oaad81l9nid0lssick0tsl"
+GATEWAY_ID="smithy-bedrock-gateway-jylket9fcr"
+COGNITO_USER_POOL_ID="us-east-1_99yGKwJQs"
+COGNITO_CLIENT_ID="6i16fr1o98ggd8a54f2fgrj6ki"
 LAMBDA_FUNCTION_NAME="agentcore-smithy-bedrock-AgentFunction"
 TEST_USERNAME="testuser"
 TEST_PASSWORD="TestPass123!"
@@ -24,7 +24,6 @@ echo "Lambda: ${LAMBDA_FUNCTION_NAME}"
 echo "Prompt: ${PROMPT}"
 echo ""
 
-# Authenticate with Cognito
 echo ">>> Authenticating with Cognito..."
 AUTH_RESULT=$(aws cognito-idp initiate-auth \
     --auth-flow USER_PASSWORD_AUTH \
@@ -37,7 +36,6 @@ AUTH_RESULT=$(aws cognito-idp initiate-auth \
 ID_TOKEN="${AUTH_RESULT}"
 echo "Authentication successful."
 
-# Build the Lambda payload
 PAYLOAD_FILE="/tmp/test-payload-$$.json"
 rm -f "${PAYLOAD_FILE}"
 cat > "${PAYLOAD_FILE}" << PAYLOAD_INNER_EOF
@@ -51,7 +49,6 @@ cat > "${PAYLOAD_FILE}" << PAYLOAD_INNER_EOF
 }
 PAYLOAD_INNER_EOF
 
-# Invoke the Lambda function
 echo ""
 echo ">>> Invoking Lambda function..."
 OUTPUT_FILE="/tmp/test-output-$$.json"
@@ -69,7 +66,6 @@ echo ">>> Response:"
 cat "${OUTPUT_FILE}"
 echo ""
 
-# Cleanup
 rm -f "${PAYLOAD_FILE}" "${OUTPUT_FILE}"
 
 echo ""

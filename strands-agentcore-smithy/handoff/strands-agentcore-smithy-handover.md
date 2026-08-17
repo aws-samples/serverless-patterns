@@ -80,7 +80,7 @@ The script:
 | `SmithyTarget` | `AWS::BedrockAgentCore::GatewayTarget` | Smithy model target pointing to Bedrock Runtime via S3 |
 | `CognitoUserPool` | `AWS::Cognito::UserPool` | User authentication |
 | `CognitoUserPoolClient` | `AWS::Cognito::UserPoolClient` | Client for USER_PASSWORD_AUTH flow |
-| `AgentLambdaFunction` | `AWS::Lambda::Function` | Strands SDK agent (Python 3.12, x86_64) |
+| `AgentLambdaFunction` | `AWS::Lambda::Function` | Strands SDK agent (Python 3.13, x86_64) |
 | `AgentLambdaRole` | `AWS::IAM::Role` | Lambda execution role (Bedrock + AgentCore + Logs) |
 | `GatewayExecutionRole` | `AWS::IAM::Role` | Gateway role (4 ARN patterns + Bedrock Runtime + S3) |
 
@@ -117,7 +117,7 @@ All code in `src/agent/` and `src/shared/` connects via MCP and doesn't referenc
 ## Prerequisites
 
 - AWS CLI v2
-- Python 3.12+
+- Python 3.13+
 - pip3
 - AWS account with Bedrock and AgentCore enabled in `us-east-1`
 - Bedrock model access for Claude 3 Sonnet and Claude 3 Haiku

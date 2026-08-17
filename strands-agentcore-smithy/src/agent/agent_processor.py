@@ -22,7 +22,7 @@ GATEWAY_URL_ENV = "GATEWAY_URL"
 SYSTEM_PROMPT = """You have access to Bedrock Runtime tools via MCP. Use the Converse tool (not InvokeModel) to call another model.
 
 When using bedrock-runtime-target___Converse:
-- Set modelId to: anthropic.claude-haiku-4-5-20251001-v1:0
+- Set modelId to: us.anthropic.claude-haiku-4-5-20251001-v1:0
 - Set messages to an array with one object: [{"role": "user", "content": [{"text": "YOUR PROMPT HERE"}]}]
 - The content field inside each message must be an array of objects with a "text" key
 - Do NOT set Region, UseFIPS, UseDualStack, or Endpoint

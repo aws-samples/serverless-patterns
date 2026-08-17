@@ -34,7 +34,7 @@ _CfnLoader.add_multi_constructor("!", _cfn_tag_constructor)
 # ---------------------------------------------------------------------------
 
 _TEMPLATE_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "..", "infrastructure", "cloudformation-template.yaml"
+    os.path.dirname(__file__), "..", "..", "infrastructure", "template.yaml"
 )
 
 with open(_TEMPLATE_PATH) as _fh:
@@ -257,10 +257,9 @@ class TestLambdaConfiguration:
                 elif isinstance(actions, list):
                     self.all_actions.extend(actions)
 
-    def test_runtime_python312(self):
-        """Req 5.1: Runtime must be python3.12."""
-        assert self.lambda_props["Runtime"] == "python3.12"
-
+    def test_runtime_python313(self):
+        """Req 5.1: Runtime must be python3.13."""
+        assert self.lambda_props["Runtime"] == "python3.13"
     def test_architecture_x86_64(self):
         """Req 5.1: Architecture must be x86_64."""
         assert "x86_64" in self.lambda_props["Architectures"]

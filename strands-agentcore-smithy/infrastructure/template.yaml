@@ -1,7 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
 Description: >
   AgentCore Smithy Amazon Bedrock Runtime - Serverless AI agent exposing Amazon Bedrock Runtime
   operations through Amazon Bedrock AgentCore Gateway using a Smithy model target.
+  Built and deployed with AWS SAM (Makefile build, no Docker required).
 
 Parameters:
   GatewayName:
@@ -10,7 +12,6 @@ Parameters:
     Description: Name for the AgentCore Gateway
 
 Resources:
-  # ============================================================
   # ============================================================
   # Cognito User Pool and Client
   # ============================================================
@@ -95,7 +96,7 @@ Resources:
                 Action:
                   - s3:GetObject
                 Resource:
-                  - !Sub 'arn:aws:s3:::${AWS::StackName}-smithy-models/*'
+                  - !Sub 'arn:aws:s3:::${AWS::StackName}-smithy-${AWS::AccountId}/*'
 
   # ============================================================
   # AgentCore Gateway
@@ -128,7 +129,7 @@ Resources:
         Mcp:
           SmithyModel:
             S3:
-              Uri: !Sub 's3://${AWS::StackName}-smithy-models/bedrock-runtime-2023-09-30.json'
+              Uri: !Sub 's3://${AWS::StackName}-smithy-${AWS::AccountId}/bedrock-runtime-2023-09-30.json'
 
   # ============================================================
   # Agent Lambda Execution Role
@@ -156,7 +157,7 @@ Resources:
                   - bedrock:Converse
                   - bedrock:ConverseStream
                 Resource:
-                  - !Sub 'arn:aws:bedrock:*::foundation-model/*'
+                  - 'arn:aws:bedrock:*::foundation-model/*'
                   - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
         - PolicyName: AgentCoreAccess
           PolicyDocument:
@@ -184,16 +185,19 @@ Resources:
                   - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-AgentFunction:*'
 
   # ============================================================
-  # Agent Lambda Function
+  # Agent Lambda Function (SAM Serverless Function, Makefile build)
   # ============================================================
   AgentLambdaFunction:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
     Properties:
       FunctionName: !Sub '${AWS::StackName}-AgentFunction'
-      Runtime: python3.12
+      CodeUri: ../
+      Handler: src.agent.handler.lambda_handler
+      Runtime: python3.13
       Architectures:
         - x86_64
-      Handler: src.agent.handler.lambda_handler
       Role: !GetAtt AgentLambdaRole.Arn
       Timeout: 120
       MemorySize: 1024
@@ -204,10 +208,6 @@ Resources:
           COGNITO_USER_POOL_ID: !Ref CognitoUserPool
           COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
           AWS_REGION_NAME: !Ref AWS::Region
-      Code:
-        ZipFile: |
-          def lambda_handler(event, context):
-              return {"statusCode": 200, "body": "Placeholder - deploy script will update with actual code"}
 
 # ============================================================
 # Stack Outputs

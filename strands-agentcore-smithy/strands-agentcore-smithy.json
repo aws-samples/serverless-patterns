@@ -22,7 +22,7 @@
             "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/strands-agentcore-smithy",
             "templateURL": "serverless-patterns/strands-agentcore-smithy",
             "projectFolder": "strands-agentcore-smithy",
-            "templateFile": "infrastructure/cloudformation-template.yaml"
+            "templateFile": "infrastructure/template.yaml"
         }
     },
     "resources": {
