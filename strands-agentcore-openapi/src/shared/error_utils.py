@@ -1,10 +1,17 @@
 """Error handling utilities with retry logic, timeout management, and HTTP status codes."""
 
+import sys
 import time
 import json
 from typing import Callable, Any, Optional, Dict
 from functools import wraps
-import signal
+
+# signal.SIGALRM is only available on Unix; import conditionally so this module
+# loads safely on Windows and Lambda (which enforces its own execution timeout).
+if sys.platform != 'win32':
+    import signal
+else:
+    signal = None  # type: ignore
 
 
 class TimeoutError(Exception):
@@ -151,38 +158,42 @@ def retry_with_backoff(
 
 
 def timeout_wrapper(timeout_seconds: int):
-    """Decorator to add timeout to function execution.
-    
+    """Decorator to add timeout to a function using SIGALRM (Unix/Linux only).
+
+    Note: Lambda enforces its own execution timeout, so this helper is not
+    used in production. It is available for local testing on Unix only.
+    On non-Unix platforms the decorator is a no-op.
+
     Args:
         timeout_seconds: Timeout in seconds
-        
+
     Returns:
         Decorated function
-        
+
     Raises:
-        TimeoutError: If function execution exceeds timeout
+        TimeoutError: If function execution exceeds timeout (Unix only)
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
+            if signal is None or not hasattr(signal, 'SIGALRM'):
+                # Non-Unix platform — run without timeout
+                return func(*args, **kwargs)
+
             def timeout_handler(signum, frame):
-                raise TimeoutError(f"Function {func.__name__} timed out after {timeout_seconds} seconds")
-            
-            # Set up signal handler
+                raise TimeoutError(
+                    f"Function {func.__name__} timed out after {timeout_seconds} seconds"
+                )
+
             old_handler = signal.signal(signal.SIGALRM, timeout_handler)
             signal.alarm(timeout_seconds)
-            
             try:
                 result = func(*args, **kwargs)
             finally:
-                # Restore old handler and cancel alarm
                 signal.alarm(0)
                 signal.signal(signal.SIGALRM, old_handler)
-            
             return result
-        
         return wrapper
-    
     return decorator
 
 

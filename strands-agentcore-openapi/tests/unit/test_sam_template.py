@@ -43,10 +43,11 @@ class TestSamTemplate:
         assert 'WeatherApiKeySecretArn' in params
         assert 'CredentialProviderArn' in params
         assert 'BedrockModelId' in params
+        assert 'BedrockFoundationModelId' in params
 
     def test_default_model_id(self, sam_template):
-        default_model = sam_template['Parameters']['BedrockModelId']['Default']
-        assert default_model == 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
+        assert sam_template['Parameters']['BedrockModelId']['Default'] == 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
+        assert sam_template['Parameters']['BedrockFoundationModelId']['Default'] == 'anthropic.claude-sonnet-4-5-20250929-v1:0'
 
     def test_agent_function_is_serverless(self, sam_template):
         resources = sam_template['Resources']
@@ -66,6 +67,16 @@ class TestSamTemplate:
         assert 'COGNITO_JWKS_URL' in env_vars
         assert 'GATEWAY_ID' in env_vars
         assert 'BEDROCK_MODEL_ID' in env_vars
+
+    def test_bedrock_resource_not_wildcard(self, sam_template):
+        """Bedrock actions must be scoped to specific model ARNs, not '*'."""
+        policies = sam_template['Resources']['AgentFunction']['Properties']['Policies']
+        for policy in policies:
+            for stmt in policy.get('Statement', []):
+                if stmt.get('Sid') == 'BedrockInvoke':
+                    resources = stmt.get('Resource', [])
+                    assert '*' not in resources, "BedrockInvoke must not use wildcard resource"
+                    assert len(resources) >= 2, "Expected inference-profile + foundation-model ARNs"
 
     def test_log_group_retention(self, sam_template):
         resources = sam_template['Resources']

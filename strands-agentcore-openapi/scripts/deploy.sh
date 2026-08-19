@@ -21,6 +21,7 @@ REGION="us-east-1"
 ENVIRONMENT_NAME=""
 WEATHER_API_KEY=""
 MODEL_ID="us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+FOUNDATION_MODEL_ID="anthropic.claude-sonnet-4-5-20250929-v1:0"
 TEMPLATE_FILE="template.yaml"
 CAPABILITIES="CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND"
 
@@ -45,9 +46,13 @@ while [[ $# -gt 0 ]]; do
       MODEL_ID="$2"
       shift 2
       ;;
+    --foundation-model-id)
+      FOUNDATION_MODEL_ID="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown parameter: $1"
-      echo "Usage: $0 --environment-name NAME --weather-api-key KEY [--region REGION] [--model-id MODEL_ID]"
+      echo "Usage: $0 --environment-name NAME --weather-api-key KEY [--region REGION] [--model-id MODEL_ID] [--foundation-model-id FOUNDATION_MODEL_ID]"
       exit 1
       ;;
   esac
@@ -204,6 +209,7 @@ PARAM_OVERRIDES=(
   "EnvironmentName=${ENVIRONMENT_NAME}"
   "WeatherApiKeySecretArn=${WEATHER_SECRET_ARN}"
   "BedrockModelId=${MODEL_ID}"
+  "BedrockFoundationModelId=${FOUNDATION_MODEL_ID}"
 )
 # Only pass CredentialProviderArn when we actually have one — SAM rejects an
 # empty parameter value, and omitting it lets the template default ('') apply,
@@ -246,6 +252,23 @@ cat > deployment/stack_outputs.json << EOF
 }
 EOF
 echo "    Outputs saved to deployment/stack_outputs.json"
+# Note: the generated test password is embedded only in scripts/test.sh (gitignored)
+# and is never written to stack_outputs.json or any tracked file.
+
+# =============================================================================
+# (Optional) Customer-managed KMS key for the WeatherAPI secret
+# =============================================================================
+# By default the secret uses the AWS-managed key (aws/secretsmanager).
+# To use a customer-managed KMS key, create the secret manually:
+#
+#   aws secretsmanager create-secret \
+#     --name "${WEATHER_SECRET_NAME}" \
+#     --secret-string "${WEATHER_API_KEY}" \
+#     --kms-key-id arn:aws:kms:us-east-1:<ACCOUNT>:key/<KEY_ID> \
+#     --region "${REGION}"
+#
+# Then re-run this script — it will update the existing secret value
+# without changing the KMS key association.
 
 # =============================================================================
 # Step 5: Create test user
@@ -254,20 +277,41 @@ echo ""
 echo ">>> Step 5: Creating test user..."
 
 TEST_USERNAME="testuser@example.com"
-TEST_PASSWORD="TestPassword123!"
+# Generate a random password at deploy time — never committed to the repo.
+# Cognito requires: 8+ chars, uppercase, lowercase, digit, special char.
+TEST_PASSWORD="$(python3 -c "
+import secrets, string
+chars = string.ascii_uppercase + string.ascii_lowercase + string.digits + '!@#\$%^&*'
+# Guarantee at least one of each required character class
+pwd = (
+    secrets.choice(string.ascii_uppercase) +
+    secrets.choice(string.ascii_lowercase) +
+    secrets.choice(string.digits) +
+    secrets.choice('!@#\$%^&*') +
+    ''.join(secrets.choice(chars) for _ in range(12))
+)
+# Shuffle so the guaranteed chars aren't always at the front
+import random; lst = list(pwd); random.shuffle(lst); print(''.join(lst))
+")"
 
 if aws cognito-idp admin-get-user \
   --user-pool-id "${USER_POOL_ID}" \
   --username "${TEST_USERNAME}" \
   --region "${REGION}" > /dev/null 2>&1; then
-  echo "    Test user '${TEST_USERNAME}' already exists."
+  echo "    Test user '${TEST_USERNAME}' already exists — resetting password..."
+  aws cognito-idp admin-set-user-password \
+    --user-pool-id "${USER_POOL_ID}" \
+    --username "${TEST_USERNAME}" \
+    --password "${TEST_PASSWORD}" \
+    --permanent \
+    --region "${REGION}" > /dev/null
 else
   echo "    Creating test user '${TEST_USERNAME}'..."
   aws cognito-idp admin-create-user \
     --user-pool-id "${USER_POOL_ID}" \
     --username "${TEST_USERNAME}" \
     --user-attributes Name=email,Value="${TEST_USERNAME}" Name=email_verified,Value=true \
-    --temporary-password "TempPass123!" \
+    --temporary-password "${TEST_PASSWORD}" \
     --message-action SUPPRESS \
     --region "${REGION}" > /dev/null
 

@@ -24,8 +24,15 @@ Parameters:
 
   BedrockModelId:
     Type: String
-    Description: Bedrock model ID for the Agent Lambda
+    Description: Bedrock inference profile ID for the Agent Lambda (e.g. the cross-region inference profile ID)
     Default: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
+
+  BedrockFoundationModelId:
+    Type: String
+    Description: >
+      Underlying foundation model ID (without regional prefix) used to scope
+      IAM permissions to the specific model. Must match the model behind BedrockModelId.
+    Default: 'anthropic.claude-sonnet-4-5-20250929-v1:0'
 
 Conditions:
   HasCredentialProvider: !Not [!Equals [!Ref CredentialProviderArn, '']]
@@ -47,6 +54,9 @@ Resources:
       UserPoolId: !Ref CognitoUserPool
       GenerateSecret: false
       ExplicitAuthFlows:
+        # USER_PASSWORD_AUTH is used for simplicity in the demo test script.
+        # For production, prefer ALLOW_USER_SRP_AUTH (SRP protocol — password
+        # is never sent in plaintext) and update the authentication client.
         - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
 
@@ -61,9 +71,20 @@ Resources:
             Principal:
               Service: bedrock-agentcore.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
       Policies:
+        - PolicyName: GatewayCloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: GatewayLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/bedrock-agentcore/gateways/*'
         - PolicyName: GatewayOutboundAuth
           PolicyDocument:
             Version: '2012-10-17'
@@ -123,6 +144,7 @@ Resources:
         - x86_64
       Timeout: 120
       MemorySize: 1024
+      Tracing: Active
       Environment:
         Variables:
           COGNITO_JWKS_URL: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}/.well-known/jwks.json'
@@ -130,6 +152,12 @@ Resources:
           BEDROCK_MODEL_ID: !Ref BedrockModelId
       Policies:
         - Statement:
+            - Sid: XRayWrite
+              Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: '*'
             - Sid: BedrockInvoke
               Effect: Allow
               Action:
@@ -137,14 +165,22 @@ Resources:
                 - bedrock:InvokeModelWithResponseStream
                 - bedrock:Converse
                 - bedrock:ConverseStream
-              Resource: '*'
+              Resource:
+                # Cross-region inference profile (account-scoped)
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${BedrockModelId}'
+                # Foundation model in each US routing region (not account-scoped)
+                - !Sub 'arn:aws:bedrock:us-east-1::foundation-model/${BedrockFoundationModelId}'
+                - !Sub 'arn:aws:bedrock:us-east-2::foundation-model/${BedrockFoundationModelId}'
+                - !Sub 'arn:aws:bedrock:us-west-2::foundation-model/${BedrockFoundationModelId}'
             - Sid: AgentCoreGatewayRead
               Effect: Allow
               Action:
                 - bedrock-agentcore:ListGatewayTargets
                 - bedrock-agentcore:GetGatewayTarget
                 - bedrock-agentcore:GetGateway
-              Resource: '*'
+              Resource:
+                - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:gateway/${AgentCoreGateway}'
+                - !Sub 'arn:aws:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:gateway/${AgentCoreGateway}/target/*'
 
   AgentFunctionLogGroup:
     Type: AWS::Logs::LogGroup

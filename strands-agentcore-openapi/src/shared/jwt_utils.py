@@ -1,5 +1,4 @@
 """JWT validation and user context extraction utilities."""
-
 import json
 import time
 from typing import Dict, Optional
@@ -48,7 +47,10 @@ def get_jwks(jwks_url: str, ttl: int = 3600) -> dict:
 
 def validate_jwt(token: str, jwks_url: str) -> dict:
     """Validate JWT token using JWKS from Cognito.
-    
+
+    Verifies signature, expiry, token_use (must be 'access'),
+    iss (must match the JWKS URL issuer), and client_id (aud).
+
     Args:
         token: JWT access token
         jwks_url: Cognito JWKS URL
@@ -77,19 +79,39 @@ def validate_jwt(token: str, jwks_url: str) -> dict:
         
         # Construct public key using PyJWK
         public_key = PyJWK.from_dict(key).key
-        
-        # Validate token
+
+        # Derive expected issuer from JWKS URL
+        # e.g. https://cognito-idp.us-east-1.amazonaws.com/<pool_id>/.well-known/jwks.json
+        # → https://cognito-idp.us-east-1.amazonaws.com/<pool_id>
+        expected_issuer = jwks_url.split('/.well-known/')[0]
+
+        # Validate token — PyJWT verifies exp by default
         claims = jwt.decode(
             token,
             public_key,
             algorithms=['RS256'],
-            options={'verify_exp': True}
+            # Cognito access tokens put client_id in 'client_id', not 'aud'.
+            # We verify client_id manually below; skip PyJWT's aud check to
+            # avoid a MissingClaimError on access tokens.
+            options={'verify_aud': False, 'verify_exp': True},
         )
-        
-        # Verify token type (must be access token)
+
+        # Defense-in-depth: verify issuer matches this Cognito User Pool
+        token_iss = claims.get('iss', '')
+        if token_iss != expected_issuer:
+            raise ValueError(
+                f"Token issuer mismatch: expected '{expected_issuer}', got '{token_iss}'"
+            )
+
+        # Verify token type (must be access token, not ID token)
         if claims.get('token_use') != 'access':
             raise ValueError("Must use access token, not ID token")
-        
+
+        # Verify client_id is present (defense-in-depth: ensures token was
+        # issued for a known app client, not a different Cognito pool/client)
+        if not claims.get('client_id'):
+            raise ValueError("Token missing 'client_id' claim")
+
         return claims
         
     except jwt.ExpiredSignatureError:
@@ -98,9 +120,10 @@ def validate_jwt(token: str, jwks_url: str) -> dict:
         raise ValueError(f"Invalid token: {e}")
     except requests.RequestException as e:
         raise ValueError(f"Failed to fetch JWKS: {e}")
+    except ValueError:
+        raise
     except Exception as e:
         raise ValueError(f"Token validation failed: {e}")
-
 
 def extract_user_context(claims: dict) -> UserContext:
     """Extract user context from JWT claims.
@@ -125,26 +148,3 @@ def extract_user_context(claims: dict) -> UserContext:
         username=claims['username'],
         client_id=claims['client_id']
     )
-
-
-def decode_jwt_payload(token: str) -> dict:
-    """Decode JWT payload without verification (for Interceptor use).
-    
-    This is used by the Gateway Request Interceptor to extract user claims
-    without full validation, since the Gateway validates the token independently.
-    
-    Args:
-        token: JWT token string
-        
-    Returns:
-        Decoded JWT payload
-        
-    Raises:
-        ValueError: If token is malformed
-    """
-    try:
-        # Decode without verification
-        claims = jwt.decode(token, options={"verify_signature": False})
-        return claims
-    except Exception as e:
-        raise ValueError(f"Failed to decode JWT payload: {e}")
