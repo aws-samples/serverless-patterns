@@ -1,0 +1,128 @@
+{
+  "title": "Amazon EventBridge to Amazon OpenSearch via Amazon Data Firehose",
+  "description": "Monitor every event flowing through an EventBridge bus in near real time by streaming it to OpenSearch through Amazon Data Firehose, with daily index rotation, payload flattening, and an S3 backup of all documents.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "CDK",
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon2": {
+      "x": 40,
+      "y": 50,
+      "service": "kinesis-firehose",
+      "label": "Amazon Data Firehose"
+    },
+    "icon3": {
+      "x": 40,
+      "y": 15,
+      "service": "lambda",
+      "label": "Transform Lambda"
+    },
+    "icon4": {
+      "x": 75,
+      "y": 50,
+      "service": "opensearch",
+      "label": "Amazon OpenSearch"
+    },
+    "icon5": {
+      "x": 75,
+      "y": 15,
+      "service": "s3",
+      "label": "Amazon S3"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2",
+      "label": "All events"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3",
+      "label": "Flatten"
+    },
+    "line3": {
+      "from": "icon2",
+      "to": "icon4",
+      "label": "Index"
+    },
+    "line4": {
+      "from": "icon2",
+      "to": "icon5",
+      "label": "Backup"
+    }
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern gives you full-text search over every event on an Amazon EventBridge bus, usually within about 60 seconds of the event being emitted. CloudWatch metrics tell you how many events flowed; this tells you what was in them.",
+      "A catch-all EventBridge rule matches every event on a custom bus and sends it to an Amazon Data Firehose delivery stream. The rule pattern matches on a source prefix of an empty string, because every EventBridge event carries a source and an entirely empty pattern is rejected.",
+      "Firehose buffers for 60 seconds or 1 MB, whichever comes first. That buffer is the floor Firehose allows and it sets the end-to-end latency of the pattern.",
+      "Before indexing, a Lambda transform flattens the EventBridge envelope: detail-type is renamed to detail_type so it needs no escaping in queries, and the fields inside detail are promoted to the top level so a dashboard can filter on claimId rather than detail.claimId. Envelope fields win on collision, so a business payload carrying its own source key is indexed as detail_source instead of masking the real event source.",
+      "Documents land in a daily-rotated index, events-YYYY-MM-DD, and every document is also written to an S3 bucket, which makes that bucket an audit trail rather than only a dead letter destination.",
+      "Firehose authenticates to OpenSearch with SigV4 using its delivery role. A managed domain authorizes each request against its own access policy, so the role is granted access on both sides: an identity policy on the role and a domain access policy naming that role as principal."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-firehose-opensearch-cdk",
+      "templateURL": "serverless-patterns/eventbridge-firehose-opensearch-cdk",
+      "projectFolder": "eventbridge-firehose-opensearch-cdk",
+      "templateFile": "cdk/lib/eventbridge-opensearch-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Loading streaming data into Amazon OpenSearch Service with Amazon Data Firehose",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/integrations-fh.html"
+      },
+      {
+        "text": "Amazon Data Firehose data transformation with AWS Lambda",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
+      },
+      {
+        "text": "Amazon EventBridge event patterns",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html"
+      },
+      {
+        "text": "Identity and Access Management in Amazon OpenSearch Service",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html"
+      },
+      {
+        "text": "Audit AWS service events with Amazon EventBridge and Amazon Data Firehose",
+        "link": "https://aws.amazon.com/blogs/big-data/audit-aws-service-events-with-amazon-eventbridge-and-amazon-kinesis-data-firehose/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "npm install",
+      "cdk deploy -c dashboardAccessIp=YOUR_IP/32"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo README.md for detailed testing instructions.",
+      "Emit a test event onto the bus: aws events put-events --entries '[{\"Source\":\"demo.test\",\"DetailType\":\"TestEvent\",\"Detail\":\"{\\\"message\\\":\\\"Hello OpenSearch\\\",\\\"claimId\\\":\\\"CLM-001\\\"}\",\"EventBusName\":\"event-monitor-bus\"}]'",
+      "Wait 60 to 90 seconds for the Firehose buffer to flush, then open the DashboardsUrl from the stack outputs and create an index pattern of events-* with time as the time field."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": ["cd cdk", "cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Antoine Boucherie",
+      "bio": "Principal Solutions Architect, AWS Global Financial Services",
+      "linkedin": "antoineboucherie"
+    }
+  ]
+}
