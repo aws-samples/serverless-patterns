@@ -16,6 +16,8 @@
 #   - Use pip3, never bare pip
 #   - Two steps: --only-binary=:all: against requirements.txt, then --no-deps for
 #     the pure-Python set (--only-binary silently skips pure-Python packages)
+#   - --no-cache-dir ensures the correct python-version wheel is fetched, not a
+#     cached wheel from a different Python version
 #   - Do NOT delete .dist-info directories (OpenTelemetry reads them at runtime)
 #   - Preserve the src/ prefix so src.agent.handler.lambda_handler and
 #     src.mcp_server.handler.lambda_handler resolve
@@ -23,13 +25,13 @@
 build-AgentLambdaFunction:
 	# Step A: binary packages from requirements.txt (manylinux wheels)
 	pip3 install --target "$(ARTIFACTS_DIR)" \
-	  --platform manylinux2014_x86_64 --python-version 3.12 \
-	  --only-binary=:all: -r requirements.txt
-	# Step B: pure-Python packages skipped by --only-binary in Step A
+	  --platform manylinux2014_x86_64 --python-version 3.13 \
+	  --only-binary=:all: --no-cache-dir -r requirements.txt
+	# Step B: pure-Python packages + rpds-py to ensure correct ABI wheel
 	pip3 install --target "$(ARTIFACTS_DIR)" \
-	  --platform manylinux2014_x86_64 --python-version 3.12 \
-	  --only-binary=:all: --no-deps \
-	  requests urllib3 charset-normalizer idna certifi PyJWT cryptography cffi mcp
+	  --platform manylinux2014_x86_64 --python-version 3.13 \
+	  --only-binary=:all: --no-deps --no-cache-dir \
+	  requests urllib3 charset-normalizer idna certifi PyJWT cryptography cffi mcp rpds-py
 	# Copy the src/ tree into the artifact, preserving the src/ prefix so
 	# src.agent.handler.lambda_handler resolves
 	cp -r src "$(ARTIFACTS_DIR)/src"
@@ -37,13 +39,13 @@ build-AgentLambdaFunction:
 build-McpServerLambda:
 	# Step A: binary packages from requirements.txt (manylinux wheels)
 	pip3 install --target "$(ARTIFACTS_DIR)" \
-	  --platform manylinux2014_x86_64 --python-version 3.12 \
-	  --only-binary=:all: -r requirements.txt
-	# Step B: pure-Python packages skipped by --only-binary in Step A
+	  --platform manylinux2014_x86_64 --python-version 3.13 \
+	  --only-binary=:all: --no-cache-dir -r requirements.txt
+	# Step B: pure-Python packages + rpds-py to ensure correct ABI wheel
 	pip3 install --target "$(ARTIFACTS_DIR)" \
-	  --platform manylinux2014_x86_64 --python-version 3.12 \
-	  --only-binary=:all: --no-deps \
-	  requests urllib3 charset-normalizer idna certifi PyJWT cryptography cffi mcp
+	  --platform manylinux2014_x86_64 --python-version 3.13 \
+	  --only-binary=:all: --no-deps --no-cache-dir \
+	  requests urllib3 charset-normalizer idna certifi PyJWT cryptography cffi mcp rpds-py
 	# Copy the src/ tree into the artifact, preserving the src/ prefix so
 	# src.mcp_server.handler.lambda_handler resolves
 	cp -r src "$(ARTIFACTS_DIR)/src"

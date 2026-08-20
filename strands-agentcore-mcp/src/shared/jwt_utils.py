@@ -9,7 +9,7 @@ claim.
 Mandatory rules (see .kiro/steering/project-conventions.md):
     - Accept both token_use: access AND token_use: id
     - Pass verify_aud=False to jwt.decode (Gateway enforces audience)
-    - Extract username from the cognito:username claim (NOT username, NOT sub)
+    - Extract username from 'cognito:username' (ID tokens) or 'username' (access tokens)
 """
 
 import logging
@@ -133,19 +133,24 @@ def validate_token(
 def extract_username(claims: Dict[str, Any]) -> str:
     """Extract the username from JWT claims.
 
-    Uses the 'cognito:username' claim, which is the correct claim for
-    Cognito ID tokens. Does NOT fall back to 'username' or 'sub' claims.
+    Tries 'cognito:username' first (present in Cognito ID tokens), then falls
+    back to 'username' (present in Cognito access tokens). This handles both
+    token types that validate_token accepts (token_use: id and token_use: access).
 
     Args:
         claims: Decoded JWT claims dictionary.
 
     Returns:
-        The username string from the cognito:username claim.
+        The username string.
 
     Raises:
-        JWTValidationError: If the cognito:username claim is missing.
+        JWTValidationError: If neither 'cognito:username' nor 'username' claim
+            is present.
     """
-    username = claims.get("cognito:username")
+    username = claims.get("cognito:username") or claims.get("username")
     if not username:
-        raise JWTValidationError("Missing 'cognito:username' claim in token")
+        raise JWTValidationError(
+            "Missing username claim in token: expected 'cognito:username' "
+            "(ID token) or 'username' (access token)"
+        )
     return username

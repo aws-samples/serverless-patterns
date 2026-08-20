@@ -27,7 +27,7 @@ MAKEFILE_PATH = os.path.join(
 # The pure-Python package set installed in Step B (--no-deps), in order.
 PURE_PYTHON_PACKAGES = [
     "requests", "urllib3", "charset-normalizer", "idna", "certifi",
-    "PyJWT", "cryptography", "cffi", "mcp",
+    "PyJWT", "cryptography", "cffi", "mcp", "rpds-py",
 ]
 
 REQUIRED_TARGETS = ["build-AgentLambdaFunction", "build-McpServerLambda"]
@@ -137,21 +137,21 @@ def test_step_b_no_deps_pure_python_set(target_recipes, target):
 
 
 # ---------------------------------------------------------------------------
-# 4. Both steps target manylinux2014_x86_64 / python 3.12 (Requirement 2.6)
+# 4. Both steps target manylinux2014_x86_64 / python 3.13 (Requirement 2.6)
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("target", REQUIRED_TARGETS)
 def test_platform_and_python_version(target_recipes, target):
-    """Both pip3 steps must pin --platform manylinux2014_x86_64 and 3.12."""
+    """Both pip3 steps must pin --platform manylinux2014_x86_64 and 3.13."""
     text = _recipe_text(target_recipes, target)
     platform_count = text.count("--platform manylinux2014_x86_64")
-    pyversion_count = text.count("--python-version 3.12")
+    pyversion_count = text.count("--python-version 3.13")
     assert platform_count >= 2, (
         f"'{target}' must use --platform manylinux2014_x86_64 in BOTH pip3 "
         f"steps, found {platform_count}"
     )
     assert pyversion_count >= 2, (
-        f"'{target}' must use --python-version 3.12 in BOTH pip3 steps, "
+        f"'{target}' must use --python-version 3.13 in BOTH pip3 steps, "
         f"found {pyversion_count}"
     )
 

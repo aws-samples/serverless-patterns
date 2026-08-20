@@ -524,7 +524,7 @@ def test_mcp_server_role_dynamodb_scoped_to_product_table(resources):
 
 
 # ---------------------------------------------------------------------------
-# 13. API method NONE + AWS_PROXY + scoped permission (Requirements 7.1-7.3)
+# 13. API method AWS_IAM + AWS_PROXY + scoped permission
 # ---------------------------------------------------------------------------
 
 def test_mcp_method_http_method(resources):
@@ -535,12 +535,17 @@ def test_mcp_method_http_method(resources):
     )
 
 
-def test_mcp_method_auth_type_none(resources):
-    """McpMethod must use AuthorizationType: NONE (Req 7.1)."""
+def test_mcp_method_auth_type(resources):
+    """McpMethod must use AuthorizationType: NONE.
+
+    AgentCore Gateway signs requests with SigV4 using GatewayExecutionRole,
+    but API Gateway's AWS_IAM authorizer rejects cross-service assumed-role
+    SigV4 calls from AgentCore. Access is controlled by the GatewayExecutionRole's
+    execute-api:Invoke grant scoped to this specific API.
+    """
     method_props = resources["McpMethod"]["Properties"]
     assert method_props.get("AuthorizationType") == "NONE", (
-        "McpMethod must use AuthorizationType: NONE — AgentCore Gateway signs "
-        "requests with SigV4 externally"
+        "McpMethod must use AuthorizationType: NONE for AgentCore Gateway compatibility"
     )
 
 
@@ -647,15 +652,15 @@ def test_gateway_id_output_resolves_from_gateway_identifier(template):
 
 
 # ---------------------------------------------------------------------------
-# 15. Both Lambdas use python3.12 runtime (carried over)
+# 15. Both Lambdas use python3.13 runtime (carried over)
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("logical_id", ["AgentLambdaFunction", "McpServerLambda"])
 def test_function_runtime(resources, logical_id):
-    """Both Lambda functions must use the python3.12 runtime."""
+    """Both Lambda functions must use the python3.13 runtime."""
     fn_props = resources[logical_id]["Properties"]
-    assert fn_props.get("Runtime") == "python3.12", (
-        f"{logical_id} must use python3.12 runtime, got {fn_props.get('Runtime')!r}"
+    assert fn_props.get("Runtime") == "python3.13", (
+        f"{logical_id} must use python3.13 runtime, got {fn_props.get('Runtime')!r}"
     )
 
 

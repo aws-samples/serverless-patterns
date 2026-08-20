@@ -5,7 +5,7 @@
 # Usage:
 #   ./scripts/deploy.sh
 #
-# Prerequisites: AWS SAM CLI + pip3 (Python 3.12). No Docker required —
+# Prerequisites: AWS SAM CLI + pip3 (Python 3.13). No Docker required —
 # the build is Docker-free via the root Makefile's BuildMethod: makefile
 # targets, which run the two-step pip3 manylinux install during `sam build`.
 #

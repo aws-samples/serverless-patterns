@@ -54,8 +54,6 @@ def configure_logging(
     log_format += " %(name)s - %(message)s"
 
     logging.basicConfig(level=level, format=log_format, force=True)
-    # Enable debug logging for strands to see tool call details
-    logging.getLogger("strands").setLevel(logging.DEBUG)
     return logging.getLogger()
 
 

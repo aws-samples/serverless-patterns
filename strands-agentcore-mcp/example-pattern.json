@@ -1,5 +1,5 @@
 {
-  "title": "Serverless AI Agent with AgentCore MCP Gateway on Lambda",
+  "title": "Agent using MCP server on AWS Lambda through Amazon Bedrock AgentCore Gateway",
   "description": "Strands SDK agent on Lambda routes tool calls via AgentCore Gateway (MCP) to a Lambda MCP Server backed by DynamoDB, with Cognito JWT auth.",
   "language": "Python",
   "level": "300",
@@ -58,20 +58,20 @@
   },
   "deploy": {
     "text": [
-      "./scripts/deploy.sh"
+      "<code>./scripts/deploy.sh</code>"
     ]
   },
   "testing": {
     "text": [
-      "./scripts/test.sh",
-      "./scripts/test.sh 'List all products in Electronics'",
-      "./scripts/test.sh 'Get product ELEC-001 details'",
-      "./scripts/test.sh 'Add a new product called Widget Pro in Electronics for $49.99'"
+      "<code>./scripts/test.sh</code>",
+      "<code>./scripts/test.sh 'List all products in Electronics'</code>",
+      "<code>./scripts/test.sh 'Get product ELEC-001 details'</code>",
+      "<code>./scripts/test.sh 'Add a new product called Widget Pro in Electronics for $49.99'</code>"
     ]
   },
   "cleanup": {
     "text": [
-      "./scripts/terminate.sh"
+      "<code>./scripts/terminate.sh</code>"
     ]
   },
   "authors": [

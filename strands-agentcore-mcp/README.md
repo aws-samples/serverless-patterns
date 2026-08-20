@@ -1,17 +1,17 @@
-# strands-agentcore-mcp
+# Agent using MCP server on AWS Lambda through Amazon Bedrock AgentCore Gateway
 
-A serverless AI agent that answers natural-language prompts about products by invoking tools through AWS Bedrock AgentCore Gateway using the Model Context Protocol (MCP).
+A serverless AI agent that answers natural-language prompts about products by invoking tools through Amazon Bedrock AgentCore Gateway using the Model Context Protocol (MCP).
 
 ## Architecture
 
 ![Architecture Diagram](architecture/mcp-target.png)
 
 ```
-User → Agent Lambda → AgentCore Gateway (MCP) → API Gateway → MCP Server Lambda → DynamoDB
-            │                   │                                      │
-       Strands Agent       CUSTOM_JWT Auth                       JSON-RPC 2.0
-       + BedrockModel      + MCP Routing                         Tool Execution
-       + MCPClient         + Tool Discovery                      (list/get/put)
+User → Agent Lambda function → AgentCore Gateway (MCP) → API Gateway → MCP Server Lambda function → DynamoDB
+            │                         │                                          │
+       Strands Agent             CUSTOM_JWT Auth                           JSON-RPC 2.0
+       + BedrockModel            + MCP Routing                             Tool Execution
+       + MCPClient               + Tool Discovery                          (list/get/put)
             │
        Cognito JWT
        Validated
@@ -25,7 +25,7 @@ The agent is model-driven: Claude decides which tool to call based on the user's
 
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) installed
 - AWS CLI v2 configured with credentials for `us-east-1`
-- Python 3.12 and `pip3`
+- Python 3.13 and `pip3`
 - **No Docker required.** The build is Docker-free: `sam build` runs the root `Makefile`'s `BuildMethod: makefile` targets, which perform the two-step `pip3` manylinux install directly on your machine. There is no `--use-container` step and no Docker daemon to run.
 - Bedrock model access enabled in your account:
   - Open the [Bedrock console](https://console.aws.amazon.com/bedrock) → Model Access
@@ -52,19 +52,17 @@ cd serverless-patterns/strands-agentcore-mcp
 
 To use a different model, edit the `BedrockModelId` value in the `parameter_overrides` line of `samconfig.toml` before running (or pass `sam deploy --parameter-overrides 'BedrockModelId="<model-id>"'`).
 
-The deploy script is a thin wrapper around AWS SAM. It runs `sam build` (Docker-free — no `--use-container`) followed by `sam deploy` (which reads `samconfig.toml`), then performs the post-deploy steps. In order it will:
+The deploy script is a thin wrapper around AWS SAM. It runs `sam build` followed by `sam deploy`, then performs the post-deploy steps. In order it will:
 
-1. Build the SAM application with `sam build` — the native `BuildMethod: makefile` build (driven by the root `Makefile`) installs Lambda dependencies via the two-step `pip3` manylinux install and packages the real `src/` tree, no Docker needed
-2. Deploy the stack with `sam deploy` — Cognito, DynamoDB, API Gateway, Lambda x2, AgentCore Gateway, and IAM roles are created (or updated) in one shot with the real Lambda code, no inline placeholders
+1. Build the SAM application with `sam build`
+2. Deploy the stack with `sam deploy` — Cognito, DynamoDB, API Gateway, Lambda x2, AgentCore Gateway, and IAM roles are created (or updated)
 3. Read the stack outputs
 4. Create and synchronize the MCP Gateway Target
-5. Seed DynamoDB with 3 sample products
+5. Seed the DynamoDB table with 3 sample products
 6. Create a Cognito test user (`testuser` / `TestPass123!`)
 7. Generate `scripts/test.sh` with deployment values baked in
 
 Deploy takes approximately 5–10 minutes on first run.
-
-> **Packaging convention.** The native SAM `BuildMethod: makefile` build replaces the old in-script two-step `pip3` packaging and the separate `aws lambda update-function-code` flow. The proven two-step `pip3 --platform manylinux2014_x86_64 --only-binary=:all:` install (binary packages, then pure-Python packages `--no-deps`) now lives in the root `Makefile`'s `build-AgentLambdaFunction` / `build-McpServerLambda` targets and runs during `sam build`. `sam deploy` ships the real code directly, so there is no manual zip-and-update step.
 
 ## Test
 
@@ -146,14 +144,6 @@ The agent has access to three product management tools:
 pip3 install -r requirements-dev.txt
 python3 -m pytest tests/unit/ tests/property/ -v
 ```
-
-## Notes
-
-- Region: `us-east-1`
-- Build: Docker-free. `sam build` uses each function's `Metadata.BuildMethod: makefile` to run the root `Makefile`'s two-step `pip3` manylinux install, producing Linux-correct wheels on macOS without a Docker daemon.
-- Model: Claude Sonnet 4.5 (cross-region inference profile `us.anthropic.claude-sonnet-4-5-20250929-v1:0`)
-- To swap models without code changes, edit the `BedrockModelId` value in the `parameter_overrides` line of `samconfig.toml` and re-run `./scripts/deploy.sh`.
-- The MCP Gateway Target is created via boto3 in `deploy.sh` (not the SAM template) because AgentCore probes `tools/list` during target creation — keeping it as an ordered post-deploy step preserves the proven create-vs-update behavior even though `sam deploy` ships the real Lambda code.
 
 ---
 
