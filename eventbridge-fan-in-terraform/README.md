@@ -1,8 +1,8 @@
-# Amazon Eventbridge Eventbus fan-in to Central Eventbus to different Region
+# Amazon EventBridge Eventbus fan-in to Central Eventbus to different Region
 
 This pattern demonstrates how to aggregate all your events from multiple Eventbus (in the same Region) to a central Eventbus in a different Region. This allows you to centrally accumulate events coming in from different event sources for downstream consumption.
 
-This pattern is deployed using Terraform to create a central EventBridge bus, Eventbridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in the `terraform.tfvars` file (sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS Regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
+This pattern is deployed using Terraform to create a central EventBridge bus, EventBridge rules on fan-in buses and all IAM resources required. The Eventbuses to aggregate can be defined in the `terraform.tfvars` file (sample ARNs is provided, replace with Eventbus ARNs as needed). The provider.tf file also lists the AWS Regions of the fan-in Eventbus and central Eventbus (replace these based on where your Eventbuses exist and where you want your central bus to be created).
 
 Note: The pattern assumes you already have a minimum of 2 eventbuses that you want to aggregate onto a central Eventbus (the central bus will be created as part of this deployment). The fan-in Eventbuses can be created manually or using any of the Infrastructure-as-code platforms.
 
@@ -29,26 +29,57 @@ Important: this application uses various AWS services and there are costs associ
     ```
 3. In the provider.tf file, add the Regions where the Eventbuses exist in the provider block with alias "others". Also add the Region where you want the central Eventbus to be created in the provider block with alias "central"
 
-4. In the terraform.tfvars file, add the ARNs of the existing Eventbuses you want to aggregate. Note that all of these fan-in Eventbuses should exist in the same Region. 
+4. If you do not already have Eventbuses to aggregate, create a minimum of 2 Eventbuses in the fan-in Region:
+    ```
+    aws events create-event-bus --name eventBus1 --region us-east-2
+    aws events create-event-bus --name eventBus2 --region us-east-2
+    ```
 
-5. From the command line, initialize Terraform:
+5. In the terraform.tfvars file, add the ARNs of the existing Eventbuses you want to aggregate. Note that all of these fan-in Eventbuses should exist in the same Region.
+
+6. From the command line, initialize Terraform:
     ```
     terraform init
     ```
-6. From the command line, apply the configuration in the main.tf file and follow the prompts:
+7. From the command line, apply the configuration in the main.tf file and follow the prompts:
      ```
     terraform apply
     ```
 
 ## How it works
 
-This application picks the configurations from terraform.tfvars files to create Eventbridge rules on all entered Eventbus for fan-in to a central Eventbus. The terraform creates the rules, along with the required IAM roles and policies and configures the target as the central Eventbus which it also creates. The central Eventbus has a rule that routes all events to a Cloudwatch log group for testing.
+This application picks the configurations from terraform.tfvars files to create EventBridge rules on all entered Eventbus for fan-in to a central Eventbus. The terraform creates the rules, along with the required IAM roles and policies and configures the target as the central Eventbus which it also creates. The central Eventbus has a rule that routes all events to a CloudWatch log group for testing.
 
 ## Testing
 
 Note: To test this pattern, you will need a minimum of 2 existing event buses in the fan-in Region. 
 
-Login to the AWS account where the terraform is deployed. Publish an event on any of the fan-in Eventbuses. Switch to the Region where the central Eventbus is created and navigate to Cloudwatch logs. You should see the event you published in the log group of the Central Eventbus.
+1. Publish a test event on each of the fan-in Eventbuses:
+    ```
+    aws events put-events --region us-east-2 --entries '[
+      {
+        "EventBusName": "eventBus1",
+        "Source": "demo.test",
+        "DetailType": "TestEvent",
+        "Detail": "{\"message\": \"hello from eventBus1\"}"
+      }
+    ]'
+    aws events put-events --region us-east-2 --entries '[
+      {
+        "EventBusName": "eventBus2",
+        "Source": "demo.test",
+        "DetailType": "TestEvent",
+        "Detail": "{\"message\": \"hello from eventBus2\"}"
+      }
+    ]'
+    ```
+    Each command should return `"FailedEntryCount": 0`.
+
+2. After a few seconds, check the log group of the central Eventbus in the central Region:
+    ```
+    aws logs tail /aws/events/central-bus-logs/logs --region ca-central-1 --since 10m
+    ```
+    You should see both published events as JSON, including `"source": "demo.test"` and `"region": "us-east-2"`. You can also view the log group `/aws/events/central-bus-logs/logs` in the CloudWatch console.
 
 
 ## Cleanup
@@ -56,6 +87,11 @@ Login to the AWS account where the terraform is deployed. Publish an event on an
 1. Delete all created resources and follow the prompts:
      ```
     terraform destroy
+    ```
+2. If you created the Eventbuses in the deployment step 4, delete them:
+    ```
+    aws events delete-event-bus --name eventBus1 --region us-east-2
+    aws events delete-event-bus --name eventBus2 --region us-east-2
     ```
 ----
 Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
