@@ -307,11 +307,6 @@ Resources:
       GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
       GroupName: !Sub "${AWS::StackName} Security group attached to the RabbitMQ client"
       VpcId: !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 10.0.0.0/16
 
   RabbitMQSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -628,10 +623,9 @@ Resources:
             cd /home/ec2-user
             mkdir -p ip_prefix
             cd ip_prefix
-            git clone https://github.com/joetek/aws-ip-ranges-json.git
-            cd aws-ip-ranges-json
+            curl -o ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
             AWS_REGION=${aws_region}
-            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
+            EC2_CONNECT_IP=$(cat ip-ranges.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION and .service=="EC2_INSTANCE_CONNECT").ip_prefix')
             echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
             SECURITY_GROUP=${security_group_id}
             echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
