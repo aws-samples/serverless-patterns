@@ -11,7 +11,7 @@
 #
 # What it does (in order):
 #   1. Build the SAM application (sam build — Docker-free, Makefile-driven)
-#   2. Deploy the SAM application (sam deploy — reads samconfig.toml)
+#   2. Deploy the SAM application (sam deploy — parameters passed explicitly)
 #   3. Read stack outputs
 #   4. Create or update the AgentCore MCP Target (boto3) + synchronize
 #   5. Seed DynamoDB with sample products
@@ -26,6 +26,8 @@ set -euo pipefail
 REGION="us-east-1"
 STACK_NAME="agentcore-mcp"
 TEMPLATE_FILE="infrastructure/template.yaml"
+# Bedrock model — change here (or pass --parameter-overrides to sam deploy) to swap models
+BEDROCK_MODEL_ID="us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
 # Test user credentials (baked into generated test.sh)
 TEST_USERNAME="testuser"
@@ -52,7 +54,7 @@ log() { echo "[deploy] $*"; }
 die() { echo "[deploy] ERROR: $*" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
-# STEP 1: Build the SAM application (Requirement 2.1, 10.1)
+# STEP 1: Build the SAM application
 #
 # Docker-free: each function declares Metadata.BuildMethod: makefile, so
 # `sam build` invokes the root Makefile's build-<FunctionLogicalId> targets,
@@ -64,21 +66,31 @@ sam build --template "$TEMPLATE_FILE"
 log "Build complete."
 
 # ---------------------------------------------------------------------------
-# STEP 2: Deploy the SAM application (Requirement 10.1, 10.2)
+# STEP 2: Deploy the SAM application
 #
-# All deploy parameters (stack name, region, capabilities, resolve_s3,
-# parameter_overrides, fail_on_empty_changeset=false) live in samconfig.toml,
-# so no flags are passed here. SAM handles create-vs-update automatically and
-# tolerates no-op changesets.
+# All deploy parameters are passed explicitly on the command line so a fresh
+# clone deploys with no manual setup and without a committed samconfig.toml
+# (samconfig.toml is gitignored repo-wide in serverless-patterns).
+#   --resolve-s3               let SAM manage the deployment artifact bucket
+#   --no-confirm-changeset     non-interactive deploy
+#   --no-fail-on-empty-changeset  tolerate no-op redeploys (create-vs-update auto)
+# To swap models, change BEDROCK_MODEL_ID above or override here.
 # ---------------------------------------------------------------------------
 log "Step 2: Deploying SAM application (stack '$STACK_NAME')..."
-sam deploy
+sam deploy \
+  --stack-name "$STACK_NAME" \
+  --region "$REGION" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --resolve-s3 \
+  --no-confirm-changeset \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides "BedrockModelId=\"$BEDROCK_MODEL_ID\""
 log "Deploy complete."
 
 # ---------------------------------------------------------------------------
 # Read stack outputs
 #
-# Prefer `sam list stack-outputs` (Requirement 12.2); fall back to
+# Prefer `sam list stack-outputs`; fall back to
 # `aws cloudformation describe-stacks` if `sam list` fails or is unavailable.
 # The two sources produce different JSON shapes:
 #   - sam list stack-outputs: a flat array of {OutputKey, OutputValue}
@@ -305,7 +317,7 @@ log "  MCP target synchronized."
 rm -f "$TMP_TARGET_OUTPUT"
 
 # ---------------------------------------------------------------------------
-# STEP 6: Seed DynamoDB with sample products (Requirement 10.4)
+# STEP 6: Seed DynamoDB with sample products
 #
 # At least three items across at least two categories.
 # DynamoDB attribute-value JSON format.
@@ -345,7 +357,7 @@ aws dynamodb put-item \
 log "  Seeded 3 products (Electronics x2, Books x1)."
 
 # ---------------------------------------------------------------------------
-# STEP 7: Create Cognito test user (Requirement 10.5)
+# STEP 7: Create Cognito test user
 # ---------------------------------------------------------------------------
 log "Step 7: Creating Cognito test user '$TEST_USERNAME'..."
 
@@ -371,7 +383,7 @@ log "  Test user '$TEST_USERNAME' is CONFIRMED."
 # ---------------------------------------------------------------------------
 # STEP 8: Generate scripts/test.sh with baked-in literal values
 #
-# Rules (Requirements 11.3, 11.4, 11.5):
+# Rules:
 #   - Use a heredoc + sed substitution (NOT nested echo emitting JSON)
 #   - Bake in USER_POOL_ID, CLIENT_ID, AGENT_LAMBDA_NAME, USERNAME, PASSWORD
 #   - Accept $1 as optional prompt, fall back to DEFAULT_PROMPT

@@ -50,7 +50,9 @@ cd serverless-patterns/strands-agentcore-mcp
 ./scripts/deploy.sh
 ```
 
-To use a different model, edit the `BedrockModelId` value in the `parameter_overrides` line of `samconfig.toml` before running (or pass `sam deploy --parameter-overrides 'BedrockModelId="<model-id>"'`).
+To use a different model, edit the `BEDROCK_MODEL_ID` value near the top of `scripts/deploy.sh` before running (or pass `sam deploy --parameter-overrides 'BedrockModelId="<model-id>"'`).
+
+To deploy to a different region, update the `REGION` value near the top of `scripts/deploy.sh`.
 
 The deploy script is a thin wrapper around AWS SAM. It runs `sam build` followed by `sam deploy`, then performs the post-deploy steps. In order it will:
 
@@ -112,7 +114,6 @@ The agent has access to three product management tools:
 ├── infrastructure/
 │   └── template.yaml                   # SAM template — all AWS resources
 ├── Makefile                            # Docker-free SAM build targets (BuildMethod: makefile)
-├── samconfig.toml                      # sam deploy parameters (stack, region, capabilities)
 ├── scripts/
 │   ├── deploy.sh                       # One-command deploy (wraps sam build + sam deploy)
 │   ├── terminate.sh                    # One-command teardown
