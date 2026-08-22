@@ -37,7 +37,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This sample project demonstrates how to use WebSocket API to integrate with Amazon Simple Notification service (SNS) to send notifications. This pattern also implements data validation in WebSocket API using model in API Gateway. This template does not implement Authentication in WebSocket API to keep it simple. However, it is recommended to implement Authentication on WebSocket API.
+This sample project demonstrates how to use WebSocket API to integrate with Amazon Simple Notification Service (SNS) to send notifications. This pattern also implements data validation in WebSocket API using model in Amazon API Gateway. This template does not implement Authentication in WebSocket API to keep it simple. However, it is recommended to implement Authentication on WebSocket API.
 This pattern is utilizing native AWS Integration between WebSocket API Gateway and SNS. Request template is used in WebSocket integration to map the input to SNS payload.
 This pattern is also a workaround to invoke AWS services in WebSocket API which requires Content-Type header to be application/x-www-form-urlencoded. By default, WebSocket APIs do not support overriding headers from AWS console and supports application/json in Content-Type header.
 
