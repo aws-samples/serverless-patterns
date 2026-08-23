@@ -1,6 +1,6 @@
 # Amazon S3 static website served by an Amazon CloudFront distribution restricted with Origin Access Control (OAC)
 
-This repo contains a serverless pattern showing how to set up an Amazon S3 website hosting bucketthat is served by a CloudFront distribution that also obfuscates the CloudFront Distribution domain via CloudFront Origin Access Control (OAC).
+This repository contains a serverless pattern showing how to set up an Amazon S3 website hosting bucket that is served by a Amazon CloudFront distribution that restricts direct access to the private Amazon S3 origin using CloudFront Origin Access Control (OAC), so the bucket is only accessible through CloudFront..
 
 ![Demo Project Solution Architecture Diagram](diagram.PNG)
 
