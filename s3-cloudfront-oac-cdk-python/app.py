@@ -31,7 +31,7 @@ class S3CloudFrontOAC(Construct):
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 response_headers_policy=cloudfront.ResponseHeadersPolicy.SECURITY_HEADERS,
                 cache_policy=cloudfront.CachePolicy.CACHING_OPTIMIZED,
-                allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL
+                allowed_methods=cloudfront.AllowedMethods.ALLOW_GET_HEAD
             )
         )
 
