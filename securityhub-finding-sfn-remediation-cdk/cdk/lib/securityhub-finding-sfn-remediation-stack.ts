@@ -102,17 +102,26 @@ export class SecurityhubFindingSfnRemediationStack extends cdk.Stack {
       result: sfn.Result.fromObject({ status: 'COMPLETE' }),
     });
 
-    // Route by finding type
+    // Route by finding type.
+    // Each branch guards the comparison with isPresent first: a Choice state
+    // raises a States.Runtime error if a stringMatches path is missing from the
+    // input, so an isPresent check must short-circuit before the string compare.
     const definition = new sfn.Choice(this, 'ClassifyFinding')
       .when(
-        sfn.Condition.or(
-          sfn.Condition.stringMatches('$.detail.findings[0].Type', '*EC2*SecurityGroup*'),
-          sfn.Condition.stringMatches('$.detail.findings[0].Type', '*Software and Configuration*'),
+        sfn.Condition.and(
+          sfn.Condition.isPresent('$.detail.findings[0].Type'),
+          sfn.Condition.or(
+            sfn.Condition.stringMatches('$.detail.findings[0].Type', '*EC2*SecurityGroup*'),
+            sfn.Condition.stringMatches('$.detail.findings[0].Type', '*Software and Configuration*'),
+          ),
         ),
         remediateTask.next(notifyTask).next(done),
       )
       .when(
-        sfn.Condition.stringMatches('$.detail.findings[0].Type', '*S3*PublicAccess*'),
+        sfn.Condition.and(
+          sfn.Condition.isPresent('$.detail.findings[0].Type'),
+          sfn.Condition.stringMatches('$.detail.findings[0].Type', '*S3*PublicAccess*'),
+        ),
         new sfnTasks.LambdaInvoke(this, 'RemediateS3Finding', {
           lambdaFunction: remediateFn,
           outputPath: '$.Payload',
