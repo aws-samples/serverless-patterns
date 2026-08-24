@@ -15,6 +15,10 @@ Important: this application uses various AWS services and there are costs associ
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for Anthropic Claude Sonnet in your target region
 
+## Supported Regions
+
+The stack derives the Amazon Bedrock cross-Region inference profile prefix (`us.`, `eu.`, `apac.`) from the deployment Region, so it deploys without edits in US, EU, and APAC Regions where the Anthropic Claude Sonnet inference profile is available. Ensure model access is enabled for the profile in your target Region before deploying. The model id is a single constant in `lib/apigw-lambda-bedrock-code-interpreter-stack.ts` if you want to target a different Claude Sonnet version.
+
 ## Architecture
 
 ```
@@ -60,10 +64,10 @@ Neither Amazon Bedrock nor Amazon Bedrock AgentCore Code Interpreter alone can s
 Invoke the API with a natural language data question:
 
 ```bash
-curl -X POST $(aws cloudformation describe-stacks \
+curl -X POST "$(aws cloudformation describe-stacks \
   --stack-name ApigwLambdaBedrockCodeInterpreterStack \
-  --query 'Stacks[0].Outputs[?contains(OutputKey,`Endpoint`)].OutputValue' \
-  --output text)analyze \
+  --query "Stacks[0].Outputs[?OutputKey=='ApiEndpoint'].OutputValue" \
+  --output text)analyze" \
   -H "Content-Type: application/json" \
   -d '{"question": "Calculate the compound interest on $10,000 at 5% annual rate over 10 years"}'
 ```
