@@ -64,7 +64,7 @@ Run functions locally and invoke them with the `sam local invoke` command.
 sam local invoke --event events/event.json
 ```
 
-## Deploy the sample application
+## Deploy the sample application (from the Amazon EC2 instance)
 
 To deploy your application for the first time, run the following in your shell. Make sure the shell variable $AWS_REGION is set. If not, replace $AWS_REGION with the region in which you are deploying the AWS Lambda function:
 
@@ -93,6 +93,97 @@ The sam deploy command will package and deploy your application to AWS, with a s
 You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
     
 **Note: In case you want to deploy the Lambda function by pointing to an existing Amazon MQ (Apache ActiveMQ) Cluster and not the one created by running the AWS CloudFormation template provided in this pattern, you will need to modify the values of the above parameters accordingly**
+
+
+## Build and Deploy the sample application (locally on your local laptop/desktop machine)
+
+The steps that have been described above to build and deploy the AWS Lambda function are meant to be run from the Amazon EC2 instance that is created by the AWS CloudFormation template.
+
+It is also possible to build and deploy the AWS Lambda function directly from your own laptop or desktop machine.
+
+In this case, change directory from the root directory where you cloned the https://github.com/aws-samples/serverless-patterns.git
+
+Copy the template_original.yaml file to template.yaml
+
+    ```
+    cd serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam
+    cp ./template_original.yaml ./template.yaml
+    
+    ```
+Replace the parameters in the template.yaml file with their correct values. Instead of placeholder default values of each of the parameters, input the correct values and save the file.
+
+In case you need to get the correct values, you can log in to the Amazon EC2 instance created by the AWS CloudFormation template.
+
+Then cd ~/serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam.
+
+cat the template.yaml file and note the default values for each of the below parameters and replace them in the template.yaml file in your local machine.
+
+Parameters:
+  ActiveMQBrokerArn:
+    Type: String
+    Description: Enter the ARN of the ActiveMQBroker
+    Default: ACTIVEMQ_BROKER_ARN
+  ActiveMQQueue:
+    Type: String
+    Description: Enter the name of the ActiveMQ queue from which the lambda function will consume messages
+    Default: ACTIVEMQ_QUEUE_NAME
+  SecretsManagerSecretForMQ:
+    Type: String
+    Description: Enter the ARN of the secret that has username/password for Active MQ
+    Default: ACTIVEMQ_SECRET_ARN
+  Subnet1:
+    Type: String
+    Description: The first of the three private subnets in the ActiveMQ broker's VPC
+    Default: ACTIVEMQ_SUBNET_ONE
+  Subnet2:
+    Type: String
+    Description: The second of the three private subnets in the ActiveMQ broker's VPC
+    Default: ACTIVEMQ_SUBNET_TWO
+  Subnet3:
+    Type: String
+    Description: The second of the three private subnets in the ActiveMQ broker's VPC
+    Default: ACTIVEMQ_SUBNET_THREE
+  SecurityGroup:
+    Type: String
+    Description: The security group associated with this function
+    Default: SECURITY_GROUP
+    
+
+Once you have replaced the default values of all the parameters shown above in the template.yaml file, save the file.
+
+You can then run the sam build and sam deploy commands to build and deploy the lambda function, by using the commands below.
+
+Before running the commands above, make sure to set the AWS_PROFILE on your local machine to point to the correct AWS account and the AWS_REGION to the correct region.
+
+    ```
+    cd serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam
+    sam build
+    sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name activemq-lambda-python-sam --guided
+    
+    ```
+
+The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
+
+* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
+* **AWS Region**: The AWS region you want to deploy your app to.
+* **Parameter ActiveMQBrokerArn**: The ARN of the Amazon MQ (Apache ActiveMQ) broker that was created by the AWS CloudFormation template
+* **Parameter ActiveMQQueue**: The name of the Amazon MQ (Apache ActiveMQ) queue from which the lambda function will consume messages
+* **Parameter SecretsManagerSecretForMQ**: The ARN of the secret that has username/password for Amazon MQ (Apache ActiveMQ)
+* **Parameter Subnet1**: The first of the three private subnets where the Amazon MQ (Apache ActiveMQ) cluster is deployed
+* **Parameter Subnet2**: The second of the three private subnets where the Amazon MQ (Apache ActiveMQ) cluster is deployed
+* **Parameter Subnet3**: The third of the three private subnets where the Amazon MQ (Apache ActiveMQ) cluster is deployed
+* **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 instance that was created by the AWS CloudFormation template
+* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
+* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
+* **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails
+* **Save arguments to configuration file**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
+* **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally
+* **SAM configuration environment [default]**: Environment for storing deployment information locally
+
+You should get a message "Successfully created/updated stack - <StackName> in <Region>" if all goes well
+    
+**Note: In case you want to deploy the Lambda function by pointing to an existing Amazon MQ (Apache ActiveMQ) Cluster and not the one created by running the AWS CloudFormation template provided in this pattern, you will need to modify the values of the above parameters accordingly**
+
 
 
 ## Test the application
