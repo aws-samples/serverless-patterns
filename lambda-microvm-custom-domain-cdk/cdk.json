@@ -1,0 +1,61 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/microvm-custom-domains.ts",
+  "watch": {
+    "include": ["**"],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/*.d.ts",
+      "**/*.js",
+      "tsconfig.json",
+      "package*.json",
+      "node_modules",
+      "test"
+    ]
+  },
+  "context": {
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": ["aws", "aws-cn"],
+    "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": true,
+    "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true,
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/core:validateSnapshotRemovalPolicy": true,
+    "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": true,
+    "@aws-cdk/aws-s3:createDefaultLoggingPolicy": true,
+    "@aws-cdk/core:enablePartitionLiterals": true,
+    "@aws-cdk/aws-route53-patters:useCertificate": true,
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
+
+    "microvm-custom-domains": {
+      "//": "------------------------------------------------------------------",
+      "//1": "EDIT THESE VALUES, then `npx cdk deploy`. All are overridable with -c.",
+      "//2": "------------------------------------------------------------------",
+
+      "account": "111122223333",
+      "region": "us-east-2",
+
+      "//zone": "Existing Route53 public hosted zone that will hold the wildcard record.",
+      "hostedZoneId": "Z0123456789ABCDEFGHIJ",
+      "hostedZoneName": "example.com",
+
+      "//domain": "The wildcard base under which each <uuid> custom domain is served.",
+      "customDomainBase": "microvms.example.com",
+
+      "//origin": "The MicroVM GA endpoint domain requests are rewritten TO. The label before this base (the MicroVM id) is preserved per-request by the Host rewrite regex.",
+      "microvmEndpointBase": "lambda-microvm.us-east-2.on.aws",
+
+      "//privatelink": "AWS-managed PrivateLink service for reaching MicroVMs privately (public com.amazonaws.<region>.<svc> name; safe to commit).",
+      "microvmVpceServiceName": "com.amazonaws.us-east-2.lambda-microvm",
+
+      "//cors": "Value for the Access-Control-Allow-Origin header the ALB inserts on every response. '*' for the demo.",
+      "corsAllowOrigin": "*",
+
+      "//image": "ARN of the MicroVM image the provisioning Lambda launches when no running MicroVM is available.",
+      "microvmImageArn": "arn:aws:lambda:us-east-2:111122223333:microvm-image:my-microvm-image",
+
+      "//app": "Single host (a label under customDomainBase) that serves the demo page AND its /api/provision endpoint from one ALB-invoked Lambda. Covered by the wildcard cert/record; matched ahead of the host-rewrite rule.",
+      "appDomain": "customdomain.microvms.example.com"
+    }
+  }
+}
