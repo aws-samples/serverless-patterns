@@ -52,11 +52,7 @@
   },
   "testing": {
     "text": [
-      "Create a Cognito user: <code>aws cognito-idp admin-create-user --user-pool-id USER_POOL_ID --username user@example.com --user-attributes Name=email,Value=user@example.com Name=custom:tenantId,Value=sample-tenant --temporary-password \"TempPass1!\"</code>",
-      "Set a permanent password: <code>aws cognito-idp admin-set-user-password --user-pool-id USER_POOL_ID --username user@example.com --password \"MySecurePass1!\" --permanent</code>",
-      "Insert a tenant mapping into the DynamoDB table: <code>aws dynamodb put-item --table-name TABLE_NAME --item '{\"tenantId\": {\"S\": \"sample-tenant\"}, \"apiKey\": {\"S\": \"my-api-key-123\"}}'</code>",
-      "Get a token and call the API: <code>node get-token.js --user-pool-id USER_POOL_ID --client-id CLIENT_ID --username user@example.com --password \"MySecurePass1!\" --api-url https://REPLACE_WITH_API_URL/protected</code>",
-      "If successful, you should receive a response: <code>{ \"message\": \"Access granted\" }</code>"
+        "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
