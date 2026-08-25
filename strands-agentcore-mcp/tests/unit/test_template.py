@@ -9,7 +9,7 @@ These tests guard against:
   - AgentCore Gateway property casing that has bitten this project before
     (see .kiro/steering/project-conventions.md)
   - IAM least-privilege scoping (no wildcard Resource, ARN-scoped policies)
-  - The MCP API authorization model (NONE + AWS_PROXY + scoped permission)
+  - The MCP API authorization model (AWS_IAM + resource policy + AWS_PROXY + scoped permission)
   - Stack outputs consumed by downstream tooling (incl. GatewayId)
 
 Validates: Requirements 1.1, 1.2, 2.3, 2.4, 2.6, 3.1, 5.1-5.6, 6.1-6.4,
@@ -536,17 +536,34 @@ def test_mcp_method_http_method(resources):
 
 
 def test_mcp_method_auth_type(resources):
-    """McpMethod must use AuthorizationType: NONE.
+    """McpMethod must use AuthorizationType: AWS_IAM.
 
-    AgentCore Gateway signs requests with SigV4 using GatewayExecutionRole,
-    but API Gateway's AWS_IAM authorizer rejects cross-service assumed-role
-    SigV4 calls from AgentCore. Access is controlled by the GatewayExecutionRole's
-    execute-api:Invoke grant scoped to this specific API.
+    Combined with the McpApi resource policy (which allows only GatewayExecutionRole),
+    this rejects anonymous callers with HTTP 403 before they can reach the MCP Lambda.
     """
     method_props = resources["McpMethod"]["Properties"]
-    assert method_props.get("AuthorizationType") == "NONE", (
-        "McpMethod must use AuthorizationType: NONE for AgentCore Gateway compatibility"
+    assert method_props.get("AuthorizationType") == "AWS_IAM", (
+        "McpMethod must use AuthorizationType: AWS_IAM — combined with the McpApi "
+        "resource policy to prevent anonymous access to the MCP Lambda"
     )
+
+
+def test_mcp_api_has_resource_policy_for_gateway_role(resources):
+    """McpApi must have a resource policy allowing only GatewayExecutionRole.
+
+    AuthorizationType: AWS_IAM alone is not sufficient — a resource policy with
+    an explicit Allow for GatewayExecutionRole is also required. Without it,
+    anonymous callers can still reach the MCP Lambda directly (bypassing the
+    AgentCore Gateway's JWT auth entirely).
+    """
+    api_props = resources["McpApi"]["Properties"]
+    policy = api_props.get("Policy", {})
+    assert policy, "McpApi must declare a resource Policy to restrict access"
+    statements = policy.get("Statement", [])
+    assert statements, "McpApi Policy must have at least one Statement"
+    # At least one Allow statement must reference GatewayExecutionRole
+    allows = [s for s in statements if s.get("Effect") == "Allow"]
+    assert allows, "McpApi Policy must have an Allow statement for GatewayExecutionRole"
 
 
 def test_mcp_method_uses_aws_proxy(resources):

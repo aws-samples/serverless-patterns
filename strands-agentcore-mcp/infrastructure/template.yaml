@@ -265,6 +265,19 @@ Resources:
     Properties:
       Name: mcp-api
       Description: HTTPS endpoint for the MCP Server Lambda (AgentCore MCP target)
+      # Resource policy restricts invocation to GatewayExecutionRole only.
+      # Combined with AuthorizationType: AWS_IAM on McpMethod, anonymous callers
+      # receive a 403 and cannot reach the MCP Lambda directly.
+      Policy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: execute-api:Invoke
+            Resource: '*'
+            Condition:
+              ArnLike:
+                aws:PrincipalArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-gateway-execution-role'
 
   McpResource:
     Type: AWS::ApiGateway::Resource
@@ -279,11 +292,11 @@ Resources:
       RestApiId: !Ref McpApi
       ResourceId: !Ref McpResource
       HttpMethod: POST
-      # AuthorizationType NONE — AgentCore Gateway signs requests with SigV4
-      # using GatewayExecutionRole, but API Gateway's AWS_IAM authorizer rejects
-      # cross-service assumed-role SigV4 calls from AgentCore. Access is controlled
-      # by the GatewayExecutionRole's execute-api:Invoke grant scoped to this API.
-      AuthorizationType: NONE
+      # AWS_IAM auth + resource policy — together these reject anonymous callers
+      # with HTTP 403. The resource policy allows only GatewayExecutionRole;
+      # AWS_IAM enforces SigV4 on the method so unsigned requests are denied
+      # before the resource policy is even evaluated.
+      AuthorizationType: AWS_IAM
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
