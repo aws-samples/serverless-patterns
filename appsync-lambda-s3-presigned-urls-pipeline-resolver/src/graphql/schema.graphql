@@ -1,0 +1,28 @@
+type Note {
+  NoteId: ID!
+  title: String
+  content: String
+  attachmentKey: String
+  uploadUrl: String
+  downloadUrl: String
+}
+
+type PaginatedNotes {
+  notes: [Note!]!
+  nextToken: String
+}
+
+type Query {
+  allNotes(limit: Int, nextToken: String): PaginatedNotes!
+  getNote(NoteId: ID!): Note
+}
+
+type Mutation {
+  saveNote(NoteId: ID!, title: String!, content: String!, fileName: String): Note
+  deleteNote(NoteId: ID!): Note
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}
