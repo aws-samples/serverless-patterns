@@ -1,0 +1,320 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Serverless patterns - Amazon S3 to Amazon OpenSearch Serverless using an
+  Amazon OpenSearch Ingestion (OSIS) pipeline with an S3 source.
+  (tag:s3-opensearch-serverless-osis-sam)
+
+Parameters:
+  AccessARN:
+    Description: >-
+      ARN of the IAM role or user that will access the OpenSearch dashboard /
+      collection (for example, the principal you use in the AWS console).
+    Type: String
+  DeploymentName:
+    Description: Unique lowercase value used to name the resources in this stack.
+    Default: demo-s3-oss-osis
+    Type: String
+    AllowedPattern: ^[a-z][a-z0-9-]{2,31}$
+
+Resources:
+
+  # ---------------------------------------------------------------------------
+  # Source bucket. Users upload newline-delimited JSON (JSON Lines) log files
+  # here. Object-created events are published to the ingestion SQS queue.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+  # ---------------------------------------------------------------------------
+  DataBucket:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - IngestQueuePolicy
+    Properties:
+      # Fixed name (built from DeploymentName + account + region) so the queue
+      # policy can reference the bucket ARN without creating a circular
+      # dependency between the bucket notification and the queue policy.
+      BucketName: !Sub "${DeploymentName}-data-${AWS::AccountId}-${AWS::Region}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Queue: !GetAtt IngestQueue.Arn
+
+  # ---------------------------------------------------------------------------
+  # Separate bucket for the pipeline dead-letter queue (DLQ). Kept separate from
+  # DataBucket on purpose: writing DLQ objects into the source bucket would
+  # re-trigger the S3 -> SQS notification and create an ingestion loop.
+  # ---------------------------------------------------------------------------
+  DlqBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${DeploymentName}-dlq-${AWS::AccountId}-${AWS::Region}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # ---------------------------------------------------------------------------
+  # SQS queue that receives S3 object-created notifications. The OSIS S3 source
+  # polls this queue to discover new objects to ingest.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html
+  # ---------------------------------------------------------------------------
+  IngestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${DeploymentName}-ingest"
+      # Visibility timeout should be >= the time the pipeline needs to process a
+      # batch of objects before the message becomes visible again.
+      VisibilityTimeout: 90
+      MessageRetentionPeriod: 345600
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt IngestDlq.Arn
+        maxReceiveCount: 5
+
+  # Dead-letter queue for SQS notification messages that repeatedly fail.
+  IngestDlq:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${DeploymentName}-ingest-dlq"
+      MessageRetentionPeriod: 1209600
+
+  # Allow Amazon S3 to send object-created notifications to the ingest queue.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queuepolicy.html
+  IngestQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref IngestQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowS3SendMessage
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: "sqs:SendMessage"
+            Resource: !GetAtt IngestQueue.Arn
+            Condition:
+              ArnLike:
+                "aws:SourceArn": !Sub "arn:${AWS::Partition}:s3:::${DeploymentName}-data-${AWS::AccountId}-${AWS::Region}"
+              StringEquals:
+                "aws:SourceAccount": !Ref "AWS::AccountId"
+
+  # ---------------------------------------------------------------------------
+  # IAM role assumed by the OpenSearch Ingestion pipeline. It needs to read the
+  # source bucket, consume from the SQS queue, write to the DLQ bucket, and
+  # send documents to the OpenSearch Serverless collection.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  # ---------------------------------------------------------------------------
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${DeploymentName}-pipeline"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - osis-pipelines.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: OpenSearchServerless
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "aoss:BatchGetCollection"
+                  - "aoss:APIAccessAll"
+                Resource: !GetAtt OpenSearchServerless.Arn
+              - Effect: Allow
+                Action:
+                  - "aoss:CreateSecurityPolicy"
+                  - "aoss:GetSecurityPolicy"
+                  - "aoss:UpdateSecurityPolicy"
+                Resource: "*"
+                Condition:
+                  StringEquals:
+                    "aoss:collection": !Ref DeploymentName
+        - PolicyName: SourceBucketRead
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                Resource: !Sub "arn:${AWS::Partition}:s3:::${DeploymentName}-data-${AWS::AccountId}-${AWS::Region}/*"
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                Resource: !Sub "arn:${AWS::Partition}:s3:::${DeploymentName}-data-${AWS::AccountId}-${AWS::Region}"
+        - PolicyName: DlqBucketWrite
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:PutObject"
+                  - "s3:AbortMultipartUpload"
+                Resource: !Sub "${DlqBucket.Arn}/*"
+        - PolicyName: SqsConsume
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "sqs:ReceiveMessage"
+                  - "sqs:DeleteMessage"
+                  - "sqs:GetQueueAttributes"
+                  - "sqs:ChangeMessageVisibility"
+                Resource: !GetAtt IngestQueue.Arn
+
+  # ---------------------------------------------------------------------------
+  # OpenSearch Serverless collection and its required security policies.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-opensearchserverless-collection.html
+  # ---------------------------------------------------------------------------
+  OpenSearchServerless:
+    Type: AWS::OpenSearchServerless::Collection
+    DependsOn:
+      - EncryptionPolicy
+      - NetworkPolicy
+      - AccessPolicy
+    Properties:
+      Name: !Ref DeploymentName
+      Type: SEARCH
+
+  EncryptionPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: !Ref DeploymentName
+      Type: encryption
+      Description: Encryption policy for the collection.
+      Policy: !Sub >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/${DeploymentName}"]}],"AWSOwnedKey":true}
+
+  NetworkPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: !Ref DeploymentName
+      Type: network
+      Description: Network policy for the collection.
+      # AllowFromPublic is used here for a simple demo. For production, restrict
+      # access using a VPC endpoint (SourceVPCEs) instead.
+      Policy: !Sub >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/${DeploymentName}"]},{"ResourceType":"dashboard","Resource":["collection/${DeploymentName}"]}],"AllowFromPublic":true}]
+
+  AccessPolicy:
+    Type: AWS::OpenSearchServerless::AccessPolicy
+    Properties:
+      Name: !Ref DeploymentName
+      Type: data
+      Description: Data access policy for the pipeline role and the console principal.
+      Policy: !Sub >-
+        [{"Description":"Access for pipeline and admin","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:*"]},{"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],"Principal":["${AccessARN}","arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]}]
+
+  # ---------------------------------------------------------------------------
+  # CloudWatch log group for pipeline audit logs.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
+  # ---------------------------------------------------------------------------
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/vendedlogs/OpenSearchIngestion/${DeploymentName}/audit-logs"
+      RetentionInDays: 3
+
+  # ---------------------------------------------------------------------------
+  # OpenSearch Ingestion (OSIS) pipeline. Reads objects announced on the SQS
+  # queue from the source bucket, parses each JSON line, and indexes the
+  # documents into the OpenSearch Serverless collection.
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-osis-pipeline.html
+  # ---------------------------------------------------------------------------
+  OpenSearchPipeline:
+    Type: AWS::OSIS::Pipeline
+    Properties:
+      PipelineName: !Ref DeploymentName
+      LogPublishingOptions:
+        CloudWatchLogDestination:
+          LogGroup: !Ref CloudWatchLogGroup
+        IsLoggingEnabled: true
+      MaxUnits: 4
+      MinUnits: 1
+      PipelineConfigurationBody: !Sub
+        |
+          version: "2"
+          s3-log-pipeline:
+            source:
+              s3:
+                # Acknowledge SQS messages only after data reaches the sink.
+                acknowledgments: true
+                notification_type: "sqs"
+                compression: "none"
+                # Treat each line of the object as one record; the parse_json
+                # processor below converts each line into a structured document.
+                codec:
+                  newline:
+                sqs:
+                  queue_url: "${IngestQueue}"
+                  maximum_messages: 10
+                  visibility_timeout: "90s"
+                aws:
+                  region: "${AWS::Region}"
+                  sts_role_arn: "${PipelineRole.Arn}"
+            processor:
+              - parse_json:
+                  source: "message"
+            sink:
+              - opensearch:
+                  hosts:
+                    [
+                      "${OpenSearchServerless.CollectionEndpoint}"
+                    ]
+                  index: "s3-logs"
+                  aws:
+                    sts_role_arn: "${PipelineRole.Arn}"
+                    region: "${AWS::Region}"
+                    # Required when the sink is an OpenSearch Serverless collection.
+                    serverless: true
+                  # Capture failed documents in the separate DLQ bucket.
+                  dlq:
+                    s3:
+                      bucket: "${DlqBucket}"
+                      key_path_prefix: "s3-log-pipeline/dlq"
+                      region: "${AWS::Region}"
+                      sts_role_arn: "${PipelineRole.Arn}"
+
+Outputs:
+  DataBucketName:
+    Description: Upload newline-delimited JSON (.json / .log) files here to ingest them.
+    Value: !Ref DataBucket
+  DlqBucketName:
+    Description: Failed documents are written here. Empty this bucket before deleting the stack.
+    Value: !Ref DlqBucket
+  IngestQueueUrl:
+    Description: SQS queue that receives S3 object-created notifications.
+    Value: !Ref IngestQueue
+  CollectionEndpoint:
+    Description: OpenSearch Serverless collection endpoint.
+    Value: !GetAtt OpenSearchServerless.CollectionEndpoint
+  DevToolsURL:
+    Description: Direct URL to Dev Tools within the OpenSearch dashboard to query the index.
+    Value: !Sub "${OpenSearchServerless.DashboardEndpoint}/app/dev_tools#/console"
+  DataAccessPolicyEditURL:
+    Description: Direct URL to modify the data access policy if you need to add principals.
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/aos/home?region=${AWS::Region}#opensearch/security/access-policies/${DeploymentName}/editAccessPolicy"
