@@ -1,6 +1,6 @@
 {
   "title": "Custom domains for AWS Lambda MicroVMs with Application Load Balancer",
-  "description": "Serve each AWS Lambda MicroVM under a domain you own using an Application Load Balancer Host header rewrite over PrivateLink, with no CloudFront and no compute in the request path.",
+  "description": "Serve each AWS Lambda MicroVM under a domain you own via an Application Load Balancer Host header rewrite over PrivateLink, with no CloudFront or request-path compute.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",

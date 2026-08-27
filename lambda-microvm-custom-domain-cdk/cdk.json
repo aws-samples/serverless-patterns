@@ -35,7 +35,7 @@
       "account": "111122223333",
       "region": "us-east-2",
 
-      "//zone": "Existing Route53 public hosted zone that will hold the wildcard record.",
+      "//zone": "Existing Route 53 public hosted zone that will hold the wildcard record.",
       "hostedZoneId": "Z0123456789ABCDEFGHIJ",
       "hostedZoneName": "example.com",
 

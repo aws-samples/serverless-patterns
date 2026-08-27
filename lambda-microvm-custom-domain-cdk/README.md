@@ -1,8 +1,8 @@
-# Custom domains for AWS Lambda MicroVMs with Application Load Balancer
+# Custom domains for AWS Lambda MicroVMs with AWS Application Load Balancer
 
 This pattern gives each of your [AWS Lambda MicroVMs](https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html) a domain **you** own — e.g. `92cfc7f9-….microvms.example.com` — instead of exposing the service-generated `92cfc7f9-….lambda-microvm-….on.aws` endpoint directly.
 
-It is built entirely from load-balancing and networking primitives: **no CloudFront** and **no compute in the request path** — just an Application Load Balancer (ALB) that rewrites the `Host` header with an [ALB Host header rewrite](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-url-and-host-header-rewrite-with-aws-application-load-balancers/) and forwards to the MicroVM service over AWS PrivateLink. A wildcard ACM certificate and a Route 53 wildcard record cover every MicroVM id under a single base domain.
+It is built entirely from load-balancing and networking primitives: **no Amazon CloudFront** and **no compute in the request path** — just an Application Load Balancer (ALB) that rewrites the `Host` header with an [ALB Host header rewrite](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-url-and-host-header-rewrite-with-aws-application-load-balancers/) and forwards to the MicroVM service over AWS PrivateLink. A wildcard [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/) (ACM) certificate and an Amazon Route 53 wildcard record cover every MicroVM id under a single base domain.
 
 The CDK app is split into two parts, deployed together as one stack:
 - **`lib/microvm-custom-domains-stack.ts`** — the reusable core pattern (VPC, interface VPC endpoint, ACM cert, ALB, host-rewrite listener rule, Route 53 wildcard record). This is the only part in the request path.
@@ -12,14 +12,14 @@ Learn more about this pattern at [Serverless Land Patterns](https://serverlessla
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
-> ⚠️ **The optional demo layer is DEMO ONLY — NOT PRODUCTION-SAFE.** Its `POST /api/provision` endpoint is completely unauthenticated, it returns auth tokens to the browser, and it uses wide-open CORS (`Access-Control-Allow-Origin: *`). The **core pattern** (`MicroVmCustomDomainsStack`) is production-oriented networking, but before deploying the demo layer, put real authentication in front of the provisioning API, pin CORS to your own origin, and scope IAM and tokens to the minimum. Deploy the demo only in an isolated, non-production account.
+> ⚠️ **The optional demo layer is DEMO ONLY — NOT PRODUCTION-SAFE.** Its `POST /api/provision` endpoint is completely unauthenticated, it returns auth tokens to the browser, and it uses wide-open CORS (`Access-Control-Allow-Origin: *`). The **core pattern** (`MicroVmCustomDomainsStack`) is production-oriented networking, but before deploying the demo layer, at least put real authentication in front of the provisioning API, pin CORS to your own origin, and scope IAM and tokens to the minimum. Deploy the demo only in an isolated, non-production account.
 
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
-* [Node.js 18+](https://nodejs.org/en/download/) and [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npx cdk` works; no global install required).
+* [Node.js 22+](https://nodejs.org/en/download/) and [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npx cdk` works; no global install required).
 * An **existing Amazon Route 53 public hosted zone** for your domain (e.g. `example.com`). This stack imports it and adds a wildcard record.
 * Access to [AWS Lambda MicroVMs](https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html) and its regional PrivateLink service (`com.amazonaws.<region>.lambda-microvm`) in your target Region.
 * The **ALB Host/URL rewrite (Transforms) feature** available in your account/Region.
@@ -99,6 +99,6 @@ A missing or expired token returns `403 Forbidden` — the ALB only rewrites `Ho
     ```
 
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

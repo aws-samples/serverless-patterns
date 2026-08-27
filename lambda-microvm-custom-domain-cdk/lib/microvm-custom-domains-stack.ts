@@ -10,7 +10,7 @@ import * as cr from 'aws-cdk-lib/custom-resources';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
 export interface MicroVmCustomDomainsConfig {
-  /** ID of an existing Route53 public hosted zone that will hold the wildcard record. */
+  /** ID of an existing Route 53 public hosted zone that will hold the wildcard record. */
   readonly hostedZoneId: string;
   /** Name of that hosted zone, e.g. "example.com". */
   readonly hostedZoneName: string;
@@ -49,7 +49,7 @@ export interface MicroVmCustomDomainsStackProps extends cdk.StackProps {
  *
  * Request flow:
  *   <uuid>.microvms.example.com
- *     -> Route53 A/AAAA alias (wildcard) -> ALB (TLS, *.customDomainBase cert)
+ *     -> Route 53 A/AAAA alias (wildcard) -> ALB (TLS, *.customDomainBase cert)
  *     -> HTTPS listener rule: regex host match + Host-header rewrite Transform
  *          <uuid>.customDomainBase  =>  <uuid>.microvmEndpointBase
  *     -> IP target group (private ENI IPs of the MicroVM interface endpoint), HTTPS:443
@@ -216,7 +216,7 @@ export class MicroVmCustomDomainsStack extends cdk.Stack {
 
     this.applyHostRewrite(forwardingRule, cfg.customDomainBase, cfg.microvmEndpointBase);
 
-    // --- Route53: wildcard alias to the ALB -------------------------------
+    // --- Route 53: wildcard alias to the ALB -------------------------------
     // customDomainBase is always within the hosted zone, so we use the fully
     // qualified wildcard name directly (CDK accepts absolute names that end in
     // the zone name). This is robust to any number of subdomain labels between

@@ -126,7 +126,7 @@ describe('MicroVmCustomDomainsStack', () => {
     });
   });
 
-  test('creates a wildcard Route53 alias to the ALB', () => {
+  test('creates a wildcard Route 53 alias to the ALB', () => {
     const t = synth();
     t.hasResourceProperties('AWS::Route53::RecordSet', {
       Type: 'A',
@@ -172,16 +172,29 @@ describe('MicroVmCustomDomainsStack', () => {
         }),
       },
     });
+    // Item-level actions are scoped to the single MicroVM image ARN (the only
+    // MicroVM resource type in Lambda's IAM model) -- not "*".
     t.hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: Match.arrayWith([
           Match.objectLike({
             Action: Match.arrayWith([
               'lambda:RunMicrovm',
-              'lambda:ListMicrovms',
               'lambda:GetMicrovm',
               'lambda:CreateMicrovmAuthToken',
             ]),
+            Resource: 'arn:aws:lambda:us-east-2:111122223333:microvm-image:my-microvm-image',
+          }),
+        ]),
+      },
+    });
+    // ListMicrovms has no resource ARN in the IAM model and remains on "*".
+    t.hasResourceProperties('AWS::IAM::Policy', {
+      PolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: 'lambda:ListMicrovms',
+            Resource: '*',
           }),
         ]),
       },

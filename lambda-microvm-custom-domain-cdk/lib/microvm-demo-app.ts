@@ -12,7 +12,7 @@ export interface MicroVmDemoAppProps {
    * The core stack's public HTTPS listener. The demo attaches a higher-priority
    * host rule here; it does not create its own ALB, certificate, or DNS record
    * (the demo host is a label under the wildcard base, so the core stack's
-   * wildcard cert and Route53 record already cover it).
+   * wildcard cert and Route 53 record already cover it).
    */
   readonly listener: elbv2.IApplicationListener;
   /**
@@ -60,7 +60,7 @@ export class MicroVmDemoApp extends Construct {
     // Bundled with esbuild because the @aws-sdk/client-lambda-microvms client is
     // not in the Lambda runtime, and the demo HTML is inlined via a text loader.
     const provisionFn = new NodejsFunction(this, 'ProvisionFn', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       entry: path.join(__dirname, '..', 'lambda', 'provision.ts'),
       handler: 'handler',
       timeout: cdk.Duration.seconds(60),
@@ -84,15 +84,31 @@ export class MicroVmDemoApp extends Construct {
 
     // Least-privilege: only the MicroVM control-plane actions the handler calls.
     // (IAM prefix is "lambda"; verified via the SDK's defaultSigningName.)
+    //
+    // RunMicrovm, GetMicrovm and CreateMicrovmAuthToken are all authorized on the
+    // MicroVM *image* resource -- there is no per-MicroVM ARN in Lambda's IAM
+    // model -- so the single image ARN is the tightest grant possible. Because the
+    // ARN carries both, this also pins these actions to this account and Region.
     provisionFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: [
           'lambda:RunMicrovm',
-          'lambda:ListMicrovms',
           'lambda:GetMicrovm',
           'lambda:CreateMicrovmAuthToken',
         ],
-        resources: ['*'], // MicroVM ids are generated at run time; scope by account/region via the execution env.
+        resources: [props.microvmImageArn],
+      }),
+    );
+
+    // ListMicrovms is defined with no resource ARN in Lambda's IAM authorization
+    // model, so it can only be granted on "*" -- a narrower ARN would match nothing
+    // and deny the call. It is already implicitly account-scoped (the role can only
+    // list MicroVMs in its own account); the demo calls it only to find a reusable
+    // RUNNING MicroVM before launching a new one.
+    provisionFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['lambda:ListMicrovms'],
+        resources: ['*'],
       }),
     );
 
@@ -124,7 +140,7 @@ export class MicroVmDemoApp extends Construct {
     // sits ABOVE the core stack's wildcard host-rewrite rule (priority 20), so
     // requests to the demo host are served by the Lambda and never rewritten to
     // a MicroVM origin. appDomain is a label under customDomainBase, so the
-    // wildcard cert and wildcard Route53 record already cover it.
+    // wildcard cert and wildcard Route 53 record already cover it.
     new elbv2.ApplicationListenerRule(this, 'AppHostRule', {
       listener: props.listener,
       priority: 5,
