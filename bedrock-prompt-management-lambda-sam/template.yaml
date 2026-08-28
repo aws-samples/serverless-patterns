@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Manage and version Amazon Bedrock prompts as infrastructure. A managed Bedrock prompt and a
+  published version are defined as native CloudFormation resources; an AWS Lambda function
+  invokes the prompt by its version ARN through the Bedrock Converse API. Update or roll back
+  the prompt by publishing a new version - the function code never changes.
+  (bedrock-prompt-management-lambda-sam)
+
+Parameters:
+  ModelId:
+    Type: String
+    Default: us.amazon.nova-lite-v1:0
+    Description: Bedrock model or inference profile the prompt runs against (Converse-compatible).
+
+Resources:
+  # A managed, versionable Bedrock prompt. The template text and its input variables live here
+  # in Bedrock - not hardcoded in the function - so prompts can be iterated independently of code.
+  SummaryPrompt:
+    Type: AWS::Bedrock::Prompt
+    Properties:
+      Name: !Sub "${AWS::StackName}-summary-prompt"
+      Description: Summarize input text in one sentence.
+      DefaultVariant: v1
+      Variants:
+        - Name: v1
+          TemplateType: TEXT
+          ModelId: !Ref ModelId
+          TemplateConfiguration:
+            Text:
+              Text: "Summarize the following text in exactly one clear sentence:\n\n{{input}}"
+              InputVariables:
+                - Name: input
+          InferenceConfiguration:
+            Text:
+              Temperature: 0.5
+              MaxTokens: 300
+
+  # An immutable published version. Production code invokes a pinned version ARN, so prompt
+  # changes are deliberate: publish a new version and repoint, or roll back to an older one.
+  SummaryPromptVersion:
+    Type: AWS::Bedrock::PromptVersion
+    Properties:
+      PromptArn: !GetAtt SummaryPrompt.Arn
+      Description: First published version.
+
+  InvokePromptFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: InvokeManagedPrompt
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: RenderManagedPrompt
+                Effect: Allow
+                Action:
+                  - bedrock:GetPrompt
+                  - bedrock:RenderPrompt
+                Resource:
+                  - !GetAtt SummaryPrompt.Arn
+                  - !Sub "${SummaryPrompt.Arn}:*"
+              - Sid: InvokeModel
+                Effect: Allow
+                Action: bedrock:InvokeModel
+                Resource:
+                  - !Sub "arn:aws:bedrock:*::foundation-model/*"
+                  - !Sub "arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/*"
+
+  InvokePromptFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-invoke-prompt"
+      CodeUri: src/
+      Handler: handler.handler
+      Runtime: python3.13
+      Architectures:
+        - arm64
+      Timeout: 30
+      MemorySize: 128
+      Role: !GetAtt InvokePromptFunctionRole.Arn
+      Environment:
+        Variables:
+          PROMPT_VERSION_ARN: !GetAtt SummaryPromptVersion.Arn
+
+Outputs:
+  PromptArn:
+    Description: ARN of the managed Bedrock prompt (draft).
+    Value: !GetAtt SummaryPrompt.Arn
+  PromptVersionArn:
+    Description: ARN of the published prompt version the function invokes.
+    Value: !GetAtt SummaryPromptVersion.Arn
+  InvokePromptFunctionName:
+    Description: Lambda function that invokes the managed prompt via Converse.
+    Value: !Ref InvokePromptFunction
