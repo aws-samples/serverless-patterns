@@ -8,12 +8,12 @@
         "headline": "How it works",
         "text": [
             "The user authenticates with Amazon Cognito and receives a JWT token.",
-            "The JWT is passed to an AWS Lambda function which uses the Strands Agents SDK to create an AI agent backed by Amazon Bedrock (Claude Sonnet 4.6 cross-region inference profile).",
+            "The JWT is passed to an AWS Lambda function which uses the Strands Agents SDK to create an AI agent backed by Amazon Bedrock (Claude Sonnet 5 cross-region inference profile).",
             "The Strands Agent connects to an Amazon Bedrock AgentCore Gateway MCP endpoint, dynamically discovering available Amazon Bedrock Runtime operations via the MCP tools/list protocol.",
             "The Amazon Bedrock AgentCore Gateway validates the JWT token using a CUSTOM_JWT authorizer backed by Amazon Cognito, then routes MCP tool calls to the Smithy model target.",
             "The gateway target uses the official Amazon Bedrock Runtime Smithy model (loaded from S3) to expose Amazon Bedrock Runtime operations as MCP tools.",
             "The gateway uses its IAM execution role (GATEWAY_IAM_ROLE) to sign requests to Amazon Bedrock Runtime — no API keys or Secrets Manager secrets are required.",
-            "The outer agent (Claude Sonnet 4.6) calls the Converse tool, which invokes Claude Haiku 4.5 as the inner model to generate the response.",
+            "The outer agent (Claude Sonnet 5) calls the Converse tool, which invokes Claude Haiku 4.5 as the inner model to generate the response.",
             "The Strands SDK handles the full agentic loop: tool discovery, Claude tool selection, MCP tool execution, and response formatting — all in a single agent() call."
         ]
     },
