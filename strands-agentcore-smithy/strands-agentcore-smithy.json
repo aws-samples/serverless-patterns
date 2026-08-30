@@ -3,7 +3,7 @@
     "description": "Strands SDK agent on AWS Lambda calls Amazon Bedrock Runtime via Amazon Bedrock AgentCore Gateway using a Smithy model target, with Cognito JWT auth and IAM role signing.",
     "language": "Python",
     "level": "300",
-    "framework": "AWS CloudFormation",
+    "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [
