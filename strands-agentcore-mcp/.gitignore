@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Lambda build artifacts
+/tmp/
+
+# Generated scripts
+scripts/test.sh
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Kiro
+.kiro/
+
+# SAM build artifacts
+.aws-sam/
+
+# SAM config (environment-specific)
+samconfig.toml

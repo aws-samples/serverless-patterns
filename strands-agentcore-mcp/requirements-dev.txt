@@ -1,0 +1,5 @@
+pytest
+hypothesis
+moto[dynamodb]
+pyyaml
+cfn-lint
