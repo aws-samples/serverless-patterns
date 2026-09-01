@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed (version 1.141.0+ with DurableConfig support)
-* Python 3.13+
+* Python 3.14
 
 ## Deployment Instructions
 
@@ -78,10 +78,10 @@ Lambda durable functions enable you to build resilient, long-running workflows w
 Input:  {"id": "test-123", "name": "demo", "value": 5}
 
 Step 1 (Add):       value = 5 + 10 = 15
-Step 2 (Transform): value = 15 × 2 = 30, name = "DEMO"
-Step 3 (Finalize):  value = 30 + 5 = 35, status = "COMPLETED"
+Step 2 (Transform): value = 15 × 2 = 30, transformed_name = "DEMO"
+Step 3 (Finalize):  final_value = 30 + 5 = 35, status = "COMPLETED"
 
-Output: {"value": 35, "final_value": 40, "transformed_name": "DEMO", "status": "COMPLETED"}
+Output: {"value": 30, "final_value": 35, "transformed_name": "DEMO", "status": "COMPLETED"}
 ```
 
 ### Fault Tolerance Example
@@ -122,12 +122,12 @@ If the orchestrator fails after Step 2 completes:
         "id": "test-123",
         "name": "demo",
         "step1_completed": true,
-        "value": 35,
+        "value": 30,
         "step2_completed": true,
         "transformed_name": "DEMO",
         "step3_completed": true,
         "status": "COMPLETED",
-        "final_value": 40
+        "final_value": 35
       }
     }
     ```
