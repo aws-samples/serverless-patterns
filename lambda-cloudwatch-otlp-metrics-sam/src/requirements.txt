@@ -1,0 +1,2 @@
+# The AWS Distro for OpenTelemetry Lambda layer provides the OpenTelemetry API and
+# SDK at runtime, so no packages need to be bundled with the function.
