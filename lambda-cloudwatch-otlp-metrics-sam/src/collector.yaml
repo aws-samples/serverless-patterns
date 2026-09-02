@@ -1,0 +1,40 @@
+# Configuration for the reduced ADOT collector that ships inside the Lambda layer.
+#
+# Two things here are easy to get wrong:
+#
+# 1. There are deliberately no processors. The collector build in the ADOT Lambda
+#    layer is compiled without processors, so naming one (for example batch) stops
+#    the collector extension from starting and nothing is exported at all.
+#
+# 2. Use metrics_endpoint, not endpoint. The exporter appends the signal path to
+#    endpoint, so setting endpoint to the full metrics URL produces a doubled path
+#    such as /v1/metrics/v1/metrics and every export fails with HTTP 404.
+#    metrics_endpoint is taken as the exact URL.
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: "localhost:4318"
+
+extensions:
+  # Signs every outbound request with SigV4. The CloudWatch OTLP endpoint is an
+  # authenticated AWS API and its signing name is monitoring.
+  sigv4auth:
+    region: "${env:AWS_REGION}"
+    service: "monitoring"
+
+exporters:
+  # Named otlp_http here. Older collector builds use the otlphttp alias instead.
+  otlp_http:
+    metrics_endpoint: "https://monitoring.${env:AWS_REGION}.amazonaws.com/v1/metrics"
+    auth:
+      authenticator: sigv4auth
+    compression: gzip
+
+service:
+  extensions: [sigv4auth]
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [otlp_http]

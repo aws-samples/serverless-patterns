@@ -1,0 +1,49 @@
+{
+    "title": "Send custom Lambda metrics to Amazon CloudWatch over OTLP",
+    "description": "Record custom application metrics in an AWS Lambda function using the OpenTelemetry metrics API and forward them to Amazon CloudWatch over OTLP. The AWS Distro for OpenTelemetry Lambda layer signs each request with SigV4, so the function makes no PutMetricData calls and writes no embedded metric format logs.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "patternArch": {
+        "icon1": { "x": 30, "y": 50, "service": "lambda", "label": "AWS Lambda with ADOT layer" },
+        "icon2": { "x": 70, "y": 50, "service": "cloudwatch", "label": "Amazon CloudWatch OTLP endpoint" },
+        "line1": { "from": "icon1", "to": "icon2", "label": "OTLP over HTTP, SigV4 signed" }
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Teams that need custom business metrics from AWS Lambda have had two options, and both cost something. Calling PutMetricData adds a synchronous AWS API call to the invocation and caps you at 30 dimensions per metric. Writing embedded metric format logs avoids the API call but bills you for log ingestion plus a monthly charge for every unique metric and dimension combination, which gets expensive as cardinality grows. Amazon CloudWatch now accepts OpenTelemetry metrics directly over OTLP, and this pattern shows how to send them from a Lambda function without either of those trade-offs.",
+            "The template deploys a Python function with the AWS Distro for OpenTelemetry Lambda layer attached and a small collector configuration bundled with the function code. The layer starts a reduced OpenTelemetry collector alongside the function. The function records metrics using only the OpenTelemetry metrics API, the collector receives them over local OTLP, signs each request with SigV4, and forwards them to the CloudWatch OTLP endpoint. The function code contains no AWS SDK calls for metrics and performs no request signing, and the only permission it needs is cloudwatch PutMetricData.",
+            "Two details make the OTLP path attractive beyond convenience. There is no per series charge, so wide, high cardinality metrics are billed on volume rather than on the number of unique dimension combinations. The endpoint also accepts up to 150 labels per metric against the 30 dimensions allowed by PutMetricData, so you can attach far richer context to each data point.",
+            "The pattern captures the practical details that are easy to get wrong. The collector build inside the ADOT Lambda layer is compiled without processors, so naming one such as batch stops the collector from starting and nothing is exported at all. Lambda freezes the execution environment the moment the handler returns, so the function flushes the meter provider before returning rather than waiting for the next periodic export. Metrics sent this way are queried with PromQL instead of appearing in the classic CloudWatch metrics console. The OTLP endpoint is also turned off by default and has to be enabled once per account and Region, which the README covers.",
+            "Good fits include business and product metrics such as orders, signups, or revenue, per tenant metrics in multi tenant applications where cardinality is high, and any team already standardized on OpenTelemetry that wants CloudWatch as the backend without running a separate collector gateway."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-cloudwatch-otlp-metrics-sam",
+            "templateURL": "serverless-patterns/lambda-cloudwatch-otlp-metrics-sam",
+            "projectFolder": "lambda-cloudwatch-otlp-metrics-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            { "text": "Send OpenTelemetry metrics to Amazon CloudWatch", "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLP-metrics.html" },
+            { "text": "AWS Distro for OpenTelemetry Lambda support", "link": "https://aws-otel.github.io/docs/getting-started/lambda" },
+            { "text": "Query CloudWatch metrics with PromQL", "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-PromQL.html" },
+            { "text": "OpenTelemetry metrics API for Python", "link": "https://opentelemetry.io/docs/languages/python/instrumentation/" }
+        ]
+    },
+    "deploy": { "text": [ "sam build", "sam deploy --guided" ] },
+    "testing": {
+        "headline": "Testing",
+        "text": [ "Enable the CloudWatch OTLP endpoint for your account and Region, invoke the function a few times, then query the metric with PromQL to confirm the data points arrived. See the README for detailed instructions." ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [ "1. Delete the stack: <code>sam delete</code>." ]
+    },
+    "authors": [ { "name": "Manish S", "image": "", "bio": "", "linkedin": "", "twitter": "" } ]
+}
