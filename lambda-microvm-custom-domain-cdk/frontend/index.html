@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lambda MicroVMs — custom domain demo</title>
+<style>
+  :root { color-scheme: light dark; --gap: 12px; }
+  body { font: 15px/1.5 system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 16px; }
+  h1 { font-size: 1.3rem; }
+  fieldset { border: 1px solid #8884; border-radius: 8px; margin: 0 0 var(--gap); padding: 14px 16px; }
+  legend { padding: 0 6px; font-weight: 600; }
+  label { display: block; margin: 8px 0 2px; font-weight: 600; font-size: .85rem; }
+  input { width: 100%; box-sizing: border-box; padding: 7px 9px; border-radius: 6px; border: 1px solid #8886; font: inherit; }
+  .row { display: flex; gap: var(--gap); }
+  .row > div { flex: 1; }
+  button { margin-top: 10px; padding: 8px 16px; border-radius: 6px; border: 0; background: #2563eb; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  button.secondary { background: #64748b; }
+  pre { background: #8881; padding: 12px; border-radius: 6px; overflow: auto; white-space: pre-wrap; word-break: break-all; max-height: 320px; }
+  .muted { color: #8889; font-size: .82rem; }
+  .status { font-weight: 600; }
+  .ok { color: #16a34a; } .err { color: #dc2626; }
+</style>
+</head>
+<body>
+  <h1>AWS Lambda MicroVMs — custom domain demo</h1>
+  <p class="muted">
+    This page and its provisioning API are both served from the same custom domain by the
+    ALB (the page is static HTML, the API a Lambda target). Step 1 provisions a MicroVM
+    (reuses a running one, else launches one) and mints a short-lived auth token. Step 2
+    calls the MicroVM through <em>its</em> custom domain — the ALB rewrites the
+    <code>Host</code> header and forwards over PrivateLink.
+  </p>
+
+  <fieldset>
+    <legend>1 · Provision</legend>
+    <p class="muted" style="margin:0">
+      Calls <code>/api/provision</code> on this same domain — a Lambda served by the
+      ALB. No endpoint to paste; the page and the provisioning API share one origin.
+    </p>
+    <button id="provision">Get / launch MicroVM + token</button>
+    <div id="provStatus" class="status"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>2 · Call the MicroVM via the custom domain</legend>
+    <label for="domain">Custom domain</label>
+    <input id="domain" placeholder="&lt;uuid&gt;.microvms.demos.example.com" />
+    <div class="row">
+      <div>
+        <label for="port">Port</label>
+        <input id="port" value="8080" />
+      </div>
+      <div>
+        <label for="path">Path</label>
+        <input id="path" value="/ping" />
+      </div>
+    </div>
+    <label for="token">Auth token (X-aws-proxy-auth)</label>
+    <input id="token" placeholder="filled in by step 1 — or paste your own" />
+    <button id="call">Call MicroVM</button>
+    <div id="callStatus" class="status"></div>
+  </fieldset>
+
+  <label>Result</label>
+  <pre id="out">—</pre>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const out = $('out');
+  const show = (obj) => { out.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2); };
+  const setStatus = (el, msg, ok) => { el.textContent = msg; el.className = 'status ' + (ok ? 'ok' : 'err'); };
+
+  $('provision').addEventListener('click', async () => {
+    $('provision').disabled = true;
+    setStatus($('provStatus'), 'Provisioning…', true);
+    try {
+      // Same-origin call to the ALB-served Lambda. Relative path, so it works
+      // no matter which host the page is served from.
+      const res = await fetch('/api/provision', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || res.statusText);
+      // Prefill step 2.
+      $('domain').value = data.customDomain || '';
+      $('token').value = data.authToken || '';
+      if (data.port) $('port').value = data.port;
+      if (data.defaultPath) $('path').value = data.defaultPath;
+      setStatus($('provStatus'),
+        `${data.reused ? 'Reused' : 'Launched'} ${data.microvmId} (${data.state}). Token valid ~${data.tokenTtlMinutes} min.`, true);
+      show(data);
+    } catch (e) {
+      setStatus($('provStatus'), 'Failed: ' + e.message, false);
+      show(String(e));
+    } finally {
+      $('provision').disabled = false;
+    }
+  });
+
+  $('call').addEventListener('click', async () => {
+    const domain = $('domain').value.trim();
+    const port = $('port').value.trim() || '8080';
+    let path = $('path').value.trim() || '/';
+    if (!path.startsWith('/')) path = '/' + path;
+    const token = $('token').value.trim();
+    if (!domain || !token) { setStatus($('callStatus'), 'Need a custom domain and a token (run step 1).', false); return; }
+
+    $('call').disabled = true;
+    setStatus($('callStatus'), 'Calling…', true);
+    const url = `https://${domain}${path}`;
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 'X-aws-proxy-auth': token, 'X-aws-proxy-port': port },
+      });
+      const text = await res.text();
+      setStatus($('callStatus'), `HTTP ${res.status} ${res.statusText}`, res.ok);
+      show(`GET ${url}\nport ${port}\n\n${text}`);
+    } catch (e) {
+      // A CORS/network failure lands here with an opaque message.
+      setStatus($('callStatus'), 'Fetch failed (network/CORS): ' + e.message, false);
+      show(`GET ${url}\n\n${e}\n\nIf this is a CORS error, confirm the ALB is inserting Access-Control-Allow-* response headers.`);
+    } finally {
+      $('call').disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

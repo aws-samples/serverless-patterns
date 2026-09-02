@@ -1,0 +1,33 @@
+{
+  "name": "lambda-microvm-custom-domain-cdk",
+  "version": "1.0.0",
+  "description": "Self-service custom domains for AWS Lambda MicroVMs using CloudFront-free, compute-free ALB Host header rewrite over PrivateLink.",
+  "license": "MIT-0",
+  "bin": {
+    "microvm-custom-domains": "bin/microvm-custom-domains.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "aws-cdk": "^2.1000.0",
+    "esbuild": "^0.21.0",
+    "jest": "^29.7.0",
+    "source-map-support": "^0.5.21",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-lambda-microvms": "^3.0.0",
+    "aws-cdk-lib": "^2.150.0",
+    "constructs": "^10.3.0"
+  }
+}
