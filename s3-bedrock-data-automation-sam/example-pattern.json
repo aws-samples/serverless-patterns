@@ -1,0 +1,64 @@
+{
+    "title": "Extract structured data from documents with Amazon Bedrock Data Automation",
+    "description": "Automatically turn files uploaded to Amazon S3 (documents, images, video, audio) into structured JSON using Amazon Bedrock Data Automation and AWS Lambda, with no machine-learning code.",
+    "language": "Python",
+    "level": "200",
+    "framework": "AWS SAM",
+    "patternArch": {
+        "icon1": { "x": 20, "y": 50, "service": "s3", "label": "Amazon S3 (input + output)" },
+        "icon2": { "x": 50, "y": 50, "service": "lambda", "label": "AWS Lambda (starts BDA job)" },
+        "icon3": { "x": 80, "y": 50, "service": "bedrock", "label": "Bedrock Data Automation" },
+        "line1": { "from": "icon1", "to": "icon2", "label": "ObjectCreated" },
+        "line2": { "from": "icon2", "to": "icon3", "label": "invoke async" },
+        "line3": { "from": "icon3", "to": "icon1", "label": "structured JSON" }
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Amazon Bedrock Data Automation (BDA) is a managed service that extracts structured information from unstructured content such as documents, images, video, and audio. This pattern wires it into a fully serverless, event-driven pipeline so that any file dropped into Amazon S3 is automatically turned into structured JSON, with no machine-learning code to write or maintain.",
+            "When a file is uploaded to the input/ prefix of the Amazon S3 bucket, the ObjectCreated event triggers an AWS Lambda function. The function calls the BDA runtime InvokeDataAutomationAsync API, passing the input file location, an output location, and the Amazon Bedrock Data Automation project that defines what to extract. The function is fire-and-forget: it only starts the asynchronous job and returns immediately, so it stays small and cheap.",
+            "Bedrock Data Automation reads the file, runs the managed extraction defined by the project, and writes the structured result to the output/ prefix of the same bucket. The project in this pattern uses a standard output configuration that returns each document as clean Markdown text (including tables) plus a generative summary. You can change what is extracted by editing the project resource in the template: add Image, Video, or Audio blocks, or attach a custom output configuration (a blueprint) that defines the exact fields you want.",
+            "The Amazon Bedrock Data Automation project is a native AWS CloudFormation resource (AWS::Bedrock::DataAutomationProject), so the entire pipeline is defined as infrastructure as code and the amount of custom code is minimal. IAM permissions follow least privilege: the Lambda function may read and write only the pattern bucket, and may invoke only Bedrock Data Automation. Note that the system data automation profile (us.data-automation-v1) is a cross-region profile, so the profile ARN in the policy is region-wildcarded because the job can be routed to any US region.",
+            "Good use cases include invoice and form processing, contract and document understanding, media cataloging, and any workflow that needs to convert a pile of raw files into queryable data. Because both Amazon S3 and AWS Lambda are pay-per-use and Bedrock Data Automation is fully managed, the pipeline scales to zero and has no idle cost."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-bedrock-data-automation-sam",
+            "templateURL": "serverless-patterns/s3-bedrock-data-automation-sam",
+            "projectFolder": "s3-bedrock-data-automation-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            { "text": "Amazon Bedrock Data Automation - documentation", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/bda.html" },
+            { "text": "AWS::Bedrock::DataAutomationProject - CloudFormation resource", "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-bedrock-dataautomationproject.html" },
+            { "text": "InvokeDataAutomationAsync - BDA runtime API", "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeDataAutomationAsync.html" },
+            { "text": "Using Amazon S3 notifications to trigger AWS Lambda", "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html" }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "Upload a document to the input/ prefix, then read the structured JSON from the output/ prefix. See the README for detailed instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Empty the S3 bucket: <code>aws s3 rm s3://YOUR_BUCKET --recursive</code>.",
+            "2. Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        { "name": "Manish S", "image": "", "bio": "", "linkedin": "", "twitter": "" }
+    ]
+}
