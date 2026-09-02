@@ -5,12 +5,15 @@ from datetime import datetime
 
 import boto3
 from pymongo import MongoClient
+import logging
 
+logger = logging.getLogger(__name__)
 
 def get_secret(secret_name):
     session = boto3.session.Session()
     region = session.region_name
-    print(f"region = {region}")
+    #print(f"region = {region}")
+    logger.info("region = %s", region)
 
     client = session.client(service_name="secretsmanager", region_name=region)
     response = client.get_secret_value(SecretId=secret_name)
@@ -41,7 +44,7 @@ def get_person_from_row(row, message_id):
 
 def main():
     if len(sys.argv) != 5:
-        print(
+        logger.error(
             "Pass four parameters: 1 - DocumentDB Database Name, "
             "2 - DocumentDB Collection Name, "
             "3 - A string to be used as key for this batch of messages, "
@@ -68,7 +71,7 @@ def main():
         f"&tlsCAFile={ca_file_path}&retryWrites=false"
     )
 
-    print(f"Connection String = {connection_string}")
+    #print(f"Connection String = {connection_string}")
 
     client = MongoClient(connection_string)
     db = client[db_name]
@@ -87,9 +90,11 @@ def main():
 
     for i in range(1, messages_to_send + 1):
         person = get_person_from_row(people[i - 1], f"{message_key}-{i}")
-        print(f"Now going to insert a row in DynamoDB for messageID = {person['_id']}")
+        #print(f"Now going to insert a row in DynamoDB for messageID = {person['_id']}")
+        logger.info("Now going to insert a row in DocumentDB for messageID = %s", person['_id'])
         collection.insert_one(person)
-        print(f"Now done inserting a row in DynamoDB for messageID = {person['_id']}")
+        #print(f"Now done inserting a row in DynamoDB for messageID = {person['_id']}")
+        logger.info("Now done inserting a row in DocumentDB for messageID = %s", person['_id'])
 
     client.close()
 

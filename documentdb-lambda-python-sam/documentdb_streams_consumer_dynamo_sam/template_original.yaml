@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   documentdb_streams_event_consumer_function
 
-  Sample SAM Template for documentdb-streams-consumer-with-sam (Python)
+  Sample SAM Template for documentdb-streams-consumer-with-sam (Python) (uksb-1tthgi812) (tag:documentdb_streams_consumer_dynamo_sam)
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:

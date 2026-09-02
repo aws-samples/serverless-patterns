@@ -31,7 +31,6 @@ Parameters:
   DocumentDBClusterPassword:
     Type: String
     Description: Password for the DocumentDB Cluster
-    Default: docdbPassword123
     NoEcho: true
   ServerlessLandGithubLocation:
     Type: String
@@ -705,9 +704,18 @@ Resources:
                   {
             "Effect": "Allow",
             "Action": [
-                "iam:*"
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:GetRole",
+                "iam:PassRole",
+                "iam:TagRole",
+                "iam:UntagRole"
             ],
-            "Resource": "*"
+            "Resource": "arn:aws:iam::${AWS::AccountId}:role/*"
         }
               ]
           }'
