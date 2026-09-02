@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="520" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 1: Function Chaining</text>
+  <text x="24" y="36" fill="#FF9900" font-size="18" font-weight="bold" dx="270"> | </text>
+  <text x="305" y="36" fill="#D5DBDB" font-size="14">Sequential steps with checkpointed results</text>
+
+  <!-- Lambda icon area -->
+  <rect x="30" y="78" width="70" height="30" fill="#ED7100" rx="4"/>
+  <text x="40" y="98" fill="#FFF" font-size="11" font-weight="bold">SNS Topic</text>
+
+  <!-- Arrow from SNS -->
+  <line x1="100" y1="93" x2="140" y2="93" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Step 1 -->
+  <rect x="145" y="70" width="160" height="90" fill="url(#stepGrad)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow)"/>
+  <rect x="145" y="70" width="160" height="26" fill="#1B660F" rx="6"/>
+  <rect x="145" y="84" width="160" height="12" fill="#1B660F"/>
+  <text x="175" y="88" fill="#FFF" font-size="11" font-weight="bold">Step 1: validate-order</text>
+  <text x="158" y="114" fill="#16191F" font-size="10">Validate orderId exists</text>
+  <text x="158" y="128" fill="#16191F" font-size="10">Verify amount &gt; 0</text>
+  <text x="158" y="145" fill="#687078" font-size="9" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- Arrow 1-2 -->
+  <line x1="305" y1="115" x2="335" y2="115" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="310" y="108" fill="#1B660F" font-size="9">checkpointed</text>
+
+  <!-- Step 2 -->
+  <rect x="340" y="70" width="160" height="90" fill="url(#stepGrad)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow)"/>
+  <rect x="340" y="70" width="160" height="26" fill="#1B660F" rx="6"/>
+  <rect x="340" y="84" width="160" height="12" fill="#1B660F"/>
+  <text x="355" y="88" fill="#FFF" font-size="11" font-weight="bold">Step 2: reserve-inventory</text>
+  <text x="353" y="114" fill="#16191F" font-size="10">Reserve stock in warehouse</text>
+  <text x="353" y="128" fill="#16191F" font-size="10">Generate reservationId</text>
+  <text x="353" y="145" fill="#687078" font-size="9" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- Arrow 2-3 -->
+  <line x1="500" y1="115" x2="530" y2="115" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="505" y="108" fill="#1B660F" font-size="9">checkpointed</text>
+
+  <!-- Step 3 -->
+  <rect x="535" y="70" width="160" height="90" fill="url(#stepGrad)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow)"/>
+  <rect x="535" y="70" width="160" height="26" fill="#1B660F" rx="6"/>
+  <rect x="535" y="84" width="160" height="12" fill="#1B660F"/>
+  <text x="550" y="88" fill="#FFF" font-size="11" font-weight="bold">Step 3: process-payment</text>
+  <text x="548" y="114" fill="#16191F" font-size="10">Charge customer card</text>
+  <text x="548" y="128" fill="#16191F" font-size="10">Generate transactionId</text>
+  <text x="548" y="145" fill="#687078" font-size="9" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- Arrow 3-4 -->
+  <line x1="695" y1="115" x2="725" y2="115" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="700" y="108" fill="#1B660F" font-size="9">checkpointed</text>
+
+  <!-- Step 4 -->
+  <rect x="730" y="70" width="160" height="90" fill="url(#stepGrad)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow)"/>
+  <rect x="730" y="70" width="160" height="26" fill="#1B660F" rx="6"/>
+  <rect x="730" y="84" width="160" height="12" fill="#1B660F"/>
+  <text x="765" y="88" fill="#FFF" font-size="11" font-weight="bold">Step 4: ship-order</text>
+  <text x="743" y="114" fill="#16191F" font-size="10">Create shipping label</text>
+  <text x="743" y="128" fill="#16191F" font-size="10">Generate trackingNumber</text>
+  <text x="743" y="145" fill="#687078" font-size="9" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- Arrow 4-5 -->
+  <line x1="890" y1="115" x2="920" y2="115" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Step 5 -->
+  <rect x="925" y="70" width="155" height="90" fill="url(#stepGrad)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow)"/>
+  <rect x="925" y="70" width="155" height="26" fill="#1B660F" rx="6"/>
+  <rect x="925" y="84" width="155" height="12" fill="#1B660F"/>
+  <text x="940" y="88" fill="#FFF" font-size="11" font-weight="bold">Step 5: notify-customer</text>
+  <text x="938" y="114" fill="#16191F" font-size="10">Send shipment email</text>
+  <text x="938" y="128" fill="#16191F" font-size="10">Include tracking info</text>
+
+  <!-- Key concept box -->
+  <rect x="30" y="195" width="1040" height="130" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow)"/>
+  <rect x="30" y="195" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="213" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="215" fill="#FF9900" font-size="12" font-weight="bold">Key Concept: Checkpointing &amp; Replay</text>
+
+  <text x="50" y="250" fill="#16191F" font-size="12">Each step's result is durably checkpointed. If the function is interrupted (timeout, error, wait), it resumes from</text>
+  <text x="50" y="268" fill="#16191F" font-size="12">the last checkpoint without re-executing completed steps.</text>
+
+  <!-- Replay diagram -->
+  <rect x="50" y="282" width="100" height="28" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="4"/>
+  <text x="66" y="300" fill="#1B660F" font-size="10" font-weight="bold">Step 1 </text>
+  <text x="98" y="300" fill="#1B660F" font-size="10">&#x2713;</text>
+
+  <line x1="150" y1="296" x2="170" y2="296" stroke="#545B64" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+  <rect x="175" y="282" width="100" height="28" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="4"/>
+  <text x="191" y="300" fill="#1B660F" font-size="10" font-weight="bold">Step 2 </text>
+  <text x="223" y="300" fill="#1B660F" font-size="10">&#x2713;</text>
+
+  <line x1="275" y1="296" x2="295" y2="296" stroke="#545B64" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+  <rect x="300" y="282" width="100" height="28" fill="#FFF3E0" stroke="#FF9900" stroke-width="1.5" rx="4"/>
+  <text x="316" y="300" fill="#FF9900" font-size="10" font-weight="bold">Step 3 </text>
+  <text x="348" y="300" fill="#FF9900" font-size="10">&#x25B6;</text>
+
+  <line x1="400" y1="296" x2="420" y2="296" stroke="#AAB7B8" stroke-width="1" stroke-dasharray="4" marker-end="url(#arrowhead)"/>
+
+  <rect x="425" y="282" width="100" height="28" fill="#F5F5F5" stroke="#AAB7B8" stroke-width="1" rx="4" stroke-dasharray="4"/>
+  <text x="449" y="300" fill="#AAB7B8" font-size="10">Step 4</text>
+
+  <line x1="525" y1="296" x2="545" y2="296" stroke="#AAB7B8" stroke-width="1" stroke-dasharray="4" marker-end="url(#arrowhead)"/>
+
+  <rect x="550" y="282" width="100" height="28" fill="#F5F5F5" stroke="#AAB7B8" stroke-width="1" rx="4" stroke-dasharray="4"/>
+  <text x="574" y="300" fill="#AAB7B8" font-size="10">Step 5</text>
+
+  <text x="680" y="300" fill="#687078" font-size="10">&#x2190; On replay: skips 1-2, resumes at 3</text>
+
+  <!-- Data flow box -->
+  <rect x="30" y="350" width="1040" height="150" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow)"/>
+  <rect x="30" y="350" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="368" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="370" fill="#FF9900" font-size="12" font-weight="bold">Data Flow Between Steps</text>
+
+  <!-- Data flow arrows -->
+  <rect x="50" y="395" width="180" height="90" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="4"/>
+  <text x="60" y="413" fill="#2C3E50" font-size="10" font-weight="bold">Input (SNS Message)</text>
+  <text x="60" y="430" fill="#545B64" font-size="9">orderId: "ORD-123"</text>
+  <text x="60" y="444" fill="#545B64" font-size="9">totalAmount: 299.99</text>
+  <text x="60" y="458" fill="#545B64" font-size="9">customerId: "CUST-001"</text>
+  <text x="60" y="472" fill="#545B64" font-size="9">shippingAddress: "123 Main St"</text>
+
+  <line x1="230" y1="440" x2="270" y2="440" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <rect x="275" y="395" width="180" height="90" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="4"/>
+  <text x="285" y="413" fill="#2C3E50" font-size="10" font-weight="bold">Validate Output</text>
+  <text x="285" y="430" fill="#545B64" font-size="9">orderId: "ORD-123"</text>
+  <text x="285" y="444" fill="#545B64" font-size="9">status: "VALIDATED"</text>
+  <text x="285" y="458" fill="#545B64" font-size="9">amount: 299.99</text>
+  <text x="285" y="472" fill="#545B64" font-size="9">customerId: "CUST-001"</text>
+
+  <line x1="455" y1="440" x2="495" y2="440" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <rect x="500" y="395" width="180" height="90" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="4"/>
+  <text x="510" y="413" fill="#2C3E50" font-size="10" font-weight="bold">Inventory Output</text>
+  <text x="510" y="430" fill="#545B64" font-size="9">orderId: "ORD-123"</text>
+  <text x="510" y="444" fill="#545B64" font-size="9">status: "INVENTORY_RESERVED"</text>
+  <text x="510" y="458" fill="#545B64" font-size="9">reservationId: "RES-ORD-123"</text>
+  <text x="510" y="472" fill="#545B64" font-size="9">warehouse: "WAREHOUSE-EAST-1"</text>
+
+  <line x1="680" y1="440" x2="720" y2="440" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <rect x="725" y="395" width="160" height="90" fill="#E8F8F5" stroke="#1B660F" stroke-width="1.5" rx="4"/>
+  <text x="735" y="413" fill="#1B660F" font-size="10" font-weight="bold">Final Output</text>
+  <text x="735" y="430" fill="#545B64" font-size="9">pattern: "CHAINING"</text>
+  <text x="735" y="444" fill="#545B64" font-size="9">finalStatus: "COMPLETED"</text>
+  <text x="735" y="458" fill="#545B64" font-size="9">trackingNumber: "TRACK-..."</text>
+  <text x="735" y="472" fill="#545B64" font-size="9">transactionId: "TXN-..."</text>
+
+  <text x="903" y="440" fill="#687078" font-size="9" font-style="italic">&#x2192; DynamoDB</text>
+</svg>
