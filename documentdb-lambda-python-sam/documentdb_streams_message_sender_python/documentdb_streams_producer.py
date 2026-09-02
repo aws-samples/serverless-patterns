@@ -7,6 +7,10 @@ import boto3
 from pymongo import MongoClient
 import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 def get_secret(secret_name):
