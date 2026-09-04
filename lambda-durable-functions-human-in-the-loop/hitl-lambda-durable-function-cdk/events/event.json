@@ -1,0 +1,39 @@
+{
+  "submissionId": "DOC-2026-001234",
+  "submissionType": "expense_report",
+  "submitter": {
+    "name": "Alice Johnson",
+    "email": "alice.johnson@example.com",
+    "department": "Engineering",
+    "employeeId": "EMP-5678"
+  },
+  "document": {
+    "title": "Q1 2026 Conference Travel Expenses",
+    "amount": 2450.00,
+    "currency": "USD",
+    "category": "Travel & Entertainment",
+    "description": "AWS re:Invent 2026 conference attendance including flights, hotel, and meals",
+    "items": [
+      {
+        "description": "Round-trip flight to Las Vegas",
+        "amount": 850.00,
+        "date": "2026-11-28"
+      },
+      {
+        "description": "Hotel accommodation (4 nights)",
+        "amount": 1200.00,
+        "date": "2026-11-28"
+      },
+      {
+        "description": "Meals and transportation",
+        "amount": 400.00,
+        "date": "2026-11-28"
+      }
+    ],
+    "attachments": [
+      "s3://expense-receipts/2026/alice-johnson/flight-receipt.pdf",
+      "s3://expense-receipts/2026/alice-johnson/hotel-invoice.pdf"
+    ]
+  },
+  "submittedAt": "2026-02-13T14:30:00Z"
+}
