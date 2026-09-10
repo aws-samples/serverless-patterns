@@ -45,5 +45,5 @@
         "headline": "Cleanup",
         "text": [ "1. Delete the stack: <code>sam delete</code>." ]
     },
-    "authors": [ { "name": "Manish S", "image": "", "bio": "", "linkedin": "", "twitter": "" } ]
+    "authors": [ { "name": "Manish S", "image": "", "bio": "AWS Support Engineer, trying to build things", "linkedin": "https://www.linkedin.com/in/manish-s-84199221b", "twitter": "" } ]
 }
