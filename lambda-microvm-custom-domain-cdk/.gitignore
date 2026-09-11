@@ -1,0 +1,26 @@
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+# CDK context cache — can contain account-specific lookup data; don't commit
+cdk.context.json
+
+# Build / deploy logs
+*.log
+
+# Local env / creds — never commit
+.env
+*.local
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# OS
+.DS_Store

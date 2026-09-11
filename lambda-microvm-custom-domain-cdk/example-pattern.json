@@ -1,0 +1,65 @@
+{
+  "title": "Custom domains for AWS Lambda MicroVMs with Application Load Balancer",
+  "description": "Serve each AWS Lambda MicroVM under a domain you own via an Application Load Balancer Host header rewrite over PrivateLink, with no CloudFront or request-path compute.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern gives each AWS Lambda MicroVM a domain you own (e.g. <uuid>.microvms.example.com) instead of exposing the service-generated <uuid>.lambda-microvm.<region>.on.aws endpoint. It is built entirely from load-balancing and networking primitives: there is no CloudFront and no compute in the request path.",
+      "A client sends HTTPS to <uuid>.microvms.example.com. Route 53 resolves a wildcard record to an Application Load Balancer, which terminates TLS with a wildcard ACM certificate. A listener rule matches the host with a regex condition, then a host-header-rewrite Transform swaps only the base-domain suffix (preserving everything ahead of it) to rewrite Host to <uuid>.lambda-microvm.<region>.on.aws.",
+      "The ALB forwards to an IP target group whose targets are the private ENI IPs of a MicroVM interface VPC endpoint, reaching the MicroVM service over AWS PrivateLink. The service routes to the correct MicroVM using the rewritten Host header and enforces the JWE auth token the client supplied. Because a Transform (not a redirect) performs the rewrite, the customer's domain stays intact end to end.",
+      "CORS is handled entirely at the ALB (a 204 preflight rule plus inserted Access-Control-Allow-* response headers), so no change is required inside the MicroVM. The CDK app also includes an optional, demo-only single-page app and provisioning API that can be removed to deploy the pure networking pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-custom-domain-cdk",
+      "templateURL": "serverless-patterns/lambda-microvm-custom-domain-cdk",
+      "projectFolder": "lambda-microvm-custom-domain-cdk",
+      "templateFile": "lib/microvm-custom-domains-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html"
+      },
+      {
+        "text": "Introducing URL and Host header rewrite with AWS Application Load Balancers",
+        "link": "https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-url-and-host-header-rewrite-with-aws-application-load-balancers/"
+      },
+      {
+        "text": "AWS PrivateLink interface VPC endpoints",
+        "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/interface-endpoints.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Frank Scarfo",
+      "image": "https://avatars.githubusercontent.com/u/8919289?v=4",
+      "bio": "Frank Scarfo is a Senior Software Development Engineer at Amazon Web Services.",
+      "linkedin": "frank-scarfo-7bba053a",
+      "twitter": ""
+    }
+  ]
+}
