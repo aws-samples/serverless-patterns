@@ -61,24 +61,5 @@
             "linkedin": "frank-scarfo-7bba053a",
             "twitter": ""
         }
-    ],
-    "patternArch": {
-        "icon1": {
-            "x": 20,
-            "y": 50,
-            "service": "alb",
-            "label": "Application Load Balancer"
-        },
-        "icon2": {
-            "x": 80,
-            "y": 50,
-            "service": "lambda-microvms",
-            "label": "AWS Lambda MicroVMs"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2",
-            "label": ""
-        }
-    }
+    ]
 }

@@ -15,8 +15,8 @@
   "gitHub": {
     "template": {
       "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/documentdb-lambda-python-sam",
-      "templateURL": "serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam",
-      "projectFolder": "documentdb_streams_consumer_dynamo_sam",
+      "templateURL": "serverless-patterns/documentdb-lambda-python-sam",
+      "projectFolder": "documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam",
       "templateFile": "template_original.yaml"
     }
   },
