@@ -146,7 +146,6 @@ resource "aws_iam_policy" "scheduler_alarm_policy" {
 
 resource "aws_iam_role" "scheduler-alarm-role" {
   name = "scheduler-alarm-role"
-  managed_policy_arns = [aws_iam_policy.scheduler_alarm_policy.arn]
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -161,4 +160,9 @@ resource "aws_iam_role" "scheduler-alarm-role" {
       },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "scheduler_alarm_policy_attachment" {
+  role       = aws_iam_role.scheduler-alarm-role.name
+  policy_arn = aws_iam_policy.scheduler_alarm_policy.arn
 }
