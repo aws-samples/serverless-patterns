@@ -1,25 +1,23 @@
 # Amazon EventBridge Pipes with Amazon Bedrock AI Enrichment
 
-This pattern deploys an Amazon EventBridge Pipe that enriches messages in-flight using Amazon Bedrock before delivering them to the target. Messages from Amazon SQS are passed through an AWS Lambda enrichment function that calls Amazon Bedrock to classify sentiment, extract entities, and generate summaries — then writes the enriched data to Amazon DynamoDB.
-
-Important: This is the first serverless pattern combining Amazon EventBridge Pipes with Amazon Bedrock. While 48+ Pipes patterns exist in this repo, none use AI/ML enrichment. This pattern demonstrates how to add real-time AI processing to any event pipeline without changing source or target configurations.
+This pattern deploys an Amazon EventBridge Pipe that enriches messages in-flight using Amazon Bedrock before delivering them to the target. Messages from Amazon SQS pass through an AWS Lambda enrichment function that calls Amazon Bedrock to classify sentiment, extract entities, and generate summaries. The Pipe target is Amazon CloudWatch Logs, where the enriched output is delivered. The enrichment function also persists each enriched record to Amazon DynamoDB for downstream querying and analytics.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-bedrock-enrichment-cdk
 
 ## Architecture
 
 ```
-┌──────────────┐     ┌─────────────────────────────────────────────┐     ┌──────────────────┐
-│ Amazon SQS   │────▶│ Amazon EventBridge Pipe                      │────▶│ Amazon DynamoDB  │
-│ (Source)     │     │                                             │     │ (Enriched Data)  │
-└──────────────┘     │  ┌─────────────────────────────────────┐   │     └──────────────────┘
-                     │  │ AWS Lambda (Enrichment)              │   │
-                     │  │  → Amazon Bedrock (Claude Sonnet 4.6)│   │
-                     │  │  → Classify sentiment                │   │
-                     │  │  → Extract entities                  │   │
-                     │  │  → Generate summary                  │   │
-                     │  └─────────────────────────────────────┘   │
-                     └─────────────────────────────────────────────┘
+┌──────────────┐     ┌─────────────────────────────────────────────┐     ┌────────────────────────┐
+│ Amazon SQS   │────▶│ Amazon EventBridge Pipe                       │────▶│ Amazon CloudWatch Logs │
+│ (Source)     │     │                                               │     │ (Target)               │
+└──────────────┘     │  ┌─────────────────────────────────────┐      │     └────────────────────────┘
+                     │  │ AWS Lambda (Enrichment)              │      │
+                     │  │  → Amazon Bedrock (Claude Sonnet 4.6)│      │
+                     │  │  → Classify sentiment                │      │
+                     │  │  → Extract entities                  │      │              ┌──────────────────┐
+                     │  │  → Generate summary                  │──────┼─────────────▶│ Amazon DynamoDB  │
+                     │  └─────────────────────────────────────┘      │              │ (Enriched Store) │
+                     └─────────────────────────────────────────────┘               └──────────────────┘
 ```
 
 **How it works:**
@@ -27,7 +25,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 1. Messages arrive in the Amazon SQS source queue (any format — customer feedback, support tickets, log entries)
 2. Amazon EventBridge Pipes reads the message and invokes the AWS Lambda enrichment function
 3. The enrichment function calls Amazon Bedrock (Claude Sonnet 4.6) to classify sentiment, extract named entities, and generate a one-line summary
-4. The enriched message (original + sentiment + entities + summary) is written to Amazon DynamoDB
+4. The Pipe delivers the enriched message to the target, Amazon CloudWatch Logs
+5. In parallel, the enrichment function writes each enriched record (original + sentiment + entities + summary) to Amazon DynamoDB for persistent storage and querying
 
 **Use cases:** Real-time sentiment analysis on customer feedback, automated ticket classification, log enrichment with AI context, content moderation pipelines.
 
@@ -62,6 +61,14 @@ aws sqs send-message \
   --message-body '{"message": "I absolutely love the new feature you released! The AI suggestions save me hours every week. Your team is doing amazing work."}'
 ```
 
+### Check the enriched output in Amazon CloudWatch Logs (Pipe target)
+
+```bash
+aws logs tail /pipes/bedrock-enriched-output --since 5m --format short
+```
+
+The Pipe delivers the enriched records to the `/pipes/bedrock-enriched-output` log group. Each entry includes `sentiment`, `entities`, and `summary`.
+
 ### Check enriched results in Amazon DynamoDB
 
 ```bash
@@ -92,7 +99,8 @@ npx cdk destroy
 | Amazon EventBridge Pipes | Orchestrates source → enrichment → target flow |
 | AWS Lambda | Enrichment step — calls Amazon Bedrock |
 | Amazon Bedrock | AI classification, entity extraction, summarization |
-| Amazon DynamoDB | Target — stores enriched messages with AI metadata |
+| Amazon CloudWatch Logs | Target — receives the enriched output from the Pipe |
+| Amazon DynamoDB | Persistent store — enriched messages with AI metadata for querying |
 
 ----
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.

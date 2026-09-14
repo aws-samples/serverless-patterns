@@ -4,3 +4,6 @@ cdk.context.json
 build
 *.js
 *.d.ts
+
+__pycache__/
+*.pyc

@@ -5,13 +5,17 @@ Classifies sentiment, extracts entities, and generates summary using
 Amazon Bedrock before the message reaches the target."""
 
 import json
+import logging
 import os
 from datetime import datetime, timezone
 
 import boto3
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 BEDROCK_CLIENT = boto3.client('bedrock-runtime')
-MODEL_ID = os.environ.get('MODEL_ID', 'us.anthropic.claude-sonnet-4-6-20250514-v1:0')
+MODEL_ID = os.environ.get('MODEL_ID', 'us.anthropic.claude-sonnet-4-6')
 DYNAMODB = boto3.resource('dynamodb')
 TABLE_NAME = os.environ.get('ENRICHED_TABLE', '')
 
@@ -55,10 +59,10 @@ def lambda_handler(event, context):
                         'ttl': int(datetime.now(timezone.utc).timestamp()) + 86400 * 7,
                     })
                 except Exception as ddb_err:
-                    print(f'DynamoDB write failed: {ddb_err}')
+                    logger.error('DynamoDB write failed: %s', ddb_err)
 
         except Exception as e:
-            print(f'Enrichment failed for record: {e}')
+            logger.error('Enrichment failed for record: %s', e)
             results.append({
                 'messageId': record.get('messageId', 'unknown'),
                 'originalMessage': str(record.get('body', ''))[:500],
@@ -110,8 +114,8 @@ Return ONLY valid JSON, no explanation."""
         return enrichment
 
     except (json.JSONDecodeError, KeyError, IndexError) as e:
-        print(f'Bedrock response parse error: {e}')
+        logger.error('Bedrock response parse error: %s', e)
         return {'sentiment': 'UNKNOWN', 'entities': [], 'summary': 'Parse error'}
     except Exception as e:
-        print(f'Bedrock invocation error: {e}')
+        logger.error('Bedrock invocation error: %s', e)
         raise
