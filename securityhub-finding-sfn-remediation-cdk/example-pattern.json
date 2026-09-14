@@ -34,9 +34,9 @@
   },
   "deploy": {
     "text": [
-      "<code>cd securityhub-finding-sfn-remediation-cdk/cdk</code>",
+      "<code>cd securityhub-finding-sfn-remediation-cdk</code>",
       "<code>npm install</code>",
-      "<code>npx cdk deploy</code>"
+      "<code>cdk deploy</code>"
     ]
   },
   "testing": {
@@ -48,7 +48,7 @@
     ]
   },
   "cleanup": {
-    "text": ["<code>npx cdk destroy</code>"]
+    "text": ["<code>cd securityhub-finding-sfn-remediation-cdk</code>", "<code>cdk destroy</code>"]
   },
   "authors": [
     {

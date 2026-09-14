@@ -147,7 +147,7 @@ aws sns subscribe --topic-arn $TOPIC_ARN --protocol email \
 > **Warning:** After destroying this stack, Security Hub findings will no longer be auto-remediated.
 
 ```bash
-cd securityhub-finding-sfn-remediation-cdk/cdk
+cd securityhub-finding-sfn-remediation-cdk
 cdk destroy
 ```
 
