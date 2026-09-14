@@ -1,0 +1,113 @@
+{
+    "title": "Amazon EventBridge Pipes with Amazon Bedrock AI Enrichment",
+    "description": "Enrich messages in-flight with AI classification and entity extraction using Amazon EventBridge Pipes and Amazon Bedrock",
+    "language": "TypeScript",
+    "level": "300",
+    "framework": "AWS CDK",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Messages arrive in an Amazon SQS queue and are read by Amazon EventBridge Pipes.",
+            "The Pipe invokes an AWS Lambda enrichment function that calls Amazon Bedrock (Claude Sonnet 4.6) to classify sentiment, extract entities, and summarize the message.",
+            "The Pipe delivers the enriched output to its target, Amazon CloudWatch Logs. In parallel, the enrichment function persists each enriched record to Amazon DynamoDB for querying and downstream analytics."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-bedrock-enrichment-cdk",
+            "templateURL": "serverless-patterns/eventbridge-pipes-bedrock-enrichment-cdk",
+            "projectFolder": "eventbridge-pipes-bedrock-enrichment-cdk",
+            "templateFile": "cdk/lib/eventbridge-pipes-bedrock-enrichment-stack.ts"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon EventBridge Pipes enrichment",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-enrichment.html"
+            },
+            {
+                "text": "Amazon Bedrock InvokeModel API",
+                "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "<code>cd eventbridge-pipes-bedrock-enrichment-cdk/cdk</code>",
+            "<code>npm install</code>",
+            "<code>npx cdk deploy</code>"
+        ]
+    },
+    "testing": {
+        "text": [
+            "Send a message to the Amazon SQS source queue.",
+            "Wait a few seconds for the Pipe to process.",
+            "Tail the Amazon CloudWatch Logs target log group (/pipes/bedrock-enriched-output) to see the enriched output delivered by the Pipe.",
+            "Query the Amazon DynamoDB table to see the persisted enriched record with sentiment, entities, and summary."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "<code>npx cdk destroy</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Nithin Chandran R",
+            "image": "",
+            "bio": "Technical Account Manager at AWS",
+            "linkedin": "nithin-chandran-r",
+            "twitter": ""
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 8,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS"
+        },
+        "icon2": {
+            "x": 35,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "Amazon EventBridge Pipes"
+        },
+        "icon3": {
+            "x": 62,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Amazon Bedrock"
+        },
+        "icon4": {
+            "x": 85,
+            "y": 25,
+            "service": "cloudwatch",
+            "label": "Amazon CloudWatch Logs"
+        },
+        "icon5": {
+            "x": 85,
+            "y": 70,
+            "service": "dynamodb",
+            "label": "Amazon DynamoDB"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        },
+        "line3": {
+            "from": "icon3",
+            "to": "icon4"
+        },
+        "line4": {
+            "from": "icon3",
+            "to": "icon5"
+        }
+    },
+    "patternType": "Serverless"
+}
