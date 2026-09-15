@@ -66,43 +66,70 @@ export class GuarddutyFileModificationSfnResponseStack extends cdk.Stack {
       description: 'Isolates compromised Amazon EC2 instance: replaces security group, creates snapshot, tags',
     });
 
-    // EC2 permissions for isolation actions
+    // EC2 permissions for isolation actions.
+    // Describe* actions do not support resource-level permissions, so they must
+    // use Resource "*" (AWS API constraint). The mutating actions are scoped to
+    // resources in this account and Region via ARNs built from the stack's own
+    // account/Region.
     isolateFn.addToRolePolicy(new iam.PolicyStatement({
+      sid: 'Ec2ReadOnly',
       effect: iam.Effect.ALLOW,
       actions: [
         'ec2:DescribeInstances',
         'ec2:DescribeSecurityGroups',
+        'ec2:DescribeVolumes',
+      ],
+      // These read-only Describe* actions do not support resource-level scoping.
+      resources: ['*'],
+    }));
+
+    isolateFn.addToRolePolicy(new iam.PolicyStatement({
+      sid: 'Ec2IsolationMutations',
+      effect: iam.Effect.ALLOW,
+      actions: [
         'ec2:CreateSecurityGroup',
         'ec2:RevokeSecurityGroupEgress',
         'ec2:ModifyInstanceAttribute',
         'ec2:CreateSnapshot',
         'ec2:CreateTags',
-        'ec2:DescribeVolumes',
       ],
-      resources: ['*'],
-      conditions: {
-        StringEquals: { 'aws:RequestedRegion': region },
-      },
+      resources: [
+        `arn:${cdk.Aws.PARTITION}:ec2:${region}:${account}:instance/*`,
+        `arn:${cdk.Aws.PARTITION}:ec2:${region}:${account}:security-group/*`,
+        `arn:${cdk.Aws.PARTITION}:ec2:${region}:${account}:volume/*`,
+        `arn:${cdk.Aws.PARTITION}:ec2:${region}:${account}:snapshot/*`,
+        `arn:${cdk.Aws.PARTITION}:ec2:${region}:${account}:vpc/*`,
+        `arn:${cdk.Aws.PARTITION}:ec2:${region}:${account}:network-interface/*`,
+      ],
     }));
 
     // =========================================================
     // 4. AWS Step Functions: Incident Response Workflow
     // =========================================================
 
-    // Isolate instance (HIGH severity)
+    // Isolate instance (HIGH severity).
+    // Use resultPath (not outputPath) so the isolation result is nested under
+    // $.isolation and the ORIGINAL finding fields ($.detail.*) remain available
+    // to the downstream notify task. This keeps the workflow robust when the
+    // isolation AWS Lambda function returns its SKIPPED/FAILED branch (e.g. the
+    // instance was already terminated), whose payload does not include
+    // findingType/instanceId.
     const isolateTask = new sfnTasks.LambdaInvoke(this, 'IsolateInstance', {
       lambdaFunction: isolateFn,
-      outputPath: '$.Payload',
+      payloadResponseOnly: true,
+      resultPath: '$.isolation',
       comment: 'Replace security group, create forensic snapshot, tag instance',
     });
 
-    // Publish HIGH severity to SNS (after isolation)
+    // Publish HIGH severity to SNS (after isolation). Subject fields are sourced
+    // from the original finding ($.detail.*), which is always present, and the
+    // isolation outcome status from $.isolation.status.
     const notifyHighTask = new sfnTasks.SnsPublish(this, 'NotifyHighSeverity', {
       topic: incidentTopic,
       subject: sfn.JsonPath.format(
-        'GuardDuty CRITICAL: {} on instance {}',
-        sfn.JsonPath.stringAt('$.findingType'),
-        sfn.JsonPath.stringAt('$.instanceId'),
+        'GuardDuty CRITICAL: {} (isolation: {})',
+        sfn.JsonPath.stringAt('$.detail.type'),
+        sfn.JsonPath.stringAt('$.isolation.status'),
       ),
       message: sfn.TaskInput.fromJsonPathAt('$'),
       resultPath: '$.notification',

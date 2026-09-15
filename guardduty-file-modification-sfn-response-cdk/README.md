@@ -9,9 +9,9 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 ## Architecture
 
 ```
-┌──────────────────┐     ┌─────────────────┐     ┌──────────────────────────────────────────────────────┐
-│ Amazon GuardDuty │────▶│ Amazon           │────▶│ AWS Step Functions (Incident Response Workflow)       │
-│ (Finding)        │     │ Amazon EventBridge│     │                                                      │
+┌──────────────────┐     ┌─────────────────────┐     ┌──────────────────────────────────────────────────────┐
+│ Amazon GuardDuty │────▶│ Amazon EventBridge  │────▶│ AWS Step Functions (Incident Response Workflow)       │
+│ (Finding)        │     │ (rule)              │     │                                                      │
 └──────────────────┘     └─────────────────┘     │  ┌─────────────────┐                                │
                                                   │  │ Classify         │                                │
                                                   │  │ Severity         │                                │
@@ -57,7 +57,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 - [Node.js 20+](https://nodejs.org/) with npm
 - AWS account [bootstrapped for CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
 - Python 3.12 (for AWS Lambda functions)
-- Amazon GuardDuty enabled in your account (the stack enables a detector)
+- Amazon GuardDuty: an account has at most one detector per Region. If GuardDuty is **not** already enabled, this stack creates a detector for you. If a detector **already exists**, deployment fails with `A detector already exists for the current account` unless you pass its ID with the `DetectorId` parameter (see Deployment below). Find an existing detector with `aws guardduty list-detectors`.
 
 ## Deployment
 
@@ -67,37 +67,17 @@ npm install
 npx cdk deploy
 ```
 
+If a GuardDuty detector already exists in this account and Region, pass its ID so the stack reuses it instead of trying to create a second one:
+
+```bash
+npx cdk deploy --parameters DetectorId=$(aws guardduty list-detectors --query 'DetectorIds[0]' --output text)
+```
+
 ## Testing
 
-### Simulate a GuardDuty finding (using sample findings)
+### 1. Subscribe to incident alerts first
 
-```bash
-# Generate sample findings to test the pipeline
-DETECTOR_ID=$(aws cloudformation describe-stacks \
-  --stack-name GuarddutyFileModificationSfnResponseStack \
-  --query 'Stacks[0].Outputs[?OutputKey==`DetectorId`].OutputValue' \
-  --output text)
-
-aws guardduty create-sample-findings \
-  --detector-id $DETECTOR_ID \
-  --finding-types "UnauthorizedAccess:EC2/SSHBruteForce"
-```
-
-### Verify AWS Step Functions execution
-
-```bash
-SFN_ARN=$(aws cloudformation describe-stacks \
-  --stack-name GuarddutyFileModificationSfnResponseStack \
-  --query 'Stacks[0].Outputs[?OutputKey==`StateMachineArn`].OutputValue' \
-  --output text)
-
-aws stepfunctions list-executions \
-  --state-machine-arn $SFN_ARN \
-  --max-results 5 \
-  --query 'executions[].{Status:status,Start:startDate}'
-```
-
-### Subscribe to incident alerts
+Subscribe (and confirm the subscription from your inbox) **before** generating a finding, so the alert email is delivered during the test:
 
 ```bash
 TOPIC_ARN=$(aws cloudformation describe-stacks \
@@ -111,14 +91,60 @@ aws sns subscribe \
   --notification-endpoint your-security-team@example.com
 ```
 
+### 2. Simulate a GuardDuty finding (using sample findings)
+
+```bash
+# Generate sample findings to test the pipeline
+DETECTOR_ID=$(aws cloudformation describe-stacks \
+  --stack-name GuarddutyFileModificationSfnResponseStack \
+  --query 'Stacks[0].Outputs[?OutputKey==`DetectorIdOutput`].OutputValue' \
+  --output text)
+
+aws guardduty create-sample-findings \
+  --detector-id $DETECTOR_ID \
+  --finding-types "UnauthorizedAccess:EC2/SSHBruteForce"
+```
+
+### 3. Verify AWS Step Functions execution
+
+```bash
+SFN_ARN=$(aws cloudformation describe-stacks \
+  --stack-name GuarddutyFileModificationSfnResponseStack \
+  --query 'Stacks[0].Outputs[?OutputKey==`StateMachineArn`].OutputValue' \
+  --output text)
+
+aws stepfunctions list-executions \
+  --state-machine-arn $SFN_ARN \
+  --max-results 5 \
+  --query 'executions[].{Status:status,Start:startDate}'
+```
+
 ## Cleanup
 
-> **Warning:** This will delete the Amazon GuardDuty detector. If you have other GuardDuty configurations, remove the detector resource from the stack before deploying.
+> **Warning:** This will delete the Amazon GuardDuty detector created by this stack. If you passed an existing detector via the `DetectorId` parameter, that detector is left untouched.
 
 ```bash
 cd guardduty-file-modification-sfn-response-cdk/cdk
 npx cdk destroy
 ```
+
+If the isolation workflow ran during testing, it created resources **outside** the stack that `cdk destroy` does not remove. Delete them manually:
+
+```bash
+# Isolation security groups created by the AWS Lambda function
+aws ec2 describe-security-groups \
+  --filters "Name=tag:Purpose,Values=GuardDuty-Isolation" \
+  --query 'SecurityGroups[].GroupId' --output text | \
+  xargs -r -n1 aws ec2 delete-security-group --group-id
+
+# Forensic EBS snapshots created by the AWS Lambda function
+aws ec2 describe-snapshots --owner-ids self \
+  --filters "Name=tag:Purpose,Values=GuardDuty-Forensics" \
+  --query 'Snapshots[].SnapshotId' --output text | \
+  xargs -r -n1 aws ec2 delete-snapshot --snapshot-id
+```
+
+Isolated instances also keep their `GuardDuty:*` tags and the isolation security group as their only group; restore their original security groups (recorded in the `GuardDuty:OriginalSecurityGroups` tag) before terminating or returning them to service.
 
 ## Services Used
 

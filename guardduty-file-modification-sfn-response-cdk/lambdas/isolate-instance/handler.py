@@ -5,10 +5,13 @@ detects HIGH severity sensitive file modification. Isolates the compromised
 Amazon EC2 instance by replacing its security group, creating forensic
 snapshots, and tagging for investigation."""
 
-import json
+import logging
 from datetime import datetime, timezone
 
 import boto3
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 EC2_CLIENT = boto3.client('ec2')
 
@@ -23,10 +26,11 @@ def lambda_handler(event, context):
     severity = detail.get('severity', 0)
 
     if not instance_id:
-        print(f'No instanceId in finding: {finding_type}')
-        return {'status': 'SKIPPED', 'reason': 'No instance ID in finding'}
+        logger.error(f'No instanceId in finding: {finding_type}')
+        return {'status': 'SKIPPED', 'reason': 'No instance ID in finding',
+                'findingType': finding_type}
 
-    print(f'Isolating instance {instance_id} | Finding: {finding_type} | Severity: {severity}')
+    logger.info(f'Isolating instance {instance_id} | Finding: {finding_type} | Severity: {severity}')
 
     try:
         # Step 1: Get instance details
@@ -42,7 +46,7 @@ def lambda_handler(event, context):
             InstanceId=instance_id,
             Groups=[isolation_sg],
         )
-        print(f'Replaced security groups on {instance_id} with isolation SG {isolation_sg}')
+        logger.info(f'Replaced security groups on {instance_id} with isolation SG {isolation_sg}')
 
         # Step 4: Create forensic snapshots of all volumes
         snapshot_ids = create_forensic_snapshots(instance_id, instance_info, finding_type)
@@ -62,10 +66,11 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
-        print(f'Isolation failed for {instance_id}: {e}')
+        logger.error(f'Isolation failed for {instance_id}: {e}')
         return {
             'status': 'FAILED',
             'instanceId': instance_id,
+            'findingType': finding_type,
             'error': str(e),
         }
 
@@ -108,7 +113,7 @@ def create_isolation_sg(vpc_id: str, instance_id: str) -> str:
             ],
         )
 
-        print(f'Created isolation SG: {sg_id} (no ingress, no egress)')
+        logger.info(f'Created isolation SG: {sg_id} (no ingress, no egress)')
         return sg_id
 
     except EC2_CLIENT.exceptions.ClientError as e:
@@ -149,9 +154,9 @@ def create_forensic_snapshots(instance_id: str, instance_info: dict, finding_typ
                 }],
             )
             snapshot_ids.append(response['SnapshotId'])
-            print(f'Created forensic snapshot {response["SnapshotId"]} for volume {volume_id}')
+            logger.info(f'Created forensic snapshot {response["SnapshotId"]} for volume {volume_id}')
         except Exception as e:
-            print(f'Failed to snapshot volume {volume_id}: {e}')
+            logger.error(f'Failed to snapshot volume {volume_id}: {e}')
 
     return snapshot_ids
 
@@ -169,4 +174,4 @@ def tag_instance(instance_id: str, finding_type: str, original_sgs: list) -> Non
             ],
         )
     except Exception as e:
-        print(f'Failed to tag instance {instance_id}: {e}')
+        logger.error(f'Failed to tag instance {instance_id}: {e}')
