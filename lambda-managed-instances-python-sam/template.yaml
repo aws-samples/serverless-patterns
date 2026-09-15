@@ -48,9 +48,126 @@ Resources:
     Properties:
       GroupDescription: Security group for Lambda Managed Instances
       VpcId: !Ref ManagedInstancesVPC
+      # Egress to 443 so instances can reach the VPC interface endpoints
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref VpcCIDR
+          Description: HTTPS to VPC endpoints within the VPC
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-sg"
+
+  # --- Private networking (no internet path) ---
+  # Managed Instances egress (e.g. CloudWatch Logs, ECR image pull) stays inside
+  # the VPC and reaches AWS services over PrivateLink interface/gateway endpoints.
+
+  # Explicit private route table for the subnets. It has only the implicit
+  # local route (10.0.0.0/16) plus the S3 gateway endpoint route below —
+  # there is deliberately no 0.0.0.0/0 route, so no internet egress.
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-private-rt"
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # Security group for the interface endpoints: allow inbound 443 from the
+  # instance security group only.
+  VPCEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTPS from Managed Instances to VPC interface endpoints
+      VpcId: !Ref ManagedInstancesVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref SecurityGroup
+          Description: HTTPS from Managed Instances
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-vpce-sg"
+
+  # Interface endpoint: CloudWatch Logs (documented egress requirement for LMI)
+  LogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.logs"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+
+  # Interface endpoints: ECR API + Docker registry (instances pull the runtime image)
+  EcrApiEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.api"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+
+  EcrDkrEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.dkr"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+
+  # Interface endpoint: EC2 (instance lifecycle calls)
+  Ec2Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ec2"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+
+  # Gateway endpoint: S3 (ECR image layers are stored in S3). Bound to the
+  # private route table via an AWS managed prefix list route.
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref ManagedInstancesVPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PrivateRouteTable
 
   # IAM role for Capacity Provider operator
   CapacityProviderOperatorRole:
@@ -106,11 +223,11 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   # Lambda function running on Managed Instances
+  # Note: no explicit DependsOn is needed — the LoggingConfig !Ref to
+  # ApiHandlerLogGroup and the CapacityProviderConfig !GetAtt to
+  # LambdaCapacityProvider already enforce correct creation order.
   ApiHandlerFunction:
     Type: AWS::Lambda::Function
-    DependsOn:
-      - ApiHandlerLogGroup
-      - LambdaCapacityProvider
     Properties:
       FunctionName: !Sub "${AWS::StackName}-api-handler"
       Runtime: python3.13
@@ -182,3 +299,7 @@ Outputs:
   VpcId:
     Description: VPC ID
     Value: !Ref ManagedInstancesVPC
+
+  PrivateRouteTableId:
+    Description: Private route table ID (no internet route; S3 gateway + local only)
+    Value: !Ref PrivateRouteTable

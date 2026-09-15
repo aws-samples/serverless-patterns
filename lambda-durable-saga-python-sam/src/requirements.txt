@@ -1,2 +1,0 @@
-aws-durable-execution-sdk-python>=1.0.0
-boto3>=1.34.0
