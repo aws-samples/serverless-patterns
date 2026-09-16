@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: KQD Stack 2 - Self-managed Kafka 4.2.x broker on EC2 (KRaft, PLAINTEXT)
+
+Parameters:
+  KafkaVersion:
+    Type: String
+    Default: 4.2.0
+  InstanceType:
+    Type: String
+    Default: t3.medium
+  LatestAL2023AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Resources:
+
+  KafkaInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonSSMPatchAssociation
+
+  # Automated patching: runs AWS-RunPatchBaseline every Sunday at 2am UTC
+  PatchAssociation:
+    Type: AWS::SSM::Association
+    Properties:
+      Name: AWS-RunPatchBaseline
+      Targets:
+        - Key: tag:aws:cloudformation:stack-name
+          Values:
+            - !Ref AWS::StackName
+      ScheduleExpression: cron(0 2 ? * SUN *)
+      Parameters:
+        Operation:
+          - Install
+
+  KafkaInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref KafkaInstanceRole
+
+  KafkaInstance:
+    Type: AWS::EC2::Instance
+    DependsOn: VPCGatewayAttachmentDependency
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref LatestAL2023AmiId
+      SubnetId: !ImportValue kqd-PublicSubnetId
+      SecurityGroupIds:
+        - !ImportValue kqd-BrokerSecurityGroupId
+      IamInstanceProfile: !Ref KafkaInstanceProfile
+      Tags:
+        - Key: Name
+          Value: kqd-kafka-broker
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/kafka-setup.log) 2>&1
+          echo "=== Kafka ${KafkaVersion} setup $(date) ==="
+
+          signal_cfn() {
+            /opt/aws/bin/cfn-signal -e $1 \
+              --stack ${AWS::StackName} \
+              --resource KafkaInstance \
+              --region ${AWS::Region} || true
+          }
+          trap 'echo "ERROR line $LINENO"; signal_cfn 1' ERR
+
+          dnf install -y java-21-amazon-corretto-headless
+          echo "Java installed."
+
+          KAFKA_DIR=/opt/kafka
+          mkdir -p $KAFKA_DIR
+          wget -q --timeout=180 --tries=3 \
+            "https://archive.apache.org/dist/kafka/${KafkaVersion}/kafka_2.13-${KafkaVersion}.tgz" \
+            -O /tmp/kafka.tgz
+          tar -xzf /tmp/kafka.tgz -C $KAFKA_DIR --strip-components=1
+          echo "Kafka extracted."
+
+          INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+          mkdir -p /var/kafka-logs
+
+          PROPS=/tmp/kraft-server.properties
+          printf '%s\n' \
+            'process.roles=broker,controller' \
+            'node.id=1' \
+            'controller.quorum.voters=1@localhost:9093' \
+            'listeners=CONTROLLER://localhost:9093,PLAINTEXT://0.0.0.0:9092' \
+            "advertised.listeners=PLAINTEXT://$INSTANCE_IP:9092" \
+            'listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT' \
+            'controller.listener.names=CONTROLLER' \
+            'inter.broker.listener.name=PLAINTEXT' \
+            'log.dirs=/var/kafka-logs' \
+            'num.partitions=3' \
+            'default.replication.factor=1' \
+            'offsets.topic.replication.factor=1' \
+            'transaction.state.log.replication.factor=1' \
+            'transaction.state.log.min.isr=1' \
+            'auto.create.topics.enable=true' \
+            'group.coordinator.rebalance.protocols=classic,consumer,share' \
+            'share.coordinator.state.topic.replication.factor=1' \
+            'share.coordinator.state.topic.min.isr=1' \
+            "group.share.partition.max.record.locks=100" \
+            "group.share.record.lock.duration.ms=30000" \
+            "group.share.delivery.count.limit=3" \
+            "group.share.max.size=10" \
+            > $PROPS
+
+          CLUSTER_ID=$($KAFKA_DIR/bin/kafka-storage.sh random-uuid)
+          $KAFKA_DIR/bin/kafka-storage.sh format -t $CLUSTER_ID -c $PROPS
+          echo "KRaft storage formatted."
+
+          export KAFKA_HEAP_OPTS="-Xmx512m -Xms256m"
+          nohup $KAFKA_DIR/bin/kafka-server-start.sh $PROPS \
+            > /var/log/kafka.log 2>&1 &
+          echo "Kafka started (PID $!)"
+
+          echo "Waiting for broker..."
+          for i in $(seq 1 24); do
+            $KAFKA_DIR/bin/kafka-broker-api-versions.sh \
+              --bootstrap-server localhost:9092 > /dev/null 2>&1 \
+              && echo "Broker ready after ${!i}x5s" && break \
+              || sleep 5
+          done
+
+          # Enable KIP-932 share groups
+          $KAFKA_DIR/bin/kafka-features.sh \
+            --bootstrap-server localhost:9092 \
+            upgrade --feature share.version=1
+          echo "Share groups (KIP-932) enabled."
+
+          echo "=== Setup complete $(date). Bootstrap: $INSTANCE_IP:9092 ==="
+          signal_cfn 0
+
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT20M
+
+  # Dummy resource to ensure IGW is attached before EC2 launches
+  VPCGatewayAttachmentDependency:
+    Type: AWS::CloudFormation::WaitConditionHandle
+
+Outputs:
+  BootstrapServers:
+    Value: !Sub "${KafkaInstance.PrivateIp}:9092"
+    Export:
+      Name: kqd-BootstrapServers
+
+  BrokerInstanceId:
+    Value: !Ref KafkaInstance
+    Export:
+      Name: kqd-BrokerInstanceId

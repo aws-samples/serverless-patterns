@@ -1,0 +1,40 @@
+{
+  "eventSource": "aws:kafka",
+  "bootstrapServers": "10.0.0.43:9092",
+  "records": {
+    "kqd-task-worker-0": [
+      {
+        "topic": "kqd-task-worker",
+        "partition": 0,
+        "offset": 0,
+        "timestamp": 1726000000000,
+        "timestampType": "CREATE_TIME",
+        "key": "am9iSWQtMQ==",
+        "value": "eyJqb2JJZCI6ICJqb2JJZC0xIiwgInRhc2tJbmRleCI6IDEsICJwYXlsb2FkIjogInRhc2stMSIsICJzaG91bGRGYWlsIjogZmFsc2V9",
+        "headers": []
+      },
+      {
+        "topic": "kqd-task-worker",
+        "partition": 0,
+        "offset": 1,
+        "timestamp": 1726000001000,
+        "timestampType": "CREATE_TIME",
+        "key": "am9iSWQtMg==",
+        "value": "eyJqb2JJZCI6ICJqb2JJZC0yIiwgInRhc2tJbmRleCI6IDcsICJwYXlsb2FkIjogInRhc2stNyIsICJzaG91bGRGYWlsIjogdHJ1ZX0=",
+        "headers": []
+      }
+    ],
+    "kqd-task-worker-1": [
+      {
+        "topic": "kqd-task-worker",
+        "partition": 1,
+        "offset": 0,
+        "timestamp": 1726000000500,
+        "timestampType": "CREATE_TIME",
+        "key": "am9iSWQtMw==",
+        "value": "eyJqb2JJZCI6ICJqb2JJZC0zIiwgInRhc2tJbmRleCI6IDIsICJwYXlsb2FkIjogInRhc2stMiIsICJzaG91bGRGYWlsIjogZmFsc2V9",
+        "headers": []
+      }
+    ]
+  }
+}
