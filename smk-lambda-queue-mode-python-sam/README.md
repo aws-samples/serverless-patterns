@@ -8,19 +8,16 @@ Learn more about this pattern at Serverless Land: https://serverlessland.com/pat
 
 ## Architecture
 
+```mermaid
+graph LR
+    Producer["Producer\nLambda"] -->|publish| Kafka["Apache Kafka\n4.2+ Cluster"]
+    Kafka -->|Queue mode ESM\nConsumptionMode: Queue| Worker["Worker\nLambda"]
+    Worker --> DDB["DynamoDB\nIdempotency"]
+    Worker --> SQS["SQS\nDLQ"]
+    Worker --> CW["CloudWatch\nMetrics"]
 ```
-Producer Lambda ──► Kafka topic (3 partitions)
-                         │
-              ┌──────────┼──────────┐
-         Poller 1    Poller 2    Poller 3..10
-              │           │           │
-         (same partition can be served by multiple pollers)
-              └──────────┼──────────┘
-                         │
-                  Worker Lambda
-                  ├── DynamoDB (idempotency)
-                  └── SQS DLQ (failed records)
-```
+
+**Queue mode vs Stream mode:** In Stream mode each partition maps to exactly one consumer — a 3-partition topic supports at most 3 concurrent Lambda invocations. In Queue mode, multiple pollers share all partitions — 10 pollers can process a 3-partition topic concurrently, and a slow record in one poller does not block other pollers.
 
 ## Prerequisites
 
@@ -184,26 +181,53 @@ sam local invoke WorkerFunction \
 
 ---
 
-## Verifying Queue mode behavior
+## Verifying Queue mode scaling
 
-**Confirm the share group exists on the broker:**
+The key differentiator of Queue mode is that pollers exceed the partition count. Verify this directly on the broker after producing a large batch:
+
+**Step 1: Produce a large batch**
 
 ```bash
-# On the Kafka broker (via SSM or SSH)
+aws lambda invoke \
+  --function-name kqd-app-producer \
+  --region <region> \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"count": 200}' /dev/stdout
+```
+
+**Step 2: Check the broker coordinator log**
+
+Connect to the broker via SSM Session Manager and run:
+
+```bash
+grep "new assignment state" /var/log/kafka.log | grep <your-consumer-group-id> | tail -20
+```
+
+You should see multiple members assigned to the same partition simultaneously. For example, with a 3-partition topic and `MaximumPollers: 10`, the output shows more than 3 members total — some partitions shared by 2 or more pollers:
+
+```
+[GroupId my-queue-group] Member AAA new assignment state: ... assignedPartitions=[topic-0]
+[GroupId my-queue-group] Member BBB new assignment state: ... assignedPartitions=[topic-0]  <- same partition!
+[GroupId my-queue-group] Member CCC new assignment state: ... assignedPartitions=[topic-1]
+[GroupId my-queue-group] Member DDD new assignment state: ... assignedPartitions=[topic-1]  <- same partition!
+[GroupId my-queue-group] Member EEE new assignment state: ... assignedPartitions=[topic-2]
+```
+
+In Stream mode, each partition can only appear once across all members. Multiple members sharing the same partition is only possible with share groups — this is the Queue mode scaling proof.
+
+**Step 3: Confirm via kafka-share-groups.sh**
+
+```bash
+# On the broker
 bin/kafka-share-groups.sh --bootstrap-server localhost:9092 --list
-# Should show your consumer group ID
+# Your consumer group ID should appear here (not in kafka-consumer-groups.sh)
 
 bin/kafka-share-groups.sh --bootstrap-server localhost:9092 \
-  --describe --group kqd-queue-group-<timestamp>
-# Shows per-partition lag with multiple pollers assigned
+  --describe --group <your-consumer-group-id>
+# Shows per-partition lag — confirms share group is consuming
 ```
 
-**Confirm share groups are enabled:**
-
-```bash
-bin/kafka-features.sh --bootstrap-server localhost:9092 describe | grep share
-# Should show: FinalizedVersionLevel: 1
-```
+If the group appears in `kafka-share-groups.sh` but NOT in `kafka-consumer-groups.sh`, it is a share group and Queue mode is active.
 
 ---
 
