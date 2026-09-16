@@ -3,7 +3,6 @@
 import base64
 import json
 import logging
-import time
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -31,10 +30,6 @@ def lambda_handler(event, context):
                 identifier = f"{r['topic']}-{r['partition']}-{r['offset']}"
                 logger.warning("Simulated failure, releasing record: %s", identifier)
                 failures.append({"itemIdentifier": identifier})
-            else:
-                # 0.5s simulated processing keeps records inflight long enough
-                # to observe concurrent pollers during the scaling test
-                time.sleep(0.5)
 
     logger.info(
         "Batch done: %d record(s), %d failure(s)",

@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >-
-  KQD Stack 3 - Worker Lambda, Producer Lambda, DynamoDB idempotency table,
-  and SQS DLQ for the Kafka Queue mode (KIP-932) pattern.
+  KQD Stack 3 - Worker Lambda, Producer Lambda, and SQS DLQ
+  for the Kafka Queue mode (KIP-932) pattern.
   Supports three deployment paths:
     - Full: imports VPC outputs from kqd-network stack (set UseExistingInfra=false)
     - Bring-your-own Kafka: provide BootstrapServers, VpcSubnetIds, VpcSecurityGroupId
@@ -46,25 +46,12 @@ Parameters:
 
 Conditions:
   ImportInfra: !Equals [!Ref UseExistingInfra, "false"]
-  UseProvidedInfra: !Equals [!Ref UseExistingInfra, "true"]
 
 Resources:
 
-  IdempotencyTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub ${AWS::StackName}-idempotency
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      TimeToLiveSpecification:
-        AttributeName: expiration
-        Enabled: true
-
+  # SQS DLQ — receives records that exhaust their delivery attempt limit.
+  # group.share.delivery.count.limit on the broker and MaximumRetryAttempts
+  # on the ESM must be set to the same value.
   TaskWorkerDLQ:
     Type: AWS::SQS::Queue
     Properties:
@@ -82,19 +69,10 @@ Resources:
       Handler: handler.lambda_handler
       MemorySize: 512
       Timeout: 25
-      Environment:
-        Variables:
-          IDEMPOTENCY_TABLE: !Ref IdempotencyTable
       Policies:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - Version: '2012-10-17'
           Statement:
-            - Effect: Allow
-              Action:
-                - dynamodb:PutItem
-                - dynamodb:GetItem
-                - dynamodb:DeleteItem
-              Resource: !GetAtt IdempotencyTable.Arn
             - Effect: Allow
               Action: sqs:SendMessage
               Resource: !GetAtt TaskWorkerDLQ.Arn
