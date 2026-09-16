@@ -161,7 +161,7 @@ Each topic below is explained in full in the comments of the file that implement
 
 ### Region and model handling
 
-Nothing about the Region is baked into the image. The platform supplies `AWS_REGION`; the `ModelId` and `McpEndpoint` template parameters become the `CODEX_MODEL` and `AWS_MCP_ENDPOINT` image environment variables. [src/app.py](src/app.py) renders all three into the Codex config and the shell profile at startup and on every `/run` and `/resume`. A value that cannot be resolved is logged and its line is dropped rather than replaced with a default. Interactive shells do not inherit the image environment, which is why the profile is written to `/etc/profile.d/` (see [src/Dockerfile](src/Dockerfile)).
+Nothing about the Region is baked into the image. The platform supplies `AWS_REGION`; the template sets the `CODEX_MODEL` and `AWS_MCP_ENDPOINT` image environment variables from its `ModelId` and `McpEndpoint` parameters. [src/app.py](src/app.py) reads all three from the environment and renders them into the Codex config and the shell profile at startup and on every `/run` and `/resume`. A value that cannot be resolved is logged and its line is dropped rather than replaced with a default. Interactive shells do not inherit the image environment, which is why the profile is written to `/etc/profile.d/` (see [src/Dockerfile](src/Dockerfile)).
 
 ### How Codex reaches Amazon Bedrock
 
@@ -171,7 +171,7 @@ Use the plain model ID with no cross-Region routing prefix (`us.`, `global.`), a
 
 ### The AWS MCP Server
 
-The server is AWS-managed and remote. The Codex config in [src/codex-config.toml.tmpl](src/codex-config.toml.tmpl) launches the MCP Proxy for AWS as a local stdio bridge that signs each request with SigV4 and forwards it to the `McpEndpoint`. Two Regions are involved: the endpoint's Region (a cross-Region dependency, derived by the proxy from the hostname) and the Region the agent operates on (the MicroVM's own, passed as metadata). The template comments and the TOML comments cover both, including why `--region` must not be passed to the proxy and why `enabled_tools` lists the AWS tools explicitly.
+The server is AWS-managed and remote. The Codex config in [src/codex-config.toml.tmpl](src/codex-config.toml.tmpl) tells Codex to launch the MCP Proxy for AWS as a local stdio bridge; the proxy signs each request with SigV4 and forwards it to the `McpEndpoint`. Two Regions are involved: the endpoint's Region (a cross-Region dependency, derived by the proxy from the hostname) and the Region the agent operates on (the MicroVM's own, passed as metadata). The template comments and the TOML comments cover both, including why `--region` must not be passed to the proxy and why `enabled_tools` lists the AWS tools explicitly.
 
 Read-only access is enforced by IAM alone: the server forwards each call under the caller's credentials and adds no permissions of its own. Forwarded requests carry the `aws:ViaAWSMCPService` and `aws:CalledViaAWSMCP` condition keys, which this role does not need but which let a broader role stay read-only for agent traffic while a human using the same role can still write; see [Identity-based policy examples](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/security_iam_id-based-policy-examples.html). The AWS MCP Server's [quotas](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/aws-mcp-limits.html) apply per account and Region.
 

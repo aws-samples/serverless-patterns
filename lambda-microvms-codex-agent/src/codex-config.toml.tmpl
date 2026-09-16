@@ -43,11 +43,11 @@ trust_level = "trusted"
 # AWS documentation, and retrieve AWS skills.
 #
 # Unlike a locally installed MCP server, this one is AWS-managed and remote. The
-# command below launches the MCP Proxy for AWS, a local stdio bridge that signs
-# each request with SigV4 using the execution-role credentials from the AWS SDK
-# default chain (no keys) and forwards it to the endpoint. Codex has no native
-# SigV4 support, so the proxy is what lets IAM authentication stand in for the
-# browser-based OAuth flow, which a headless MicroVM cannot complete.
+# command below tells Codex to launch the MCP Proxy for AWS, a local stdio bridge
+# that signs each request with SigV4 using the execution-role credentials from
+# the AWS SDK default chain (no keys) and forwards it to the endpoint. Codex has
+# no native SigV4 support, so the proxy is what lets IAM authentication stand in
+# for the browser-based OAuth flow, which a headless MicroVM cannot complete.
 #
 # The endpoint's Region and the Region the agent operates on are two different
 # things, and only one of them is fixed:
