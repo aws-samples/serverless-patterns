@@ -56,6 +56,14 @@ Resources:
         - AttributeName: notification_id
           KeyType: HASH
 
+  # Explicit log group so the pattern sets a retention policy and the group
+  # is removed when the stack is deleted (rather than an implicit, never-expiring one)
+  ProcessorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-processor"
+      RetentionInDays: 14
+
   # Durable Function — processes stream records with checkpoints
   StreamProcessorFunction:
     Type: AWS::Serverless::Function
@@ -65,6 +73,8 @@ Resources:
       CodeUri: src/
       Description: Durable function processing DynamoDB stream events with checkpoints
       AutoPublishAlias: live
+      LoggingConfig:
+        LogGroup: !Ref ProcessorLogGroup
       DurableConfig:
         ExecutionTimeout: 900
         RetentionPeriodInDays: 3
@@ -85,7 +95,9 @@ Resources:
             - Effect: Allow
               Action:
                 - lambda:InvokeFunction
-              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-processor*"
+              Resource:
+                - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-processor"
+                - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-processor:*"
       Events:
         DDBStream:
           Type: DynamoDB

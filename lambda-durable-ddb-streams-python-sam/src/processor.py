@@ -14,16 +14,16 @@ Uses ReportBatchItemFailures for partial batch error handling.
 
 import os
 import uuid
-import logging
 from datetime import datetime, timezone
-from decimal import Decimal
 
 import boto3
+from aws_durable_execution_sdk_python import ExecutionError
 from aws_durable_execution_sdk_python.context import DurableContext, StepContext, durable_step
 from aws_durable_execution_sdk_python.execution import durable_execution
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+# Note: logging is done through the durable SDK's replay-aware logger
+# (context.logger / step_context.logger), not a module-level logging.getLogger(),
+# so log lines are not duplicated when a durable execution replays.
 
 dynamodb = boto3.resource("dynamodb")
 processed_table = dynamodb.Table(os.environ["PROCESSED_TABLE"])
@@ -47,7 +47,7 @@ def validate_record(step_context: StepContext, record: dict) -> dict:
     missing = [f for f in required_fields if f not in new_image]
 
     if missing:
-        raise UnrecoverableInvocationError(
+        raise ExecutionError(
             f"Record missing required fields: {missing}"
         )
 
