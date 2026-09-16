@@ -1,6 +1,6 @@
-# Lambda Managed Instances with SAM (Python)
+# AWS Lambda Managed Instances with AWS SAM (Python)
 
-This pattern deploys a Python Lambda function running on AWS Lambda Managed Instances using AWS SAM. Lambda Managed Instances enables you to run functions on EC2 instances while AWS handles lifecycle management, patching, routing, and scaling. You benefit from EC2 pricing (Savings Plans, Reserved Instances) and multi-concurrency support.
+This pattern deploys a Python Lambda function running on AWS Lambda Managed Instances using AWS SAM. Lambda Managed Instances enables you to run functions on Amazon EC2 instances while AWS handles lifecycle management, patching, routing, and scaling. You benefit from EC2 pricing (Savings Plans, Reserved Instances) and multi-concurrency support.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-managed-instances-python-sam](https://serverlessland.com/patterns/lambda-managed-instances-python-sam)
 
@@ -29,8 +29,9 @@ Important: this application uses various AWS services and there are costs associ
 1. From the command line, use AWS SAM to build and deploy:
    ```
    sam build
-   sam deploy --guided
+   sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
    ```
+   `CAPABILITY_NAMED_IAM` is required because the template creates a named IAM role for the capacity provider operator.
 1. During the prompts:
    - Enter a stack name
    - Enter the desired AWS Region
@@ -44,9 +45,9 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern creates:
 
-1. **VPC with private subnets**: Two private subnets across availability zones for the capacity provider. The subnets use a dedicated private route table with no internet route (no NAT, no internet gateway). Egress to AWS services stays inside the VPC via PrivateLink: interface endpoints for CloudWatch Logs, Amazon ECR (`ecr.api` and `ecr.dkr`), and Amazon EC2, plus an S3 gateway endpoint for pulling the runtime image layers.
+1. **VPC with private subnets**: Two private subnets across availability zones for the capacity provider. The subnets use a dedicated private route table with no internet route (no NAT, no internet gateway). Egress to AWS services stays inside the VPC via PrivateLink: interface endpoints for Amazon CloudWatch Logs, Amazon ECR (`ecr.api` and `ecr.dkr`), and Amazon EC2, plus an Amazon S3 gateway endpoint for pulling the runtime image layers.
 
-2. **Capacity Provider Operator IAM Role**: An IAM role with the `AWSLambdaManagedEC2ResourceOperator` managed policy that Lambda uses to provision and manage EC2 instances.
+2. **Capacity Provider Operator IAM Role**: An Amazon IAM role with the `AWSLambdaManagedEC2ResourceOperator` managed policy that Lambda uses to provision and manage EC2 instances.
 
 3. **Lambda Capacity Provider**: Defines where functions run — VPC config, instance architecture (arm64 / AWS Graviton), and the operator role for instance management.
 
@@ -85,7 +86,7 @@ This pattern creates:
    ```json
    {
      "statusCode": 200,
-     "body": "{\"message\": \"Hello, Serverless Land!\", \"invocation\": 1, \"timestamp\": \"...\", \"version\": \"1\"}"
+     "body": "{\"message\": \"Hello, Serverless Land!\", \"invocation\": 1, \"timestamp\": \"2026-09-16T14:30:00.123456+00:00\", \"version\": \"1\"}"
    }
    ```
 
