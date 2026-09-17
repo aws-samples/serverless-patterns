@@ -65,7 +65,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           set -euo pipefail
-          exec > >(tee /var/log/kafka-setup.log) 2>&1
+          exec >> /var/log/kafka-setup.log 2>&1
           echo "=== Kafka ${KafkaVersion} setup $(date) ==="
 
           signal_cfn() {
