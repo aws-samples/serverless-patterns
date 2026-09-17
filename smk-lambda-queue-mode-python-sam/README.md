@@ -334,18 +334,22 @@ aws cloudformation describe-stacks \
 
 # 3. Find and delete the lambda VPC endpoint
 aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>" "Name=service-name,Values=com.amazonaws.<region>.lambda" --query 'VpcEndpoints[0].VpcEndpointId' --output text --region <region>
+
 aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <lambda-endpoint-id> --region <region>
 
 # 4. Find and delete the sts VPC endpoint
 aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>" "Name=service-name,Values=com.amazonaws.<region>.sts" --query 'VpcEndpoints[0].VpcEndpointId' --output text --region <region>
+
 aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <sts-endpoint-id> --region <region>
 
 # 5. Find and delete the sqs VPC endpoint
 aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>" "Name=service-name,Values=com.amazonaws.<region>.sqs" --query 'VpcEndpoints[0].VpcEndpointId' --output text --region <region>
+
 aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <sqs-endpoint-id> --region <region>
 
 # 6. Delete application stacks
 aws cloudformation delete-stack --stack-name kafka-queue-observability --region <region>
+
 aws cloudformation delete-stack --stack-name kafka-queue-app --region <region>
 
 # 7. Delete broker (if deployed)

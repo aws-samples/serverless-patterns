@@ -31,15 +31,11 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
       },
       {
-        "text": "Apache Kafka KIP-932: Queues for Kafka",
-        "link": "https://cwiki.apache.org/confluence/display/KAFKA/KIP-932+Queues+for+Kafka"
-      },
-      {
-        "text": "Lambda ESM provisioned mode for Kafka",
+        "text": "Apache Kafka event poller scaling modes in Lambda",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-scaling-modes.html"
       },
       {
-        "text": "Partial batch response for Lambda",
+        "text": "Configuring error handling controls for Kafka event sources",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-retry-configurations.html"
       }
     ]
