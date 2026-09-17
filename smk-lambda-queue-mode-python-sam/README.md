@@ -372,9 +372,3 @@ aws cloudformation delete-stack --stack-name kafka-queue-network --region <regio
 | Ordering guarantees | None (Queue mode) |
 | Authentication | PLAINTEXT (see notes for SASL/SCRAM) |
 | Region | Configurable |
-
-## Author
-
-**Vaibhav Jain**
-AWS — Senior Delivery Consultant
-[LinkedIn](https://www.linkedin.com/in/vaibhavjainv/)
