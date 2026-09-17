@@ -27,7 +27,7 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
     // Derive the prefix from the deployment Region so the pattern works in US,
     // EU, and APAC without code edits. The model name is a single constant, so
     // bumping to a newer model (e.g. a later Claude Sonnet) is a one-line change.
-    const modelName = 'anthropic.claude-sonnet-4-5-20250929-v1:0';
+    const modelName = 'anthropic.claude-sonnet-5';
     const geoPrefix = this.region.startsWith('eu-')
       ? 'eu'
       : this.region.startsWith('ap-')

@@ -24,7 +24,7 @@ def handler(event, context):
             }
 
         code_interpreter_id = os.environ['CODE_INTERPRETER_ID']
-        model_id = os.environ.get('MODEL_ID', 'us.anthropic.claude-sonnet-4-5-20250929-v1:0')
+        model_id = os.environ.get('MODEL_ID', 'us.anthropic.claude-sonnet-5')
         region = os.environ['AWS_REGION']
 
         # Step 1: Use Amazon Bedrock to generate Python code for the question
