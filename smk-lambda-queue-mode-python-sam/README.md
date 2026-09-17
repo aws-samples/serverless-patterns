@@ -326,18 +326,31 @@ Delete stacks in reverse order:
 # 1. Delete the ESM first (get UUID from create-esm.sh output or console)
 aws lambda delete-event-source-mapping --uuid <esm-uuid> --region <region>
 
-# 2. Delete VPC endpoints
-# Open the VPC console → Endpoints, filter by your VPC ID,
-# select the lambda, sts, and sqs endpoints, then Actions → Delete.
+# 2. Get your VPC ID
+aws cloudformation describe-stacks \
+  --stack-name kafka-queue-network \
+  --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue' \
+  --output text --region <region>
 
-# 3. Delete application stacks
+# 3. List VPC endpoint IDs (replace <vpc-id> with output from step 2)
+aws ec2 describe-vpc-endpoints \
+  --filters "Name=vpc-id,Values=<vpc-id>" \
+  --query 'VpcEndpoints[?contains(ServiceName,`lambda`) || contains(ServiceName,`sts`) || contains(ServiceName,`sqs`)].[VpcEndpointId,ServiceName]' \
+  --output text --region <region>
+
+# 4. Delete endpoints (replace <endpoint-ids> with space-separated IDs from step 3)
+aws ec2 delete-vpc-endpoints \
+  --vpc-endpoint-ids <endpoint-id-1> <endpoint-id-2> <endpoint-id-3> \
+  --region <region>
+
+# 5. Delete application stacks
 aws cloudformation delete-stack --stack-name kafka-queue-observability --region <region>
 aws cloudformation delete-stack --stack-name kafka-queue-app --region <region>
 
-# 4. Delete broker (if deployed)
+# 6. Delete broker (if deployed)
 aws cloudformation delete-stack --stack-name kafka-queue-broker --region <region>
 
-# 5. Delete network (if deployed)
+# 7. Delete network (if deployed)
 aws cloudformation delete-stack --stack-name kafka-queue-network --region <region>
 ```
 
