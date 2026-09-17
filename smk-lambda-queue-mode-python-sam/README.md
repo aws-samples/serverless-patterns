@@ -332,25 +332,26 @@ aws cloudformation describe-stacks \
   --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue' \
   --output text --region <region>
 
-# 3. List VPC endpoint IDs (replace <vpc-id> with output from step 2)
-aws ec2 describe-vpc-endpoints \
-  --filters "Name=vpc-id,Values=<vpc-id>" \
-  --query 'VpcEndpoints[?contains(ServiceName,`lambda`) || contains(ServiceName,`sts`) || contains(ServiceName,`sqs`)].[VpcEndpointId,ServiceName]' \
-  --output text --region <region>
+# 3. Find and delete the lambda VPC endpoint
+aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>" "Name=service-name,Values=com.amazonaws.<region>.lambda" --query 'VpcEndpoints[0].VpcEndpointId' --output text --region <region>
+aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <lambda-endpoint-id> --region <region>
 
-# 4. Delete endpoints (replace <endpoint-ids> with space-separated IDs from step 3)
-aws ec2 delete-vpc-endpoints \
-  --vpc-endpoint-ids <endpoint-id-1> <endpoint-id-2> <endpoint-id-3> \
-  --region <region>
+# 4. Find and delete the sts VPC endpoint
+aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>" "Name=service-name,Values=com.amazonaws.<region>.sts" --query 'VpcEndpoints[0].VpcEndpointId' --output text --region <region>
+aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <sts-endpoint-id> --region <region>
 
-# 5. Delete application stacks
+# 5. Find and delete the sqs VPC endpoint
+aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=<vpc-id>" "Name=service-name,Values=com.amazonaws.<region>.sqs" --query 'VpcEndpoints[0].VpcEndpointId' --output text --region <region>
+aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <sqs-endpoint-id> --region <region>
+
+# 6. Delete application stacks
 aws cloudformation delete-stack --stack-name kafka-queue-observability --region <region>
 aws cloudformation delete-stack --stack-name kafka-queue-app --region <region>
 
-# 6. Delete broker (if deployed)
+# 7. Delete broker (if deployed)
 aws cloudformation delete-stack --stack-name kafka-queue-broker --region <region>
 
-# 7. Delete network (if deployed)
+# 8. Delete network (if deployed)
 aws cloudformation delete-stack --stack-name kafka-queue-network --region <region>
 ```
 
