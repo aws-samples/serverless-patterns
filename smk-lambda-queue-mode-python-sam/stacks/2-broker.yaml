@@ -65,7 +65,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           set -euo pipefail
-          exec >> /var/log/kafka-setup.log 2>&1
+          exec > >(tee /var/log/kafka-setup.log) 2>&1
           echo "=== Kafka ${KafkaVersion} setup $(date) ==="
 
           signal_cfn() {
@@ -81,8 +81,6 @@ Resources:
 
           KAFKA_DIR=/opt/kafka
           mkdir -p $KAFKA_DIR
-          # Wait for network routing to settle after instance launch
-          sleep 15
           wget -q --timeout=180 --tries=5 \
             "https://archive.apache.org/dist/kafka/${KafkaVersion}/kafka_2.13-${KafkaVersion}.tgz" \
             -O /tmp/kafka.tgz
@@ -146,7 +144,7 @@ Resources:
 
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT20M
+        Timeout: PT30M
 
   # Dummy resource to ensure IGW is attached before EC2 launches
   VPCGatewayAttachmentDependency:
