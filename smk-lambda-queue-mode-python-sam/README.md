@@ -327,16 +327,17 @@ Delete stacks in reverse order:
 aws lambda delete-event-source-mapping --uuid <esm-uuid> --region <region>
 
 # 2. Delete VPC endpoints
+REGION=<region>
 VPC_ID=$(aws cloudformation describe-stacks \
   --stack-name kafka-queue-network \
   --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue' \
-  --output text --region <region>)
+  --output text --region $REGION)
 ENDPOINT_IDS=$(aws ec2 describe-vpc-endpoints \
   --filters "Name=vpc-id,Values=$VPC_ID" \
-            "Name=service-name,Values=com.amazonaws.<region>.lambda,com.amazonaws.<region>.sts,com.amazonaws.<region>.sqs" \
-  --query 'VpcEndpoints[*].VpcEndpointId' --output text --region <region>)
+            "Name=service-name,Values=com.amazonaws.$REGION.lambda,com.amazonaws.$REGION.sts,com.amazonaws.$REGION.sqs" \
+  --query 'VpcEndpoints[*].VpcEndpointId' --output text --region $REGION)
 aws ec2 delete-vpc-endpoints \
-  --vpc-endpoint-ids $ENDPOINT_IDS --region <region>
+  --vpc-endpoint-ids $ENDPOINT_IDS --region $REGION
 
 # 3. Delete application stacks
 aws cloudformation delete-stack --stack-name kafka-queue-observability --region <region>
