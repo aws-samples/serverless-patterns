@@ -8,12 +8,6 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as logs from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
-import {
-  DynamoDbVectorIndex,
-  VectorDistanceFunction,
-  VectorProjectionType,
-  VectorSearchSchemaElementType,
-} from "./dynamodb-vector-index";
 
 const EMBEDDING_MODEL_ID = "amazon.titan-embed-text-v2:0";
 const VECTOR_DIMENSIONS = 1024;
@@ -33,35 +27,36 @@ export class VectorSearchStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
       pointInTimeRecoverySpecification: {
         pointInTimeRecoveryEnabled: true,
       },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    const vectorIndex = new DynamoDbVectorIndex(this, "DocumentEmbeddingIndex", {
-      table,
-      indexName: VECTOR_INDEX_NAME,
-      vectorAttributeName: "embedding",
-      dimensions: VECTOR_DIMENSIONS,
-      distanceFunction: VectorDistanceFunction.COSINE,
-      searchSchema: [
-        {
-          attributeName: "tenantId",
-          elementType: VectorSearchSchemaElementType.HASH,
-          attributeType: dynamodb.AttributeType.STRING,
+    const cfnTable = table.node.defaultChild as dynamodb.CfnTable;
+    // The pinned CDK version predates the native CloudFormation VectorIndexes property.
+    cfnTable.addPropertyOverride("AttributeDefinitions", [
+      { AttributeName: "tenantId", AttributeType: "S" },
+      { AttributeName: "documentId", AttributeType: "S" },
+      { AttributeName: "category", AttributeType: "S" },
+    ]);
+    cfnTable.addPropertyOverride("VectorIndexes", [
+      {
+        IndexName: VECTOR_INDEX_NAME,
+        VectorAttribute: { AttributeName: "embedding" },
+        Dimensions: VECTOR_DIMENSIONS,
+        DistanceFunction: "COSINE",
+        SearchSchema: [
+          { AttributeName: "tenantId", SearchSchemaElementType: "HASH" },
+          { AttributeName: "category", SearchSchemaElementType: "INLINE_FILTER" },
+        ],
+        Projection: {
+          ProjectionType: "INCLUDE",
+          NonKeyAttributes: ["title", "content"],
         },
-        {
-          attributeName: "category",
-          elementType: VectorSearchSchemaElementType.INLINE_FILTER,
-          attributeType: dynamodb.AttributeType.STRING,
-        },
-      ],
-      projection: {
-        projectionType: VectorProjectionType.INCLUDE,
-        nonKeyAttributes: ["title", "content"],
       },
-    });
+    ]);
 
     const apiFunction = new lambdaNodejs.NodejsFunction(this, "VectorSearchFunction", {
       entry: path.join(__dirname, "../src/vector-search-handler.ts"),
@@ -91,7 +86,7 @@ export class VectorSearchStack extends cdk.Stack {
     apiFunction.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["dynamodb:SearchVectors"],
-        resources: [vectorIndex.indexArn],
+        resources: [`${table.tableArn}/index/${VECTOR_INDEX_NAME}`],
       }),
     );
     apiFunction.addToRolePolicy(
@@ -143,7 +138,7 @@ export class VectorSearchStack extends cdk.Stack {
     });
     new cdk.CfnOutput(this, "VectorIndexName", {
       description: "DynamoDB vector index used by SearchVectors",
-      value: vectorIndex.indexName,
+      value: VECTOR_INDEX_NAME,
     });
     new cdk.CfnOutput(this, "VectorSearchFunctionName", {
       description: "Lambda function backing both HTTP API routes",

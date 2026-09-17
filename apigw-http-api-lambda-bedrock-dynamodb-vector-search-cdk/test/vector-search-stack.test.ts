@@ -18,27 +18,27 @@ describe("VectorSearchStack", () => {
         PointInTimeRecoveryEnabled: true,
       },
     });
-    template.hasResourceProperties("Custom::DynamoDBVectorIndex", {
-      IndexName: "document-embedding-index",
-      VectorAttributeName: "embedding",
-      Dimensions: 1024,
-      DistanceFunction: "COSINE",
-      SearchSchema: [
-        {
-          AttributeName: "tenantId",
-          SearchSchemaElementType: "HASH",
-          AttributeType: "S",
-        },
-        {
-          AttributeName: "category",
-          SearchSchemaElementType: "INLINE_FILTER",
-          AttributeType: "S",
-        },
+    template.hasResourceProperties("AWS::DynamoDB::Table", {
+      SSESpecification: { SSEEnabled: true },
+      AttributeDefinitions: [
+        { AttributeName: "tenantId", AttributeType: "S" },
+        { AttributeName: "documentId", AttributeType: "S" },
+        { AttributeName: "category", AttributeType: "S" },
       ],
-      Projection: {
-        ProjectionType: "INCLUDE",
-        NonKeyAttributes: ["title", "content"],
-      },
+      VectorIndexes: [{
+        IndexName: "document-embedding-index",
+        VectorAttribute: { AttributeName: "embedding" },
+        Dimensions: 1024,
+        DistanceFunction: "COSINE",
+        SearchSchema: [
+          { AttributeName: "tenantId", SearchSchemaElementType: "HASH" },
+          { AttributeName: "category", SearchSchemaElementType: "INLINE_FILTER" },
+        ],
+        Projection: {
+          ProjectionType: "INCLUDE",
+          NonKeyAttributes: ["title", "content"],
+        },
+      }],
     });
     template.hasResourceProperties("AWS::Lambda::Function", {
       Runtime: "nodejs22.x",
@@ -58,13 +58,23 @@ describe("VectorSearchStack", () => {
       RouteKey: "POST /search",
     });
     template.resourceCountIs("AWS::StepFunctions::StateMachine", 0);
-    template.resourceCountIs("AWS::Logs::LogGroup", 3);
+    template.resourceCountIs("AWS::Logs::LogGroup", 1);
+    template.resourceCountIs("AWS::Lambda::Function", 1);
+    template.resourceCountIs("Custom::DynamoDBVectorIndex", 0);
     template.hasResourceProperties("AWS::IAM::Policy", {
       PolicyDocument: {
         Statement: Match.arrayWith([
           Match.objectLike({
             Action: "dynamodb:SearchVectors",
             Effect: "Allow",
+            Resource: {
+              "Fn::Join": ["", [
+                { "Fn::GetAtt": [stack.getLogicalId(
+                  stack.node.findChild("Documents").node.defaultChild as cdk.CfnResource,
+                ), "Arn"] },
+                "/index/document-embedding-index",
+              ]],
+            },
           }),
           Match.objectLike({
             Action: "bedrock:InvokeModel",
@@ -73,5 +83,15 @@ describe("VectorSearchStack", () => {
         ]),
       },
     });
+    const resources = Object.values(template.toJSON().Resources) as Array<{
+      Type: string;
+      Properties?: { PolicyDocument?: { Statement: Array<{ Action: string | string[] }> } };
+    }>;
+    const actions = resources
+      .filter((resource) => resource.Type === "AWS::IAM::Policy")
+      .flatMap((resource) => resource.Properties?.PolicyDocument?.Statement ?? [])
+      .flatMap((statement) => statement.Action);
+    expect(actions).not.toContain("dynamodb:UpdateTable");
+    expect(actions).not.toContain("dynamodb:DescribeTable");
   });
 });

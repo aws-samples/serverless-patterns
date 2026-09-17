@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-![Architecture diagram showing the runtime semantic-search request flow and the CDK custom-resource provisioning flow](diagram.png)
+![Architecture diagram showing the runtime semantic-search request flow and native CloudFormation provisioning](diagram.png)
 
 The diagram uses the official [AWS Architecture Icons](https://aws.amazon.com/architecture/icons/).
 
@@ -29,17 +29,16 @@ The diagram uses the official [AWS Architecture Icons](https://aws.amazon.com/ar
 4. For document ingestion, Lambda stores the source content, metadata, and embedding together in DynamoDB with `PutItem`.
 5. For search, Lambda calls `SearchVectors` using the query embedding, required `tenantId` partition, optional `category` filter, and requested `topK`.
 6. DynamoDB returns projected document attributes ordered by cosine distance, where lower scores indicate closer semantic matches.
-7. During deployment, the CDK custom resource calls `UpdateTable` and polls `DescribeTable` until the vector index is active and backfilling is complete.
+7. During deployment, AWS CDK synthesizes the table and its native `VectorIndexes` property; CloudFormation provisions the table and index together.
 
 ### Resources
 
 - An Amazon API Gateway HTTP API with `POST /documents` and `POST /search` routes.
 - An AWS Lambda function that validates requests, invokes Bedrock, stores documents, and performs vector searches.
 - Amazon Bedrock with Amazon Titan Text Embeddings V2 for document and query embeddings.
-- An on-demand Amazon DynamoDB table with a native vector index, tenant partitioning, inline category filtering, and projected content attributes.
-- A CloudFormation custom-resource provider implemented with Lambda to create, monitor, replace, and delete the DynamoDB vector index.
+- An on-demand Amazon DynamoDB table with AWS-managed KMS encryption, a native vector index, tenant partitioning, inline category filtering, and projected content attributes.
 
-The CDK application also deploys a CloudFormation custom-resource provider to create the DynamoDB vector index and wait for asynchronous backfilling to finish. This deployment plumbing is required until DynamoDB vector indexes are available as native CDK/CloudFormation table properties.
+The vector index is declared directly on `AWS::DynamoDB::Table` using its native [VectorIndexes property](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-dynamodb-table.html#cfn-dynamodb-table-vectorindexes). The pinned CDK version does not expose this property, so the stack uses `CfnTable.addPropertyOverride` with CloudFormation property names. Search-schema attributes are declared in the table’s `AttributeDefinitions`. CloudFormation manages the index lifecycle without a custom-resource provider or polling Lambda functions.
 
 ## How it works
 
@@ -78,7 +77,7 @@ The HTTP API is intentionally unauthenticated to keep the integration focused. A
 
 5. Note the `ApiEndpoint`, `TableName`, `VectorIndexName`, and `VectorSearchFunctionName` stack outputs.
 
-The custom resource completes only after the vector index reports `ACTIVE` and `Backfilling` is false. It checks every 10 seconds and times out after 13 minutes. This bounded wait is intended for the new, empty table created by this pattern.
+The stack creates one vector index on a new, empty on-demand table through CloudFormation. The table explicitly uses `TableEncryption.AWS_MANAGED` for encryption with the AWS-managed DynamoDB KMS key.
 
 ### Optional CI/CD deployment pipeline
 
@@ -186,9 +185,11 @@ npm test
 npm run synth
 ```
 
+The pinned CDK release may warn that `VectorIndexes` is an unexpected property during synthesis because its bundled validation schema predates CloudFormation support. The property override follows the current CloudFormation specification; this warning does not prevent synthesis.
+
 ## Updating the vector index
 
-Vector attribute, dimensions, distance function, search schema, and projection are immutable. If you change one of these settings, also change the index name. The custom resource creates and waits for the replacement index before CloudFormation deletes the old index. Backfilling a replacement on a table that has grown substantially can exceed the sample's 13-minute bounded wait; use a dedicated migration workflow for that case.
+Vector index properties do not support in-place updates. CloudFormation supports creating or deleting only one vector index per stack operation. To replace an index, first add a differently named index while retaining the existing one and deploy; after the new index is ready, switch the application to it, then remove the old index in a separate deployment. Keep the application’s `VECTOR_INDEX_NAME`, the `SearchVectors` IAM resource, and the stack output aligned with the active index. See the [CloudFormation vector index reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-dynamodb-table-vectorindex.html) before changing the schema.
 
 ## Cleanup
 
@@ -198,7 +199,7 @@ Delete the deployed resources:
 npx cdk destroy
 ```
 
-The custom resource deletes the vector index before CloudFormation deletes the DynamoDB table.
+CloudFormation deletes the DynamoDB table and its vector index. The application Lambda log group is also removed by the stack’s `DESTROY` removal policy.
 
 Confirm that no active stack with this name remains; the expected result is an empty array:
 
