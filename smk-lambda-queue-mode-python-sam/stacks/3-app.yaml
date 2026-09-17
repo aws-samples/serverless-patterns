@@ -4,14 +4,14 @@ Description: >-
   KQD Stack 3 - Worker Lambda, Producer Lambda, and SQS DLQ
   for the Kafka Queue mode (KIP-932) pattern.
   Supports three deployment paths:
-    - Full: imports VPC outputs from kqd-network stack (set UseExistingInfra=false)
+    - Full: imports VPC outputs from kafka-queue-network stack (set UseExistingInfra=false)
     - Bring-your-own Kafka: provide BootstrapServers, VpcSubnetIds, VpcSecurityGroupId
     - Bring-your-own Kafka + VPC: same as above (UseExistingInfra=true)
 
 Parameters:
   KafkaTopic:
     Type: String
-    Default: kqd-task-worker
+    Default: kafka-queue-task-worker
     Description: Kafka topic name the worker consumes and the producer publishes to.
 
   BootstrapServers:
@@ -19,21 +19,21 @@ Parameters:
     Default: ""
     Description: >-
       Kafka bootstrap servers (e.g. 10.0.0.43:9092).
-      Leave blank to import from kqd-broker stack output.
+      Leave blank to import from kafka-queue-broker stack output.
 
   VpcSubnetIds:
     Type: String
     Default: ""
     Description: >-
       Comma-separated private subnet IDs for the producer Lambda VPC config.
-      Leave blank to import from kqd-network stack output.
+      Leave blank to import from kafka-queue-network stack output.
 
   VpcSecurityGroupId:
     Type: String
     Default: ""
     Description: >-
       Security group ID for the producer Lambda.
-      Leave blank to import from kqd-network stack output.
+      Leave blank to import from kafka-queue-network stack output.
 
   UseExistingInfra:
     Type: String
@@ -41,8 +41,8 @@ Parameters:
     AllowedValues: ["true", "false"]
     Description: >-
       Set to true when providing your own BootstrapServers, VpcSubnetIds,
-      and VpcSecurityGroupId (skips CloudFormation imports from kqd-network
-      and kqd-broker stacks).
+      and VpcSecurityGroupId (skips CloudFormation imports from kafka-queue-network
+      and kafka-queue-broker stacks).
 
 Conditions:
   ImportInfra: !Equals [!Ref UseExistingInfra, "false"]
@@ -102,21 +102,21 @@ Resources:
             - ImportInfra
             - !Join
               - ","
-              - - !ImportValue kqd-PrivateSubnetA
-                - !ImportValue kqd-PrivateSubnetB
-                - !ImportValue kqd-PrivateSubnetC
+              - - !ImportValue kafka-queue-PrivateSubnetA
+                - !ImportValue kafka-queue-PrivateSubnetB
+                - !ImportValue kafka-queue-PrivateSubnetC
             - !Ref VpcSubnetIds
         SecurityGroupIds:
           - !If
             - ImportInfra
-            - !ImportValue kqd-LambdaSecurityGroupId
+            - !ImportValue kafka-queue-LambdaSecurityGroupId
             - !Ref VpcSecurityGroupId
       Environment:
         Variables:
           KAFKA_TOPIC: !Ref KafkaTopic
           BOOTSTRAP_SERVERS: !If
             - ImportInfra
-            - !ImportValue kqd-BootstrapServers
+            - !ImportValue kafka-queue-BootstrapServers
             - !Ref BootstrapServers
       Policies:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
@@ -125,19 +125,19 @@ Outputs:
   WorkerFunctionArn:
     Value: !GetAtt WorkerFunction.Arn
     Export:
-      Name: kqd-WorkerFunctionArn
+      Name: kafka-queue-WorkerFunctionArn
 
   WorkerFunctionName:
     Value: !Ref WorkerFunction
     Export:
-      Name: kqd-WorkerFunctionName
+      Name: kafka-queue-WorkerFunctionName
 
   TaskWorkerDLQArn:
     Value: !GetAtt TaskWorkerDLQ.Arn
     Export:
-      Name: kqd-TaskWorkerDLQArn
+      Name: kafka-queue-TaskWorkerDLQArn
 
   TaskWorkerDLQUrl:
     Value: !Ref TaskWorkerDLQ
     Export:
-      Name: kqd-TaskWorkerDLQUrl
+      Name: kafka-queue-TaskWorkerDLQUrl

@@ -54,13 +54,13 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref LatestAL2023AmiId
-      SubnetId: !ImportValue kqd-PublicSubnetId
+      SubnetId: !ImportValue kafka-queue-PublicSubnetId
       SecurityGroupIds:
-        - !ImportValue kqd-BrokerSecurityGroupId
+        - !ImportValue kafka-queue-BrokerSecurityGroupId
       IamInstanceProfile: !Ref KafkaInstanceProfile
       Tags:
         - Key: Name
-          Value: kqd-kafka-broker
+          Value: kafka-queue-kafka-broker
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -154,9 +154,9 @@ Outputs:
   BootstrapServers:
     Value: !Sub "${KafkaInstance.PrivateIp}:9092"
     Export:
-      Name: kqd-BootstrapServers
+      Name: kafka-queue-BootstrapServers
 
   BrokerInstanceId:
     Value: !Ref KafkaInstance
     Export:
-      Name: kqd-BrokerInstanceId
+      Name: kafka-queue-BrokerInstanceId

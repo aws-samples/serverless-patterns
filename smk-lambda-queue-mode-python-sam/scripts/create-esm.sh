@@ -8,7 +8,7 @@
 # Prerequisites:
 #   - aws CLI configured with appropriate credentials
 #   - curl >= 7.75 (for --aws-sigv4 support)
-#   - Stacks kqd-network, kqd-broker, kqd-app must be deployed
+#   - Stacks kafka-queue-network, kafka-queue-broker, kafka-queue-app must be deployed
 #
 # Usage:
 #   ./scripts/create-esm.sh
@@ -19,11 +19,11 @@ set -euo pipefail
 # ── Defaults ─────────────────────────────────────────────────
 REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 PROFILE="${AWS_PROFILE:-default}"
-APP_STACK="kqd-app"
-BROKER_STACK="kqd-broker"
-NETWORK_STACK="kqd-network"
-CONSUMER_GROUP_ID="kqd-queue-group-$(date +%s)"
-TOPIC="kqd-task-worker"
+APP_STACK="kafka-queue-app"
+BROKER_STACK="kafka-queue-broker"
+NETWORK_STACK="kafka-queue-network"
+CONSUMER_GROUP_ID="kafka-queue-group-$(date +%s)"
+TOPIC="kafka-queue-task-worker"
 MIN_POLLERS=2
 MAX_POLLERS=10
 MAX_RETRY_ATTEMPTS=3
@@ -127,13 +127,13 @@ print()
 print('Wait ~60s for State to reach Enabled, then produce records:')
 print()
 print('  aws lambda invoke \\\\')
-print('    --function-name kqd-app-producer \\\\')
+print('    --function-name kafka-queue-app-producer \\\\')
 print('    --region $REGION --profile $PROFILE \\\\')
 print('    --cli-binary-format raw-in-base64-out \\\\')
 print('    --payload \'{"count": 20}\' /dev/stdout')
 print()
 print('Watch logs:')
-print('  aws logs tail /aws/lambda/kqd-app-worker --follow \\\\')
+print('  aws logs tail /aws/lambda/kafka-queue-app-worker --follow \\\\')
 print('    --filter-pattern KAFKA_RECORD \\\\')
 print('    --region $REGION --profile $PROFILE')
 " REGION="$REGION" PROFILE="$PROFILE"

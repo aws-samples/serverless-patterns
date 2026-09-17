@@ -15,7 +15,7 @@ from confluent_kafka.admin import AdminClient, NewTopic
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-TOPIC = os.environ.get("KAFKA_TOPIC", "kqd-task-worker")
+TOPIC = os.environ.get("KAFKA_TOPIC", "kafka-queue-task-worker")
 BOOTSTRAP_SERVERS = os.environ.get("BOOTSTRAP_SERVERS", "")
 DEFAULT_COUNT = 50
 

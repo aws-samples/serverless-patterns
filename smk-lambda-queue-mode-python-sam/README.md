@@ -58,7 +58,7 @@ cd serverless-patterns/smk-lambda-queue-mode-python-sam
 
 ```bash
 aws cloudformation deploy \
-  --stack-name kqd-network \
+  --stack-name kafka-queue-network \
   --template-file stacks/1-network.yaml \
   --region <region>
 ```
@@ -67,7 +67,7 @@ aws cloudformation deploy \
 
 ```bash
 aws cloudformation deploy \
-  --stack-name kqd-broker \
+  --stack-name kafka-queue-broker \
   --template-file stacks/2-broker.yaml \
   --capabilities CAPABILITY_IAM \
   --region <region>
@@ -80,7 +80,7 @@ This provisions a t3.medium EC2 instance running Apache Kafka 4.2.x in KRaft mod
 ```bash
 sam build --template stacks/3-app.yaml
 sam deploy \
-  --stack-name kqd-app \
+  --stack-name kafka-queue-app \
   --template-file .aws-sam/build/template.yaml \
   --capabilities CAPABILITY_IAM \
   --resolve-s3 \
@@ -91,7 +91,7 @@ sam deploy \
 
 ```bash
 aws cloudformation deploy \
-  --stack-name kqd-observability \
+  --stack-name kafka-queue-observability \
   --template-file stacks/4-observability.yaml \
   --region <region>
 ```
@@ -105,7 +105,7 @@ Skip Steps 1 and 2. Provide your Kafka bootstrap servers, VPC subnet IDs, and se
 ```bash
 sam build --template stacks/3-app.yaml
 sam deploy \
-  --stack-name kqd-app \
+  --stack-name kafka-queue-app \
   --template-file .aws-sam/build/template.yaml \
   --capabilities CAPABILITY_IAM \
   --resolve-s3 \
@@ -152,7 +152,7 @@ Wait ~60 seconds for the ESM to reach `State: Enabled`.
 
 ```bash
 aws lambda invoke \
-  --function-name kqd-app-producer \
+  --function-name kafka-queue-app-producer \
   --region <region> \
   --cli-binary-format raw-in-base64-out \
   --payload '{"count": 20}' /dev/stdout
@@ -163,7 +163,7 @@ Every 7th record (`taskIndex % 7 == 0`) has `shouldFail: true` to demonstrate th
 **Watch the worker Lambda logs:**
 
 ```bash
-aws logs tail /aws/lambda/kqd-app-worker \
+aws logs tail /aws/lambda/kafka-queue-app-worker \
   --follow \
   --filter-pattern KAFKA_RECORD \
   --region <region>
@@ -189,7 +189,7 @@ The key differentiator of Queue mode is that pollers exceed the partition count.
 
 ```bash
 aws lambda invoke \
-  --function-name kqd-app-producer \
+  --function-name kafka-queue-app-producer \
   --region <region> \
   --cli-binary-format raw-in-base64-out \
   --payload '{"count": 200}' /dev/stdout
@@ -268,14 +268,14 @@ Delete stacks in reverse order:
 aws lambda delete-event-source-mapping --uuid <esm-uuid> --region <region>
 
 # 2. Delete application stacks
-aws cloudformation delete-stack --stack-name kqd-observability --region <region>
-aws cloudformation delete-stack --stack-name kqd-app --region <region>
+aws cloudformation delete-stack --stack-name kafka-queue-observability --region <region>
+aws cloudformation delete-stack --stack-name kafka-queue-app --region <region>
 
 # 3. Delete broker (if deployed)
-aws cloudformation delete-stack --stack-name kqd-broker --region <region>
+aws cloudformation delete-stack --stack-name kafka-queue-broker --region <region>
 
 # 4. Delete network (if deployed)
-aws cloudformation delete-stack --stack-name kqd-network --region <region>
+aws cloudformation delete-stack --stack-name kafka-queue-network --region <region>
 ```
 
 ---

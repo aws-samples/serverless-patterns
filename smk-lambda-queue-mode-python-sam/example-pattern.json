@@ -56,7 +56,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete stacks in reverse order: <code>aws cloudformation delete-stack --stack-name kqd-esm</code>, then <code>kqd-app</code>, <code>kqd-broker</code>, <code>kqd-network</code>."
+      "Delete stacks in reverse order: <code>aws cloudformation delete-stack --stack-name kafka-queue-esm</code>, then <code>kafka-queue-app</code>, <code>kafka-queue-broker</code>, <code>kafka-queue-network</code>."
     ]
   },
   "authors": [

@@ -11,14 +11,14 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: kqd-vpc
+          Value: kafka-queue-vpc
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: kqd-igw
+          Value: kafka-queue-igw
 
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -35,7 +35,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: kqd-public
+          Value: kafka-queue-public
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -43,7 +43,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: kqd-public-rt
+          Value: kafka-queue-public-rt
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -67,7 +67,7 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: kqd-private-a
+          Value: kafka-queue-private-a
 
   PrivateSubnetB:
     Type: AWS::EC2::Subnet
@@ -77,7 +77,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: kqd-private-b
+          Value: kafka-queue-private-b
 
   PrivateSubnetC:
     Type: AWS::EC2::Subnet
@@ -87,7 +87,7 @@ Resources:
       AvailabilityZone: !Select [2, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: kqd-private-c
+          Value: kafka-queue-private-c
 
   BrokerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -102,7 +102,7 @@ Resources:
           Description: Kafka PLAINTEXT from VPC
       Tags:
         - Key: Name
-          Value: kqd-broker-sg
+          Value: kafka-queue-broker-sg
 
   LambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -122,7 +122,7 @@ Resources:
           Description: HTTPS for AWS APIs and VPC endpoints
       Tags:
         - Key: Name
-          Value: kqd-lambda-sg
+          Value: kafka-queue-lambda-sg
 
   # Allow inbound 443 from VPC (VPC endpoint ENIs need this)
   LambdaSGIngressVPC:
@@ -159,34 +159,34 @@ Outputs:
   VpcId:
     Value: !Ref VPC
     Export:
-      Name: kqd-VpcId
+      Name: kafka-queue-VpcId
 
   PublicSubnetId:
     Value: !Ref PublicSubnet
     Export:
-      Name: kqd-PublicSubnetId
+      Name: kafka-queue-PublicSubnetId
 
   PrivateSubnetA:
     Value: !Ref PrivateSubnetA
     Export:
-      Name: kqd-PrivateSubnetA
+      Name: kafka-queue-PrivateSubnetA
 
   PrivateSubnetB:
     Value: !Ref PrivateSubnetB
     Export:
-      Name: kqd-PrivateSubnetB
+      Name: kafka-queue-PrivateSubnetB
 
   PrivateSubnetC:
     Value: !Ref PrivateSubnetC
     Export:
-      Name: kqd-PrivateSubnetC
+      Name: kafka-queue-PrivateSubnetC
 
   BrokerSecurityGroupId:
     Value: !Ref BrokerSecurityGroup
     Export:
-      Name: kqd-BrokerSecurityGroupId
+      Name: kafka-queue-BrokerSecurityGroupId
 
   LambdaSecurityGroupId:
     Value: !Ref LambdaSecurityGroup
     Export:
-      Name: kqd-LambdaSecurityGroupId
+      Name: kafka-queue-LambdaSecurityGroupId
