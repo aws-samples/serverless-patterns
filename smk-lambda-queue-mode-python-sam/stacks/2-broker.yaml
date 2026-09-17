@@ -81,7 +81,9 @@ Resources:
 
           KAFKA_DIR=/opt/kafka
           mkdir -p $KAFKA_DIR
-          wget -q --timeout=180 --tries=3 \
+          # Wait for network routing to settle after instance launch
+          sleep 15
+          wget -q --timeout=180 --tries=5 \
             "https://archive.apache.org/dist/kafka/${KafkaVersion}/kafka_2.13-${KafkaVersion}.tgz" \
             -O /tmp/kafka.tgz
           tar -xzf /tmp/kafka.tgz -C $KAFKA_DIR --strip-components=1
