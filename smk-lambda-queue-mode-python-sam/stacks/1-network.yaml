@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: KQD Stack 1 - Networking (VPC, subnets, IGW, security groups)
+Description: Stack 1 - Networking (VPC, subnets, IGW, security groups)
 
 Resources:
 

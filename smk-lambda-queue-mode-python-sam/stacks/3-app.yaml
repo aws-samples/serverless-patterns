@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >-
-  KQD Stack 3 - Worker Lambda, Producer Lambda, and SQS DLQ
+  Stack 3 - Worker Lambda, Producer Lambda, and SQS DLQ
   for the Kafka Queue mode (KIP-932) pattern.
   Supports three deployment paths:
     - Full: imports VPC outputs from kafka-queue-network stack (set UseExistingInfra=false)

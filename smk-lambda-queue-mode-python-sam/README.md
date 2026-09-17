@@ -12,7 +12,6 @@ Learn more about this pattern at Serverless Land: https://serverlessland.com/pat
 graph LR
     Producer["Producer\nLambda"] -->|publish| Kafka["Apache Kafka\n4.2+ Cluster"]
     Kafka -->|Queue mode ESM\nConsumptionMode: Queue| Worker["Worker\nLambda"]
-    Worker --> DDB["DynamoDB\nIdempotency"]
     Worker --> SQS["SQS\nDLQ"]
     Worker --> CW["CloudWatch\nMetrics"]
 ```
@@ -29,7 +28,7 @@ graph LR
 
 ## Costs
 
-This pattern uses EC2 (t3.medium), Lambda, DynamoDB, SQS, CloudWatch, and VPC resources. See [AWS Pricing](https://aws.amazon.com/pricing/) for details. There are costs associated with these services beyond the Free Tier.
+This pattern uses EC2 (t3.medium), Lambda, SQS, CloudWatch, and VPC resources. See [AWS Pricing](https://aws.amazon.com/pricing/) for details. There are costs associated with these services beyond the Free Tier.
 
 ---
 
@@ -185,6 +184,16 @@ aws lambda invoke \
   --payload '{"count": 20}' /dev/stdout
 ```
 
+You can also override the topic at invocation time without redeploying:
+
+```bash
+aws lambda invoke \
+  --function-name kafka-queue-app-producer \
+  --region <region> \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"count": 20, "topic": "my-custom-topic"}' /dev/stdout
+```
+
 Every 7th record (`taskIndex % 7 == 0`) has `shouldFail: true` to demonstrate the RELEASE/retry/DLQ path.
 
 **Watch the worker Lambda logs:**
@@ -197,6 +206,16 @@ aws logs tail /aws/lambda/kafka-queue-app-worker \
 ```
 
 You should see `KAFKA_RECORD` log entries with `topic`, `partition`, `offset`, and `payload`. Records with `shouldFail: true` log a warning and return in `batchItemFailures`, causing the broker to RELEASE them for retry.
+
+**View the CloudWatch dashboard:**
+
+Open the `kafka-queue-dashboard` dashboard in CloudWatch to see real-time metrics:
+- **Share Group Lag** — records waiting to be processed (spikes on produce, drains to zero)
+- **Provisioned Pollers** — number of active pollers (Queue mode only)
+- **Event Counts** — PolledEventCount, InvokedEventCount, OnFailureDestinationDeliveredEventCount
+- **Errors** — PollingErrorCount, FailedInvokeEventCount
+
+All metrics are scoped to the ESM UUID, not the function name.
 
 **Test locally:**
 
@@ -294,14 +313,22 @@ Delete stacks in reverse order:
 # 1. Delete the ESM first (get UUID from create-esm.sh output or console)
 aws lambda delete-event-source-mapping --uuid <esm-uuid> --region <region>
 
-# 2. Delete application stacks
+# 2. Delete VPC endpoints
+aws ec2 describe-vpc-endpoints \
+  --filters "Name=vpc-id,Values=<your-vpc-id>" \
+            "Name=service-name,Values=com.amazonaws.<region>.lambda,com.amazonaws.<region>.sts,com.amazonaws.<region>.sqs" \
+  --query 'VpcEndpoints[*].VpcEndpointId' --output text --region <region>
+# Then delete each endpoint:
+aws ec2 delete-vpc-endpoints --vpc-endpoint-ids <endpoint-ids> --region <region>
+
+# 3. Delete application stacks
 aws cloudformation delete-stack --stack-name kafka-queue-observability --region <region>
 aws cloudformation delete-stack --stack-name kafka-queue-app --region <region>
 
-# 3. Delete broker (if deployed)
+# 4. Delete broker (if deployed)
 aws cloudformation delete-stack --stack-name kafka-queue-broker --region <region>
 
-# 4. Delete network (if deployed)
+# 5. Delete network (if deployed)
 aws cloudformation delete-stack --stack-name kafka-queue-network --region <region>
 ```
 

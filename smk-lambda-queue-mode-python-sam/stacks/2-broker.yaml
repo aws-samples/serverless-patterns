@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: KQD Stack 2 - Self-managed Kafka 4.2.x broker on EC2 (KRaft, PLAINTEXT)
+Description: Stack 2 - Self-managed Kafka 4.2.x broker on EC2 (KRaft, PLAINTEXT)
 
 Parameters:
   KafkaVersion:
