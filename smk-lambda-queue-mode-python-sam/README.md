@@ -129,6 +129,10 @@ aws cloudformation deploy \
 
 This creates a CloudWatch dashboard (`kafka-queue-dashboard`) and alarms for share group lag, DLQ delivery, and poller errors.
 
+---
+
+### Path B: Bring your own Kafka cluster
+
 Skip Steps 1, 2, and 2b. Provide your Kafka bootstrap servers, VPC subnet IDs, and security group at deploy time:
 
 ```bash
