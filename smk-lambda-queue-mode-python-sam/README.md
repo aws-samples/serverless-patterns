@@ -72,7 +72,16 @@ aws cloudformation deploy \
   --region <region>
 ```
 
-This provisions a t3.medium EC2 instance running Apache Kafka 4.2.x in KRaft mode with share groups enabled. The stack signals CloudFormation when Kafka is ready (~10 minutes).
+This provisions a t3.medium EC2 instance. The instance is ready in ~2 minutes.
+
+**Step 2b: Install Kafka on the broker**
+
+```bash
+chmod +x scripts/setup-broker.sh
+./scripts/setup-broker.sh --region <region> --profile <profile>
+```
+
+This script connects to the broker via SSM (no SSH required) and installs Apache Kafka 4.2.x, configures KRaft mode with share groups enabled, and starts the broker. It runs 6 steps sequentially and reports progress. The Kafka download (~130MB) takes about 15-20 minutes depending on network speed.
 
 **Step 3: Build and deploy the application**
 
@@ -120,7 +129,7 @@ aws cloudformation deploy \
 
 This creates a CloudWatch dashboard (`kafka-queue-dashboard`) and alarms for share group lag, DLQ delivery, and poller errors.
 
-Skip Steps 1 and 2. Provide your Kafka bootstrap servers, VPC subnet IDs, and security group at deploy time:
+Skip Steps 1, 2, and 2b. Provide your Kafka bootstrap servers, VPC subnet IDs, and security group at deploy time:
 
 ```bash
 sam build --template stacks/3-app.yaml
