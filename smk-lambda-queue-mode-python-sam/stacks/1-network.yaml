@@ -146,14 +146,18 @@ Resources:
       SourceSecurityGroupId: !Ref LambdaSecurityGroup
       Description: Self - Hyperplane ENI to VPC endpoint ENI
 
-  # VPC Interface Endpoint for Lambda (allows ESM pollers to invoke Lambda)
-  # NOTE: Created separately via CLI if this stack is deployed fresh:
-  #   aws ec2 create-vpc-endpoint --vpc-endpoint-type Interface \
-  #     --vpc-id <VpcId> --service-name com.amazonaws.<region>.lambda \
-  #     --subnet-ids <private-subnets> --security-group-ids <LambdaSG> \
-  #     --private-dns-enabled --region <region>
-  # Same for com.amazonaws.<region>.sts
-  # These endpoints are not managed here to avoid conflict on update.
+  # VPC Interface Endpoints — all three are required for Queue mode ESM pollers:
+  #   lambda  — pollers invoke the Lambda function
+  #   sts     — pollers obtain temporary credentials
+  #   sqs     — pollers write failed records to the OnFailure DLQ
+  #
+  # IMPORTANT: Missing the SQS endpoint causes a silent connection error —
+  # the ESM stays Enabled/OK but Lambda stops being invoked after the first
+  # batch when a failed record triggers a DLQ write.
+  #
+  # These are created via scripts/setup-vpc-endpoints.sh rather than as
+  # CloudFormation resources because AWS::EC2::VpcEndpoint is restricted
+  # in some accounts (e.g. Isengard/bindled accounts used for testing).
 
 Outputs:
   VpcId:

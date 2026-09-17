@@ -87,18 +87,39 @@ sam deploy \
   --region <region>
 ```
 
-**Step 4: Deploy observability (optional)**
+**Step 4: Create VPC endpoints**
+
+ESM pollers run in private subnets and require three VPC interface endpoints: `lambda`, `sts`, and `sqs`. Missing any one of them — especially `sqs` — causes a silent failure where the ESM stays `Enabled/OK` but Lambda stops being invoked after the first batch.
+
+```bash
+chmod +x scripts/setup-vpc-endpoints.sh
+./scripts/setup-vpc-endpoints.sh --region <region> --profile <profile>
+```
+
+This script is idempotent — it skips endpoints that already exist.
+
+**Step 5: Create the Queue mode ESM**
+
+```bash
+chmod +x scripts/create-esm.sh
+./scripts/create-esm.sh --region <region> --profile <profile>
+```
+
+Note the ESM UUID printed in the output — you need it for the observability step.
+
+Wait ~60 seconds for the ESM to reach `State: Enabled`.
+
+**Step 6: Deploy observability (optional)**
 
 ```bash
 aws cloudformation deploy \
   --stack-name kafka-queue-observability \
   --template-file stacks/4-observability.yaml \
+  --parameter-overrides ESMUuid=<esm-uuid-from-step-5> \
   --region <region>
 ```
 
----
-
-### Path B: Bring your own Kafka cluster
+This creates a CloudWatch dashboard (`kafka-queue-dashboard`) and alarms for share group lag, DLQ delivery, and poller errors.
 
 Skip Steps 1 and 2. Provide your Kafka bootstrap servers, VPC subnet IDs, and security group at deploy time:
 
@@ -123,26 +144,32 @@ Your Kafka cluster must:
 - Have `share.version` upgraded to 1 via `kafka-features.sh upgrade --feature share.version=1`
 - Be reachable from the Lambda VPC subnets on the configured port
 
+**Create VPC endpoints**
+
+If your VPC does not already have `lambda`, `sts`, and `sqs` interface endpoints, create them:
+
+```bash
+./scripts/setup-vpc-endpoints.sh --region <region> --profile <profile> \
+  --vpc-id <your-vpc-id> \
+  --subnet-ids "subnet-aaa111,subnet-bbb222,subnet-ccc333" \
+  --security-group-id <your-security-group-id>
+```
+
+If your VPC already has these endpoints, skip this step.
+
+**Create the Queue mode ESM**
+
+```bash
+./scripts/create-esm.sh --region <region> --profile <profile>
+```
+
 ---
 
 ### Path C: Bring your own Kafka cluster and VPC
 
-Same as Path B — `UseExistingInfra=true` handles both cases.
+Same as Path B — `UseExistingInfra=true` handles both cases. Provide your own `--vpc-id`, `--subnet-ids`, and `--security-group-id` to `setup-vpc-endpoints.sh` if your VPC doesn't already have the required endpoints.
 
 ---
-
-## Create the Queue mode ESM
-
-After deploying the application stack, create the Event Source Mapping with `ConsumptionMode: Queue`:
-
-```bash
-chmod +x scripts/create-esm.sh
-./scripts/create-esm.sh --region <region> --profile <profile>
-```
-
-Wait ~60 seconds for the ESM to reach `State: Enabled`.
-
-> **Note:** The script uses `curl --aws-sigv4` to call the Lambda API directly because `ConsumptionMode: Queue` is not yet in the SAM or AWS CLI service model. Update to the latest AWS CLI or SAM when this field becomes available to use standard tooling.
 
 ---
 
