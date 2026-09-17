@@ -113,7 +113,7 @@ run_ssm "1/6 Install Java" \
 # ── Step 2: Download Kafka ────────────────────────────────────
 run_ssm "2/6 Download Kafka $KAFKA_VERSION (this takes ~20 min)" \
   "wget -q --timeout=1800 --tries=3 https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz -O /tmp/kafka.tgz && ls -lh /tmp/kafka.tgz" \
-  1800
+  2400
 
 # ── Step 3: Extract ───────────────────────────────────────────
 run_ssm "3/6 Extract Kafka" \
