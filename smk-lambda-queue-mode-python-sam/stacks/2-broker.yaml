@@ -144,7 +144,7 @@ Resources:
 
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT30M
+        Timeout: PT40M
 
   # Dummy resource to ensure IGW is attached before EC2 launches
   VPCGatewayAttachmentDependency:
