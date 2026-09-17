@@ -3,6 +3,7 @@
 PLAINTEXT, no auth. Every 7th item (taskIndex % 7 == 0) has shouldFail=True
 to demonstrate the RELEASE/retry path.
 """
+
 import json
 import logging
 import os
@@ -23,15 +24,15 @@ def _config():
     return {"bootstrap.servers": BOOTSTRAP_SERVERS}
 
 
-def _ensure_topic(admin):
-    nt = NewTopic(TOPIC, num_partitions=3, replication_factor=1)
-    for topic, future in admin.create_topics([nt]).items():
+def _ensure_topic(admin, topic):
+    nt = NewTopic(topic, num_partitions=3, replication_factor=1)
+    for t, future in admin.create_topics([nt]).items():
         try:
             future.result()
-            logger.info("Created topic %s", topic)
+            logger.info("Created topic %s", t)
         except KafkaException as e:
             if "already exists" in str(e).lower():
-                logger.info("Topic %s already exists", topic)
+                logger.info("Topic %s already exists", t)
             else:
                 raise
 
@@ -39,8 +40,9 @@ def _ensure_topic(admin):
 def lambda_handler(event, context):
     event = event or {}
     count = int(event.get("count", DEFAULT_COUNT))
+    topic = event.get("topic") or TOPIC
 
-    _ensure_topic(AdminClient(_config()))
+    _ensure_topic(AdminClient(_config()), topic)
 
     producer = Producer(_config())
     failures = 0
@@ -59,7 +61,7 @@ def lambda_handler(event, context):
             "shouldFail": i % 7 == 0,
         }
         producer.produce(
-            TOPIC,
+            topic,
             key=item["jobId"].encode(),
             value=json.dumps(item).encode(),
             on_delivery=on_delivery,
@@ -67,6 +69,6 @@ def lambda_handler(event, context):
         producer.poll(0)
 
     producer.flush()
-    result = {"topic": TOPIC, "produced": count, "failures": failures}
+    result = {"topic": topic, "produced": count, "failures": failures}
     logger.info("Producer done: %s", json.dumps(result))
     return result
