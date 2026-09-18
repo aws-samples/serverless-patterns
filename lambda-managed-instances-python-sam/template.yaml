@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Lambda Managed Instances with SAM (Python).
   Runs a Lambda function on EC2 instances managed by AWS, with EC2 pricing
-  advantages (Savings Plans, Reserved Instances) and multi-concurrency support.
+  advantages (Savings Plans, Reserved Instances) and multi-concurrency support. (uksb-1tthgi812) (tag:lambda-managed-instances-python-sam)
 
 Parameters:
   VpcCIDR:
