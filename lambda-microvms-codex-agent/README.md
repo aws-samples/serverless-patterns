@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ![Codex CLI Agent on AWS Lambda MicroVMs architecture](images/architecture.png)
 
-1. **Image build**: AWS Lambda downloads the zip and executes [src/Dockerfile](src/Dockerfile) server-side, installing Git, the Codex CLI, `uv`, and the MCP Proxy for AWS, and initialising `/workspace` as a Git repository. It waits for the `/ready` hook and takes a snapshot.
+1. **Image build**: AWS Lambda downloads the zip and executes [src/Dockerfile](src/Dockerfile) server-side, installing Git, bubblewrap, the Codex CLI, `uv`, and the MCP Proxy for AWS, and initialising `/workspace` as a Git repository. It waits for the `/ready` hook and takes a snapshot.
 2. **Run**: The MicroVM resumes from the snapshot with the execution role, `SHELL_INGRESS`, and `INTERNET_EGRESS` attached.
 3. **Configure**: [src/app.py](src/app.py) renders `~/.codex/config.toml` and `/etc/profile.d/codex-agent.sh` from the MicroVM environment (Region, model, MCP endpoint) at startup and on every `/run` and `/resume`, so the same image deploys unchanged into any supported Region.
 4. **Connect**: You generate a shell auth token and open an interactive shell. The shell lands in `/workspace`.
@@ -66,7 +66,7 @@ Pick a Region where both [AWS Lambda MicroVMs](https://docs.aws.amazon.com/lambd
    The WebSocket shell does not carry your terminal's window size, so the image applies a default (120x40) that keeps the interactive `codex` TUI usable. Resize it to match your own window for the best layout:
 
    ```bash
-   stty cols 200 rows 50; export COLUMNS=200 LINES=50
+   stty cols 120 rows 40; export COLUMNS=120 LINES=40
    ```
 
    The headless `codex exec` mode used in Testing below is unaffected either way.
