@@ -26,6 +26,8 @@ graph LR
 - curl >= 7.75 (for `--aws-sigv4` support)
 - Apache Kafka 4.2+ cluster (see Deployment Path A to provision one automatically)
 
+> **Security note:** This pattern uses PLAINTEXT with no authentication between the producer and the Kafka broker. Traffic is unencrypted and unauthenticated. This is intentional for a self-contained demo — do not use this configuration outside of an isolated sandbox. For production use, configure SASL/SCRAM or Mutual TLS (mTLS) on the broker and add the corresponding credentials to the ESM `SourceAccessConfigurations`.
+
 ## Costs
 
 This pattern uses Amazon EC2 (t3.medium), AWS Lambda, Amazon SQS, Amazon CloudWatch, and Amazon VPC resources. See [AWS Pricing](https://aws.amazon.com/pricing/) for details. There are costs associated with these services beyond the Free Tier.
