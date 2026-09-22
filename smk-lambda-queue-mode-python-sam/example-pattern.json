@@ -1,6 +1,6 @@
 {
   "title": "Self-managed Apache Kafka Queue mode to AWS Lambda (KIP-932)",
-  "description": "Deploy a Lambda function that consumes from a self-managed Apache Kafka 4.2+ cluster using Queue consumption mode (KIP-932 Share Groups). Queue mode allows multiple Lambda pollers to process records from the same partition concurrently, breaking the partition-count ceiling of traditional consumer groups.",
+  "description": "Lambda ESM for self-managed Kafka 4.2+ using Queue mode (KIP-932 Share Groups). Multiple pollers process the same partition concurrently, breaking the partition-count ceiling.",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
