@@ -150,10 +150,6 @@ Resources:
   #   lambda  — pollers invoke the Lambda function
   #   sts     — pollers obtain temporary credentials
   #   sqs     — pollers write failed records to the OnFailure DLQ
-  #
-  # IMPORTANT: Missing the SQS endpoint causes a silent connection error —
-  # the ESM stays Enabled/OK but Lambda stops being invoked after the first
-  # batch when a failed record triggers a DLQ write.
   # Run scripts/setup-vpc-endpoints.sh to create all three endpoints.
 
 Outputs:
