@@ -72,7 +72,7 @@ aws cloudformation deploy \
   --region <region>
 ```
 
-This provisions a t3.medium EC2 instance. The instance is ready in ~2 minutes.
+This provisions a t3.medium Amazon EC2 instance. The instance is ready in ~2 minutes.
 
 **Step 2b: Install Kafka on the broker**
 
@@ -81,7 +81,7 @@ chmod +x scripts/setup-broker.sh
 ./scripts/setup-broker.sh --region <region> --profile <profile>
 ```
 
-This script connects to the broker via SSM (no SSH required) and installs Apache Kafka 4.2.x, configures KRaft mode with share groups enabled, and starts the broker. It runs 6 steps sequentially and reports progress. The Kafka download (~130MB) takes about 15-20 minutes depending on network speed.
+This script connects to the broker via AWS Systems Manager (SSM) (no SSH required) and installs Apache Kafka 4.2.x, configures KRaft mode with share groups enabled, and starts the broker. It runs 6 steps sequentially and reports progress. The Kafka download (~130MB) takes about 15-20 minutes depending on network speed.
 
 **Step 3: Build and deploy the application**
 
