@@ -4,7 +4,7 @@ This pattern deploys an AWS Lambda function that consumes from a self-managed Ap
 
 Learn more about this pattern at Serverless Land: https://serverlessland.com/patterns/smk-lambda-queue-mode-python-sam
 
-> **Important:** Queue consumption mode requires Apache Kafka 4.2 or later with share groups enabled. This is a preview feature — `ConsumptionMode: Queue` is not yet available in the SAM or CloudFormation schema. The ESM is created via a script that calls the Lambda API directly.
+> **Important:** Queue consumption mode requires Apache Kafka 4.2 or later with share groups enabled. This is a preview feature — `ConsumptionMode: Queue` is not yet available in the AWS SAM or AWS CloudFormation schema. The ESM is created via a script that calls the Lambda API directly.
 
 ## Architecture
 
@@ -28,7 +28,7 @@ graph LR
 
 ## Costs
 
-This pattern uses EC2 (t3.medium), Lambda, SQS, CloudWatch, and VPC resources. See [AWS Pricing](https://aws.amazon.com/pricing/) for details. There are costs associated with these services beyond the Free Tier.
+This pattern uses Amazon EC2 (t3.medium), AWS Lambda, Amazon SQS, Amazon CloudWatch, and Amazon VPC resources. See [AWS Pricing](https://aws.amazon.com/pricing/) for details. There are costs associated with these services beyond the Free Tier.
 
 ---
 
