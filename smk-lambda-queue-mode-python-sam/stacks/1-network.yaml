@@ -156,8 +156,7 @@ Resources:
   # batch when a failed record triggers a DLQ write.
   #
   # These are created via scripts/setup-vpc-endpoints.sh rather than as
-  # CloudFormation resources because AWS::EC2::VpcEndpoint is restricted
-  # in some accounts (e.g. Isengard/bindled accounts used for testing).
+  # CloudFormation resources to avoid conflicts on stack updates.
 
 Outputs:
   VpcId:
