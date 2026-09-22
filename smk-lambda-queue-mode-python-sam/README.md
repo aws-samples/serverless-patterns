@@ -360,15 +360,5 @@ aws cloudformation delete-stack --stack-name kafka-queue-network --region <regio
 ```
 
 ---
-
-## Pattern details
-
-| Property | Value |
-|----------|-------|
-| Kafka version required | Apache Kafka 4.2+ |
-| Lambda runtime | Python 3.12 |
-| IaC framework | AWS SAM + AWS CloudFormation |
-| Delivery semantics | At-least-once |
-| Ordering guarantees | None (Queue mode) |
-| Authentication | PLAINTEXT (see notes for SASL/SCRAM) |
-| Region | Configurable |
+Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+SPDX-License-Identifier: MIT-0
