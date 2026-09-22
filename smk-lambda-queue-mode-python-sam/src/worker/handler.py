@@ -17,6 +17,11 @@ def lambda_handler(event, context):
             try:
                 payload = json.loads(base64.b64decode(r["value"]).decode("utf-8"))
             except Exception:
+                logger.warning(
+                    "Failed to decode record %s-%s-%s, falling back to raw value",
+                    r.get("topic"), r.get("partition"), r.get("offset"),
+                    exc_info=True,
+                )
                 payload = {"raw": r.get("value", "")}
 
             logger.info(
