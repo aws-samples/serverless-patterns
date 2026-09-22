@@ -74,6 +74,10 @@ unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 eval "$(aws configure export-credentials --format env --profile "$PROFILE")"
 
 # ── Create ESM via Lambda REST API ───────────────────────────
+# Security note: --user exposes credentials in the process argument list.
+# This script is intended for temporary use until ConsumptionMode: Queue
+# is available in the AWS CLI, at which point standard aws lambda
+# create-event-source-mapping can replace this script entirely.
 echo "Creating ESM..."
 RESPONSE=$(curl -sS -X POST \
   "https://lambda.$REGION.amazonaws.com/2015-03-31/event-source-mappings/" \
