@@ -23,6 +23,7 @@ graph LR
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
 - [Python 3.12](https://www.python.org/downloads/)
+- [Docker](https://docs.docker.com/get-docker/) installed and running (required for `sam build --use-container`)
 - curl >= 7.75 (for `--aws-sigv4` support)
 - Apache Kafka 4.2+ cluster (see Deployment Path A to provision one automatically)
 
@@ -88,7 +89,7 @@ This script connects to the broker via AWS Systems Manager (SSM) (no SSH require
 **Step 3: Build and deploy the application**
 
 ```bash
-sam build --template stacks/3-app.yaml
+sam build --template stacks/3-app.yaml --use-container
 sam deploy \
   --stack-name kafka-queue-app \
   --template-file .aws-sam/build/template.yaml \
@@ -138,7 +139,7 @@ This creates a CloudWatch dashboard (`kafka-queue-dashboard`) and alarms for sha
 Skip Steps 1, 2, and 2b. Provide your Kafka bootstrap servers, VPC subnet IDs, and security group at deploy time:
 
 ```bash
-sam build --template stacks/3-app.yaml
+sam build --template stacks/3-app.yaml --use-container
 sam deploy \
   --stack-name kafka-queue-app \
   --template-file .aws-sam/build/template.yaml \
