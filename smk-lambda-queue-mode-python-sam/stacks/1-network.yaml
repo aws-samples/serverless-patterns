@@ -154,9 +154,7 @@ Resources:
   # IMPORTANT: Missing the SQS endpoint causes a silent connection error —
   # the ESM stays Enabled/OK but Lambda stops being invoked after the first
   # batch when a failed record triggers a DLQ write.
-  #
-  # These are created via scripts/setup-vpc-endpoints.sh rather than as
-  # CloudFormation resources to avoid conflicts on stack updates.
+  # Run scripts/setup-vpc-endpoints.sh to create all three endpoints.
 
 Outputs:
   VpcId:
