@@ -61,6 +61,9 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
+              # Converse is called with the prompt version ARN as modelId. Bedrock then
+              # fetches the managed prompt (GetPrompt) and substitutes the variables
+              # (RenderPrompt) under the caller identity, so both actions are required.
               - Sid: RenderManagedPrompt
                 Effect: Allow
                 Action:
