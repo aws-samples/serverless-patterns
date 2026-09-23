@@ -74,7 +74,7 @@ Resources:
   CacheEpoch:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: /semantic-cache/epoch
+      Name: !Sub "/${AWS::StackName}/epoch"
       Type: String
       Value: "1"
 
@@ -82,7 +82,6 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn: VectorIndexResource
     Properties:
-      FunctionName: semantic-cache
       Runtime: python3.13
       Handler: cache.handler
       CodeUri: src/
@@ -98,7 +97,7 @@ Resources:
           LLM_MODEL: !Ref LlmModel
           SIM_THRESHOLD: !Ref SimThreshold
           TTL_SECONDS: !Ref TtlSeconds
-          EPOCH_PARAM: /semantic-cache/epoch
+          EPOCH_PARAM: !Ref CacheEpoch
           # Only the parameter NAME is passed. The secret value itself is fetched at
           # runtime with decryption, so it never appears in the function configuration.
           API_KEY_PARAM: !Ref ApiKeyParameterName
@@ -126,7 +125,7 @@ Resources:
               Action:
                 - ssm:GetParameter
                 - ssm:PutParameter
-              Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/semantic-cache/epoch"
+              Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/epoch"
             - !If
               - HasApiKeyParam
               - Sid: ReadApiKeyParameter
