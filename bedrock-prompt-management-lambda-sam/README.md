@@ -31,6 +31,8 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment
 
 ```bash
+git clone https://github.com/aws-samples/serverless-patterns
+cd serverless-patterns/bedrock-prompt-management-lambda-sam
 sam build
 sam deploy --guided
 #   - Stack Name : bedrock-prompt-management
