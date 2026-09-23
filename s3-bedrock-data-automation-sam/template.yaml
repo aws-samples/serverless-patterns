@@ -63,6 +63,9 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
+              # Bedrock Data Automation reads the input object and writes the extraction
+              # output using this role, so the role needs both actions on the bucket even
+              # though the function itself never calls S3.
               - Sid: S3ReadWrite
                 Effect: Allow
                 Action:
