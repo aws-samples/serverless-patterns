@@ -58,14 +58,5 @@
       "linkedin": "nithin-chandran-r",
       "twitter": ""
     }
-  ],
-  "patternArch": {
-    "icon1": { "x": 10, "y": 50, "service": "securityhub", "label": "AWS Security Hub" },
-    "icon2": { "x": 30, "y": 50, "service": "eventbridge", "label": "Amazon EventBridge" },
-    "icon3": { "x": 50, "y": 50, "service": "sfn", "label": "AWS Step Functions" },
-    "icon4": { "x": 70, "y": 50, "service": "lambda", "label": "AWS Lambda" },
-    "icon5": { "x": 90, "y": 25, "service": "sns", "label": "Amazon SNS" },
-    "icon6": { "x": 90, "y": 75, "service": "ec2", "label": "Amazon EC2 / Amazon S3" }
-  },
-  "patternType": "Serverless"
+  ]
 }
