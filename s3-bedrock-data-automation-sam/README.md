@@ -31,6 +31,8 @@ Important: this application uses various AWS services and there are costs associ
 ## Deployment
 
 ```bash
+git clone https://github.com/aws-samples/serverless-patterns
+cd serverless-patterns/s3-bedrock-data-automation-sam
 sam build
 sam deploy --guided
 #   - Stack Name       : s3-bedrock-data-automation
