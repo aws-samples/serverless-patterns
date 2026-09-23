@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Stack 3 - Worker Lambda, Producer Lambda, and SQS DLQ
+  for the Kafka Queue mode (KIP-932) pattern.
+  Supports three deployment paths:
+    - Full: imports VPC outputs from kafka-queue-network stack (set UseExistingInfra=false)
+    - Bring-your-own Kafka: provide BootstrapServers, VpcSubnetIds, VpcSecurityGroupId
+    - Bring-your-own Kafka + VPC: same as above (UseExistingInfra=true)
+
+Parameters:
+  KafkaTopic:
+    Type: String
+    Default: kafka-queue-task-worker
+    Description: Kafka topic name the worker consumes and the producer publishes to.
+
+  BootstrapServers:
+    Type: String
+    Default: ""
+    Description: >-
+      Kafka bootstrap servers (e.g. 10.0.0.43:9092).
+      Leave blank to import from kafka-queue-broker stack output.
+
+  VpcSubnetIds:
+    Type: String
+    Default: ""
+    Description: >-
+      Comma-separated private subnet IDs for the producer Lambda VPC config.
+      Leave blank to import from kafka-queue-network stack output.
+
+  VpcSecurityGroupId:
+    Type: String
+    Default: ""
+    Description: >-
+      Security group ID for the producer Lambda.
+      Leave blank to import from kafka-queue-network stack output.
+
+  UseExistingInfra:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: >-
+      Set to true when providing your own BootstrapServers, VpcSubnetIds,
+      and VpcSecurityGroupId (skips CloudFormation imports from kafka-queue-network
+      and kafka-queue-broker stacks).
+
+Conditions:
+  ImportInfra: !Equals [!Ref UseExistingInfra, "false"]
+
+Resources:
+
+  # SQS DLQ — receives records that exhaust their delivery attempt limit.
+  # group.share.delivery.count.limit on the broker and MaximumRetryAttempts
+  # on the ESM must be set to the same value.
+  TaskWorkerDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-dlq
+      MessageRetentionPeriod: 1209600
+      VisibilityTimeout: 300
+      SqsManagedSseEnabled: true
+
+  WorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-worker
+      Runtime: python3.12
+      CodeUri: ../src/worker/
+      Handler: handler.lambda_handler
+      MemorySize: 512
+      Timeout: 25
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: sqs:SendMessage
+              Resource: !GetAtt TaskWorkerDLQ.Arn
+
+  ProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-producer
+      Runtime: python3.12
+      CodeUri: ../src/producer/
+      Handler: producer.lambda_handler
+      MemorySize: 256
+      Timeout: 60
+      VpcConfig:
+        SubnetIds: !Split
+          - ","
+          - !If
+            - ImportInfra
+            - !Join
+              - ","
+              - - !ImportValue kafka-queue-PrivateSubnetA
+                - !ImportValue kafka-queue-PrivateSubnetB
+                - !ImportValue kafka-queue-PrivateSubnetC
+            - !Ref VpcSubnetIds
+        SecurityGroupIds:
+          - !If
+            - ImportInfra
+            - !ImportValue kafka-queue-LambdaSecurityGroupId
+            - !Ref VpcSecurityGroupId
+      Environment:
+        Variables:
+          KAFKA_TOPIC: !Ref KafkaTopic
+          BOOTSTRAP_SERVERS: !If
+            - ImportInfra
+            - !ImportValue kafka-queue-BootstrapServers
+            - !Ref BootstrapServers
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+
+Outputs:
+  WorkerFunctionArn:
+    Value: !GetAtt WorkerFunction.Arn
+    Export:
+      Name: kafka-queue-WorkerFunctionArn
+
+  WorkerFunctionName:
+    Value: !Ref WorkerFunction
+    Export:
+      Name: kafka-queue-WorkerFunctionName
+
+  TaskWorkerDLQArn:
+    Value: !GetAtt TaskWorkerDLQ.Arn
+    Export:
+      Name: kafka-queue-TaskWorkerDLQArn
+
+  TaskWorkerDLQUrl:
+    Value: !Ref TaskWorkerDLQ
+    Export:
+      Name: kafka-queue-TaskWorkerDLQUrl

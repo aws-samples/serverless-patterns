@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Stack 4 - CloudWatch alarms and dashboard for Queue mode ESM
+
+Parameters:
+  ESMUuid:
+    Type: String
+    Description: UUID of the Queue mode Event Source Mapping (from create-esm.sh output)
+
+Resources:
+
+  DlqDeliveryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: kafka-queue-dlq-delivery
+      AlarmDescription: Records routed to DLQ (delivery attempts exhausted)
+      Namespace: AWS/Lambda
+      MetricName: OnFailureDestinationDeliveredEventCount
+      Dimensions:
+        - Name: EventSourceMappingUUID
+          Value: !Ref ESMUuid
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+  LagGrowthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: kafka-queue-lag-growth
+      AlarmDescription: Share group lag is growing
+      Namespace: AWS/Lambda
+      MetricName: MaxShareGroupLag
+      Dimensions:
+        - Name: EventSourceMappingUUID
+          Value: !Ref ESMUuid
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 1000
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  PollerErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: kafka-queue-poller-errors
+      AlarmDescription: ESM reported polling errors
+      Namespace: AWS/Lambda
+      MetricName: PollingErrorCount
+      Dimensions:
+        - Name: EventSourceMappingUUID
+          Value: !Ref ESMUuid
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+  KafkaQueueDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: kafka-queue-dashboard
+      DashboardBody: !Sub
+        - |
+          {"widgets":[
+            {"type":"metric","x":0,"y":0,"width":12,"height":6,"properties":{"title":"Share Group Lag","region":"${AWS::Region}","view":"timeSeries","metrics":[["AWS/Lambda","SumShareGroupLag","EventSourceMappingUUID","${ESM}"],["AWS/Lambda","MaxShareGroupLag","EventSourceMappingUUID","${ESM}"]]}},
+            {"type":"metric","x":12,"y":0,"width":12,"height":6,"properties":{"title":"Provisioned Pollers","region":"${AWS::Region}","view":"timeSeries","metrics":[["AWS/Lambda","ProvisionedPollers","EventSourceMappingUUID","${ESM}"]]}},
+            {"type":"metric","x":0,"y":6,"width":12,"height":6,"properties":{"title":"Event Counts","region":"${AWS::Region}","view":"timeSeries","metrics":[["AWS/Lambda","PolledEventCount","EventSourceMappingUUID","${ESM}"],["AWS/Lambda","InvokedEventCount","EventSourceMappingUUID","${ESM}"],["AWS/Lambda","OnFailureDestinationDeliveredEventCount","EventSourceMappingUUID","${ESM}"]]}},
+            {"type":"metric","x":12,"y":6,"width":12,"height":6,"properties":{"title":"Errors","region":"${AWS::Region}","view":"timeSeries","metrics":[["AWS/Lambda","PollingErrorCount","EventSourceMappingUUID","${ESM}"],["AWS/Lambda","FailedInvokeEventCount","EventSourceMappingUUID","${ESM}"]]}}
+          ]}
+        - ESM: !Ref ESMUuid
