@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one, and an IAM principal with permissions to make the necessary service calls and manage the resources in this pattern.
-- An AWS account with permissions for AWS Lambda and Amazon Bedrock, and access to the chosen Bedrock model in your Region.
+- Permissions for AWS Lambda and Amazon Bedrock, and access to the chosen Bedrock model in your Region.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed.
