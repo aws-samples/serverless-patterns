@@ -71,7 +71,7 @@ prompt --> [Lambda] --embed--> Amazon Bedrock (Titan v2 -> 1024-dim vector)
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one, and an IAM principal with permissions to make the necessary service calls and manage the resources in this pattern.
-- An AWS account with permissions for AWS Lambda, Amazon Bedrock, Amazon S3 Vectors, and AWS Systems Manager.
+- Permissions for AWS Lambda, Amazon Bedrock, Amazon S3 Vectors, and AWS Systems Manager.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
 - Python 3, only needed to run the test payload helper commands further below.
