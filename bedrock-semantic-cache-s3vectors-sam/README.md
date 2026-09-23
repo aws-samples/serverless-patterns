@@ -4,7 +4,7 @@ Return cached answers for **semantically similar** prompts - different wording s
 
 Learn more at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-semantic-cache-s3vectors-sam
 
-> Important: this application uses AWS services (AWS Lambda, Amazon Bedrock, Amazon S3 Vectors, AWS Systems Manager) and there are costs associated with these services after the Free Tier usage. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+> Important: this application uses AWS services (AWS Lambda, Amazon Bedrock, Amazon S3 Vectors, AWS Systems Manager) and there are costs associated with these services after the Free Tier usage, see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ---
 
@@ -70,12 +70,14 @@ prompt --> [Lambda] --embed--> Amazon Bedrock (Titan v2 -> 1024-dim vector)
 
 ## Requirements
 
+- [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one, and an IAM principal with permissions to make the necessary service calls and manage the resources in this pattern.
 - An AWS account with permissions for AWS Lambda, Amazon Bedrock, Amazon S3 Vectors, and AWS Systems Manager.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
 - Python 3, only needed to run the test payload helper commands further below.
 - Amazon Bedrock **model access enabled** for the embeddings model (`amazon.titan-embed-text-v2:0`) and the text model (`amazon.nova-lite-v1:0`) in your Region.
 - A Region where Amazon S3 Vectors and Amazon Bedrock are available (e.g. `us-east-1`).
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed.
 
 ## Deployment
 
