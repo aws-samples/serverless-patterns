@@ -21,7 +21,7 @@ EMBED_MODEL = os.environ.get("EMBED_MODEL", "amazon.titan-embed-text-v2:0")
 DEFAULT_MODEL = os.environ.get("LLM_MODEL", "amazon.nova-lite-v1:0")
 SIM_THRESHOLD = float(os.environ.get("SIM_THRESHOLD", "0.85"))
 TTL_SECONDS = int(os.environ.get("TTL_SECONDS", "86400"))
-API_KEY = os.environ.get("API_KEY", "")
+API_KEY_PARAM = os.environ.get("API_KEY_PARAM", "")
 EPOCH_PARAM = os.environ.get("EPOCH_PARAM", "/semantic-cache/epoch")
 
 br = boto3.client("bedrock-runtime", region_name=REGION)
@@ -29,6 +29,26 @@ s3v = boto3.client("s3vectors", region_name=REGION)
 ssm = boto3.client("ssm", region_name=REGION)
 
 _epoch = {"val": None, "ts": 0.0}
+_api_key = {"val": None, "loaded": False}
+
+
+def api_key():
+    """Read the optional app-level key from Parameter Store, once per environment.
+
+    Only the parameter name is configured on the function. The secret value is never
+    stored in a Lambda environment variable; it is fetched here with decryption.
+    """
+    if not API_KEY_PARAM:
+        return ""
+    if not _api_key["loaded"]:
+        try:
+            _api_key["val"] = ssm.get_parameter(
+                Name=API_KEY_PARAM, WithDecryption=True
+            )["Parameter"]["Value"]
+        except Exception:
+            _api_key["val"] = ""
+        _api_key["loaded"] = True
+    return _api_key["val"] or ""
 
 
 def current_epoch():
@@ -69,7 +89,8 @@ def llm(prompt, model):
 def handler(event, context):
     t0 = time.time()
     headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
-    if API_KEY and headers.get("x-api-key") != API_KEY:
+    expected_key = api_key()
+    if expected_key and headers.get("x-api-key") != expected_key:
         return _resp(401, {"error": "unauthorized"})
     body = {}
     if event.get("body"):

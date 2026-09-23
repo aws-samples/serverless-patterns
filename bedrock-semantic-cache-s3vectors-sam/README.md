@@ -59,7 +59,7 @@ prompt --> [Lambda] --embed--> Amazon Bedrock (Titan v2 -> 1024-dim vector)
 - **Amazon Bedrock** is used two ways: **embeddings** (turn text into a meaning vector so matching is semantic) and the **LLM** (answer on a miss).
 - **Amazon S3 Vectors** is the cache store *and* the similarity search - pay-per-use, no always-on cost. This is the primitive that makes a serverless semantic cache economical.
 - **AWS Lambda** is stateless glue. The cache lives entirely in S3 Vectors, so it survives cold starts, redeploys, and env recycling.
-- **SSM Parameter Store** holds the epoch counter for force-invalidation.
+- **AWS Systems Manager Parameter Store** holds the epoch counter for force-invalidation, and optionally the app-level API key as a SecureString.
 
 ### Correctness features
 - **Tunable similarity threshold** (default cosine 0.85) - per-deploy and per-request.
@@ -71,40 +71,53 @@ prompt --> [Lambda] --embed--> Amazon Bedrock (Titan v2 -> 1024-dim vector)
 ## Requirements
 
 - An AWS account with permissions for AWS Lambda, Amazon Bedrock, Amazon S3 Vectors, and AWS Systems Manager.
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2, recent enough to include the `s3vectors` commands.
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
+- Python 3, only needed to run the test payload helper commands further below.
 - Amazon Bedrock **model access enabled** for the embeddings model (`amazon.titan-embed-text-v2:0`) and the text model (`amazon.nova-lite-v1:0`) in your Region.
 - A Region where Amazon S3 Vectors and Amazon Bedrock are available (e.g. `us-east-1`).
 
 ## Deployment
 
-S3 Vectors is not yet a CloudFormation resource, so create the vector store first (two commands), then deploy the rest with SAM.
+Amazon S3 Vectors has native CloudFormation support, so the template creates the vector
+bucket and the cosine index for you. There are no manual setup commands.
 
 ```bash
-# 1. Create the S3 Vectors bucket and a cosine index (1024 dims = Titan v2)
-export VECTOR_BUCKET="semantic-cache-$(aws sts get-caller-identity --query Account --output text)"
-aws s3vectors create-vector-bucket --vector-bucket-name "$VECTOR_BUCKET"
-aws s3vectors create-index \
-  --vector-bucket-name "$VECTOR_BUCKET" \
-  --index-name prompt-cache --data-type float32 --dimension 1024 --distance-metric cosine \
-  --metadata-configuration 'nonFilterableMetadataKeys=prompt,response,model,created_at,epoch'
+git clone https://github.com/aws-samples/serverless-patterns
+cd serverless-patterns/bedrock-semantic-cache-s3vectors-sam
 
-# 2. Build and deploy the Lambda + IAM + SSM epoch parameter
 sam build
 sam deploy --guided
-#   - VectorBucket: value of $VECTOR_BUCKET above
-#   - VectorIndex : prompt-cache
-#   - ApiKey      : (optional) a secret for the x-api-key header, or leave blank for IAM-only
+#   - VectorBucketName    : semantic-cache (must be unique per Region)
+#   - VectorIndex         : prompt-cache
+#   - ApiKeyParameterName : (optional) see below, or leave blank for IAM-only auth
 ```
 
 Note the `FunctionUrl` and `FunctionName` outputs.
+
+### Optional: app-level API key
+
+The function URL already requires IAM (SigV4) auth. If you also want an application-level
+key checked against the `x-api-key` header, store it as a SecureString in AWS Systems
+Manager Parameter Store and pass only the parameter **name** to the stack. The secret
+value is fetched at runtime with decryption and is never placed in a Lambda environment
+variable.
+
+```bash
+aws ssm put-parameter \
+  --name /semantic-cache/api-key \
+  --value "your-secret-key" \
+  --type SecureString
+
+# then deploy with ApiKeyParameterName = /semantic-cache/api-key
+```
 
 ## Testing
 
 The function URL uses AWS_IAM auth (SigV4). The simplest test is a direct invoke:
 
 ```bash
-KEY="<the ApiKey you set, or omit the header if blank>"
+KEY="<the value you stored in the SecureString parameter, or leave blank if you did not set one>"
 payload() { python3 -c "import json,sys;print(json.dumps({'headers':{'x-api-key':'$KEY'},'body':json.dumps({'prompt':sys.argv[1]})}))" "$1" > ev.json; }
 
 # MISS (calls Bedrock)
@@ -139,9 +152,10 @@ Expected: exact/semantic repeats HIT (`cached=true` with a similarity score); un
 
 ```bash
 sam delete
-aws s3vectors delete-index --vector-bucket-name "$VECTOR_BUCKET" --index-name prompt-cache
-aws s3vectors delete-vector-bucket --vector-bucket-name "$VECTOR_BUCKET"
 aws ssm delete-parameter --name /semantic-cache/epoch
+# If you created one: aws ssm delete-parameter --name /semantic-cache/api-key
+# sam delete removes the vector bucket and index too. If the bucket delete fails
+# because it still holds vectors, delete the index first and retry.
 ```
 
 ---
