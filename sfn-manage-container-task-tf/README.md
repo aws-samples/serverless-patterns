@@ -5,7 +5,7 @@ This sample project demonstrates how to run an AWS Fargate task, and then send a
 In this project, Step Functions uses a state machine to call the Fargate task synchronously. It then waits for the task to succeed or fail, and it sends an Amazon SNS topic with a message about whether the job succeeded or failed.
 * A Fargate task
 * An Amazon SNS topic
-* AWS Step Function
+* AWS Step Functions
 * Related AWS Identity and Access Management (IAM) roles
 
 Learn more about this workflow at Step Functions workflows collection: https://docs.aws.amazon.com/step-functions/latest/dg/sample-project-container-task-notification.html
@@ -17,17 +17,17 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) with version 1.x installed (this pattern has been tested with version 1.15)
 
 ## Deployment Instructions
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://github.com/aws-samples/step-functions-workflows-collection
+    git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
     ```
-    cd sfn-manage-container-task-tf
+    cd serverless-patterns/sfn-manage-container-task-tf
     ```
 1. From the command line, use Terraform to deploy the AWS resources for the workflow as specified in the ```main.tf``` file:
     ```
@@ -38,9 +38,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This sample project demonstrates how to submit an AWS Batch job, and then send an Amazon SNS notification based on whether that job succeeds or fails. Deploying this sample project creates an AWS Step Functions state machine, an AWS Batch job, and an Amazon SNS topic.
+This sample project demonstrates how to run an AWS Fargate task, and then send an Amazon SNS notification based on whether that task succeeds or fails.
 
-In this project, Step Functions uses a state machine to call the AWS Batch job synchronously. It then waits for the job to succeed or fail, and it sends an Amazon SNS topic with a message about whether the job succeeded or failed.
+The state machine runs the Fargate task synchronously and waits for it to complete. The task simply runs an `echo` command in a container and exits. Based on the result, the state machine publishes a message to the Amazon SNS topic to notify whether the task succeeded or failed.
 
 ## Image
 
