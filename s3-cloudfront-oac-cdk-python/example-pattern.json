@@ -1,0 +1,56 @@
+{
+  "title": "Amazon S3 static website served by Amazon CloudFront with Origin Access Control (OAC)",
+  "description": "Serve a static website hosted in a private Amazon S3 bucket through an Amazon CloudFront distribution using Origin Access Control (OAC).",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK app creates a private S3 bucket, uploads a sample index.html to it, and creates a CloudFront distribution in front of the bucket.",
+      "CloudFront reads the bucket content through Origin Access Control (OAC), so the bucket stays private and is only accessible via CloudFront."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-cloudfront-oac-cdk-python",
+      "templateURL": "serverless-patterns/s3-cloudfront-oac-cdk-python",
+      "projectFolder": "s3-cloudfront-oac-cdk-python",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Restricting access to an Amazon Simple Storage Service origin",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+      },
+      {
+        "text": "Hosting a static website using Amazon S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Faraz Haider",
+      "bio": "Faraz Haider is an Associate Cloud Consultant for Amazon Web Services. Faraz's main areas of interest within AWS has been learning/developing serverless solutions and exploring front end development.",
+      "linkedin": "fhaider2"
+    }
+  ]
+}
