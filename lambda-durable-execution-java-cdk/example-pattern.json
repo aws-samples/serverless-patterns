@@ -1,0 +1,62 @@
+{
+  "title": "Lambda Durable Execution with Java SDK",
+  "description": "Build a resilient, multi-step order processing workflow using the AWS Lambda Durable Execution SDK for Java with automatic checkpointing and failure recovery.",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda durable function written in Java that orchestrates a multi-step order processing workflow. The function uses the Durable Execution SDK for Java (v1.0.1) to automatically checkpoint progress at each step.",
+      "The workflow: (1) validates the order, (2) reserves inventory, (3) processes payment, (4) waits for warehouse processing (no compute charges), (5) confirms shipment. Each step is checkpointed, so if the function is interrupted, it resumes from the last completed step.",
+      "This is the first Java-based durable execution pattern. The Java SDK provides an idiomatic experience with DurableHandler<I,O> and DurableContext, supporting steps, waits, callbacks, invoke, map, and parallel operations."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-execution-java-cdk",
+      "templateURL": "serverless-patterns/lambda-durable-execution-java-cdk",
+      "projectFolder": "lambda-durable-execution-java-cdk",
+      "templateFile": "lib/lambda-durable-execution-java-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Execution SDK for Java on GitHub",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-java/"
+      },
+      {
+        "text": "Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Deploy Lambda durable functions with Infrastructure as Code",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-getting-started-iac.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd src && mvn clean package -q",
+      "cd .. && cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
