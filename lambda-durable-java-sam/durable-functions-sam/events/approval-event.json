@@ -1,0 +1,6 @@
+{
+  "requestId": "REQ-TEST-001",
+  "requestor": "employee@example.com",
+  "amount": 15000.00,
+  "description": "Conference travel budget request"
+}

@@ -1,0 +1,365 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  JavaVersion:
+    Type: String
+    Description: Choose the version of Java. Lambda currently supports Java 17 and 21
+    AllowedValues:
+      - java17
+      - java21
+    Default: java21
+  ServerlessLandGithubLocation:
+    Type: String
+    Default: https://github.com/aws-samples/serverless-patterns
+    Description: Github location of the serverless-patterns repo. Make sure to leave the .git at the end even if you are using a fork
+
+Mappings:
+  SubnetConfig:
+      VPC:
+        CIDR: '10.1.0.0/16'
+      PublicOne:
+        CIDR: '10.1.0.0/24'
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags:
+        - Key: 'Name'
+          Value: 'DurableFunctionsVPC'
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'DurableFunctionsPublicSubnet'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetOne
+      RouteTableId: !Ref PublicRouteTable
+
+  ClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for the Durable Functions client EC2 instance
+      GroupName: !Sub "${AWS::StackName}-client-sg"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 10.0.0.0/16
+
+  ClientEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      SubnetId: !Ref PublicSubnetOne
+      SecurityGroupIds: [!GetAtt ClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'DurableFunctionsClientInstance'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp2
+            DeleteOnTermination: true
+      UserData:
+        Fn::Base64:
+          !Sub
+          - |
+            #!/bin/bash
+            yum update -y
+
+            # install Java
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install Java"
+                JAVA_VERSION=${java_version}
+                echo "export JAVA_VERSION=$JAVA_VERSION" >> /home/ec2-user/.bash_profile
+                if [ "$JAVA_VERSION" == "java17" ]; then
+                    sudo yum install java-17-amazon-corretto-devel -y
+                elif [ "$JAVA_VERSION" == "java21" ]; then
+                    sudo yum install java-21-amazon-corretto-devel -y
+                else
+                    sudo yum install java-21-amazon-corretto-devel -y
+                fi
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of Java succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            # Set JAVA_HOME based on installed version
+            if [ "$JAVA_VERSION" == "java17" ]; then
+                JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+            else
+                JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+            fi
+            echo "export JAVA_HOME=$JAVA_HOME" >> /home/ec2-user/.bash_profile
+            echo "export PATH=$JAVA_HOME/bin:\$PATH" >> /home/ec2-user/.bash_profile
+            export JAVA_HOME
+            export PATH=$JAVA_HOME/bin:$PATH
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install git"
+                yum install git -y
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of git succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install jq"
+                yum install jq -y
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of jq succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install docker"
+                sudo yum install -y docker
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of docker succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            service docker start
+            usermod -a -G docker ec2-user
+
+            max_attempts=5
+            attempt_num=1
+            success=false
+            while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
+                echo "Trying yum install maven"
+                sudo yum install -y maven
+                if [ $? -eq 0 ]; then
+                    echo "Yum install of maven succeeded"
+                    success=true
+                else
+                    echo "Attempt $attempt_num failed. Sleeping for 3 seconds and trying again..."
+                    sleep 3
+                    ((attempt_num++))
+                fi
+            done
+
+            # Remove old AWS CLI and install AWS CLI 2
+            yum erase awscli -y
+            cd /home/ec2-user
+            mkdir -p awscli
+            cd awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+            # Install AWS SAM CLI
+            cd /home/ec2-user
+            mkdir -p awssam
+            cd awssam
+            wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+            unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+            sudo ./sam-installation/install
+
+            # Set environment variables
+            AWS_REGION=${aws_region}
+            echo "export AWS_REGION=$AWS_REGION" >> /home/ec2-user/.bash_profile
+
+            # Clone the durable functions project from serverless-patterns
+            cd /home/ec2-user
+            SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
+            git clone -n --depth=1 --filter=tree:0 $SERVERLESS_LAND_GITHUB_LOCATION
+            cd ./serverless-patterns
+            git sparse-checkout set --no-cone /lambda-durable-java-sam
+            git checkout
+            cd lambda-durable-java-sam
+            sudo chown -R ec2-user .
+
+            # Get IP CIDR range for EC2 Instance Connect
+            cd /home/ec2-user
+            mkdir -p ip_prefix
+            cd ip_prefix
+            git clone https://github.com/joetek/aws-ip-ranges-json.git
+            cd aws-ip-ranges-json
+            EC2_CONNECT_IP=$(cat ip-ranges-ec2-instance-connect.json | jq -r --arg AWS_REGION "$AWS_REGION" '.prefixes[] | select(.region==$AWS_REGION).ip_prefix')
+            echo "export EC2_CONNECT_IP=$EC2_CONNECT_IP" >> /home/ec2-user/.bash_profile
+            SECURITY_GROUP=${security_group_id}
+            echo "export SECURITY_GROUP=$SECURITY_GROUP" >> /home/ec2-user/.bash_profile
+            aws ec2 authorize-security-group-ingress --region $AWS_REGION --group-id $SECURITY_GROUP --protocol tcp --port 22 --cidr $EC2_CONNECT_IP
+
+          - serverless_land_github_location: !Ref ServerlessLandGithubLocation
+            aws_region: !Ref 'AWS::Region'
+            java_version: !Ref JavaVersion
+            security_group_id: !GetAtt ClientInstanceSecurityGroup.GroupId
+
+  EC2InstanceEndpoint:
+    Type: AWS::EC2::InstanceConnectEndpoint
+    Properties:
+      PreserveClientIp: true
+      SecurityGroupIds:
+        - !GetAtt ClientInstanceSecurityGroup.GroupId
+      SubnetId: !Ref PublicSubnetOne
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess_v2
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
+      Policies:
+        - PolicyName: SecurityGroupsPolicy
+          PolicyDocument: !Sub '{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:DescribeSecurityGroups",
+                        "ec2:DescribeSecurityGroupRules",
+                        "ec2:DescribeTags"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AuthorizeSecurityGroupIngress",
+                        "ec2:RevokeSecurityGroupIngress",
+                        "ec2:AuthorizeSecurityGroupEgress",
+                        "ec2:RevokeSecurityGroupEgress",
+                        "ec2:ModifySecurityGroupRules",
+                        "ec2:UpdateSecurityGroupRuleDescriptionsIngress",
+                        "ec2:UpdateSecurityGroupRuleDescriptionsEgress"
+                    ],
+                    "Resource": [
+                        "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:ModifySecurityGroupRules"
+                    ],
+                    "Resource": [
+                        "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group-rule/*"
+                    ]
+                }
+            ]
+          }'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Join
+        - '-'
+        - - 'EC2DurableFunctionsProfile'
+          - !Ref 'AWS::StackName'
+      Roles:
+        - !Ref EC2Role
+
+Outputs:
+  VPCId:
+    Description: The ID of the VPC created
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  PublicSubnetOne:
+    Description: The name of the public subnet created
+    Value: !Ref 'PublicSubnetOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetOne"
+  EC2InstanceEndpointID:
+    Description: The ID of the EC2 Instance Connect Endpoint
+    Value: !Ref EC2InstanceEndpoint
+  EC2InstanceId:
+    Description: The ID of the EC2 Client Instance
+    Value: !Ref ClientEC2Instance
