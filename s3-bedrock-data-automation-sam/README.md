@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one, and an IAM principal with permissions to make the necessary service calls and manage the resources in this pattern.
-- An AWS account with permissions for Amazon S3, AWS Lambda, and Amazon Bedrock Data Automation.
+- Permissions for Amazon S3, AWS Lambda, and Amazon Bedrock Data Automation.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2, recent enough to include the `bedrock-data-automation` and `bedrock-data-automation-runtime` commands.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
 - A Region where Amazon Bedrock Data Automation is available (for example, `us-east-1`).
