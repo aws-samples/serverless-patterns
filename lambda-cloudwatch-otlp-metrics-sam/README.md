@@ -54,6 +54,8 @@ aws observabilityadmin get-telemetry-enrichment-status --region $REGION
 ## Deployment
 
 ```bash
+git clone https://github.com/aws-samples/serverless-patterns
+cd serverless-patterns/lambda-cloudwatch-otlp-metrics-sam
 sam build
 sam deploy --guided
 #   - Stack Name  : otlp-metrics
