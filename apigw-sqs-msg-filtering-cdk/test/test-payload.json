@@ -1,0 +1,25 @@
+{
+  "messageBody": {
+    "neededStringElement": "I am needed!",
+    "neededNumberElement": 1234,
+    "notNeededElement": {
+      "notNeededStringElement": "Not needed",
+      "notNeededNumberElement": 1234
+    }
+  },
+  "delaySeconds": 5,
+  "messageAttributes": {
+    "stringAttribute": {
+      "dataType": "String",
+      "stringValue": "Lorem Ipsum"
+    },
+    "numberAttribute": {
+      "dataType": "Number",
+      "stringValue": "1234567890"
+    },
+    "binaryAttribute": {
+      "dataType": "Binary",
+      "binaryValue": "SGVsbG8gV29ybGQ="
+    }
+  }
+}
