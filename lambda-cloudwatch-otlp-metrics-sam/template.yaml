@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Send custom application metrics from AWS Lambda to Amazon CloudWatch over OTLP.
+  The AWS Distro for OpenTelemetry Lambda layer runs a collector that signs each
+  request with SigV4 and forwards OTLP metrics to the CloudWatch OTLP endpoint, so
+  the function code never calls PutMetricData and writes no embedded metric logs.
+  (lambda-cloudwatch-otlp-metrics-sam)
+
+Parameters:
+  AdotLayerArn:
+    Type: String
+    Default: arn:aws:lambda:us-east-1:901920570463:layer:aws-otel-python-amd64-ver-1-32-0:7
+    Description: >
+      ARN of the AWS Distro for OpenTelemetry Python Lambda layer. This ARN is Region
+      specific, so change the Region in the value when you deploy outside us-east-1.
+  ServiceName:
+    Type: String
+    Default: orders-service
+    Description: Value reported as the service.name resource attribute on every metric.
+
+Resources:
+  MetricsFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: PublishOtlpMetrics
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # cloudwatch:PutMetricData is the only permission the OTLP metrics
+              # endpoint requires. It does not support resource level permissions.
+              - Sid: PublishMetrics
+                Effect: Allow
+                Action: cloudwatch:PutMetricData
+                Resource: "*"
+
+  MetricsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-otlp-metrics"
+      CodeUri: src/
+      Handler: handler.handler
+      Runtime: python3.13
+      Architectures:
+        - x86_64
+      Timeout: 30
+      MemorySize: 256
+      Role: !GetAtt MetricsFunctionRole.Arn
+      Layers:
+        - !Ref AdotLayerArn
+      Environment:
+        Variables:
+          # Starts the ADOT auto instrumentation wrapper and the bundled collector.
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-instrument
+          OPENTELEMETRY_COLLECTOR_CONFIG_URI: /var/task/collector.yaml
+          OTEL_METRICS_EXPORTER: otlp
+          OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+          OTEL_TRACES_EXPORTER: none
+          OTEL_LOGS_EXPORTER: none
+          OTEL_SERVICE_NAME: !Ref ServiceName
+
+Outputs:
+  MetricsFunctionName:
+    Description: Name of the Lambda function that records the custom metrics.
+    Value: !Ref MetricsFunction
+  ServiceNameValue:
+    Description: service.name attribute reported with every metric.
+    Value: !Ref ServiceName
