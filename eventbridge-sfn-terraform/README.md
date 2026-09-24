@@ -1,8 +1,8 @@
-# EventBridge to Step Function
+# EventBridge to Step Functions
 
-This pattern demonstrates executing a Step Function using an EventBridge rule.
+This pattern demonstrates executing a Step Functions using an EventBridge rule.
 
-In this example, the EventBridge rule specified in `main.tf` filters the events based upon the criteria in the `aws_cloudwatch_event_rule` block. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see "Example event payload from EventBridge to SQS" in the README) to the Step Function as an Input.
+In this example, the EventBridge rule specified in `main.tf` filters the events based upon the criteria in the `aws_cloudwatch_event_rule` block. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see "Example event payload from EventBridge to SQS" in the README) to the Step Functions as an Input.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-sfn
 
@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The template creates a shell Step Function, with a CloudWatch log group for log reporting of all events, that triggers based upon the criteria in the `aws_cloudwatch_event_rule` block and branches based on the value.
+The template creates a shell Step Functions, with a CloudWatch log group for log reporting of all events, that triggers based upon the criteria in the `aws_cloudwatch_event_rule` block and branches based on the value.
 
 ## Testing
 
@@ -51,16 +51,16 @@ The template creates a shell Step Function, with a CloudWatch log group for log 
     ```bash
     aws events put-events --entries file://event-B.json
     ```
-1. Send an event for Path C to EventBridge, which should cause the Step Function to fail:
+1. Send an event for Path C to EventBridge, which should cause the Step Functions to fail:
     ```bash
     aws events put-events --entries file://event-Fail.json
     ```
 
-Go to the Step Function created by this template to view the new execution that ran.
+Go to the Step Functions created by this template to view the new execution that ran.
 
 ![](./images/stepfunctions_graph.png)
 
-You can also go to the CloudWatch Logs stream in the Log Group displayed in the output of the terraform deployment to check the results of the three events that triggered the Step Function.
+You can also go to the CloudWatch Logs stream in the Log Group displayed in the output of the terraform deployment to check the results of the three events that triggered the Step Functions.
 ## Cleanup
  
 1. Change directory to the pattern directory:
