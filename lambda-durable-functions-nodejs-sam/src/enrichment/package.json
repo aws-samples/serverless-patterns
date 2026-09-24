@@ -1,0 +1,12 @@
+{
+  "name": "order-enrichment-lambda",
+  "version": "1.0.0",
+  "description": "Simple order enrichment service",
+  "main": "index.js",
+  "keywords": [
+    "aws",
+    "lambda"
+  ],
+  "author": "",
+  "license": "MIT"
+}
