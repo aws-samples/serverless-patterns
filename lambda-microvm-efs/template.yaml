@@ -1,0 +1,362 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  Lambda MicroVMs + Amazon EFS: a Firecracker-isolated MicroVM image that mounts
+  an EFS file system over NFS 4.1, reachable through a VPC egress network
+  connector. Provisions everything that has a CloudFormation resource; the
+  MicroVM is launched afterwards with src/run.sh (RunMicrovm is a runtime API).
+
+# ─────────────────────────────────────────────────────────────────────────────
+# If cfn-lint flags E3006 ("type <X> does not exist in <region>") for the
+# AWS::Lambda::MicrovmImage / AWS::Lambda::NetworkConnector resources, that is a
+# false positive from an out-of-date bundled resource spec. It is suppressed
+# below; remove the suppression once cfn-lint ships an updated spec.
+#
+# IAM propagation: the build/execution role is created in this same stack. Newly
+# created roles can take a few seconds to become assumable by the consuming
+# service. If the MicrovmImage build fails with "unable to assume the role
+# provided", simply update/redeploy the stack — the role will have propagated.
+# ─────────────────────────────────────────────────────────────────────────────
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E3006  # resource types not yet in cfn-lint's bundled spec
+
+Parameters:
+  CodeArtifactBucket:
+    Type: String
+    Description: >-
+      Name of an EXISTING S3 bucket (same region as this stack) holding the app
+      zip (Dockerfile + app.py at the root). Upload it before deploying — see
+      README. Nothing in this bucket is mounted; it only carries the build input.
+  CodeArtifactKey:
+    Type: String
+    Default: app.zip
+    Description: Key of the app zip within CodeArtifactBucket.
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the NFS security group, EFS mount target, and egress connector.
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: >-
+      Subnet (in VpcId) for the EFS mount target and the connector ENIs. Putting
+      both in ONE subnet keeps the MicroVM and the mount target in the same AZ,
+      which is what you want for latency and throughput. See README.
+  ImageName:
+    Type: String
+    Default: microvm-efs-pattern
+    AllowedPattern: "^[a-zA-Z0-9-_]+$"
+    Description: Name of the MicroVM image (changing it replaces the image).
+  BaseImageName:
+    Type: String
+    Default: al2023-1
+    Description: >-
+      Managed base MicroVM image name. The ARN is built as
+      arn:aws:lambda:<region>:aws:microvm-image:<name>. al2023-1 is currently the
+      only managed base image that exists; availability is region-specific.
+  BaseImageVersion:
+    Type: String
+    Default: "0"
+    Description: >-
+      Major version of the managed base image. The MicrovmImage resource expects
+      a single major version number (e.g. "0"); the service normalizes to "0.0".
+  MinimumMemoryInMiB:
+    Type: Number
+    Default: 2048
+    Description: >-
+      Minimum memory allocated to the MicroVM. NOTE: this also sets the MicroVM's
+      egress bandwidth allocation, which is what EFS traffic is governed by —
+      measured at roughly 625 Mbps of sustained EFS read throughput per GB. Raise
+      to 8192 for the maximum (~4.2 Gbps sustained). See README "Throughput".
+  MountPath:
+    Type: String
+    Default: /mnt/efs
+    Description: Where the file system is mounted inside the guest (read by app.py).
+
+Resources:
+  # ── EFS file system + network access ────────────────────────────────────────
+  # Elastic throughput: scales on demand to multiple GiB/s, far above any single
+  # MicroVM's egress allocation, so the MicroVM is the limiter and not EFS.
+  # Bursting or a low Provisioned value would mean measuring EFS instead.
+  FileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      ThroughputMode: elastic
+      PerformanceMode: generalPurpose
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub ${ImageName}-fs
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-efs
+
+  # Self-referencing SG allowing NFS (2049) within itself. Attached to BOTH the
+  # mount target and the egress connector ENIs so the MicroVM can reach the mount.
+  NfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EFS NFS 2049 for the MicroVM egress connector.
+      VpcId: !Ref VpcId
+
+  NfsSelfIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref NfsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
+      SourceSecurityGroupId: !Ref NfsSecurityGroup
+
+  MountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId: !Ref SubnetId
+      SecurityGroups:
+        - !Ref NfsSecurityGroup
+
+  # Access point scoped to /microvm, squashing all access to uid/gid 1000. Because
+  # the access point pins the POSIX identity, the container can run as root without
+  # needing elasticfilesystem:ClientRootAccess.
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref FileSystem
+      PosixUser:
+        Uid: "1000"
+        Gid: "1000"
+      RootDirectory:
+        Path: /microvm
+        CreationInfo:
+          OwnerUid: "1000"
+          OwnerGid: "1000"
+          Permissions: "0755"
+      AccessPointTags:
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-efs
+
+  # ── VPC egress network connector ─────────────────────────────────────────────
+  # Role Lambda assumes to manage the connector's ENIs in your VPC.
+  ConnectorOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: [sts:AssumeRole, sts:TagSession]
+      Policies:
+        - PolicyName: NetworkConnectorEni
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Scope ENI creation to THIS subnet and security group by listing the
+              # exact subnet/SG ARNs the connector may create interfaces in. The
+              # connector cannot place ENIs in any other subnet or attach any other SG.
+              #
+              # NOTE: scoping via the `ec2:Vpc` condition key (the intuitive choice)
+              # does NOT work here — CreateNetworkConnector pre-validates this role
+              # WITHOUT the VPC request context, so a condition on ec2:Vpc evaluates
+              # false and the connector fails to create with "invalid
+              # ConnectorOperatorRole permissions". Resource-ARN scoping is validated
+              # correctly and provisions the ENIs.
+              - Sid: CreateEniInThisSubnet
+                Effect: Allow
+                Action: ec2:CreateNetworkInterface
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${SubnetId}
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:security-group/${NfsSecurityGroup.GroupId}
+              # Delete/tag apply to the ENIs the connector manages (ENI IDs are
+              # created dynamically and are unpredictable, so the resource is the
+              # network-interface wildcard within this account/region).
+              - Sid: ManageConnectorEnis
+                Effect: Allow
+                Action:
+                  - ec2:DeleteNetworkInterface
+                  - ec2:CreateTags
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+              # ec2:Describe* actions do NOT support resource-level scoping — they
+              # must use "*". They are read-only.
+              - Sid: DescribeNetworkResources
+                Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                Resource: "*"
+
+  EgressConnector:
+    Type: AWS::Lambda::NetworkConnector
+    Properties:
+      Name: !Sub ${ImageName}-egress
+      OperatorRole: !GetAtt ConnectorOperatorRole.Arn
+      Configuration:
+        VpcEgressConfiguration:
+          SubnetIds:
+            - !Ref SubnetId
+          SecurityGroupIds:
+            - !Ref NfsSecurityGroup
+          NetworkProtocol: IPv4
+          AssociatedComputeResourceTypes:
+            - MicroVm
+      Tags:
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-efs
+
+  # ── MicroVM image build ──────────────────────────────────────────────────────
+  MicrovmLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda-microvms/${ImageName}
+      RetentionInDays: 7
+
+  # One IAM role used BOTH to build the image (read the artifact zip, ship build
+  # logs) and as the MicroVM's run-time execution role (exposed to the guest via
+  # IMDSv2 for the IAM-authenticated EFS mount). A single role keeps the demo
+  # simple; scope into two roles for least privilege in production.
+  #
+  # NOTE: the assume-role source ARN is the IMAGE (microvm-image:*) at build AND
+  # at run time — the running VM also presents the image ARN, NOT microvm:* — so
+  # the confused-deputy condition must allow BOTH. Restricting to microvm:* alone
+  # makes the VM fail to assume the role and self-terminate with "unable to assume
+  # the role provided".
+  MicrovmRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn:
+                  - !Sub arn:${AWS::Partition}:lambda:*:${AWS::AccountId}:microvm-image:*
+                  - !Sub arn:${AWS::Partition}:lambda:*:${AWS::AccountId}:microvm:*
+      Policies:
+        - PolicyName: MicrovmBuildAndExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ReadCodeArtifact
+                Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${CodeArtifactBucket}/${CodeArtifactKey}
+              - Sid: WriteLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/*
+              # Client permissions for the IAM-authenticated EFS NFS mount, scoped
+              # to this file system AND only through the access point above.
+              # ClientRootAccess is deliberately NOT granted: the access point
+              # squashes everything to uid/gid 1000, so it is not needed.
+              - Sid: MountEfs
+                Effect: Allow
+                Action:
+                  - elasticfilesystem:ClientMount
+                  - elasticfilesystem:ClientWrite
+                Resource: !GetAtt FileSystem.Arn
+                Condition:
+                  StringEquals:
+                    elasticfilesystem:AccessPointArn: !GetAtt AccessPoint.Arn
+
+  MicrovmImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Ref ImageName
+      Description: Lambda MicroVMs + Amazon EFS pattern — shared POSIX file system over NFS.
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:${BaseImageName}
+      BaseImageVersion: !Ref BaseImageVersion
+      BuildRoleArn: !GetAtt MicrovmRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${CodeArtifactBucket}/${CodeArtifactKey}
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: !Ref MinimumMemoryInMiB
+      # REQUIRED. This is what grants CAP_SYS_ADMIN and exposes the full set of
+      # guest device nodes. Without it the container gets only /dev/sysgenid and
+      # cannot call mount(2) at all — so no NFS and no EFS. It is applied inside
+      # the VM isolation boundary and does not affect the host or other MicroVMs.
+      # NOTE: not a breadth choice — the resource schema's enum for
+      # AdditionalOsCapabilities is exactly ["ALL"], so it cannot be narrowed.
+      AdditionalOsCapabilities:
+        - ALL
+      # Build-time egress: INTERNET_EGRESS lets the Dockerfile install packages.
+      # The VPC egress connector (above) is attached at RUN time by src/run.sh.
+      EgressNetworkConnectors:
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS
+      EnvironmentVariables:
+        - Key: EFS_MOUNT_PATH
+          Value: !Ref MountPath
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 60
+          Validate: ENABLED
+          ValidateTimeoutInSeconds: 30
+        MicrovmHooks:
+          # /run mounts EFS and blocks until the mount actually carries I/O
+          # (mount + efs-proxy TLS tunnel readiness probe). app.py bounds its own
+          # work to ~47s worst case (35s mount cap + ~12s probe deadline), so give
+          # the hook the max 60s. Same for /resume, which re-mounts after a suspend.
+          Run: ENABLED
+          RunTimeoutInSeconds: 60
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 60
+          # /suspend UNMOUNTS. A resumed MicroVM has a new network identity and may
+          # be on a different host, so an NFS session captured in a snapshot is dead
+          # on arrival and returns ENOTCONN. Unmounting cleanly on the way down is
+          # what makes the /resume re-mount reliable. Allow time for the umount.
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 15
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 10
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref MicrovmLogGroup
+      Tags:
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-efs
+
+Outputs:
+  ImageArn:
+    Description: ARN of the built MicroVM image (pass to src/run.sh).
+    Value: !GetAtt MicrovmImage.ImageArn
+  ImageState:
+    Description: Image state (CREATING / CREATED / CREATE_FAILED).
+    Value: !GetAtt MicrovmImage.State
+  ExecutionRoleArn:
+    Description: Role the MicroVM assumes at run time (also the image build role).
+    Value: !GetAtt MicrovmRole.Arn
+  EgressConnectorArn:
+    Description: VPC egress connector ARN — attach at run time so the VM reaches the mount.
+    Value: !GetAtt EgressConnector.Arn
+  FileSystemId:
+    Description: EFS file system ID (run-hook payload).
+    Value: !Ref FileSystem
+  AccessPointId:
+    Description: EFS access point ID (run-hook payload).
+    Value: !Ref AccessPoint
+  MountTargetId:
+    Description: Mount target ID — src/run.sh looks up its IP for the run-hook payload.
+    Value: !Ref MountTarget
+  MountPath:
+    Description: Path the file system is mounted on inside the guest.
+    Value: !Ref MountPath
+  Region:
+    Description: Region everything is deployed in.
+    Value: !Ref AWS::Region
