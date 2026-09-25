@@ -1,0 +1,10 @@
+# Vendored dependencies (bundled at deploy time, not committed)
+boto3/
+botocore/
+s3transfer/
+urllib3/
+jmespath/
+dateutil/
+six.py
+*.dist-info/
+bin/
