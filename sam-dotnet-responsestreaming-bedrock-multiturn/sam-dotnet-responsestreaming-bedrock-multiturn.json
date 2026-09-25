@@ -1,0 +1,68 @@
+{
+  "title": "Lambda Response Streaming with Multi-Turn Bedrock Agent (.NET)",
+  "description": "A multi-turn AI agent with DynamoDB session persistence that asks clarifying questions before streaming a trip itinerary through API Gateway response streaming.",
+  "language": ".NET",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function that implements a multi-turn AI agent using Amazon Bedrock (Claude Sonnet) with tool use. The agent can pause and ask the user clarifying questions before generating output.",
+      "Conversation state (Bedrock message history) is persisted in DynamoDB between requests with TTL auto-expiry. When the agent has gathered enough information, it generates a full trip itinerary that streams token-by-token through API Gateway response streaming.",
+      "This pattern demonstrates session persistence, multi-turn agentic loops, and keepalive streaming to prevent API Gateway idle timeouts during long-running Bedrock calls."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-dotnet-responsestreaming-bedrock-multiturn",
+      "templateURL": "serverless-patterns/sam-dotnet-responsestreaming-bedrock-multiturn",
+      "projectFolder": "sam-dotnet-responsestreaming-bedrock-multiturn",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Response Streaming Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/response-streaming.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html"
+      },
+      {
+        "text": "Amazon Bedrock Tool Use (Function Calling)",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html"
+      },
+      {
+        "text": "Amazon DynamoDB TTL",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Doug Perkes",
+      "image": "",
+      "bio": "Senior Solutions Architect at AWS, focused on .NET and serverless.",
+      "linkedin": "dougperkes",
+      "twitter": ""
+    }
+  ]
+}
