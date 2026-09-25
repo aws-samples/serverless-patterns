@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="320" viewBox="0 0 720 320">
+  <defs>
+    <style>text{font-family:Arial,sans-serif;font-size:13px;fill:#232f3e}.title{font-size:11px;font-weight:bold}.box{stroke:#232f3e;stroke-width:2;rx:8;ry:8}.arrow{stroke:#232f3e;stroke-width:2;fill:none;marker-end:url(#ah)}</style>
+    <marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#232f3e"/></marker>
+  </defs>
+  <rect x="20" y="120" width="130" height="60" class="box" fill="#f2f3f3"/>
+  <text x="50" y="145" class="title">Publisher</text>
+  <text x="50" y="165">(HTTP POST)</text>
+  <rect x="240" y="80" width="200" height="140" class="box" fill="#e7f6fd"/>
+  <text x="260" y="115" class="title">AWS AppSync Events</text>
+  <text x="270" y="140">Channel Namespaces:</text>
+  <text x="280" y="160">notifications</text>
+  <text x="280" y="180">alerts</text>
+  <text x="270" y="205">(WebSocket pub/sub)</text>
+  <rect x="290" y="260" width="150" height="50" class="box" fill="#fdf3e7"/>
+  <text x="315" y="290" class="title">AWS Lambda</text>
+  <rect x="540" y="120" width="140" height="60" class="box" fill="#f2f3f3"/>
+  <text x="565" y="145" class="title">Subscribers</text>
+  <text x="560" y="165">(WebSocket)</text>
+  <line x1="150" y1="150" x2="238" y2="150" class="arrow"/>
+  <line x1="440" y1="150" x2="538" y2="150" class="arrow"/>
+  <line x1="340" y1="220" x2="340" y2="258" class="arrow"/>
+</svg>
