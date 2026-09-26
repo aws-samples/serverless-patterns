@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Infra</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CDK Construct Library dependencies -->
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.262.0" />
+    <PackageReference Include="Constructs" Version="10.7.1" />
+  </ItemGroup>
+
+</Project>
