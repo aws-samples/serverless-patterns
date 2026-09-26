@@ -1,0 +1,68 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon Connect Push Notification",
+  "description": "Create an API Gateway REST API that sends in-app push notifications to Amazon Connect users via direct AWS service integration",
+  "language": "",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API with a direct AWS service integration to Amazon Connect.",
+      "A POST request is transformed via VTL mapping templates and forwarded directly to the Connect CreateNotification API.",
+      "Using this Customers can send In-app notifications such as System notifications or custom organizational messages to Connnect Agents and Admins.",
+      "Notifications appear in the Amazon Connect workspace header for targeted users.",
+      "Supports localized content (11 locales), priority levels, TTL expiration, and tag-based access control."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-connect-notification",
+      "templateURL": "serverless-patterns/apigw-connect-notification",
+      "projectFolder": "apigw-connect-notification",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Connect Notifications - Admin Guide",
+        "link": "https://docs.aws.amazon.com/connect/latest/adminguide/amazon-connect-notifications.html"
+      },
+      {
+        "text": "CreateNotification API Reference",
+        "link": "https://docs.aws.amazon.com/connect/latest/APIReference/API_CreateNotification.html"
+      },
+      {
+        "text": "API Gateway AWS Service Integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "VTL Mapping Template Reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete --stack-name <your-stack-name>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vaidehi Patel",
+      "bio": "Solutions Architect at Amazon Web Services",
+      "linkedin": "https://www.linkedin.com/in/vaidehi-patel08/"
+    }
+  ]
+}
