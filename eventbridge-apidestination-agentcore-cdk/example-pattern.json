@@ -1,0 +1,120 @@
+{
+  "title": "Amazon EventBridge API Destination to Amazon Bedrock AgentCore Runtime",
+  "description": "Invoke an AgentCore Runtime agent directly from EventBridge without any Lambda glue code, using an API Destination with Cognito M2M OAuth.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon2": {
+      "x": 50,
+      "y": 50,
+      "service": "eventbridge-api-destination",
+      "label": "API Destination"
+    },
+    "icon3": {
+      "x": 80,
+      "y": 50,
+      "service": "bedrock",
+      "label": "Amazon Bedrock AgentCore Runtime"
+    },
+    "icon4": {
+      "x": 50,
+      "y": 20,
+      "service": "cognito",
+      "label": "Amazon Cognito (M2M OAuth)"
+    },
+    "icon5": {
+      "x": 50,
+      "y": 80,
+      "service": "sqs",
+      "label": "Dead-letter queue"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon4",
+      "to": "icon2"
+    },
+    "line4": {
+      "from": "icon2",
+      "to": "icon5"
+    }
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows a Lambda-less, event-driven invocation of an Amazon Bedrock AgentCore Runtime agent. The CDK stack is self-contained: it builds and deploys the AgentCore Runtime (from a bundled agent container image) along with all the EventBridge plumbing.",
+      "An EventBridge rule matches events on a custom bus and routes them to an API Destination whose HTTPS endpoint is the AgentCore Runtime InvokeAgentRuntime API.",
+      "The EventBridge Connection authenticates using the OAuth client_credentials flow against an Amazon Cognito user pool (machine-to-machine). The AgentCore Runtime validates the resulting JWT via its inbound identity (customJwtAuthorizer) configuration, which the stack wires to the same Cognito user pool at creation time.",
+      "Because API Destinations enforce a 5-second response timeout, the AgentCore Runtime is invoked in asynchronous mode: the agent entrypoint acknowledges the request immediately and continues processing the event in the background.",
+      "The endpoint URL uses the agent runtime ID plus an accountId query parameter instead of a URL-encoded ARN, because API Destinations automatically decode percent-encoded sequences in target URLs.",
+      "Deliveries that fail after retries are captured in an SQS dead-letter queue for inspection and redrive.",
+      "IAM permissions follow least privilege: the AgentCore Runtime execution role grants only ecr:BatchGetImage and ecr:GetDownloadUrlForLayer to the specific ECR repository, scoped CloudWatch Logs and X-Ray permissions, and bedrock:InvokeModel for foundation models. The EventBridge rule's target role has only events:InvokeApiDestination on the specific API Destination. The SQS DLQ enforces SSL in transit."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-apidestination-agentcore-cdk",
+      "templateURL": "serverless-patterns/eventbridge-apidestination-agentcore-cdk",
+      "projectFolder": "eventbridge-apidestination-agentcore-cdk",
+      "templateFile": "cdk/lib/eventbridge-agentcore-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge API Destinations",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Runtime",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html"
+      },
+      {
+        "text": "AgentCore Runtime inbound JWT authorizer",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html"
+      },
+      {
+        "text": "Cognito machine-to-machine authorization (client credentials grant)",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo README.md for detailed testing instructions.",
+      "Sample test event payload: {\"EventBusName\":\"agentcore-events\",\"Source\":\"demo.orders\",\"DetailType\":\"OrderCreated\",\"Detail\":\"{\\\"orderId\\\":\\\"12345\\\",\\\"prompt\\\":\\\"Summarize this order and flag any anomalies.\\\"}\"}"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": ["cd cdk", "cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Antoine Boucherie",
+      "bio": "Principal Solutions Architect, AWS Global Financial Services",
+      "linkedin": "antoineboucherie"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "eventbridge-apidestination-agentcore-cdk",
+  "version": "1.0.0",
+  "description": "EventBridge API Destination to Amazon Bedrock AgentCore Runtime - Lambda-less event-driven agent invocation",
+  "bin": {
+    "app": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "aws-cdk": "2.1136.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.5.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.264.0",
+    "constructs": "^10.8.1"
+  }
+}
