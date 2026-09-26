@@ -1,0 +1,64 @@
+{
+  "title": "Lambda Response Streaming with Amazon Bedrock — Story Generator (.NET)",
+  "description": "Stream LLM-generated story text token-by-token from Amazon Bedrock through Lambda response streaming and API Gateway to the client.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function that invokes Amazon Bedrock (Claude Sonnet) via the ConverseStream API and pipes generated tokens directly through API Gateway response streaming to the client.",
+      "The user specifies a genre, setting, and theme via query parameters, and the story appears word-by-word in the terminal. First tokens arrive within seconds — no waiting for the full generation to complete.",
+      "This demonstrates end-to-end streaming from Bedrock through Lambda to the client using the .NET response streaming SDK (LambdaResponseStreamFactory.CreateHttpStream)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-dotnet-responsestreaming-bedrock",
+      "templateURL": "serverless-patterns/sam-dotnet-responsestreaming-bedrock",
+      "projectFolder": "sam-dotnet-responsestreaming-bedrock",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Response Streaming Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/response-streaming.html"
+      },
+      {
+        "text": "Amazon Bedrock ConverseStream API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Doug Perkes",
+      "image": "",
+      "bio": "Senior Solutions Architect at AWS, focused on .NET and serverless.",
+      "linkedin": "dougperkes",
+      "twitter": ""
+    }
+  ]
+}
