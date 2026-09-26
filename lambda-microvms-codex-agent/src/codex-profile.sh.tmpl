@@ -1,0 +1,37 @@
+# Shell environment for Codex CLI inside the AWS Lambda MicroVM.
+#
+# Rendered by app.py to /etc/profile.d/codex-agent.sh at MicroVM start (see
+# codex-config.toml.tmpl for how placeholders are resolved). Interactive shells
+# opened through the SHELL_INGRESS connector are spawned by the shell agent and
+# do NOT inherit the image's ENV, so anything the shell needs has to be written
+# here and sourced from the bash init files.
+#
+# No credentials are ever written here. They come from the MicroVM execution
+# role at runtime.
+
+export PATH="$PATH:/root/.local/bin"
+export CODEX_HOME=/root/.codex
+
+# Region for anything in the shell that uses the AWS SDKs, including the MCP
+# proxy when Codex is started from here. Dropped when unresolved so the SDK
+# default chain decides rather than defaulting to the wrong Region.
+export AWS_REGION="__AWS_REGION__"
+export AWS_DEFAULT_REGION="__AWS_REGION__"
+
+# The WebSocket shell (SHELL_INGRESS) does not carry a window size, so a
+# full-screen TUI like `codex` would otherwise render into a single column.
+# Set a usable default when the terminal reports no size, and a TERM if unset.
+# This does not override a real size on terminals that do report one. Resize to
+# your own window with, e.g., `stty cols 120 rows 40`.
+if [ -n "$PS1" ]; then
+    : "${TERM:=xterm-256color}"; export TERM
+    if [ "$(stty size 2>/dev/null)" = "0 0" ]; then
+        stty cols 120 rows 40 2>/dev/null
+        export COLUMNS=120 LINES=40
+    fi
+fi
+
+# Land interactive shells in /workspace: it is a Git repository (Codex refuses to
+# run outside one without --skip-git-repo-check) and is pre-trusted in
+# config.toml.
+[ -n "$PS1" ] && cd /workspace

@@ -1,0 +1,117 @@
+# Codex CLI configuration template for AWS Lambda MicroVMs.
+#
+# app.py renders this into $CODEX_HOME/config.toml when the MicroVM starts and
+# again on the /run and /resume hooks. Placeholders are filled from the MicroVM
+# environment:
+#
+#   __AWS_REGION__         <- AWS_REGION (platform-supplied, reserved) or AWS_DEFAULT_REGION
+#   __CODEX_MODEL__        <- CODEX_MODEL, from the ModelId AWS CloudFormation parameter
+#   __AWS_MCP_ENDPOINT__   <- AWS_MCP_ENDPOINT, from the McpEndpoint parameter
+#
+# Any line whose placeholder cannot be resolved is dropped rather than left
+# blank, so an unresolved Region falls back to the AWS SDK default chain instead
+# of silently targeting the wrong one. Make changes here in the template; the
+# rendered file is overwritten on every hook.
+
+# Amazon Bedrock is a built-in provider. Authentication is AWS-native: no ChatGPT
+# sign-in, no OPENAI_API_KEY, no Amazon Bedrock API key. Codex resolves credentials
+# through the AWS SDK default chain, which inside the MicroVM is the execution
+# role.
+model_provider = "amazon-bedrock"
+model = "__CODEX_MODEL__"
+
+# Codex's own sandbox, layered inside the MicroVM boundary. workspace-write lets
+# it edit files under /workspace but not the rest of the filesystem.
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# Shell commands Codex runs need outbound access to reach AWS endpoints.
+network_access = true
+
+# Region for the built-in amazon-bedrock provider. Omitted when unresolved so
+# the SDK default chain decides.
+[model_providers.amazon-bedrock.aws]
+region = "__AWS_REGION__"
+
+# Pre-trust /workspace so an interactive session does not open on a trust
+# prompt. The MicroVM boundary and the read-only execution role are what
+# actually constrain the agent.
+[projects."/workspace"]
+trust_level = "trusted"
+
+# AWS MCP Server (Agent Toolkit for AWS): lets Codex make live AWS calls, search
+# AWS documentation, and retrieve AWS skills.
+#
+# Unlike a locally installed MCP server, this one is AWS-managed and remote. The
+# command below tells Codex to launch the MCP Proxy for AWS, a local stdio bridge
+# that signs each request with SigV4 using the execution-role credentials from
+# the AWS SDK default chain (no keys) and forwards it to the endpoint. Codex has
+# no native SigV4 support, so the proxy is what lets IAM authentication stand in
+# for the browser-based OAuth flow, which a headless MicroVM cannot complete.
+#
+# The endpoint's Region and the Region the agent operates on are two different
+# things, and only one of them is fixed:
+#
+#   * Signing/endpoint Region -- parsed by the proxy from the endpoint hostname
+#     (aws-mcp.<region>.api.aws). Do NOT pass --region: an explicit value
+#     overrides the parsed one and the signature stops matching the endpoint.
+#     The AWS MCP Server is offered in a limited set of Regions, so this is a
+#     fixed cross-Region dependency. See the McpEndpoint parameter.
+#   * Operating Region -- the AWS_REGION metadata below, which is this MicroVM's
+#     own Region. Passed explicitly so it is visible in the rendered config; the
+#     proxy would otherwise infer the same value from the environment.
+#
+# No extra IAM actions are needed for the MCP server itself: it forwards calls
+# under the caller's own credentials, so the execution role's ReadOnlyAccess is
+# what bounds it. Read-only is enforced by IAM rather than by the proxy's
+# --read-only flag. That flag hides every tool not annotated readOnlyHint=true,
+# and in the server release this pattern was tested with, aws___run_script (the
+# tool that reaches the AWS APIs) is annotated readOnlyHint=false, so the flag
+# would leave the documentation tools and no AWS access. Annotations are upstream
+# metadata and can change; IAM is the stable and stronger control, evaluated
+# server-side and recorded in AWS CloudTrail.
+#
+# startup_timeout_sec is well above Codex's default: this spawn does a network
+# handshake with a remote endpoint, and the first one after a snapshot resume is
+# the slowest.
+#
+# enabled_tools names the AWS tools explicitly. In the Codex release this pattern
+# was tested with, MCP tools were deferred behind a tool-search step and were
+# unreachable without an allow list, even though `codex mcp list` showed the
+# server healthy. The list is a snapshot: it silently drops anything it does not
+# name, so re-check it against the tool reference after a Codex upgrade or when
+# AWS publishes new tools, and remove it if a Codex release no longer needs it.
+# https://docs.aws.amazon.com/agent-toolkit/latest/userguide/understanding-mcp-server-tools.html
+#
+# aws___get_presigned_url is left out on purpose: presigning uses the caller's
+# credentials, so an upload URL cannot work under a read-only role. Add it if you
+# widen the role.
+[mcp_servers.aws]
+command = "mcp-proxy-for-aws-cli"
+# Split across lines on purpose. app.py drops any line whose placeholder it could
+# not resolve, so the endpoint and the metadata pair must not share a line: an
+# unresolved Region would otherwise take the endpoint with it and leave the proxy
+# with nothing to connect to. Keep --metadata and its value together on one line
+# for the same reason, since the flag is useless without it.
+args = [
+    "__AWS_MCP_ENDPOINT__",
+    "--metadata", "AWS_REGION=__AWS_REGION__",
+]
+enabled = true
+enabled_tools = [
+    "aws___run_script",
+    "aws___get_tasks",
+    "aws___retrieve_skill",
+    "aws___search_documentation",
+    "aws___read_documentation",
+    "aws___list_regions",
+    "aws___get_regional_availability",
+]
+startup_timeout_sec = 60
+# Matched to the proxy's own tool timeout. Set lower and Codex gives up while the
+# proxy is still waiting on a long script run, so check the proxy documentation
+# before reducing it.
+tool_timeout_sec = 300
+
+[mcp_servers.aws.env]
+AWS_REGION = "__AWS_REGION__"

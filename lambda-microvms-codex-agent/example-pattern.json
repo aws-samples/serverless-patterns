@@ -1,0 +1,82 @@
+{
+  "title": "Codex CLI Agent on AWS Lambda MicroVMs",
+  "description": "Deploy an AWS Lambda MicroVM with the OpenAI Codex CLI, powered by Amazon Bedrock and reachable through an interactive shell.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS Lambda MicroVM with the Codex CLI installed into the image. The MicroVM is launched with the SHELL_INGRESS network connector, so you connect over an interactive shell and run codex directly inside the isolated Firecracker VM.",
+      "Codex uses its built-in amazon-bedrock model provider, so inference runs on Amazon Bedrock with credentials supplied at runtime by the MicroVM execution role. No API keys are stored in the image. Codex is also connected to the AWS MCP Server from the Agent Toolkit for AWS through the MCP Proxy for AWS, which signs requests with the same execution-role credentials, so it can make live AWS API calls, search AWS documentation, and retrieve AWS skills. Access to AWS is read-only, enforced by IAM.",
+      "The image is Region-agnostic: the model, MCP endpoint, and Region are rendered into the Codex configuration at runtime from the MicroVM environment. The MicroVM suspends when idle, resumes on demand, and has a hard maximum lifetime, so treat it as disposable.",
+      "See the README in the GitHub repository for deployment steps, design notes, and troubleshooting."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvms-codex-agent",
+      "templateURL": "serverless-patterns/lambda-microvms-codex-agent",
+      "projectFolder": "lambda-microvms-codex-agent",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Use ChatGPT Work and Codex with Amazon Bedrock",
+        "link": "https://help.openai.com/en/articles/20001253-configure-codex-with-amazon-bedrock"
+      },
+      {
+        "text": "Amazon Bedrock Responses API (OpenAI-compatible)",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-mantle.html"
+      },
+      {
+        "text": "Codex CLI configuration reference",
+        "link": "https://developers.openai.com/codex/config-reference"
+      },
+      {
+        "text": "Agent Toolkit for AWS",
+        "link": "https://github.com/aws/agent-toolkit-for-aws"
+      },
+      {
+        "text": "AWS MCP Server",
+        "link": "https://docs.aws.amazon.com/agent-toolkit/latest/userguide/mcp-server.html"
+      },
+      {
+        "text": "MCP Proxy for AWS",
+        "link": "https://github.com/aws/mcp-proxy-for-aws"
+      },
+      {
+        "text": "Firecracker - Secure and fast microVMs for serverless computing",
+        "link": "https://aws.amazon.com/blogs/opensource/firecracker-open-source-secure-fast-microvm-serverless/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>./deploy.sh</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>./cleanup.sh</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dmitry Gulin",
+      "bio": "Senior Delivery Consultant at AWS Professional Services, specializing in Serverless and Agentic AI workloads.",
+      "linkedin": "dmitry-gulin"
+    }
+  ]
+}
