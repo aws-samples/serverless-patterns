@@ -1,0 +1,64 @@
+{
+  "title": "Lambda Response Streaming with Bedrock Agent Tool Use (.NET)",
+  "description": "An AI trip planner agent using Claude Sonnet tool calling that streams a day-by-day itinerary progressively through API Gateway response streaming.",
+  "language": ".NET",
+  "level": "300",
+  "framework": "SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda function that runs an agentic tool-use loop with Amazon Bedrock (Claude Sonnet). The model calls an add_day_plan tool for each day of a trip itinerary, and the Lambda streams each day's plan to the client as it's generated.",
+      "The agent loop continues until all days are planned, giving the user progressive feedback as structured output appears. API Gateway response streaming ensures the client sees each day incrementally over the connection.",
+      "This demonstrates a practical AI agent pattern where a model drives a structured workflow through tool calling, with no external databases or APIs required."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sam-dotnet-responsestreaming-bedrock-agent",
+      "templateURL": "serverless-patterns/sam-dotnet-responsestreaming-bedrock-agent",
+      "projectFolder": "sam-dotnet-responsestreaming-bedrock-agent",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Response Streaming Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/response-streaming.html"
+      },
+      {
+        "text": "Amazon Bedrock Tool Use (Function Calling)",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-call.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Doug Perkes",
+      "image": "",
+      "bio": "Senior Solutions Architect at AWS, focused on .NET and serverless.",
+      "linkedin": "dougperkes",
+      "twitter": ""
+    }
+  ]
+}
