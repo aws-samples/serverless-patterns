@@ -1,0 +1,61 @@
+{
+  "title": "Serverless multi-tenant workflow with external callback using Lambda durable functions",
+  "description": "This pattern implements a multi-tenant workflow API that suspends execution while waiting for external confirmation and resumes processing when a callback arrives, with per-tenant compute isolation ensuring workflow state remains private throughout the suspension period.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "SaaS applications often process tenant requests that cannot complete in a single invocation — the workflow must pause and wait for an external system to confirm before proceeding. During this wait, tenant-specific data from the first processing step (cached configuration, validated credentials, computed results) remains in the execution environment's memory. This pattern uses Lambda durable functions to suspend and resume the workflow across the wait boundary without losing progress, and Lambda tenant isolation mode to guarantee that the suspended environment — including all cached in-memory state — is never reassigned to a different tenant during the wait period.",
+      "The /workflow endpoint starts a durable workflow for a specific tenant. The function checkpoints after its first step and suspends at zero compute cost, logging a callback token. When the external system confirms the operation, it sends the token to the /callback endpoint, which resumes the workflow from its checkpoint. The resumed function skips all previously completed work and finishes processing with the confirmation payload. Multiple tenants can have workflows suspended simultaneously, each in a dedicated execution environment, each resuming independently when its callback arrives."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-durable-tenant-isolation-callback-terraform",
+      "templateURL": "serverless-patterns/apigw-lambda-durable-tenant-isolation-callback-terraform",
+      "projectFolder": "apigw-lambda-durable-tenant-isolation-callback-terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Lambda Tenant Isolation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd src/workflow && npm install && cd ../..",
+      "cd src/callback && npm install && cd ../..",
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Annangarachari R",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQHDdhBrpBtWsg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1651409742725?e=1759363200&v=beta&t=7-EnqmtXjWlH2uA8oSMCwnLfFFvlWtf42-aC8NSZukw",
+      "bio": "Serverless Enthusiast",
+      "linkedin": "https://www.linkedin.com/in/annangarachari-r/"
+    }
+  ]
+}
