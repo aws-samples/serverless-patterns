@@ -1,0 +1,64 @@
+{
+  "title": "Avro on an Amazon EventBridge custom event bus",
+  "description": "Publishes an Avro-encoded event to an EventBridge custom event bus with a Glue Schema Registry and delivers the decoded JSON to a Lambda",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to publish a rich domain event, Avro-encoded, to an Amazon EventBridge custom event bus (the eventsv2 API) using PutRawEvents together with an AWS Glue Schema Registry, and then deliver that same event to a Lambda subscriber.",
+      "The publisher encodes an OrderPlaced event against an Avro schema and wraps it in the Glue wire format. EventBridge decodes the Avro against the Glue registry server-side and delivers the payload as plain JSON, so the consumer Lambda needs no Avro library and simply logs the event to CloudWatch. A matching orderId, fields, and metadata prove the delivered event equals the one that was published.",
+      "This deploys one EventBridge custom event bus, one subscriber, an AWS Glue Schema Registry and Avro schema, one Java 21 Lambda function, an SQS dead-letter queue, and the delivery role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-avro-sam-java",
+      "templateURL": "serverless-patterns/eventbridge-custom-avro-sam-java",
+      "projectFolder": "eventbridge-custom-avro-sam-java",
+      "templateFile": "infra/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge event buses",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      },
+      {
+        "text": "AWS Glue Schema Registry",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html"
+      },
+      {
+        "text": "Apache Avro specification",
+        "link": "https://avro.apache.org/docs/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}

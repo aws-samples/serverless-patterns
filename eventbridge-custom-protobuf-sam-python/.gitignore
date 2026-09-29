@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+*.zip
+.aws-sam/
+
+# Generated Protobuf bindings — a build artifact. Run scripts/generate.sh.
+common/gen/
+# SAM deploy state — generated per user by `sam deploy --guided` (region, stack name, AppName).
+samconfig.toml
+# ProtoShield security scan output.
+.protoshield/

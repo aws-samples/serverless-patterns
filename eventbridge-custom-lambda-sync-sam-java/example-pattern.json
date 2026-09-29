@@ -1,0 +1,60 @@
+{
+  "title": "Ordered processing with a synchronous Lambda target on Amazon EventBridge",
+  "description": "Processes events in order by invoking a Lambda synchronously from a FIFO subscriber on an EventBridge custom event bus",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how an Amazon EventBridge custom event bus (the eventsv2 API) processes events in order by invoking a Lambda synchronously (InvocationType REQUEST_RESPONSE) from a FIFO subscriber.",
+      "The publisher sends a sequence of OrderPlaced events that share one EventGroupId, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer Lambda synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the CloudWatch log shows the sequence handled in order, one at a time. Synchronous confirmation provides the reliability and back-pressure teams used to add an SQS queue between the bus and Lambda to get, so no SQS buffer sits in the path.",
+      "This deploys one EventBridge custom event bus, one FIFO subscriber configured for synchronous invocation, one Java 21 Lambda function, an SQS dead-letter queue (safety net), and the delivery role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-lambda-sync-sam-java",
+      "templateURL": "serverless-patterns/eventbridge-custom-lambda-sync-sam-java",
+      "projectFolder": "eventbridge-custom-lambda-sync-sam-java",
+      "templateFile": "infra/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge event buses",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      },
+      {
+        "text": "Invoking Lambda functions with the Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}

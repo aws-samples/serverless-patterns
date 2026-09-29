@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="470" viewBox="0 0 1040 470" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#232f3e"/>
+    </marker>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4D5BD1"/><stop offset="1" stop-color="#3B48CC"/>
+    </linearGradient>
+    <style>
+      .title { font-size: 21px; font-weight: bold; fill: #232f3e; }
+      .sub   { font-size: 12px; fill: #545b64; }
+      .name  { font-size: 13px; font-weight: bold; fill: #232f3e; }
+      .name2 { font-size: 12px; fill: #232f3e; }
+      .lbl   { font-size: 12px; fill: #232f3e; }
+      .lblsm { font-size: 11px; fill: #687078; }
+      .seq   { font-size: 11px; fill: #3B48CC; font-weight: bold; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1040" height="470" fill="#ffffff"/>
+  <text x="30" y="40" class="title">Ordered processing with a synchronous Lambda target (EventBridge eventsv2)</text>
+  <text x="30" y="62" class="sub">A FIFO subscriber invokes the Lambda synchronously (REQUEST_RESPONSE) and waits for each event to be confirmed before delivering the next — ordered, reliable, direct to Lambda, with no SQS buffer in between.</text>
+
+  <!-- PUBLISHER -->
+  <g transform="translate(40,150)">
+    <rect x="0" y="0" width="64" height="64" rx="10" fill="url(#gBlue)"/>
+    <path d="M24 22 L14 32 L24 42" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M40 22 L50 32 L40 42" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="34" y1="18" x2="30" y2="46" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round"/>
+    <text x="32" y="82" text-anchor="middle" class="name">publish.py</text>
+    <text x="32" y="98" text-anchor="middle" class="lblsm">PutEvents (JSON)</text>
+    <text x="32" y="113" text-anchor="middle" class="seq">seq 1,2,3,...</text>
+  </g>
+
+  <!-- EVENTBRIDGE BUS -->
+  <g transform="translate(310,150)">
+    <rect x="0" y="0" width="64" height="64" rx="10" fill="#ffffff" stroke="#E7157B" stroke-width="2"/>
+    <svg x="8" y="8" width="48" height="48" viewBox="0 0 48 48">
+      <path d="M43.717,22.782 L42.433,21.233 L41.329,22.147 L42.613,23.697 L43.717,22.782 Z M26.847,36.768 L25.563,35.22 L23.053,37.3 L22.575,39.003 L24.337,38.849 L26.847,36.768 Z M27.102,33.942 L28.387,35.492 L41.074,24.973 L39.79,23.425 L27.102,33.942 Z M45.764,23.683 L25.373,40.588 C25.216,40.718 25.024,40.797 24.821,40.814 L21.309,41.121 C21.28,41.124 21.251,41.125 21.222,41.125 C20.926,41.125 20.643,40.993 20.452,40.763 C20.242,40.511 20.17,40.171 20.259,39.855 L21.211,36.46 C21.266,36.263 21.379,36.09 21.535,35.96 L41.926,19.055 C42.131,18.886 42.396,18.806 42.657,18.829 C42.922,18.854 43.165,18.982 43.334,19.186 L45.895,22.275 C46.247,22.701 46.189,23.331 45.764,23.683 L45.764,23.683 Z M31.1,6.91 L29.26,6.125 L26.673,12.19 L28.513,12.975 L31.1,6.91 Z M39.08,13.67 L37.879,12.07 L32.572,16.054 L33.774,17.654 L39.08,13.67 Z M13.466,43.154 L15.306,43.939 L17.893,37.874 L16.053,37.089 L13.466,43.154 Z M5.486,36.394 L6.687,37.994 L11.993,34.01 L10.792,32.41 L5.486,36.394 Z M8.604,25.755 L2,26.591 L2.252,28.575 L8.856,27.739 L8.604,25.755 Z M10.081,18.901 L3.95,16.364 L3.185,18.212 L9.316,20.749 L10.081,18.901 Z M14.832,13.688 L10.817,8.459 L9.231,9.678 L13.246,14.907 L14.832,13.688 Z M21.581,11.521 L20.756,5 L18.772,5.252 L19.597,11.773 L21.581,11.521 Z M16.71,33.125 L12.003,24.972 C11.824,24.663 11.824,24.282 12.003,23.972 L16.71,15.82 C16.889,15.511 17.219,15.32 17.576,15.32 L26.989,15.32 C27.347,15.32 27.677,15.511 27.856,15.82 L32.563,23.972 L30.83,24.972 L26.412,17.32 L18.154,17.32 L14.024,24.472 L18.154,31.625 L22.033,31.625 L22.033,33.625 L17.576,33.625 C17.219,33.625 16.889,33.434 16.71,33.125 L16.71,33.125 Z" fill="#E7157B"/>
+    </svg>
+    <text x="32" y="82" text-anchor="middle" class="name">EventBridge</text>
+    <text x="32" y="98" text-anchor="middle" class="name2">custom event bus</text>
+    <text x="32" y="114" text-anchor="middle" class="lblsm">eventsv2</text>
+  </g>
+
+  <!-- SUBSCRIBER (FIFO) -->
+  <g transform="translate(560,150)">
+    <rect x="0" y="0" width="64" height="64" rx="10" fill="#ffffff" stroke="#E7157B" stroke-width="2" stroke-dasharray="4,3"/>
+    <path d="M18 22 L46 22 L35 35 L35 47 L27 43 L27 35 Z" fill="#E7157B"/>
+    <text x="32" y="82" text-anchor="middle" class="name">Subscriber</text>
+    <text x="32" y="98" text-anchor="middle" class="lblsm">FIFO (ordered)</text>
+    <text x="32" y="113" text-anchor="middle" class="lblsm">REQUEST_RESPONSE</text>
+  </g>
+
+  <!-- LAMBDA -->
+  <g transform="translate(810,150)">
+    <svg x="0" y="0" width="64" height="64" viewBox="0 0 80 80">
+      <rect x="0" y="0" width="80" height="80" rx="12" fill="#ED7100"/>
+      <path d="M28.0075352,66 L15.5907274,66 L29.3235885,37.296 L35.5460249,50.106 L28.0075352,66 Z M30.2196674,34.553 C30.0512768,34.208 29.7004629,33.989 29.3175745,33.989 L29.3145676,33.989 C28.9286723,33.99 28.5778583,34.211 28.4124746,34.558 L13.097944,66.569 C12.9495999,66.879 12.9706487,67.243 13.1550766,67.534 C13.3374998,67.824 13.6582439,68 14.0020416,68 L28.6420072,68 C29.0299071,68 29.3817234,67.777 29.5481094,67.428 L37.563706,50.528 C37.693006,50.254 37.6920037,49.937 37.5586944,49.665 L30.2196674,34.553 Z M64.9953491,66 L52.6587274,66 L32.866809,24.57 C32.7014253,24.222 32.3486067,24 31.9617091,24 L23.8899822,24 L23.8990031,14 L39.7197081,14 L59.4204149,55.429 C59.5857986,55.777 59.9386172,56 60.3255148,56 L64.9953491,56 L64.9953491,66 Z M65.9976745,54 L60.9599868,54 L41.25928,12.571 C41.0938963,12.223 40.7410777,12 40.3531778,12 L22.89768,12 C22.3453987,12 21.8963569,12.447 21.8953545,12.999 L21.884329,24.999 C21.884329,25.265 21.9885708,25.519 22.1780103,25.707 C22.3654452,25.895 22.6200358,26 22.8866544,26 L31.3292417,26 L51.1221625,67.43 C51.2885485,67.778 51.6393624,68 52.02626,68 L65.9976745,68 C66.5519605,68 67,67.552 67,67 L67,55 C67,54.448 66.5519605,54 65.9976745,54 L65.9976745,54 Z" fill="#FFFFFF"/>
+    </svg>
+    <text x="32" y="82" text-anchor="middle" class="name">Lambda</text>
+    <text x="32" y="98" text-anchor="middle" class="lblsm">consumer (sync)</text>
+    <text x="32" y="113" text-anchor="middle" class="lblsm">logs seq in order</text>
+  </g>
+
+  <!-- FLOWS -->
+  <line x1="112" y1="182" x2="304" y2="182" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="208" y="170" text-anchor="middle" class="lbl">PutEvents</text>
+  <text x="208" y="200" text-anchor="middle" class="lblsm">one EventGroupId</text>
+
+  <line x1="374" y1="182" x2="554" y2="182" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="464" y="170" text-anchor="middle" class="lblsm">ordered within group</text>
+
+  <line x1="624" y1="182" x2="804" y2="182" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="714" y="170" text-anchor="middle" class="lblsm">sync invoke,</text>
+  <text x="714" y="200" text-anchor="middle" class="lblsm">one at a time</text>
+
+  <!-- ordered confirmation note -->
+  <rect x="310" y="300" width="564" height="70" rx="8" fill="#f6f8fa" stroke="#d5dbdb"/>
+  <text x="326" y="324" class="lbl">Each event is confirmed before the next is delivered.</text>
+  <text x="326" y="344" class="lblsm">The synchronous FIFO subscriber processes seq 1, then 2, then 3 ... in order — no SQS queue needed</text>
+  <text x="326" y="360" class="lblsm">between the bus and Lambda to get reliability or back-pressure.</text>
+
+  <text x="40" y="440" class="lblsm">Service icons: AWS Architecture Icons. "Subscriber" is a configuration on the bus, shown for clarity.</text>
+</svg>
