@@ -285,26 +285,31 @@ export function createPatternShape(servicesMap) {
           ),
       ),
     }),
-    // Where the pattern lives in aws-samples/serverless-patterns. Optional:
-    // Serverless Land records the folder your example-pattern.json is in when
-    // it imports the pattern. Only set templateFile if the file to show on the
-    // pattern page isn't template.yaml.
-    gitHub: z
-      .object({
-        template: z
-          .object({
+    // The file shown on the pattern page. Serverless Land records the folder
+    // your example-pattern.json is in when it imports the pattern, so you
+    // don't need to give the folder.
+    gitHub: z.object(
+      {
+        template: z.object(
+          {
+            // Relative to your pattern folder, not the repo root, e.g.
+            // "template.yaml" or "cdk/lib/my-stack.ts".
+            templateFile: z
+              .string({ error: 'Missing gitHub.template.templateFile (e.g. "template.yaml")' })
+              .min(1, 'gitHub.template.templateFile must not be empty (e.g. "template.yaml")'),
             // Pattern folder from the repo root, e.g. "sqs-lambda/python/sam".
+            // Optional: set by Serverless Land.
             patternPath: patternPathSchema.optional(),
-            // Relative to the pattern folder, not the repo root. Defaults to template.yaml.
-            templateFile: z.string().optional(),
             // Older fields, still accepted. Serverless Land derives these now.
             repoURL: z.string().optional(),
             templateURL: z.string().optional(),
             projectFolder: z.string().optional(),
-          })
-          .optional(),
-      })
-      .optional(),
+          },
+          { error: 'Missing gitHub.template: add { "templateFile": "template.yaml" }' },
+        ),
+      },
+      { error: 'Missing gitHub: add { "template": { "templateFile": "template.yaml" } }' },
+    ),
     deploy: deploySchema,
     testing: testingSchema,
     cleanup: cleanupSchema,
