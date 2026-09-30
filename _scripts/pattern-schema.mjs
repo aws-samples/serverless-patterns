@@ -240,6 +240,14 @@ export const contributorsSchema = z
 // Pattern
 // ---------------------------------------------------------------------------
 
+/** A folder path relative to the repo root: "a/b/c", no URL, no leading "serverless-patterns/", no leading/trailing "/". */
+export const patternPathSchema = z
+  .string()
+  .regex(
+    /^(?!serverless-patterns(\/|$))(?!https?:)[^/\s]+(\/[^/\s]+)*$/,
+    'patternPath is the folder from the repo root, e.g. "sqs-lambda/python/sam" (no URL, no leading "serverless-patterns/", no leading or trailing "/")',
+  );
+
 /**
  * Pattern fields, without the people fields. Pass a servicesMap
  * ({ "lambda": "AWS Lambda", ... }) to also check patternArch service keys.
@@ -265,16 +273,38 @@ export function createPatternShape(servicesMap) {
     level: z.enum(VALID_LEVELS, {
       message: `level must be one of: ${VALID_LEVELS.join(", ")}`,
     }),
-    introBox: introBoxSchema,
-    gitHub: z.object({
-      template: z.object({
-        repoURL: z.string(),
-        templateURL: z.string(),
-        projectFolder: z.string(),
-        // Relative to projectFolder, not the repo root
-        templateFile: z.string(),
-      }),
+    // The pattern page draws the architecture from patternArch, so an
+    // embedded image in the intro text would show it twice.
+    introBox: introBoxSchema.extend({
+      text: z.array(
+        z
+          .string()
+          .refine(
+            (t) => !/<img\b/i.test(t),
+            "introBox.text must not contain <img> tags — describe the architecture with patternArch instead",
+          ),
+      ),
     }),
+    // Where the pattern lives in aws-samples/serverless-patterns. Optional:
+    // Serverless Land records the folder your example-pattern.json is in when
+    // it imports the pattern. Only set templateFile if the file to show on the
+    // pattern page isn't template.yaml.
+    gitHub: z
+      .object({
+        template: z
+          .object({
+            // Pattern folder from the repo root, e.g. "sqs-lambda/python/sam".
+            patternPath: patternPathSchema.optional(),
+            // Relative to the pattern folder, not the repo root. Defaults to template.yaml.
+            templateFile: z.string().optional(),
+            // Older fields, still accepted. Serverless Land derives these now.
+            repoURL: z.string().optional(),
+            templateURL: z.string().optional(),
+            projectFolder: z.string().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
     deploy: deploySchema,
     testing: testingSchema,
     cleanup: cleanupSchema,
@@ -310,18 +340,19 @@ export function createPatternSchema({ servicesMap } = {}) {
     .refine(templateFileNotPrefixed, {
       path: ["gitHub", "template", "templateFile"],
       message:
-        "templateFile is relative to projectFolder — remove the projectFolder prefix",
+        "templateFile is relative to the pattern folder — remove the folder prefix",
       when: () => true,
     });
 }
 
-/** templateFile must not repeat projectFolder (it's already relative to it). */
+/** templateFile must not repeat the pattern folder (it's already relative to it). */
 export function templateFileNotPrefixed(data) {
-  const { projectFolder, templateFile } = data?.gitHub?.template ?? {};
-  if (typeof projectFolder !== "string" || typeof templateFile !== "string") {
+  const { patternPath, projectFolder, templateFile } = data?.gitHub?.template ?? {};
+  const folderValue = patternPath || projectFolder;
+  if (typeof folderValue !== "string" || typeof templateFile !== "string") {
     return true;
   }
-  const folder = projectFolder.replace(/\/+$/, "");
+  const folder = folderValue.replace(/\/+$/, "");
   return !(folder && templateFile.startsWith(folder + "/"));
 }
 

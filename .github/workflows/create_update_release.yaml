@@ -38,6 +38,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Fetch zip exclude list
+        # Pattern zips not built or uploaded (release is at GitHub's 1,000-asset
+        # cap). Maintained by Serverless Land. Stop if it can't be fetched:
+        # uploading without it would refill the freed slots.
+        run: |
+          curl -fsSL https://serverlessland.com/pattern-zip-exclude.json -o zip-exclude.json
+          jq -r '.exclude[]' zip-exclude.json > zip-exclude.txt
+          echo "Excluding $(wc -l < zip-exclude.txt) patterns"
+
       - name: Release doesn't exist so create one
         id: create_release
         env:
@@ -60,6 +69,7 @@ jobs:
             -printf '%h\n' | sed 's|^\./||' | sort -u | while IFS= read -r dir; do
             [ -n "$dir" ] || continue
             zip_name=$(echo "$dir" | tr '/' '-')
+            if grep -qxF "$zip_name" zip-exclude.txt; then echo "Skipping $zip_name (excluded)"; continue; fi
             staging="temp/stage/${zip_name}"
             mkdir -p "$staging"
             # Copy the leaf folder's contents under a clean, flattened archive root.
@@ -92,6 +102,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Fetch zip exclude list
+        # Pattern zips not built or uploaded (release is at GitHub's 1,000-asset
+        # cap). Maintained by Serverless Land. Stop if it can't be fetched:
+        # uploading without it would refill the freed slots.
+        run: |
+          curl -fsSL https://serverlessland.com/pattern-zip-exclude.json -o zip-exclude.json
+          jq -r '.exclude[]' zip-exclude.json > zip-exclude.txt
+          echo "Excluding $(wc -l < zip-exclude.txt) patterns"
 
       - name: Fetch latest tags
         run: |
@@ -140,6 +159,7 @@ jobs:
             [ -n "$dir" ] || continue
             if [ -d "$dir" ]; then
               zip_name=$(echo "$dir" | tr '/' '-')
+              if grep -qxF "$zip_name" zip-exclude.txt; then echo "Skipping $zip_name (excluded)"; continue; fi
               staging="temp_archives/stage/${zip_name}"
               mkdir -p "$staging"
               # Each zip holds only this one leaf pattern, under a flattened
@@ -162,6 +182,7 @@ jobs:
           while IFS= read -r dir; do
             [ -n "$dir" ] || continue
             zip_name=$(echo "$dir" | tr '/' '-')
+            if grep -qxF "$zip_name" zip-exclude.txt; then echo "Skipping $zip_name (excluded)"; continue; fi
             archive="temp_archives/${zip_name}.zip"
             if [ -f "$archive" ]; then
               gh release upload ${{ needs.get-release.outputs.latest_release }} "$archive" --clobber
