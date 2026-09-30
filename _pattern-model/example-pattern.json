@@ -1,5 +1,5 @@
 {
-  "title": "Step Functions to Athena",
+  "title": "AWS Step Functions to Amazon Athena",
   "description": "Create a Step Functions workflow to query Amazon Athena.",
   "language": "Python",
   "level": "200",
@@ -53,7 +53,7 @@
       "image": "link-to-your-photo.jpg",
       "bio": "Your bio.",
       "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "twitter": "twitter_handle"
     }
   ]
 }

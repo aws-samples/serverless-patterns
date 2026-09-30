@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/rest": "^19.0.4",
-    "jsonschema": "^1.4.1",
-    "node-fetch": "^2.7.0"
+    "zod": "^4.0.0"
   }
 }
