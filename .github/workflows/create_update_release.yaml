@@ -46,16 +46,28 @@ jobs:
           gh release create v1.0.0 --notes "Initial release v1.0.0" --prerelease=false
           echo "Release created"
 
-      - name: Zip files of folders
+      - name: Zip pattern folders
         id: zip_folders
         run: |
           mkdir -p temp
-          for folder in */; do
-            if [ -d "$folder" ]; then
-              folder_name=$(basename "$folder")
-              zip -r "temp/${folder_name}.zip" "$folder_name"
-            fi
+          # A pattern is any folder containing an example-pattern.json, at any
+          # depth (flat "sqs-lambda-python-sam" or nested "sqs-lambda/python/sam").
+          # Each zip holds only that one leaf folder, named with the path
+          # flattened to "-" (e.g. sqs-lambda/python/sam -> sqs-lambda-python-sam.zip),
+          # so a single zip never spans more than one language/framework.
+          find . -name example-pattern.json \
+            -not -path './.github/*' -not -path './_*' -not -path '*/node_modules/*' \
+            -printf '%h\n' | sed 's|^\./||' | sort -u | while IFS= read -r dir; do
+            [ -n "$dir" ] || continue
+            zip_name=$(echo "$dir" | tr '/' '-')
+            staging="temp/stage/${zip_name}"
+            mkdir -p "$staging"
+            # Copy the leaf folder's contents under a clean, flattened archive root.
+            cp -a "$dir/." "$staging/"
+            (cd temp/stage && zip -r "../${zip_name}.zip" "$zip_name" -q)
+            rm -rf "$staging"
           done
+          rm -rf temp/stage
           echo "Zip files created"
 
       - name: upload files to the release
@@ -98,37 +110,59 @@ jobs:
             echo "" > changed_files.txt
           fi
 
-      - name: Identify changed folders
+      - name: Identify changed patterns
         id: identify_folders
         run: |
+          # Map each changed file to the pattern it belongs to: the nearest
+          # ancestor folder containing an example-pattern.json (any depth).
+          # Store that pattern folder path so a change to sqs-lambda/python/sam/...
+          # resolves to sqs-lambda/python/sam, not the family folder.
+          : > changed_folders.txt
           if [ -s changed_files.txt ]; then
-            changed_folders=$(awk -F/ '{print $1}' changed_files.txt | sort | uniq)
-            echo "Changed folders: $changed_folders"
-            echo "$changed_folders" > changed_folders.txt
-          else
-            echo "No changed files"
-            echo "" > changed_folders.txt
+            while IFS= read -r file; do
+              [ -n "$file" ] || continue
+              dir=$(dirname "$file")
+              while [ "$dir" != "." ] && [ "$dir" != "/" ] && [ ! -f "$dir/example-pattern.json" ]; do
+                dir=$(dirname "$dir")
+              done
+              if [ -f "$dir/example-pattern.json" ]; then
+                echo "$dir"
+              fi
+            done < changed_files.txt | sort -u > changed_folders.txt
           fi
+          echo "Changed patterns:"
+          cat changed_folders.txt
 
-      - name: Archive changed folders
+      - name: Archive changed patterns
         run: |
           mkdir -p temp_archives
-          while IFS= read -r folder; do
-            if [ -d "$folder" ]; then
-              zip -r "temp_archives/$folder.zip" "$folder"
-              echo "Archived $folder"
+          while IFS= read -r dir; do
+            [ -n "$dir" ] || continue
+            if [ -d "$dir" ]; then
+              zip_name=$(echo "$dir" | tr '/' '-')
+              staging="temp_archives/stage/${zip_name}"
+              mkdir -p "$staging"
+              # Each zip holds only this one leaf pattern, under a flattened
+              # archive root, so it never spans more than one language/framework.
+              cp -a "$dir/." "$staging/"
+              (cd temp_archives/stage && zip -r "../${zip_name}.zip" "$zip_name" -q)
+              rm -rf "$staging"
+              echo "Archived $dir as ${zip_name}.zip"
             else
-              echo "Folder $folder does not exist"
+              echo "Pattern folder $dir does not exist"
             fi
           done < changed_folders.txt
+          rm -rf temp_archives/stage
 
       - name: Upload archives to release
         if: needs.get-release.outputs.latest_release != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          while IFS= read -r folder; do
-            archive="temp_archives/$folder.zip"
+          while IFS= read -r dir; do
+            [ -n "$dir" ] || continue
+            zip_name=$(echo "$dir" | tr '/' '-')
+            archive="temp_archives/${zip_name}.zip"
             if [ -f "$archive" ]; then
               gh release upload ${{ needs.get-release.outputs.latest_release }} "$archive" --clobber
               echo "Uploaded $archive, waiting to avoid rate limits..."
