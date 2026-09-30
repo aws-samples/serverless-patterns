@@ -23,9 +23,9 @@ jobs:
           modified=$(git diff --name-only --no-renames --diff-filter=M "$BASE_SHA" HEAD | paste -sd, -)
           echo "added_files=$added" >> "$GITHUB_OUTPUT"
           echo "modified_files=$modified" >> "$GITHUB_OUTPUT"
-      - run: cd scripts && npm i
+      - run: cd _scripts && npm i
       - name: Validate
-        run: node scripts/validate.js
+        run: node _scripts/validate.js
         env:
           MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
           ADDED_FILES: ${{ steps.changed-files.outputs.added_files }}

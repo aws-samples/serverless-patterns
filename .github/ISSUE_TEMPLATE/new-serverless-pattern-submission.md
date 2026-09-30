@@ -27,6 +27,7 @@ Note the following information for the model:
 - Resources should like to AWS documentation and AWS blogs related to the post (1-5 maximum).
 - Author bio may include a LinkedIn and/or Twitter reference and a 1-sentence bio. Use your LinkedIn profile ID and Twitter handle, not URLs.
 - Returning authors with a profile page at https://serverlessland.com/about/your-name can list `"contributors": ["content/contributors/your-name.json"]` instead of `authors`.
+- Pull requests check "example-pattern.json" against the [pattern schema](https://github.com/aws-samples/serverless-patterns/blob/main/_scripts/pattern-schema.mjs). To check it locally, run `cd _scripts && npm i`, then from the repo root `node _scripts/validate.js your-pattern/example-pattern.json`.
 
 You must ensure that the sections of the model README.md are completed in full.
 

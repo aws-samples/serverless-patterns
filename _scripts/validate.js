@@ -2,8 +2,8 @@
 // (pattern-schema.mjs, copied from serverless-land — don't edit it here).
 //
 // Locally:
-//   cd scripts && npm i
-//   node scripts/validate.js path/to/example-pattern.json [more files...]
+//   cd _scripts && npm i
+//   cd .. && node _scripts/validate.js path/to/example-pattern.json [more files...]
 //
 // In CI, the files come from the ADDED_FILES and MODIFIED_FILES env vars
 // (comma-separated, relative to the repo root). When GH_AUTOMATION is true, the
