@@ -1,0 +1,283 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Codex CLI and the AWS MCP Server on AWS Lambda MicroVMs, backed by Amazon Bedrock
+
+Parameters:
+  S3Bucket:
+    Type: String
+    Description: Amazon S3 bucket containing the code artifact zip
+  S3Key:
+    Type: String
+    Description: Amazon S3 key for the code artifact zip
+  ImageName:
+    Type: String
+    Default: codex-cli-agent
+    AllowedPattern: ^[a-zA-Z0-9-_]+$
+    MaxLength: 64
+    Description: >-
+      Name of the MicroVM image. Also used for the CloudWatch log group name
+      (/aws/lambda-microvms/<ImageName>), and by deploy.sh and cleanup.sh to
+      derive the stack name. Changing it replaces the image.
+  ModelId:
+    Type: String
+    # The default is a starting point only. Which models Amazon Bedrock serves on
+    # the Responses API, and in which Regions, changes over time, so confirm the
+    # current list in the Amazon Bedrock documentation and override as needed.
+    Default: openai.gpt-5.6-terra
+    # Only the general shape of an Amazon Bedrock model id (<provider>.<model>) is
+    # enforced. Which providers and models Codex's amazon-bedrock provider can use
+    # is decided by Codex and by the Responses API, and both change over time, so
+    # neither is encoded here; the Description says where to check.
+    AllowedPattern: ^[a-z0-9]+\.[a-zA-Z0-9.\-:]+$
+    ConstraintDescription: must be an Amazon Bedrock model id of the form <provider>.<model>
+    Description: >-
+      Amazon Bedrock model ID for Codex. Use the PLAIN id with no cross-Region routing
+      prefix: Codex talks to Amazon Bedrock's OpenAI-compatible Responses API, whose
+      model namespace differs from the classic InvokeModel API, and a prefixed id
+      such as us.<provider>.<model> is rejected there with 404 "does not exist".
+      Because the two namespaces differ, a model listed by
+      list-foundation-models is not necessarily served on the Responses API, and
+      the model must also be one Codex's amazon-bedrock provider supports. Model
+      and Region availability change over time, so check the Amazon Bedrock API
+      compatibility documentation and the Codex configuration reference for the
+      current lists instead of relying on this parameter's default.
+  McpEndpoint:
+    Type: String
+    Default: https://aws-mcp.us-east-1.api.aws/mcp
+    # The pattern only checks the URL shape. The Region list is not encoded here
+    # because AWS adds Regions over time; see the Description for where to look.
+    AllowedPattern: ^https://aws-mcp\.[a-z0-9-]+\.api\.aws/mcp$
+    ConstraintDescription: must be of the form https://aws-mcp.<region>.api.aws/mcp
+    Description: >-
+      AWS MCP Server endpoint (Agent Toolkit for AWS), of the form
+      https://aws-mcp.<region>.api.aws/mcp. The server is AWS-managed and offered
+      in a limited set of Regions, so this is a cross-Region dependency: it does
+      not have to match the Region the MicroVM runs in, so pick whichever is
+      nearest. The Region the agent operates on is separate, and comes from the
+      MicroVM's own AWS_REGION at runtime. The proxy derives its SigV4 signing
+      Region from this hostname, so a Region that does not host the server fails
+      at signing time (InvalidSignatureException or a connection error) rather
+      than at deploy time. Check the current endpoint list before changing it:
+      https://docs.aws.amazon.com/general/latest/gr/aws-mcp.html
+
+  MemoryMiB:
+    Type: Number
+    Default: 4096
+    MinValue: 4096
+    Description: >-
+      Minimum MicroVM memory in MiB. 4096 is the recommended floor for running the
+      Codex CLI comfortably; raise it (for example to 8192) for work over large
+      repositories. Check the AWS Lambda MicroVMs documentation for the current
+      maximum.
+
+Resources:
+  # Explicit log group so `delete-stack` cleans it up. Left implicit, the platform
+  # creates it and it outlives the stack.
+  MicroVMLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda-microvms/${ImageName}"
+      RetentionInDays: 14
+
+  # Neither role sets RoleName. IAM is global, so a fixed name would collide the
+  # second time this stack is deployed into another Region of the same account.
+  # CloudFormation generates a unique, stack-prefixed name instead, and the ARNs
+  # are exposed as stack outputs for everything that needs them.
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      # The build only needs to read the one artifact it is given and write its
+      # own build logs, so it is scoped to exactly that.
+      Policies:
+        - PolicyName: MicroVMBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ReadCodeArtifact
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/${S3Key}"
+              - Sid: WriteBuildLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt MicroVMLogGroup.Arn
+
+  # Credentials the Codex CLI and the MCP Proxy for AWS both resolve at runtime
+  # through the AWS SDK default chain. Nothing is baked into the image.
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      # ReadOnlyAccess is the single control on what the agent can do in AWS. The
+      # AWS MCP Server needs no IAM actions of its own: it forwards each call
+      # under these same credentials, so the downstream service authorizes it
+      # exactly as it would a direct API call.
+      #
+      # Requests forwarded by the server arrive carrying the aws:ViaAWSMCPService
+      # and aws:CalledViaAWSMCP condition keys. This role leaves them unused, since
+      # ReadOnlyAccess already denies everything they would deny. They matter when
+      # the role has to be broader: they keep agent traffic read-only while a human
+      # using the same role can still write. Documented policy forms:
+      # https://docs.aws.amazon.com/agent-toolkit/latest/userguide/security_iam_id-based-policy-examples.html
+      #
+      # Codex does NOT call the classic bedrock:InvokeModel API. Its amazon-bedrock
+      # provider posts to Amazon Bedrock's OpenAI-compatible Responses API on the
+      # bedrock-mantle endpoint, which authorizes under the separate `bedrock-mantle`
+      # IAM service against an Amazon Bedrock *project* resource instead of a model
+      # ARN. Without that permission every run fails with:
+      #   403 ... not authorized to perform: bedrock-mantle:CreateInference
+      #   on resource: arn:aws:bedrock-mantle:<region>:<account>:project/default
+      #
+      # AmazonBedrockMantleInferenceAccess is the AWS-managed policy for exactly
+      # this path, so it is used as-is instead of a hand-picked action list that
+      # would need updating whenever the service or Codex changes. It grants more
+      # than inference: bedrock-mantle read actions, bearer-token authentication,
+      # Amazon Bedrock web search, and a conditional aws-marketplace:Subscribe that
+      # only applies when Amazon Bedrock itself is completing a third-party model
+      # subscription on the caller's behalf. Review the current policy document
+      # before attaching it in an account with stricter requirements:
+      # https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonBedrockMantleInferenceAccess.html
+      #
+      # To pin inference to the deployed model, add an inline Deny with
+      # StringNotEquals on the bedrock-mantle:Model condition key. Not done here
+      # because it also blocks the `codex exec -m <other-model>` check the README
+      # uses to try models; confirm the key's value format in the Service
+      # Authorization Reference before adding it.
+      #
+      # Deliberately NOT granted: bedrock:InvokeModel. Nothing in the image can
+      # reach the classic API: Codex uses the Mantle path, the AWS CLI is not
+      # installed, and ReadOnlyAccess covers everything the agent reaches through
+      # the AWS MCP Server. Adding it would widen the role for no caller.
+      #
+      # This is a dependency on Codex, not on AWS. Amazon Bedrock offers the
+      # Responses API on both the bedrock-mantle and bedrock-runtime endpoints, and
+      # which one Codex's amazon-bedrock provider targets is decided by the Codex
+      # release, not by this template. If a Codex upgrade starts failing with
+      #   not authorized to perform: bedrock:InvokeModel
+      # the provider has moved to bedrock-runtime, and the fix is to attach the
+      # AmazonBedrockLimitedAccess managed policy (or a bedrock:InvokeModel
+      # statement) alongside the policy above.
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonBedrockMantleInferenceAccess"
+      Policies:
+        - PolicyName: MicroVMExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # ReadOnlyAccess covers reading logs; only the writes the MicroVM
+              # runtime needs to ship its own logs are added, scoped to the stack's
+              # log group.
+              - Sid: WriteMicroVMLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt MicroVMLogGroup.Arn
+
+  MicroVMImage:
+    Type: AWS::Lambda::MicrovmImage
+    # The build and log-group dependencies are implied by the references below.
+    # The execution role is not referenced here, since it is only passed at
+    # run-microvm time, so it needs an explicit ordering edge to be sure it
+    # exists by the time the stack finishes and the image is runnable.
+    DependsOn: MicroVMExecutionRole
+    Properties:
+      Name: !Ref ImageName
+      # Base image name and version are platform-supplied values, so check the AWS
+      # Lambda MicroVMs documentation for the current ones before pinning newer.
+      BaseImageArn: !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
+      BaseImageVersion: "0"
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub "s3://${S3Bucket}/${S3Key}"
+      # Everything the image installs publishes ARM builds. Switch to X86_64 if you
+      # add a dependency that does not, and rebuild.
+      CpuConfigurations:
+        - Architecture: ARM_64
+      # Codex's workspace-write sandbox is backed by bubblewrap, which needs to
+      # create user namespaces, mount /proc inside them, and hold CAP_SETFCAP when
+      # running as root. The MicroVM standard capability set is not documented to
+      # include these, so the elevated set is granted. What ALL enables:
+      # https://docs.aws.amazon.com/lambda/latest/dg/microvms-images.html#microvms-images-os-capabilities
+      # An empty list is the tighter setting if AWS documents that the standard
+      # set covers those requirements.
+      AdditionalOsCapabilities:
+        - ALL
+      Description: Codex CLI with the AWS MCP Server, backed by Amazon Bedrock
+      # Outbound HTTPS so Codex can reach the Amazon Bedrock endpoint and the MCP
+      # Proxy for AWS can reach the AWS MCP Server endpoint. The proxy talks to a
+      # remote managed endpoint, so egress is on the path for AWS access here as
+      # well as for inference.
+      EgressNetworkConnectors:
+        - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS"
+      # AWS_REGION is a reserved key and cannot be set here. The platform supplies
+      # it, and app.py reads it from the environment at runtime.
+      EnvironmentVariables:
+        - Key: CODEX_MODEL
+          Value: !Ref ModelId
+        - Key: AWS_MCP_ENDPOINT
+          Value: !Ref McpEndpoint
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 300
+        MicrovmHooks:
+          # Run and Resume re-render the Codex config, so they get more headroom
+          # than the hooks that only log.
+          Run: ENABLED
+          RunTimeoutInSeconds: 10
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 10
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 5
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 5
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref MicroVMLogGroup
+      Resources:
+        - MinimumMemoryInMiB: !Ref MemoryMiB
+
+Outputs:
+  ImageArn:
+    Description: MicroVM image ARN, passed to run-microvm
+    Value: !GetAtt MicroVMImage.ImageArn
+  State:
+    Description: Image build state
+    Value: !GetAtt MicroVMImage.State
+  BuildRoleArn:
+    Description: Role the image build assumes to read the artifact and write build logs
+    Value: !GetAtt MicroVMBuildRole.Arn
+  ExecutionRoleArn:
+    Description: Role the MicroVM assumes, passed to run-microvm
+    Value: !GetAtt MicroVMExecutionRole.Arn
+  ModelId:
+    Description: Amazon Bedrock model ID the MicroVM passes to Codex as CODEX_MODEL
+    Value: !Ref ModelId
+  McpEndpoint:
+    Description: AWS MCP Server endpoint the MicroVM passes to the MCP proxy
+    Value: !Ref McpEndpoint
+  LogGroup:
+    Description: CloudWatch log group for image build and MicroVM logs, passed to run-microvm
+    Value: !Ref MicroVMLogGroup
