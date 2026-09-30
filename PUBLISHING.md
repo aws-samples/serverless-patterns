@@ -69,7 +69,7 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
 - **One pattern variant per pull request.** Put everything in one variant folder. Don't change other pattern folders.
 - <a id="folder-structure"></a>**Folder structure:** `{family}/{language}/{framework}`, all lowercase, e.g. `sqs-lambda/python/sam`.
   - The family folder names the services, hyphenated, e.g. `sqs-lambda`. It groups patterns that differ only by language or framework.
-  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `node`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`.
+  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`.
   - Skip the language level when the pattern has no language (infra-only, e.g. `language` is `""`): use `{family}/{framework}`, e.g. `apigw-sqs/sam`.
   - Each variant folder holds a complete pattern: `README.md`, `example-pattern.json`, the template and the code.
   - Older patterns still use single folders such as `sqs-lambda-python-sam`. Use the new structure for new patterns.
