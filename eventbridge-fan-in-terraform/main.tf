@@ -12,7 +12,7 @@ resource "aws_cloudwatch_event_rule" "ebrule" {
       local.account_id
     ]
   })
-  is_enabled = true
+  state = "ENABLED"
 }
 
 //IAM role and policy for Event rule
@@ -86,6 +86,7 @@ data "aws_iam_policy_document" "log_policy" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "log-resource-policy" {
+  provider        = aws.central
   policy_document = data.aws_iam_policy_document.log_policy.json
   policy_name     = "eventbridge-log-publishing-policy"
 }
@@ -95,7 +96,8 @@ module "central_eventbridge" {
   providers = {
     aws = aws.central
   }
-  source = "terraform-aws-modules/eventbridge/aws"
+  source  = "terraform-aws-modules/eventbridge/aws"
+  version = "~> 4.3"
 
   bus_name = "central-event-bus"
 
@@ -128,6 +130,7 @@ module "central_eventbridge" {
 
 //Create targets on each rule to send events to Central Eventbus
 resource "aws_cloudwatch_event_target" "EBtargets" {
+  provider       = aws.others
   for_each       = tomap(aws_cloudwatch_event_rule.ebrule)
   event_bus_name = each.key
   rule           = each.value.name
