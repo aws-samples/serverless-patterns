@@ -9,7 +9,7 @@
   "region": "ap-south-1",
   "configuration": "Release",
   "function-architecture": "x86_64",
-  "function-runtime": "dotnet6",
+  "function-runtime": "dotnet10",
   "function-memory-size": 256,
   "function-timeout": 30,
   "function-handler": "EventBridgeLambda::EventBridgeLambda.Function::FunctionHandler"

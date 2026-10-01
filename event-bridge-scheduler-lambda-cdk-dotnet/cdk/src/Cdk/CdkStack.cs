@@ -14,7 +14,7 @@ namespace Cdk
 
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -30,7 +30,7 @@ namespace Cdk
             {
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "EventBridgeLambda::EventBridgeLambda.Function::FunctionHandler",
                 Code = Code.FromAsset("../lambda/EventBridgeLambda/", new Amazon.CDK.AWS.S3.Assets.AssetOptions
                 {
