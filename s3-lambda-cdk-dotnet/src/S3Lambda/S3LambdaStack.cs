@@ -36,14 +36,14 @@ namespace S3Lambda
             {
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "lambda::lambda.Function::FunctionHandler",
-                Code = Code.FromAsset("src\\lambda\\src\\lambda", new AssetOptions
+                Code = Code.FromAsset("src/lambda/src/lambda", new AssetOptions
                 {
                     // Note: Asset path should point to the folder where .csproj file is present. Also,this path should be relative to cdk.json
                     Bundling = new BundlingOptions
                     {
-                        Image = Runtime.DOTNET_6.BundlingImage,
+                        Image = Runtime.DOTNET_10.BundlingImage,
                         Command = new[]
                         {
                             "bash", "-c", string.Join(" && ", buildCommands)
