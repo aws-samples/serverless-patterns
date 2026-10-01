@@ -1,0 +1,206 @@
+AWSTemplateFormatVersion: "2010-09-09"
+# No `Transform: AWS::Serverless-2016-10-09`: this pattern has no AWS::Serverless::*
+# resources (the EventBridge -> DynamoDB integration is codeless), so the SAM macro
+# is unnecessary. Including it also forces cloudformation:CreateChangeSet on the
+# transform macro, which some roles are not permitted to invoke. The SAM CLI
+# (sam deploy / sam delete) deploys this plain CloudFormation template as-is.
+Description: >
+  eventbridge-custom-bus-dynamodb
+
+  Deliver events from an Amazon EventBridge Custom Event Bus directly to an Amazon
+  DynamoDB table using subscriber universal targets (dynamodb:PutItem for single
+  writes and dynamodb:BatchWriteItem for batched writes), with no Lambda function
+  in the path.
+
+# -----------------------------------------------------------------------------
+# This pattern uses the Amazon EventBridge Custom Event Bus (the AWS::EventsV2
+# resource family), which is distinct from the classic event bus (AWS::Events).
+# A subscriber watches the bus, filters events, and delivers each matching event
+# to exactly one target. Here the targets are "universal targets": AWS SDK API
+# actions that EventBridge calls directly. The request body is built from the
+# event(s) with a JSONata expression, so no custom code is needed.
+#
+# Two subscribers share the bus and the table. Events are published with
+# PutRawEvents and routed on the eventType key of the entry's Metadata:
+#   * OrdersToDynamoDbSubscriber      - "Order Placed"   -> PutItem, 1 event per call
+#   * OrdersBatchToDynamoDbSubscriber - "Order Imported" -> BatchWriteItem, up to
+#                                       25 events per call
+# -----------------------------------------------------------------------------
+
+Parameters:
+  EventBusName:
+    Type: String
+    Default: custom-bus-dynamodb-demo
+    Description: Name of the EventBridge Custom Event Bus to create.
+    AllowedPattern: "^[A-Za-z0-9][\\.\\-_A-Za-z0-9]{0,255}$"
+
+Resources:
+  # The Custom Event Bus. This pattern publishes to it with PutRawEvents, and
+  # the bus retains events for the configured period so subscribers can replay them.
+  EventBus:
+    Type: AWS::EventsV2::EventBus
+    Properties:
+      Name: !Ref EventBusName
+      Description: Custom Event Bus that forwards order events to DynamoDB.
+      StorageConfiguration:
+        # Minimum retention (1 day). Raise to replay older events (max 365).
+        RetentionPeriodInDays: 1
+
+  # The destination table. One item is written per matching event.
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  # Events that exhaust their retries are recorded here. Without a dead-letter
+  # queue, failed deliveries are dropped with no signal.
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600 # 14 days
+
+  # EventBridge assumes this role to call DynamoDB PutItem and to write to the DLQ.
+  SubscriberDeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DeliverToDynamoDbAndDlq
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Permissions for the universal targets (single and batch writes).
+              - Sid: InvokeTheTargets
+                Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:BatchWriteItem
+                Resource: !GetAtt OrdersTable.Arn
+              # Required so a failed delivery can be recorded on the DLQ.
+              - Sid: WriteToTheDeadLetterQueue
+                Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+
+  # The subscriber: filter + universal target. It receives events whose
+  # eventType metadata is "Order Placed" and writes one DynamoDB item per event.
+  OrdersToDynamoDbSubscriber:
+    Type: AWS::EventsV2::Subscriber
+    Properties:
+      Name: orders-to-dynamodb
+      # Ref on the bus returns its full ARN (including the generated identifier).
+      EventBusArn: !Ref EventBus
+      Type: UNORDERED
+      # Only deliver matching events. Events are published with PutRawEvents,
+      # and the publisher sets the eventType key in the entry's Metadata.
+      # METADATA filters match exact values only.
+      FilterConfiguration:
+        Filters:
+          - Scope: METADATA
+            Pattern: '{"eventType":["Order Placed"]}'
+      InvokeConfiguration:
+        # Universal target ARN: no region, no account; service id + camelCase
+        # action with a lowercase first letter (putItem, not PutItem).
+        TargetArn: arn:aws:events:::aws-sdk:dynamodb:putItem
+        RoleArn: !GetAtt SubscriberDeliveryRole.Arn
+        UniversalTargetParameters:
+          # The DynamoDB PutItem request, built from the event with JSONata
+          # (wrapped in {% %}). For PutRawEvents, the published payload is at
+          # $events.Data and the publisher's metadata at $events.Metadata.
+          Input: !Sub |-
+            {% {
+              "TableName": "${OrdersTable}",
+              "Item": {
+                "id":        { "S": $events.Data.id },
+                "eventType": { "S": $events.Metadata.eventType },
+                "detail":    { "S": $string($events.Data) }
+              }
+            } %}
+      # One API call per event. Required when the request is per-event JSONata.
+      BatchConfiguration:
+        MaxBatchSize: 1
+        MaxBatchWindowInSeconds: 0
+      RetryPolicy:
+        MaxRetryAttempts: 5
+        MaxEventAgeInSeconds: 300
+        RetryStrategy: ALL
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+
+  # The batch subscriber: receives events whose eventType metadata is
+  # "Order Imported" and writes them in groups with a single BatchWriteItem
+  # call per batch.
+  OrdersBatchToDynamoDbSubscriber:
+    Type: AWS::EventsV2::Subscriber
+    Properties:
+      Name: orders-batch-to-dynamodb
+      EventBusArn: !Ref EventBus
+      Type: UNORDERED
+      FilterConfiguration:
+        Filters:
+          - Scope: METADATA
+            Pattern: '{"eventType":["Order Imported"]}'
+      InvokeConfiguration:
+        TargetArn: arn:aws:events:::aws-sdk:dynamodb:batchWriteItem
+        RoleArn: !GetAtt SubscriberDeliveryRole.Arn
+        UniversalTargetParameters:
+          # $events is the batch (an array of events). `$events.{ ... }` maps
+          # every event to one PutRequest, and the surrounding [ ] keeps the
+          # result an array even when the batch holds a single event.
+          Input: !Sub |-
+            {% {
+              "RequestItems": {
+                "${OrdersTable}": [$events.{
+                  "PutRequest": {
+                    "Item": {
+                      "id":        { "S": Data.id },
+                      "eventType": { "S": Metadata.eventType },
+                      "detail":    { "S": $string(Data) }
+                    }
+                  }
+                }]
+              }
+            } %}
+      # BatchWriteItem accepts at most 25 put/delete requests per call, so the
+      # batch size must not exceed 25. A batch is sent when it reaches 25 events
+      # or when the window elapses, whichever comes first.
+      BatchConfiguration:
+        MaxBatchSize: 25
+        MaxBatchWindowInSeconds: 10
+      # A throttled or rejected call fails the whole batch. Raise these limits
+      # for production so throttling can clear before events are dead-lettered.
+      RetryPolicy:
+        MaxRetryAttempts: 5
+        MaxEventAgeInSeconds: 300
+        RetryStrategy: ALL
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+
+Outputs:
+  EventBusArn:
+    Description: ARN of the Custom Event Bus. Use it to publish test events.
+    Value: !Ref EventBus
+  TableName:
+    Description: Name of the DynamoDB table that receives one item per event.
+    Value: !Ref OrdersTable
+  SubscriberArn:
+    Description: ARN of the subscriber delivering single events to DynamoDB (PutItem).
+    Value: !Ref OrdersToDynamoDbSubscriber
+  BatchSubscriberArn:
+    Description: ARN of the subscriber delivering batched events to DynamoDB (BatchWriteItem).
+    Value: !Ref OrdersBatchToDynamoDbSubscriber
+  DeadLetterQueueUrl:
+    Description: URL of the dead-letter queue for failed deliveries.
+    Value: !Ref DeadLetterQueue

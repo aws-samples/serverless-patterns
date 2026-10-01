@@ -1,0 +1,76 @@
+{
+  "title": "Amazon EventBridge Custom Event Bus to Amazon DynamoDB",
+  "description": "Write events from an EventBridge Custom Event Bus directly to DynamoDB with PutItem or BatchWriteItem universal targets, with no Lambda in the path.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon EventBridge Custom Event Bus with two subscribers that write events to an Amazon DynamoDB table, with no Lambda function in the path. Each subscriber delivers to a universal target, a DynamoDB API action that EventBridge invokes directly, and a JSONata expression builds the request from the event.",
+      "Events are published with PutRawEvents and routed on the eventType metadata key. Events with eventType 'Order Placed' are written one at a time with PutItem. Events with eventType 'Order Imported' are collected into batches of up to 25 and written with a single BatchWriteItem call.",
+      "With the batch write, a duplicate ID in a batch or a throttled call fails the whole batch. EventBridge retries the batch and then writes one record to an Amazon SQS dead-letter queue listing the IDs of all events in it, so the dead-letter queue is essential for the batch subscriber.",
+      "This pattern deploys one EventBridge Custom Event Bus, two subscribers, one DynamoDB table, one SQS dead-letter queue, and one IAM role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "What is the EventBridge Custom Event Bus?",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-what-is.html"
+      },
+      {
+        "text": "Universal targets for a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-universal-targets.html"
+      },
+      {
+        "text": "Subscribing to events on a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-subscribers.html"
+      },
+      {
+        "text": "Creating Custom Event Bus resources with CloudFormation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-cloudformation.html"
+      },
+      {
+        "text": "Retry policies and dead-letter queues for a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-retry.html"
+      },
+      {
+        "text": "Amazon DynamoDB BatchWriteItem API reference",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Marco Buss",
+      "bio": "Sr. Solutions Architect at AWS",
+      "image": "https://marcobuss.de/marbuss.jpg",
+      "linkedin": "marcobuss"
+    }
+  ]
+}
