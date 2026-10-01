@@ -16,7 +16,7 @@ export class lambdaStack extends Stack {
 
         const testLambda = new Function(this, 'testLambda', {
             functionName: `${prefix}lambdaFunction`,
-            runtime: Runtime.NODEJS_14_X,
+            runtime: Runtime.NODEJS_24_X,
             architecture: Architecture.ARM_64,
             memorySize: 512,
             code: Code.fromAsset(path.join(__dirname, '../lambda_code')),
