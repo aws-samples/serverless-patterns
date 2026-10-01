@@ -35,7 +35,7 @@ export class MainStack extends Stack {
     const authorizerFunction = new PythonFunction(this, "AuthorizerFunction", {
       entry: join(__dirname, "authorizer"),
       index: "app.py",
-      runtime: Runtime.PYTHON_3_8,
+      runtime: Runtime.PYTHON_3_14,
       environment: {
         USER_POOL_ID: auth.userPoolId,
         APP_CLIENT_ID: auth.destinationClientId
