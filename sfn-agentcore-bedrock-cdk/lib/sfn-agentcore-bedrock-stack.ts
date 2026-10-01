@@ -26,7 +26,7 @@ export class SfnAgentcoreBedrockStack extends cdk.Stack {
     const invokeAgentFn = new lambdaNode.NodejsFunction(this, 'InvokeAgentFn', {
       entry: path.join(__dirname, '..', 'src', 'invoke-agent.ts'),
       handler: 'handler',
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       memorySize: 256,
       timeout: cdk.Duration.minutes(3),
       bundling: {
@@ -44,7 +44,7 @@ export class SfnAgentcoreBedrockStack extends cdk.Stack {
 
     // Aggregate Lambda — summarizes multi-agent responses via Bedrock Converse
     const aggregateFn = new lambda.Function(this, 'AggregateFn', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'aggregate.handler',
       code: lambda.Code.fromAsset('src'),
       memorySize: 256,
@@ -137,7 +137,7 @@ export class SfnAgentcoreBedrockStack extends cdk.Stack {
 
     // Trigger Lambda
     const triggerFn = new lambda.Function(this, 'TriggerFn', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'trigger.handler',
       code: lambda.Code.fromAsset('src'),
       memorySize: 256,
