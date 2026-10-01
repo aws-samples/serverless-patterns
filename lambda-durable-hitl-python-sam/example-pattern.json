@@ -3,7 +3,7 @@
   "description": "Demonstrates Lambda durable functions with human approval workflow using Python, DynamoDB, and SNS",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-hitl-python-sam",
-      "templateURL": "serverless-patterns/lambda-durable-hitl-python-sam",
-      "projectFolder": "lambda-durable-hitl-python-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -69,19 +66,5 @@
       "bio": "Cloud Solutions Architect",
       "linkedin": "mian-tariq"
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "name": "lambda",
-      "label": "Lambda durable functions"
-    },
-    "icon2": {
-      "name": "dynamodb",
-      "label": "Amazon DynamoDB"
-    },
-    "icon3": {
-      "name": "sns",
-      "label": "Amazon SNS"
-    }
-  }
+  ]
 }

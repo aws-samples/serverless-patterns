@@ -1,0 +1,55 @@
+{
+  "title": "Public Amazon API Gateway endpoint to private Amazon API Gateway endpoint",
+  "description": "Create a public API Gateway endpoint integrated with a private API Gateway endpoint.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern in CDK creates a public API Amazon API Gateway endpoint integrated with a private API Gateway endpoint in a VPC."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/index.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Creating a private API in Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
+      },
+      {
+        "text": "How to invoke a private API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-api-test-invoke-url.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk bootstrap aws://accountnumber/region",
+      "npx cdk deploy --app 'ts-node .' --all"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/rajneesh-ranjan.json",
+    "content/contributors/britney-tong.json"
+  ]
+}

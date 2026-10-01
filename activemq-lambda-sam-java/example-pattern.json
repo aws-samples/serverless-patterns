@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/activemq-lambda-sam-java",
-      "templateURL": "serverless-patterns/activemq-lambda-sam-java",
-      "projectFolder": "activemq-lambda-sam-java",
       "templateFile": "template.yaml"
     }
   },
@@ -28,7 +25,7 @@
       {
         "text": "ActiveMQ tutorials",
         "link": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/activemq-on-amazon-mq.html"
-      }      
+      }
     ]
   },
   "deploy": {
@@ -50,14 +47,14 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "linkedin": "biswanathmukherjee"
     },
     {
       "name": "Rakshith Rao",
-      "image": "https://rao.sh/assets/img/profile_pic.png",
       "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+      "image": "https://rao.sh/assets/img/profile_pic.png",
       "linkedin": "rakshithrao"
     }
   ]

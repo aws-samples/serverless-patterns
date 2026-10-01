@@ -1,8 +1,8 @@
 {
-  "title": "EventBridge to Lambda",
-  "description": "Create an EventBridge rule that invokes a Lambda function.",
+  "title": "Amazon EventBridge to AWS Lambda",
+  "description": "Create an EventBridge rule that invokes a Lambda function",
   "language": ".NET",
-  "level": "200",
+  "level": "100",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
@@ -14,11 +14,11 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-dotnet-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-lambda-dotnet-cdk/README.md"
+      "templateFile": "src/EventBridgeLambdaDotnetCdk/EventBridgeLambdaDotnetCdkStack.cs"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
@@ -48,10 +48,10 @@
   "authors": [
     {
       "name": "Amir Khairalomoum",
-      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
       "bio": "Amir is a Sr. Solutions Architect at AWS. He supports customers in their digital transformation and their cloud journey to AWS. He is passionate about serverless technologies.",
+      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
       "linkedin": "amir-khairalomoum",
-      "twitter": "@mrark1361"
+      "twitter": "mrark1361"
     }
   ]
 }

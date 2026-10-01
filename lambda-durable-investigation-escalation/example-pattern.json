@@ -1,5 +1,5 @@
 {
-  "title": "DevOps Agent to EventBridge to Lambda durable functions escalation",
+  "title": "AWS DevOps Agent to Amazon EventBridge to AWS Lambda durable functions escalation",
   "description": "Event-driven escalation using DevOps Agent events routed via EventBridge to Lambda durable functions with callback-based human acknowledgment",
   "language": "Python",
   "level": "300",
@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-investigation-escalation",
-      "templateURL": "serverless-patterns/lambda-durable-investigation-escalation",
-      "projectFolder": "lambda-durable-investigation-escalation",
       "templateFile": "template.yaml"
     }
   },
@@ -47,7 +44,7 @@
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."    
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
@@ -58,8 +55,8 @@
   "authors": [
     {
       "name": "Ridhima Bhalerao",
-      "image": "https://media.licdn.com/dms/image/v2/C5603AQGSDtz8pQt-bg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1585665543851?e=1784764800&v=beta&t=1T_rxVsgH1xDeXf0co4ab3kahJOEK9IYQeSTxJcFRPY",
       "bio": "Technical Account Manager and a Serverless Enthusiast at AWS",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQGSDtz8pQt-bg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1585665543851?e=1784764800&v=beta&t=1T_rxVsgH1xDeXf0co4ab3kahJOEK9IYQeSTxJcFRPY",
       "linkedin": "ridhimabhalerao"
     }
   ]

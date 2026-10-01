@@ -1,5 +1,5 @@
 {
-  "title": "Lambda Function and Lambda Layers",
+  "title": "AWS Lambda Function and Lambda Layers",
   "description": "Create a Lambda Function that has a Lambda Layer added to it",
   "language": "Python",
   "level": "200",
@@ -14,24 +14,21 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-layer",
-      "templateURL": "serverless-patterns/terraform-lambda-layer",
-      "projectFolder": "terraform-lambda-layer",
-      "templateFile": "terraform-lambda-layer/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
     "bullets": [
       {
-        "test": "Terraform AWS Lambda module",
+        "text": "Terraform AWS Lambda module",
         "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
       },
       {
-        "test": "Terraform AWS Lambda examples",
+        "text": "Terraform AWS Lambda examples",
         "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
       },
       {
-        "test": "AWS Lambda Developer Guide",
+        "text": "AWS Lambda Developer Guide",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
       },
       {
@@ -50,7 +47,8 @@
   },
   "deploy": {
     "text": [
-      "terraform init && terraform apply"
+      "terraform init",
+      "terraform apply --auto-approve"
     ]
   },
   "testing": {
@@ -66,9 +64,9 @@
   "authors": [
     {
       "name": "Anton Babenko",
-      "image": "https://avatars.githubusercontent.com/u/393243",
       "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
-      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "linkedin": "antonbabenko",
       "twitter": "antonbabenko"
     }
   ]

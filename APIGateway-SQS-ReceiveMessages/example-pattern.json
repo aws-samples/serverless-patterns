@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/APIGateway-SQS-ReceiveMessages",
-      "templateURL": "serverless-patterns/APIGateway-SQS-ReceiveMessages",
-      "projectFolder": "APIGateway-SQS-ReceiveMessages",
       "templateFile": "template.yaml"
     }
   },
@@ -33,22 +30,22 @@
         "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
       },
       {
-        "text":"AWS SQS Documentation",
-	"link":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+        "text": "AWS SQS Documentation",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
       },
       {
-        "text":"AWS API Gateway Quotas",
-	"link":"https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
+        "text": "AWS API Gateway Quotas",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
       },
       {
-        "text":"AWS SQS Quotas",
-	"link":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-quotas.html"
+        "text": "AWS SQS Quotas",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-quotas.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -64,9 +61,9 @@
   "authors": [
     {
       "name": "Yogesh Nain",
-      "image": "link-to-your-photo.jpg",
       "bio": "Yogesh is Cloud Support Engineer and SME of Lambda, API Gateway at Amazon Web Services.",
-      "linkedin": "https://www.linkedin.com/in/yogesh-nain-a54133170/"
+      "image": "link-to-your-photo.jpg",
+      "linkedin": "yogesh-nain-a54133170"
     }
   ]
 }

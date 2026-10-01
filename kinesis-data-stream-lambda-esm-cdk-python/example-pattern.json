@@ -7,15 +7,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates the ability configure Amazon Kinesis as an event source for AWS Lambda to use event filtering to control which records are sent to your function for processing.",
+      "This pattern shows how to configure Amazon Kinesis as an event source for AWS Lambda and use event filtering to control which records are sent to your function for processing.",
       "This pattern deploys a Kinesis data stream and Lambda functions that are subscribed to the stream with different event filter configurations."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-data-stream-lambda-esm-cdk-python",
-      "templateURL": "serverless-patterns/kinesis-data-stream-lambda-esm-cdk-python",
-      "projectFolder": "kinesis-data-stream-lambda-esm-cdk-python",
       "templateFile": "cdk/data_stream_processor/kinesis_lambda.py"
     }
   },
@@ -26,12 +23,12 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
       },
       {
-        "text": "Lambda event source mappings",
+        "text": "AWS Lambda event source mappings",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
       },
       {
-        "text": "Filtering Kinesis events",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html#filtering-kinesis"
+        "text": "Filtering Amazon Kinesis events",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html"
       }
     ]
   },
@@ -47,14 +44,14 @@
   },
   "cleanup": {
     "text": [
-      "cdk destroy"
+      "Delete the stack: <code>cdk destroy --all</code>."
     ]
   },
   "authors": [
     {
       "name": "Edward Schaefer",
-      "image": "https://d2siip5gg18ho0.cloudfront.net/images/schaeedw-photo-centered_250x250.jpg",
       "bio": "Solutions Architect @ Amazon Web Services",
+      "image": "https://d2siip5gg18ho0.cloudfront.net/images/schaeedw-photo-centered_250x250.jpg",
       "linkedin": "ejschaefer"
     }
   ]

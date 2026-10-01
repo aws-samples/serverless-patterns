@@ -1,5 +1,5 @@
 {
-  "title": "AWS Event Source Mapping for Lambda from Amazon DynamoDB Stream",
+  "title": "AWS Event Source Mapping for AWS Lambda from Amazon DynamoDB Stream",
   "description": "Sample Lambda ESM Filter rules for DynamoDB Stream triggers",
   "language": "Node.js",
   "level": "200",
@@ -8,16 +8,13 @@
     "headline": "How it works",
     "text": [
       "Use this code to test out different trigger filters for your Lambda functions. You can use event filtering to control which events Lambda sends to your function for processing. You can use this template to explore and test how to configure event filtering for Amazon DynamoDB Stream messages triggering a Lambda function.",
-      "Please note that this template is meant to be for testing, you can subscribe more than two Lambda functions to a DynamoDB Stream, but you'll likely experience read throttling, refer to the GitHub template README for more information.",
+      "Please note that this template is meant for testing, you can subscribe more than two Lambda functions to a DynamoDB Stream, but you'll likely experience read throttling, refer to the GitHub template README for more information.",
       "The SAM template deploys multiple Lambda functions, a single stream-enabled Amazon DynamoDB Table and the permissions required to run the application. The template enforces 3 days retention period for all AWS Lambda CloudWatch logs. All AWS Lambda functions are deployed to NodeJS 18 runtime running on ARM64 processors powered by AWS Graviton."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-esm-ddb-filters-sam/",
-      "templateURL": "serverless-patterns/lambda-esm-ddb-filters-sam",
-      "projectFolder": "lambda-esm-ddb-filters-sam",
-      "templateFile": "lambda-esm-ddb-filters-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -50,8 +47,8 @@
   "authors": [
     {
       "name": "Dmitry Gulin",
-      "image": "https://s.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a",
       "bio": "Senior Modernization Architect, AWS",
+      "image": "https://s.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a",
       "linkedin": "dmitry-gulin"
     }
   ]

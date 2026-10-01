@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/qbusiness-s3-lambda",
-      "templateURL": "serverless-patterns/qbusiness-s3-lambda",
-      "projectFolder": "qbusiness-s3-lambda",
       "templateFile": "template.yaml"
     }
   },
@@ -34,7 +31,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided"
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
     ]
   },
   "testing": {
@@ -51,7 +48,7 @@
     {
       "name": "Kruthi Jayasimha Rao",
       "bio": "Kruthi is a Partner Solutions Architect with a focus in Generative AI. She provides technical guidance to AWS Partners in following best practices to build secure, resilient, and highly available solutions in the AWS Cloud.",
-      "linkedin": "https://www.linkedin.com/in/kruthi-jayasimha-rao-132a78167"
+      "linkedin": "kruthi-jayasimha-rao-132a78167"
     }
   ]
 }

@@ -1,0 +1,52 @@
+{
+  "title": "Amazon EventBridge schedule to trigger a Step Functionsworkflow",
+  "description": "Simple pattern that triggers Step Functionsexecution once a day using EventBridge Scheduler with CDK and Python. ",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge Scheduler triggers a new Step Functionsexecution every 5 minutes."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "GitHub repo views counter",
+        "link": "https://serverlessland.com/workflows/github-repo-views-counter"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build && sam deploy -g"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/benjamin-smith.json"
+  ]
+}

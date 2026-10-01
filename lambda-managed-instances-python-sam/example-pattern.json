@@ -1,9 +1,9 @@
 {
-  "title": "Lambda Managed Instances with SAM (Python)",
-  "description": "Deploy a Python Lambda function on AWS-managed EC2 instances with multi-concurrency, Graviton4 support, and EC2 pricing advantages.",
+  "title": "AWS Lambda Managed Instances with AWS SAM (Python)",
+  "description": "Deploy a Python Lambda function on AWS-managed Amazon EC2 instances with multi-concurrency, AWS Graviton support, and EC2 pricing advantages.",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-python-sam",
-      "templateURL": "serverless-patterns/lambda-managed-instances-python-sam",
-      "projectFolder": "lambda-managed-instances-python-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -33,15 +30,21 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"],
+    "text": [
+      "sam deploy --guided"
+    ],
     "file": "template.yaml"
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."],
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ],
     "file": "README.md"
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>"],
+    "text": [
+      "Delete the stack: <code>sam delete</code>"
+    ],
     "file": "template.yaml"
   },
   "authors": [

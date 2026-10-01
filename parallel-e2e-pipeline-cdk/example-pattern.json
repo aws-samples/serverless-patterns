@@ -1,0 +1,50 @@
+{
+  "title": "AWS CodePipeline scaffolding for CDK",
+  "description": "Provides scaffolding for a CI/CD pipeline with parallelized End-to-End (E2E) tests.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern in CDK provides scaffolding for a CI/CD pipeline with parallelized End-to-End (E2E) tests.",
+      "The provided pipeline consists of two stages: Source and End_to_End_Tests. The Source stage is linked to the AWS CodeCommit repository, so whenever any commit(s) is pushed to that repository, the pipeline will be triggered. Once the Source stage passes, the End_to_End_Tests stage will run. In this stage, two AWS CodeBuild servers are provisioned and each is assigned a group of test(s). The tests are then ran in parallel."
+    ],
+    "text2": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/pipeline/app/pipeline-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "What Is AWS CodePipeline?",
+        "link": "https://aws.amazon.com/codepipeline/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ],
+    "test": []
+  },
+  "contributors": [
+    "content/contributors/william-sola-lee.json"
+  ]
+}

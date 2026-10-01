@@ -1,20 +1,20 @@
 {
-  "title": "Dynamic schedules with auto deletion with Amazon EventBridge Scheduler",
-  "description": "Event-driven pattern that creates three schedules when records get added to a DynamoDB table. These schedules trigger an email service and are automatically deleted.",
+  "title": "Create Amazon EventBridge schedules using Amazon DynamoDB Streams",
+  "description": "An event-driven pattern that creates three EventBridge schedules for every user inserted into a DynamoDB table.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
-    "headline": "How it works",
+    "headline": "EventBridge schedules with DynamoDB and EventBridge Pipes",
     "text": [
-      "When a new user signs up a record is added into the DynamoDB table. Using EventBridge pipes, changes are captured and transformed into an EventBridge event. Downstream consumers listen and create schedules for each user that automatically  delete."
+      "When a new record is inserted into the DynamoDB database an event is raised to downstream consumers. EventBridge Pipes is used to connect DynamoDB stream to Amazon EventBridge.",
+      "The DynamoDB event is transformed into a <code>NewUserCreated</code> event. The schedule creator (Lambda function) consumes this event and creates three schedules for the new user.",
+      "Each schedule will trigger the <code>Email Service</code>, 2 minutes, 24 hours and 1 week after the user signs up.",
+      "After each schedule is triggered, EventBridge Scheduler deletes the schedule (as the <code>ActionAfterCompletion</code> is set to <code>DELETE</code>)."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-dynamic-with-auto-deletion",
-      "templateURL": "serverless-patterns/eventbridge-schedule-dynamic-with-auto-deletion",
-      "projectFolder": "eventbridge-schedule-dynamic-with-auto-deletion",
       "templateFile": "src/src/schedule-creator/index.ts"
     }
   },
@@ -32,7 +32,8 @@
   },
   "deploy": {
     "text": [
-      "<code>cdk deploy</code>"
+      "npm run build",
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -48,8 +49,8 @@
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

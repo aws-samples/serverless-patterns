@@ -1,0 +1,53 @@
+{
+  "title": "Amazon EventBridge to Amazon CloudWatch Logs",
+  "description": "Create an EventBridge rule that sends events to CloudWatch Logs",
+  "language": "Integration",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template creates an EventBridge event bus and rule that publishes matched events to CloudWatch Logs. In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Change directory: <code>cd eventbridge-cloudwatch-terraform</code>.",
+      "2. Delete the stack: <code>terraform destroy</code>.",
+      "3. Confirm the stack has been deleted: <code>terraform show</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ahmad-aboushady.json"
+  ]
+}

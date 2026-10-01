@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-cloudfront-oac-cdk-python",
-      "templateURL": "serverless-patterns/s3-cloudfront-oac-cdk-python",
-      "projectFolder": "s3-cloudfront-oac-cdk-python",
       "templateFile": "app.py"
     }
   },

@@ -1,23 +1,18 @@
 {
-  "title": "API Gateway WebSocket API to Lambda to Bedrock Streamed Response",
-  "description": "Create an API Gateway WebSocket API to Lambda function that streams a response from an Amazon Bedrock LLM.",
+  "title": "Streaming Amazon Bedrock response with Amazon API Gateway",
+  "description": "Stream an Amazon Bedrock LLM response with API Gateway WebSocket API and AWS Lambda function .",
   "language": "Rust",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern establishes a WebSocket connection to Amazon API Gateway. When requests are made to this API, API Gateway", 
-      "routes them to an AWS Lambda function. The Lambda function then initiates a streaming request to Amazon Bedrock using",
-      "the ConverseStream API. This allows the response from the LLM in Bedrock to start streaming back to the Lambda function",
-      "as soon as generation begins, without waiting for the entire response to be ready."
+      "This pattern establishes a WebSocket connection to Amazon API Gateway. When requests are made to this API, API Gateway routes them to an AWS Lambda function.",
+      "The Lambda function then initiates a streaming request to Amazon Bedrock using the ConverseStream API. This allows the response from the LLM in Bedrock to start streaming back to the Lambda function as soon as generation begins, without waiting for the entire response to be ready."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-bedrock-streaming-rust-cdk",
-      "templateURL": "serverless-patterns/apigw-websocket-api-bedrock-streaming-rust-cdk",
-      "projectFolder": "apigw-websocket-api-bedrock-streaming-rust-cdk",
       "templateFile": "cdk/lib/bedrock-streamer-stack.ts"
     }
   },
@@ -59,9 +54,9 @@
   "authors": [
     {
       "name": "Phil Callister",
-      "image": "https://media.licdn.com/dms/image/v2/D5603AQHElNV-QFIGQw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1725218566874?e=1735171200&v=beta&t=gr82L1aMjvNX8CZn1Nitg3fViTUYoPK_xnXNc8CdohQ",
       "bio": "I'm an Enterprise Solutions Architect at AWS, with a focus on Financial Services. As a passionate builder, I enjoy helping customers create innovative solutions to achieve their business objectives.",
-      "linkedin": "https://www.linkedin.com/in/philcallister/"
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQHElNV-QFIGQw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1725218566874?e=1735171200&v=beta&t=gr82L1aMjvNX8CZn1Nitg3fViTUYoPK_xnXNc8CdohQ",
+      "linkedin": "philcallister"
     }
   ]
 }

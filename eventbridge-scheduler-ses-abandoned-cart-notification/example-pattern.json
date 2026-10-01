@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ses-abandoned-cart-notification",
-      "templateURL": "serverless-patterns/eventbridge-scheduler-ses-abandoned-cart-notification",
-      "projectFolder": "eventbridge-scheduler-ses-abandoned-cart-notification",
       "templateFile": "main.tf"
     }
   },
@@ -50,8 +47,8 @@
   "authors": [
     {
       "name": "Rajil Paloth",
-      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
       "bio": "ProServe Delivery Consultant at AWS",
+      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
       "linkedin": "paloth"
     }
   ]

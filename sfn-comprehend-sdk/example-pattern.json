@@ -1,0 +1,54 @@
+{
+  "title": "AWS Step Functions to Amazon Comprehend",
+  "description": "Create an AWS Step Functions workflow to integrate with Amazon Comprehend.",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys a Step Functions workflow, that takes in a payload and sends it to the sentiment analysis API of the Amazon Comprehend service.",
+      "The output of the Sentiment Analysis API returns the overall sentiment ((Positive, Negative, Neutral, or Mixed) of the text we have provided. This pattern exactly shows how we can use AWS Step Functions SDK integrations to call any of the over two hundred AWS services directly from your state machine. The application contains the minimum IAM resources required to run the workflow."
+    ],
+    "text2": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "sfn_comprehend_sdk/sfn_comprehend_sdk_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ],
+    "test": []
+  },
+  "contributors": [
+    "content/contributors/revanth-anireddy.json"
+  ]
+}

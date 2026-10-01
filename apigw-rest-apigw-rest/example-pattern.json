@@ -1,0 +1,39 @@
+{
+  "title": "Amazon API Gateway REST to Amazon API Gateway REST",
+  "description": "Create a primary API that centralizes configuration and securely proxies sub API endpoints.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a public Amazon API Gateway REST API endpoint that proxies two secondary API Gateway REST API endpoints. The primary gateway inserts an API Key that is validated by the secondary endpoints. Traffic is restricted to only requests coming through the primary API. This pattern allows centralized authorization, caching, throttling, and other API configurations."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing in the README.md file in the repo"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/eric-johnson.json"
+  ]
+}

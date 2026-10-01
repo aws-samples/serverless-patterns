@@ -9,16 +9,13 @@
     "text": [
       "This pattern implements the Saga pattern using AWS Lambda durable functions to orchestrate a multi-step order workflow.",
       "Three checkpointed steps execute in sequence: reserve inventory, process payment, and confirm order.",
-      "If any step fails, compensating transactions automatically execute in reverse order to restore data consistency \u2014 cancelling payment and releasing inventory.",
+      "If any step fails, compensating transactions automatically execute in reverse order to restore data consistency — cancelling payment and releasing inventory.",
       "Each step uses @durable_step for automatic checkpointing. If interrupted, the function resumes from the last completed step without re-execution.",
       "IAM permissions follow least privilege with DynamoDBCrudPolicy scoped to each specific table."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-saga-python-sam",
-      "templateURL": "serverless-patterns/lambda-durable-saga-python-sam",
-      "projectFolder": "lambda-durable-saga-python-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -29,7 +26,7 @@
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
       },
       {
-        "text": "Saga pattern \u2014 AWS Prescriptive Guidance",
+        "text": "Saga pattern — AWS Prescriptive Guidance",
         "link": "https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html"
       },
       {
@@ -61,9 +58,7 @@
   "authors": [
     {
       "name": "Ajaya Shrestha",
-      "image": "",
-      "bio": "Cloud Support Engineer at AWS specializing in Lambda and serverless architectures.",
-      "linkedin": ""
+      "bio": "Cloud Support Engineer at AWS specializing in Lambda and serverless architectures."
     }
   ]
 }

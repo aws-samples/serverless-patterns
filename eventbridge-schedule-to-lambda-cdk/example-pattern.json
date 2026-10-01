@@ -1,18 +1,17 @@
 {
-  "title": "EventBridge Scheduler to Lambda every 5 minutes with CDK",
+  "title": "Amazon EventBridge Scheduler to AWS Lambda every 5 minutes with CDK",
   "description": "Simple pattern that triggers a Lambda function every 5 minutes using Amazon EventBridge Scheduler and CDK",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
-    "text": ["Creates a scheulde that runs every 5 minutes to trigger a given Lambda function."]
+    "text": [
+      "Creates a schedule that runs every 5 minutes to trigger a given Lambda function."
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-cdk",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-cdk",
-      "projectFolder": "eventbridge-schedule-to-lambda-cdk",
       "templateFile": "cdk/lib/eventbridge-scehdules-with-cdk-stack.ts"
     }
   },
@@ -25,23 +24,34 @@
       {
         "text": "Amazon EventBridge Scheduler Docs",
         "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "How to raise EventBridge events in the future with EventBridge Scheduler",
+        "link": "https://www.boyney.io/blog/2022-11-22-eventbridge-with-eventbridge-scheduler"
       }
     ]
   },
   "deploy": {
-    "text": ["sam deploy"]
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
   },
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

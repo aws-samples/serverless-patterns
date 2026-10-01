@@ -17,9 +17,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-parallel-processing-sam",
-      "templateURL": "serverless-patterns/lambda-durable-parallel-processing-sam",
-      "projectFolder": "lambda-durable-parallel-processing-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -52,10 +49,14 @@
     ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {

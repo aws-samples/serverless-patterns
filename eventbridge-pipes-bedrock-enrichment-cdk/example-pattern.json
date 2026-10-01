@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-bedrock-enrichment-cdk",
-      "templateURL": "serverless-patterns/eventbridge-pipes-bedrock-enrichment-cdk",
-      "projectFolder": "eventbridge-pipes-bedrock-enrichment-cdk",
       "templateFile": "cdk/lib/eventbridge-pipes-bedrock-enrichment-stack.ts"
     }
   },
@@ -48,24 +45,15 @@
     ]
   },
   "cleanup": {
-    "text": ["<code>npx cdk destroy</code>"]
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
   },
   "authors": [
     {
       "name": "Nithin Chandran R",
-      "image": "",
       "bio": "Technical Account Manager at AWS",
-      "linkedin": "nithin-chandran-r",
-      "twitter": ""
+      "linkedin": "nithin-chandran-r"
     }
-  ],
-  "patternArch": {
-    "icon1": { "x": 10, "y": 50, "service": "sqs", "label": "Amazon SQS" },
-    "icon2": { "x": 30, "y": 50, "service": "eventbridge", "label": "Amazon EventBridge Pipes" },
-    "icon3": { "x": 50, "y": 50, "service": "lambda", "label": "AWS Lambda" },
-    "icon4": { "x": 70, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
-    "icon5": { "x": 90, "y": 35, "service": "cloudwatch", "label": "Amazon CloudWatch Logs" },
-    "icon6": { "x": 90, "y": 65, "service": "dynamodb", "label": "Amazon DynamoDB" }
-  },
-  "patternType": "Serverless"
+  ]
 }

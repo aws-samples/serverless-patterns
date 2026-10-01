@@ -7,26 +7,22 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is connected to the DocumentDB cluster through a VPC. The Lambda implements CRUD operations function for this REST API"
-      ,"You should use this pattern if you want to migrate your application to DocumentDB using a serverless REST API application layer"
+      "This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is configured to use a customer VPC to connect to the DocumentDB cluster. The Lambda function implements CRUD operations on the database."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-lambda-documentdb-cdk",
-      "templateURL": "serverless-patterns/apigw-http-lambda-documentdb-cdk",
-      "projectFolder": "apigw-http-lambda-documentdb-cdk",
-      "templateFile": "apigw-http-lambda-documentdb-stack.ts"
+      "templateFile": "lib/apigw-http-lambda-documentdb-stack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "DocumentDB documentation:",
+        "text": "DocumentDB documentation",
         "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/"
       },
       {
-        "text": "Lambda documentation:",
+        "text": "Lambda documentation",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
       }
     ]
@@ -49,8 +45,8 @@
   "authors": [
     {
       "name": "Joachim Aumann",
-      "image": "./joaumann.jpg",
       "bio": "I am a Sr. Solutions Architect working at AWS",
+      "image": "./joaumann.jpg",
       "linkedin": "joachim-aumann"
     }
   ]

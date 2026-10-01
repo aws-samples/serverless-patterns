@@ -1,20 +1,17 @@
 {
-  "title": "Amazon Cognito - SNS SMS Origination Id",
-  "description": "This pattern creates an Amazon Cognito userpool and an AWS Lambda function.",
+  "title": "Amazon Cognito - Amazon SNS SMS Origination Id",
+  "description": "This pattern creates an Amazon Cognito user pool and an AWS Lambda function.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon Cognito userpool and an AWS lambda function with required polices. In general, Amazon Cognito sends SMS on your behalf by publishing the request to send SMS for MFA and other use cases. Cognito uses the default settings when choosing origination IDs. If you cannot secure the same origination ID, or if you operate with multiple origination IDs with your account, you will need to select the correct origination ID for your Cognito use cases. This solution will provide guidance on how to use Cognito with lambda triggers to select origination IDs to suit your needs."
+      "This pattern deploys an Amazon Cognito user pool and an AWS Lambda function with required polices. Amazon Cognito sends SMS on your behalf by publishing the request to send SMS for MFA and other use cases. Cognito uses the default settings when choosing origination IDs. If you cannot secure the same origination ID, or if you operate with multiple origination IDs with your account, you will need to select the correct origination ID for your Cognito use cases. This solution will provide guidance on how to use Cognito with Lambda triggers to select origination IDs to suit your needs."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-sns-sms-origination-id",
-      "templateURL": "serverless-patterns/cognito-sns-sms-origination-id",
-      "projectFolder": "cognito-sns-sms-origination-id",
       "templateFile": "lib/cognito-sns-sms-origination-identity-stack.ts"
     }
   },
@@ -52,15 +49,15 @@
   "authors": [
     {
       "name": "Vinodh Kannan Sadayamuthu",
-      "image": "https://i.postimg.cc/sx0BqLmv/vinodh.jpg",
       "bio": "Vinodh is a Specialist Solution Architect at AWS.",
+      "image": "https://i.postimg.cc/sx0BqLmv/vinodh.jpg",
       "linkedin": "vinodh-aws"
     },
     {
-        "name": "Sarath Kumar K.S",
-        "image": "https://i.postimg.cc/5NhyzLRd/Sarath.png",
-        "bio": "Sarath is a Senior Technical Account Manager at AWS.",
-        "linkedin": "kssarathkumar"
-      }
+      "name": "Sarath Kumar K.S",
+      "bio": "Sarath is a Senior Technical Account Manager at AWS.",
+      "image": "https://i.postimg.cc/5NhyzLRd/Sarath.png",
+      "linkedin": "kssarathkumar"
+    }
   ]
 }

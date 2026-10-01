@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rabbitmq-private-lambda-python-sam",
-      "templateURL": "serverless-patterns/rabbitmq-private-lambda-python-sam",
-      "projectFolder": "rabbitmq-private-lambda-python-sam",
       "templateFile": "rabbitmq_consumer_dynamo_sam/template_original.yaml"
     }
   },
@@ -37,13 +34,19 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the template: <code>sam delete</code>."]
+    "text": [
+      "Delete the template: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {

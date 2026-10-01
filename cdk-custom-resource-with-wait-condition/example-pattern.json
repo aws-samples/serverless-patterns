@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-custom-resource-with-wait-condition",
-      "templateURL": "serverless-patterns/cdk-custom-resource-with-wait-condition",
-      "projectFolder": "cdk-custom-resource-with-wait-condition",
       "templateFile": "lib/demo-stack.ts"
     }
   },
@@ -43,8 +40,7 @@
   },
   "testing": {
     "text": [
-      "Review Amazon CloudWatch logs for the Lambda functions and Step Function execution to confirm that the",
-      "long-running process completed successfully and the wait condition was signaled."
+      "Review Amazon CloudWatch logs for the Lambda functions and Step Function execution to confirm that the long-running process completed successfully and the wait condition was signaled."
     ]
   },
   "cleanup": {

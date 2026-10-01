@@ -1,22 +1,24 @@
 {
-  "title": "API Gateway WebSocket API to SQS to AWS Lambda",
-  "description": "Create an API Gateway websocket API that sends events to SQS and then to Lambda",
+  "title": "Amazon API Gateway WebSocket API to Amazon SQS to AWS Lambda",
+  "description": "Create an API Gateway WebSocket API that sends events to SQS and then to Lambda",
   "language": "Java",
-  "level": "300",
+  "level": "200",
   "framework": "AWS SAM",
   "introBox": {
-    "headline": "Create an API Gateway websocket API that sends events to SQS and then to Lambda",
+    "headline": "How it works",
     "text": [
       "This pattern creates an Amazon API Gateway WebSocket API which sends inbound messages to an Amazon SQS FIFO queue. The queue is processed by an AWS Lambda function to return a result.",
       "The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably. It also helps downstream consumers to process the incoming requests at a consistent pace. A FIFO (First-In-First-Out) queue is used to ensure that evens are processed in order of arrival."
-    ]
+    ],
+    "test": ""
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-sqs-lambda-java"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Working with Websocket APIs",
@@ -38,22 +40,24 @@
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: `sam delete --stack-name STACK_NAME`.",
-      "Confirm the stack has been deleted: `aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"`"
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Steven Warwick",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/steven-warwick.jpg",
       "bio": "Steven Warwick is a Solutions Architect at AWS. He is an engineer at heart with a passion for creating simple solutions to complex problems. He has a background in real time analytics and a passion for SaaS implementations. In his free time, he plays badminton and tinkers with IoT projects around the house.",
-      "twitter": "@StevenCWarwick"
+      "image": "https://serverlessland.com/assets/images/resources/contributors/steven-warwick.jpg",
+      "twitter": "StevenCWarwick"
     },
     {
       "name": "Steven Cook",

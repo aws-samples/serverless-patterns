@@ -1,36 +1,33 @@
 {
-  "title": "Amazon Kinesis Data Streams to Amazon OpenSeach via Amazon Kinesis Data Firehose",
-  "description": "This sample project demonstrates how to send data received by Kinesis Data Streams to Amazon OpenSearch via Kinesis Data Firehose.",
+  "title": "Amazon Kinesis Data Streams to Amazon OpenSearch via Amazon Data Firehose",
+  "description": "Send data received by Kinesis Data Streams to Amazon OpenSearch via Kinesis Data Firehose.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This SAM template creates a Kinesis Data Stream, Kinesis Data Firehose and Amazon OpenSearch Serverless collection. Kinesis Data Firehose is configured with Kinesis Data Stream as source and Amazon OpenSearch as destination. When a message is pushed to Kinesis Data Stream the same is replicated to OpenSearch suing Kinesis Data Firehose. If any messages that can not be processed by Kinesis Data Firehose the same is sent to S3 bucket.",
-      "Please refer to the architecture diagram for the event flow."
+      "This SAM template creates a Kinesis Data Stream, Kinesis Data Firehose and Amazon OpenSearch Service serverless collection. Kinesis Data Firehose is configured with Kinesis Data Stream as a source and Amazon OpenSearch as a destination.",
+      "When a message is pushed to the Kinesis Data Stream, it's replicated to OpenSearch using Kinesis Data Firehose. If any messages  can not be processed by Kinesis Data Firehose, they are sent to an S3 bucket."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kds-kdf-opensearch",
-      "templateURL": "serverless-patterns/kds-kdf-opensearch",
-      "projectFolder": "kds-kdf-opensearch",
-      "templateFile": "kds-kdf-opensearch/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Kinesis Data Stream to Amazon Kinesis Data Firehose integration",
+        "text": "Writing to Kinesis Data Firehose Using Kinesis Data Streams",
         "link": "https://docs.aws.amazon.com/firehose/latest/dev/writing-with-kinesis-streams.html"
       },
       {
-        "text": "Kinesis Data Firehose with OpenSearch Destination",
+        "text": "Kinesis Data Firehose with Amazon OpenSearch Destination Settings",
         "link": "https://docs.aws.amazon.com/firehose/latest/dev/create-destination.html#create-destination-elasticsearch"
       },
       {
-        "text": "OpenSeach Dashboard",
+        "text": "Amazon OpenSearch Dashboard",
         "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/dashboards.html"
       }
     ]
@@ -53,9 +50,9 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
-      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "title": "AWS CloudFront and Amazon S3 for Single Page Application Hosting",
-  "description": "This project demonstrates hosting a Single-Page App using AWS CloudFront & S3, where CloudFront serves the SPA from an S3 bucket for static hosting.",
-  "language": "Terraform",
+  "title": "Amazon CloudFront and Amazon S3 for Single Page Application Hosting",
+  "description": "This project hosts a Single-Page App using Amazon CloudFront & S3, where CloudFront serves the SPA from an S3 bucket for static hosting.",
+  "language": "YAML",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -18,10 +18,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-cloudfront-spa",
-      "templateURL": "serverless-patterns/s3-cloudfront-spa",
-      "projectFolder": "s3-cloudfront-spa",
-      "templateFile": "template.tf"
+      "templateFile": "terraform/template.tf"
     }
   },
   "resources": {
@@ -56,8 +53,8 @@
   "authors": [
     {
       "name": "Junaid Ansari",
-      "image": "https://media.licdn.com/dms/image/v2/C4E03AQEekYWyjMINfg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659715539214?e=1728518400&v=beta&t=HVpwkCvJ_QdUYDW2YXbCabZDcWKWv3VpTBKmnCS5uVg",
       "bio": "Cloud Application Architect at AWS.",
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQEekYWyjMINfg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1659715539214?e=1728518400&v=beta&t=HVpwkCvJ_QdUYDW2YXbCabZDcWKWv3VpTBKmnCS5uVg",
       "linkedin": "junaid-ansari-2734a912"
     }
   ]

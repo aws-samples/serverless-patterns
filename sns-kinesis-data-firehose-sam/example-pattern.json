@@ -1,0 +1,50 @@
+{
+  "title": "Amazon SNS Archiving/Analytics with Amazon Data Firehose Fanout",
+  "description": "Transform incoming source data and deliver the transformed data to destinations.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The purpose of this pattern is to deploy the infrastructure necessary to use Kinesis Data Firehose to fanout SNS messages to storage and analytics services.",
+      "Through Kinesis Data Firehose delivery streams, you can fan out Amazon SNS notifications to Amazon Simple Storage Service (Amazon S3), Amazon Redshift, Amazon OpenSearch Service (OpenSearch Service), and to third-party service providers such as Datadog, New Relic, MongoDB, and Splunk.",
+      "This pattern delivers SNS messages to Amazon S3 for archival, compliance, or analytics purposes."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Fanout to Kinesis Data Firehose delivery streams",
+        "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
+      },
+      {
+        "text": "Introducing message archiving and analytics for Amazon SNS",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-message-archiving-and-analytics-for-amazon-sns/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: aws cloudformation delete-stack --stack-name STACK_NAME"
+    ]
+  },
+  "contributors": [
+    "content/contributors/maya-flores.json"
+  ]
+}

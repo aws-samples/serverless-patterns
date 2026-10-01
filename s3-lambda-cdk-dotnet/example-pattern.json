@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda function that reads file information when file is uploaded in Amazon S3 bucket using CDK.",
+  "title": "AWS Lambda function that reads file information from uploaded file to Amazon S3",
   "description": "This AWS CDK application demonstrates triggering a AWS Lambda function, when a file is uploaded in a S3 bucket.",
   "language": ".NET",
   "level": "200",
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-cdk-dotnet",
-      "templateURL": "serverless-patterns/s3-lambda-cdk-dotnet",
-      "projectFolder": "s3-lambda-cdk-dotnet",
       "templateFile": "src/S3Lambda/S3LambdaStack.cs"
     }
   },
@@ -25,7 +22,7 @@
   },
   "testing": {
     "text": [
-      "See the Github repo for detailed testing instructions."
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
@@ -36,8 +33,8 @@
   "authors": [
     {
       "name": "Surbhita Shrote",
-      "image": "https://avatars.githubusercontent.com/u/159530457?v=4",
       "bio": "Application Development Consultant at AWS Professional Services.",
+      "image": "https://avatars.githubusercontent.com/u/159530457?v=4",
       "linkedin": "surbhitashrote"
     }
   ]

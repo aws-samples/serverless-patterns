@@ -1,0 +1,57 @@
+{
+  "title": "Amazon S3 to Amazon SNS",
+  "description": "Sends notifications from S3 to SNS when an object is created.",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template creates an S3 bucket and an SNS topic. S3 writes a messages to the SNS topic when a new object is put into the bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Building resilient serverless patterns by combining messaging services",
+        "link": "https://aws.amazon.com/blogs/compute/building-resilient-no-code-serverless-patterns-by-combining-messaging-services/"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Go to the SNS Console and select the topic that was created after running sam deploy.",
+      "2. Click on Create Subscription.",
+      "3. Under Protocol, select the type of endpoint to subscribe to (email, SMS, etc.)",
+      "4. Confirm the message subscription.",
+      "5. Upload an object to the S3 bucket you created.",
+      "6. Check your notifications."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/julian-wood.json"
+  ]
+}

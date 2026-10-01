@@ -4,10 +4,6 @@
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",
-  "services": {
-    "from": "lambda",
-    "to": "bedrock"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -17,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-strands-agent-bedrock-cdk",
-      "templateURL": "serverless-patterns/lambda-strands-agent-bedrock-cdk",
-      "projectFolder": "lambda-strands-agent-bedrock-cdk",
       "templateFile": "lib/lambda-strands-agent-bedrock-stack.ts"
     }
   },

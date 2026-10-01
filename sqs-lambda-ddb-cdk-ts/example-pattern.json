@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
-      "templateURL": "serverless-patterns/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
-      "projectFolder": "sqs-lambda-dynamodb-cloudwatch-cdk-ts",
       "templateFile": "lib/sqs-lambda-dynamo-stack.ts"
     }
   },
@@ -33,13 +30,19 @@
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"]
+    "text": [
+      "cdk deploy"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["<code>cdk destroy</code>"]
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {

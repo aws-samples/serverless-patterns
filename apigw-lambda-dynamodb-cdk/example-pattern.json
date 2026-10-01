@@ -1,19 +1,31 @@
 {
-  "title": "API Gateway to Lambda to DynamoDb",
-  "description": "Create a Lambda function that receives a request from API Gateway and inserts a record into a DynamoDB table.",
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB",
+  "description": "Create a Lambda function that receives a request from API Gateway and puts an item into DynamoDB.",
   "language": ".NET",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
-  "videoId": "",
-  "level":"200",
+  "level": "200",
   "framework": "AWS CDK",
-  "services": {
-    "from": "apigw",
-    "to": "dynamodb"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern explains how to deploy a CDK application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB."
+      "This pattern explains how to deploy a CDK application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB. When an HTTP POST request is made to the Amazon API Gateway endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Docs: Writing Data to a Table",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WriteData.html"
+      },
+      {
+        "text": "Lambda CDK docs",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2//docs/aws-cdk-lib.aws_lambda-readme.html"
+      }
     ]
   },
   "deploy": {
@@ -21,26 +33,25 @@
       "cdk deploy"
     ]
   },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-cdk/README.md"
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
-  "resources": {
-    "headline": "Additional resources",
-    "bullets": [    
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
     ]
   },
-  "author": {
-    "headline": "Presented by James Eastham, Cloud Infrastructure Architect",
-    "name": "James Eastham",
-    "twitter": "plantpowerjames"
-  }
+  "authors": [
+    {
+      "name": "James Eastham",
+      "twitter": "plantpowerjames",
+      "bio": "I am a Cloud Infrastructure Architect with AWS Professional Services."
+    }
+  ]
 }

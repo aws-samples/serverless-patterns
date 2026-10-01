@@ -1,23 +1,19 @@
 {
-  "title": "Amazon EventBridge Scheduled invocation to AWS Batch using SAM",
-  "description": "This SAM template creates an Amazon EventBus, EventRule with scheduluer having target as AWS Batch and IAM Role with the required permission to invoke AWS Batch periodically from Amazon EventBridge.",
+  "title": "Amazon EventBridge scheduled invocation to AWS Batch",
+  "description": "Create an EventBridge event bus and route events to AWS Batch on a schedule.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The EventBridge rule specified in `template.yaml` used default Event Bus to schedule trigger for AWS Batch. There are two ways to schedule the trigger - using cron expression or using rate. The template has examples for both.",
-      "Please uncomment the want you want to test. AWS Batch job is triggered based on the specified schedule.",
-      "Please refer to the architecture diagram."
+      "The EventBridge rule specified in `template.yaml` uses the default event bus to schedule a trigger for AWS Batch. There are two ways to schedule the trigger - using a cron expression or a rate expression. The template has examples for both.",
+      "Please uncomment the one you want to use. The AWS Batch job is triggered based on the specified schedule."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduled-batch-sam",
-      "templateURL": "serverless-patterns/eventbridge-scheduled-batch-sam",
-      "projectFolder": "eventbridge-scheduled-batch-sam",
-      "templateFile": "eventbridge-scheduled-batch-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -35,7 +31,7 @@
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_Batch.html"
       },
       {
-        "text": "Cron Expression Reference",
+        "text": "Cron expression reference",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-cron-expressions.html"
       }
     ]
@@ -58,9 +54,9 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
-      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
     }
   ]
 }

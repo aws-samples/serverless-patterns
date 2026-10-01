@@ -1,8 +1,8 @@
 {
-  "title": "Lambda to SSM Parameter Store",
-  "description": "Create an AWS Lambda function and an AWS Systems Manager Parameter Store parameter.",
+  "title": "AWS Lambda to SSM Parameter Store",
+  "description": "Creates an AWS Lambda function and an AWS Systems Manager Parameter Store parameter",
   "language": "Java",
-  "level": "200",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
@@ -13,19 +13,23 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ssm-java",
-      "templateURL": "serverless-patterns/lambda-ssm-java"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
+      {
+        "text": "The AWS::SSM::Parameter resource",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-parameter.html"
+      },
       {
         "text": "Sharing Secrets with AWS Lambda Using AWS Systems Manager Parameter Store",
         "link": "https://aws.amazon.com/blogs/compute/sharing-secrets-with-aws-lambda-using-aws-systems-manager-parameter-store/"
       },
       {
-        "text": "The AWS::SSM::Parameter resource",
-        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-parameter.html"
+        "text": "Restricting access to Systems Manager parameters using IAM policies",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html"
       }
     ]
   },
@@ -35,23 +39,26 @@
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "1. Once the application is deployed, navigate to the Lambda function and configure GET and PUT test events. Invoke the function using each test event. Review the Amazon CloudWatch Logs for details on the function invocation. Navigate to the AWS Systems Manager Paramater Store to observe changes to the parameter value after a PUT event.",
+      "2. See the repo for detailed test event information."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
-      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Greg Davis",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/greg-davis.jpg",
       "bio": "I am a Senior Solutions Architect, AWS Cloud Architect, Full-Stack Developer, Database Engineer, Data Integration Architect, and Serverless Enthusiast.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/greg-davis.jpg",
       "linkedin": "gregtx",
-      "twitter": "@ServerlessGuy"
+      "twitter": "ServerlessGuy"
     },
     {
       "name": "Steven Cook",

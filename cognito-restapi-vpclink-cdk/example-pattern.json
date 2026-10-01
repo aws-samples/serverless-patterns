@@ -1,5 +1,5 @@
 {
-  "title": "Cognito to API Gateway private REST API",
+  "title": "Amazon Cognito to Amazon API Gateway private REST API",
   "description": "This pattern shows how to authenticate and authorize requests to a private REST API Gateway with Amazon Cognito.",
   "language": "Node.js",
   "level": "200",
@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cognito-restapi-vpclink-cdk",
-      "templateURL": "serverless-patterns/cognito-restapi-vpclink-cdk",
-      "projectFolder": "cognito-restapi-vpclink-cdk",
-      "templateFile": "cognito-restapi-vpclink-cdk/cdk/lib/cdk-cognito-fargate-stack.js"
+      "templateFile": "cdk/lib/cdk-cognito-fargate-stack.js"
     }
   },
   "resources": {
@@ -56,10 +53,9 @@
   "authors": [
     {
       "name": "Justin Plock",
-      "image": "",
       "bio": "Principal Solutions Architect at AWS",
       "linkedin": "justinplock",
-      "twitter": "@jplock"
+      "twitter": "jplock"
     }
   ]
 }

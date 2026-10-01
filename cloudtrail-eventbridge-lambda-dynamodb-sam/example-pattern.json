@@ -1,6 +1,6 @@
 {
-  "title": "Remove unexpected BYOIPV6 route advertisements using AWS Lambda and Amazon EventBridge",
-  "description": "Use EventBridge and Lambda to respond to <code>AdvertiseByoipCidr</code> events and validate if the address space should be advertised.",
+  "title": "Remove unexpected BYOIPV6 route advertisements",
+  "description": "Use Amazon EventBridge and AWS Lambda to respond to AdvertiseByoipCidr events and validate if the address space should be advertised.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudtrail-eventbridge-lambda-dynamodb-sam",
-      "templateURL": "serverless-patterns/cloudtrail-eventbridge-lambda-dynamodb-sam",
-      "projectFolder": "cloudtrail-eventbridge-lambda-dynamodb-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -58,8 +55,8 @@
   "authors": [
     {
       "name": "John Dwyer",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/130080657.jpg",
       "bio": "I am a Senior Solutions Architect on the Worldwide Public Sector team at AWS. I help customers build and architect serverless applications at scale..",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/130080657.jpg",
       "linkedin": "jrd326"
     }
   ]

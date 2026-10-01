@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-human-approval-sam",
-      "templateURL": "serverless-patterns/lambda-durable-human-approval-sam",
-      "projectFolder": "lambda-durable-human-approval-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -54,8 +51,8 @@
   "authors": [
     {
       "name": "Abhishek Agawane",
-      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
       "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
       "linkedin": "agawabhi"
     }
   ]

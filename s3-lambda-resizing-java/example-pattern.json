@@ -1,5 +1,5 @@
 {
-  "title": "Resizing images uploaded to Amazon S3 with AWS Lambda",
+  "title": "Resizing images uploaded to Amazon S3 with AWS Lambda (Java)",
   "description": "Create an AWS Lambda function that resizes images uploaded to Amazon S3.",
   "language": "Java",
   "level": "200",
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-resizing-java",
-      "templateURL": "serverless-patterns/s3-lambda-resizing-java",
-      "projectFolder": "s3-lambda-resizing-java",
       "templateFile": "template.yaml"
     }
   },
@@ -50,8 +47,8 @@
   "authors": [
     {
       "name": "Dhiraj Mahapatro",
-      "image": "https://i.postimg.cc/cr6qVWdr/mahadhir-high-res-current-photo.jpg",
       "bio": "Principal Specialist SA, Serverless, AWS",
+      "image": "https://i.postimg.cc/cr6qVWdr/mahadhir-high-res-current-photo.jpg",
       "linkedin": "dmahapatro",
       "twitter": "dhirajmahapatro"
     }

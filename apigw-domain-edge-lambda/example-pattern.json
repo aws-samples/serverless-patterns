@@ -1,23 +1,20 @@
 {
-  "title": "Regional API with Edge-Optimized domain name to Lambda",
-  "description": "Create a Regional API with Edge-Optimized domain name with a Lambda integration",
+  "title": "Regional Amazon API Gateway with edge-optimized domain name to AWS Lambda",
+  "description": "Create a regional API with edge-optimized domain name and a Lambda integration.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway REST regional API with an edge-Optimized domain name and a Lambda integration.",
-      "You will need : a route53 hosted zone, an ACM Certificate in the US-EAST-1 region.",
-      "The domain name choosen needs to match or be a subdomain of the domain name on the certificate"
+      "This pattern deploys an Amazon API Gateway REST regional API with an edge-optimized domain name and a Lambda integration.",
+      "You will need: a route53 hosted zone, an ACM Certificate in the us-east-1 region.",
+      "The domain name choosen needs to match or be a subdomain of the domain name on the certificate."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-domain-edge-lambda",
-      "templateURL": "serverless-patterns/apigw-domain-edge-lambda",
-      "projectFolder": "apigw-domain-edge-lambda",
-      "templateFile": "apigw-domain-edge-lambda/template.yml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -43,10 +40,10 @@
   },
   "testing": {
     "text": [
-      "Enter the ARN of the certificate (which is in us-east-1) and the custom domain name in the parameters of the template.",
+      "1. Enter the ARN of the certificate (which is in us-east-1) and the custom domain name in the parameters of the template.",
       "Deploy the template",
-      "Create a new record in your Hosted zone in route53 with an alias to the API Edge-Optimized endpoint",
-      "Paste the custom domain name into a browser to make requests"
+      "2. Create a new record in your Hosted zone in route53 with an alias to the API Edge-Optimized endpoint",
+      "3. Paste the custom domain name into a browser to make requests"
     ]
   },
   "cleanup": {
@@ -57,9 +54,9 @@
   "authors": [
     {
       "name": "Alice Goumain",
-      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
       "bio": "Cloud Support Engineer for Serverless @ AWS",
-      "linkedin": "https://www.linkedin.com/in/alice-goumain/"
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "linkedin": "alice-goumain"
     }
   ]
 }

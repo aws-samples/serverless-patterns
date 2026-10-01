@@ -1,6 +1,6 @@
 {
-  "title": "Amazon EventBridge to AWS Batch using SAM",
-  "description": "This SAM template creates an Amazon EventBus, EventRule with target as AWS Batch and IAM Role with required permission to invoke AWS Batch from Amazon EventBridge.",
+  "title": "Amazon EventBridge to AWS Batch",
+  "description": "Create an EventBridge event bus and route events to AWS Batch.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
@@ -8,16 +8,12 @@
     "headline": "How it works",
     "text": [
       "The AWS SAM template deploys the resources and the IAM permissions required to run the application.",
-      "The EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, it triggers the AWS Batch.",
-      "Please refer to the architecture diagram for the event flow."
+      "The EventBridge rule specified in `template.yaml` filters the events based upon the criteria in the `EventPattern` section. When matching events are sent to EventBridge that trigger the rule, it triggers AWS Batch."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-batch-sam",
-      "templateURL": "serverless-patterns/eventbridge-batch-sam",
-      "projectFolder": "eventbridge-batch-sam",
-      "templateFile": "eventbridge-batch-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -54,9 +50,9 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
-      "linkedin": "https://www.linkedin.com/in/biswanathmukherjee"
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
     }
   ]
 }

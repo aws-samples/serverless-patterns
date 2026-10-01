@@ -1,0 +1,53 @@
+{
+  "title": "Amazon EventBridge to AWS Step Functions",
+  "description": "Create an EventBridge rule that triggers a Step Functions workflow",
+  "language": "Integration",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates running a Step Functions workflow using an EventBridge rule. The template creates a shell Step Functions workflow with a CloudWatch log group for error reporting. It is triggered on select EC2 instance state changes and branches based on the value."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Change directory: <code>cd eventbridge-sfn-terraform</code>.",
+      "2. Delete the stack: <code>terraform destroy</code>.",
+      "3. Confirm the stack has been deleted: <code>terraform show</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ahmad-aboushady.json"
+  ]
+}

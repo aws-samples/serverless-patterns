@@ -1,6 +1,6 @@
 {
-  "title": "Appsync to EventBridge directly using Appsync Datasource",
-  "description": "The AWS AppSync resolver function request and response used with the EventBridge data source allows you to send custom events to the Amazon EventBridge bus.",
+  "title": "Appsync to Amazon EventBridge using Appsync Datasource",
+  "description": "This pattern connects AppSync to EventBridge directly using AppSync Datasource",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
@@ -8,26 +8,24 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to integrate Amazon EventBridge with AWS Appsync.",
-      "This pattern deploys one AWS Appsync api, one custom EventBus, and one appsync Javascript function."
+      "AWS AppSync can publish events to EventBridge as a datasource. It uses resolver functions for the requests and responses to create the custom events.",
+      "This pattern deploys one AWS Appsync API, one custom EventBus, and one AppSync Javascript resolver function."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-eventbridge-datasource",
-      "templateURL": "serverless-patterns/appsync-eventbridge-datasource",
-      "projectFolder": "appsync-eventbridge-datasource",
-      "templateFile": "lib/appsync-eventbridge-datasource-stack.ts"
+      "templateFile": "cdk/lib/appsync-eventbridge-datasource-stack.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "CDK Custom Resource",
-        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.custom_resources.AwsCustomResource.html"
+        "text": "AWS AppSync",
+        "link": "https://aws.amazon.com/appsync/"
       },
       {
-        "text": "Call Amazon SQS with Step Functions",
-        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-eventbridge-js.html/"
+        "text": "AWS AppSync GraphQL APIs Supports JavaScript Resolvers",
+        "link": "https://aws.amazon.com/blogs/aws/aws-appsync-graphql-apis-supports-javascript-resolvers/"
       }
     ]
   },
@@ -50,7 +48,7 @@
     {
       "name": "Shankar Srinivasan",
       "bio": "I am a Cloud Application Architect at AWS. I specialize in architecting and developing serverless, event-driven solutions on AWS.",
-      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110"
+      "linkedin": "shankar-srinivasan-3863a110"
     }
   ]
 }

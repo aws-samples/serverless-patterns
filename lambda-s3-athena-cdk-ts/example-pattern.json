@@ -17,9 +17,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-athena-cdk-ts",
-      "templateURL": "serverless-patterns/lambda-s3-athena-cdk-ts",
-      "projectFolder": "lambda-s3-athena-cdk-ts",
       "templateFile": "lib/pattern-stack.ts"
     }
   },
@@ -61,13 +58,15 @@
     ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk destroy</code>"]
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {
       "name": "Marco Jahn",
-      "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
       "bio": "Senior Solutions Architect, Amazon Web Services",
+      "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
       "linkedin": "marcojahn"
     }
   ]

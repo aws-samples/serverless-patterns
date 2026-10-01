@@ -1,6 +1,7 @@
 {
   "title": "Amazon API Gateway REST API to Amazon SES",
-  "description": "Create an Amazon API Gateway REST API that integrates with Amazon SES",
+  "description": "Create an Amazon API Gateway HTTP API that integrates with Amazon SES.",
+  "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
@@ -12,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ses-transformation",
-      "templateURL": "serverless-patterns/apigw-ses-transformation",
-      "projectFolder": "apigw-ses-transformation",
-      "templateFile": "apigw-ses-transformation/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {

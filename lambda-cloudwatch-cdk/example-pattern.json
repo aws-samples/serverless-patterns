@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda to Amazon CloudWatch",
+  "description": "Create a Lambda function that publishes custom metrics to CloudWatch",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK template deploys a Lambda function that inserts custom metric data into AWS CloudWatch. The template deploys the resources and the IAM permissions required to run the application."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/lambda-cloudwatch-cdk-stack.js"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "The Lambda Operators Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/operatorguide/intro.html"
+      },
+      {
+        "text": "Publishing custom metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/gustavo-martim.json"
+  ]
+}

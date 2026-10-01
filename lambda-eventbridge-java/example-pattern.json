@@ -1,22 +1,22 @@
 {
-  "title": "Lambda to EventBridge",
-  "description": "Publish events to EventBridge.",
+  "title": "AWS Lambda to Amazon EventBridge",
+  "description": "Create a Lambda function that sends events to EventBridge.",
   "language": "Java",
-  "level": "200",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
-    "headline": "Create a Lambda function that sends events to EventBridge.",
+    "headline": "How it works",
     "text": [
       "The SAM template deploys a Lambda function with permission to publish events to EventBridge. The Lambda function publishes an event to the default bus in EventBridge when invoked."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge-java",
-      "templateURL": "serverless-patterns/lambda-eventbridge-java"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Integrating Amazon EventBridge into your serverless applications",
@@ -34,14 +34,16 @@
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>.",
-      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\""
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [

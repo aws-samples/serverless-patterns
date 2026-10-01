@@ -1,0 +1,56 @@
+{
+  "title": "AWS Fargate to Amazon DynamoDB",
+  "description": "Create an AWS Fargate service that puts to DynamoDB",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front.",
+      "The AWS Fargate service makes puts to a DynamoDB table. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built ecs.ContainerImage.fromAsset method.",
+      "The custom image has a base route / for health checks and /additem for adding items. Environment variables like the DynamoDB table name and AWS region are passed to the image to enable it to put items to the DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "Creating a single-table design with Amazon DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/glenn-chia-jin-wee.json"
+  ]
+}

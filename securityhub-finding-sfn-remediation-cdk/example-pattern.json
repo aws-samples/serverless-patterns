@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/securityhub-finding-sfn-remediation-cdk",
-      "templateURL": "serverless-patterns/securityhub-finding-sfn-remediation-cdk",
-      "projectFolder": "securityhub-finding-sfn-remediation-cdk",
-      "templateFile": "cdk/lib/securityhub-finding-sfn-remediation-stack.ts"
+      "templateFile": "lib/securityhub-finding-sfn-remediation-stack.ts"
     }
   },
   "resources": {
@@ -48,15 +45,16 @@
     ]
   },
   "cleanup": {
-    "text": ["<code>cd securityhub-finding-sfn-remediation-cdk</code>", "<code>cdk destroy</code>"]
+    "text": [
+      "<code>cd securityhub-finding-sfn-remediation-cdk</code>",
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {
       "name": "Nithin Chandran R",
-      "image": "",
       "bio": "Technical Account Manager at AWS",
-      "linkedin": "nithin-chandran-r",
-      "twitter": ""
+      "linkedin": "nithin-chandran-r"
     }
   ]
 }

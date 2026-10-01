@@ -1,5 +1,5 @@
 {
-  "title": "Amazon Eventbridge to Amazon SNS",
+  "title": "Amazon EventBridge to Amazon SNS",
   "description": "Create an EventBridge rule that invokes an SNS topic.",
   "language": ".NET",
   "level": "200",
@@ -7,17 +7,16 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This CDK template deploys a SNS topic that is triggered by an EventBridge rule.",
-      "The SNS topic policy provides the permission for EventBridge to invoke the SNS topic."
+      "This CDK template deploys a SNS topic that is triggered by an EventBridge rule. The SNS topic policy provides the permission for EventBridge to invoke the SNS topic."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-dotnet-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-sns-dotnet-cdk/README.md"
+      "templateFile": "src/EventBridgeSnsDotnetCdk/EventBridgeSnsDotnetCdkStack.cs"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
@@ -31,26 +30,30 @@
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      "See the GitHub repo."
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the GitHub repo for testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
     ]
   },
   "authors": [
     {
       "name": "Amir Khairalomoum",
-      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
       "bio": "Amir is a Sr. Solutions Architect at AWS. He supports customers in their digital transformation and their cloud journey to AWS. He is passionate about serverless technologies.",
+      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
       "linkedin": "amir-khairalomoum",
-      "twitter": "@mrark1361"
+      "twitter": "mrark1361"
     }
   ]
 }

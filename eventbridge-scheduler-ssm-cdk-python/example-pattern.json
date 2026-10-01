@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ssm-cdk-python",
-      "templateURL": "serverless-patterns/eventbridge-scheduler-ssm-cdk-python",
-      "projectFolder": "eventbridge-scheduler-ssm-cdk-python",
       "templateFile": "eventbridge_scheduler_ssm_cdk_python/eventbridge_scheduler_ssm_cdk_python_stack.py"
     }
   },

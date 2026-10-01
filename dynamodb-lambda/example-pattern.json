@@ -1,19 +1,33 @@
 {
-  "title": "Lambda to EventBridge",
-  "description": "Create a Lambda function that sends events to EventBridge.",
+  "title": "Amazon DynamoDB to AWS Lambda",
+  "description": "Invoke a Lambda function from changes to a DynamoDB table",
   "language": "Node.js",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
-  "videoId": "",
-  "level":"100",
+  "level": "200",
   "framework": "AWS SAM",
-  "services": {
-    "from": "lambda",
-    "to": "eventbridge"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The SAM template deploys a Lambda function with permission to publish events to EventBridge. The Lambda function publishes an event to the default bus in EventBridge when invoked."
+      "The SAM template deploys a Lambda function, a DynamoDB table, and the minimum IAM resources required to run the application.",
+      "When items are written or updated in the DynamoDB table, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the contents of the table item that changed."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Docs: DynamoDB Streams and AWS Lambda Triggers",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.html"
+      },
+      {
+        "text": "Creating a scalable serverless import process for Amazon DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/creating-a-scalable-serverless-import-process-for-amazon-dynamodb/"
+      }
     ]
   },
   "deploy": {
@@ -21,37 +35,25 @@
       "sam deploy --guided"
     ]
   },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge",
-      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/lambda-eventbridge/template.yaml",
-      "readmeURL": ""
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "After deployment, add an item to the DynamoDB table. Go to the CloudWatch Logs for the deployed Lambda function. You will see the event is logged out containing the item data."
     ]
   },
-  "resources": {
-    "headline": "Additional resources",
-    "bullets": [
-      {
-        "text": "Integrating Amazon EventBridge into your serverless applications",
-        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
-      },
-      {
-        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
-        "link": "https://serverlessland.com/learn/eventbridge"
-      }      
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
-  "author": {
-    "headline": "Presented by James Beswick, Developer Advocate",
-    "name": "James Beswick",
-    "imageURL": "https://pbs.twimg.com/profile_images/1165718285754753025/OrGcUHER_400x400.jpg",
-    "twitter": "jbesw",
-    "bio": "James is a senior developer advocate for Serverless Applications at Amazon Web Services based in the US. Prior to joining AWS Ben worked in a number of different technical roles specializing in workflow Automation and web development."
-  }
+  "authors": [
+    {
+      "name": "James Beswick",
+      "bio": "James is a senior developer advocate for Serverless Applications at Amazon Web Services based in the US. Prior to joining AWS Ben worked in a number of different technical roles specializing in workflow Automation and web development.",
+      "image": "https://pbs.twimg.com/profile_images/1165718285754753025/OrGcUHER_400x400.jpg",
+      "twitter": "jbesw"
+    }
+  ]
 }

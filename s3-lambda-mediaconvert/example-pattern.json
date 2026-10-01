@@ -1,6 +1,6 @@
 {
-  "title": "S3 to MediaCovert via AWS Lambda",
-  "description": "Automate the trans-codification of new video files on Amazon S3, leveraging AWS Lambda and AWS Elemental MediaConvert. The transcoded video will go to another S3 bucket for future streaming or further processing.",
+  "title": "Amazon S3 to AWS Lambda to MediaConvert",
+  "description": "Automate transcoding media files uploaded to S3.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -15,13 +15,11 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-mediaconvert",
-      "templateURL": "serverless-patterns/s3-lambda-mediaconvert",
-      "projectFolder": "s3-lambda-mediaconvert",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Video on Demand on AWS",
@@ -35,27 +33,29 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete</code>.",
-      "See the GitHub repo for detailed cleanup instructions."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Aryam Gutierrez",
-      "image": "https://d38h74djm40icj.cloudfront.net/agutierrezl-image.png",
       "bio": "Aryam is a Solutions Architect at Amazon Web Service based in Spain",
+      "image": "https://d38h74djm40icj.cloudfront.net/agutierrezl-image.png",
       "linkedin": "aryaml",
-      "twitter": "@aryam_gl"
+      "twitter": "aryam_gl"
     }
   ]
 }

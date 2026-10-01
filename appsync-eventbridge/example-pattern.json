@@ -1,0 +1,52 @@
+{
+  "title": "AWS AppSync to Amazon EventBridge",
+  "description": "Create an AppSync API with an EventBridge event bus",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample pattern for using an Amazon EventBridge event bus as a HTTP data source with an AWS AppSync API."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/appsync-eventbridge-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      },
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy",
+      "See the GitHub repo for detailed instructions"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "To delete the stack, run: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ami-patel.json"
+  ]
+}

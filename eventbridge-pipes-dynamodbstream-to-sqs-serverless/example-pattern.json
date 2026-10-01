@@ -1,5 +1,5 @@
 {
-  "title": "DynamoDB Stream to SQS queue using EventBridge Pipes",
+  "title": "Sends events from Amazon DynamoDB Streams to Amazon SQS using Amazon EventBridge Pipes",
   "description": "Serverless pattern that sends events from DynamoDB Stream to SQS using EventBridge Pipes. Implemented with serverless framework",
   "language": "Node.js",
   "level": "200",
@@ -7,16 +7,13 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This serverless pattern demonstrates how to send events from DynamoDB Stream to SQS using EventBridge Pipes. Whenever an item is inserted in DynamoDB table, the stream picks up the event & sends it to EventBridge Pipes. ",
-      "EventBridge Pipes filters the event and passes to the next states accordingly. For this example pattern, it checks for INSERT events & passes it to enrichment Lambda function. The Lambda function makes some logs regarding to event & event name & finally passes it to the target SQS queue.",
-      "The intermediate filter & enrichment Lambda functions are optional & can be skipped as part of editing the implementation."
+      "This serverless pattern demonstrates how to send events from DynamoDB Stream to SQS using EventBridge Pipes.",
+      "Filters are configured on the pipe and matched events are enriched using AWS Lambda. The Lambda function logs information about the event before sending the event to the pipe target (SQS queue).",
+      "Filters and enrichment stages are optional and can be configured."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/eventbridge-pipes-dynamodbstream-to-sqs-serverless",
-      "projectFolder": "eventbridge-pipes-dynamodbstream-to-sqs-serverless",
       "templateFile": "serverless.yml"
     }
   },
@@ -35,7 +32,7 @@
   },
   "deploy": {
     "text": [
-      "<code>serverless deploy --verbose</code>"
+      "serverless deploy --verbose"
     ]
   },
   "testing": {
@@ -49,12 +46,11 @@
     ]
   },
   "authors": [
-    {  
-      "headline": "Presented by Anjali Modi, Senior Software Engineer, Distinction-Dev",
+    {
       "name": "Anjali Modi",
-      "image": "https://en.gravatar.com/userimage/147444966/1aad7adb8eca7d94a2f25dbe079bec81.jpeg?size=256",
       "bio": "Anjali Modi is a Senior Software Engineer, passionate for developing Serverless solutions at Distinction-Dev, India",
-      "linkedin":"https://www.linkedin.com/in/anjali-modi-068045119/"
+      "image": "https://en.gravatar.com/userimage/147444966/1aad7adb8eca7d94a2f25dbe079bec81.jpeg?size=256",
+      "linkedin": "anjali-modi-068045119"
     }
   ]
 }

@@ -1,22 +1,19 @@
 {
-  "title": "Bedrock in a NodeJS Lambda",
-  "description": "Create an AWS Lambda Function that invokes Amazon Bedrock via Converse API",
+  "title": "AWS Lambda to Amazon Bedrock",
+  "description": "Connecting to Amazon bedrock from AWS Lambda using the Node.js SDK",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern shows how to make use of Bedrock within a Lambda function on NodeJS runtime.",
+      "This pattern shows how to make use of Bedrock within a Lambda function on Node.js runtime.",
       "The business logic is in <code>./src/index.js</code>. You can use sample payloads stored in <code>./events</code> to test the function."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-lambda-nodejs",
-      "templateURL": "serverless-patterns/bedrock-lambda-nodejs",
-      "projectFolder": "bedrock-lambda-nodejs",
-      "templateFile": "bedrock-lambda-nodejs/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
@@ -33,7 +30,8 @@
   },
   "deploy": {
     "text": [
-      "sam build && sam deploy --guided"
+      "sam build",
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -49,8 +47,8 @@
   "authors": [
     {
       "name": "Giuseppe Battista",
-      "image": "https://media.licdn.com/dms/image/D4E03AQGOz6p4p-rSfg/profile-displayphoto-shrink_800_800/0/1686238097666?e=1703721600&v=beta&t=bhKqpehfON17sLUNDn-yFUKJhohuWljVKNCarDnsdYA",
       "bio": "Giuseppe Battista is a Senior Solutions Architect at Amazon Web Services. He leads soultions architecture for Early Stage Startups in UK and Ireland. He hosts the Twitch Show \"Let's Build a Startup\" on twitch.tv/aws and he's head of Unicorn's Den accelerator.",
+      "image": "https://media.licdn.com/dms/image/D4E03AQGOz6p4p-rSfg/profile-displayphoto-shrink_800_800/0/1686238097666?e=1703721600&v=beta&t=bhKqpehfON17sLUNDn-yFUKJhohuWljVKNCarDnsdYA",
       "linkedin": "giusedroid",
       "twitter": "giusedroid"
     }

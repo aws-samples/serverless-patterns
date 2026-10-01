@@ -1,0 +1,69 @@
+{
+  "title": "AWS Step Functions to AWS Glue",
+  "description": "Create an AWS Step Functions workflow to integrate with AWS Glue.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys a Step Functions workflow, that takes in a payload and trigger a AWS Glue job synchronously. In this pattern, the state machine does wait for Glue job to finish. The application contains the minimum IAM resources required to run the workflow and Glue job."
+    ],
+    "text2": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "What Is AWS Glue?",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+      },
+      {
+        "text": "Manage AWS Glue Jobs with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-glue.html"
+      },
+      {
+        "text": "Service Integration Patterns",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-sync"
+      },
+      {
+        "text": "CDK documentation for Glue",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-glue-readme.html"
+      },
+      {
+        "text": "CDK documentation for Step Functions",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-stepfunctions-readme.html"
+      },
+      {
+        "text": "CDK documentation for Step Functions Tasks",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-stepfunctions-tasks-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ],
+    "test": []
+  },
+  "contributors": [
+    "content/contributors/sanket-shinde.json"
+  ]
+}

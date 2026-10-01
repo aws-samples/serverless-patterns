@@ -1,15 +1,19 @@
 {
   "title": "Amazon API Gateway Websocket API with VPC Link integration",
-  "description": "The SAM template deploys an Amazon API Gateway Websocket API endpoint with a VPC Link integration.",
+  "description": "The AWS SAM template deploys an Amazon API Gateway Websocket API endpoint with a VPC Link integration.",
   "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway WebSocket API endpoint with a VPC Link integration to an internal Network Load Balancer (NLB).",
+      "WebSocket APIs with VPC Links allow bidirectional communication between clients and backend services hosted in private VPCs."
+    ]
+  },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-vpclink",
-      "templateURL": "serverless-patterns/apigw-websocket-api-vpclink",
-      "projectFolder": "apigw-websocket-api-vpclink",
-      "templateFile": "template.yaml"
+      "templateFile": "template.yml"
     }
   },
   "deploy": {
@@ -30,17 +34,15 @@
   "authors": [
     {
       "name": "Manasvi Jain",
-      "image": "https://avatars.githubusercontent.com/u/56217984?v=4",
       "bio": "Associate Partner Solutions Architect at AWS",
-
-      "linkedin": "https://www.linkedin.com/in/manasvi-jain-36b9941a3/"
+      "image": "https://avatars.githubusercontent.com/u/56217984?v=4",
+      "linkedin": "manasvi-jain-36b9941a3"
     },
     {
       "name": "Umang Aggarwal",
-      "image": "https://avatars.githubusercontent.com/Umang071",
       "bio": "Technical Account Manager @ AWS",
-
-      "linkedin": "https://www.linkedin.com/in/umangaggarwal"
+      "image": "https://avatars.githubusercontent.com/Umang071",
+      "linkedin": "umangaggarwal"
     }
   ]
 }

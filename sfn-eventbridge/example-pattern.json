@@ -1,0 +1,55 @@
+{
+  "title": "AWS Step Functions to Amazon EventBridge",
+  "description": "Creates a Step Functions workflow that publishes events to EventBridge",
+  "language": "Node.js",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The AWS SAM template deploys a Step Functions workflow that publishes an event to an EventBridge event bus. An IAM Role allows the workflow execution to publish events onto the event bus. An EventBridge rule forwards all events to a CloudWatch Logs log group for easy inspection."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Execute the Step Functions workflow:",
+      "<code>aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STATE_MACHINE_ARN</code>",
+      "2. View CloudWatch Logs to see events that Step Functions published to EventBridge:",
+      "<code>aws logs tail CLOUDWATCH_LOG_GROUP</code>",
+      "3. You see an event that was delivered to the event bus."
+    ]
+  },
+  "contributors": [
+    "content/contributors/david-maccarone.json"
+  ]
+}

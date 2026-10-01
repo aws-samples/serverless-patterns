@@ -1,5 +1,5 @@
 {
-  "title": "AWS CloudFront to Amazon S3",
+  "title": "Amazon CloudFront to Amazon S3",
   "description": "Serving private content from CloudFront with signed URLs and signed cookies",
   "language": ".NET",
   "level": "200",
@@ -13,10 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-s3-cdk-dotnet",
-      "projectFolder": "cloudfront-s3-cdk-dotnet",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-s3-cdk-dotnet/README.md",
-      "templateURL": "serverless-patterns/cloudfront-s3-cdk-dotnet",
       "templateFile": "src/cdk/src/Cdk/CdkStack.cs"
     }
   },
@@ -38,8 +34,8 @@
   "authors": [
     {
       "name": "Ankush Jain",
-      "image": "https://avatars.githubusercontent.com/u/13661966?v=4",
       "bio": "Application Development Consultant at AWS Professional Services.",
+      "image": "https://avatars.githubusercontent.com/u/13661966?v=4",
       "linkedin": "ankush-jain-developer",
       "twitter": "ankushjain358"
     }

@@ -8,13 +8,11 @@
     "headline": "How it works",
     "text": [
       "VPC Lattice is to designed to help you easily and effectively discover, secure, connect, and monitor all of the services within it. Each component within VPC Lattice communicates unidirectionally or bi-directionally within the service network based on its association with the service network and its access settings. Access settings are comprised of authentication and authorization policies required for this communication.",
-      "This pattern uses Lambda as weighted targets. VPC Lattice service shifts traffic based on the percentage of weight configured for target groups under VPC Lattice listener. User may update the weight for the targets according to their use case and requirements. " ]
+      "This pattern uses Lambda as weighted targets. VPC Lattice service shifts traffic based on the percentage of weight configured for target groups under VPC Lattice listener. User may update the weight for the targets according to their use case and requirements. "
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/vpc-lattice-lambda",
-      "templateURL": "serverless-patterns/vpc-lattice-lambda",
-      "projectFolder": "vpc-lattice-lambda",
       "templateFile": "template.yaml"
     }
   },
@@ -43,7 +41,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [

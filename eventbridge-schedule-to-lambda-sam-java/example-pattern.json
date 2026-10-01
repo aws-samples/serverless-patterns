@@ -1,5 +1,5 @@
 {
-  "title": "Amazon EventBridge Schedule to Lambda",
+  "title": "Amazon EventBridge Schedule to AWS Lambda",
   "description": "Creates an EventBridge schedule to run a Lambda every 5 minutes",
   "language": "Java",
   "level": "200",
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-sam-java",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-sam-java",
-      "projectFolder": "eventbridge-schedule-to-lambda-sam-java",
       "templateFile": "template.yaml"
     }
   },
@@ -45,10 +42,9 @@
   "authors": [
     {
       "name": "Kurt Tometich",
-      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
       "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
-      "linkedin": "kurt-tometich",
-      "twitter": ""
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "linkedin": "kurt-tometich"
     }
   ]
 }

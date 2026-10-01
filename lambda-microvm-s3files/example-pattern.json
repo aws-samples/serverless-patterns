@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-s3files",
-      "templateURL": "serverless-patterns/lambda-microvm-s3files",
-      "projectFolder": "lambda-microvm-s3files",
       "templateFile": "template.yaml"
     }
   },
@@ -56,7 +53,8 @@
     {
       "name": "Ben Freiberg",
       "image": "https://serverlessland.com/assets/images/contributors/ben-freiberg.jpg",
-      "linkedin": "benfreiberg"
+      "linkedin": "benfreiberg",
+      "bio": "Ben is a Senior Solutions Architect at Amazon Web Services (AWS) based in Frankfurt, Germany."
     }
   ]
 }
