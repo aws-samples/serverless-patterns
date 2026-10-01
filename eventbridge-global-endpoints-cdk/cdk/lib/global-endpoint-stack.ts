@@ -50,10 +50,10 @@ export class GlobalEndpointStack extends Stack {
 			description: 'endpoint id',
 		});
 
-		this.endpointName = endpoint.name;
+		this.endpointName = endpoint.name!;
 
 		new CfnOutput(this, 'endpoint name', {
-			value: endpoint.name,
+			value: endpoint.name!,
 			description: 'endpoint name',
 		});
 	}
