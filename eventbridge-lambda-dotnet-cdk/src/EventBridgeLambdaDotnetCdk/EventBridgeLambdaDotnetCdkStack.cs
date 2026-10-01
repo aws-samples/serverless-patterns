@@ -35,7 +35,7 @@ namespace EventBridgeLambdaDotnetCdk
             // Lambda Function Build Commands
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -52,7 +52,7 @@ namespace EventBridgeLambdaDotnetCdk
             {
                 MemorySize = 128,
                 Timeout = Duration.Seconds(10),
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset("src/ConsumerLambda", new AssetOptions
                 {
                     Bundling = buildOption

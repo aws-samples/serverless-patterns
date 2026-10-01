@@ -8,8 +8,8 @@
   "profile": "",
   "region": "",
   "configuration": "Release",
-  "framework": "net6.0",
-  "function-runtime": "dotnetcore3.1",
+  "framework": "net10.0",
+  "function-runtime": "dotnet10",
   "function-memory-size": 128,
   "function-timeout": 10,
   "function-handler": "ConsumerLambda::ConsumerLambda.Function::FunctionHandler"
