@@ -14,7 +14,7 @@ class CloudfrontLambdaEdgeCdkPythonStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         lambda_edge = _lambda.Function(self, 'LambdaEdge',
-            runtime = _lambda.Runtime.PYTHON_3_7,
+            runtime = _lambda.Runtime.PYTHON_3_14,
             handler = 'index.handler',
             code = _lambda.Code.from_asset('lambda'),
         )
