@@ -29,7 +29,7 @@ export class EventbridgeOutboxPatternWithDdbStack extends cdk.Stack {
     const writeToDDBFunction: NodejsFunction = new NodejsFunction(this, 'write-to-ddb', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/write-to-ddb/index.ts'),
       environment: {
@@ -43,7 +43,7 @@ export class EventbridgeOutboxPatternWithDdbStack extends cdk.Stack {
     const streamToEventBridge: NodejsFunction = new NodejsFunction(this, 'streamToEventBridge', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/ddb-stream-into-eventbridge-events/index.ts'),
       environment: {
@@ -67,7 +67,7 @@ export class EventbridgeOutboxPatternWithDdbStack extends cdk.Stack {
     const userCreatedConsumer: NodejsFunction = new NodejsFunction(this, 'userCreatedConsumer', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/consumers/user-created/index.ts')
     });
