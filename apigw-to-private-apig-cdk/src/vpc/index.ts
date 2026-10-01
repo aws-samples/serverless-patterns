@@ -1,6 +1,6 @@
 
-import * as cdk from "@aws-cdk/core";
-import {Vpc, SubnetType} from '@aws-cdk/aws-ec2';
+import * as cdk from "aws-cdk-lib";
+import {Vpc, SubnetType} from 'aws-cdk-lib/aws-ec2';
 
 export class VpcStack extends cdk.Stack {
   vpc: Vpc;
@@ -15,7 +15,7 @@ export class VpcStack extends cdk.Stack {
       subnetConfiguration: [
         {
           name: 'private-subnet-1',
-          subnetType: SubnetType.PRIVATE,
+          subnetType: SubnetType.PRIVATE_WITH_EGRESS,
           cidrMask: 24,
         },
         {
