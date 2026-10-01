@@ -24,7 +24,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: SqsIntegration::SqsIntegration.Function::FunctionHandler
-      Runtime: dotnet8
+      Runtime: dotnet10
       Timeout: 30
       MemorySize: 256
       Architectures:
