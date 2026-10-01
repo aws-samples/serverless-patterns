@@ -47,7 +47,7 @@ class SfnDynamodbCdkStack(Stack):
         definition = send_to_ddb.next(read_from_ddb)
         state_machine = sfn.StateMachine(
             self, "SfnToDDBWorkflowStateMachine",
-            definition=definition,
+            definition_body=sfn.DefinitionBody.from_chainable(definition),
             timeout=Duration.minutes(5)
         )
 
