@@ -55,7 +55,7 @@ Create a new local branch for each serverless pattern or modification being made
 Now is the time to create your new serverless pattern or modify existing code.
 
 1. If you are creating a new serverless pattern, start from a template. Either copy the folder named "_pattern-model", or copy a similar existing pattern, such as another variant in the same family.For example: `mkdir -p sqs-lambda/python && cp -r _pattern-model sqs-lambda/python/sam`
-    If you copy an existing pattern, update everything that refers to the original: `example-pattern.json` (title, description, language, framework, `gitHub.template` paths and authors), the README, and resource and stack names in the template. Remove build output and anything the new variant doesn't use.
+    If you copy an existing pattern, update everything that refers to the original: `example-pattern.json` (title, description, language, framework, `gitHub.template.templateFile` and authors), the README, and resource and stack names in the template. Remove build output and anything the new variant doesn't use.
 2. If you are modifying existing code, make your code changes now.
 3. Work through the [pattern checklist](#pattern-checklist) below.
 4. When your code is complete, stage the changes in your pattern folder: `git add {family}/{language}/{framework}`
@@ -79,7 +79,7 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
   - The first mention of each service in `title` uses its official name: "AWS Lambda to Amazon DynamoDB", not "Lambda to DynamoDB".
   - `title` is 100 characters or fewer and `description` is 175 or fewer.
   - `language`, `framework` and `level` must use one of the values in the schema, e.g. `"framework": "AWS SAM"`.
-  - `gitHub.template.templateFile` is relative to `projectFolder`: `"template.yaml"`, not `"my-pattern/template.yaml"`.
+  - `gitHub.template.templateFile` is required: the file shown on the pattern page, relative to your pattern folder, e.g. `"template.yaml"` or `"cdk/lib/my-stack.ts"`, not `"my-pattern/template.yaml"`. That's the only `gitHub` field you need. Serverless Land records the folder itself, so don't add `repoURL`, `templateURL` or `projectFolder`.
   - In `authors`, `linkedin` is your profile ID (`jane-doe`) and `twitter` is your handle (`jane_doe`), not URLs. If you have a page at `serverlessland.com/about/your-name`, you can use `"contributors": ["content/contributors/your-name.json"]` instead.
   - The `deploy` and `cleanup` commands match your framework, e.g. `sam deploy` and `sam delete`, or `cdk deploy` and `cdk destroy`.
 - **Check the pattern file** from the repo root:
