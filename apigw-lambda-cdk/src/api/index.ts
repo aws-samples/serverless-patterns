@@ -14,7 +14,7 @@ export class ApiStack extends Stack {
     const handler = new lambda.Function(this, "handler", {
       code: new lambda.AssetCode(path.resolve(__dirname, "dist")),
       handler: `index.${config.api.handler}`,
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       architecture: lambda.Architecture.ARM_64
     });
 

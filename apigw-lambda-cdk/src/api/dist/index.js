@@ -18,11 +18,11 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // api/lambda/index.ts
-var lambda_exports = {};
-__export(lambda_exports, {
+var index_exports = {};
+__export(index_exports, {
   ApiLambda: () => handler
 });
-module.exports = __toCommonJS(lambda_exports);
+module.exports = __toCommonJS(index_exports);
 
 // api/config.json
 var config_default = {
