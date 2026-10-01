@@ -10,11 +10,12 @@
     "test": "jest"
   },
   "devDependencies": {
-    "aws-cdk": "2.80.0",
+    "aws-cdk": "^2.1143.0",
     "jest": "^26.4.2"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.185.0",
+    "@aws-sdk/client-cloudwatch": "^3.1144.0",
+    "aws-cdk-lib": "^2.271.0",
     "constructs": "^10.0.0"
   }
 }
