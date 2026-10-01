@@ -14,7 +14,7 @@ export class LambdaExtensionParameterStoreCdkStack extends Stack {
     });
 
     const checkParameterLambda = new nodejs_lambda.NodejsFunction(this, "CheckParameterLambda", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, `/../lambda/index.ts`),
       handler: "handler",
       retryAttempts: 0,
