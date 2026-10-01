@@ -21,7 +21,7 @@ export class LambdaAdapterCdkStack extends Stack {
 
 		// Lambda
 		const lambdaAdapterFunction = new Function(this, 'lambdaAdapterFunction', {
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			code: Code.fromAsset('app'),
 			handler: 'run.sh',
 			environment: {
