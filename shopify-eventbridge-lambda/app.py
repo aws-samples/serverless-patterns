@@ -56,7 +56,7 @@ class ShopifyIntegrationStack(Stack):
         shopify_process_product_updated_events_lambda = _lambda.Function(
             self,
             id='ShopifyProcessProductUpdatedLambda',
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='ShopifyProcessProductUpdated.handler',
             role=lambda_role,
