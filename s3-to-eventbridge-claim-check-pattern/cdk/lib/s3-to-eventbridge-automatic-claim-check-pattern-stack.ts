@@ -33,7 +33,7 @@ export class S3ToEventbridgeAutomaticClaimCheckPatternStack extends cdk.Stack {
     const transformerFunction: NodejsFunction = new NodejsFunction(this, 'transformerFunction', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       environment: {
         EVENT_BUS_NAME: customEventBus.eventBusName,
@@ -65,7 +65,7 @@ export class S3ToEventbridgeAutomaticClaimCheckPatternStack extends cdk.Stack {
     const claimCreatedConsumer: NodejsFunction = new NodejsFunction(this, 'claimCreatedConsumer', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/consumers/ClaimCreated/index.ts'),
     });
@@ -84,7 +84,7 @@ export class S3ToEventbridgeAutomaticClaimCheckPatternStack extends cdk.Stack {
     const claimProcessedConsumer: NodejsFunction = new NodejsFunction(this, 'claimProcessedConsumer', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/consumers/ClaimProcessed/index.ts'),
     });
