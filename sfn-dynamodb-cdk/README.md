@@ -1,8 +1,7 @@
-
 # Create an AWS Step Functions workflow to integrate with Amazon DynamoDB
 
 The CDK application deploys a Step Functions workflow, that takes in a payload and puts the item in DynamoBb. Additionally, this workflow also shows how to read an item directly from the DynamoDB table. The CDK application contains the minimum IAM resources required to run the application.
-You can find the SAM template for the same pattern [here](https://serverlessland.com/patterns/sfn-dynamodb) 
+You can find the SAM template for the same pattern [here](https://serverlessland.com/patterns/sfn-dynamodb)
 
 Learn more about this pattern at: https://serverlessland.com/patterns/sfn-dynamodb-cdk.
 
@@ -57,7 +56,7 @@ command.
 
 Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineArn} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
 ```bash
-aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachineArn}" --input "{\"id\":  \"12345\" }"
+aws stepfunctions start-execution --name "test" --state-machine-arn "{StateMachineArn}" --input "{\"id\": \"12345\" }"
 ```
 
 ### output:
@@ -72,7 +71,7 @@ aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMach
 Note the `executionArn` from the above output and run the below cli command to get the status of the execution
 
 ```bash
-aws stepfunctions describe-execution --execution-arn  "{executionArn}"
+aws stepfunctions describe-execution --execution-arn "{executionArn}"
 ```
 
 ### Get execution status output:
@@ -85,7 +84,7 @@ aws stepfunctions describe-execution --execution-arn  "{executionArn}"
     "status": "SUCCEEDED",
     "startDate": 1620674586.347,
     "stopDate": 1620674586.553,
-    "input": "{\"id\":  \"123456\" }",
+    "input": "{\"id\": \"123456\" }",
     "inputDetails": {
         "included": true
     },
@@ -99,7 +98,7 @@ Once the `status` is `SUCCEEDED`, you can verify what was stored in DynamoDB tab
 Additionally, you can also verify if the item is stored in DynamoDB by running the below get item cli command on the table.
 
 ```bash
- aws dynamodb get-item --table-name my-table --key "{\"id\": {\"S\": \"12345\"} }"
+aws dynamodb get-item --table-name {tableName} --key "{\"id\": {\"S\": \"12345\"} }"
 ```
 
 ### DynamoDB Get Item Output:
@@ -118,7 +117,7 @@ Additionally, you can also verify if the item is stored in DynamoDB by running t
 ```
 
 ## Cleanup
- 
+
 1. Delete the stack
     ```bash
     cdk destroy

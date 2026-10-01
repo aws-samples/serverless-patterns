@@ -8,8 +8,8 @@ from aws_cdk import (
     aws_lambda as _lambda
 )
 from constructs import Construct
-import aws_cdk.aws_apigatewayv2_alpha as api_gateway
-import aws_cdk.aws_apigatewayv2_integrations_alpha as integrations
+import aws_cdk.aws_apigatewayv2 as api_gateway
+import aws_cdk.aws_apigatewayv2_integrations as integrations
 
 
 class LambdaEfsCdkStack(Stack):
