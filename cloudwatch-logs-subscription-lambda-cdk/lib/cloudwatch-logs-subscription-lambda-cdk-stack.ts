@@ -7,7 +7,7 @@ export class CloudwatchLogsSubscriptionLambdaCdkStack extends Stack {
     super(scope, id, props);
 
     const logReceivingLambdaFunction = new nodejs_lambda.NodejsFunction(this, "LogReceivingLambdaFunction", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, `/../lambda/index.ts`),
       handler: "handler",
       retryAttempts: 0,
