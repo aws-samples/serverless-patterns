@@ -5,7 +5,7 @@ using AlbEcsBedrockAgentsCdkDotnet.Common;
 using Amazon.CDK;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
-using Amazon.CDK.AwsBedrock;
+using Amazon.CDK.AWS.Bedrock;
 
 namespace AlbEcsBedrockAgentsCdkDotnet.BedrockAgent.ActionGroup;
 
@@ -230,7 +230,7 @@ internal sealed class BedrockAgentCdk
             new FunctionProps
             {
                 FunctionName = $"chatbot-bedrock-agent-action-group-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(300),
                 Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64
@@ -292,7 +292,7 @@ internal sealed class BedrockAgentCdk
             new FunctionProps
             {
                 FunctionName = $"chatbot-bedrock-agent-alias-creation-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(180),
                 Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64

@@ -7,7 +7,7 @@ using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.OpenSearchServerless;
 using Amazon.CDK.AWS.S3;
-using Amazon.CDK.AwsBedrock;
+using Amazon.CDK.AWS.Bedrock;
 using Newtonsoft.Json.Linq;
 
 namespace AlbEcsBedrockAgentsCdkDotnet.BedrockAgent.KnowledgeBase;
@@ -491,7 +491,7 @@ internal sealed class BedrockKnowledgeBaseCdk
             new FunctionProps
             {
                 FunctionName = $"chatbot-bedrock-knowledge-base-index-creation-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(180),
                 Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64
@@ -523,7 +523,7 @@ internal sealed class BedrockKnowledgeBaseCdk
             new FunctionProps
             {
                 FunctionName = $"chatbot-bedrock-knowledge-base-ingestion-{Utils.GenerateRandomStringFromStackId(_stack.StackId)}",
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 MemorySize = 512,
                 Timeout = Duration.Minutes(15),
                 Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64

@@ -296,7 +296,7 @@ namespace AlbEcsBedrockAgentsCdkDotnet.ECS
                         SubnetType = SubnetType.PUBLIC,
                         OnePerAz = true,
                     },
-                    IpAddressType = IpAddressType.IPV4,
+                    IpAddressType = Amazon.CDK.AWS.ElasticLoadBalancingV2.IpAddressType.IPV4,
                     CrossZoneEnabled = true,
                     DropInvalidHeaderFields = true
                 });
