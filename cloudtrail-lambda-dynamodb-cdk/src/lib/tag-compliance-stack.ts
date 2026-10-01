@@ -79,7 +79,7 @@ export class TagComplianceStack extends cdk.Stack {
     // function that gets cloudtrail events from the s3 bucket and populates to dynamo table
     const populateDynamoFn = new lambda.Function(this, 'populateDynamoFunction', {
       functionName: 'populate-dynamo',
-      runtime: lambda.Runtime.PYTHON_3_10,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'index.lambda_handler',
       code: lambda.Code.fromAsset('lib/lambda/populate_dynamo'),
       environment: {
@@ -120,7 +120,7 @@ export class TagComplianceStack extends cdk.Stack {
     // function that checks the resources put into Dynamo for the tags specified in this function (go to function code to edit)
     const objectTagCheckerFn = new lambda.Function(this, 'objectTagCheckerFunction', {
       functionName: 'object-tag-checker',
-      runtime: lambda.Runtime.PYTHON_3_10,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'index.lambda_handler',
       code: lambda.Code.fromAsset('lib/lambda/object_tag_checker'),
       environment: {
