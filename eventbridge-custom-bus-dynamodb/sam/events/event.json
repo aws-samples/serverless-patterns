@@ -1,0 +1,7 @@
+[
+  {
+    "Source": "com.example.orders",
+    "DetailType": "Order Placed",
+    "Detail": "{\"id\":\"1001\",\"description\":\"Widget order\",\"total\":42.5}"
+  }
+]
