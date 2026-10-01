@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0.0"
+      version = "~> 6.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -158,7 +158,7 @@ resource "aws_apigatewayv2_integration_response" "disconnect_route_integration_r
 resource "aws_apigatewayv2_integration" "send_order_route_integration" {
   api_id                    = aws_apigatewayv2_api.web_socket_api.id
   integration_type          = "AWS"
-  integration_uri           = "arn:aws:apigateway:${data.aws_region.current.name}:sns:action/Publish"
+  integration_uri           = "arn:aws:apigateway:${data.aws_region.current.region}:sns:action/Publish"
   credentials_arn           = aws_iam_role.apigw_sns_demo_functionrole.arn
   integration_method        = "POST"
   content_handling_strategy = "CONVERT_TO_TEXT"
@@ -206,5 +206,5 @@ resource "aws_apigatewayv2_integration_response" "send_order_route_integration_r
 
 output "api_endpoint" {
   description = "API Gateway endpoint URL"
-  value       = "wss://${aws_apigatewayv2_api.web_socket_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${var.api_stage_name}"
+  value       = "wss://${aws_apigatewayv2_api.web_socket_api.id}.execute-api.${data.aws_region.current.region}.amazonaws.com/${var.api_stage_name}"
 }
