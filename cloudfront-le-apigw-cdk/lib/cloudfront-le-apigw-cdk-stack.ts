@@ -21,7 +21,7 @@ export class CloudfrontLeApigwCdkStack extends Stack {
     super(scope, id, props);
 
     const helloWorld = new lambda.Function(this, "HelloWorld", {
-      runtime:  lambda.Runtime.PYTHON_3_7,
+      runtime:  lambda.Runtime.PYTHON_3_14,
       code: lambda.Code.fromAsset("lambda"),
       handler: "index.handler",
     });
@@ -34,7 +34,7 @@ export class CloudfrontLeApigwCdkStack extends Stack {
     });
 
     const lambdaEdge = new lambda.Function(this, 'LambdaEdge', {
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('lambda_edge'),
     });
