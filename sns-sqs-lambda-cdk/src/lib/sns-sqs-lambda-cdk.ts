@@ -27,7 +27,7 @@ export class SNSSQSLambdaStack extends cdk.Stack {
 		/* Lambda function that sends messages */
 		const sender = new Function(this, 'SenderFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'sender.handler',
 			environment: {
 				TOPIC_ARN: snsTopic.topicArn,
@@ -43,7 +43,7 @@ export class SNSSQSLambdaStack extends cdk.Stack {
 		/* Lambda function that consumes messages from the queue */
 		const consumer = new Function(this, 'ConsumerFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'consumer.handler',
 		});
 
