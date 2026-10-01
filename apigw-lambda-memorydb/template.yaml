@@ -7,7 +7,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: java8
+    Runtime: java21
     MemorySize: 512
     Timeout: 900
 
@@ -110,8 +110,8 @@ Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: HelloWorldFunction
-      Handler: helloworld.App::handleRequest
+      CodeUri: .
+      Handler: com.example.helloworld.App::handleRequest
       Events:
         GetItem:
           Type: Api
