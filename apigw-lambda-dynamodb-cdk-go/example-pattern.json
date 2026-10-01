@@ -50,10 +50,10 @@
   "authors": [
     {
       "name": "Abhishek Gupta",
+      "bio": "Principal Developer Advocate @ AWS",
       "image": "https://abhirockzz.github.io/icon.jpg",
       "linkedin": "abhirockzz",
-      "twitter": "abhi_tweeter",
-      "bio": "Principal Developer Advocate @ AWS"
+      "twitter": "abhi_tweeter"
     }
   ]
 }

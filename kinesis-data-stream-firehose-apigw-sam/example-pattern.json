@@ -1,13 +1,13 @@
 {
   "title": "Amazon Kinesis Data Streams to Amazon API Gateway via Amazon Data Firehose",
-  "description": "POST data received by Kinesis Data Streams to an HTTP endpoint securely using Kinesis Data Firehose",
+  "description": "POST data received by Kinesis Data Streams to an HTTP endpoint securely using Amazon Data Firehose",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to send data received by Kinesis Data Streams to a HTTP endpoint with authorization (here API Gateway REST API) using Kinesis Data Firehose."
+      "This sample project demonstrates how to send data received by Kinesis Data Streams to a HTTP endpoint with authorization (here API Gateway REST API) using Amazon Data Firehose."
     ]
   },
   "gitHub": {
@@ -22,7 +22,7 @@
         "link": "https://aws.amazon.com/blogs/big-data/stream-data-to-an-http-endpoint-with-amazon-kinesis-data-firehose/"
       },
       {
-        "text": "Kinesis Data Firehose HTTP Endpoint Destination",
+        "text": "Amazon Data Firehose HTTP Endpoint Destination",
         "link": "https://docs.aws.amazon.com/firehose/latest/dev/create-destination.html#create-destination-http"
       }
     ]

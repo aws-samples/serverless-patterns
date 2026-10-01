@@ -1,15 +1,15 @@
 {
   "title": "Amazon CloudWatch Logs Subscription to Amazon Data Firehose",
-  "description": "Create a CloudWatch Logs subscription to Kinesis Firehose to S3 bucket",
+  "description": "Create a CloudWatch Logs subscription to Amazon Data Firehose to S3 bucket",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to create a log subscription in Cloudwath Logs with Kinesis Firehose as a log receiver.",
+      "This sample project demonstrates how to create a log subscription in Cloudwath Logs with Amazon Data Firehose as a log receiver.",
       "From Firehose, logs will be delivered to S3 bucket",
-      "Using filter rules, we can control the logs that sends from CloudWatch Logs to Kinesis Firehose."
+      "Using filter rules, we can control the logs that sends from CloudWatch Logs to Amazon Data Firehose."
     ]
   },
   "gitHub": {
@@ -24,7 +24,7 @@
         "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html"
       },
       {
-        "text": "CloudWatch subscription filters for Kinesis Firehose",
+        "text": "CloudWatch subscription filters for Amazon Data Firehose",
         "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html#FirehoseExample"
       }
     ]

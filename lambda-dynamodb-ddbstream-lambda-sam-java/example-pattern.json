@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates two lambda functions, a DynamoDB table and enables DynamoDB Stream using SAM and Java 11."
+      "This pattern creates two lambda functions, a DynamoDB table and enables DynamoDB Stream using SAM and Java 25."
     ]
   },
   "gitHub": {

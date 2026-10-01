@@ -19,7 +19,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Amazon Kinesis Data Analytics for Apache Flink",
+        "text": "Amazon Managed Service for Apache Flink for Apache Flink",
         "link": "https://docs.aws.amazon.com/kinesisanalytics/latest/java/what-is.html"
       }
     ]

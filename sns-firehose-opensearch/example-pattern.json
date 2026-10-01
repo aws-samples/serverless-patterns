@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The purpose of this pattern is to deploy the infrastructure necessary to use Kinesis Data Firehose to fanout Cloudwatch Alarms using SNS to the Amazon OpenSearch Service for analytics purposes."
+      "The purpose of this pattern is to deploy the infrastructure necessary to use Amazon Data Firehose to fanout Cloudwatch Alarms using SNS to the Amazon OpenSearch Service for analytics purposes."
     ]
   },
   "gitHub": {
@@ -18,7 +18,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Fanout to Kinesis Data Firehose delivery streams",
+        "text": "Fanout to Amazon Data Firehose delivery streams",
         "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
       },
       {

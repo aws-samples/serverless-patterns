@@ -1,13 +1,13 @@
 {
   "title": "Amazon Kinesis Data Streams to Amazon Data Firehose to Amazon S3",
-  "description": "Create a Kinesis Data Streams that writes to Kinesis Data Firehose, then an S3 bucket.",
+  "description": "Create a Kinesis Data Streams that writes to Amazon Data Firehose, then an S3 bucket.",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The SAM template deploys a Kinesis Data Streams, a Kinesis Data Firehose and an S3 bucket.",
+      "The SAM template deploys a Kinesis Data Streams, a Amazon Data Firehose and an S3 bucket.",
       "This is a Java project."
     ]
   },

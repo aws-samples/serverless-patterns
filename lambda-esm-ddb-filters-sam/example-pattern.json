@@ -9,7 +9,7 @@
     "text": [
       "Use this code to test out different trigger filters for your Lambda functions. You can use event filtering to control which events Lambda sends to your function for processing. You can use this template to explore and test how to configure event filtering for Amazon DynamoDB Stream messages triggering a Lambda function.",
       "Please note that this template is meant for testing, you can subscribe more than two Lambda functions to a DynamoDB Stream, but you'll likely experience read throttling, refer to the GitHub template README for more information.",
-      "The SAM template deploys multiple Lambda functions, a single stream-enabled Amazon DynamoDB Table and the permissions required to run the application. The template enforces 3 days retention period for all AWS Lambda CloudWatch logs. All AWS Lambda functions are deployed to NodeJS 18 runtime running on ARM64 processors powered by AWS Graviton."
+      "The SAM template deploys multiple Lambda functions, a single stream-enabled Amazon DynamoDB Table and the permissions required to run the application. The template enforces 3 days retention period for all AWS Lambda CloudWatch logs. All AWS Lambda functions are deployed to Node.js 24 runtime running on ARM64 processors powered by AWS Graviton."
     ]
   },
   "gitHub": {

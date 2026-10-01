@@ -10,7 +10,7 @@
       "This sample project demonstrates how to use Lambda for triggering trans-codification jobs on AWS Elemental MediaCovert. This pattern leverages the integration between Amazon S3 and AWS Lambda for triggering Lambda functions",
       "Each time you upload a video file to the input S3 bucket, a Lambda function is triggered. The function gets invocation event, process it, and creates a job in AWS Elemental MediaConverter. The settings of the job are in the job.json file which is part of the lambda deployment package.",
       "The output of the job is a transcoded video which is saved in the output S3 bucket.",
-      "This pattern deploys two S3 buckets, one AWS Lambda function and the required IAM Roles for making AWS Lambda capable of creating AWS Elemental MediaConvert jobs and write logs in Amazon CloudWatch Logs. AWS Lambda function is written in Python 3.9."
+      "This pattern deploys two S3 buckets, one AWS Lambda function and the required IAM Roles for making AWS Lambda capable of creating AWS Elemental MediaConvert jobs and write logs in Amazon CloudWatch Logs. AWS Lambda function is written in Python 3.14."
     ]
   },
   "gitHub": {

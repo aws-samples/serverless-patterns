@@ -52,9 +52,9 @@
   "authors": [
     {
       "name": "Ben Freiberg",
+      "bio": "Ben is a Senior Solutions Architect at Amazon Web Services (AWS) based in Frankfurt, Germany.",
       "image": "https://serverlessland.com/assets/images/contributors/ben-freiberg.jpg",
-      "linkedin": "benfreiberg",
-      "bio": "Ben is a Senior Solutions Architect at Amazon Web Services (AWS) based in Frankfurt, Germany."
+      "linkedin": "benfreiberg"
     }
   ]
 }

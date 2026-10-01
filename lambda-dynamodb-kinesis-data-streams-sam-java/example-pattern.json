@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "The SAM template deploys a Lambda function, a DynamoDB table and a Kinesis Data Stream.",
-      "This is a Java 11 implementation of this pattern."
+      "This is a Java 25 implementation of this pattern."
     ]
   },
   "gitHub": {

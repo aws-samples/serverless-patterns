@@ -10,7 +10,7 @@
       "The SAM template contains all the information to deploy AWS resources(one S3 bucket, one SQS queue and one Lambda function) and also the permission required by these service to communicate.",
       "You will be able to create and delete the CloudFormation stack using the CLI commands.",
       "The S3 will send notifications to an SQS queue when .png objects are deleted. The SQS will trigger and invoke a Lambda function which will display the object deleted as events.",
-      "This is fully functional example implemented in Java 11."
+      "This is fully functional example implemented in Java 25."
     ]
   },
   "gitHub": {

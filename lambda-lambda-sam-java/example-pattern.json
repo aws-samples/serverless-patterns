@@ -10,7 +10,7 @@
       "In this pattern SAM will deploy two Lambda functions, LambdaRequest and LambdaResponse. The LambdaRequest will call the LambdaResponse synchronously, and will wait for the response from the LambdaResponse function. The LambdaResponse will return an JSON payload.",
       "The SAM template contains all the information to deploy AWS resources and also the permission required by these service to communicate.",
       "You will be able to create and delete the CloudFormation stack using the CLI commands.",
-      "This is fully functional example developed in Java 11."
+      "This is fully functional example developed in Java 25."
     ]
   },
   "gitHub": {

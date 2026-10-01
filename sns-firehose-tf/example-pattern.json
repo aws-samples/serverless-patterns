@@ -1,13 +1,13 @@
 {
   "title": "Amazon SNS to Amazon Data Firehose",
-  "description": "Publishes SNS messages to a Kinesis Firehose Delivery Stream.",
+  "description": "Publishes SNS messages to a Amazon Data Firehose Delivery Stream.",
   "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This template creates an SNS topic, Kinesis Firehose delivery stream, S3 bucket, and subscribes the Kinesis Firehose Delivery Stream to the SNS topic.",
+      "This template creates an SNS topic, Amazon Data Firehose delivery stream, S3 bucket, and subscribes the Amazon Data Firehose Delivery Stream to the SNS topic.",
       "As messages are published to the topic, they are streamed to the Firehose delivery stream, and then delivered the the Firehose delivery stream's destination, which in this case is an S3 bucket."
     ]
   },
@@ -19,7 +19,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Fanout to Kinesis Data Firehose delivery streams",
+        "text": "Fanout to Amazon Data Firehose delivery streams",
         "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
       },
       {

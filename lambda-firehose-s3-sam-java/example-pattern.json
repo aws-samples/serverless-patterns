@@ -1,14 +1,14 @@
 {
   "title": "AWS Lambda to Amazon Data Firehose to Amazon S3",
-  "description": "Create a Lambda function that writes to Kinesis Data Firehose, then an S3 bucket.",
+  "description": "Create a Lambda function that writes to Amazon Data Firehose, then an S3 bucket.",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The SAM template deploys a Lambda function, a Kinesis Data Firehose and an S3 bucket.",
-      "This is a Java 11 implementation of this pattern."
+      "The SAM template deploys a Lambda function, a Amazon Data Firehose and an S3 bucket.",
+      "This is a Java 25 implementation of this pattern."
     ]
   },
   "gitHub": {

@@ -1,13 +1,13 @@
 {
   "title": "Deliver messages to Amazon OpenSearch via Amazon SNS and Amazon Kinesis",
-  "description": "This pattern deploys infrastructure that utilizes Kinesis Firehose to deliver messages sent to an SNS topic to Amazon OpenSearch.",
+  "description": "This pattern deploys infrastructure that utilizes Amazon Data Firehose to deliver messages sent to an SNS topic to Amazon OpenSearch.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Messages are sent to an SNS topic, and SNS fans out the messages to a Kinesis Data Firehose delivery stream. Firehose then streams and delivers the messages to OpenSearch, where the streaming data is loaded and indexed for analysis and searching. Additionally, failed data is backed up using an S3 bucket."
+      "Messages are sent to an SNS topic, and SNS fans out the messages to a Amazon Data Firehose delivery stream. Firehose then streams and delivers the messages to OpenSearch, where the streaming data is loaded and indexed for analysis and searching. Additionally, failed data is backed up using an S3 bucket."
     ]
   },
   "gitHub": {
@@ -18,7 +18,7 @@
   "resources": {
     "bullets": [
       {
-        "text": "Fanout to Kinesis Data Firehose delivery streams",
+        "text": "Fanout to Amazon Data Firehose delivery streams",
         "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
       },
       {

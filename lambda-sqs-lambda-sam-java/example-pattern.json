@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates two Lambda functions and an SQS queue using AWS SAM, and the code is implemented in Java 11."
+      "This pattern creates two Lambda functions and an SQS queue using AWS SAM, and the code is implemented in Java 25."
     ]
   },
   "gitHub": {

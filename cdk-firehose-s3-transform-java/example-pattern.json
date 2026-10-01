@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The purpose of this pattern is to deploy the infrastructure necessary to enable Kinesis Data Firehose data transformation.",
-      "Kinesis Data Firehose can invoke a Lambda function to transform incoming source data and deliver the transformed data to destinations. In this architecture, Kinesis Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode.",
-      "The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+      "The purpose of this pattern is to deploy the infrastructure necessary to enable Amazon Data Firehose data transformation.",
+      "Amazon Data Firehose can invoke a Lambda function to transform incoming source data and deliver the transformed data to destinations. In this architecture, Amazon Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode.",
+      "The transformed data is sent from Lambda to Amazon Data Firehose. Amazon Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
     ]
   },
   "gitHub": {

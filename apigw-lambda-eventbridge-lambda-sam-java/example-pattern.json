@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway HTTP API, a AWS Lambda function (publisher), a custom EventBridge bus and event rule, and another Lambda function (subscriber) using SAM and Java 11.",
+      "This pattern creates an Amazon API Gateway HTTP API, a AWS Lambda function (publisher), a custom EventBridge bus and event rule, and another Lambda function (subscriber) using SAM and Java 25.",
       "This example is an implementation of an publisher/subscriber pattern in Event-Drivent Architecture."
     ]
   },

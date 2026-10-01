@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern demonstrates how to transform streaming data received by Amazon Data Firehose using AWS Lambda before delivering the transformed data to Amazon S3.",
-      "To transform incoming source data, Kinesis Data Firehose invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+      "To transform incoming source data, Amazon Data Firehose invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Amazon Data Firehose. Amazon Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
     ]
   },
   "gitHub": {

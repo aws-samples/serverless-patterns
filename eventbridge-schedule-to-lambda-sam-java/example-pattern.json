@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This project demonstrates how to use Amazon EventBridge Scheduler with Lambda to invoke a function on a schedule. This pattern uses the rate type schedule to run the Lambda function every 5 minutes.",
-      "This deploys one EventBridge rate based schedule and one Java 11 based Lambda function."
+      "This deploys one EventBridge rate based schedule and one Java 25 based Lambda function."
     ]
   },
   "gitHub": {

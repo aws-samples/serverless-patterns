@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This SAM template creates a regional REST API with a mapping template in the integration request to pass to the Lambda function.",
-      "The AWS Lambda function is written in Node.js 18. The function returns a small message and a status code to the caller."
+      "The AWS Lambda function is written in Node.js 24. The function returns a small message and a status code to the caller."
     ]
   },
   "gitHub": {

@@ -11,7 +11,7 @@
       "To test this pattern you need to start the State Machine ProcessOrder from your terminal or from AWS Console Step Function. The state machine will invoke the OrderState Lambda function which will create a OrderCreated object which will be sent to a custom EventBridge Bus and intercepted by an Event Pattern Rule.",
       "The event pattern Rule will invoke the ProcessOrder Lambda function with the EventBridge message as a Payload.",
       "You can see the event in the CloudWatch Logs - Log Group of the ProcessOrder Lambda function.",
-      "This is fully functional example implemented in Java 11."
+      "This is fully functional example implemented in Java 25."
     ]
   },
   "gitHub": {

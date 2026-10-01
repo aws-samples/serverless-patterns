@@ -1,14 +1,14 @@
 {
   "title": "Amazon Kinesis Data Streams to Amazon OpenSearch via Amazon Data Firehose",
-  "description": "Send data received by Kinesis Data Streams to Amazon OpenSearch via Kinesis Data Firehose.",
+  "description": "Send data received by Kinesis Data Streams to Amazon OpenSearch via Amazon Data Firehose.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This SAM template creates a Kinesis Data Stream, Kinesis Data Firehose and Amazon OpenSearch Service serverless collection. Kinesis Data Firehose is configured with Kinesis Data Stream as a source and Amazon OpenSearch as a destination.",
-      "When a message is pushed to the Kinesis Data Stream, it's replicated to OpenSearch using Kinesis Data Firehose. If any messages  can not be processed by Kinesis Data Firehose, they are sent to an S3 bucket."
+      "This SAM template creates a Kinesis Data Stream, Amazon Data Firehose and Amazon OpenSearch Service serverless collection. Amazon Data Firehose is configured with Kinesis Data Stream as a source and Amazon OpenSearch as a destination.",
+      "When a message is pushed to the Kinesis Data Stream, it's replicated to OpenSearch using Amazon Data Firehose. If any messages  can not be processed by Amazon Data Firehose, they are sent to an S3 bucket."
     ]
   },
   "gitHub": {
@@ -19,11 +19,11 @@
   "resources": {
     "bullets": [
       {
-        "text": "Writing to Kinesis Data Firehose Using Kinesis Data Streams",
+        "text": "Writing to Amazon Data Firehose Using Kinesis Data Streams",
         "link": "https://docs.aws.amazon.com/firehose/latest/dev/writing-with-kinesis-streams.html"
       },
       {
-        "text": "Kinesis Data Firehose with Amazon OpenSearch Destination Settings",
+        "text": "Amazon Data Firehose with Amazon OpenSearch Destination Settings",
         "link": "https://docs.aws.amazon.com/firehose/latest/dev/create-destination.html#create-destination-elasticsearch"
       },
       {

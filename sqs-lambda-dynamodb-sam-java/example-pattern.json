@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an SQS queue, a Lambda Function, and a DynamoDB table allowing batch writes from SQS messages to a DynamoDB. The CDK application contains the minimum IAM resources required to run the application, using SAM and Java 11."
+      "This pattern deploys an SQS queue, a Lambda Function, and a DynamoDB table allowing batch writes from SQS messages to a DynamoDB. The CDK application contains the minimum IAM resources required to run the application, using SAM and Java 25."
     ]
   },
   "gitHub": {

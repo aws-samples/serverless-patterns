@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an two Lambda function, a producer and a consumer, an SNS topic and an SQS queue using SAM and Java 21."
+      "This pattern creates an two Lambda function, a producer and a consumer, an SNS topic and an SQS queue using SAM and Java 25."
     ]
   },
   "gitHub": {
