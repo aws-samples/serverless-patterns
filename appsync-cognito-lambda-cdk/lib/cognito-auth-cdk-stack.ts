@@ -117,7 +117,7 @@ export class CognitoAuthCdkStack extends Stack {
     const userLambda = new NodejsFunction(this, "CognitoUserHandler", {
       tracing: Tracing.ACTIVE,
       codeSigningConfig,
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "handler",
       entry: path.join(__dirname, "lambda-fns", "app.ts"),
 
