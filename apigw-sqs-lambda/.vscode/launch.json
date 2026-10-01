@@ -12,7 +12,7 @@
             "lambda": {
                 "payload": {},
                 "environmentVariables": {},
-                "runtime": "nodejs16.x"
+                "runtime": "nodejs24.x"
             }
         },
         {
@@ -32,7 +32,7 @@
                 }
             },
             "lambda": {
-                "runtime": "nodejs16.x"
+                "runtime": "nodejs24.x"
             }
         },
         {
