@@ -23,7 +23,7 @@ namespace AlbPathBasedRouteLambdaCdk
             // Create an AWS Lambda function
             var lambdaFunction1 = new Function(this, "MyLambdaFunction1", new FunctionProps
             {
-                Runtime = Runtime.NODEJS_14_X,
+                Runtime = Runtime.NODEJS_24_X,
                 Handler = "index.handler", // Update with your Lambda handler
                 Code = Code.FromAsset("./src/AlbPathBasedRouteLambdaCdk/Lambda1.zip"),
                 Vpc = vpc, // Attach the Lambda to the VPC
@@ -32,7 +32,7 @@ namespace AlbPathBasedRouteLambdaCdk
             // Create an AWS Lambda function
             var lambdaFunction2 = new Function(this, "MyLambdaFunction2", new FunctionProps
             {
-                Runtime = Runtime.NODEJS_14_X,
+                Runtime = Runtime.NODEJS_24_X,
                 Handler = "index.handler", // Update with your Lambda handler
                 Code = Code.FromAsset("./src/AlbPathBasedRouteLambdaCdk/Lambda2.zip"),
                 Vpc = vpc, // Attach the Lambda to the VPC
