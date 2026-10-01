@@ -30,9 +30,9 @@ namespace ApigwSnsSqsLambdaCdkDotnet
 
             var lambdaCarChangeQueueNonPremium = new Function(this, "nonPremiumWorkerHandler", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "ApiEventHandler::ApiEventHandler.Function::SQSHandler",
-                Code = Code.FromAsset("./src/lambdaHandler/ApiEventHandler/src/ApiEventHandler/bin/Debug/net6.0"),
+                Code = Code.FromAsset("./src/lambdaHandler/ApiEventHandler/src/ApiEventHandler/bin/Debug/net10.0"),
 
             });
 
@@ -49,7 +49,7 @@ namespace ApigwSnsSqsLambdaCdkDotnet
 
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -63,7 +63,7 @@ namespace ApigwSnsSqsLambdaCdkDotnet
 
             var lambdaCarChangeQueuePremium = new Function(this, "premiumWorkerHandler", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "Lambdas::Lambdas.Function::SQSHandler",
                 Code = Code.FromAsset("./src/lambdaHandler/ApiEventHandler/src/ApiEventHandler", new AssetOptions
                 {
