@@ -16,7 +16,7 @@ namespace Cdk
         {
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -55,7 +55,7 @@ namespace Cdk
             Function processDynamoDBFunc = new Function(this, "ProcessDynamoDBRecordsFunction", new FunctionProps
             {
                 FunctionName = functionName,
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset("code/src/AddItemsDynamoDB", new Amazon.CDK.AWS.S3.Assets.AssetOptions()
                 {
                     Bundling = buildOption
