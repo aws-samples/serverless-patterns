@@ -40,7 +40,7 @@ class MyStack(scope: Construct, id: String) : Stack(scope, id) {
             .handler("org.myorg.example.MyLambda::handleRequest")
             .timeout(Duration.seconds(50))
             .memorySize(1024)
-            .runtime(Runtime.JAVA_8)
+            .runtime(Runtime.JAVA_21)
             .build()
 
     private fun addDynamoDBStreamToLambda(function: Function, table: Table) {

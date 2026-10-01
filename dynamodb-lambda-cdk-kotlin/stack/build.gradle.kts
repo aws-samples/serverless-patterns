@@ -1,10 +1,10 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "2.4.20"
     application
-    kotlin("plugin.serialization") version "1.5.20"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    kotlin("plugin.serialization") version "2.4.20"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
 group = "org.myorg"
@@ -15,22 +15,26 @@ repositories {
 }
 
 dependencies {
-    val cdkVersion = "2.56.0"
-    implementation("software.amazon.awscdk:aws-cdk-lib:${cdkVersion}")
-    implementation("software.constructs:constructs:${cdkVersion}")
-    testImplementation(kotlin("test"))}
-
-
+    implementation("software.amazon.awscdk:aws-cdk-lib:2.272.0")
+    implementation("software.constructs:constructs:10.8.1")
+    testImplementation(kotlin("test"))
+}
 
 tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
 }
 
 application {
     mainClass.set("org.myorg.example.AppKt")
 }
-
