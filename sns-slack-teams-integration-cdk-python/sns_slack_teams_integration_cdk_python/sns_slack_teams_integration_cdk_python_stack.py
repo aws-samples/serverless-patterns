@@ -15,7 +15,7 @@ class SnsSlackTeamsIntegrationCdkPythonStack(Stack):
 
         # Lambda function
         lambdaFn = _lambda.Function(self, "SlackTeamsIntegrationLambda",
-                                    runtime=_lambda.Runtime.PYTHON_3_8,
+                                    runtime=_lambda.Runtime.PYTHON_3_14,
                                     code=_lambda.Code.from_asset('lambda'),
                                     handler="lambda_function.lambda_handler", 
                                     timeout=Duration.seconds(10))
