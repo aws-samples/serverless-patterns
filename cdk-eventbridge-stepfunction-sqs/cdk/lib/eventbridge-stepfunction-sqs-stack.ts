@@ -18,7 +18,7 @@ export class EventBridgeCDKStateMachineStack extends cdk.Stack {
 
     // Defines an AWS Lambda resource
     const executionLambda = new lambda.Function(this, 'executionLambda', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset(path.join(__dirname, '/../src/stepFunctionExecution')),
       handler: 'stepFunctionExecution.handler',
       timeout: cdk.Duration.seconds(900)
