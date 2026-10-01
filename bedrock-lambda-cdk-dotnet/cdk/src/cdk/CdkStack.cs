@@ -64,7 +64,7 @@ namespace Cdk
                 FunctionName = lambdaFunctionName,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "BedrockLambda::BedrockLambda.Function::FunctionHandler",
                 LogRetention = RetentionDays.ONE_DAY,
                 Role = lambdaIAMRole,

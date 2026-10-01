@@ -4,7 +4,7 @@
       "commandName": "Executable",
       "executablePath": "%USERPROFILE%\\.dotnet\\tools\\dotnet-lambda-test-tool-8.0.exe",
       "commandLineArgs": "--port 5050",
-      "workingDirectory": ".\\bin\\$(Configuration)\\net8.0"
+      "workingDirectory": ".\\bin\\$(Configuration)\\net10.0"
     }
   }
 }
