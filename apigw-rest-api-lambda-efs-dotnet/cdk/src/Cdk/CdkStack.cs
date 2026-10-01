@@ -23,7 +23,7 @@ namespace Cdk
         {
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -73,7 +73,7 @@ namespace Cdk
             var function = new Function(this, functionName, new FunctionProps
             {
                 FunctionName = functionName,
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset(codePath, new Amazon.CDK.AWS.S3.Assets.AssetOptions()
                 {
                     Bundling = buildOption
