@@ -20,7 +20,8 @@ Description: >
 # actions that EventBridge calls directly. The request body is built from the
 # event(s) with a JSONata expression, so no custom code is needed.
 #
-# Two subscribers share the bus and the table:
+# Two subscribers share the bus and the table. Events are published with
+# PutRawEvents and routed on the eventType key of the entry's Metadata:
 #   * OrdersToDynamoDbSubscriber      - "Order Placed"   -> PutItem, 1 event per call
 #   * OrdersBatchToDynamoDbSubscriber - "Order Imported" -> BatchWriteItem, up to
 #                                       25 events per call
@@ -34,8 +35,8 @@ Parameters:
     AllowedPattern: "^[A-Za-z0-9][\\.\\-_A-Za-z0-9]{0,255}$"
 
 Resources:
-  # The Custom Event Bus. Events are published to it with PutEvents / PutRawEvents
-  # and retained for the configured period so subscribers can replay them.
+  # The Custom Event Bus. This pattern publishes to it with PutRawEvents, and
+  # the bus retains events for the configured period so subscribers can replay them.
   EventBus:
     Type: AWS::EventsV2::EventBus
     Properties:
@@ -94,7 +95,7 @@ Resources:
                 Resource: !GetAtt DeadLetterQueue.Arn
 
   # The subscriber: filter + universal target. It receives events whose
-  # detail-type is "Order Placed" and writes one DynamoDB item per event.
+  # eventType metadata is "Order Placed" and writes one DynamoDB item per event.
   OrdersToDynamoDbSubscriber:
     Type: AWS::EventsV2::Subscriber
     Properties:
@@ -102,13 +103,13 @@ Resources:
       # Ref on the bus returns its full ARN (including the generated identifier).
       EventBusArn: !Ref EventBus
       Type: UNORDERED
-      # Only deliver matching events. Scope DATA matches the event payload; for
-      # events published with PutEvents, the EventBridge envelope carries
-      # detail-type at the top level of the delivered payload.
+      # Only deliver matching events. Events are published with PutRawEvents,
+      # and the publisher sets the eventType key in the entry's Metadata.
+      # METADATA filters match exact values only.
       FilterConfiguration:
         Filters:
-          - Scope: DATA
-            Pattern: '{"detail-type":["Order Placed"]}'
+          - Scope: METADATA
+            Pattern: '{"eventType":["Order Placed"]}'
       InvokeConfiguration:
         # Universal target ARN: no region, no account; service id + camelCase
         # action with a lowercase first letter (putItem, not PutItem).
@@ -116,16 +117,15 @@ Resources:
         RoleArn: !GetAtt SubscriberDeliveryRole.Arn
         UniversalTargetParameters:
           # The DynamoDB PutItem request, built from the event with JSONata
-          # (wrapped in {% %}). For PutEvents, the caller's Detail object is at
-          # $events.Data.detail and the envelope fields at $events.Data.
+          # (wrapped in {% %}). For PutRawEvents, the published payload is at
+          # $events.Data and the publisher's metadata at $events.Metadata.
           Input: !Sub |-
             {% {
               "TableName": "${OrdersTable}",
               "Item": {
-                "id":         { "S": $events.Data.detail.id },
-                "detailType": { "S": $events.Data.`detail-type` },
-                "source":     { "S": $events.Data.source },
-                "detail":     { "S": $string($events.Data.detail) }
+                "id":        { "S": $events.Data.id },
+                "eventType": { "S": $events.Metadata.eventType },
+                "detail":    { "S": $string($events.Data) }
               }
             } %}
       # One API call per event. Required when the request is per-event JSONata.
@@ -139,8 +139,9 @@ Resources:
       OnFailureConfiguration:
         Arn: !GetAtt DeadLetterQueue.Arn
 
-  # The batch subscriber: receives events whose detail-type is "Order Imported"
-  # and writes them in groups with a single BatchWriteItem call per batch.
+  # The batch subscriber: receives events whose eventType metadata is
+  # "Order Imported" and writes them in groups with a single BatchWriteItem
+  # call per batch.
   OrdersBatchToDynamoDbSubscriber:
     Type: AWS::EventsV2::Subscriber
     Properties:
@@ -149,8 +150,8 @@ Resources:
       Type: UNORDERED
       FilterConfiguration:
         Filters:
-          - Scope: DATA
-            Pattern: '{"detail-type":["Order Imported"]}'
+          - Scope: METADATA
+            Pattern: '{"eventType":["Order Imported"]}'
       InvokeConfiguration:
         TargetArn: arn:aws:events:::aws-sdk:dynamodb:batchWriteItem
         RoleArn: !GetAtt SubscriberDeliveryRole.Arn
@@ -164,10 +165,9 @@ Resources:
                 "${OrdersTable}": [$events.{
                   "PutRequest": {
                     "Item": {
-                      "id":         { "S": Data.detail.id },
-                      "detailType": { "S": Data.`detail-type` },
-                      "source":     { "S": Data.source },
-                      "detail":     { "S": $string(Data.detail) }
+                      "id":        { "S": Data.id },
+                      "eventType": { "S": Metadata.eventType },
+                      "detail":    { "S": $string(Data) }
                     }
                   }
                 }]

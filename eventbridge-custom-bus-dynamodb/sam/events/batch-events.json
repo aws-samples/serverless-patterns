@@ -1,17 +1,17 @@
 [
   {
-    "Source": "com.example.orders",
-    "DetailType": "Order Imported",
-    "Detail": "{\"id\":\"2001\",\"description\":\"Imported order A\",\"total\":10}"
+    "Data": "{\"id\":\"2001\",\"description\":\"Imported order A\",\"total\":10}",
+    "Metadata": { "eventType": "Order Imported" },
+    "SystemMetadata": { "ContentType": "application/json" }
   },
   {
-    "Source": "com.example.orders",
-    "DetailType": "Order Imported",
-    "Detail": "{\"id\":\"2002\",\"description\":\"Imported order B\",\"total\":20}"
+    "Data": "{\"id\":\"2002\",\"description\":\"Imported order B\",\"total\":20}",
+    "Metadata": { "eventType": "Order Imported" },
+    "SystemMetadata": { "ContentType": "application/json" }
   },
   {
-    "Source": "com.example.orders",
-    "DetailType": "Order Imported",
-    "Detail": "{\"id\":\"2003\",\"description\":\"Imported order C\",\"total\":30}"
+    "Data": "{\"id\":\"2003\",\"description\":\"Imported order C\",\"total\":30}",
+    "Metadata": { "eventType": "Order Imported" },
+    "SystemMetadata": { "ContentType": "application/json" }
   }
 ]

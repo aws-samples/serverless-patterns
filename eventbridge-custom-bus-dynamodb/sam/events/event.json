@@ -1,7 +1,7 @@
 [
   {
-    "Source": "com.example.orders",
-    "DetailType": "Order Placed",
-    "Detail": "{\"id\":\"1001\",\"description\":\"Widget order\",\"total\":42.5}"
+    "Data": "{\"id\":\"1001\",\"description\":\"Widget order\",\"total\":42.5}",
+    "Metadata": { "eventType": "Order Placed" },
+    "SystemMetadata": { "ContentType": "application/json" }
   }
 ]

@@ -38,47 +38,51 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The template deploys an EventBridge Custom Event Bus, a DynamoDB table, an SQS dead-letter queue, and two subscribers. Each subscriber filters events by `detail-type` and delivers them to a *universal target*, a DynamoDB API action that EventBridge calls directly. A JSONata expression in the subscriber builds the API request from the event, so no Lambda function is needed.
+The template deploys an EventBridge Custom Event Bus, a DynamoDB table, an SQS dead-letter queue, and two subscribers. Events are published with `PutRawEvents`, which sends the JSON payload as is and lets the publisher attach metadata. Each subscriber filters events on the `eventType` metadata key and delivers them to a *universal target*, a DynamoDB API action that EventBridge calls directly. A JSONata expression in the subscriber builds the API request from the event, so no Lambda function is needed.
 
-* **Single write** (`orders-to-dynamodb`): events with detail-type `Order Placed` are written one at a time with `PutItem`.
-* **Batch write** (`orders-batch-to-dynamodb`): events with detail-type `Order Imported` are collected for up to 10 seconds or 25 events (the `BatchWriteItem` limit) and written with a single `BatchWriteItem` call.
+* **Single write** (`orders-to-dynamodb`): events with `eventType` `Order Placed` are written one at a time with `PutItem`.
+* **Batch write** (`orders-batch-to-dynamodb`): events with `eventType` `Order Imported` are collected for up to 10 seconds or 25 events (the `BatchWriteItem` limit) and written with a single `BatchWriteItem` call.
 
 With the batch write, a failure affects the whole batch: if two events in a batch have the same `id`, or if DynamoDB throttles the call, EventBridge retries the entire batch and, once the retries are exhausted, writes one record to the dead-letter queue listing the IDs of all events in the batch. Configure the dead-letter queue for the batch subscriber; without it, failed batches are dropped and the only trace is the `EventsDropped` metric. Failed events stay on the bus for the retention period and can be replayed to a new subscriber.
 
 ## Testing
 
-1. Set the bus ARN and table name from the stack outputs:
+1. Set the name of the stack you deployed, then read the bus ARN and table name from the stack outputs:
 
     ```bash
+    STACK_NAME=your-stack-name
+
     EVENT_BUS_ARN=$(aws cloudformation describe-stacks \
-      --stack-name STACK_NAME \
+      --stack-name "$STACK_NAME" \
       --query "Stacks[0].Outputs[?OutputKey=='EventBusArn'].OutputValue" --output text)
 
     TABLE_NAME=$(aws cloudformation describe-stacks \
-      --stack-name STACK_NAME \
+      --stack-name "$STACK_NAME" \
       --query "Stacks[0].Outputs[?OutputKey=='TableName'].OutputValue" --output text)
     ```
 
 2. Test the single write. Publish the `Order Placed` event in `events/event.json`, then read the item after a few seconds:
 
     ```bash
-    aws eventsv2 put-events \
+    aws eventsv2 put-raw-events \
       --event-bus-arn "$EVENT_BUS_ARN" \
-      --entries file://events/event.json
+      --entries file://events/event.json \
+      --cli-binary-format raw-in-base64-out
 
     aws dynamodb get-item \
       --table-name "$TABLE_NAME" \
       --key '{"id":{"S":"1001"}}'
     ```
 
-    The response from `put-events` confirms only that the bus accepted the event. The `get-item` call should return an item with `id` `1001` and a `detailType` of `Order Placed`.
+    Each entry in the event file holds the JSON payload in `Data`, the `eventType` in `Metadata`, and the content type `application/json`. `--cli-binary-format raw-in-base64-out` lets the AWS CLI send `Data` as written instead of expecting Base64. The response from `put-raw-events` confirms only that the bus accepted the event. The `get-item` call should return an item with `id` `1001` and an `eventType` of `Order Placed`.
 
 3. Test the batch write. Publish the three `Order Imported` events in `events/batch-events.json`. The subscriber waits up to 10 seconds for more events before it writes the batch, so read the items after about 15 seconds:
 
     ```bash
-    aws eventsv2 put-events \
+    aws eventsv2 put-raw-events \
       --event-bus-arn "$EVENT_BUS_ARN" \
-      --entries file://events/batch-events.json
+      --entries file://events/batch-events.json \
+      --cli-binary-format raw-in-base64-out
 
     aws dynamodb batch-get-item --request-items "{
       \"$TABLE_NAME\": { \"Keys\": [
@@ -87,13 +91,13 @@ With the batch write, a failure affects the whole batch: if two events in a batc
     }"
     ```
 
-    You should see three items with a `detailType` of `Order Imported`.
+    You should see three items with an `eventType` of `Order Imported`.
 
 4. If an item does not appear, check the dead-letter queue. Each record names the error code and the IDs of the failed events:
 
     ```bash
     DLQ_URL=$(aws cloudformation describe-stacks \
-      --stack-name STACK_NAME \
+      --stack-name "$STACK_NAME" \
       --query "Stacks[0].Outputs[?OutputKey=='DeadLetterQueueUrl'].OutputValue" --output text)
 
     aws sqs receive-message --queue-url "$DLQ_URL"
@@ -104,13 +108,13 @@ With the batch write, a failure affects the whole batch: if two events in a batc
 
 ## Cleanup
 
-1. Delete the stack:
+1. Delete the stack. `STACK_NAME` is the variable set in Testing step 1:
     ```bash
-    sam delete --stack-name STACK_NAME
+    sam delete --stack-name "$STACK_NAME"
     ```
 1. Confirm the stack has been deleted:
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'$STACK_NAME')].StackStatus"
     ```
 
 ----
