@@ -1,6 +1,6 @@
-﻿FROM public.ecr.aws/lambda/dotnet:6 AS base
+﻿FROM public.ecr.aws/lambda/dotnet:10 AS base
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim as build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 as build
 WORKDIR /src
 COPY ["rawLambda.csproj", "rawLambda/"]
 RUN dotnet restore "rawLambda/rawLambda.csproj"
