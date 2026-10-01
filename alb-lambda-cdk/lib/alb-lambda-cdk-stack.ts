@@ -41,7 +41,7 @@ export class AlbLambdaCdkStack extends Stack {
     });
 
     const lambdaFunction = new nodejs_lambda.NodejsFunction(this, "LambdaFunction", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, `/../lambda/index.ts`),
       handler: "handler",
     });
