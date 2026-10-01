@@ -289,12 +289,12 @@ namespace Cdk
         /// </summary>
         private (IFunction claimCheckSplitLambda, IFunction claimCheckRetrievalLambda) CreateFunctions(IQueue sampleDataWriteQueue, ITable claimCheckTable)
         {
-            const string lambdaBinPath = "../lambda/bin/Debug/net6.0";
+            const string lambdaBinPath = "../lambda/bin/Debug/net10.0";
 
             // Lambda for generation of sample data
             var claimCheckSampleDataCreatorLambda = new Function(this, "ClaimCheckSampleDataCreatorLambda", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset(lambdaBinPath),
                 Handler = "ClaimCheckPattern::ClaimCheckPattern.ClaimCheckDataCreator::FunctionHandler",
                 Environment = new Dictionary<string, string>(1)
@@ -310,7 +310,7 @@ namespace Cdk
             // Lambda for splitting a full message into a claim check
             var claimCheckSplitLambda = new Function(this, "ClaimCheckSplitLambda", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset(lambdaBinPath),
                 Handler = "ClaimCheckPattern::ClaimCheckPattern.ClaimCheckSplitter::FunctionHandler",
                 Environment = new Dictionary<string, string>(1)
@@ -326,7 +326,7 @@ namespace Cdk
             // Lambda for retrieving a full message from a claim check
             var claimCheckRetrievalLambda = new Function(this, "ClaimCheckRetrievalLambda", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset(lambdaBinPath),
                 Handler = "ClaimCheckPattern::ClaimCheckPattern.ClaimCheckRetriever::FunctionHandler",
                 Environment = new Dictionary<string, string>(1)
