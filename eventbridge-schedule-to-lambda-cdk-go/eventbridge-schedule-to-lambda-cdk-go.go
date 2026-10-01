@@ -22,9 +22,9 @@ func NewEventbridgeScheduleToLambdaCdkGoStack(scope constructs.Construct, id str
 
 	// Create Go based lambda function
 	goLambdaFunction := awslambda.NewFunction(stack, jsii.String("EventBridgeLambdaTarget"), &awslambda.FunctionProps{
-		Runtime:      awslambda.Runtime_GO_1_X(),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2023(),
 		Code:         awslambda.Code_FromAsset(jsii.String("./src/main.zip"), nil),
-		Handler:      jsii.String("main"),
+		Handler:      jsii.String("bootstrap"),
 		Timeout:      awscdk.Duration_Seconds(jsii.Number(30)),
 	})
 
