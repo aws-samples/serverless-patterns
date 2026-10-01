@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk');
-const sns = new AWS.SNS();
+const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
+const sns = new SNSClient({});
 
 exports.handler = async (event) => {
 	const color = event.color;
@@ -17,6 +17,6 @@ exports.handler = async (event) => {
 		},
 	};
 
-	const result = await sns.publish(params).promise();
+	const result = await sns.send(new PublishCommand(params));
 	console.log(result);
 };
