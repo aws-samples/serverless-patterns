@@ -23,7 +23,7 @@ const (
 
 // Lambda function related constants
 const (
-	lambdaHandlerName   = "my-func" //same as Go binary name
+	lambdaHandlerName   = "bootstrap" //same as Go binary name
 	functionZipFilePath = "../function/function.zip"
 )
 
@@ -50,7 +50,7 @@ func NewApigwLambdaDynamodbCdkGolangStack(scope constructs.Construct, id string,
 	lambdaEnvVar := &map[string]*string{dynamoDBTableNameEnvVar: dynamoDBTable.TableName()}
 
 	// lambda function packaged as zip file
-	function := awslambda.NewFunction(stack, jsii.String("lambda-function"), &awslambda.FunctionProps{Runtime: awslambda.Runtime_GO_1_X(), Handler: jsii.String(lambdaHandlerName), Code: awslambda.AssetCode_FromAsset(jsii.String(functionZipFilePath), nil), Environment: lambdaEnvVar})
+	function := awslambda.NewFunction(stack, jsii.String("lambda-function"), &awslambda.FunctionProps{Runtime: awslambda.Runtime_PROVIDED_AL2023(), Handler: jsii.String(lambdaHandlerName), Code: awslambda.AssetCode_FromAsset(jsii.String(functionZipFilePath), nil), Environment: lambdaEnvVar})
 
 	// policy to allow DynamoDB PutItem calls
 	dynamoDBPutItemPolicy := awsiam.NewPolicy(stack, jsii.String("policy"), &awsiam.PolicyProps{PolicyName: jsii.String("LambdaDynamoDBPutItemPolicy"), Statements: &[]awsiam.PolicyStatement{awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{Effect: awsiam.Effect_ALLOW, Actions: jsii.Strings("dynamodb:PutItem"), Resources: jsii.Strings(*dynamoDBTable.TableArn())})}})
