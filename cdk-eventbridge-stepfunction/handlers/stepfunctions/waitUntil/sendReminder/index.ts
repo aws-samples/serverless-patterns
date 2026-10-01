@@ -1,5 +1,7 @@
 import { EventBridgeEvent, Context } from "aws-lambda";
-import { EventBridge } from "aws-sdk";
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
+
+const eventBridge = new EventBridgeClient({});
 
 export enum EventBridgeTypes {
   StartReminder = "StartReminder",
@@ -32,9 +34,8 @@ export const publish = async <TEvent>(
   detail: TEvent,
   eventBusName: string = "default"
 ) => {
-  const eventBus = new EventBridge();
-  const res = await eventBus
-    .putEvents({
+  const res = await eventBridge.send(
+    new PutEventsCommand({
       Entries: [
         {
           EventBusName: eventBusName,
@@ -44,7 +45,7 @@ export const publish = async <TEvent>(
         },
       ],
     })
-    .promise();
+  );
   const errors: string[] = [];
   res.Entries?.forEach((entry) => {
     if (entry.ErrorMessage) {

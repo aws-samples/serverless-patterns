@@ -31,7 +31,7 @@ export class CdkEventbridgeStepfunctionStack extends Stack {
       this,
       "sendReminderHandler",
       {
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: "handler",
         entry: path.join(
           __dirname,
