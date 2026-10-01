@@ -1,0 +1,52 @@
+{
+  "title": "Amazon API Gateway CORS allowlist",
+  "description": "Create an allowlist of domains for CORS pre-flight requests.",
+  "language": "Go",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "By instrumenting CORS, a browser's request will be validated against an OPTIONS request inside of API Gateway. API Gateway only allows a single domain to be registered or a `*` can be utilized to allow all domains. In the case of more restriction and more flexibility, a whitelist of allowed domains can be built using a Lambda that is executed via a Proxy Integration."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "infra/lib/main-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+      },
+      {
+        "text": "Amazon API Gateway CORS",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html"
+      },
+      {
+        "text": "Go Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "make build-and-deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "make teardown"
+    ]
+  },
+  "contributors": [
+    "content/contributors/benjamen-pyle.json"
+  ]
+}

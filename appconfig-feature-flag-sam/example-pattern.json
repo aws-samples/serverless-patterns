@@ -1,0 +1,58 @@
+{
+  "title": "AppConfig Feature Flag",
+  "description": "Read the status from Appconfig Application using Lambda Extension",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to implement a feature flag into AppConfig using AWS SAM.",
+      "Also how to use of AppConfig Lambda Extension to retrieve the status of a Feature Flag."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppConfig",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html"
+      },
+      {
+        "text": "AppConfig Feature Flags",
+        "link": "https://aws.amazon.com/blogs/mt/using-aws-appconfig-feature-flags/"
+      },
+      {
+        "text": "AppConfig Lambda Extension",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.html"
+      },
+      {
+        "text": "AppConfig region specific Lambda Extension versions",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete"
+    ]
+  },
+  "contributors": [
+    "content/contributors/greg-davis.json"
+  ]
+}

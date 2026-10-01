@@ -9,14 +9,11 @@
     "text": [
       "This pattern creates an AWS Lambda function and an Amazon Aurora MySQL database version 2 (with MySQL 5.7 compatibility) in an Aurora Serverless version 1 DB cluster with Data API and a Secrets Manager secret.",
       "The function creates an example table in the DB, inserts a row with data from the event object, then returns the results of a select query.",
-      "For Aurora Serverless v2, please use [another pattern](https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql)"
+      "For Aurora Serverless v2, please use <a href=\"https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql\">another pattern</a>"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-aurora-serverless",
-      "templateURL": "serverless-patterns/lambda-aurora",
-      "projectFolder": "lambda-aurora-serverless",
       "templateFile": "template.yml"
     }
   },
@@ -54,8 +51,8 @@
   "authors": [
     {
       "name": "Greg Davis",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/greg-davis.jpg",
       "bio": "I am a Principal Solutions Architect, Serverless Developer, Database Engineer, and Data Integration Architect. I specialize in architecting and developing Serverless, event-driven solutions.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/greg-davis.jpg",
       "linkedin": "gregtx",
       "twitter": "ServerlessGuy"
     }

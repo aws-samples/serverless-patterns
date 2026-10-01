@@ -6,20 +6,19 @@
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
-    "text": ["When a user sends a message to the EventBridge bus, the message gets routed to the EventBridge rule based on the \"DetailType\". Then, the EventBridge rule sends the \"Detail\" field value from the message to the rule target Firehose delivery stream. Once the message reaches the Firehose delivery stream, the JsonParsingEngine processes the message to read the \"Department\" field value, which is used for the S3 prefix. After message processing, the message gets delivered to the targeted S3 bucket by following the calculated S3 prefix based on the \"Department\" field value."]
+    "text": [
+      "When a user sends a message to the EventBridge bus, the message gets routed to the EventBridge rule based on the \"DetailType\". Then, the EventBridge rule sends the \"Detail\" field value from the message to the rule target Firehose delivery stream. Once the message reaches the Firehose delivery stream, the JsonParsingEngine processes the message to read the \"Department\" field value, which is used for the S3 prefix. After message processing, the message gets delivered to the targeted S3 bucket by following the calculated S3 prefix based on the \"Department\" field value."
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-firehose-s3-cdk-java",
-      "projectFolder": "eventbridge-firehose-s3-cdk-java",
-      "templateFile": "src/main/java/com/myorg/EventBridgeFirehoseS3Stack.java",
-      "templateURL": "serverless-patterns/eventbridge-firehose-s3-cdk-java"
+      "templateFile": "src/main/java/com/myorg/EventBridgeFirehoseS3Stack.java"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Amazon Kinesis Data Firehose Delivery Stream",
+        "text": "Amazon Data Firehose Delivery Stream",
         "link": "https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html"
       },
       {
@@ -50,8 +49,8 @@
   "authors": [
     {
       "name": "Matt Ridehalgh",
-      "image": "https://avatars.githubusercontent.com/u/9155962",
       "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
+      "image": "https://avatars.githubusercontent.com/u/9155962",
       "linkedin": "matthew-ridehalgh",
       "twitter": "mrideh"
     }

@@ -1,25 +1,21 @@
 {
   "title": "Amazon API Gateway to Amazon Kinesis",
-  "description": "Create an Amazon API Gateway to Amazon Kinesis REST API",
-  "language": "Typescript",
-  "level": "200",
+  "description": "Amazon API Gateway to Amazon Kinesis Data Stream",
+  "language": "TypeScript",
+  "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis Data Stream using the AWS Cloud Development Kit (AWS CDK) in Typescript."
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon Kinesis Data Stream using the AWS Cloud Development Kit (AWS CDK) in TypeScript."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-kinesis-cdk",
-      "projectFolder": "apigw-rest-api-kinesis-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-kinesis-cdk/README.md",
-      "templateURL": "serverless-patterns/apigw-rest-api-kinesis-cdk",
       "templateFile": "cdk/lib/apigw-kinesis-integration-stack.ts"
     }
   },
-"resources": {
+  "resources": {
     "headline": "Documentation",
     "bullets": [
       {

@@ -1,18 +1,22 @@
 {
-  "title": "Event driven vulnerability scanning with EventBridge and Lambda",
-  "description": "This pattern listens to Amazon Inspector events and triggers downstream consumers",
-  "language": "YAMl",
+  "title": "Event-driven vulnerability processing with Amazon EventBridge",
+  "description": "Amazon Inspector vulnerability events to EventBridge",
+  "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
-    "text": ["Listening to Amazon Inspector events a rule is set up to trigger a downstream consumer (Lambda function). Every scan complete of Lambda function triggers the consumer allowing automation around vulnerability scanning."]
+    "text": [
+      "Amazon Inspector raises events during scanning. This pattern configures a rule to trigger a downstream consumer (Lambda function) when a Lambda function scan is complete. This enables event-driven automation around vulnerability scanning.",
+      "<h5>How this pattern works?</h5>",
+      "Before deploying this pattern you will need to turn on Amazon Inspector for your Lambda functions. Every time your Lambda function is scanned for vulnerabilities an event is raised with the results",
+      "Amazon Inspector events are sent to your default event bus (for free) and this pattern configures a rule to listen to these events to trigger downstream services",
+      "Using EventBridge rules you can filter which events and severity information you are interested in, and automate tasks from them",
+      "This pattern uses Lambda as a downstream consumer but you could pick any of the <a href='https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html'>20+ EventBridge targets supported.</a>"
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/lambda-inspector-scans",
-      "templateURL": "serverless-patterns/lambda-inspector-scans",
-      "projectFolder": "lambda-inspector-scans",
       "templateFile": "template.yaml"
     }
   },
@@ -25,19 +29,25 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

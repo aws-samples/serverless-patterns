@@ -1,7 +1,7 @@
 {
-  "title": "API Gateway REST API to SageMaker",
+  "title": "Amazon API Gateway REST API to Amazon Sagemaker",
   "description": "Create a an Amazon API Gateway REST API to invoke a Sagemaker endpoint.",
-  "language": "",
+  "language": "Integration",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-sagemaker",
-      "templateURL": "serverless-patterns/apigw-rest-sagemaker",
-      "projectFolder": "apigw-rest-sagemaker",
       "templateFile": "template.yaml"
     }
   },
@@ -43,14 +40,14 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: aws cloudformation delete-stack --stack-name STACK_NAME"
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Nabanita Paul",
-      "image": "nabanita-paul.jpeg",
       "bio": "Cloud Support Engineer II @AWS",
+      "image": "nabanita-paul.jpeg",
       "linkedin": "nabanita-paul"
     }
   ]

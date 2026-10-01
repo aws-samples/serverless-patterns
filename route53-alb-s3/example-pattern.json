@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/route53-alb-s3",
-      "templateURL": "serverless-patterns/route53-alb-s3",
-      "projectFolder": "route53-alb-s3",
       "templateFile": "template.yaml"
     }
   },
@@ -28,7 +25,7 @@
       {
         "text": "AWS PrivateLink for Amazon S3",
         "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/privatelink-interface-endpoints.html"
-      }      
+      }
     ]
   },
   "deploy": {
@@ -52,14 +49,14 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "linkedin": "biswanathmukherjee"
     },
     {
       "name": "Rakshith Rao",
-      "image": "https://rao.sh/assets/img/profile_pic.png",
       "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+      "image": "https://rao.sh/assets/img/profile_pic.png",
       "linkedin": "rakshithrao"
     }
   ]

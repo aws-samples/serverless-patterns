@@ -1,19 +1,31 @@
 {
-  "title": "API Gateway to Step Functions",
-  "description": "Create an API Gateway HTTP APIs endpoint that starts a Step Functions synchronous Express Workflow.",
+  "title": "Amazon API Gateway to AWS Step Functions",
+  "description": "Create an API Gateway HTTP APIs endpoint that starts a Step Functions syncronous Express Workflow",
   "language": ".NET",
-  "architectureURL": "",
-  "videoId": "",
-  "level":"300",
+  "level": "300",
   "framework": "AWS CDK",
-  "services": {
-    "from": "apigw",
-    "to": "sfn"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern explains how to deploy a CDK application with Amazon API Gateway that invokes a syncronous Step Functions workflow."
+      "This pattern explains how to deploy an API Gateway HTTP API that synchronously invokes a Step FunctionsExpress Workflow and returns the output state of the workflow in the HTTP request response body. The CDK application also creates a log group that Step Functions writes execution data into."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
     ]
   },
   "deploy": {
@@ -21,26 +33,25 @@
       "cdk deploy"
     ]
   },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-cdk/README.md"
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following command to send an HTTP `POST` request to the HTTP APIs endpoint. Note, you must edit the {HelloWorldApi} placeholder with the URL of the deployed HTTP APIs endpoint. This is provided in the stack outputs:",
+      "<code>curl --location --request POST '{HelloWorldApi}' --header 'Content-Type: application/json' --data-raw '{ \"IsHelloWorldExample\": \"Yes\" }'</code>"
     ]
   },
-  "resources": {
-    "headline": "Additional resources",
-    "bullets": [    
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
-  "author": {
-    "headline": "Presented by James Eastham, Cloud Infrastructure Architect",
-    "name": "James Eastham",
-    "twitter": "plantpowerjames"
-  }
+  "authors": [
+    {
+      "name": "James Eastham",
+      "bio": "I am a Cloud Infrastructure Architect with AWS Professional Services.",
+      "twitter": "plantpowerjames"
+    }
+  ]
 }

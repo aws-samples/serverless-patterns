@@ -1,0 +1,416 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  Lambda MicroVMs + S3 Files: a Firecracker-isolated MicroVM image that mounts an
+  Amazon S3 bucket as a POSIX file system over NFS, reachable through a VPC egress
+  network connector. Provisions everything that has a CloudFormation resource; the
+  MicroVM is launched afterwards with src/run.sh (RunMicrovm is a runtime API).
+
+# ─────────────────────────────────────────────────────────────────────────────
+# If cfn-lint flags E3006 ("type does not exist in <region>") for the
+# AWS::Lambda::MicrovmImage / AWS::Lambda::NetworkConnector / AWS::S3Files::*
+# resources, or W3037 for the `s3files:` IAM action prefix, those are false
+# positives from an out-of-date bundled resource spec. They are suppressed below;
+# remove the suppression once cfn-lint ships an updated spec.
+#
+# IAM propagation: the build/execution/S3-Files-access roles are created in this
+# same stack. Newly created roles can take a few seconds to become assumable by
+# the consuming service. If the MicrovmImage build or the FileSystem create fails
+# with "unable to assume the role provided", simply update/redeploy the stack —
+# the roles will have propagated by then.
+# ─────────────────────────────────────────────────────────────────────────────
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E3006   # resource types not yet in cfn-lint's bundled spec
+        - W3037   # 's3files' IAM action prefix not yet in cfn-lint's service list
+
+Parameters:
+  CodeArtifactBucket:
+    Type: String
+    Description: >-
+      Name of an EXISTING S3 bucket (same region as this stack) holding the app
+      zip (Dockerfile + app.py at the root). Upload it before deploying — see
+      README. This is NOT the bucket that gets mounted.
+  CodeArtifactKey:
+    Type: String
+    Default: app.zip
+    Description: Key of the app zip within CodeArtifactBucket.
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the NFS security group, mount target, and egress connector.
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: >-
+      Subnet (in VpcId) for the S3 Files mount target and the connector ENIs.
+      The MicroVM reaches the mount target over the connector within this VPC.
+
+  ImageName:
+    Type: String
+    Default: microvm-s3files-pattern
+    AllowedPattern: "^[a-zA-Z0-9-_]+$"
+    Description: Name of the MicroVM image (changing it replaces the image).
+
+  BaseImageName:
+    Type: String
+    Default: al2023-1
+    Description: >-
+      Managed base MicroVM image name. The ARN is built as
+      arn:aws:lambda:<region>:aws:microvm-image:<BaseImageName>. Availability is
+      region-specific (e.g. us-west-2 offers al2023-1).
+  BaseImageVersion:
+    Type: String
+    Default: "0"
+    Description: >-
+      Major version of the managed base image. The MicrovmImage resource expects a
+      single major version number (e.g. "0"); the service normalizes it to "0.0".
+
+  MinimumMemoryInMiB:
+    Type: Number
+    Default: 2048
+    Description: Minimum memory allocated to the MicroVM.
+
+  MountPath:
+    Type: String
+    Default: /mnt/s3files
+    Description: Where the file system is mounted inside the guest (read by app.py).
+
+Resources:
+  # ── Data source ────────────────────────────────────────────────────────────
+  # The bucket S3 Files mounts. Versioning is REQUIRED by S3 Files.
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Versioning is REQUIRED by S3 Files. (SSE-S3/AES256 is already the S3
+      # default, so no explicit BucketEncryption block is needed.)
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # Role S3 Files assumes to read/write the bucket and manage its sync rules.
+  S3FilesAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: elasticfilesystem.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:s3files:${AWS::Region}:${AWS::AccountId}:file-system/*
+      Policies:
+        - PolicyName: S3FilesBucketAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: S3BucketPermissions
+                Effect: Allow
+                Action: [s3:ListBucket, s3:ListBucketVersions]
+                Resource: !GetAtt DataBucket.Arn
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount: !Ref AWS::AccountId
+              - Sid: S3ObjectPermissions
+                Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:DeleteObject*
+                  - s3:GetObject*
+                  - s3:List*
+                  - s3:PutObject*
+                Resource: !Sub ${DataBucket.Arn}/*
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount: !Ref AWS::AccountId
+              - Sid: EventBridgeManage
+                Effect: Allow
+                Action:
+                  - events:DeleteRule
+                  - events:DisableRule
+                  - events:EnableRule
+                  - events:PutRule
+                  - events:PutTargets
+                  - events:RemoveTargets
+                Condition:
+                  StringEquals:
+                    events:ManagedBy: elasticfilesystem.amazonaws.com
+                Resource: !Sub arn:${AWS::Partition}:events:*:*:rule/DO-NOT-DELETE-S3-Files*
+              - Sid: EventBridgeRead
+                Effect: Allow
+                Action:
+                  - events:DescribeRule
+                  - events:ListRuleNamesByTarget
+                  - events:ListRules
+                  - events:ListTargetsByRule
+                Resource: !Sub arn:${AWS::Partition}:events:*:*:rule/*
+
+  # ── S3 Files file system + network access ────────────────────────────────────
+  FileSystem:
+    Type: AWS::S3Files::FileSystem
+    Properties:
+      Bucket: !GetAtt DataBucket.Arn
+      RoleArn: !GetAtt S3FilesAccessRole.Arn
+      AcceptBucketWarning: true
+      Tags:
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-s3files
+
+  # Self-referencing SG allowing NFS (2049) within itself. Attached to BOTH the
+  # mount target and the egress connector ENIs so the MicroVM can reach the mount.
+  NfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: S3 Files NFS 2049 for the MicroVM egress connector.
+      VpcId: !Ref VpcId
+  NfsSelfIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref NfsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
+      SourceSecurityGroupId: !Ref NfsSecurityGroup
+
+  MountTarget:
+    Type: AWS::S3Files::MountTarget
+    Properties:
+      FileSystemId: !GetAtt FileSystem.FileSystemId
+      SubnetId: !Ref SubnetId
+      IpAddressType: IPV4_ONLY
+      SecurityGroups:
+        - !Ref NfsSecurityGroup
+
+  # Access point scoped to /microvm with uid/gid 1000 (matches the app's mount).
+  AccessPoint:
+    Type: AWS::S3Files::AccessPoint
+    Properties:
+      FileSystemId: !GetAtt FileSystem.FileSystemId
+      PosixUser:
+        Uid: "1000"
+        Gid: "1000"
+      RootDirectory:
+        Path: /microvm
+        CreationPermissions:
+          OwnerUid: "1000"
+          OwnerGid: "1000"
+          Permissions: "0755"
+
+  # ── VPC egress network connector ─────────────────────────────────────────────
+  # Role Lambda assumes to manage the connector's ENIs in your VPC.
+  ConnectorOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: [sts:AssumeRole, sts:TagSession]
+      Policies:
+        - PolicyName: NetworkConnectorEni
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Scope ENI creation to THIS subnet and security group (i.e. to the
+              # VPC you deployed into) by listing the exact subnet/SG ARNs the
+              # connector is allowed to create interfaces in. The connector cannot
+              # place ENIs in any other subnet or attach any other SG.
+              #
+              # NOTE: scoping via the `ec2:Vpc` condition key (the intuitive choice)
+              # does NOT work here — CreateNetworkConnector pre-validates this role
+              # WITHOUT the VPC request context, so a condition on ec2:Vpc evaluates
+              # false and the connector fails to create with "invalid
+              # ConnectorOperatorRole permissions". Resource-ARN scoping is validated
+              # correctly and provisions the ENIs. See README "How it works".
+              - Sid: CreateEniInThisSubnet
+                Effect: Allow
+                Action: ec2:CreateNetworkInterface
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${SubnetId}
+                  - !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:security-group/${NfsSecurityGroup.GroupId}
+              # Delete/tag apply to the ENIs the connector manages (ENI IDs are
+              # created dynamically and are unpredictable, so the resource is the
+              # network-interface wildcard within this account/region).
+              - Sid: ManageConnectorEnis
+                Effect: Allow
+                Action:
+                  - ec2:DeleteNetworkInterface
+                  - ec2:CreateTags
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+              # ec2:Describe* actions do NOT support resource-level scoping — they
+              # must use "*". They are read-only.
+              - Sid: DescribeNetworkResources
+                Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                Resource: "*"
+
+  EgressConnector:
+    Type: AWS::Lambda::NetworkConnector
+    Properties:
+      Name: !Sub ${ImageName}-egress
+      OperatorRole: !GetAtt ConnectorOperatorRole.Arn
+      Configuration:
+        VpcEgressConfiguration:
+          SubnetIds:
+            - !Ref SubnetId
+          SecurityGroupIds:
+            - !Ref NfsSecurityGroup
+          NetworkProtocol: IPv4
+          AssociatedComputeResourceTypes:
+            - MicroVm
+      Tags:
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-s3files
+
+  # ── MicroVM image build ──────────────────────────────────────────────────────
+  MicrovmLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda-microvms/${ImageName}
+      RetentionInDays: 7
+
+  # One IAM role used BOTH to build the image (read the artifact zip, ship build
+  # logs) and as the MicroVM's run-time execution role (exposed to the guest via
+  # IMDSv2 for the IAM-authenticated S3 Files mount). A single role keeps the demo
+  # simple; scope into two roles for least privilege in production.
+  #
+  # NOTE: the assume-role source ARN is the IMAGE (microvm-image:*) at build AND
+  # at run time — the running VM also presents the image ARN, NOT microvm:* — so
+  # the confused-deputy condition must allow BOTH. Restricting to microvm:* alone
+  # makes the VM fail to assume the role and self-terminate with "unable to assume
+  # the role provided".
+  MicrovmRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn:
+                  - !Sub arn:${AWS::Partition}:lambda:*:${AWS::AccountId}:microvm-image:*
+                  - !Sub arn:${AWS::Partition}:lambda:*:${AWS::AccountId}:microvm:*
+      Policies:
+        - PolicyName: MicrovmBuildAndExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ReadCodeArtifact
+                Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${CodeArtifactBucket}/${CodeArtifactKey}
+              - Sid: WriteLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/*
+              - Sid: MountS3Files
+                Effect: Allow
+                # Client permissions for the IAM-authenticated S3 Files NFS mount.
+                Action: s3files:Client*
+                Resource: !GetAtt FileSystem.FileSystemArn
+
+  MicrovmImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Ref ImageName
+      Description: Lambda MicroVMs + S3 Files pattern — S3 bucket mounted as a filesystem.
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:${BaseImageName}
+      BaseImageVersion: !Ref BaseImageVersion
+      BuildRoleArn: !GetAtt MicrovmRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${CodeArtifactBucket}/${CodeArtifactKey}
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: !Ref MinimumMemoryInMiB
+      # Required for the NFS mount (EFS utils / FUSE).
+      AdditionalOsCapabilities:
+        - ALL
+      # Build-time egress: INTERNET_EGRESS lets the Dockerfile install packages.
+      # The VPC egress connector (above) is attached at RUN time by src/run.sh.
+      EgressNetworkConnectors:
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS
+      EnvironmentVariables:
+        - Key: S3FILES_MOUNT_PATH
+          Value: !Ref MountPath
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 60
+          Validate: ENABLED
+          ValidateTimeoutInSeconds: 30
+        MicrovmHooks:
+          Run: ENABLED
+          # The /run hook mounts S3 Files and blocks until the mount is usable
+          # (mount ~15s + efs-proxy tunnel readiness probe). app.py bounds its own
+          # work to ~51s worst case (35s mount cap + ~16s probe deadline), so give
+          # the hook the max 60s. Same for /resume, which re-mounts after a suspend.
+          RunTimeoutInSeconds: 60
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 60
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 5
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 5
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref MicrovmLogGroup
+      Tags:
+        - Key: Project
+          Value: serverless-pattern-lambda-microvm-s3files
+
+Outputs:
+  ImageArn:
+    Description: ARN of the built MicroVM image (pass to src/run.sh).
+    Value: !GetAtt MicrovmImage.ImageArn
+  ImageState:
+    Description: Image state (CREATING / CREATED / CREATE_FAILED).
+    Value: !GetAtt MicrovmImage.State
+  ExecutionRoleArn:
+    Description: Role the MicroVM assumes at run time (also the image build role).
+    Value: !GetAtt MicrovmRole.Arn
+  EgressConnectorArn:
+    Description: VPC egress connector ARN — attach at run time so the VM reaches the mount.
+    Value: !GetAtt EgressConnector.Arn
+  FileSystemId:
+    Description: S3 Files file system ID (run-hook payload).
+    Value: !GetAtt FileSystem.FileSystemId
+  AccessPointId:
+    Description: S3 Files access point ID (run-hook payload).
+    Value: !GetAtt AccessPoint.AccessPointId
+  MountTargetId:
+    Description: Mount target ID — src/run.sh looks up its IPv4 for the run-hook payload.
+    Value: !GetAtt MountTarget.MountTargetId
+  DataBucket:
+    Description: Bucket mounted by the MicroVM as a file system.
+    Value: !Ref DataBucket
+  Region:
+    Description: Region everything is deployed in.
+    Value: !Ref AWS::Region

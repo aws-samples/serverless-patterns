@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-amazonmq-to-eventbridge-sam",
-      "templateURL": "serverless-patterns/eventbridge-pipes-amazonmq-to-eventbridge-sam",
-      "projectFolder": "eventbridge-pipes-amazonmq-to-eventbridge-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -52,8 +49,8 @@
   "authors": [
     {
       "name": "Adrian Begg",
-      "image": "https://gravatar.com/avatar/f17ca29ef28efd2863147f957426dd88a45a8e497b1a1732aab9673359b1f299.jpg?size=256",
       "bio": "Adrian is a Snr. Specialist Solutions Architect with Amazon Web Services (AWS) based in Germany with a focus on Migration & Modernization.",
+      "image": "https://gravatar.com/avatar/f17ca29ef28efd2863147f957426dd88a45a8e497b1a1732aab9673359b1f299.jpg?size=256",
       "linkedin": "adrian-begg"
     }
   ]

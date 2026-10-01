@@ -1,0 +1,53 @@
+{
+  "title": "Amazon API Gateway to Private ALB and ECS Cluster via VPC Link",
+  "description": "Create an API Gateway endpoint to an ECS Fargate cluster.",
+  "language": "Integration",
+  "level": "400",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates an integration pattern that allows configuring a public API Gateway endpoint to a private Application Load Balancer with an ECS Fargate cluster behind it.",
+      "It allows to build a secure pattern without exposing the private subnet resources and can be accessed only via a VPC Link.",
+      "This pattern creates the following resources: Requried Security Groups, ECS Fargate cluster with service and task definitions, Private Application Load Balancer with appropriate listener and target group, VPC Link. API gateway integration between the API endpoint and the private ALB via the VPC Link."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "HTTP API private integration using VPC link",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html"
+      },
+      {
+        "text": "Configuring private integrations with Amazon API Gateway HTTP APIs",
+        "link": "https://aws.amazon.com/blogs/compute/configuring-private-integrations-with-amazon-api-gateway-http-apis/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>terraform destroy --auto-approve</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/bideep-bezbaruah.json"
+  ]
+}

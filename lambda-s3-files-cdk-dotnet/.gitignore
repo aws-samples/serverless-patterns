@@ -1,0 +1,42 @@
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# User-specific files
+*.userprefs
+
+# Build logs
+*.log
+*.binlog
+
+# Test Results
+[Tt]est[Rr]esult*/
+
+# .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/

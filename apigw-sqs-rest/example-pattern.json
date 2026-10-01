@@ -1,25 +1,24 @@
 {
-  "title": "API Gateway REST API to SQS",
-  "description": "API Gateway REST API Integration to SQS",
-  "language": "Python",
-  "level": "200",
+  "title": "Amazon API Gateway REST API to Amazon SQS",
+  "description": "Create an Amazon API Gateway REST API that integrates with an Amazon SQS queue.",
+  "language": "Integration",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "An API Gateway REST API is created with integration to Amazon SQS. ",
-      "A HTTP Request to API Gateway POST method will create a message with the request body to SQS"
+      "In this pattern, called \"Queue based leveling\", a serverless queue is introduced between your API Gateway and your workers, a Lambda function in this case.",
+      "The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably.",
+      "It also helps downstream consumers to process the incoming requests at a consistent pace."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sqs-rest",
-      "templateURL": "serverless-patterns/apigw-sqs-rest",
-      "projectFolder": "apigw-sqs-rest",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Amazon API Gateway - Rest API to AWS Services",
@@ -29,25 +28,27 @@
   },
   "deploy": {
     "text": [
-      "sam build",
       "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the repo for detailed testing notes."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Abdul Waheed",
-      "image": "https://avatars.githubusercontent.com/u/15647692?v=4",
       "bio": "Solutions Architect @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/15647692?v=4",
       "linkedin": "linked-in-ID",
       "twitter": "waheed2"
     }

@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-bedrock-async-invoke-cdk",
-      "templateURL": "serverless-patterns/lambda-durable-bedrock-async-invoke-cdk",
-      "projectFolder": "lambda-durable-bedrock-async-invoke-cdk",
       "templateFile": "lib/cdk-bedrock-async-invoke-stack.ts"
     }
   },
@@ -59,8 +56,8 @@
   "authors": [
     {
       "name": "Ben Freiberg",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ben-freiberg.jpg",
       "bio": "Ben is a Senior Solutions Architect at Amazon Web Services (AWS) based in Frankfurt, Germany.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ben-freiberg.jpg",
       "linkedin": "benfreiberg"
     },
     {

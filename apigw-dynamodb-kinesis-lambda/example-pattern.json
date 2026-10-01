@@ -1,0 +1,49 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon DynamoDB to Amazon Kinesis to AWS Lambda",
+  "description": "Create an Amazon API Gateway REST API that integrates with Kinesis via a DynamoDB table",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will help you to deploy Amazon API Gateway API integration with Amazon DynamoDB. Additionally, the Amazon DynamoDB table has an Amazon Kinesis Data Stream to capture item-level changes in your table and replicates the changes to a Kinesis Data Stream.",
+      "Lastly, AWS Lambda will consume those changes from Amazon Kinesis to log the decoded message which was received from the Amazon Kinesis Stream."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Amazon API Gateway as a proxy for DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
+      },
+      {
+        "text": "Amazon DynamoDB PutItem API",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/vijay-konade.json"
+  ]
+}

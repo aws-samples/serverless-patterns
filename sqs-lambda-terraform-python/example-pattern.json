@@ -1,0 +1,43 @@
+{
+  "title": "Amazon SQS to AWS Lambda",
+  "description": "Create a Lambda function that subscribes to an SQS queue",
+  "language": "Python",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys deploys a Lambda function and an SQS queue. SQS invokes the Lambda function when new messages are available. The CDK application contains the minimum IAM resources required to run the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": []
+  },
+  "deploy": {
+    "text": [
+      "terraform apply --auto-approve",
+      "terraform init"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy --auto-approve</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/nicolas-diez.json"
+  ]
+}

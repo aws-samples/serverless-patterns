@@ -1,0 +1,67 @@
+{
+  "title": "AWS Step Functions to AWS Lambda durable functions",
+  "description": "Create a Step Functions workflow to invoke Lambda durable functions synchronously and asynchronously with checkpointing.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to integrate AWS Lambda durable functions into an AWS Step Functions workflow.",
+      "It covers both synchronous invocation (using default Request Response pattern) and asynchronous invocation (using the Step Function Wait for Callback with Task Token integration pattern) of durable Lambda functions.",
+      "The pattern addresses the challenge of running long-running Lambda functions (beyond 15 minutes) within a Step Functions orchestration, using asynchronous invocation and durable checkpointing.",
+      "Lambda durable functions use a checkpoint/replay mechanism that allows Lambda executions to run for up to one year, automatically recovering from interruptions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk_stepfunction_durable_lambda_function/cdk_stepfunction_durable_lambda_function_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Invoking durable Lambda functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html"
+      },
+      {
+        "text": "Step Functions Integration Patterns",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html"
+      },
+      {
+        "text": "Durable functions or Step Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-step-functions.html"
+      },
+      {
+        "text": "Best practices for Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-best-practices.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "python3 -m venv .venv",
+      "source .venv/bin/activate",
+      "python3 -m pip install -r requirements.txt",
+      "cdk synth",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "contributors": [
+    "content/contributors/akshay-singhal.json"
+  ]
+}

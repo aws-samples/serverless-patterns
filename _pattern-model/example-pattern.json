@@ -1,5 +1,5 @@
 {
-  "title": "Step Functions to Athena",
+  "title": "AWS Step Functions to Amazon Athena",
   "description": "Create a Step Functions workflow to query Amazon Athena.",
   "language": "Python",
   "level": "200",
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
       "templateFile": "sfn_athena_cdk_python_stack.py"
     }
   },
@@ -53,7 +50,7 @@
       "image": "link-to-your-photo.jpg",
       "bio": "Your bio.",
       "linkedin": "linked-in-ID",
-      "twitter": "twitter-handle"
+      "twitter": "twitter_handle"
     }
   ]
 }

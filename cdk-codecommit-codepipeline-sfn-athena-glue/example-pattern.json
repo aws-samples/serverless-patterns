@@ -1,0 +1,58 @@
+{
+  "title": "CodeCommit to CodePipeline to AWS Step Functions",
+  "description": "Create a CodePipeline that invokes Steps Functions to run Glue queries",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "CDK CodePipeline spins up against AWS CodeCommit repository, which triggers AWS StepFunctions to call Amazon Athena NamedQueries to create Views and Tables.",
+      "The branch Name and CodeCommit repository details must be provided in the configuration file src/config.ts."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk bootstrap aws://accountnumber/region",
+      "npx cdk synth",
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/atul-sharma.json",
+    "content/contributors/feroz-kumar.json",
+    "content/contributors/jayesh-a-shinde.json"
+  ]
+}

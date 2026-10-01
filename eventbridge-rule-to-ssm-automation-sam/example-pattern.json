@@ -1,0 +1,50 @@
+{
+  "title": "Amazon EventBridge rule to AWS Systems Manager automation",
+  "description": "Create an EventBridge Rule to trigger an AWS Systems Manager automation runbook.",
+  "language": "YAML",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will create an EventBridge rule that is configured to trigger when an EC2 instance goes into the \"running\" state. The rule will then execute the AWSSupport-ConfigureEC2Metadata Automation Runbook against that instance to disable IMDSv1."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Rules User Guide",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
+      },
+      {
+        "text": "SSM Automation User Guide",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Once the stack is deployed, launch a new EC2 Instance, and then navigate to https://console.aws.amazon.com/systems-manager/automation/executions. There will be a new execution of the `AWSSupport-ConfigureEC2Metadata` document against the new instance."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/syed-hussain.json"
+  ]
+}

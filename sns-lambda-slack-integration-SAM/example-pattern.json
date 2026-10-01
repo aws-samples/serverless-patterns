@@ -1,5 +1,5 @@
 {
-  "title": "SNS to Lambda to Slack Integration via SAM",
+  "title": "Amazon SNS to AWS Lambda to a Slack channel",
   "description": "Creating a SNS topic to publish to Slack channel via AWS Lambda",
   "language": "Python",
   "level": "200",
@@ -7,21 +7,18 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This is a sample project where the message will be published from SNS topic to aws lambda which triggers notification to slack channel."
+      "This sample project demonstrates the publishing of messages from an SNS topic to an AWS Lambda function, which in turn triggers notifications to a Slack channel."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sns-lambda-slack-integration-SAM",
-      "templateURL": "serverless-patterns/sns-lambda-slack-integration-SAM",
-      "projectFolder": "sns-lambda-slack-integration-SAM",
-      "templateFile": "sns-lambda-slack-integration-SAM/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "AWS SNS to AWS Lambda",
+        "text": "Amazon SNS to AWS Lambda",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sns-example.html"
       },
       {
@@ -42,16 +39,13 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Ibraheem Khaleel",
-      "image": "",
-      "bio": "AWS Cloud Support Engineer",
-      "linkedin": "",
-      "twitter": ""
+      "bio": "AWS Cloud Support Engineer"
     }
   ]
 }

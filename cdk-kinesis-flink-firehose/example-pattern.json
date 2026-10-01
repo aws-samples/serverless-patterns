@@ -1,6 +1,6 @@
 {
-  "title": "Apache Flink with Kinesis Data Stream Source and Firehose Sink",
-  "description": "Create a Managed Service for Apache Flink application with an Amazon Kinesis Data Stream source and Amazon Kinesis Firehose sink.",
+  "title": "Apache Flink with Amazon Kinesis Data Stream Source and Amazon Data Firehose Sink",
+  "description": "Create a Managed Service for Apache Flink application with an Amazon Kinesis Data Stream source and Amazon Data Firehose sink.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
@@ -13,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-kinesis-flink-firehose",
-      "templateURL": "serverless-patterns/cdk-kinesis-flink-firehose",
-      "projectFolder": "cdk-kinesis-flink-firehose/cdk/lib/",
-      "templateFile": "stack.ts"
+      "templateFile": "cdk/lib/cdk-stack.ts"
     }
   },
   "resources": {
@@ -32,18 +29,23 @@
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"]
+    "text": [
+      "cdk deploy"
+    ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["cdk destroy"]
+    "text": [
+      "cdk destroy"
+    ]
   },
   "authors": [
     {
       "name": "Jim Thwaits",
-      "image": "",
       "bio": "Cloud Application Architect, AWS",
       "linkedin": "jim-thwaits"
     }

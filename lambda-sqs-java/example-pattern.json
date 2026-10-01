@@ -1,8 +1,8 @@
 {
-  "title": "Lambda to SQS",
+  "title": "AWS Lambda to Amazon SQS",
   "description": "Create a Lambda function that publishes to an SQS queue",
   "language": "Java",
-  "level": "200",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
@@ -12,18 +12,19 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sqs-java"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
-      {
-        "text": "Using AWS Lambda with Amazon SQS",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
-      },
       {
         "text": "Choosing between messaging services for serverless applications.",
         "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
       }
     ]
   },
@@ -33,23 +34,27 @@
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Use the AWS CLI to invoke the Lambda function. The function name is in the outputs of the AWS SAM deployment (the key is QueuePublisherFunction):",
+      "1. Invoke the Lambda function to publish a message to the SQS queue: <code>aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME outfile.txt</code>.",
+      "2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs: <code>aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL</code>"
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>.",
-      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\""
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "James Beswick",
-      "image": "https://serverlessland.com/assets/images/resources/jbes.jpg",
       "bio": "I am a self-confessed serverless geek and enjoy helping developers build faster with serverless! I have been software developer and product manager before becoming a Developer Advocate. Ask me anything!",
+      "image": "https://serverlessland.com/assets/images/resources/jbes.jpg",
       "linkedin": "jamesbeswick",
-      "twitter": "@jbesw"
+      "twitter": "jbesw"
     },
     {
       "name": "Steven Cook",

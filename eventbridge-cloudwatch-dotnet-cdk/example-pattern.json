@@ -1,24 +1,23 @@
 {
-  "title": "EventBridge to CloudWatch Logs",
-  "description": "Create an EventBridge rule that sends events to CloudWatch Logs.",
+  "title": "Amazon EventBridge to Amazon CloudWatch Logs",
+  "description": "Create an EventBridge rule that sends events to CloudWatch Logs",
   "language": ".NET",
-  "level": "200",
+  "level": "100",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This project contains a sample AWS CDK template to create an EventBridge Rule, as well as, a CloudWatch Logs Group.",
-      "The EventBridge Rule publishes matched events to CloudWatch Logs.",
-      "In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target."
-    ]
+      "This project contains a sample AWS CDK template to create an EventBridge Rule, as well as, a CloudWatch Logs Group. The EventBridge Rule publishes matched events to CloudWatch Logs. In this example, the rule filters for specific attributes in the event before sending to the CloudWatch Logs target. Note: CDK may automatically create a Custom Resource Lambda to set certain policy configurations for CloudWatch Logs."
+    ],
+    "test": ""
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-cloudwatch-dotnet-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-cloudwatch-dotnet-cdk/README.md"
+      "templateFile": "src/EventBridgeCloudWatchDotnetCdk/EventBridgeCloudWatchDotnetCdkStack.cs"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
@@ -32,26 +31,30 @@
   },
   "deploy": {
     "text": [
-      "cdk deploy"
+      "See the GitHub repo for detailed deployment instructions."
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
     ]
   },
   "authors": [
     {
       "name": "Amir Khairalomoum",
-      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
       "bio": "Amir is a Sr. Solutions Architect at AWS. He supports customers in their digital transformation and their cloud journey to AWS. He is passionate about serverless technologies.",
+      "image": "https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/06/29/Amir-Khairalomoum.jpg",
       "linkedin": "amir-khairalomoum",
-      "twitter": "@mrark1361"
+      "twitter": "mrark1361"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "title": "AWS Glue Job trigger a Lambda Function over Eventbridge Rule",
-  "description": "AWS Glue Job trigger a Lambda Function over Eventbridge Rule after change state to timed out",
+  "title": "AWS Glue Job trigger an AWS Lambda Function with Amazon EventBridge Rule",
+  "description": "AWS Glue Job trigger a Lambda Function over EventBridge Rule after change state to timed out",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/glue-eventbridge-lambda-cdk",
-      "templateURL": "serverless-patterns/glue-eventbridge-lambda-cdk",
-      "projectFolder": "glue-eventbridge-lambda-cdk",
       "templateFile": "glue_eventbridge_lambda_cdk/glue_eventbridge_lambda_cdk_stack.py"
     }
   },
@@ -53,9 +50,9 @@
   "authors": [
     {
       "name": "José Albino Neto",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-jose-albino-neto.jpg",
       "bio": "Cloud Application Architect @ AWS",
-      "linkedin": "https://www.linkedin.com/in/albinoneto/",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-jose-albino-neto.jpg",
+      "linkedin": "albinoneto",
       "twitter": "none"
     }
   ]

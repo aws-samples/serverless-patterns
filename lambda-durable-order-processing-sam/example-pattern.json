@@ -17,9 +17,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-order-processing-sam",
-      "templateURL": "serverless-patterns/lambda-durable-order-processing-sam",
-      "projectFolder": "lambda-durable-order-processing-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -34,7 +31,7 @@
         "link": "https://github.com/aws/aws-durable-execution-sdk-js"
       },
       {
-        "text": "AWS Blog: Build multi-step applications with Lambda durable functions",
+        "text": "AWS Blog: Build multi-step applications with AWS Lambda durable functions",
         "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
       }
     ]
@@ -48,17 +45,21 @@
     ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete --region us-east-2</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete --region us-east-2</code>."
+    ]
   },
   "authors": [
     {
       "name": "Abhishek Agawane",
-      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
       "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations. He has helped numerous organizations enhance their cloud operations through targeted optimizations, robust architectures, and best-practice implementations.",
-      "linkedin": "https://www.linkedin.com/in/agawabhi/"
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "linkedin": "agawabhi"
     }
   ]
 }

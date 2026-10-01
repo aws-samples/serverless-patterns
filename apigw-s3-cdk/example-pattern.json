@@ -1,0 +1,60 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon S3",
+  "description": "Create an Amazon API Gateway API that integrates with an S3 bucket.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This AWS CDK Construct implements an Amazon API Gateway REST API connected to Amazon S3 bucket(s)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/apigw-s3-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Create a REST API as an Amazon S3 proxy in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html"
+      },
+      {
+        "text": "How do I use API Gateway as a proxy for another AWS service?",
+        "link": "https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-proxy-integrate-service/"
+      },
+      {
+        "text": "Amazon API Gateway API request and response data mapping reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html"
+      },
+      {
+        "text": "API Gateway mapping template and access logging variable reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/yogananda-karra.json"
+  ]
+}

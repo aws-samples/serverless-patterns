@@ -1,0 +1,58 @@
+{
+  "title": "AWS Lambda function with X-Ray",
+  "description": "Create a Lambda function using Lambda layers to enable X-Ray.",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK example sets up AWS X-Ray for a Lambda function that uses Lambda Layers. The example demonstrates the use of the folder structure for a Lambda layer written in Python, and using constructs for deploying and using the layer and X-Ray."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lambda_layer_x_ray_stack/lambda_layer_x_ray_stack_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Amazon Web Services Cloud Development Kit(AWS CDK) framework.",
+        "link": "https://aws.amazon.com/cdk/"
+      },
+      {
+        "text": "Creating and sharing Lambda layers",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html"
+      },
+      {
+        "text": "AWS X-Ray SDK for Python",
+        "link": "https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-python.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/emmanuel-saliu.json",
+    "content/contributors/mark-lyon.json"
+  ]
+}

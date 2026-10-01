@@ -20,15 +20,14 @@ class SfnGlueCdkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Glue job execution IAM Role      
+        # Glue job execution IAM Role
         glue_job_role = iam.Role(
             self,
             'Glue-Job-Role',
             assumed_by=iam.ServicePrincipal('glue.amazonaws.com'),
             managed_policies = [iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AWSGlueServiceRole')]
         )
-        
-        
+
         S3_BUCKET_NAME = "MyCdkGlueJobBucket"
 
         # S3 Bucket to host glue scripts
@@ -36,7 +35,7 @@ class SfnGlueCdkStack(Stack):
                     auto_delete_objects=True, block_public_access=s3.BlockPublicAccess.BLOCK_ALL)
 
         # asset to sync local scripts folder with S3 bucket
-        asset = s3deploy.Source.asset("./resources/glue-scripts")       
+        asset = s3deploy.Source.asset("./resources/glue-scripts")
 
         # Sync local scripts with S3 bucket
         s3deploy.BucketDeployment(self, "DeployGlueJobScripts",
@@ -55,7 +54,7 @@ class SfnGlueCdkStack(Stack):
             role=glue_job_role.role_arn,
             command=glue.CfnJob.JobCommandProperty(
                 name='pythonshell',
-                python_version='3',
+                python_version='3.9',
                 script_location=scriptLocation
             ))
 
@@ -66,15 +65,15 @@ class SfnGlueCdkStack(Stack):
             arguments=sfn.TaskInput.from_object({
                 "--message": sfn.JsonPath.string_at("$.message")
             }),
-            timeout=Duration.minutes(6),
+            task_timeout=sfn.Timeout.duration(Duration.minutes(6)),
             notify_delay_after= Duration.minutes(6)
         )
 
-        # State Function defination
+        # State Function definition
         definition = glue_task
         state_machine = sfn.StateMachine(
             self, "GlueJobStateMachine",
-            definition=definition,
+            definition_body=sfn.DefinitionBody.from_chainable(definition),
             timeout=Duration.minutes(10)
         )
 

@@ -1,0 +1,59 @@
+{
+  "title": "Amazon S3 to Amazon SQS to AWS Lambda",
+  "description": "Create a Lambda function that resizes images uploaded to S3 via SQS.",
+  "language": "Node.js",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Lambda function, an SQS queue, 2 S3 buckets and the IAM resources required to run the application.",
+      "An SQS queue consumes ObjectCreated events from an Amazon S3 bucket if the file has .jpg extension. The SQS triggers a Lambda function.",
+      "The Lambda code checks the uploaded file is an image and creates a thumbnail version of the image in another bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Building resilient serverless patterns by combining messaging services",
+        "link": "https://aws.amazon.com/blogs/compute/building-resilient-no-code-serverless-patterns-by-combining-messaging-services/"
+      },
+      {
+        "text": "S3-to-Lambda serverless applications",
+        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm --prefix ./src install ./src",
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Run the following S3 CLI command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the source S3 Bucket. This is provided in the stack outputs.",
+      "<code>aws s3 cp './events/exampleImage.png' s3://{SourceBucketName}</code>",
+      "2. Run the following command to check that a new version of the image has been created in the destination bucket.",
+      "<code>aws s3 ls s3://{DestinationBucketName}</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/ahmed-mohamed.json"
+  ]
+}

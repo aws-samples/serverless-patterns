@@ -1,0 +1,597 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless Search API — Lambda + OpenSearch Serverless NextGen.
+  Demonstrates zero-baseline cost with both Lambda and OpenSearch scaling to zero when idle.(uksb-1tthgi812) (tag:apigw-lambda-opensearch-serverless-nextgen)
+
+Parameters:
+  DeploymentRoleName:
+    Type: String
+    Description: >
+      Name of the IAM role used to deploy this stack. CloudFormation uses this role
+      to create the OpenSearch index. Run 'aws sts get-caller-identity' and use the
+      role name from the ARN (the part after 'role/').
+
+  CollectionName:
+    Type: String
+    Default: semantic-search
+    Description: Name of the OpenSearch Serverless collection
+    AllowedPattern: '^[a-z][a-z0-9-]{2,27}$'
+
+  CollectionGroupName:
+    Type: String
+    Default: semantic-search-cg
+    Description: Name of the OpenSearch Serverless collection group
+    AllowedPattern: '^[a-z][a-z0-9-]{2,31}$'
+
+  LogRetentionDays:
+    Type: Number
+    Default: 7
+    Description: Number of days to retain CloudWatch log events
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
+
+  EnableApiAccessLogs:
+    Type: String
+    Default: 'false'
+    Description: >
+      Enable API Gateway access logging. Prerequisite: the account-level API Gateway
+      CloudWatch Logs role must already be configured before setting this to true.
+    AllowedValues: ['true', 'false']
+
+Conditions:
+  ApiAccessLogsEnabled: !Equals [!Ref EnableApiAccessLogs, 'true']
+
+Globals:
+  Function:
+    Timeout: 29
+    MemorySize: 256
+    Runtime: python3.14
+    Architectures:
+      - arm64
+    Tracing: Active
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: opensearch-nextgen
+        POWERTOOLS_METRICS_NAMESPACE: opensearch-nextgen
+    Layers:
+      - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-python314-arm64:33
+
+Resources:
+  # ============================================================
+  # API Gateway
+  # ============================================================
+
+  SearchApi:
+    Type: AWS::Serverless::Api
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W64
+            reason: "Sample application — usage plan not required for demonstration purposes"
+          - id: W68
+            reason: "Sample application — usage plan not required for demonstration purposes"
+          - id: W69
+            reason: "Sample application — access logging controlled by EnableApiAccessLogs parameter"
+    Properties:
+      StageName: Prod
+      TracingEnabled: true
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+      AccessLogSetting: !If
+        - ApiAccessLogsEnabled
+        - DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+          Format: '{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","caller":"$context.identity.caller","user":"$context.identity.user","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength"}'
+        - !Ref AWS::NoValue
+
+  # ============================================================
+  # API Gateway Access Logging (conditional)
+  # Prerequisite: The account-level API Gateway CloudWatch Logs role must be configured
+  # before enabling. Set via AWS Console (API Gateway > Settings) or a separate stack.
+  # ============================================================
+
+  ApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: ApiAccessLogsEnabled
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W84
+            reason: "Sample application — KMS encryption not required for demonstration log data"
+    Properties:
+      LogGroupName: !Sub /aws/apigateway/${AWS::StackName}-access-logs
+      RetentionInDays: !Ref LogRetentionDays
+
+  # ============================================================
+  # Shared Lambda Layer
+  # ============================================================
+
+  OpenSearchClientLayer:
+    Type: AWS::Serverless::LayerVersion
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LayerName: opensearch-client
+      Description: OpenSearch Serverless client with SigV4 auth
+      ContentUri: layers/opensearch_client/
+      CompatibleRuntimes:
+        - python3.14
+      CompatibleArchitectures:
+        - arm64
+    Metadata:
+      BuildMethod: python3.14
+      BuildArchitecture: arm64
+
+  # ============================================================
+  # NextGen Collection Group
+  # ============================================================
+
+  CollectionGroup:
+    Type: AWS::OpenSearchServerless::CollectionGroup
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3002  # Generation property is valid but not yet in cfn-lint's schema
+    Properties:
+      Name: !Ref CollectionGroupName
+      Description: Collection group for semantic search sample — NextGen with scale-to-zero
+      Generation: NEXTGEN
+      StandbyReplicas: ENABLED
+      CapacityLimits:
+        MaxIndexingCapacityInOcu: 8
+        MaxSearchCapacityInOcu: 8
+
+  # ============================================================
+  # OpenSearch Serverless — Security Policies & Collection
+  # ============================================================
+
+  EncryptionPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: !Sub '${AWS::StackName}-enc'
+      Type: encryption
+      Description: Encryption policy for semantic search collection
+      Policy: !Sub |
+        {
+          "Rules": [
+            {
+              "ResourceType": "collection",
+              "Resource": ["collection/${CollectionName}"]
+            }
+          ],
+          "AWSOwnedKey": true
+        }
+
+  NetworkPolicy:
+    Type: AWS::OpenSearchServerless::SecurityPolicy
+    Properties:
+      Name: !Sub '${AWS::StackName}-net'
+      Type: network
+      Description: Network policy — public access with semantic enrichment service access
+      Policy: !Sub |
+        [
+          {
+            "Rules": [
+              {
+                "ResourceType": "collection",
+                "Resource": ["collection/${CollectionName}"]
+              },
+              {
+                "ResourceType": "dashboard",
+                "Resource": ["collection/${CollectionName}"]
+              }
+            ],
+            "AllowFromPublic": true
+          },
+          {
+            "Rules": [
+              {
+                "ResourceType": "collection",
+                "Resource": ["collection/${CollectionName}"]
+              }
+            ],
+            "AllowFromPublic": false,
+            "SourceServices": ["aoss.amazonaws.com"]
+          }
+        ]
+
+  DataAccessPolicy:
+    Type: AWS::OpenSearchServerless::AccessPolicy
+    Properties:
+      Name: !Sub '${AWS::StackName}-access'
+      Type: data
+      Description: Data access policy for Lambda function role
+      Policy: !Sub
+        - |
+          [
+            {
+              "Description": "Search read and ML execute access",
+              "Rules": [{"ResourceType": "index", "Resource": ["index/${CollectionName}/*"], "Permission": ["aoss:DescribeIndex", "aoss:ReadDocument"]}, {"ResourceType": "model", "Resource": ["model/${CollectionName}/*"], "Permission": ["aoss:DescribeMLResource", "aoss:ExecuteMLResource"]}],
+              "Principal": ["${SearchRoleArn}"]
+            },
+            {
+              "Description": "Index write access",
+              "Rules": [{"ResourceType": "index", "Resource": ["index/${CollectionName}/*"], "Permission": ["aoss:CreateIndex", "aoss:DescribeIndex", "aoss:UpdateIndex", "aoss:ReadDocument", "aoss:WriteDocument"]}],
+              "Principal": ["${IndexRoleArn}"]
+            },
+            {
+              "Description": "Delete write access",
+              "Rules": [{"ResourceType": "index", "Resource": ["index/${CollectionName}/*"], "Permission": ["aoss:DescribeIndex", "aoss:WriteDocument"]}],
+              "Principal": ["${DeleteRoleArn}"]
+            },
+            {
+              "Description": "Index pipeline and ML full access",
+              "Rules": [{"ResourceType": "collection", "Resource": ["collection/${CollectionName}"], "Permission": ["aoss:CreateCollectionItems", "aoss:DescribeCollectionItems", "aoss:UpdateCollectionItems"]}, {"ResourceType": "model", "Resource": ["model/${CollectionName}/*"], "Permission": ["aoss:CreateMLResource", "aoss:DescribeMLResource", "aoss:UpdateMLResource", "aoss:DeleteMLResource", "aoss:ExecuteMLResource"]}],
+              "Principal": ["${IndexRoleArn}"]
+            },
+            {
+              "Description": "Deployment role - allows CloudFormation to create and manage the vector index",
+              "Rules": [{"ResourceType": "index", "Resource": ["index/${CollectionName}/*"], "Permission": ["aoss:CreateIndex", "aoss:DescribeIndex", "aoss:UpdateIndex", "aoss:DeleteIndex"]}],
+              "Principal": ["arn:aws:iam::${AWS::AccountId}:role/${DeploymentRoleName}"]
+            }
+          ]
+        - SearchRoleArn: !GetAtt SearchFunctionRole.Arn
+          IndexRoleArn: !GetAtt IndexFunctionRole.Arn
+          DeleteRoleArn: !GetAtt DeleteFunctionRole.Arn
+
+  Collection:
+    Type: AWS::OpenSearchServerless::Collection
+    DependsOn:
+      - EncryptionPolicy
+      - NetworkPolicy
+      - DataAccessPolicy
+      - CollectionGroup
+    Properties:
+      Name: !Ref CollectionName
+      Type: VECTORSEARCH
+      Description: NextGen vector search collection for semantic search API
+      CollectionGroupName: !Ref CollectionGroupName
+
+  # ============================================================
+  # ML Model Role — allows OpenSearch ML to invoke Bedrock
+  # ============================================================
+
+  OpenSearchMLRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - opensearchservice.amazonaws.com
+                - ml.opensearchservice.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BedrockInvoke
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0'
+
+  # ============================================================
+  # Index & Pipeline Setup (runs at deploy time)
+  # ============================================================
+
+  SetupPipelineFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W84
+            reason: "Sample application — KMS encryption not required for demonstration log data"
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-SetupPipelineFunction
+      RetentionInDays: !Ref LogRetentionDays
+
+  SetupPipelineFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Sample application — VPC deployment not required for demonstration purposes"
+          - id: W92
+            reason: "Sample application — reserved concurrency not required for demonstration purposes"
+    Properties:
+      Handler: app.lambda_handler
+      CodeUri: lambda/custom_resources/setup_pipeline/
+      Description: Creates ML model, ingest pipeline, and search pipeline at deploy time
+      Timeout: 300
+      Role: !GetAtt IndexFunctionRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref SetupPipelineFunctionLogGroup
+      Layers:
+        - !Ref OpenSearchClientLayer
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: opensearch-nextgen-setup
+
+  VectorIndex:
+    Type: AWS::OpenSearchServerless::Index
+    Properties:
+      CollectionEndpoint: !GetAtt Collection.CollectionEndpoint
+      IndexName: documents
+      Mappings:
+        Properties:
+          title:
+            Type: text
+          content:
+            Type: text
+          embedding_text:
+            Type: text
+          embedding:
+            Type: knn_vector
+            Dimension: 1024
+            Method:
+              Name: hnsw
+              SpaceType: cosinesimil
+      Settings:
+        Index:
+          Knn: true
+
+  SetupSearchPipeline:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: VectorIndex
+    Properties:
+      ServiceToken: !GetAtt SetupPipelineFunction.Arn
+      ServiceTimeout: '300'
+      CollectionEndpoint: !GetAtt Collection.CollectionEndpoint
+      ModelRoleArn: !GetAtt OpenSearchMLRole.Arn
+      EmbeddingModelId: amazon.titan-embed-text-v2:0
+      EmbeddingDimension: '1024'
+
+  # ============================================================
+  # Lambda Functions
+  # ============================================================
+
+  SearchFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: OpenSearchServerlessRead
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - aoss:APIAccessAll
+                Resource: !Sub 'arn:aws:aoss:${AWS::Region}:${AWS::AccountId}:collection/*'
+
+  SearchFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W84
+            reason: "Sample application — KMS encryption not required for demonstration log data"
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-SearchFunction
+      RetentionInDays: !Ref LogRetentionDays
+
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Sample application — VPC deployment not required for demonstration purposes"
+          - id: W92
+            reason: "Sample application — reserved concurrency not required for demonstration purposes"
+    Properties:
+      Handler: app.handler
+      CodeUri: lambda/search/
+      Description: Performs semantic, lexical, and hybrid search (neural queries via OpenSearch ML)
+      Role: !GetAtt SearchFunctionRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref SearchFunctionLogGroup
+      Layers:
+        - !Ref OpenSearchClientLayer
+      Environment:
+        Variables:
+          COLLECTION_ENDPOINT: !GetAtt Collection.CollectionEndpoint
+          COLLECTION_NAME: !Ref CollectionName
+          INDEX_NAME: documents
+          MODEL_ID: !GetAtt SetupSearchPipeline.ModelId
+      Events:
+        SearchApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SearchApi
+            Path: /search
+            Method: POST
+
+  IndexFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: OpenSearchServerlessWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - aoss:APIAccessAll
+                  - aoss:CreateIndex
+                  - aoss:GetIndex
+                Resource: !Sub 'arn:aws:aoss:${AWS::Region}:${AWS::AccountId}:collection/*'
+        - PolicyName: PassMLRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !GetAtt OpenSearchMLRole.Arn
+
+  IndexFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W84
+            reason: "Sample application — KMS encryption not required for demonstration log data"
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-IndexFunction
+      RetentionInDays: !Ref LogRetentionDays
+
+  IndexFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Sample application — VPC deployment not required for demonstration purposes"
+          - id: W92
+            reason: "Sample application — reserved concurrency not required for demonstration purposes"
+    Properties:
+      Handler: app.handler
+      CodeUri: lambda/index_documents/
+      Description: Indexes documents with text (embeddings generated by OpenSearch ML)
+      Timeout: 120
+      Role: !GetAtt IndexFunctionRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref IndexFunctionLogGroup
+      Layers:
+        - !Ref OpenSearchClientLayer
+      Environment:
+        Variables:
+          COLLECTION_ENDPOINT: !GetAtt Collection.CollectionEndpoint
+          COLLECTION_NAME: !Ref CollectionName
+          INDEX_NAME: documents
+          INGEST_PIPELINE: !GetAtt SetupSearchPipeline.IngestPipeline
+      Events:
+        IndexApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SearchApi
+            Path: /index
+            Method: POST
+
+  DeleteFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: OpenSearchServerlessDelete
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - aoss:APIAccessAll
+                Resource: !Sub 'arn:aws:aoss:${AWS::Region}:${AWS::AccountId}:collection/*'
+
+  DeleteFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W84
+            reason: "Sample application — KMS encryption not required for demonstration log data"
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-DeleteFunction
+      RetentionInDays: !Ref LogRetentionDays
+
+  DeleteFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "Sample application — VPC deployment not required for demonstration purposes"
+          - id: W92
+            reason: "Sample application — reserved concurrency not required for demonstration purposes"
+    Properties:
+      Handler: app.handler
+      CodeUri: lambda/delete_documents/
+      Description: Deletes documents by ID from the index
+      Role: !GetAtt DeleteFunctionRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref DeleteFunctionLogGroup
+      Layers:
+        - !Ref OpenSearchClientLayer
+      Environment:
+        Variables:
+          COLLECTION_ENDPOINT: !GetAtt Collection.CollectionEndpoint
+          COLLECTION_NAME: !Ref CollectionName
+          INDEX_NAME: documents
+      Events:
+        DeleteApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SearchApi
+            Path: /documents
+            Method: DELETE
+
+Outputs:
+  SearchApiUrl:
+    Description: API Gateway endpoint URL for the search function
+    Value: !Sub 'https://${SearchApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/search'
+
+  IndexApiUrl:
+    Description: API Gateway endpoint URL for the index function
+    Value: !Sub 'https://${SearchApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/index'
+
+  DeleteApiUrl:
+    Description: API Gateway endpoint URL for the delete function
+    Value: !Sub 'https://${SearchApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/documents'
+
+  CollectionEndpoint:
+    Description: OpenSearch Serverless collection endpoint
+    Value: !GetAtt Collection.CollectionEndpoint
+
+  CollectionArn:
+    Description: OpenSearch Serverless collection ARN
+    Value: !GetAtt Collection.Arn
+
+  CollectionGroupId:
+    Description: NextGen Collection Group ID
+    Value: !Ref CollectionGroup
+
+  MLModelId:
+    Description: OpenSearch ML model ID for neural search
+    Value: !GetAtt SetupSearchPipeline.ModelId

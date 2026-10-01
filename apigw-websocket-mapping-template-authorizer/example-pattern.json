@@ -1,23 +1,20 @@
 {
   "title": "Websocket Amazon API Gateway with an AWS Lambda Authorizer and mapping template",
-  "description": "Create a Websocket API with a Lambda authorizer and a Lambda in the back-end.",
+  "description": "Create a Websocket API with a Lambda Authorizer and an AWS Lambda in the back-end.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This projects demonstrates how to use an AWS WebSocket API with an AWS Lambda Authorizer",
-      "The WebSocket API does not have a Proxy integration with the back-end Lambda Function written NodeJs 22, instead it is using a mapping template that forwards the main information of the request.",
-      "The Connection ID is stored in an AWS DynamoDB table and the Lambda Function sends a response to the websocket API through the endpoint URL"
+      "This projects demonstrates how to use a WebSocket API with an AWS Lambda Authorizer",
+      "The WebSocket API does not have a Proxy integration with the back-end Lambda Function written Node.js 24, instead it is using a mapping template that forwards the main information of the request.",
+      "The Connection ID is stored in a Amazon DynamoDB table and the Lambda Function sends a response to the websocket API through the endpoint URL"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-mapping-template-authorizer",
-      "templateURL": "serverless-patterns/apigw-websocket-mapping-template-authorizer",
-      "projectFolder": "apigw-websocket-mapping-template-authorizer",
-      "templateFile": "apigw-websocket-mapping-template-authorizer/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -54,9 +51,9 @@
   "authors": [
     {
       "name": "Alice Goumain",
-      "image": "https://media.licdn.com/dms/image/v2/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1662636937225?e=2147483647&v=beta&t=f4IFRXMLweHD9WieD3X1D3YkZO3Hf-bdTXHAfYcFpbo",
       "bio": "Cloud Support Engineer in Serverless @ AWS",
-      "linkedin": "https://www.linkedin.com/in/alice-goumain/"
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1662636937225?e=2147483647&v=beta&t=f4IFRXMLweHD9WieD3X1D3YkZO3Hf-bdTXHAfYcFpbo",
+      "linkedin": "alice-goumain"
     }
   ]
 }

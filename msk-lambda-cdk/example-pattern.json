@@ -1,0 +1,55 @@
+{
+  "title": "Amazon MSK to AWS Lambda",
+  "description": "Create a Lambda function that subscribes to an MSK topic",
+  "language": "Node.js",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Lambda is a consumer application for your Kafka topic. It processes records from one or more partitions and sends the payload to the target function. Lambda continues to process batches until there are no more messages in the topic.",
+      "Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. Lambda reads the messages in batches and provides these to your function as an event payload. The maximum batch size is configurable. (The default is 100 messages.)",
+      "The CDK template creates a Lambda Function that uses a AWSLambdaMSKExecutionRole IAM role to poll a certain topic within a certain MSK Stream as defined as the Event source in the template."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/msk-lambda-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Using Amazon MSK as an event source for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/"
+      },
+      {
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Publish messages to the Amazon MSK topic. Follow the steps as outlined in Step 4 to create a client machine and publish messages to the MSK Topic.",
+      "2. Retrieve the logs from the Lambda function: <code> sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME</code>."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/pablo-silva.json"
+  ]
+}

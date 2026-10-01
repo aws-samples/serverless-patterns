@@ -1,6 +1,7 @@
 {
-  "title": "API WebSocket to SNS with request validation",
+  "title": "API WebSocket to Amazon SNS with request validation",
   "description": "Create a WebSocket API to send notification via SNS topic with request validation",
+  "language": "Integration",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
@@ -14,10 +15,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-sns",
-      "templateURL": "serverless-patterns/apigw-websocket-api-sns",
-      "projectFolder": "apigw-websocket-api-sns",
-      "templateFile": "apigw-websocket-api-sns/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -50,9 +48,9 @@
   "authors": [
     {
       "name": "Bharat Sahni",
-      "image": "https://drive.google.com/file/d/1ajooLmbTGN2KI2IcehV4neB2rHxGzZD2/view",
       "bio": "Bharat Sahni is a Cloud Support Engineer 2 in Serverless team at AWS based in BLR, India.",
-      "linkedin": "https://www.linkedin.com/in/sahnibharat/"
+      "image": "https://drive.google.com/file/d/1ajooLmbTGN2KI2IcehV4neB2rHxGzZD2/view",
+      "linkedin": "sahnibharat"
     }
   ]
 }

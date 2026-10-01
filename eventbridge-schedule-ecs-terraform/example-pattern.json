@@ -1,7 +1,7 @@
 {
   "title": "Amazon EventBridge Schedule to Amazon Elastic Container Service",
   "description": "Creates an EventBridge schedule to invoke an Amazon Elastic Container Service task every 5 minutes",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -12,16 +12,13 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ecs-terraform",
-      "templateURL": "serverless-patterns/eventbridge-schedule-ecs-terraform",
-      "projectFolder": "eventbridge-schedule-ecs-terraform",
-      "templateFile": "eventbridge-schedule-ecs-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Getting Started with EventBridge Scheduler",
+        "text": "Getting started with EventBridge Scheduler",
         "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
       },
       {
@@ -52,9 +49,9 @@
   "authors": [
     {
       "name": "Rajdeep Banerjee",
-      "image": "https://avatars.githubusercontent.com/u/106704318",
       "bio": "AWS Sr. Solutions Architect",
-      "linkedin": "https://www.linkedin.com/in/rajdeep-banerjee/"
+      "image": "https://avatars.githubusercontent.com/u/106704318",
+      "linkedin": "rajdeep-banerjee"
     }
   ]
 }

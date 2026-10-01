@@ -1,52 +1,61 @@
 {
-  "title": "Amazon API Gateway REST API to AWS Lambda",
-  "description": "This pattern creates an Application Load Balancer and an AWS Lambda function as target.",
+  "title": "Application Load Balancer to AWS Lambda",
+  "description": "Create an Application Load Balancer that invokes an AWS Lambda function.",
   "language": "Rust",
-  "level": "300",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Application Load Balancer with an AWS Lambda function written in Rust as target. The function logs the incoming API event and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
-    ]
+      "This AWS SAM pattern creates an Application Load Balancer with an AWS Lambda function (using Rust) as a target."
+    ],
+    "test": ""
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-lambda-rust",
-      "templateURL": "serverless-patterns/alb-lambda-rust",
-      "projectFolder": "alb-lambda-rust",
-      "templateFile": "alb-lambda-rust/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
-        "text": "Application Load Balancer",
-        "link": "https://aws.amazon.com/elasticloadbalancing"
+        "text": "What is an Application Load Balancer?",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "Rust Runtime for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/opensource/rust-runtime-for-aws-lambda/"
+      },
+      {
+        "text": "Lambda Function Handler",
+        "link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/the-handler.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the repo for additional testing notes."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

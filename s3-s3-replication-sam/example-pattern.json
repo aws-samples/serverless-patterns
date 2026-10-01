@@ -12,16 +12,13 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-s3-replication-sam",
-      "templateURL": "serverless-patterns/s3-s3-replication-sam",
-      "projectFolder": "s3-s3-replication-sam",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Same Region Replication",
+        "text": "Amazon S3 Same Region Replication",
         "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html#srr-scenario"
       }
     ]
@@ -44,10 +41,10 @@
   "authors": [
     {
       "name": "Jorge Tovar",
-      "image": "https://avatars.githubusercontent.com/u/21094604?v=4",
       "bio": "Software Architect, passionate about serverless technologies and cloud computing.",
+      "image": "https://avatars.githubusercontent.com/u/21094604?v=4",
       "linkedin": "jorgetovar-sa",
-      "twitter": "https://twitter.com/jorgetovar621"
+      "twitter": "jorgetovar621"
     }
   ]
 }

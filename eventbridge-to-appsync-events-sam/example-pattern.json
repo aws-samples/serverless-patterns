@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge to AWS AppSync Events",
-  "description": "Create an EventBridge rule to send events to an AppSync Event API.",
+  "description": "Create an Amazon EventBridge rule to send events to an AWS AppSync Event API.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
@@ -8,13 +8,10 @@
     "headline": "How it works",
     "text": [
       "This project demonstrates how to use Amazon EventBridge to send events to an AWS AppSync Events API. An EventBridge rule catches events and sends them to an AppSync Events API. You can test this pattern easily using the EventBridge and Events API Console. If there are errors delivering events to your Events API from EventBridge, they will be delivered to a dead-letter queue (DLQ) where you can inspect what went wrong."
-     ]
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-to-appsync-events",
-      "templateURL": "serverless-patterns/eventbridge-to-appsync-events",
-      "projectFolder": "eventbridge-to-appsync-events",
       "templateFile": "template.yaml"
     }
   },
@@ -48,10 +45,9 @@
   "authors": [
     {
       "name": "Ronan Prenty",
-      "image": "https://avatars.githubusercontent.com/u/26303402?v=4",
       "bio": "Principal Solutions Architect at AWS based in Dublin, Ireland.",
-      "linkedin": "ronan-prenty",
-      "twitter": ""
+      "image": "https://avatars.githubusercontent.com/u/26303402?v=4",
+      "linkedin": "ronan-prenty"
     }
   ]
 }

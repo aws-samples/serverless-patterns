@@ -1,0 +1,54 @@
+{
+  "title": "Amazon EventBridge to AWS AppSync with OAuth",
+  "description": "EventBridge API Destination to AWS AppSync GraphQL API with OAuth authorization.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, AWS AppSync is configured with a a schema to manage and read todos. The pattern uses an event bridge bus and an EventBridge API destination to trigger the AppSync GraphQL updateTodo mutation when an event that matches the defined rule is received. The AppSync Lambda Authorizer is used as the mode of authorization to verify the provided access token.",
+      "This pattern demonstrates configuring the EventBridge API Destination OAuth authorization type. Although this pattern uses Amazon Cognito as the OIDC provider, other providers can be used in a similar capacity. AWS AppSync also offers a built-in OIDC authorizer, this pattern uses the Lambda Authorizer to demonstrate added flexibility.",
+      "EventBridge API Destinations uses AWS Secrets Manager to manage client secrets. The cost of storing the secret is included in the pricing for API destinations.",
+      "EventBridge caches the JWT access token returned by the API Destination authorization endpoint. The authorization endpoint must return a 401 or 403 HTTP response for EventBridge to renew the access token. This can be seen in the Lambda Authorizer included in this pattern. Your authorization endpoint must return the proper unauthorized error code for the access token to be refreshed."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/main.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      },
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --parameters authDomainName=<your_domain_name>"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "To delete the stack, run: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/josh-kahn.json"
+  ]
+}

@@ -1,0 +1,12 @@
+*-deps/
+*-package/
+*.zip
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.so
+*.egg-info/
+.pytest_cache/
+.hypothesis/
+.DS_Store

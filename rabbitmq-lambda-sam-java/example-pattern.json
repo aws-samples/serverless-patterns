@@ -1,6 +1,6 @@
 {
-  "title": "Event driven Amazon MQ for RabbitMQ message processing using AWS Lambda (Java)",
-  "description": "This sample project demonstrates event driven message processing from an Amazon MQ for RabbitMQ queue using an AWS Lambda function written in Java.",
+  "title": "Event driven Amazon MQ for RabbitMQ message processing using AWS Lambda",
+  "description": "This sample project shows event driven message processing from an Amazon MQ for RabbitMQ queue using an AWS Lambda function written in Java.",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/rabbitmq-lambda-sam-java",
-      "templateURL": "serverless-patterns/rabbitmq-lambda-sam-java",
-      "projectFolder": "rabbitmq-lambda-sam-java",
       "templateFile": "template.yaml"
     }
   },
@@ -28,7 +25,7 @@
       {
         "text": "Creating and connecting to a RabbitMQ broker",
         "link": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/getting-started-rabbitmq.html"
-      }      
+      }
     ]
   },
   "deploy": {
@@ -50,14 +47,14 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "linkedin": "biswanathmukherjee"
     },
     {
       "name": "Rakshith Rao",
-      "image": "https://rao.sh/assets/img/profile_pic.png",
       "bio": "I am a Senior Solutions Architect at AWS and help our strategic customers build and operate their key workloads on AWS.",
+      "image": "https://rao.sh/assets/img/profile_pic.png",
       "linkedin": "rakshithrao"
     }
   ]

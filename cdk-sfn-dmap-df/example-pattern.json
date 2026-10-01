@@ -1,5 +1,5 @@
 {
-  "title": "AWS Step Functions Distributed Map with Lambda durable functions",
+  "title": "AWS Step Functions Distributed Map with AWS Lambda durable functions",
   "description": "Fan out across Amazon S3 items using Distributed Map, invoking a Lambda durable function per item with per-item idempotency.",
   "language": "TypeScript",
   "level": "300",
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sfn-dmap-df",
-      "templateURL": "serverless-patterns/cdk-sfn-dmap-df",
-      "projectFolder": "cdk-sfn-dmap-df",
       "templateFile": "lib/cdk-sfn-dmap-df-stack.ts"
     }
   },
@@ -55,13 +52,15 @@
     ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk destroy</code>"]
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {
       "name": "Marco Jahn",
-      "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
       "bio": "Senior Solutions Architect, Amazon Web Services",
+      "image": "https://sessionize.com/image/e99b-400o400o2-pqR4BacUSzHrq4fgZ4wwEQ.png",
       "linkedin": "marcojahn"
     }
   ]

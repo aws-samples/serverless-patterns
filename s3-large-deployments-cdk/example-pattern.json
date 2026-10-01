@@ -1,0 +1,54 @@
+{
+  "title": "Amazon S3 to AWS Lambda",
+  "description": "Upload large file to S3 buckets with custom resources.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The samples in this project demonstrate how to upload large file to S3 Bucket using CDK using the inbuilt CDK Assets Bucket and Custom Resource.",
+      "Assets are local files, directories, or Docker images that can be bundled into AWS CDK libraries and apps; for example, a directory that contains the handler code for an AWS Lambda function. Assets can represent any artifact that the app needs to operate. You can define local files and directories as assets, and the AWS CDK packages and uploads them to Amazon S3 through the aws-s3-assets module.",
+      "A Lambda Backed Custom Resource can be used to copy your large file from the assets bucket to your custom s3 bucket"
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "s3_large_deployment/s3_large_deployment_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Using AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Custom resources",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --context filename=<sample file name> --context s3bucketname=<the name of the s3 bucket> --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/payal-shah.json"
+  ]
+}

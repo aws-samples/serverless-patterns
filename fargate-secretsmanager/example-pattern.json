@@ -1,0 +1,67 @@
+{
+  "title": "Secrets Manager with AWS Fargate",
+  "description": "Use AWS Secrets Manager to inject secrets into AWS Fargate Containers.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon ECS Cluster, ECS Task Definition, AWS Fargate Container, and AWS Secrets Manager instance, along with associated roles.",
+      "Secrets Manager generates a random secret and injects this into the container upon start-up as environment variable. The container is spun up when a Fargate task is run in an existing VPC in the user's AWS account via a CLI command in the testing section. For the roles: A task execution role is created for logging to CloudWatch and for accessing the secrets (the policy for the secrets is added by default). An 'empty' (policy-less) default task role is also created along with Task Definition creation. The Task Definition does not display any hard-coded values for secrets in the console; rather, it displays the ARN of the Secret for which it retrieves the password from via its IAM role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/fargate_secretsmanager_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Secrets Manager",
+        "link": "https://aws.amazon.com/secrets-manager/"
+      },
+      {
+        "text": "Amazon ECS Workshop: Get started with ECS and Fargate",
+        "link": "https://ecsworkshop.com/"
+      },
+      {
+        "text": "Amazon ECS: Specifying sensitive data",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html"
+      },
+      {
+        "text": "Tutorial: Walkthrough on passing in secret data to container",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-tutorial.html"
+      },
+      {
+        "text": "AWS Premium Support - How to securely pass secrets to a container in Amazon ECS",
+        "link": "https://aws.amazon.com/premiumsupport/knowledge-center/ecs-data-security-container-task/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing in the README.md file in the repo"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/abdul-ahad-khan.json"
+  ]
+}

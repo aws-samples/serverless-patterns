@@ -1,21 +1,19 @@
 {
-  "title": "S3 Object Lambda using textract",
-  "description": "This pattern provides a simple On-demand mechanism of extracting key value pair from document for Intelligent document processing.Example Use case : If an enterprise has a large volume of PDF document and does not want to run a batch job due to the cost of processing of extracting / processing all the document, S3 Ojbect lambda provdies a good mechanism to extract only the OCR document on need basis without major changes to the architecture and in a serverless fashion, optimising cost.",
+  "title": "Amazon S3 Object Lambda using Amazon Textract",
+  "description": "Pattern for extracting key value pair from documents for intelligent document processing",
   "language": "Python",
   "level": "200",
-  "framework": "AWS SAM",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to setup AWS S3 Object Lambda to invoke Amazon Textract. Amazon Textract can be used on a Object Lambda Access point to provide the extract of a document PDF / Image"
+      "This demonstrates how to setup AWS S3 Object Lambda to invoke Amazon Textract. Amazon Textract can be used on an Object Lambda Access point to provide the extract of a document PDF or image.",
+      "For example, if an enterprise has a large volume of PDF documents and does not want to run a batch job due to the cost of processing of extracting or processing all the documents, S3 Object Lambda provides a way to extract only the OCR document without major changes to the architecture, optimizing cost."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/sonihemish/serverless-patterns/tree/sonihemish-feature-s3-object-lambda-textract/s3-object-lambda-textract",
-      "templateURL": "serverless-patterns/s3-object-lambda-textract",
-      "projectFolder": "s3-object-lambda-textract",
-      "templateFile": "s3-object-lambda-textract/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -48,10 +46,10 @@
   "authors": [
     {
       "name": "Hemish Soni",
-      "image": "https://badgephotos.corp.amazon.com/?uid=hnsoni",
       "bio": "Sr Partner Solution Architect, Serverless Enthusiast",
-      "linkedin": "https://www.linkedin.com/in/sonihemish/",
-      "twitter": "@sonihemish"
+      "image": "https://badgephotos.corp.amazon.com/?uid=hnsoni",
+      "linkedin": "sonihemish",
+      "twitter": "sonihemish"
     }
   ]
 }

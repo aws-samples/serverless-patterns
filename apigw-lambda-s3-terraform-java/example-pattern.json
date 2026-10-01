@@ -1,6 +1,6 @@
 {
   "title": "Upload file to Amazon S3 bucket using presigned URL",
-  "description": "This project deploys Amazon API Gateway with AWS Lambda integration to showcase how to upload a file up to 5GB to Amazon S3 bucket using a presigned S3 URL.",
+  "description": "Amazon API Gateway with AWS Lambda integration to showcase how to upload a file up to 5GB to Amazon S3 bucket using a presigned S3 URL.",
   "language": "Java",
   "level": "200",
   "framework": "Terraform",
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-s3-terraform-java",
-      "templateURL": "serverless-patterns/apigw-lambda-s3-terraform-java",
-      "projectFolder": "apigw-lambda-s3-terraform-java",
       "templateFile": "main.tf"
     }
   },
@@ -29,7 +26,7 @@
       {
         "text": "Uploading objects with presigned URLs",
         "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
-      }      
+      }
     ]
   },
   "deploy": {
@@ -53,8 +50,8 @@
   "authors": [
     {
       "name": "Jing Xiang Peh",
-      "image": "images/profile-pic.jpg",
       "bio": "I am a Specialist Solutions Architect for Serveless based in Singapore",
+      "image": "images/profile-pic.jpg",
       "linkedin": "jing-xiang-peh"
     }
   ]

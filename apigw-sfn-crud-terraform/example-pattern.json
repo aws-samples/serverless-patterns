@@ -1,7 +1,7 @@
 {
   "title": "Amazon API Gateway, AWS Step Functions, to Amazon DynamoDB CRUD API",
   "description": "Create a CRUD API with AWS Step Functions.",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-crud-terraform",
-      "templateURL": "serverless-patterns/apigw-sfn-crud-terraform",
-      "projectFolder": "apigw-sfn-crud-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -53,11 +50,9 @@
   "authors": [
     {
       "name": "Oriol Matavacas",
-      "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
       "bio": "Oriol Matavacas is a Senior Solutions Architect at AWS based in Barcelona. Oriol primarily supports customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
-      "linkedin": "oriol-matavacas-rodriguez-b165868a",
-      "twitter": ""
+      "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
+      "linkedin": "oriol-matavacas-rodriguez-b165868a"
     }
   ]
 }
-

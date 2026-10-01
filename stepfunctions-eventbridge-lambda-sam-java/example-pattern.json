@@ -1,0 +1,59 @@
+{
+  "title": "AWS Step Functions to Amazon EventBridge to AWS Lambda",
+  "description": "Creates a Step Functions workflow that publishes events to EventBridge, routing to Lambda.",
+  "language": "Java",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template contains all the information to deploy AWS resources(the Lambda functions, the EventBridge and the Step Functions workflow) and also the permission required by these service to communicate.",
+      "To test this pattern you need to start the State Machine ProcessOrder from your terminal or from AWS Console Step Function. The state machine will invoke the OrderState Lambda function which will create a OrderCreated object which will be sent to a custom EventBridge Bus and intercepted by an Event Pattern Rule.",
+      "The event pattern Rule will invoke the ProcessOrder Lambda function with the EventBridge message as a Payload.",
+      "You can see the event in the CloudWatch Logs - Log Group of the ProcessOrder Lambda function.",
+      "This is fully functional example implemented in Java 25."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Execute the Step Functions workflow:",
+      "<code>aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STATE_MACHINE_ARN</code>",
+      "2. View CloudWatch Logs to see events that Step Functions published to EventBridge:",
+      "<code>aws logs tail CLOUDWATCH_LOG_GROUP</code>",
+      "3. You see an event that was delivered to the event bus."
+    ]
+  },
+  "contributors": [
+    "content/contributors/razvan-minciuna.json"
+  ]
+}

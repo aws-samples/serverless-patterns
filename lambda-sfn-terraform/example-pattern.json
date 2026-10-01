@@ -1,0 +1,52 @@
+{
+  "title": "AWS Lambda to AWS Step Functions",
+  "description": "Invoke an AWS Step Functions workflow from AWS Lambda, with logging enabled",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Terraform template deploys a Lambda function, and a Step Functions workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Step Functionsworkflow, passing the event body. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the response from the Step Functionsincluding the execution ARN and start date."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Using AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Blog Series: Building scalable serverless applications with Amazon S3 and AWS Lambda.",
+        "link": "https://aws.amazon.com/blogs/compute/building-scalable-serverless-applications-with-amazon-s3-and-aws-lambda/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>terraform show</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/ahmad-aboushady.json"
+  ]
+}

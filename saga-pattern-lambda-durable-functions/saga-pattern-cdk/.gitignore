@@ -1,0 +1,15 @@
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+# Ignore the .zip file
+saga-layer.zip
+
+# Lambda layer build artifacts
+lambda/saga-workflow/saga-layer.zip
+lambda/saga-workflow/layer-build/
