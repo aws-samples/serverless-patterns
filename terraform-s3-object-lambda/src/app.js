@@ -2,11 +2,11 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const { S3 } = require("aws-sdk");
+const { S3Client, WriteGetObjectResponseCommand } = require("@aws-sdk/client-s3");
 const axios = require("axios").default;  // Promise-based HTTP requests
 const sharp = require("sharp"); // Used for image resizing
 
-const s3 = new S3();
+const s3 = new S3Client({});
 
 exports.handler = async (event) => {
   // Output the event details to CloudWatch Logs.
@@ -24,7 +24,7 @@ exports.handler = async (event) => {
   // Resize the image
   // Height is optional, will automatically maintain aspect ratio.
   // withMetadata retains the EXIF data which preserves the orientation of the image.
-  const resized = await sharp(data).resize({ width: 100, height: 100 }).withMetadata();
+  const resized = await sharp(data).resize({ width: 100, height: 100 }).withMetadata().toBuffer();
 
   // Send the resized image back to S3 Object Lambda.
   const params = {
@@ -32,7 +32,7 @@ exports.handler = async (event) => {
     RequestToken: outputToken,
     Body: resized,
   };
-  await s3.writeGetObjectResponse(params).promise();
+  await s3.send(new WriteGetObjectResponseCommand(params));
 
   // Exit the Lambda function.
   return { statusCode: 200 };
