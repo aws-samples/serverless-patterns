@@ -39,24 +39,24 @@ namespace cdk
 
             var processOrderFunction = new Amazon.CDK.AWS.Lambda.Function(this, "ListFilesFunction", new FunctionProps()
             {
-                Runtime = Runtime.DOTNET_6,
-                Code = Code.FromAsset("processOrderFunction/bin/Release/net6.0/publish"),
+                Runtime = Runtime.DOTNET_10,
+                Code = Code.FromAsset("processOrderFunction/bin/Release/net10.0/publish"),
                 Handler = "processOrderFunction::processOrderFunction.Function::FunctionHandler",
                 Timeout = Duration.Minutes(10)
             });
 
             var completeOrderFunction = new Amazon.CDK.AWS.Lambda.Function(this, "completeOrderFunction", new FunctionProps()
             {
-                Runtime = Runtime.DOTNET_6,
-                Code = Code.FromAsset("completeOrderFunction/bin/Release/net6.0/publish"),
+                Runtime = Runtime.DOTNET_10,
+                Code = Code.FromAsset("completeOrderFunction/bin/Release/net10.0/publish"),
                 Handler = "completeOrderFunction::completeOrderFunction.Function::FunctionHandler",
                 Timeout = Duration.Minutes(10)
             });
 
             var storeTaskTokenFunction = new Amazon.CDK.AWS.Lambda.Function(this, "storeTaskTokenFunction", new FunctionProps()
             {
-                Runtime = Runtime.DOTNET_6,
-                Code = Code.FromAsset("storeTaskTokenFunction/bin/Release/net6.0/publish"),
+                Runtime = Runtime.DOTNET_10,
+                Code = Code.FromAsset("storeTaskTokenFunction/bin/Release/net10.0/publish"),
                 Handler = "storeTaskTokenFunction::storeTaskTokenFunction.Function::FunctionHandler",
                 Timeout = Duration.Minutes(3),
                 Environment = new Dictionary<string, string>() { { "TokenStoreBucket", storeTaskTokenBucket.BucketName } }
@@ -66,8 +66,8 @@ namespace cdk
 
             var workflowAPIFunction = new Amazon.CDK.AWS.Lambda.Function(this, "callbackPatternAPIFunction", new FunctionProps()
             {
-                Runtime = Runtime.DOTNET_6,
-                Code = Code.FromAsset("CallbackPatternSample.API/bin/Release/net6.0/publish"),
+                Runtime = Runtime.DOTNET_10,
+                Code = Code.FromAsset("CallbackPatternSample.API/bin/Release/net10.0/publish"),
                 Handler = "CallbackPatternSample.API::CallbackPatternSample.API.LambdaEntryPoint::FunctionHandlerAsync",
                 Timeout = Duration.Minutes(10),
                 Environment = new Dictionary<string, string>() { { "TokenStoreBucket", storeTaskTokenBucket.BucketName } }
