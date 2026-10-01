@@ -69,7 +69,7 @@ export class AppConfigFeatureFlagCdkStack extends Stack {
     const APPCONFIG_EXTENSION_ARN = appConfigExtensionArn.valueAsString;
 
     const checkFeatureFlagStatusLambda = new nodejs_lambda.NodejsFunction(this, "CheckFeatureFlagStatusLambda", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, `/../lambda/index.ts`),
       handler: "handler",
       retryAttempts: 0,
