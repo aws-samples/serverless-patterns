@@ -381,6 +381,17 @@ function checkPatternArchServices(arch, ctx, servicesMap) {
           message: `Invalid service "${value.service}" — not a known service key.`,
         });
       }
+      // Icons are centred on y; below 75% the label runs off the bottom of the diagram.
+      if (key.includes("icon") && typeof value.y === "number" && value.y > PATTERN_ARCH_MAX_Y) {
+        ctx.addIssue({
+          code: "custom",
+          path: [key, "y"],
+          message: `${key}.y is ${value.y}; keep icons at y ${PATTERN_ARCH_MAX_Y} or less so the label fits.`,
+        });
+      }
     }
   }
 }
+
+/** Highest icon y (percent) in patternArch. */
+export const PATTERN_ARCH_MAX_Y = 75;
