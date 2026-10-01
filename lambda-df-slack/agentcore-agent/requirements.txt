@@ -1,0 +1,4 @@
+strands-agents
+bedrock-agentcore
+boto3
+aws-durable-execution-sdk-python

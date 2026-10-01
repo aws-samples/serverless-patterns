@@ -1,21 +1,18 @@
 {
-  "title": "Amazon Dynamodb Streams to AWS Lambda to Amazon EventBridge",
-  "description": "TThe AWS SAM template deploys a Lambda function, a DynamoDB table and an Amazon EventBridge bus, and the minimum IAM resources required to run the application.",
-  "language": "TypeScript",
+  "title": "Amazon DynamoDB Streams to AWS Lambda to Amazon EventBridge",
+  "description": "Send DynamoDB changes to EventBridge via Lambda.",
+  "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The changes are sent to a stream when items are written in a DynamoDB table. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the table item that has been inserted. The Lambda will then emit an event to Amazon EventBridge."
+      "The changes are sent to a stream when items are written in a DynamoDB table. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the table item that has been inserted. The Lambda function will then emit an event to Amazon EventBridge."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-lambda-eventbridge-sam-node",
-      "templateURL": "serverless-patterns/dynamodb-streams-lambda-eventbridge-sam-node",
-      "projectFolder": "dynamodb-streams-lambda-eventbridge-sam-node",
-      "templateFile": "dynamodb-streams-lambda-eventbridge-sam-node/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
@@ -51,10 +48,9 @@
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

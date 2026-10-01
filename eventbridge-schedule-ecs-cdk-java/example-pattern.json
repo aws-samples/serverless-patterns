@@ -1,21 +1,18 @@
 {
-  "title": "EventBridge Scheduler to Run ECS Task",
-  "description": "Simple pattern that run task in Amazon Elastic Container Service cluster every 15 minutes.",
+  "title": "Amazon EventBridge Scheduler to run Amazon Elastic Container Service task",
+  "description": "Simple pattern that create an Amazon EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes.",
   "language": "Java",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample pattern demonstrates how to use EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes and deployed using the AWS CDK for Java."
+      "This sample pattern demonstrates how to use Amazon EventBridge Scheduler to run task in Amazon Elastic Container Service cluster every 15 minutes and deployed using the AWS CDK for Java."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ecs-cdk-java",
-      "templateURL": "serverless-patterns/eventbridge-schedule-ecs-cdk-java",
-      "projectFolder": "eventbridge-schedule-to-sns-publish-cdk-java",
-      "templateFile": "eventbridge-schedule-ecs-cdk-java/src/main/java/com/myorg/EventbridgeScheduleEcsCdkJavaStack.java"
+      "templateFile": "src/main/java/com/myorg/EventbridgeScheduleEcsCdkJavaStack.java"
     }
   },
   "resources": {
@@ -40,7 +37,7 @@
   },
   "deploy": {
     "text": [
-      "<code>cdk deploy</code>"
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -58,7 +55,7 @@
     {
       "name": "Hoi Wing Chan",
       "bio": "Hoi Wing is a Technical Account Manager at Amazon Web Services with a background of software development and architecture.",
-      "linkedin": "https://www.linkedin.com/in/wing-chan-0943a344"
+      "linkedin": "wing-chan-0943a344"
     }
   ]
 }

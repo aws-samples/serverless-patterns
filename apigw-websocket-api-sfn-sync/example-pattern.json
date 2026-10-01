@@ -1,7 +1,7 @@
 {
-  "title": "API Gateway WebSocket API to Step Functions Express (Synchronous Execution)",
+  "title": "Amazon API Gateway WebSocket API to AWS Step Functions Express (Synchronous Execution)",
   "description": "Start Step Functions Express Workflow synchronous execution via WebSocket API",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
@@ -13,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-api-sfn-sync",
-      "templateURL": "serverless-patterns/apigw-websocket-api-sfn-sync",
-      "projectFolder": "apigw-websocket-api-sfn-sync",
-      "templateFile": "apigw-websocket-api-sfn-sync/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -33,26 +30,27 @@
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See the repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Giedrius Praspaliauskas",
-      "image": "",
       "bio": "Giedrius is a senior solutions architect focusing on serverless at Amazon Web Services based in the US.",
-      "linkedin": "https://www.linkedin.com/in/gpraspaliauskas/",
-      "twitter": ""
+      "linkedin": "gpraspaliauskas"
     }
   ]
 }

@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-functions-nodejs-calling-ecs",
-      "templateURL": "serverless-patterns/lambda-durable-functions-nodejs-calling-ecs",
-      "projectFolder": "lambda-durable-functions-nodejs-calling-ecs",
       "templateFile": "template.yaml"
     }
   },
@@ -60,7 +57,6 @@
   "authors": [
     {
       "name": "Surya Sai D",
-      "image": "",
       "bio": "Surya works as a Technical Account Manager at AWS. He is an expert in Serverless frameworks and Event Driven Architectures. Surya is also passionate on technical writing and has contributed to AWS blogs and other Open Source Content.",
       "linkedin": "surya-sai-d-64920416a"
     }

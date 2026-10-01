@@ -1,0 +1,53 @@
+{
+  "title": "Amazon SQS to AWS Lambda to Amazon DynamoDB",
+  "description": "Create a Lambda function that batch writes to DynamoDB from SQS.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an SQS queue, a Lambda Function, and a DynamoDB table allowing batch writes from SQS messages to a DynamoDB. The CDK application contains the minimum IAM resources required to run the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "vsam_to_dynamo/vsam_to_dynamo_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Choosing between messaging services for serverless applications.",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      },
+      {
+        "text": "Configuring a queue to trigger an AWS Lambda function",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/paulo-beleza-heneine.json"
+  ]
+}

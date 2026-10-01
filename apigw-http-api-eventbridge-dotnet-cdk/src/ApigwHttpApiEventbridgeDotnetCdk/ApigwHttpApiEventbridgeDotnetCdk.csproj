@@ -10,8 +10,8 @@
   <ItemGroup>
     <!-- CDK Construct Library dependencies -->
     <PackageReference Include="Amazon.CDK.AWS.APIGatewayv2.Alpha" Version="2.7.0-alpha.0" />
-    <PackageReference Include="Amazon.CDK.Lib" Version="2.7.0" />
-    <PackageReference Include="Constructs" Version="10.0.32" />
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.253.0" />
+    <PackageReference Include="Constructs" Version="10.5.0" />
 
     <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />

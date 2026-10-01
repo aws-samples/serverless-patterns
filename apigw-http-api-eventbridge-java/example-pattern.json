@@ -1,25 +1,27 @@
 {
-  "title": "API Gateway HTTP API to Amazon EventBridge",
-  "description": "Create an HTTP API endpoint that directly integrates with Amazon EventBridge.",
+  "title": "Amazon API Gateway HTTP API to Amazon EventBridge",
+  "description": "Create an HTTP API endpoint that directly integrates with Amazon EventBridge",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway HTTP API endpoint.",
-      "The endpoint uses service integrations to directly connect to Amazon EventBridge."
+      "This pattern creates an Amazon API Gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-eventbridge-java",
-      "templateURL": "serverless-patterns/apigw-http-api-eventbridge-java",
-      "projectFolder": "apigw-http-api-eventbridge-java"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
+      {
+        "text": "Storage first integrations",
+        "link": "https://aws.amazon.com/blogs/compute/building-storage-first-applications-with-http-apis-service-integrations/"
+      },
       {
         "text": "Working with AWS service integrations for HTTP APIs",
         "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html"
@@ -32,23 +34,25 @@
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See testing in the README.md file in the repo"
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
-      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Eric Johnson",
-      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
       "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduces a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
       "linkedin": "singledigit",
-      "twitter": "@edjgeek"
+      "twitter": "edjgeek"
     },
     {
       "name": "Steven Cook",

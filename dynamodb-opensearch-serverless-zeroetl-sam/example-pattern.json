@@ -7,14 +7,11 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project shows how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection."
+      "This sample project demonstrates how to deploy a zero-ETL integration from a DynamoDB table to an OpenSearch Serverless collection."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-opensearch-serverless-zeroetl-sam",
-      "templateURL": "serverless-patterns/dynamodb-opensearch-serverless-zeroetl-sam",
-      "projectFolder": "dynamodb-opensearch-serverless-zeroetl-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -52,8 +49,8 @@
   "authors": [
     {
       "name": "Nathan J. Lichtenstein",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-nathan-lichtenstein.png",
       "bio": "Never satisfied with the status quo, Nathan joined AWS as a Senior Solutions Architect in 2022. Based in NYC he loves all things cloud and networking.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-nathan-lichtenstein.png",
       "linkedin": "nathanjlichtenstein"
     }
   ]

@@ -2,6 +2,8 @@
 
 To submit a new serverless pattern, or to make changes to existing code, follow the instructions below.
 
+**Check for an existing pattern first.** Search [Serverless Land patterns](https://serverlessland.com/patterns) and the folders in this repo for the same services. If a pattern already exists, add your language or framework as a new variant in that pattern's family folder instead of creating a new pattern. See [folder structure](#folder-structure).
+
 ## Repo Names
 
 * **local:** Your local copy of the forked repository.
@@ -52,10 +54,43 @@ Create a new local branch for each serverless pattern or modification being made
 
 Now is the time to create your new serverless pattern or modify existing code.
 
-1. If you are creating a new serverless pattern, copy the folder named "_pattern-model" to start with a template: `cp -r _pattern-model {new-folder-name}`
-1. If you are modifying existing code, make your code changes now.
-1. When your code is complete, stage the changes to your local branch: `git add .`
-1. Commit the changes to your local branch: `git commit -m 'Comment here'`
+1. If you are creating a new serverless pattern, start from a template. Either copy the folder named "_pattern-model", or copy a similar existing pattern, such as another variant in the same family.For example: `mkdir -p sqs-lambda/python && cp -r _pattern-model sqs-lambda/python/sam`
+    If you copy an existing pattern, update everything that refers to the original: `example-pattern.json` (title, description, language, framework, `gitHub.template.templateFile` and authors), the README, and resource and stack names in the template. Remove build output and anything the new variant doesn't use.
+2. If you are modifying existing code, make your code changes now.
+3. Work through the [pattern checklist](#pattern-checklist) below.
+4. When your code is complete, stage the changes in your pattern folder: `git add {family}/{language}/{framework}`
+5. Commit the changes to your local branch: `git commit -m 'Comment here'`
+
+## Pattern checklist
+
+Use this checklist whether you write the pattern yourself or use an AI coding agent. Agents also read [AGENTS.md](AGENTS.md).
+
+- **Check for an existing pattern** with the same services before you start. Add a variant to it rather than creating a duplicate.
+- **One pattern variant per pull request.** Put everything in one variant folder. Don't change other pattern folders.
+- <a id="folder-structure"></a>**Folder structure:** `{family}/{language}/{framework}`, all lowercase, e.g. `sqs-lambda/python/sam`.
+  - The family folder names the services, hyphenated, e.g. `sqs-lambda`. It groups patterns that differ only by language or framework.
+  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`.
+  - Skip the language level when the pattern has no language (infra-only, e.g. `language` is `""`): use `{family}/{framework}`, e.g. `apigw-sqs/sam`.
+  - Each variant folder holds a complete pattern: `README.md`, `example-pattern.json`, the template and the code.
+  - Older patterns still use single folders such as `sqs-lambda-python-sam`. Use the new structure for new patterns.
+- **Scope:** patterns are infrastructure as code for 2–4 AWS services with minimal custom code. Utilities, demos and full applications belong in [Serverless Land repos](https://serverlessland.com/repos).
+- **README.md:** keep the headings from `_pattern-model/README.md` and fill in every section: requirements, deployment, how it works, testing and cleanup.
+- **example-pattern.json:** this file builds the pattern page on Serverless Land. Pull requests check it against the [pattern schema](_scripts/pattern-schema.mjs). The rules people most often miss:
+  - The first mention of each service in `title` uses its official name: "AWS Lambda to Amazon DynamoDB", not "Lambda to DynamoDB".
+  - `title` is 100 characters or fewer and `description` is 175 or fewer.
+  - `language`, `framework` and `level` must use one of the values in the schema, e.g. `"framework": "AWS SAM"`.
+  - `gitHub.template.templateFile` is required: the file shown on the pattern page, relative to your pattern folder, e.g. `"template.yaml"` or `"cdk/lib/my-stack.ts"`, not `"my-pattern/template.yaml"`. That's the only `gitHub` field you need. Serverless Land records the folder itself, so don't add `repoURL`, `templateURL` or `projectFolder`.
+  - In `authors`, `linkedin` is your profile ID (`jane-doe`) and `twitter` is your handle (`jane_doe`), not URLs. If you have a page at `serverlessland.com/about/your-name`, you can use `"contributors": ["content/contributors/your-name.json"]` instead.
+  - The `deploy` and `cleanup` commands match your framework, e.g. `sam deploy` and `sam delete`, or `cdk deploy` and `cdk destroy`.
+- **Check the pattern file** from the repo root:
+
+    ```bash
+    cd _scripts && npm i && cd ..
+    node _scripts/validate.js {family}/{language}/{framework}/example-pattern.json
+    ```
+
+- **Check the template builds**, e.g. `sam validate --lint`, `cdk synth` or `terraform validate`, and deploy and test it in your own account before you open the pull request.
+- **Leave out:** account IDs, secrets, build output such as `.aws-sam/`, `cdk.out/` and `node_modules/`, and architecture diagrams. The Serverless Land team creates the diagrams.
 
 ## Pull Request
 
@@ -72,13 +107,6 @@ Push your code to the remote repos and [create a pull request](https://docs.gith
 
     1. Add a description of the changes.
     1. Click "Create pull request".
-1. Submit a [new issue](https://github.com/aws-samples/serverless-patterns/issues/new?assignees=jbesw&labels=&template=new-serverless-pattern-submission.md&title=New+pattern+submission) to provide the additional details that will be used to build the serverless pattern web page on ServerlessLand.com.
-    1. Provide responses to each section (eg: Description, Language, Framework, etc.)
-    1. Add a link to the pull request in the "GitHub PR for template" section. If you type a hashtag (#), it will display a list of the current pull requests to select from.
-    1. Consider adding a few links to AWS documentation in the "Additional resources" section to provide more information about your serverless pattern.
-    1. Be sure to provide your information in the "Author bio" section.
-    1. Click "Submit new issue".
-    1. Example issue: https://github.com/aws-samples/serverless-patterns/issues/57
 
 ## Sync Repos
 

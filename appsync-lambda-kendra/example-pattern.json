@@ -1,20 +1,17 @@
 {
-  "title": "AppSync Query Amazon Kendra",
-  "description": "An AWS Serverless Pattern to demonstrate integration of AppSync, Lambda and Kendra.",
+  "title": "AWS AppSync query to Amazon Kendra",
+  "description": "Integrate AppSync, Lambda, and Kendra.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "An AWS Serverless Pattern to demonstrate integration of AppSync, Lambda and Kendra."
+      "This pattern demonstrates the integration of AppSync, Lambda and Kendra."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-lambda-kendra",
-      "templateURL": "serverless-patterns/appsync-lambda-kendra",
-      "projectFolder": "appsync-lambda-kendra",
       "templateFile": "template.yaml"
     }
   },
@@ -48,8 +45,8 @@
   "authors": [
     {
       "name": "Sayan Moitra",
-      "image": "./smoitra.png",
       "bio": "Sayan is a Solutions Architect at Amazon Web Services based in India.",
+      "image": "./smoitra.png",
       "linkedin": "sayanmoitra"
     }
   ]

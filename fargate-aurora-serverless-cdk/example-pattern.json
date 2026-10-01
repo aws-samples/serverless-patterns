@@ -1,0 +1,61 @@
+{
+  "title": "AWS Fargate to Amazon Aurora Serverless",
+  "description": "Create an AWS Fargate service that interacts with Aurora Serverless",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front.",
+      "The AWS Fargate service executes commands against an Amazon Aurora Serverless Cluster. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library.",
+      "This makes use of the in-built ecs.ContainerImage.fromAsset method. The custom image has a base route / for health checks, /createtable for adding a table to the database, and /showtables for displaying a list of tables in the database.",
+      "Environment variables like the database name, secrets ARN, and Aurora Serverless Cluster ARN are passed to the image to enable it to perform actions on the Database."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CDK documentation for ApplicationLoadBalancedFargateService",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-ecs-patterns.ApplicationLoadBalancedFargateService.html"
+      },
+      {
+        "text": "CDK documentation for Secrets Manager",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-secretsmanager-readme.html"
+      },
+      {
+        "text": "CDK documentation for RDS Serverless Cluster",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-rds.ServerlessCluster.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/glenn-chia-jin-wee.json"
+  ]
+}

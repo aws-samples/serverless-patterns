@@ -1,0 +1,50 @@
+{
+  "title": "Amazon CloudFront with Amazon CloudFront Functions to Amazon S3",
+  "description": "CloudFront with CloudFront Functions to S3",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon Cloudfront distribution, an Amazon Cloudfront Function and a Amazon S3 Bucket and demonstrates how to implement an A/B testing solution.",
+      "Using Cloudfront Functions, you are dynamically changing the URI to display either the old home page or new home page randomly."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cloudfront_cff_s3_cdk_python/cloudfront_cff_s3_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CDK Patterns",
+        "link": "https://cdkpatterns.com/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>cdk destroy</code>",
+      "2. See additional notes in the repo."
+    ]
+  },
+  "contributors": [
+    "content/contributors/corneliu-croitoru.json"
+  ]
+}

@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-endusermessaging",
-      "templateURL": "serverless-patterns/lambda-endusermessaging",
-      "projectFolder": "lambda-endusermessaging",
       "templateFile": "simple_sms_messaging/simple_sms_messaging_stack.py"
     }
   },
@@ -52,8 +49,8 @@
   "authors": [
     {
       "name": "Sarath Kumar K.S",
-      "image": "https://i.postimg.cc/6qpwHbWD/IMG-0258.jpg",
       "bio": "Sarath is a Senior Technical Account Manager at AWS.",
+      "image": "https://i.postimg.cc/6qpwHbWD/IMG-0258.jpg",
       "linkedin": "kssarathkumar"
     }
   ]

@@ -1,0 +1,55 @@
+{
+  "title": "AWS Fargate to AWS Step Functions",
+  "description": "Create an AWS Fargate service that invokes Step Functions",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front.",
+      "The AWS Fargate service makes startExecution calls to an AWS Step Functions (SFN) state machine. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built ecs.ContainerImage.fromAsset method. The custom image has a base route / for health checks, and /startexecution route for executing the state machine. Environment variables like the state machine ARN and AWS region are passed to the image to enable it to perform actions on the state machine.",
+      "This project also shows how to set up an Step Functions Interface Endpoint to the VPC. A VPC Endpoint policy is created to only allow the Fargate task definition to perform actions through the VPC endpoint."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "AWS Step Functions",
+        "link": "https://aws.amazon.com/step-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/glenn-chia-jin-wee.json"
+  ]
+}

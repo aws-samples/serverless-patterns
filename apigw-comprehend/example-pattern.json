@@ -1,21 +1,18 @@
 {
   "title": "Amazon API Gateway to Amazon Comprehend",
   "description": "Create a REST API that acts as a proxy to Amazon Comprehend DetectSentiment API operation.",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how to use Amazon API Gateway REST API as a proxy to Amazon Comprehend DetectSentiment API.",
-      "You can easily utilise this solution to expose other Comprehend API operations as well with minimal efforts"
+      "Use this solution to expose other Comprehend API operations with minimal effort."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-comprehend",
-      "templateURL": "serverless-patterns/apigw-comprehend",
-      "projectFolder": "apigw-comprehend",
       "templateFile": "template.yaml"
     }
   },
@@ -43,15 +40,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: sam delete."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
-      {
-          "name": "Saborni Bhattacharya",
-          "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
-          "bio": "I am Saborni working as a Cloud Engineer at AWS SE Serverless.",
-          "linkedin": "saborni-bhattacharya-5b523812a"
-        }
+    {
+      "name": "Saborni Bhattacharya",
+      "bio": "I am Saborni working as a Cloud Engineer at AWS SE Serverless.",
+      "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+      "linkedin": "saborni-bhattacharya-5b523812a"
+    }
   ]
 }

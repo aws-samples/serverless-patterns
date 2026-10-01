@@ -1,0 +1,52 @@
+{
+  "title": "Amazon API Gateway to Amazon SQS to AWS Lambda",
+  "description": "Create an HTTP API that routes to SQS then Lambda",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway HTTP API with a send route that send message to a SQS queue. The Amazon API Gateway HTTP API has basic CORS configured. Upon receiving message, SQS will trigger a Lambda function to process the message. The function will only print the message only. The function written in Python."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "infrastructure/apigw_http_api_sqs_lambda_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      },
+      {
+        "text": "Amazon API Gateway HTTP Integration subtype reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services-reference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Running following cURL command to agaist the HTTP API Endpoint:",
+      "<code>curl -XPOST https://${HTTP_API_ENDPOOINT}/send -d'{\"MessageBody\":\"hello\"}'</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>cdk destroy</code>",
+      "2. Confirm the removal and wait for the resource deletion to complete."
+    ]
+  },
+  "contributors": [
+    "content/contributors/paul-lu.json"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "title": "CodeCommit to Amazon S3",
+  "description": "Backup CodeCommit repos to S3 buckets.",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern implements the solution outlined at https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/automate-event-driven-backups-from-codecommit-to-amazon-s3-using-codebuild-and-cloudwatch-events.html.",
+      "It uses a Lambda function and a CloudFormation Custom Resource to create the CodeBuild buildspec.yml template at deployment time, and the EventBridge and CodeBuild project described on the AWS Prescriptive Guidance."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS CodeCommit",
+        "link": "https://aws.amazon.com/codecommit/"
+      },
+      {
+        "text": "S3-to-Lambda application patterns",
+        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided  --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. You can test the solution by accessing the Lambda console, finding the Lambda function, and clicking Test in the Code Source section.",
+      "2. You can also invoke the function from the CLI using <code>aws lambda invoke --function-name ENTER_FUNCTION_NAME output.txt</code>.",
+      "3. Go to the S3 console, locate the deployed S3 bucket, and view the object has been written."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/marcos-hauer.json"
+  ]
+}

@@ -1,43 +1,19 @@
 {
   "title": "Amazon API Gateway to AWS Lambda",
-  "description": "Create an Amazon API Gateway to AWS Lambda REST API.",
-  "language": "Node.js, TypeScript",
-  "architectureURL": "https://ibrahimcesar-github.s3.amazonaws.com/patterns-apigw-lambda-cdk.png",
-  "videoId": "",
-  "level":"100",
+  "description": "Create an Amazon API Gateway to AWS Lambda REST API",
+  "language": "TypeScript",
+  "level": "100",
   "framework": "AWS CDK",
-  "services": {
-    "from": "apigateway",
-    "to": "lambda"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern in CDK offers a boilerlate to generate an Amazon API Gateway REST API endpoint with a a greedy proxy ('{proxy+}') and 'ANY' method from the specified path, meaning it will accept by default any method and any path. The lambda provided in TypeScript only returns the path."
-    ]
-  },
-  "deploy": {
-    "text": [
-      "npm run deploy"
-    ]
-  },
-  "cleanup": {
-    "text": [
-      "Delete the stack: npm run destroy"
+      "This pattern in CDK offers a boilerplate to generate an Amazon API Gateway REST API endpoint with a a greedy proxy ('{proxy+}') and 'ANY' method from the specified path, meaning it will accept by default any method and any path. The Lambda function provided in TypeScript only returns the path."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-cdk",
-      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-lambda-cdk/src/",
-      "readmeURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/apigw-lambda-cdk/README.md"
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
-    ]
+      "templateFile": "src/index.ts"
+    }
   },
   "resources": {
     "headline": "Additional resources",
@@ -48,11 +24,33 @@
       }
     ]
   },
-  "author": {
+  "deploy": {
+    "text": [
+      "npm run deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "After deployment, the output shows the API Gateway URL with the Lambda Integration, for example: <code>ServerlessLandApi.ServerlessLandEndpointC36EEEC4 = https://<random-id>.execute-api.us-east-1.amazonaws.com/prod/</code>.",
+      "Accessing the URL in a browser, you see:",
+      "<code> Hello, your path is: \"/\"<code>.",
+      "This page logs any path you type after \"/\". You can use this as a starting point as a general purpose endpoint for various types of applications."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npm run destroy</code>",
+      "2. Confirm the removal and wait for the resource deletion to complete."
+    ]
+  },
+  "authors": [
+    {
       "name": "Ibrahim Cesar",
-      "image": "https://phonetool.amazon.com/users/ibracnb",
       "bio": "Enterprise Solutions Architect @ AWS",
-      "linkedin": "https://www.linkedin.com/in/ibrahimcesar/?locale=en_US",
-      "twitter": "twitter.com/ibrahimcesar"
-  }
+      "image": "https://phonetool.amazon.com/users/ibracnb",
+      "linkedin": "ibrahimcesar"
+    }
+  ]
 }

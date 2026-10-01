@@ -7,34 +7,30 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The pattern creates a Lambda function, and a Step Functions workflow, a Log group and the IAM resources required to run the application.",
-      "A Lambda function uses the AWS SDK to asynchronously invoke the Step Function workflow, passing the event body. The Step Function workflow showcasing the different States."
+      "A Lambda function uses the AWS SDK to asyncronously invoke the Step Functionsworkflow, passing the event body. The Step Functionsworkflow showcasing the different States."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/terraform-lambda-sfn",
-      "templateURL": "serverless-patterns/terraform-lambda-sfn",
-      "projectFolder": "terraform-lambda-sfn",
-      "templateFile": "terraform-lambda-sfn/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
     "bullets": [
       {
-        "test": "Terraform AWS Lambda module",
+        "text": "Terraform AWS Lambda module",
         "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
       },
       {
-        "test": "Terraform AWS Lambda examples",
+        "text": "Terraform AWS Lambda examples",
         "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
       },
       {
-        "test": "Terraform AWS Step Functions module",
+        "text": "Terraform AWS Step Functions module",
         "link": "https://github.com/terraform-aws-modules/terraform-aws-step-functions/"
       },
       {
-        "test": "Terraform AWS Step Functions examples",
+        "text": "Terraform AWS Step Functions examples",
         "link": "https://github.com/terraform-aws-modules/terraform-aws-step-functions//tree/master/examples"
       },
       {
@@ -42,14 +38,15 @@
         "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
       },
       {
-        "test": "AWS Lambda Developer Guide",
+        "text": "AWS Lambda Developer Guide",
         "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "terraform init && terraform apply"
+      "terraform init",
+      "terraform apply --auto-approve"
     ]
   },
   "testing": {
@@ -65,9 +62,9 @@
   "authors": [
     {
       "name": "Anton Babenko",
-      "image": "https://avatars.githubusercontent.com/u/393243",
       "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
-      "linkedin": "https://www.linkedin.com/in/antonbabenko",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "linkedin": "antonbabenko",
       "twitter": "antonbabenko"
     }
   ]

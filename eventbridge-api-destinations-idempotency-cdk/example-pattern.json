@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-api-destinations-idempotency-cdk",
-      "templateURL": "serverless-patterns/eventbridge-api-destinations-idempotency-cdk",
-      "projectFolder": "eventbridge-api-destinations-idempotency-cdk",
       "templateFile": "src/lib/eb-api-destination-stack.ts"
     }
   },
@@ -41,7 +38,7 @@
   },
   "deploy": {
     "text": [
-      "Deploy the stack: <code>cdk deploy</code>"
+      "cdk deploy"
     ]
   },
   "testing": {
@@ -57,8 +54,8 @@
   "authors": [
     {
       "name": "Michael Gasch",
-      "image": "https://serverlessland.com/assets/images/resources/Michael%20Gasch.jpeg",
       "bio": "Senior Product Manager Technical for Amazon EventBridge.",
+      "image": "https://serverlessland.com/assets/images/resources/Michael%20Gasch.jpeg",
       "linkedin": "michael-gasch-10603298",
       "twitter": "embano1"
     }

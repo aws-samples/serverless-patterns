@@ -1,15 +1,9 @@
 {
   "title": "Synchronize Amazon Bedrock Knowledge Bases",
   "description": "Create an automated workflow using Amazon EventBridge Scheduler and AWS Step Functions to synchronize Amazon Bedrock Knowledge Base.",
+  "language": "Python",
+  "level": "300",
   "framework": "AWS CDK",
-  "gitHub": {
-    "template": {
-      "projectFolder": "eventbridge-scheduled-stepfunction-bedrock-kb-sync",
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduled-stepfunction-bedrock-kb-sync",
-      "templateFile": "cdk/stacks/kb_infra_stack.py",
-      "templateURL": "serverless-patterns/eventbridge-scheduled-stepfunction-bedrock-kb-sync"
-    }
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -18,8 +12,11 @@
       "The workflow includes comprehensive status checking and result reporting for each sync operation. For each Knowledge Base, it retrieves all associated data sources, initiates sync operations sequentially, monitors progress, and aggregates results. The pattern deploys one EventBridge Scheduler schedule (running every 15 minutes), one Step Functions state machine with nested Map states, Amazon S3 buckets for data sources, and configures the necessary IAM roles and permissions for Bedrock Knowledge Base integration."
     ]
   },
-  "language": "Python",
-  "level": "300",
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/stacks/kb_infra_stack.py"
+    }
+  },
   "resources": {
     "bullets": [
       {
@@ -36,6 +33,11 @@
       }
     ]
   },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
   "testing": {
     "text": [
       "1. Upload sample documents to the created Amazon S3 bucket (kb-data-source-{account-id})",
@@ -50,16 +52,11 @@
       "2. Delete the stack: <code>cdk destroy --all</code>"
     ]
   },
-  "deploy": {
-    "text": [
-      "cdk deploy --all"
-    ]
-  },  
   "authors": [
     {
       "name": "Shankar Srinivasan",
       "bio": "I am an AWS Professional Services Delivery Consultant specializing in enterprise-scale cloud transformations and modernization initiatives.",
-      "linkedin": "https://www.linkedin.com/in/shankar-srinivasan-3863a110"
+      "linkedin": "shankar-srinivasan-3863a110"
     }
   ]
 }

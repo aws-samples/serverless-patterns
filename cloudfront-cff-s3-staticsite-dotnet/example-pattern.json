@@ -1,26 +1,24 @@
 {
-  "title": "CloudFront to S3 - Static Website",
-  "description": "Creates CloudFront Distributions to server the static site from S3.",
+  "title": "Amazon CloudFront to Amazon S3",
+  "description": "CloudFront to S3 to serve a static site",
   "language": ".NET",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how can you deploy a MKDOCS site to S3 with Cloud Front.",
-      "The CloudFront execute a function when recieves a request from viewer and append index.html to each request for proper routing",
-      "In S3 we host the html files generated from the MKDOCS"
+      "This sample project demonstrates how can you deploy a MKDOCS site to S3 with CloudFront.",
+      "CloudFront executes a function when receiving a request from the viewer and appends index.html to each request for proper routing.",
+      "S3 hosts the HTML files generated from the MKDOCS."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-cff-s3-staticsite-dotnet",
-      "templateURL": "serverless-patterns/cloudfront-cff-s3-staticsite-dotnet",
-      "projectFolder": "cloudfront-cff-s3-staticsite-dotnet",
-      "templateFile": "cloudfront-cff-s3-staticsite-dotnet/MdsiteStack.cs"
+      "templateFile": "src/Mdsite/MdsiteStack.cs"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "CloudFront",
@@ -34,26 +32,28 @@
   },
   "deploy": {
     "text": [
-      "See the GitHub repo for detailed deployment instructions."
+      "cdk deploy"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "You can test the solution by accessing the CloudFront distribution domain using a web browser."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "See the GitHub repo for detailed cleanup instructions."
+      "In the source folder, from the command line enter:",
+      "<code>cdk destroy</code>"
     ]
   },
   "authors": [
     {
       "name": "Sakthivel Chellapparimanam",
-      "image": "",
       "bio": "AWS - Cloud Application Architect",
-      "linkedin": "https://www.linkedin.com/in/srcsakthivel",
-      "twitter": "@srcsakthivel"
+      "linkedin": "srcsakthivel",
+      "twitter": "srcsakthivel"
     }
   ]
 }

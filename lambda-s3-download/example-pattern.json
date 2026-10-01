@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-download",
-      "templateURL": "serverless-patterns/lambda-s3-download",
-      "projectFolder": "lambda-s3-download",
       "templateFile": "template.yaml"
     }
   },
@@ -51,10 +48,9 @@
   "authors": [
     {
       "name": "Robert Meyer",
-      "image": "",
       "bio": "Robert is a Partner Solutions Architect with AWS in EMEA.",
       "linkedin": "robert-meyer-phd-6a114a58",
-      "twitter": "@robl_on_tour"
+      "twitter": "robl_on_tour"
     }
   ]
 }

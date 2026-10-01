@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-eventbridge-cron-nodejs-sam",
-      "templateURL": "serverless-patterns/lambda-durable-eventbridge-cron-nodejs-sam",
-      "projectFolder": "lambda-durable-eventbridge-cron-nodejs-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -55,8 +52,8 @@
   "authors": [
     {
       "name": "Anusha Ganapuram",
-      "image": "https://avatars.githubusercontent.com/u/58950933",
       "bio": "Technical Account Manager at AWS with deep expertise in serverless and event-driven solutions. Passionate about building scalable, secure and distributed applications that help organizations modernize their infrastructure and accelerate innovation.",
+      "image": "https://avatars.githubusercontent.com/u/58950933",
       "linkedin": "anushaganapuram"
     }
   ]

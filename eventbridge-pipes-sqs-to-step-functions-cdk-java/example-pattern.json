@@ -1,19 +1,18 @@
 {
   "title": "Amazon SQS to AWS Step Functions using Amazon EventBridge Pipes",
-  "description": "This pattern uses SQS and triggers a Step Functions workflow directly with optional filtering supported.",
+  "description": "This pattern invokes a Step Functions workflow from an SQS queue with optional filtering supported.",
   "language": "Java",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
-    "text": ["SQS queue is polled and a Step Functions workflow execution is started for each batch of messages."]
+    "text": [
+      "SQS queue is polled and a Step Functions workflow execution is started for each batch of messages."
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-step-functions-cdk-java",
-      "projectFolder": "eventbridge-pipes-sqs-to-step-functions-cdk-java",
-      "templateFile": "src/main/java/com/myorg/SqsSfnStack.java",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-step-functions-cdk-java"
+      "templateFile": "src/main/java/com/myorg/SqsSfnApp.java"
     }
   },
   "resources": {
@@ -48,14 +47,14 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
     {
       "name": "Matt Ridehalgh",
-      "image": "https://avatars.githubusercontent.com/u/9155962",
       "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
+      "image": "https://avatars.githubusercontent.com/u/9155962",
       "linkedin": "matthew-ridehalgh",
       "twitter": "mrideh"
     }

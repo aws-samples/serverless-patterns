@@ -1,0 +1,55 @@
+{
+  "title": "Amazon API Gateway to AWS Step Functions",
+  "description": "Create an API Gateway HTTP APIs endpoint that starts a Step Functions syncronous Express Workflow",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a HTTP APIs endpoint with an integration that syncronsouly invokes a Step Functions Express workflow and returns the response. The SAM template contains the minimum IAM resources required to run the application with logging enabled.",
+      "The HTTP's API endpoint can be called from an application (e.g. a web front end) to run an express workflow and return the result."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following command to send an HTTP `POST` request to the HTTP APIs endpoint. Note, you must edit the {HelloWorldApi} placeholder with the URL of the deployed HTTP APIs endpoint. This is provided in the stack outputs:",
+      "<code>curl --location --request POST '{HelloWorldApi}' --header 'Content-Type: application/json' --data-raw '{ \"IsHelloWorldExample\": \"Yes\" }'</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/benjamin-smith.json"
+  ]
+}

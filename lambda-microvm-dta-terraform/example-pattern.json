@@ -9,14 +9,11 @@
     "text": [
       "This pattern demonstrates a dynamic-threat-analysis (DTA) style CI/CD gate built on AWS Lambda MicroVMs. A MicroVM image carries a small sandbox supervisor. For each analysis the orchestrator runs a fresh MicroVM, the supervisor launches an untrusted target as a child process (argv only, never a shell), and a set of collectors observe the target entirely from the outside: the process tree via /proc, a before/after filesystem diff, fake canary files and environment variables, syscalls via strace, and network connections via /proc/net.",
       "The target never reports on its own behavior. A simple, explainable rule engine turns the observed events into a deterministic verdict (clean, suspicious, policy_violation, unknown, or error) and a machine-readable report, and CI passes or fails on policy. The MicroVM is always terminated, even when the job fails.",
-      "The Terraform deploys the least-privilege IAM build and execution roles plus an artifact S3 bucket that the orchestrator uses to build the MicroVM image and run the analysis (the same configuration that was applied and destroyed against GA Lambda MicroVMs during testing). The default scenarios are benign and canary-based, so the sample is safe to run in a dedicated sandbox account."
+      "The Terraform deploys the least-privilege Amazon IAM build and execution roles plus an artifact Amazon S3 bucket that the orchestrator uses to build the MicroVM image and run the analysis (the same configuration that was applied and destroyed against GA Lambda MicroVMs during testing). The default scenarios are benign and canary-based, so the sample is safe to run in a dedicated sandbox account."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-dta-terraform",
-      "templateURL": "serverless-patterns/lambda-microvm-dta-terraform",
-      "projectFolder": "lambda-microvm-dta-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -50,8 +47,8 @@
   "authors": [
     {
       "name": "Ryota Yamada",
-      "image": "https://avatars.githubusercontent.com/u/42636694",
       "bio": "Global Automotive Solutions Architect at AWS",
+      "image": "https://avatars.githubusercontent.com/u/42636694",
       "linkedin": "riita10069",
       "twitter": "riita10069"
     }

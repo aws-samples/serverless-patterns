@@ -1,19 +1,32 @@
 {
-  "title": "Lambda to EventBridge",
-  "description": "Create a Lambda function that sends events to EventBridge.",
+  "title": "AWS Lambda to Amazon CloudWatch",
+  "description": "Create a Lambda function that publishes custom metrics to CloudWatch",
   "language": "Node.js",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
-  "videoId": "",
-  "level":"100",
+  "level": "200",
   "framework": "AWS SAM",
-  "services": {
-    "from": "lambda",
-    "to": "eventbridge"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The SAM template deploys a Lambda function with permission to publish events to EventBridge. The Lambda function publishes an event to the default bus in EventBridge when invoked."
+      "This SAM template deploys a Lambda function that inserts custom metric data into AWS CloudWatch. The AWS SAM template deploys the resources and the IAM permissions required to run the application."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "The Lambda Operators Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/operatorguide/intro.html"
+      },
+      {
+        "text": "Publishing custom metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+      }
     ]
   },
   "deploy": {
@@ -21,37 +34,25 @@
       "sam deploy --guided"
     ]
   },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge",
-      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/lambda-eventbridge/template.yaml",
-      "readmeURL": ""
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
-  "resources": {
-    "headline": "Additional resources",
-    "bullets": [
-      {
-        "text": "Integrating Amazon EventBridge into your serverless applications",
-        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
-      },
-      {
-        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
-        "link": "https://serverlessland.com/learn/eventbridge"
-      }      
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
-  "author": {
-    "headline": "Presented by James Beswick, Developer Advocate",
-    "name": "James Beswick",
-    "imageURL": "https://pbs.twimg.com/profile_images/1165718285754753025/OrGcUHER_400x400.jpg",
-    "twitter": "jbesw",
-    "bio": "James is a senior developer advocate for Serverless Applications at Amazon Web Services based in the US. Prior to joining AWS Ben worked in a number of different technical roles specializing in workflow Automation and web development."
-  }
+  "authors": [
+    {
+      "name": "James Beswick",
+      "bio": "James is a senior developer advocate for Serverless Applications at Amazon Web Services based in the US. Prior to joining AWS Ben worked in a number of different technical roles specializing in workflow Automation and web development.",
+      "image": "https://pbs.twimg.com/profile_images/1165718285754753025/OrGcUHER_400x400.jpg",
+      "twitter": "jbesw"
+    }
+  ]
 }

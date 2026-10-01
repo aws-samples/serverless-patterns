@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge Scheduler to call Lambda every 5 minutes with CDK",
+  "title": "Amazon EventBridge Scheduler to call AWS Lambda every 5 minutes with CDK",
   "description": "Simple pattern that triggers a .NET Lambda function every 5 minutes using Amazon EventBridge Scheduler and CDK",
   "language": ".NET",
   "level": "200",
@@ -12,10 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/event-bridge-scheduler-lambda-cdk-dotnet",
-      "projectFolder": "event-bridge-scheduler-lambda-cdk-dotnet",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/event-bridge-scheduler-lambda-cdk-dotnet/README.md",
-      "templateURL": "serverless-patterns/event-bridge-scheduler-lambda-cdk-dotnet",
       "templateFile": "cdk/src/Cdk/CdkStack.cs"
     }
   },
@@ -37,8 +33,8 @@
   "authors": [
     {
       "name": "Sanjay Chaudhari",
-      "image": "https://avatars.githubusercontent.com/u/9101436?v=4",
       "bio": "Application Development Consultant at AWS Professional Services.",
+      "image": "https://avatars.githubusercontent.com/u/9101436?v=4",
       "linkedin": "sanjay-chaudhari-it",
       "twitter": "sanjaypc"
     }

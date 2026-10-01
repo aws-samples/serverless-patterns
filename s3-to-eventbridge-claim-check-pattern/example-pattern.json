@@ -1,5 +1,5 @@
 {
-  "title": "S3 to EventBridge Claim Check pattern with event enrichment",
+  "title": "Amazon S3 to Amazon EventBridge claim check with presigned urls",
   "description": "Event-driven claim check pattern using S3 and EventBridge. Using Lambda to transform events into domain events with enrichment and presgined urls.",
   "language": "TypeScript",
   "level": "200",
@@ -7,19 +7,26 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern will run when a file is uploaded to an s3 bucket. The events are transformed into domain events and presigned urls are generated for the content in the buckets for downstream consumers."
+      "This pattern will listen to S3 events then transform them into Domain events (with enrichment) and have presigned urls back to the S3 object for downstream consumers.",
+      "<h5>How the claim check pattern works</h5>",
+      "<ul style=\"list-style-type: none;\"><li>1. User uploads information into a bucket. In this example an insurance claim has been inserted to be processed.</li><li>2. S3 has been configured to send events to EventBridge. This is your default event bus (all AWS accounts have one).</li><li>3. Setup an EventBridge rule to only listen for files inserted into the claims folder and S3 objects that have been Created or Deleted</li><li>4. Custom code picks up the events, and transforms it into a Domain Event. Events are enriched with data, and the S3 document is presigned with a url for an hour (for downstream consumers).</li><li>5. Events are sent to custom domain event bus. In this example our Insurance event bus.</li><li>6. Rules are setup for downstream consumers of our Domain Events (ClaimCreated, ClaimProcessed). We make assumptions that when files are removed from this Claim bucket that means that have been processed. </li><li>7. Consumers receive the Domain Events and process as they see fit. (This example just logs out, but you could email, send to other targets etc).</li></ul>",
+      "<a target=\"_blank\" href=\"https://github.com/aws-samples/serverless-patterns/blob/main/s3-to-eventbridge-claim-check-pattern/cdk\">Read more about this pattern</a>",
+      "<hr />",
+      "<h5>Things to know</h5>",
+      "This pattern makes assumptions about business logic. The bucket in this example is an example of handling company claims. Files in the bucket are to be procesed, once deleted we assume they are processed.."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-to-eventbridge-claim-check-pattern",
-      "templateURL": "serverless-patterns/s3-to-eventbridge-claim-check-pattern",
-      "projectFolder": "s3-to-eventbridge-claim-check-pattern",
-      "templateFile": "lib/s3-to-eventbridge-automatic-claim-check-pattern-stack.ts"
+      "templateFile": "cdk/lib/s3-to-eventbridge-automatic-claim-check-pattern-stack.ts"
     }
   },
   "resources": {
     "bullets": [
+      {
+        "text": "How to publish large events with Amazon EventBridge using the claim check pattern",
+        "link": "https://www.boyney.io/blog/2022-11-01-eventbridge-claim-check"
+      },
       {
         "text": "Claim Check messaging pattern",
         "link": "https://www.enterpriseintegrationpatterns.com/StoreInLibrary.html"
@@ -31,6 +38,11 @@
       "cdk deploy"
     ]
   },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
   "cleanup": {
     "text": [
       "Delete the stack: <code>cdk delete</code>."
@@ -39,8 +51,8 @@
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.jpg",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.jpg"
     }
   ]
 }

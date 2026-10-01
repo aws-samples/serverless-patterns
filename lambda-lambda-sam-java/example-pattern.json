@@ -1,0 +1,55 @@
+{
+  "title": "AWS Lambda to AWS Lambda",
+  "description": "Create Lambda function that sychronously invokes another Lambda function.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern SAM will deploy two Lambda functions, LambdaRequest and LambdaResponse. The LambdaRequest will call the LambdaResponse synchronously, and will wait for the response from the LambdaResponse function. The LambdaResponse will return an JSON payload.",
+      "The SAM template contains all the information to deploy AWS resources and also the permission required by these service to communicate.",
+      "You will be able to create and delete the CloudFormation stack using the CLI commands.",
+      "This is fully functional example developed in Java 25."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Introducing AWS Lambda Destinations",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-aws-lambda-destinations/"
+      },
+      {
+        "text": "Controls for Managing Events in Serverless Applications - AWS Online Tech Talks",
+        "link": "https://www.youtube.com/watch?v=rMXQGKAiBqI"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/razvan-minciuna.json"
+  ]
+}

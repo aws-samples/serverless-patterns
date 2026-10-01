@@ -1,7 +1,7 @@
 {
-  "title": "AWS IoT Core to Amazon SNS to Amazon SQS",
-  "description": "Create a IoT Rule with a SNS action that delivers messages to a SQS queue.",
-  "language": "",
+  "title": "AWS IoT to Amazon SNS to Amazon SQS",
+  "description": "Create an IoT rule with a SNS action that delivers messages to a SQS queue.",
+  "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-sns-sqs-terraform",
-      "templateURL": "serverless-patterns/iot-sns-sqs-terraform",
-      "projectFolder": "iot-sns-sqs-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -31,28 +28,29 @@
       }
     ]
   },
-	"deploy": {
-		"text": [
-		          "terraform init",
-		          "terraform apply"
-		        ]
-	},
-	"testing": {
-		"text": ["See the GitHub repo for detailed testing instructions."]
-	},
-	"cleanup": {
-		"text": [
-		          "terraform destroy",
-		          "terraform show"
-		        ]
-	},
-	"authors": [
-		{
-			"name": "Makendran G",
-			"image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
-			"bio": "Cloud Support Engineer @ AWS",
-			"linkedin": "https://www.linkedin.com/in/makendran",
-			"twitter": "@MakendranG"
-		}
-	]
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Makendran G",
+      "bio": "Cloud Support Engineer @ AWS",
+      "image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+      "linkedin": "makendran",
+      "twitter": "MakendranG"
+    }
+  ]
 }

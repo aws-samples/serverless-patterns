@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway REST API to EventBridge with event payload composition and SQS as target",
+  "title": "Amazon API Gateway REST API to Amazon EventBridge with payload composition and Amazon SQS target",
   "description": "Create an API Gateway that sends events to EventBridge and enriches the event in the integration request.",
   "language": "Node.js",
   "level": "300",
@@ -7,15 +7,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge that target an SQS."
+      "The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge that targets an SQS queue."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-eventbridge-sqs-sam",
-      "templateURL": "serverless-patterns/apigw-rest-api-eventbridge-sqs-sam",
-      "projectFolder": "apigw-rest-api-eventbridge-sqs-sam",
-      "templateFile": "template.yaml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
@@ -48,10 +45,9 @@
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
-      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale."
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg"
     }
   ]
 }

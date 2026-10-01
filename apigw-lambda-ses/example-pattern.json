@@ -1,0 +1,54 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon SES",
+  "description": "Send an email with Amazon SES from an AWS Lambda function behind an Amazon API Gateway REST API.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API with a GET method that invokes an AWS Lambda function. The function uses the AWS SDK for Python (Boto3) to send an HTML email with Amazon SES, using an SES configuration set that the template also creates.",
+      "Before you deploy, verify a sender identity in Amazon SES and set the sender and recipient addresses in email-lambda/email-lambda.py. In the SES sandbox, the recipient address must be verified too."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Send email with the Amazon SES API",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/send-email-api.html"
+      },
+      {
+        "text": "Verified identities in Amazon SES",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/verify-addresses-and-domains.html"
+      },
+      {
+        "text": "Amazon SES configuration sets",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/using-configuration-sets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Call the <code>apiGatewayInvokeURL</code> stack output, for example <code>curl https://{api-id}.execute-api.{region}.amazonaws.com/sendEmail</code>, then check the recipient's inbox."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/surya-dulla.json"
+  ]
+}

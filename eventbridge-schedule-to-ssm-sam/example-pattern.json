@@ -1,6 +1,6 @@
 {
-  "title": "EventBridge to Systems Manager Associations",
-  "description": "Create an EventBridge Schedule to execute a SSM State Manager Association",
+  "title": "Amazon EventBridge Scheduler to Systems Manager Associations",
+  "description": "Create an EventBridge Scheduler to execute a SSM State Manager Association",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
@@ -12,14 +12,11 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ssm-sam",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-ssm-sam",
-      "readmeURL":"https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-ssm-sam/README.md",
-      "projectFolder": "eventbridge-schedule-to-ssm-sam",
-      "templateFile": "eventbridge-schedule-to-ssm-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "EventBridge Scheduler User Guide",
@@ -37,8 +34,8 @@
   },
   "deploy": {
     "text": [
-      "<code>sam build</code>",
-      "<code>sam deploy --guided</code>"
+      "sam build",
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -54,8 +51,8 @@
   "authors": [
     {
       "name": "Joe Losinski",
-      "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4",
-      "bio": "AWS Senior Solutions Architect and Serverless Enthusiast."
+      "bio": "AWS Senior Solutions Architect and Serverless Enthusiast.",
+      "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4"
     }
   ]
 }

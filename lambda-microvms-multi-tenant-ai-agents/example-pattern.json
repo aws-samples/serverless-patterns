@@ -1,0 +1,69 @@
+{
+  "title": "Multi-tenant AI agents on AWS Lambda MicroVMs",
+  "description": "A self-hosted AI agent in one isolated Lambda MicroVM per tenant, with per-tenant state on Amazon EFS, Amazon Bedrock over a VPC endpoint; an orchestrator reaps idle VMs.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CLI",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Each tenant gets a dedicated Firecracker micro-VM running their AI agent. Tenant isolation is a hard security boundary, not a shared runtime with guardrails bolted on.",
+      "A single CloudFormation template declares the full stack: VPC with EFS, Bedrock VPC endpoints, NAT egress, the MicroVM image (built server-side, no local Docker), a DynamoDB tenant registry, an orchestrator Lambda behind API Gateway, and an EventBridge sweeper. You upload two zip artifacts and run one deploy.",
+      "When a message arrives, the orchestrator checks the tenant registry. If the tenant's VM is suspended it resumes from snapshot in seconds with memory intact. If it's cold, a fresh VM launches, mounts the tenant's EFS subdirectory, and picks up where it left off. Warm turns complete in about two seconds.",
+      "The agent calls Bedrock through a VPC endpoint using temporary credentials from IMDSv2. Available models are discovered live at cold start so new models work without redeploying. All tenant state (config and conversation memory) lives on EFS and survives suspend, resume, and the 8-hour VM lifetime limit.",
+      "An EventBridge sweeper runs every 10 minutes, terminating idle VMs and reconciling the registry. Tenants flow from hot (running) to warm (suspended, barely billed) to cold (terminated, state parked on EFS at near-zero cost). You pay for conversations, not for waiting."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Firecracker - Secure and fast microVMs for serverless computing",
+        "link": "https://aws.amazon.com/blogs/opensource/firecracker-open-source-secure-fast-microvm-serverless/"
+      },
+      {
+        "text": "Amazon Bedrock Documentation",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+      },
+      {
+        "text": "Amazon EFS Documentation",
+        "link": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "headline": "Deploy the pattern",
+    "text": [
+      "./deploy.sh <region> <stack-name>",
+      "./add-tenant.sh <region> <stack-name> tenant1"
+    ]
+  },
+  "testing": {
+    "text": [
+      "./chat.sh <region> <stack-name> tenant1 \"Remember my lucky number is 7777.\"",
+      "./chat.sh <region> <stack-name> tenant1 \"What's my lucky number?\"",
+      "See the README for cross-generation persistence and tenant-isolation tests."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "./teardown.sh <region> <stack-name>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shawn Zhang",
+      "bio": "Sr. Specialist Solutions Architect, specializing in GenAI & Engineering.",
+      "image": "https://avatars.builderprofile.aws.dev/2qK6tUfRW3r2c97Z7X6tCSpr3AQ.webp",
+      "linkedin": "hustshawn"
+    }
+  ]
+}

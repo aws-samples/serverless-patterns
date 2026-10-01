@@ -1,6 +1,6 @@
 {
-  "title": "Protect HTTP API Gateway with Amazon CloudFront and AWS WAF",
-  "description": "Provision a HTTP API Gateway (with Amazon CloudFront and AWS WAF) using Terraform",
+  "title": "Protect Amazon API Gateway with Amazon CloudFront and AWS WAF",
+  "description": "Provision an Amazon API Gateway (with Amazon CloudFront and AWS WAF) using Terraform",
   "language": "Python",
   "level": "300",
   "framework": "Terraform",
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://serverlessland.com/patterns/apigw-http-api-waf-cloudfront-terraform",
-      "templateURL": "serverless-patterns/apigw-http-api-waf-cloudfront-terraform",
-      "projectFolder": "apigw-http-api-waf-cloudfront-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -47,7 +44,8 @@
   },
   "authors": [
     {
-      "name": "Mehdi Amrane"
+      "name": "Mehdi Amrane",
+      "bio": "Senior Solutions Architect at AWS"
     }
   ]
 }

@@ -1,0 +1,22 @@
+# Runtime dependencies for the Agent Lambda (used by `sam build`).
+# Keep this lean — only what the function needs at runtime. Dev/test tooling
+# lives in the root requirements.txt.
+
+# AWS SDK — include explicitly so Strands has a recent enough boto3/botocore
+boto3>=1.34.0
+botocore>=1.34.0
+
+# Strands Agents SDK (AI agent orchestration)
+strands-agents>=1.0.0
+
+# MCP client (used by Strands MCPClient for the Gateway connection)
+mcp>=1.0.0
+
+# JWT validation of Cognito tokens
+PyJWT>=2.8.0
+cryptography>=41.0.0
+
+# HTTP + schema handling
+requests>=2.31.0
+pyyaml>=6.0.1
+jsonschema>=4.20.0

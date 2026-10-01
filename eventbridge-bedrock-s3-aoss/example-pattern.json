@@ -1,5 +1,5 @@
 {
-  "title": "Automatic sync of Amazon Bedrock Knowledge Base using EventBridge Scheduler",
+  "title": "Automatic sync of Amazon Bedrock Knowledge Base using Amazon EventBridge Scheduler",
   "description": "Use Amazon EventBridge Scheduler to trigger an Ingestion Job periodically to keep the Knowledge Bases vector store up-to-date",
   "language": "Python",
   "level": "200",
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-bedrock-s3-aoss",
-      "templateURL": "serverless-patterns/eventbridge-bedrock-s3-aoss",
-      "projectFolder": "eventbridge-bedrock-s3-aoss",
       "templateFile": "app.py"
     }
   },
@@ -51,12 +48,12 @@
     ]
   },
   "authors": [
-      {
-          "name": "Raja Vaidyanathan",
-          "image": "https://avatars.githubusercontent.com/u/125882914?v=4",
-          "bio": "Solutions Architect @ AWS",
-          "linkedin": "rajav",
-          "twitter": "rajav"
-      }
+    {
+      "name": "Raja Vaidyanathan",
+      "bio": "Solutions Architect @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/125882914?v=4",
+      "linkedin": "rajav",
+      "twitter": "rajav"
+    }
   ]
 }

@@ -1,0 +1,44 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Vendored dependencies (prevent re-commit)
+src/boto3/
+src/botocore/
+src/urllib3/
+src/s3transfer/
+src/jmespath/
+src/dateutil/
+src/bin/
+src/*.dist-info/
+src/six.py
+
+# Build artifacts
+build/
+terraform/build/
+
+# Terraform
+terraform/lambda_deployment.zip
+terraform/*.txt
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfplan
+.terraform.lock.hcl
+
+# Generated files
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Environment
+.env
+*.env

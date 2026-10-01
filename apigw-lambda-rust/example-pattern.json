@@ -1,52 +1,54 @@
 {
   "title": "Amazon API Gateway REST API to AWS Lambda",
-  "description": "This pattern creates an Amazon API Gateway REST API and an AWS Lambda function.",
+  "description": "Create an Amazon API Gateway REST API that invokes an AWS Lambda function",
   "language": "Rust",
-  "level": "300",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway REST API API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Rust. The function logs the incoming API event and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
-    ]
+      "This pattern deploys an Amazon API Gateway REST API with a default route and basic CORS configuration. The default route is integrated with an AWS Lambda function written in Node.js. The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
+    ],
+    "test": ""
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-rust",
-      "templateURL": "serverless-patterns/apigw-lambda-rust",
-      "projectFolder": "apigw-lambda-rust",
-      "templateFile": "apigw-lambda-rust/template.yml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
-        "text": "Amazon API Gateway",
-        "link": "https://aws.amazon.com/api-gateway/"
+        "text": "Working with REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "1. Once the application is deployed, retrieve the HttpApiEndpoint value from CloudFormation Outputs. Either browse to the endpoint in a web browser or call the endpoint from Postman.",
+      "2. See the repo for additional testing notes."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

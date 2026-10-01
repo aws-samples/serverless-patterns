@@ -1,0 +1,57 @@
+{
+  "title": "IoT rule to Amazon SQS queue",
+  "description": "Send to an SQS queue from an IoT rule",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template deploys resources needed to send iot events to IoT Core service to forward these events through an IoT Rule to SQS Queue with bring-your-own custom authozier for device authentication."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Managing backend requests and frontend notifications in serverless web apps",
+        "link": "https://aws.amazon.com/blogs/compute/managing-backend-requests-and-frontend-notifications-in-serverless-web-apps/"
+      },
+      {
+        "text": "Understanding the custom authentication workflow",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/custom-authorizer.html"
+      },
+      {
+        "text": "IoT rules",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rules.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Use your choise of http client for testing against this endpoint: POST ${IoT Core Data Endpoint}/topics/$aws/rules/device_events with json body and http header 'x-amz-customauthorizer-name: anonymous-authorizer'."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/enoch-tsai.json"
+  ]
+}

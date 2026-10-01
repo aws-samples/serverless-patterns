@@ -23,13 +23,10 @@
       "3.1 Establish a private hosted zone for the domain name",
       "3.2 Create a CNAME record within the hosted zone for custom domain name",
       "3.3 Point API Gateway's private custom domain name to the 'execute-api' VPC Endpoint DNS name"
-      ]
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-private-cdn-private-ca-sam",
-      "templateURL": "serverless-patterns/apigw-private-cdn-private-ca-sam",
-      "projectFolder": "apigw-private-cdn-private-ca-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -63,14 +60,14 @@
   "authors": [
     {
       "name": "Vijay Shekhar Rao",
-      "image": "./images/vijay.jpg",
       "bio": "Vijay Shekhar Rao is a Partner Solutions Architect working with global system integrators. Before joining AWS, Vijay spent several years architecting, building, managing, and troubleshooting complex infrastructure for critical systems. When not working, he enjoys time with his family and tries to stay healthy.",
+      "image": "./images/vijay.jpg",
       "linkedin": "vsr4321"
     },
     {
       "name": "Tushar Thapar",
-      "image": "./images/tusharthapar.jpg",
       "bio": "Tushar Thapar is a Cloud Engineer at Amazon Web Services based in Australia.",
+      "image": "./images/tusharthapar.jpg",
       "linkedin": "tushar-thapar-b76247120"
     }
   ]

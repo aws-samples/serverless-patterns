@@ -1,6 +1,7 @@
 {
   "title": "Amazon EventBridge Scheduler to AWS Batch",
   "description": "Schedule AWS Batch jobs using Amazon EventBridge Scheduler",
+  "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -12,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-batch-terraform",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-batch-terraform",
-      "projectFolder": "eventbridge-schedule-to-batch-terraform",
-      "templateFile": "eventbridge-schedule-to-batch-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
@@ -48,9 +46,9 @@
   "authors": [
     {
       "name": "Ian Lodge",
-      "image": "https://avatars.githubusercontent.com/u/135351711?v=4",
       "bio": "Ian is a Solutions Architect at Amazon Web Services based in the US.",
-      "linkedin": "https://www.linkedin.com/in/ian-lodge"
+      "image": "https://avatars.githubusercontent.com/u/135351711?v=4",
+      "linkedin": "ian-lodge"
     }
   ]
 }

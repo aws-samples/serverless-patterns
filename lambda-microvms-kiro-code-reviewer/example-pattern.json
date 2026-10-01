@@ -1,6 +1,6 @@
 {
   "title": "Code Reviewer using Kiro on AWS Lambda MicroVMs",
-  "description": "Deploy a Lambda MicroVM that runs Kiro headless to perform AI-powered code reviews on AWS CodeCommit pull requests. The MicroVM clones the repo, generates a diff, sends it to Kiro for review, and posts the feedback as a PR comment.",
+  "description": "Deploy AWS Lambda MicroVMs that run Kiro headless to perform AI-powered code reviews on AWS CodeCommit pull requests.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CloudFormation",
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvms-kiro-code-reviewer",
-      "templateURL": "serverless-patterns/lambda-microvms-kiro-code-reviewer",
-      "projectFolder": "lambda-microvms-kiro-code-reviewer",
       "templateFile": "template.yaml"
     }
   },
@@ -45,6 +42,7 @@
     "headline": "Deploy the pattern",
     "text": [
       "export KIRO_API_KEY=\"your-kiro-api-key\"",
+      "export KIRO_API_KEY=\"your-kiro-api-key-here\"",
       "export STACK_NAME=\"your-stack-name-here\"",
       "export REGION=\"you-region-here\"",
       "chmod +x scripts/deploy.sh",
@@ -63,10 +61,10 @@
   },
   "authors": [
     {
-        "name": "Ricardo Marques",
-        "image": "./images/rrmarq.jpg",
-        "bio": "Sr Serverless Specialist, AWS",
-        "linkedin": "ricardo-marques-aws"
-	}
+      "name": "Ricardo Marques",
+      "bio": "Sr Serverless Specialist, AWS",
+      "image": "./images/rrmarq.jpg",
+      "linkedin": "ricardo-marques-aws"
+    }
   ]
 }

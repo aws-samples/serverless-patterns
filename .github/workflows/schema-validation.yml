@@ -1,31 +1,32 @@
 name: "Schema Validation"
 permissions:
   contents: read
-
 on: [pull_request]
-
 jobs:
   validate-pattern:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3   
-
-      - uses: actions/setup-node@v3
+        uses: actions/checkout@v4
         with:
-          node-version: 16  
-
-      - name: Get changed files using defaults
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@e9772d140489982e0e3704fea5ee93d536f1e275
-        with:
-          separator: ","    
-
-      - run: cd scripts && npm i
-
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # HEAD is the PR merge commit. --no-renames reports a moved file as added.
+          added=$(git diff --name-only --no-renames --diff-filter=A "$BASE_SHA" HEAD | paste -sd, -)
+          modified=$(git diff --name-only --no-renames --diff-filter=M "$BASE_SHA" HEAD | paste -sd, -)
+          echo "added_files=$added" >> "$GITHUB_OUTPUT"
+          echo "modified_files=$modified" >> "$GITHUB_OUTPUT"
+      - run: cd _scripts && npm i
       - name: Validate
-        run: node scripts/validate.js
-        env: # Or as an environment variable
+        run: node _scripts/validate.js
+        env:
           MODIFIED_FILES: ${{ steps.changed-files.outputs.modified_files }}
           ADDED_FILES: ${{ steps.changed-files.outputs.added_files }}
           PR_NUMBER: ${{ github.event.number }}

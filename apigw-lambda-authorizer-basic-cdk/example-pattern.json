@@ -1,20 +1,17 @@
 {
-  "title": "API Gateway Lambda Authorizer for Basic HTTP Authentication",
-  "description": "This pattern deploys an API Gateway REST API protected by a Lambda Authorizer supporting Basic HTTP Authentication",
+  "title": "Amazon API Gateway AWS Lambda authorizer for basic HTTP authentication",
+  "description": "API Gateway REST API protected by a Lambda Authorizer supporting basic HTTP authentication.",
   "language": "Node.js",
   "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The Lambda authorizer decodes the credentials provided in the Authorization header. If matched in the mock database a policy is returned giving permissions to invoke the downstream Lambda function. If the user is not found a policy is returned denying access to the downstream Lambda function."
+      "The Lambda authorizer decodes the credentials provided in the Authorization header. If authorized a policy is returned giving permissions to invoke the downstream Lambda function. If the user is not found a policy is returned denying access to the downstream Lambda function."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-authorizer-basic-cdk",
-      "templateURL": "serverless-patterns/apigw-lambda-authorizer-basic-cdk",
-      "projectFolder": "apigw-lambda-authorizer-basic-cdk",
       "templateFile": "lib/basic-authorizer-construct.js"
     }
   },
@@ -38,14 +35,14 @@
   },
   "cleanup": {
     "text": [
-      "cdk destroy"
+      "<code>cdk destroy</code>"
     ]
   },
   "authors": [
     {
       "name": "Thiago Pádua",
-      "image": "https://cdn.tgpadua.host/tgpadua.jpg",
       "bio": "Senior Partner Solutions Architect, Serverless at Amazon Web Services (AWS)",
+      "image": "https://cdn.tgpadua.host/tgpadua.jpg",
       "linkedin": "thiagopadua"
     }
   ]

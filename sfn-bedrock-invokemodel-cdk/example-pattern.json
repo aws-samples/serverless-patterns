@@ -15,27 +15,39 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-bedrock-invokemodel-cdk",
-      "templateURL": "serverless-patterns/sfn-bedrock-invokemodel-cdk",
-      "projectFolder": "sfn-bedrock-invokemodel-cdk",
       "templateFile": "lib/sfn-bedrock-invokemodel-stack.ts"
     }
   },
   "resources": {
     "bullets": [
-      { "text": "Step Functions optimized integration for Amazon Bedrock", "link": "https://aws.amazon.com/about-aws/whats-new/2023/11/aws-step-functions-optimized-integration-bedrock/" },
-      { "text": "Build generative AI apps using Step Functions and Bedrock", "link": "https://aws.amazon.com/blogs/aws/build-generative-ai-apps-using-aws-step-functions-and-amazon-bedrock/" },
-      { "text": "Amazon Bedrock documentation", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/" }
+      {
+        "text": "Step Functions optimized integration for Amazon Bedrock",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2023/11/aws-step-functions-optimized-integration-bedrock/"
+      },
+      {
+        "text": "Build generative AI apps using Step Functions and Bedrock",
+        "link": "https://aws.amazon.com/blogs/aws/build-generative-ai-apps-using-aws-step-functions-and-amazon-bedrock/"
+      },
+      {
+        "text": "Amazon Bedrock documentation",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/"
+      }
     ]
   },
   "deploy": {
-    "text": ["<code>cdk deploy</code>"]
+    "text": [
+      "<code>cdk deploy</code>"
+    ]
   },
   "testing": {
-    "text": ["See the README for testing instructions."]
+    "text": [
+      "See the README for testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["<code>cdk destroy</code>"]
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {
@@ -43,10 +55,5 @@
       "bio": "Technical Account Manager at AWS",
       "linkedin": "nithin-chandran-r"
     }
-  ],
-  "patternArch": {
-    "icon1": { "x": 20, "y": 50, "service": "sfn", "label": "Step Functions" },
-    "icon2": { "x": 80, "y": 50, "service": "bedrock", "label": "Amazon Bedrock" },
-    "line1": { "from": "icon1", "to": "icon2" }
-  }
+  ]
 }

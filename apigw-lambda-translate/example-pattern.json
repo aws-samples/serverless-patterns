@@ -1,6 +1,6 @@
 {
-  "title": "API Gateway REST API to Lambda function and AWS Translate",
-  "description": "This pattern creates an Amazon API Gateway REST API and an AWS Lambda function that calls AWS Translate service.",
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon Translate",
+  "description": "Create an Amazon API Gateway REST API and an AWS Lambda function that translates text with Amazon Translate.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-translate",
-      "templateURL": "serverless-patterns/apigw-lambda-translate",
-      "projectFolder": "apigw-lambda-translate",
       "templateFile": "template.yaml"
     }
   },
@@ -36,10 +33,13 @@
   },
   "deploy": {
     "text": [
-        "sam deploy --guided"    ]
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
     "text": [
@@ -47,11 +47,11 @@
     ]
   },
   "authors": [
-      {
-        "name": "Sudheer Yalamanchili",
-        "image": "./sudheer.jpg",
-        "bio": "Sudheer is a Cloud Application Architect at AWS ProServ.",
-        "linkedin": "sudheeryalamanchili"
-      }
+    {
+      "name": "Sudheer Yalamanchili",
+      "bio": "Sudheer is a Cloud Application Architect at AWS ProServ.",
+      "image": "./sudheer.jpg",
+      "linkedin": "sudheeryalamanchili"
+    }
   ]
 }

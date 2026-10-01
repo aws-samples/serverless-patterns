@@ -1,57 +1,58 @@
 {
-  title: "AWS Kinesis Firehose Transformation with Lambda using SAM for Java",
-  description: "Create a serverless app using Amazon Kinesis Data Firehose and AWS Lambda.",
-  language: "Java",
-  level: "200",
-  framework: "AWS SAM",
-  introBox: {
-    headline: "How it works",
-    text: [
-      "This pattern deploys a Kinesis Firehose Delivery Stream, a transformation Lambda function (Java), a destination S3 bucket, and all of the additional infrastructure required for the pattern.",
-      "In this example, Kinesis Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Kinesis Data Firehose. Kinesis Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+  "title": "Amazon Data Firehose Data transformation with AWS Lambda",
+  "description": "Transform incoming source data and deliver the transformed data to destinations.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The purpose of this pattern is to deploy the infrastructure necessary to enable Amazon Data Firehose data transformation.",
+      "Amazon Data Firehose can invoke a Lambda function to transform incoming source data and deliver the transformed data to destinations. In this architecture, Amazon Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Amazon Data Firehose. Amazon Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
     ]
   },
-  gitHub: {
-    template: {
-      repoURL: "https://github.com/aws-samples/serverless-patterns/tree/main/firehose-transformation-sam-java",
-      templateURL: "patterns/firehose-transformation-sam-java",
-      projectFolder: "firehose-transformation-sam-java",
-      templateFile: "firehose-transformation-sam-java/template.yaml"
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
     }
   },
-  resources: {
-    bullets: [
+  "resources": {
+    "bullets": [
       {
-        text: "Using AWS Lambda with Amazon Kinesis",
-        link: "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+        "text": "Amazon Data Firehose Data Transformation",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
       },
       {
-        text: "Working with AWS SAM",
-        link: "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started.html"
+        "text": "Using AWS Lambda with Amazon Data Firehose",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-kinesisfirehose.html"
+      },
+      {
+        "text": "Ingesting enriched IoT data into Amazon S3 using Amazon Data Firehose",
+        "link": "https://aws.amazon.com/blogs/iot/ingesting-enriched-iot-data-into-amazon-s3-using-amazon-kinesis-data-firehose/"
+      },
+      {
+        "text": "Capture clickstream data using AWS serverless services",
+        "link": "https://aws.amazon.com/blogs/industries/capture-clickstream-data-using-aws-serverless-services/"
       }
     ]
   },
-  deploy: {
-    text: [
+  "deploy": {
+    "text": [
       "sam deploy --guided"
     ]
   },
-  testing: {
-    text: [
+  "testing": {
+    "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
-  cleanup: {
-    text: [
-      "Delete objects in S3: <code>aws s3 rm s3://<BUCKET_NAME> --recursive</code>",
+  "cleanup": {
+    "text": [
+      "Delete objects in S3: <code>aws s3 rm s3://BUCKET_NAME --recursive</code>",
       "Delete the stack: <code>sam delete</code>."
     ]
   },
-  authors: [
-    {
-      name: "Praveen Nerellapalli",
-      bio: "Solutions Architect @ AWS",
-      linkedin: "https://www.linkedin.com/in/pnerellapalli/"
-    }
+  "contributors": [
+    "content/contributors/praveen-nerellapalli.json"
   ]
 }

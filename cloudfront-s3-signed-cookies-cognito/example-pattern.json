@@ -1,6 +1,6 @@
 {
-  "title": "Amazon CloudFront signed cookies with Amazon Cognito authentication using Python CDK",
-  "description": "This pattern demonstrates how to implement Amazon CloudFront signed cookies for private S3 content access with Amazon Cognito user authentication using AWS CDK with Python.",
+  "title": "Amazon CloudFront signed cookies with Amazon Cognito using Python CDK",
+  "description": "Implement Amazon CloudFront signed cookies for private Amazon S3 content access with Amazon Cognito user authentication using AWS CDK with Python.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",
@@ -15,10 +15,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudfront-s3-signed-cookies-cognito",
-      "templateURL": "serverless-patterns/cloudfront-s3-signed-cookies-cognito",
-      "projectFolder": "cloudfront-s3-signed-cookies-cognito",
-      "templateFile": "cloudfront-s3-signed-cookies-cognito/app.py"
+      "templateFile": "app.py"
     }
   },
   "resources": {
@@ -59,10 +56,8 @@
   "authors": [
     {
       "name": "Matia Rasetina",
-      "image": "",
       "bio": "Senior Software Engineer @ Elixirr Digital",
-      "linkedin": "https://www.linkedin.com/in/matiarasetina/",
-      "twitter": ""
+      "linkedin": "matiarasetina"
     }
   ]
 }

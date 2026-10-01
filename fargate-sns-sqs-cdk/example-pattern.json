@@ -1,0 +1,62 @@
+{
+  "title": "AWS Fargate to Amazon SNS to Amazon SQS",
+  "description": "Create an AWS Fargate service that sends to SNS then SQS",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front. The AWS Fargate service makes publish call to an Amazon Simple Notification Service (SNS) and receiveMessage call to an Amazon Simple Queue Service (SQS) queue which is subscribed to the SNS topic that the template creates. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built ecs.ContainerImage.fromAsset method. The custom image has a base route / for health checks, /publishmessage for adding to the queue and /readmessage for reading messages from the queue. Environment variables like the SQS Queue URL, SNS Topic ARN and AWS region are passed to the image to enable it to perform actions on the SNS Topic and SQS Queue.",
+      "This project also shows how to set up an SNS and SQS Interface Endpoint to the VPC. A VPC Endpoint policy is created to only allow the Fargate task definition to perform actions through the VPC endpoint. In addition, an access policy is set on the SNS topic and SQS queue to deny requests that are not from the created Interface Endpoint."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "Amazon SNS",
+        "link": "https://aws.amazon.com/sns/"
+      },
+      {
+        "text": "CDK documentation for SNS",
+        "link": "https://docs.aws.amazon.com/cdk/api/v1/docs/aws-sns-readme.html"
+      },
+      {
+        "text": "CDK documentation for SQS",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-sqs-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/arun-thangaraj.json"
+  ]
+}

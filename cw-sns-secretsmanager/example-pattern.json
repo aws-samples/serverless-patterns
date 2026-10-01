@@ -1,22 +1,19 @@
 {
-  "title": "CloudWatch Events, SNS and AWS Secrets Manager Integration",
-  "description": "An application that Detects and Notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS",
+  "title": "Amazon CloudWatch Events, Amazon SNS, and AWS Secrets Manager integration",
+  "description": "An application that detects and notifies on Amazon Secrets Manager secret key creation.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This template deploys an application to Detect and Notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS", 
-      "Once the template is deployed, you will receive an email notification on the email address you defined in Requirements. Make sure to confirm email subscription in order to receive updates related to your Secret Keys present in AWS Secret manager."
+      "This template deploys an application to Detect and Notify on Amazon Secrets Manager Secret Key Creation, Updation and Deletion using Amazon CloudWatch event and Amazon SNS.",
+      "Once the template is deployed, you will receive an email notification on the email address you defined. Make sure to confirm email subscription in order to receive updates related to your Secret Keys present in AWS Secret manager."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cw-sns-secretsmanager",
-      "templateURL": "serverless-patterns/cw-sns-secretsmanager",
-      "projectFolder": "cw-sns-secretsmanager",
-      "templateFile": "cw-sns-secretsmanager/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -49,10 +46,10 @@
   "authors": [
     {
       "name": "Jainam Shah",
-      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
       "bio": "Technical Account Manager @ AWS",
-      "linkedin": "https://www.linkedin.com/in/jainamshah92",
-      "twitter": "@imJshah92"
+      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
+      "linkedin": "jainamshah92",
+      "twitter": "imJshah92"
     }
   ]
 }

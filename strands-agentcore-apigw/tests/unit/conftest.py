@@ -43,7 +43,11 @@ for tag in _CFN_TAGS:
 def template():
     """Load and parse the CloudFormation template once for all tests."""
     with open(TEMPLATE_PATH, "r") as f:
-        return yaml.load(f, Loader=CfnLoader)
+        loader = CfnLoader(f)
+        try:
+            return loader.get_single_data()
+        finally:
+            loader.dispose()
 
 
 @pytest.fixture(scope="session")

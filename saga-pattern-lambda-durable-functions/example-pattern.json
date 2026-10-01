@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/saga-pattern-lambda-durable-functions",
-      "templateURL": "serverless-patterns/saga-pattern-lambda-durable-functions",
-      "projectFolder": "saga-pattern-lambda-durable-functions",
       "templateFile": "saga-pattern-cdk/lib/saga-pattern-cdk-stack.ts"
     }
   },
