@@ -41,7 +41,7 @@ namespace KinesisLambdaDynamoDbCdk
             // Build options for Lambda functions
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_8.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = [
@@ -59,7 +59,7 @@ namespace KinesisLambdaDynamoDbCdk
             // Create Lambda function for data processing
             var processFunction = new Function(this, "DataProcessFunction", new FunctionProps
             {
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(300),
                 Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X64
