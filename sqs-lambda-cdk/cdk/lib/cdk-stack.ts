@@ -19,7 +19,7 @@ export class CdkStack extends Stack {
 
     const lambdaFunction = new lambda.Function(this, 'QueueConsumerFunction', {
       code: lambda.Code.fromAsset(path.join(__dirname, '../src')),
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'app.handler',
       timeout: Duration.seconds(3),
       memorySize: 128,
