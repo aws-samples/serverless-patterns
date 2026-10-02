@@ -1,0 +1,123 @@
+{
+  "title": "Amazon Bedrock AgentCore Runtime to Amazon EventBridge via AgentCore Gateway",
+  "description": "An AI agent on AgentCore Runtime emits business events to EventBridge through a governed AgentCore Gateway MCP tool, authenticated with IAM SigV4.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "CDK",
+  "patternArch": {
+    "icon1": {
+      "x": 10,
+      "y": 50,
+      "service": "bedrock",
+      "label": "AgentCore Runtime"
+    },
+    "icon2": {
+      "x": 35,
+      "y": 20,
+      "service": "bedrock",
+      "label": "Amazon Bedrock"
+    },
+    "icon3": {
+      "x": 40,
+      "y": 50,
+      "service": "bedrock",
+      "label": "AgentCore Gateway"
+    },
+    "icon4": {
+      "x": 70,
+      "y": 50,
+      "service": "lambda",
+      "label": "emit_event Lambda"
+    },
+    "icon5": {
+      "x": 95,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon1",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon3",
+      "to": "icon4"
+    },
+    "line4": {
+      "from": "icon4",
+      "to": "icon5"
+    }
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows an AI agent emitting structured business events to Amazon EventBridge through a governed Amazon Bedrock AgentCore Gateway MCP tool.",
+      "The agent runs on AgentCore Runtime and connects to the Gateway using the MCP Streamable HTTP transport (2025-03-26 spec). The Gateway's inbound authorization is AWS_IAM, so every request must carry a valid AWS SigV4 signature for the bedrock-agentcore service.",
+      "No MCP client SDK signs streamable-HTTP requests with SigV4 natively, so this pattern signs requests manually: a small helper wraps botocore's SigV4Auth as an httpx.Auth implementation, passed directly to the MCP client's transport.",
+      "The Gateway exposes an emit_event tool backed by an AWS Lambda function. When the agent calls emit_event with a source, detail type, and payload, the Lambda validates the source prefix (only agent.* allowed) and publishes to EventBridge via PutEvents.",
+      "IAM permissions follow least privilege: the Runtime execution role has bedrock-agentcore:InvokeGateway scoped to the specific Gateway ARN, the Gateway role can only invoke the specific Lambda, and the Lambda can only PutEvents to the specific bus."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-gateway-eventbridge-cdk",
+      "templateURL": "serverless-patterns/agentcore-gateway-eventbridge-cdk",
+      "projectFolder": "agentcore-gateway-eventbridge-cdk",
+      "templateFile": "cdk/lib/agentcore-gateway-eventbridge-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway.html"
+      },
+      {
+        "text": "Set up inbound authorization for your gateway (IAM/SigV4)",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-inbound-auth.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Runtime",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html"
+      },
+      {
+        "text": "MCP Streamable HTTP Transport",
+        "link": "https://modelcontextprotocol.io/specification/2025-03-26/basic/transports"
+      },
+      {
+        "text": "Amazon EventBridge PutEvents",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo README.md for detailed testing instructions.",
+      "Sample invocation payload: {\"prompt\":\"Use the emit_event tool to emit an event with source=agent.claims-processor, detail_type=ClaimApproved, detail={claimId: CLM-001, decision: approved, confidence: 0.94}\"}",
+      "After invoking, check the Runtime's CloudWatch Logs for a 200 OK from the Gateway MCP endpoint and the EventBridge event ID returned by the Lambda."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": ["cd cdk", "cdk destroy"]
+  },
+  "authors": [
+    {
+      "name": "Antoine Boucherie",
+      "bio": "Principal Solutions Architect, AWS Global Financial Services",
+      "linkedin": "antoineboucherie"
+    }
+  ]
+}

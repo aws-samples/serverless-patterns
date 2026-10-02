@@ -1,0 +1,2 @@
+strands-agents==1.50.2
+bedrock-agentcore==1.18.1
