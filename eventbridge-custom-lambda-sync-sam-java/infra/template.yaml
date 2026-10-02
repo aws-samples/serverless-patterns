@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Ordered processing with a synchronous Lambda target on an EventBridge custom
+  event bus (eventsv2), Java consumer. This template provisions the whole sample:
+  the event bus, a FIFO subscriber that invokes the consumer Lambda synchronously
+  (LambdaParameters.InvocationType = REQUEST_RESPONSE), the consumer Lambda, a
+  dead-letter queue, and the delivery role.
+
+  Account- and region-agnostic: no account id or region is hardcoded; resources
+  are named from the AppName parameter.
+
+Parameters:
+  AppName:
+    Type: String
+    Default: sync-orders
+    Description: Prefix used for resource names.
+  RetentionInDays:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 365
+    Description: Days events are retained on the bus (the replay window).
+
+Resources:
+
+  # --- Event bus -----------------------------------------------------------
+  # The new custom event bus. Ref returns the bus ARN.
+  OrdersBus:
+    Type: AWS::EventsV2::EventBus
+    Properties:
+      Name: !Sub "${AppName}-bus"
+      StorageConfiguration:
+        RetentionPeriodInDays: !Ref RetentionInDays
+
+  # --- Consumer Lambda -----------------------------------------------------
+  # The SYNCHRONOUS, ordered subscriber target. It logs each order in the order
+  # it is processed. SAM auto-detects the pom.xml at the CodeUri and builds it
+  # with Maven, and creates the log group and a basic execution role.
+  # MemorySize is bumped to 512 for JVM cold-start headroom.
+  ConsumerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AppName}-consumer"
+      Handler: com.example.orders.Consumer::handleRequest
+      Runtime: java21
+      CodeUri: ../
+      Timeout: 30
+      MemorySize: 512
+      Description: Logs OrderPlaced events in processing order (ordered FIFO demo).
+
+  # --- Dead-letter queue ---------------------------------------------------
+  # Best practice: a subscriber should have a DLQ so a delivery that ultimately
+  # fails has somewhere to go. This sample focuses on ordered processing, so the
+  # DLQ is just a safety net.
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AppName}-subscriber-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  # --- Delivery role -------------------------------------------------------
+  # The role EventBridge assumes to invoke the target. It trusts the
+  # events.amazonaws.com service principal and carries the target action
+  # (lambda:InvokeFunction) plus sqs:SendMessage on the DLQ.
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AppName}-delivery-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: deliver-to-lambda-and-dlq
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt ConsumerFunction.Arn
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+
+  # --- Subscriber (FIFO, synchronous) --------------------------------------
+  # The two settings that enable ordered processing:
+  #   Type: FIFO                                  -> events in a group are ordered
+  #   InvokeConfiguration.LambdaParameters.InvocationType: REQUEST_RESPONSE
+  #     -> EventBridge invokes the Lambda synchronously and waits for it to
+  #        confirm each event before delivering the next in the group.
+  # A DATA filter is fine because the payload is JSON. The DLQ is the safety net.
+  OrdersSubscriber:
+    Type: AWS::EventsV2::Subscriber
+    Properties:
+      Name: !Sub "${AppName}-to-lambda"
+      EventBusArn: !Ref OrdersBus
+      Type: FIFO
+      FilterConfiguration:
+        Filters:
+          - Scope: DATA
+            Pattern: '{"detail":{"orderId":[{"exists":true}]}}'
+      InvokeConfiguration:
+        TargetArn: !GetAtt ConsumerFunction.Arn
+        RoleArn: !GetAtt DeliveryRole.Arn
+        LambdaParameters:
+          InvocationType: REQUEST_RESPONSE
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+
+Outputs:
+  AppName:
+    Description: Resource-name prefix.
+    Value: !Ref AppName
+  EventBusArn:
+    Description: ARN of the custom event bus. Pass to the publisher.
+    Value: !Ref OrdersBus
+  SubscriberArn:
+    Description: ARN of the FIFO, synchronous subscriber.
+    Value: !Ref OrdersSubscriber
+  ConsumerFunctionArn:
+    Description: Consumer Lambda ARN. The subscriber's synchronous target.
+    Value: !GetAtt ConsumerFunction.Arn
+  ConsumerFunctionName:
+    Description: Consumer Lambda name (its log group is /aws/lambda/<name>).
+    Value: !Ref ConsumerFunction
+  DeadLetterQueueArn:
+    Description: DLQ ARN (safety net). The subscriber's OnFailureConfiguration.
+    Value: !GetAtt DeadLetterQueue.Arn
+  ConsumerLogGroup:
+    Description: CloudWatch log group where the consumer logs processing order.
+    Value: !Sub "/aws/lambda/${AppName}-consumer"
