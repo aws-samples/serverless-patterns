@@ -1,0 +1,239 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  AWS Step Functions runs a job on an AWS Lambda MicroVM using the AWS SDK
+  integration, waits for the job to call back with its result through a task
+  token, and always terminates the MicroVM, on success, failure, missed
+  heartbeats or timeout (uksb-1tthgi812) (tag:sfn-lambda-microvms-callback-sam)
+
+Parameters:
+  ArtifactBucket:
+    Type: String
+    Description: >-
+      Name of an existing S3 bucket in this Region that holds the worker zip
+      (Dockerfile and app.py at the root). Upload it before deploying, see README.
+  ArtifactKey:
+    Type: String
+    Default: worker.zip
+    Description: Object key of the worker zip in ArtifactBucket.
+  BaseImageVersion:
+    Type: String
+    Default: "1"
+    Description: Version of the managed al2023-1 base MicroVM image.
+  MinimumMemoryInMiB:
+    Type: Number
+    Default: 2048
+    Description: Memory for each MicroVM.
+  MaximumDurationInSeconds:
+    Type: Number
+    Default: 3600
+    MinValue: 60
+    MaxValue: 28800
+    Description: >-
+      Hard limit for one job. Used both as the MicroVM maximum lifetime and as
+      the Step Functions wait timeout (Lambda MicroVMs allow up to 8 hours).
+  HeartbeatSeconds:
+    Type: Number
+    Default: 60
+    MinValue: 30
+    Description: >-
+      If the worker sends no heartbeat for this long, Step Functions stops
+      waiting and terminates the MicroVM. The worker sends one every 20 seconds.
+
+Resources:
+  # Holds the task token of each waiting execution, keyed by MicroVM ID, until
+  # the worker reads it. Items expire after one day.
+  TaskTokenTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: microvmId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: microvmId
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  WorkerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda-microvms/${AWS::StackName}-worker
+      RetentionInDays: 7
+
+  # Used only while the image is built: reads the worker zip and writes build logs.
+  ImageBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:*
+      Policies:
+        - PolicyName: ImageBuild
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ArtifactBucket}/${ArtifactKey}
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt WorkerLogGroup.Arn
+
+  # Assumed by each running MicroVM. The running MicroVM presents the image ARN
+  # as aws:SourceArn, so the trust policy allows the image and MicroVM ARNs.
+  WorkerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn:
+                  - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:*
+                  - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm:*
+      Policies:
+        - PolicyName: WorkerRuntime
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: dynamodb:GetItem
+                Resource: !GetAtt TaskTokenTable.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt WorkerLogGroup.Arn
+
+  # Lets the worker report back. A separate policy avoids a circular dependency,
+  # since the state machine definition references the execution role.
+  WorkerCallbackPolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref WorkerExecutionRole
+      PolicyName: StepFunctionsCallback
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - states:SendTaskSuccess
+              - states:SendTaskFailure
+              - states:SendTaskHeartbeat
+            Resource: !Ref JobStateMachine
+
+  WorkerImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Sub ${AWS::StackName}-worker
+      Description: Job worker that reports its result to AWS Step Functions with a task token.
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1
+      BaseImageVersion: !Ref BaseImageVersion
+      BuildRoleArn: !GetAtt ImageBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${ArtifactBucket}/${ArtifactKey}
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: !Ref MinimumMemoryInMiB
+      AdditionalOsCapabilities: []
+      # Internet egress lets the Dockerfile install packages at build time and
+      # lets the worker reach the DynamoDB and Step Functions endpoints at run time.
+      EgressNetworkConnectors:
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS
+      EnvironmentVariables:
+        - Key: TASK_TOKEN_TABLE
+          Value: !Ref TaskTokenTable
+        - Key: HEARTBEAT_INTERVAL_SECONDS
+          Value: "20"
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 60
+          Validate: DISABLED
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 10
+          Resume: DISABLED
+          Suspend: DISABLED
+          Terminate: DISABLED
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref WorkerLogGroup
+
+  JobStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: statemachine/workflow.asl.json
+      DefinitionSubstitutions:
+        ImageArn: !GetAtt WorkerImage.ImageArn
+        ExecutionRoleArn: !GetAtt WorkerExecutionRole.Arn
+        EgressConnectorArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS
+        TaskTokenTable: !Ref TaskTokenTable
+        MaximumDurationInSeconds: !Ref MaximumDurationInSeconds
+        HeartbeatSeconds: !Ref HeartbeatSeconds
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:RunMicrovm
+              Resource: !GetAtt WorkerImage.ImageArn
+            # RunMicrovm attaches the managed HTTP_INGRESS connector by default, even
+            # when no ingress connector is requested, plus INTERNET_EGRESS from the
+            # definition. Passing a connector requires this permission.
+            - Effect: Allow
+              Action: lambda:PassNetworkConnector
+              Resource:
+                - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS
+                - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:HTTP_INGRESS
+            # TerminateMicrovm is authorized against the image the MicroVM was
+            # launched from, so this also limits the workflow to its own MicroVMs.
+            - Effect: Allow
+              Action: lambda:TerminateMicrovm
+              Resource: !GetAtt WorkerImage.ImageArn
+            - Effect: Allow
+              Action: iam:PassRole
+              Resource: !GetAtt WorkerExecutionRole.Arn
+              Condition:
+                StringEquals:
+                  iam:PassedToService: lambda.amazonaws.com
+            - Effect: Allow
+              Action: dynamodb:PutItem
+              Resource: !GetAtt TaskTokenTable.Arn
+
+Outputs:
+  StateMachineArn:
+    Description: Start an execution of this state machine to run a job.
+    Value: !Ref JobStateMachine
+  WorkerImageArn:
+    Description: MicroVM image the jobs run on.
+    Value: !GetAtt WorkerImage.ImageArn
+  TaskTokenTableName:
+    Description: DynamoDB table that hands task tokens to the workers.
+    Value: !Ref TaskTokenTable
+  WorkerLogGroupName:
+    Description: CloudWatch Logs log group with the worker output, one log stream per MicroVM.
+    Value: !Ref WorkerLogGroup

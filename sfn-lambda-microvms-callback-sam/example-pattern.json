@@ -1,0 +1,61 @@
+{
+    "title": "AWS Step Functions to AWS Lambda MicroVMs with a task token callback",
+    "description": "Run a job on an AWS Lambda MicroVM from AWS Step Functions, get its result with a task token callback, and always terminate the MicroVM.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "AWS Lambda MicroVMs run long or stateful work, for up to eight hours, in a Firecracker-isolated environment built from your own image. Unlike a Lambda function, a MicroVM is not invoked and does not return a response. You start it with RunMicrovm, and it keeps running and billing until it is terminated or reaches its maximum duration. Every workload therefore has to answer two questions: how does the caller get the job's result back, and who guarantees the MicroVM is terminated when the job finishes or something goes wrong? This pattern answers both with an AWS Step Functions workflow and no AWS Lambda function in between.",
+            "The workflow starts the MicroVM through the Step Functions AWS SDK integration for Lambda MicroVMs and passes the execution input to it as the job, in the run hook payload. The execution ARN is used as the idempotency token, so a retried call never starts a second MicroVM. The next step stores the task token in an Amazon DynamoDB table under the MicroVM ID and pauses with the waitForTaskToken integration pattern. Inside the MicroVM, the run lifecycle hook receives the job and the MicroVM ID. The worker reads its task token, runs the job, sends a heartbeat every 20 seconds, and finishes with SendTaskSuccess and the result, or SendTaskFailure and the error.",
+            "As soon as the result arrives, the workflow terminates the MicroVM and returns the result as the execution output. If the job reports an error, stops sending heartbeats or exceeds the maximum duration, a Catch path terminates the MicroVM first and then fails the execution with the job's error. The maximum duration is also set on the MicroVM itself, so the platform stops it even if the execution is stopped by hand.",
+            "The token is handed over in a separate step because RunMicrovm does not support the run a job (.sync) pattern, and starting it with waitForTaskToken would discard its response, leaving no MicroVM ID to terminate on the failure path. Permissions are scoped to this stack: the state machine can run and terminate MicroVMs only from its own image, and the worker can read only its token table and respond only to this state machine.",
+            "Replace the example job, which counts prime numbers, with your own batch job, data processing step or agent run that needs more time, memory or isolation than a Lambda function provides."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-lambda-microvms-callback-sam",
+            "templateURL": "serverless-patterns/sfn-lambda-microvms-callback-sam",
+            "projectFolder": "sfn-lambda-microvms-callback-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            { "text": "AWS SDK service integrations in Step Functions", "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html" },
+            { "text": "Wait for a callback with a task token", "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token" },
+            { "text": "AWS::Lambda::MicrovmImage CloudFormation resource", "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html" },
+            { "text": "AWS CLI reference for Lambda MicroVMs RunMicrovm", "link": "https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda-microvms/run-microvm.html" }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "Upload the worker zip to an S3 bucket as described in the README, then run: <code>sam deploy --guided</code>"
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "Start executions with a successful job, a failing job and a hung job, then confirm each MicroVM is terminated. See the README for detailed instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+            "2. Delete the artifact bucket: <code>aws s3 rb s3://ARTIFACT_BUCKET --force</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Manish S",
+            "image": "",
+            "bio": "AWS Support Engineer, trying to build things",
+            "linkedin": "manish-s-84199221b",
+            "twitter": ""
+        }
+    ]
+}
