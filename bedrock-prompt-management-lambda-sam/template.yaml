@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Manage and version Amazon Bedrock prompts as infrastructure. A managed Amazon Bedrock prompt
+  and a published version are defined as native AWS CloudFormation resources; an AWS Lambda
+  function invokes the prompt by its version ARN through the Amazon Bedrock Converse API.
+  Update or roll back the prompt by publishing a new version, so the function code never changes.
+  (bedrock-prompt-management-lambda-sam)
+
+Parameters:
+  ModelId:
+    Type: String
+    Default: us.amazon.nova-lite-v1:0
+    Description: >
+      Amazon Bedrock foundation model or inference profile identifier the prompt runs against
+      (must support the Converse API). The default is a cross-Region inference profile.
+  PromptRevision:
+    Type: String
+    Default: "1"
+    Description: >
+      Bump this value whenever you edit the prompt template or ModelId so that AWS CloudFormation
+      replaces the published prompt version. AWS::Bedrock::PromptVersion is only replaced when its
+      own properties change, so editing the prompt alone updates just the draft.
+
+Resources:
+  # A managed, versionable Amazon Bedrock prompt. The template text and its input variables live
+  # here in Amazon Bedrock, not hardcoded in the function, so prompts can be iterated
+  # independently of code.
+  SummaryPrompt:
+    Type: AWS::Bedrock::Prompt
+    Properties:
+      Name: !Sub "${AWS::StackName}-summary-prompt"
+      Description: Summarize input text in one sentence.
+      DefaultVariant: v1
+      Variants:
+        - Name: v1
+          TemplateType: TEXT
+          ModelId: !Ref ModelId
+          TemplateConfiguration:
+            Text:
+              Text: "Summarize the following text in exactly one clear sentence:\n\n{{input}}"
+              InputVariables:
+                - Name: input
+          InferenceConfiguration:
+            Text:
+              Temperature: 0.5
+              MaxTokens: 300
+
+  # An immutable published version. Production code invokes a pinned version ARN, so prompt
+  # changes are deliberate: publish a new version and repoint, or roll back to an older one.
+  # Description carries PromptRevision so that bumping the parameter forces a replacement, which
+  # is what publishes a new version from the current draft.
+  SummaryPromptVersion:
+    Type: AWS::Bedrock::PromptVersion
+    # Keep the previous published version so that it stays available as a rollback target.
+    UpdateReplacePolicy: Retain
+    # The default for stack deletion, stated explicitly: deleting the stack removes the version.
+    DeletionPolicy: Delete
+    Properties:
+      PromptArn: !GetAtt SummaryPrompt.Arn
+      Description: !Sub "Published for prompt revision ${PromptRevision}."
+
+  # The stack owns the function log group so that deleting the stack deletes the logs too.
+  # No LogGroupName is set, which lets AWS CloudFormation generate a unique name and keeps a
+  # second deployment in the same account and Region collision free.
+  InvokePromptFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  InvokePromptFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-invoke-prompt"
+      CodeUri: src/
+      Handler: handler.handler
+      Runtime: python3.13
+      Architectures:
+        - arm64
+      Timeout: 30
+      MemorySize: 128
+      # AWS SAM adds AWSLambdaBasicExecutionRole to the role it creates. There is no AWS SAM
+      # policy template for bedrock:RenderPrompt, so the two statements below are inline.
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            # Converse is called with the prompt version ARN as modelId, so the caller needs
+            # bedrock:RenderPrompt on the prompt and its versions. Amazon Bedrock API Reference,
+            # Converse, "Run inference on a prompt resource from Prompt management": "Check that
+            # you have bedrock:RenderPrompt permissions for the prompt resource."
+            - Sid: RenderManagedPrompt
+              Effect: Allow
+              Action: bedrock:RenderPrompt
+              Resource:
+                - !GetAtt SummaryPrompt.Arn
+                - !Sub "${SummaryPrompt.Arn}:*"
+            - Sid: InvokeModel
+              Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource:
+                # A cross-Region inference profile such as the default us.amazon.nova-lite-v1:0
+                # routes a request to a Region that Amazon Bedrock selects inside its geography
+                # ("Route model inference requests across AWS Regions with cross-Region
+                # inference"), and the request is authorized against the foundation model in the
+                # Region that serves it, so the foundation-model ARN cannot be pinned to one
+                # Region. Foundation model ARNs have no account id.
+                - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
+                # The profile itself is scoped to exactly the identifier this stack deploys.
+                - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/${ModelId}"
+      LoggingConfig:
+        LogGroup: !Ref InvokePromptFunctionLogGroup
+      Environment:
+        Variables:
+          PROMPT_VERSION_ARN: !GetAtt SummaryPromptVersion.Arn
+
+Outputs:
+  PromptArn:
+    Description: ARN of the managed Amazon Bedrock prompt (draft).
+    Value: !GetAtt SummaryPrompt.Arn
+  PromptVersionArn:
+    Description: ARN of the published prompt version the function invokes.
+    Value: !GetAtt SummaryPromptVersion.Arn
+  InvokePromptFunctionName:
+    Description: AWS Lambda function that invokes the managed prompt through Converse.
+    Value: !Ref InvokePromptFunction
+  LogGroupName:
+    Description: Amazon CloudWatch Logs log group the function writes to.
+    Value: !Ref InvokePromptFunctionLogGroup
