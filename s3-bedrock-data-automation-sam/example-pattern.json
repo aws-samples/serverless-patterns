@@ -18,7 +18,7 @@
             "Amazon Bedrock Data Automation (BDA) is a managed service that extracts structured information from unstructured content such as documents, images, video, and audio. This pattern wires it into a fully serverless, event-driven pipeline so that any file dropped into Amazon S3 is automatically turned into structured JSON, with no machine-learning code to write or maintain. Good use cases include invoice and form processing, contract and document understanding, media cataloging, and any workflow that needs to convert a pile of raw files into queryable data.",
             "When a file is uploaded to the input/ prefix of the Amazon S3 bucket, the ObjectCreated event triggers an AWS Lambda function. The function calls the BDA runtime InvokeDataAutomationAsync API, passing the input file location, an output location, and the Amazon Bedrock Data Automation project that defines what to extract. The function is fire-and-forget: it only starts the asynchronous job and returns immediately, so it stays small and cheap.",
             "Bedrock Data Automation reads the file, runs the managed extraction defined by the project, and writes the structured result to the output/ prefix of the same bucket. The project in this pattern uses a standard output configuration that returns each document as clean Markdown text (including tables) plus a generative summary. The project also processes image, video, and audio files with service defaults; you can add Image, Video, or Audio blocks to the project resource to control the standard output for those modalities, or attach a custom output configuration (a blueprint) that defines the exact fields you want.",
-            "The Amazon Bedrock Data Automation project is a native AWS CloudFormation resource (AWS::Bedrock::DataAutomationProject), so the entire pipeline is defined as infrastructure as code and the amount of custom code is minimal. AWS Identity and Access Management (IAM) permissions follow least privilege: the AWS Lambda function may read and write only the pattern bucket, and may invoke only the Bedrock Data Automation project that the stack creates.",
+            "The Amazon Bedrock Data Automation project is a native AWS CloudFormation resource (AWS::Bedrock::DataAutomationProject), so the entire pipeline is defined as infrastructure as code and the amount of custom code is minimal. AWS Identity and Access Management (IAM) permissions follow least privilege: the AWS Lambda function role may read only the input/ prefix of the pattern bucket, write only the output/ prefix, and invoke only the Bedrock Data Automation project that the stack creates.",
             "The pattern uses the US geography cross-Region inference profile us.data-automation-v1, which Amazon Bedrock Data Automation offers in the source Regions us-east-1, us-east-2, and us-west-2. The IAM policy lists the four US Regions that the profile can route the job to, and a CloudFormation Rules assertion stops the deployment early in any other Region. Because both Amazon S3 and AWS Lambda are pay-per-use and Bedrock Data Automation is fully managed, the pipeline scales to zero and has no idle cost."
         ]
     },
@@ -48,13 +48,14 @@
     },
     "testing": {
         "text": [
-            "Upload the included sample-invoice.pdf to the input/ prefix, then read the structured JSON from the output/ prefix. See the README for detailed instructions."
+            "Set REGION to the Region you deployed to and BUCKET to the DataBucketName output, then upload the included sample-invoice.pdf to the input/ prefix: <code>aws s3 cp ./sample-invoice.pdf s3://$BUCKET/input/sample-invoice.pdf --region $REGION</code>.",
+            "List the structured JSON that Bedrock Data Automation writes to the output/ prefix: <code>aws s3 ls s3://$BUCKET/output/ --recursive --region $REGION</code>. See the README for detailed instructions."
         ]
     },
     "cleanup": {
         "text": [
-            "Empty the Amazon S3 bucket: <code>aws s3 rm s3://YOUR_BUCKET --recursive</code>.",
-            "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+            "Empty the Amazon S3 bucket: <code>aws s3 rm s3://YOUR_BUCKET --recursive --region REGION_NAME</code>.",
+            "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME --region REGION_NAME</code>."
         ]
     },
     "authors": [

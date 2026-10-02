@@ -33,7 +33,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/s3-bedrock-data-automation-sam
     ```
-1. From the command line, build the function package (the function pins an exact AWS SDK for Python (Boto3) version, see `src/requirements.txt`) and use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
+1. From the command line, build the function package and use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file. The build step installs the exact AWS SDK for Python (Boto3) version that the function pins in `src/requirements.txt`:
     ```
     sam build
     sam deploy --guided
@@ -59,14 +59,16 @@ Important: this application uses various AWS services and there are costs associ
 * The function calls the Bedrock Data Automation runtime `InvokeDataAutomationAsync` API with the input file, an output location, and the Bedrock Data Automation project. It is fire-and-forget, so it only starts the job. The function skips folder markers and empty objects, and logs an error line for any record Bedrock Data Automation rejects.
 * Bedrock Data Automation reads the file, runs the managed extraction defined by the project, and writes structured JSON to the `output/` prefix.
 * The project (`AWS::Bedrock::DataAutomationProject`) is a native AWS CloudFormation resource, so the whole pipeline is infrastructure as code. The included standard output configuration returns each document as Markdown text (including tables) plus a generative summary.
+* The stack owns the function log group and keeps its logs for 7 days. To keep them for longer, change `RetentionInDays` on the `StartBdaFunctionLogGroup` resource in `template.yaml`.
 * Bedrock Data Automation requires a cross-Region inference profile. This pattern uses the US geography profile `us.data-automation-v1`, so a job started in a US source Region can be processed in any of `us-east-1`, `us-east-2`, `us-west-1` or `us-west-2`. The function execution role lists exactly those four profile ARNs, as the [Bedrock Data Automation documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html) prescribes.
 
 ## Testing
 
-1. Set a shell variable to the bucket name from the `DataBucketName` output, then upload the sample invoice that ships with this pattern to the `input/` prefix. The upload is what triggers the pipeline. Replace `BUCKET_NAME` with your bucket name:
+1. Set shell variables for the Region you deployed to and for the bucket name from the `DataBucketName` output, then upload the sample invoice that ships with this pattern to the `input/` prefix. The upload is what triggers the pipeline. Replace `REGION_NAME` with the Region you entered during deployment and `BUCKET_NAME` with your bucket name:
     ```bash
+    REGION=REGION_NAME
     BUCKET=BUCKET_NAME
-    aws s3 cp ./sample-invoice.pdf s3://$BUCKET/input/sample-invoice.pdf
+    aws s3 cp ./sample-invoice.pdf s3://$BUCKET/input/sample-invoice.pdf --region $REGION
     ```
     Output:
     ```
@@ -74,7 +76,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Wait about a minute, then list the output prefix:
     ```bash
-    aws s3 ls s3://$BUCKET/output/ --recursive
+    aws s3 ls s3://$BUCKET/output/ --recursive --region $REGION
     ```
     Output (three objects, with your own job id, timestamps and sizes):
     ```
@@ -85,7 +87,7 @@ Important: this application uses various AWS services and there are costs associ
     The path segment immediately after `output/` is the job id, `544dcfa2-fbf6-4018-b72c-52a2b552c121` in the listing above. Bedrock Data Automation writes the zero-byte `.s3_access_check` object as soon as the job starts, so a listing that shows only that object means the extraction is still running; wait and list again. `job_metadata.json` records the job status and where the job wrote its output.
 1. Read the structured result. Replace `JOB_ID` with the job id from step 2:
     ```bash
-    aws s3 cp s3://$BUCKET/output/JOB_ID/0/standard_output/0/result.json -
+    aws s3 cp s3://$BUCKET/output/JOB_ID/0/standard_output/0/result.json - --region $REGION
     ```
     The command prints the whole result as one line of JSON, which begins:
     ```
@@ -118,7 +120,7 @@ Edit the `BDAProject` resource in `template.yaml`:
 If no job starts, or `output/` stays empty, the function log group holds the reason. The function logs one line per record: a `Started BDA job ...` line, a `Skipping ...` line for a folder marker or an empty object, or an `ERROR starting BDA job ...` line with the object key and the Bedrock Data Automation error code. Use the `LogGroupName` output from the deployment:
 
 ```
-aws logs tail LOG_GROUP_NAME --since 10m
+aws logs tail LOG_GROUP_NAME --since 10m --region $REGION
 ```
 
 A record that fails makes the function raise, so AWS Lambda runs the invocation two more times by default before discarding the event (see [How Lambda handles errors and retries with asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html)), and the failure also shows in the function `Errors` metric in Amazon CloudWatch. The most common cause is an unsupported file format (see [Prerequisites for using Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-limits.html)).
@@ -127,19 +129,32 @@ If you deploy in a Region the inference profile does not cover, the stack does n
 
 ## Cleanup
 
-1. Empty the Amazon S3 bucket (the bucket must be empty before CloudFormation can delete it). Replace `BUCKET_NAME` with the `DataBucketName` output:
+If you are in a new shell, set the variables again, replacing `REGION_NAME` with the Region you deployed to, `BUCKET_NAME` with the `DataBucketName` output and `STACK_NAME` with your stack name:
+
+```bash
+REGION=REGION_NAME
+BUCKET=BUCKET_NAME
+STACK=STACK_NAME
+```
+
+1. Empty the Amazon S3 bucket (the bucket must be empty before AWS CloudFormation can delete it)
     ```bash
-    BUCKET=BUCKET_NAME
-    aws s3 rm s3://$BUCKET --recursive
+    aws s3 rm s3://$BUCKET --recursive --region $REGION
     ```
 1. Delete the stack
     ```bash
-    sam delete --stack-name STACK_NAME
+    aws cloudformation delete-stack --stack-name $STACK --region $REGION
+    aws cloudformation wait stack-delete-complete --stack-name $STACK --region $REGION
     ```
 1. Confirm the stack has been deleted
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    aws cloudformation list-stacks --region $REGION --query "StackSummaries[?contains(StackName,'$STACK')].StackStatus"
     ```
+1. Remove the local files that `sam build` and `sam deploy --guided` created in the pattern directory
+    ```bash
+    rm -rf .aws-sam samconfig.toml
+    ```
+    The AWS SAM CLI uploads build artifacts to its own managed Amazon S3 bucket, named `aws-sam-cli-managed-default-...`, which every AWS SAM deployment in the account and Region shares, so this cleanup leaves that bucket in place.
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.

@@ -60,7 +60,9 @@ def handler(event, context):
     if failed:
         # Amazon S3 invokes this function asynchronously. Raising keeps the Lambda
         # asynchronous retry behavior for the failed records and makes the failure
-        # visible in the function Errors metric instead of hiding it.
+        # visible in the function Errors metric instead of hiding it. In practice
+        # Amazon S3 delivers one record per event notification, so the retry replays
+        # only the object that failed, not a batch that already started jobs.
         raise RuntimeError("Failed to start BDA jobs for: " + ", ".join(failed))
 
     return {"startedInvocations": started}

@@ -70,60 +70,13 @@ Resources:
               State: DISABLED
 
   # Owned by the stack rather than created implicitly by the Lambda service, so that
-  # sam delete removes it and no log group is left behind. CloudFormation generates
-  # the name, which keeps a second deployment in the same account from colliding.
+  # deleting the stack removes it and no log group is left behind. CloudFormation
+  # generates the name, which keeps a second deployment in the same account from
+  # colliding. Logs expire after 7 days; raise RetentionInDays to keep them longer.
   StartBdaFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
-
-  StartBdaFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        # Grants only the CloudWatch Logs actions the Lambda service needs to write
-        # the function log stream.
-        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-      Policies:
-        - PolicyName: BdaAndS3Access
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              # Bedrock Data Automation reads the input object and writes the
-              # extraction output using this role, so the role needs both actions on
-              # the bucket even though the function itself never calls Amazon S3.
-              # See https://docs.aws.amazon.com/bedrock/latest/userguide/s3-bucket-access.html
-              - Sid: S3ReadWrite
-                Effect: Allow
-                Action:
-                  - s3:GetObject
-                  - s3:PutObject
-                Resource: !Sub "arn:${AWS::Partition}:s3:::${DataBucketName}/*"
-              # Scoped to the one project this stack creates.
-              - Sid: InvokeBdaProject
-                Effect: Allow
-                Action: bedrock:InvokeDataAutomationAsync
-                Resource: !GetAtt BDAProject.ProjectArn
-              # InvokeDataAutomationAsync also authorizes against the inference
-              # profile. us.data-automation-v1 is a cross-Region (US geography)
-              # profile, so the documented policy enumerates the four US Regions the
-              # profile can route to rather than wildcarding the Region:
-              # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html
-              - Sid: InvokeBdaProfile
-                Effect: Allow
-                Action: bedrock:InvokeDataAutomationAsync
-                Resource:
-                  - !Sub "arn:${AWS::Partition}:bedrock:us-east-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
-                  - !Sub "arn:${AWS::Partition}:bedrock:us-east-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
-                  - !Sub "arn:${AWS::Partition}:bedrock:us-west-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
-                  - !Sub "arn:${AWS::Partition}:bedrock:us-west-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
 
   StartBdaFunction:
     Type: AWS::Serverless::Function
@@ -136,9 +89,50 @@ Resources:
         - arm64
       Timeout: 30
       MemorySize: 128
-      Role: !GetAtt StartBdaFunctionRole.Arn
       LoggingConfig:
         LogGroup: !Ref StartBdaFunctionLogGroup
+      # Inline statements rather than a named AWS SAM policy template: the templates
+      # that come closest (S3ReadPolicy, S3CrudPolicy) grant more actions on a wider
+      # resource than this pattern needs, and none of them covers Bedrock Data
+      # Automation. AWS SAM appends these statements to the function default execution
+      # role, which already carries the AWS managed basic execution policy for the
+      # CloudWatch Logs actions the Lambda service needs.
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            # Bedrock Data Automation reads the input object and writes the extraction
+            # output using this role, so the role needs both actions on the bucket even
+            # though the function itself never calls Amazon S3.
+            # See https://docs.aws.amazon.com/bedrock/latest/userguide/s3-bucket-access.html
+            - Sid: S3ReadInput
+              Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub "arn:${AWS::Partition}:s3:::${DataBucketName}/input/*"
+            # The output/ prefix here must match the OUTPUT_PREFIX environment variable
+            # below, which is the location the function hands to Bedrock Data
+            # Automation. Change one and you must change the other.
+            - Sid: S3WriteOutput
+              Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub "arn:${AWS::Partition}:s3:::${DataBucketName}/output/*"
+            # Scoped to the one project this stack creates.
+            - Sid: InvokeBdaProject
+              Effect: Allow
+              Action: bedrock:InvokeDataAutomationAsync
+              Resource: !GetAtt BDAProject.ProjectArn
+            # InvokeDataAutomationAsync also authorizes against the inference profile.
+            # us.data-automation-v1 is a cross-Region (US geography) profile, so the
+            # documented policy enumerates the four US Regions the profile can route to
+            # rather than wildcarding the Region:
+            # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html
+            - Sid: InvokeBdaProfile
+              Effect: Allow
+              Action: bedrock:InvokeDataAutomationAsync
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:us-east-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-east-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-west-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-west-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
       Environment:
         Variables:
           BDA_PROJECT_ARN: !GetAtt BDAProject.ProjectArn
