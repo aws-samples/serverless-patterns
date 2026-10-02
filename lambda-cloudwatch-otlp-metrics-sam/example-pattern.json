@@ -1,0 +1,50 @@
+{
+    "title": "Send custom AWS Lambda metrics to Amazon CloudWatch over OTLP",
+    "description": "Record custom metrics in AWS Lambda with the OpenTelemetry metrics API and send them to the Amazon CloudWatch OTLP endpoint via the ADOT layer.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "patternArch": {
+        "icon1": { "x": 30, "y": 50, "service": "lambda", "label": "AWS Lambda with ADOT layer" },
+        "icon2": { "x": 70, "y": 50, "service": "cloudwatch", "label": "Amazon CloudWatch OTLP endpoint" },
+        "line1": { "from": "icon1", "to": "icon2", "label": "OTLP over HTTP, SigV4 signed" }
+    },
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Teams that need custom business metrics from AWS Lambda have had two options, and both cost something. Calling PutMetricData adds a synchronous AWS API call to the invocation and caps you at 30 dimensions per metric. Writing embedded metric format logs avoids the API call but bills you for log ingestion plus a monthly charge for every unique metric and dimension combination, which gets expensive as cardinality grows. Amazon CloudWatch now accepts OpenTelemetry metrics directly over the OpenTelemetry Protocol (OTLP), and this pattern shows how to send them from a Lambda function without either of those trade-offs.",
+            "The template deploys a Python function with the AWS Distro for OpenTelemetry (ADOT) Lambda layer attached and a small collector configuration bundled with the function code. The layer starts a reduced OpenTelemetry collector alongside the function. The function records metrics using only the OpenTelemetry metrics API, the collector receives them over local OTLP, signs each request with AWS Signature Version 4 (SigV4), and forwards them to the CloudWatch OTLP metrics endpoint. The function code contains no AWS SDK calls for metrics and performs no request signing, and beyond basic Lambda logging permissions the only permission it needs is cloudwatch:PutMetricData.",
+            "Two details make the OTLP path attractive beyond convenience. There is no per series charge, so wide, high cardinality metrics are billed on ingested volume rather than on the number of unique dimension combinations. The endpoint also accepts up to 150 labels per data point against the 30 dimensions allowed by PutMetricData, so you can attach far richer context to each data point. Label values should still be bounded: the CloudWatch documentation asks you to keep label cardinality reasonable and to avoid request IDs or UUIDs as label values, and new series creation is capped at 1,000,000 in a 10 minute window.",
+            "The pattern captures the practical details that are easy to get wrong. The collector build inside the ADOT Lambda layer is compiled without processors, so naming one such as batch stops the collector from starting and nothing is exported at all. Lambda freezes the execution environment the moment the handler returns, so the function flushes the meter provider before returning rather than waiting for the next periodic export. Metrics sent this way are queried with Prometheus Query Language (PromQL) in Query Studio instead of appearing in the classic CloudWatch metrics console, and the counter is cumulative per execution environment, so the README shows the sum query that adds the series up. The stack owns the function log group so that cleanup leaves nothing behind.",
+            "Good fits include business and product metrics such as orders, signups, or revenue, per tenant metrics in multi tenant applications where cardinality is high, and any team already standardized on OpenTelemetry that wants CloudWatch as the backend without running a separate collector gateway."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-cloudwatch-otlp-metrics-sam",
+            "templateURL": "serverless-patterns/lambda-cloudwatch-otlp-metrics-sam",
+            "projectFolder": "lambda-cloudwatch-otlp-metrics-sam",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            { "text": "Publish custom metrics with OpenTelemetry", "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-send.html" },
+            { "text": "Amazon CloudWatch OTLP endpoints and limits", "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html" },
+            { "text": "AWS Distro for OpenTelemetry Lambda support for Python", "link": "https://aws-otel.github.io/docs/getting-started/lambda/lambda-python" },
+            { "text": "Query Amazon CloudWatch metrics with PromQL", "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-PromQL.html" },
+            { "text": "OpenTelemetry metrics API for Python", "link": "https://opentelemetry.io/docs/languages/python/instrumentation/" }
+        ]
+    },
+    "deploy": { "text": [ "sam build", "sam deploy --guided" ] },
+    "testing": {
+        "headline": "Testing",
+        "text": [ "Invoke the function a few times with the test event in events/order.json, wait one to two minutes, then query the counter with PromQL using the signed request script in the pattern folder, or in Query Studio in the CloudWatch console. See the README for detailed instructions." ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [ "Delete the stack with <code>aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION</code>, wait for it with <code>aws cloudformation wait stack-delete-complete</code> and confirm it with <code>aws cloudformation list-stacks</code>, then delete the local out.json response file and the .aws-sam build directory. The shared AWS SAM CLI managed artifacts bucket and the optional account and Region wide enrichment settings are not created by the stack and are left in place." ]
+    },
+    "authors": [ { "name": "Manish S", "image": "", "bio": "AWS Support Engineer, trying to build things", "linkedin": "manish-s-84199221b", "twitter": "" } ]
+}
