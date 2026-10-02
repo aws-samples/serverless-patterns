@@ -1,0 +1,69 @@
+{
+  "title": "Amazon DynamoDB Streams to AWS Lambda Durable Function",
+  "description": "Change data capture pipeline using DynamoDB Streams and Lambda durable functions with checkpointed validate, enrich, and notify steps.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern processes DynamoDB stream events through a multi-step pipeline using Lambda durable functions.",
+      "When items are written to the source DynamoDB table, streams trigger a durable function that validates, enriches, and sends notifications for each record.",
+      "Each step is checkpointed. If the function is interrupted during processing, it resumes from the last checkpoint without re-executing completed steps.",
+      "Uses ReportBatchItemFailures for partial batch error handling so successfully processed records are not retried.",
+      "The function is deployed with AutoPublishAlias to meet the qualified ARN requirement for event source mappings with durable functions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-ddb-streams-python-sam",
+      "templateURL": "serverless-patterns/lambda-durable-ddb-streams-python-sam",
+      "projectFolder": "lambda-durable-ddb-streams-python-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Using Lambda with DynamoDB Streams",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html"
+      },
+      {
+        "text": "Durable Execution SDK for Python",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-python"
+      },
+      {
+        "text": "Reporting batch item failures for DynamoDB Streams",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-ddb-batchfailurereporting"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ajaya Shrestha",
+      "image": "",
+      "bio": "Cloud Support Engineer at AWS specializing in Lambda and serverless architectures.",
+      "linkedin": ""
+    }
+  ]
+}
