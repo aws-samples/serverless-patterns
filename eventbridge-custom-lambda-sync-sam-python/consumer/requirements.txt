@@ -1,0 +1,2 @@
+# The consumer needs no third-party packages at deploy time: boto3 is provided
+# by the Lambda runtime. (Tests install boto3 + moto locally; see the README.)
