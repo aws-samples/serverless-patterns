@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  SPDX-License-Identifier: MIT-0
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.example.orders</groupId>
+  <artifactId>eventbridge-custom-protobuf-sam-java</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <aws.sdk.version>2.55.6</aws.sdk.version>
+    <protobuf.version>4.29.3</protobuf.version>
+    <jackson.version>2.22.3</jackson.version>
+    <commons.lang3.version>3.18.0</commons.lang3.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws.sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Pin the whole Jackson family (databind + transitive jackson-core) to a
+           patched release, clearing the known jackson CVEs. -->
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Override any transitively pulled commons-lang3 to a patched release
+           (CVE-2025-48924). -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons.lang3.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <!-- eventsv2 (V2 EventBridge event bus): PutRawEvents. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>eventbridgev2</artifactId>
+    </dependency>
+    <!-- Glue: resolve the schema-version UUID for the wire header. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>glue</artifactId>
+    </dependency>
+
+    <!-- Protobuf runtime for the generated OrderPlaced/OrderItem classes. -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
+    </dependency>
+
+    <!-- Lambda handler interfaces (consumer). -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-lambda-java-core</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
+    <!-- JSON for the delivered-event handling in the consumer.
+         Version is managed by the imported jackson-bom above. -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <!-- Tests: JUnit 5 + Mockito. -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.14.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>5.14.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <extensions>
+      <!-- Detects the OS/arch classifier (e.g. osx-aarch_64) so the protobuf
+           plugin can download the matching protoc binary. -->
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.1</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.2</version>
+      </plugin>
+
+      <!-- Generates Java protobuf classes from src/main/proto/*.proto by
+           downloading the matching protoc. Runs in generate-sources. -->
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+          <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Shade builds a fat jar so the Lambda has the SDK + protobuf runtime on
+           its classpath and the publisher CLI can run with `java -jar`. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>com.example.orders.Publisher</mainClass>
+            </transformer>
+          </transformers>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
