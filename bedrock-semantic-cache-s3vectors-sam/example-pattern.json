@@ -1,0 +1,69 @@
+{
+  "title": "Serverless semantic cache for Amazon Bedrock using Amazon S3 Vectors",
+  "description": "Cache Amazon Bedrock answers by meaning: AWS Lambda checks Amazon S3 Vectors for a similar prompt and skips the model on a hit.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "patternArch": {
+    "icon1": { "x": 20, "y": 50, "service": "lambda", "label": "AWS Lambda (semantic cache)" },
+    "icon2": { "x": 55, "y": 30, "service": "bedrock", "label": "Amazon Bedrock (embeddings and text model)" },
+    "icon3": { "x": 55, "y": 70, "service": "s3", "label": "Amazon S3 Vectors (cache store)" },
+    "line1": { "from": "icon1", "to": "icon2" },
+    "line2": { "from": "icon1", "to": "icon3" }
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Large language model (LLM) calls are slow and expensive, yet a large share of production prompts are paraphrases of prompts that were already answered. This pattern places an AWS Lambda function in front of Amazon Bedrock that returns a cached answer whenever an incoming prompt is semantically similar to a previous one, so the LLM call is skipped on repeats and near repeats.",
+      "When a request arrives, the Lambda function embeds the prompt with an Amazon Bedrock embeddings model (Amazon Titan Text Embeddings V2, 1024 dimensions). It then queries an Amazon S3 Vectors index for the nearest stored prompts using cosine similarity. Amazon S3 Vectors returns the closest matches together with their distance and metadata in a single call, and the cached answer is stored directly in that metadata, so no separate database is required.",
+      "On a cache hit (cosine similarity at or above a configurable threshold, the entry still within its freshness TTL, the entry carrying the current cache epoch, and the entry passing a negation parity guard) the function returns the stored answer in milliseconds with no LLM cost. On a miss, the function calls the Amazon Bedrock text model with the Converse API to generate the answer, stores the prompt embedding plus the answer, model, timestamp and epoch back into Amazon S3 Vectors, and returns the fresh result.",
+      "Correctness is designed, not assumed. A tunable similarity threshold trades precision for hit rate. A freshness TTL bounds staleness. A one call force invalidation bumps a global epoch stored in AWS Systems Manager Parameter Store, so every previously cached answer instantly becomes a miss without deleting or scanning anything, which suits a policy or data change that cannot wait for the TTL. A negation parity guard prevents the classic semantic cache trap where a prompt and its negation ('is X' versus 'is NOT X') embed almost identically but mean the opposite. The query retrieves the top 5 candidates and iterates them, so a stale or invalidated near neighbour never blocks a valid hit.",
+      "Amazon S3 Vectors is what makes this economical and fully serverless: vector storage and search charged per use, with nothing provisioned, instead of an always on vector database. The AWS Lambda function is stateless, because the cache persists entirely in Amazon S3 Vectors and therefore survives cold starts, redeploys and execution environment recycling. Access is over a Lambda function URL with the AWS_IAM auth type, plus an optional application level API key read at runtime from an AWS Systems Manager Parameter Store SecureString. The function role follows least privilege: bedrock:InvokeModel is scoped to foundation models, the only Amazon S3 Vectors actions granted are QueryVectors, GetVectors and PutVectors scoped to the indexes of the vector bucket the stack creates, and ssm:GetParameter with ssm:PutParameter is scoped to the single epoch parameter.",
+      "The answer model is a deployment parameter and is never taken from the request body, because the cache key is the prompt embedding alone. The embeddings model is a parameter too, although any model that is not a 1024 dimension Amazon Titan Text Embeddings model also needs the index dimension and the embeddings request body changed. Best fit: FAQ and support assistants, documentation question answering, and high traffic assistants where users ask the same things in different words. It is not intended for answers that must be exact, fresh or specific to one user unless it is combined with per user namespacing, aggressive invalidation, or an equivalence verification step.",
+      "This is distinct from the prompt caching that Amazon Bedrock offers natively: native prompt caching reuses an exact prompt prefix, while this pattern matches on meaning and skips the model entirely. The two complement each other."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-semantic-cache-s3vectors-sam",
+      "templateURL": "serverless-patterns/bedrock-semantic-cache-s3vectors-sam",
+      "projectFolder": "bedrock-semantic-cache-s3vectors-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Working with S3 Vectors and vector buckets", "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html" },
+      { "text": "Amazon S3 Vectors limitations and restrictions", "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html" },
+      { "text": "Amazon Titan Text Embeddings models", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html" },
+      { "text": "Amazon Bedrock prompt caching (native, prefix based), which complements this pattern", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html" },
+      { "text": "Control access to Lambda function URLs", "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html" }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions: a miss, an exact repeat hit, a semantic hit, the negation guard, and force invalidation. Set <code>REGION</code> to the Region you deployed to, because every command passes <code>--region $REGION</code>."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION</code>, then <code>aws cloudformation wait stack-delete-complete --stack-name STACK_NAME --region $REGION</code>. This also removes the Amazon S3 Vectors index and vector bucket, the epoch parameter and the log group.",
+      "2. Confirm with <code>aws cloudformation list-stacks --region $REGION --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. If you created the optional API key parameter, delete it: <code>aws ssm delete-parameter --name /semantic-cache/api-key --region $REGION</code>, then delete the local <code>response.json</code> written during testing. The shared AWS SAM CLI artifacts bucket is left in place."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manish S",
+      "image": "",
+      "bio": "AWS Support Engineer, trying to build things",
+      "linkedin": "manish-s-84199221b",
+      "twitter": ""
+    }
+  ]
+}
