@@ -21,7 +21,13 @@ Parameters:
   VectorIndex:
     Type: String
     Default: prompt-cache
-    Description: Name of the Amazon S3 Vectors index created by this template inside the vector bucket.
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$"
+    Description: >
+      Name of the Amazon S3 Vectors index created by this template inside the vector
+      bucket. Index names must be 3 to 63 characters and unique within the vector
+      bucket. Valid characters are lowercase letters, numbers, hyphens and dots.
   SimThreshold:
     Type: String
     Default: "0.85"
@@ -43,7 +49,12 @@ Parameters:
   EmbedModel:
     Type: String
     Default: amazon.titan-embed-text-v2:0
-    Description: Amazon Bedrock embeddings model used for semantic matching (must match the index dimension).
+    Description: >
+      Amazon Bedrock embeddings model used for semantic matching. Only an Amazon Titan
+      Text Embeddings model that returns 1024 dimensions works without editing this
+      template and the function code: the index below is created with Dimension 1024,
+      and the handler sends the Amazon Titan request body {"inputText": ...}. Any other
+      model needs both of those changed as well.
   LlmModel:
     Type: String
     Default: amazon.nova-lite-v1:0
@@ -134,7 +145,8 @@ Resources:
               Effect: Allow
               Action: bedrock:InvokeModel
               Resource: !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
-            # Only the three actions cache.py actually calls. GetVectors is required
+            # Only the three actions cache.py actually calls, and all three are index
+            # level operations, so the index ARN alone is enough. GetVectors is required
             # because QueryVectors is called with returnMetadata set to true.
             # https://docs.aws.amazon.com/AmazonS3/latest/API/API_S3VectorBuckets_QueryVectors.html
             - Sid: S3Vectors
@@ -143,9 +155,7 @@ Resources:
                 - s3vectors:QueryVectors
                 - s3vectors:GetVectors
                 - s3vectors:PutVectors
-              Resource:
-                - !GetAtt VectorBucket.VectorBucketArn
-                - !Sub "${VectorBucket.VectorBucketArn}/index/*"
+              Resource: !Sub "${VectorBucket.VectorBucketArn}/index/*"
             # Scoped to the single epoch parameter this stack owns. PutParameter is needed
             # because the invalidate action bumps the epoch value.
             - Sid: EpochParam

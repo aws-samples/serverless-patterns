@@ -72,7 +72,8 @@ Important: this application uses various AWS services and there are costs associ
 2. It embeds the prompt with Amazon Titan Text Embeddings V2, whose default output vector size is 1,024 dimensions, which is why the Amazon S3 Vectors index is created with `Dimension: 1024` and `DistanceMetric: cosine`.
 3. It queries the Amazon S3 Vectors index for the 5 nearest stored prompts, asking for the distance and the metadata in the same call. Because the answer is kept in the metadata, one query returns both the match and the text to serve.
 4. A candidate is served as a HIT only if all of these hold: cosine similarity (1 minus the returned distance) is at or above the threshold, the entry is younger than `TTL_SECONDS`, the entry carries the current cache epoch, and the candidate has the same negation parity as the incoming prompt.
-5. On a MISS the function calls the Amazon Bedrock text model with the Converse API, stores the embedding plus the answer, model, timestamp and epoch in Amazon S3 Vectors, and returns the fresh answer.
+5. On a MISS the function calls the Amazon Bedrock text model with the Converse API, stores the embedding plus the answer, model, timestamp and epoch in Amazon S3 Vectors, and returns the fresh answer. Caching is best effort: if the entry would exceed the Amazon S3 Vectors metadata limit, or the write fails, the function logs it and still returns the answer with `cached` false.
+6. The stack owns the CloudWatch Logs log group and keeps log events for 7 days. Change `RetentionInDays` on the `SemanticCacheLogGroup` resource in template.yaml to keep them for longer or shorter.
 
 Why each service is there:
 
@@ -91,13 +92,15 @@ Correctness controls:
 
 ## Testing
 
-1. Set a shell variable to the `FunctionName` output from the deployment, for example:
+1. Set shell variables for the Region you deployed to and for the `FunctionName` output from the deployment, for example:
     ```
+    REGION=us-east-1
     FUNCTION=semantic-cache-SemanticCacheFunction-abc123DEF456
     ```
+    Every command below passes `--region $REGION`, so these steps work whatever your configured default Region is.
 1. Send a prompt. This is the first time it is asked, so it is a MISS and the answer comes from the model:
     ```
-    aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
+    aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
     python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
     The first command prints the invoke result and the second prints the function response without the long answer text:
@@ -112,7 +115,7 @@ Correctness controls:
     `latency_ms` and the wording of the answer vary from run to run.
 1. Send the same prompt again. It is now a HIT, served from the cache with no model call:
     ```
-    aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
+    aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
     python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
     ```
@@ -125,7 +128,7 @@ Correctness controls:
     ```
 1. Ask the same question in different words. This is the semantic hit: the text does not match, the meaning does, and `matched_prompt` shows which entry was served:
     ```
-    aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"Which city is the capital of France?\"}"}' response.json
+    aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"Which city is the capital of France?\"}"}' response.json
     python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
     ```
@@ -138,7 +141,7 @@ Correctness controls:
     ```
 1. Negate the question. The wording is close enough to pass the similarity threshold, but the negation parity guard rejects the candidate, so this is a MISS and the model answers the question that was actually asked:
     ```
-    aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"Which city is not the capital of France?\"}"}' response.json
+    aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"Which city is not the capital of France?\"}"}' response.json
     python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
     ```
@@ -151,7 +154,7 @@ Correctness controls:
     ```
 1. Force invalidate the whole cache. This bumps the epoch held in AWS Systems Manager Parameter Store:
     ```
-    aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"action\":\"invalidate\"}"}' response.json
+    aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"action\":\"invalidate\"}"}' response.json
     python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
     ```
@@ -164,7 +167,7 @@ Correctness controls:
     ```
 1. Ask the first question once more. Every entry cached under the previous epoch now misses, so the model answers again and the entry is re-cached under the new epoch. An execution environment that has not refreshed its cached epoch yet, which it does at most every 30 seconds, can still serve one hit:
     ```
-    aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
+    aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
     python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
     ```
@@ -178,63 +181,80 @@ Correctness controls:
 1. To read the function logs, use the `LogGroupName` output. The stack owns this log group, so it is deleted with the stack:
     ```
     LOG_GROUP=semantic-cache-SemanticCacheLogGroup-abc123DEF456
-    aws logs tail $LOG_GROUP --since 10m
+    aws logs tail $LOG_GROUP --since 10m --region $REGION
     ```
 
-In the runs above, a cache hit answered in roughly 190 to 280 ms while a miss took roughly 1.0 to 2.5 s, because the miss includes the model call. Your own figures will depend on the models, the Region and the prompt length.
+In the runs above, a cache hit answered in roughly 180 to 380 ms while a miss took roughly 0.9 to 2.5 s, because the miss includes the model call. Your own figures will depend on the models, the Region and the prompt length.
 
 ## Tuning
 
 | Setting | Where | Effect |
 |---|---|---|
-| Similarity threshold | `SimThreshold` parameter, `SIM_THRESHOLD` environment variable, or a `threshold` field in the request | Higher is stricter: fewer hits, less risk of serving a near miss |
+| Similarity threshold | `SimThreshold` parameter, `SIM_THRESHOLD` environment variable, or a `threshold` field in the request | Higher is stricter: fewer hits, less risk of serving a near miss. A request `threshold` that is not a number between 0 and 1 is rejected with 400 |
 | Freshness | `TtlSeconds` parameter, `TTL_SECONDS` environment variable | Maximum age of an answer that may be served |
 | Force invalidation | `{"action":"invalidate"}` in the request body | Makes every earlier entry miss at once |
-| Models | `EmbedModel` and `LlmModel` parameters | Swap the embeddings model or the answer model. A different embeddings model usually means a different vector size, which requires a new index |
+| Answer model | `LlmModel` parameter, `LLM_MODEL` environment variable | Fixed per deployment. The model is not read from the request body, because the cache key is the prompt embedding alone |
+| Models | `EmbedModel` and `LlmModel` parameters | Swap the embeddings model or the answer model. `LlmModel` can be changed on its own. `EmbedModel` only accepts an Amazon Titan Text Embeddings model that returns 1024 dimensions unless you also edit the template and the handler, as described below |
+
+Only an Amazon Titan Text Embeddings model that returns 1024 dimensions works out of the box. Any other embeddings model needs two edits: `Dimension` on the `VectorIndexResource` resource in template.yaml, to match the vector size the model returns, and the request body that `embed()` in `src/cache.py` sends, because `{"inputText": ...}` is the Amazon Titan format. A new vector size also means a new index, since the dimension of an existing index cannot be changed.
 
 ## Optional: application level API key
 
 The function URL already requires IAM authentication. If you also want an application level key checked against the `x-api-key` header, create the key as a SecureString parameter first and then pass only the parameter name to the stack. The value is read at runtime with decryption and is never placed in a Lambda environment variable.
 
 ```
-aws ssm put-parameter --name /semantic-cache/api-key --value "your-secret-key" --type SecureString
+aws ssm put-parameter --region $REGION --name /semantic-cache/api-key --value "your-secret-key" --type SecureString
 ```
 
 Then deploy with `ApiKeyParameterName` set to `/semantic-cache/api-key` (the name must start with a forward slash), and send the header with each request:
 
 ```
-aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"headers":{"x-api-key":"your-secret-key"},"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
+aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"headers":{"x-api-key":"your-secret-key"},"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
 ```
 
 A request with a missing or wrong key returns `{"statusCode": 401, ... "body": "{\"error\": \"unauthorized\"}"}`.
 
-The check fails closed. If a key is configured but the function cannot read it (the parameter was deleted, the role lost access, or the read was throttled), every request returns `{"statusCode": 503, ... "body": "{\"error\": \"api key unavailable\"}"}` instead of skipping authentication, and the reason is written to the function log group.
+The check fails closed. If a key is configured but the function cannot read it (the parameter was deleted, the role lost access, or the read was throttled), every request returns `{"statusCode": 503, ... "body": "{\"error\": \"api key unavailable\"}"}` instead of skipping authentication, and the reason is written to the function log group. The cache epoch is treated the same way: if it cannot be read, the request returns `{"statusCode": 503, ... "body": "{\"error\": \"cache epoch unavailable\"}"}` rather than serving entries that a force invalidation may already have retired.
+
+The key is read once per execution environment and kept for its lifetime, so rotating the SecureString value takes effect as environments are recycled rather than on the next request.
 
 ## Notes
 
 * The function uses only the AWS SDK for Python (Boto3) that ships with the Python 3.13 managed runtime, so there is no `requirements.txt` and no build step.
 * Amazon S3 Vectors allows up to 40 KB of metadata per vector, so a very long answer cannot be cached as metadata. See [Limitations and restrictions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html). The answer, prompt, model, timestamp and epoch are declared as non-filterable metadata keys so that they do not consume the smaller filterable metadata budget.
 * Semantic caching serves an answer that was written for a similar prompt, not the same prompt. It suits FAQ and support assistants, documentation question answering and other repetitive traffic. It does not suit answers that must be exact, fresh or specific to one user unless you also namespace entries per user, invalidate aggressively or verify equivalence before serving.
-* The negation parity guard covers negation words. It does not catch opposites such as "cheapest" and "most expensive". For high stakes content, raise the threshold or verify a borderline candidate before serving it.
+* The negation parity guard covers ASCII English negation words, because the tokenizer keeps only ASCII letters. It does not catch opposites such as "cheapest" and "most expensive". For high stakes content, raise the threshold or verify a borderline candidate before serving it.
+* The function role allows `bedrock:InvokeModel` on `foundation-model/*`. In a Region where the model you want is reachable only through a cross Region inference profile (for example `us.amazon.nova-lite-v1:0`), set `LlmModel` to the inference profile id and add the inference profile ARN to the `BedrockInvoke` statement in template.yaml, keeping the foundation model ARN as well: "When you specify an inference profile in the Resource field in the first statement, you must also specify the foundation model in each Region associated with it." See [Prerequisites for inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-prereq.html).
 
 ## Cleanup
 
+1. If you are working in a new shell, set the Region again, and use the stack name you deployed in place of STACK_NAME:
+    ```bash
+    REGION=us-east-1
+    ```
 1. Delete the stack, which also deletes the Lambda function, its execution role, the log group, the epoch parameter, and the Amazon S3 Vectors index and vector bucket with the cached vectors in them:
     ```bash
-    sam delete --stack-name STACK_NAME
+    aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION
+    ```
+1. Wait for the deletion to complete:
+    ```bash
+    aws cloudformation wait stack-delete-complete --stack-name STACK_NAME --region $REGION
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --region $REGION --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 1. If you created the optional API key parameter, delete it:
     ```bash
-    aws ssm delete-parameter --name /semantic-cache/api-key
+    aws ssm delete-parameter --name /semantic-cache/api-key --region $REGION
     ```
 1. Delete the response file written by the Testing commands:
     ```bash
     rm response.json
     ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
+
+The Amazon S3 bucket that the AWS SAM CLI uses for deployment artifacts is shared by every AWS SAM deployment in the account and Region, so it is deliberately left in place.
+
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
