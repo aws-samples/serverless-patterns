@@ -11,6 +11,8 @@ Usage:
 """
 import json
 import sys
+import urllib.parse
+import urllib.request
 
 import botocore.session
 from botocore.auth import SigV4Auth
@@ -27,7 +29,9 @@ def main():
         sys.exit('no AWS Region configured, pass it as the second argument')
 
     url = 'https://monitoring.%s.amazonaws.com/api/v1/query' % region
-    body = 'query=%s' % query
+    # The body must be form encoded, otherwise a query containing "+" or "&" is
+    # mangled by the endpoint and comes back as an invalid PromQL query.
+    body = urllib.parse.urlencode({'query': query})
     request = AWSRequest(
         method='POST',
         url=url,
@@ -36,7 +40,6 @@ def main():
     )
     SigV4Auth(session.get_credentials(), 'monitoring', region).add_auth(request)
 
-    import urllib.request
     prepared = urllib.request.Request(
         url, data=body.encode('utf-8'), headers=dict(request.headers), method='POST'
     )

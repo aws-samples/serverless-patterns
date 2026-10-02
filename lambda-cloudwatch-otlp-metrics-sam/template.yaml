@@ -26,39 +26,11 @@ Resources:
   # the logs. A log group that AWS Lambda creates implicitly is not part of the
   # stack and survives stack deletion. No LogGroupName is set, so CloudFormation
   # generates a unique name and two stacks can coexist in one account.
+  # Logs are kept for 7 days; change RetentionInDays to keep them for longer.
   MetricsFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
-
-  MetricsFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        # Basic Lambda logging permissions. The collector writes its own startup and
-        # export diagnostics to the same log group, which the README uses for
-        # troubleshooting.
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        - PolicyName: PublishOtlpMetrics
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              # cloudwatch:PutMetricData on Resource "*" is the policy AWS publishes for
-              # the CloudWatch OTLP metrics endpoint, which does not support resource
-              # level permissions. See the "IAM permissions required" section of
-              # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-send.html
-              - Sid: PublishMetrics
-                Effect: Allow
-                Action: cloudwatch:PutMetricData
-                Resource: "*"
 
   MetricsFunction:
     Type: AWS::Serverless::Function
@@ -73,7 +45,15 @@ Resources:
         - x86_64
       Timeout: 30
       MemorySize: 256
-      Role: !GetAtt MetricsFunctionRole.Arn
+      Policies:
+        # CloudWatchPutMetricPolicy expands to cloudwatch:PutMetricData on Resource "*",
+        # which is exactly the policy AWS publishes for the CloudWatch OTLP metrics
+        # endpoint, because that endpoint does not support resource level permissions.
+        # See the "IAM permissions required" section of
+        # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-send.html
+        # AWS SAM adds AWSLambdaBasicExecutionRole on top, which is what lets the
+        # function and the collector write the diagnostics the README troubleshoots with.
+        - CloudWatchPutMetricPolicy: {}
       LoggingConfig:
         LogGroup: !Ref MetricsFunctionLogGroup
       Layers:

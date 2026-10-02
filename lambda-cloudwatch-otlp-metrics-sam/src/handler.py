@@ -67,6 +67,14 @@ def handler(event, context):
     provider = metrics.get_meter_provider()
     if hasattr(provider, "force_flush"):
         provider.force_flush()
+    else:
+        # Without the ADOT layer and AWS_LAMBDA_EXEC_WRAPPER, the OpenTelemetry API
+        # falls back to a no-op meter provider: the invocation still succeeds but
+        # nothing is ever exported, so say so instead of failing silently.
+        logger.warning(
+            "meter provider %s has no force_flush, metrics are not being exported",
+            type(provider).__name__,
+        )
 
     return {
         "recorded": {"orders.processed": 1, "orders.value": value},

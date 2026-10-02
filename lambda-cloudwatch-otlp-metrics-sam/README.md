@@ -63,7 +63,7 @@ Important: this application uses various AWS services and there are costs associ
 * The collector signs each request with SigV4 (signing name `monitoring`) and forwards it to the CloudWatch OTLP metrics endpoint, `https://monitoring.<region>.amazonaws.com/v1/metrics`.
 * Beyond basic Lambda logging permissions, the only permission the function needs is `cloudwatch:PutMetricData`.
 * The function flushes the meter provider before returning, because Lambda freezes the execution environment as soon as the handler returns.
-* The stack owns the function log group, so the function and the collector diagnostics are deleted with the stack.
+* The stack owns the function log group, so the function and the collector diagnostics are deleted with the stack. It keeps them for 7 days; change `RetentionInDays` on the `MetricsFunctionLogGroup` resource in template.yaml to keep them for longer.
 
 ## Testing
 
@@ -137,6 +137,8 @@ Important: this application uses various AWS services and there are costs associ
     }
     ```
 
+    `sum()` is the right operator for this walkthrough because it returns the exact invocation count. For rates over time, use `rate()` or `increase()` on the counter instead, which is what the Supported metric types table in [Publish custom metrics with OpenTelemetry](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-send.html) recommends for counters.
+
     The metric names keep their dots, so they must be selected with `__name__` rather than written directly. Dropping `sum()` shows the labels on each series: `order.channel` and `order.country` from the function, plus resource labels such as `@resource.faas.name`, `@resource.service.name`, `@aws.account` and `@aws.region` that the layer and the endpoint add automatically.
 
     ```bash
@@ -167,6 +169,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * No per series charge. Embedded metric format bills log ingestion plus a monthly charge for every unique metric and dimension combination, which grows with cardinality. OTLP metrics are billed on ingested volume with storage and query access included, per [OTel metrics pricing and storage](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-pricing.html).
 * Up to 150 labels per data point, against the 30 dimensions allowed by PutMetricData, so you can attach much richer context. See the metrics limits table in [OTLP Endpoints](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html).
+* Label values should still be bounded: the Best practices section of [Publish custom metrics with OpenTelemetry](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-send.html) asks you to keep label cardinality reasonable and to avoid request IDs or UUIDs as label values, and the metrics limits table in [OTLP Endpoints](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTLPEndpoint.html) caps new series creation at 1,000,000 in a 10 minute window.
 * No synchronous AWS API call inside the invocation, because the collector handles delivery.
 
 ## Notes
@@ -195,25 +198,34 @@ aws observabilityadmin start-telemetry-enrichment --region $REGION
 aws cloudwatch start-otel-enrichment --region $REGION
 ```
 
-See [Enable resource tags on telemetry](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/EnableResourceTagsOnTelemetry.html) for the permissions each call needs.
+Each call documents its own permissions on its own page: [Enable resource tags on telemetry](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/EnableResourceTagsOnTelemetry.html) requires `observabilityadmin:StartTelemetryEnrichment`, `iam:CreateServiceLinkedRole`, `resource-explorer-2:CreateIndex`, `resource-explorer-2:CreateManagedView` and `resource-explorer-2:CreateStreamingAccessForService`, and [AWS vended metrics in OpenTelemetry format](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-OTelEnrichment.html) requires `cloudwatch:StartOTelEnrichment`.
 
 ## Cleanup
 
+1. If you are in a new shell, set the Region you deployed to again, because every command below passes it explicitly:
+    ```bash
+    REGION=<the Region you deployed to>
+    ```
 1. Delete the stack. This also deletes the function log group, which the stack owns:
     ```bash
-    sam delete --stack-name STACK_NAME
+    aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION
+    ```
+1. Wait for the deletion to finish
+    ```bash
+    aws cloudformation wait stack-delete-complete --stack-name STACK_NAME --region $REGION
+    ```
+1. Confirm the stack has been deleted
+    ```bash
+    aws cloudformation list-stacks --region $REGION --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 1. Delete the local files created while testing:
     ```bash
     rm -f out.json
     rm -rf .aws-sam
     ```
+1. The AWS SAM CLI managed artifacts bucket that `sam deploy --guided` creates is shared by every stack you deploy with AWS SAM in that Region, so it is deliberately not removed here.
 1. The two enrichment settings in the optional section above are account and Region wide, were not created by this stack, and affect other workloads, so leave them alone unless you enabled them only for this walkthrough.
 1. The metric data points that were ingested cannot be deleted. They age out under the included retention described in [OTel metrics pricing and storage](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-pricing.html).
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
