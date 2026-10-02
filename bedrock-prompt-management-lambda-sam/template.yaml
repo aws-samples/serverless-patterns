@@ -52,6 +52,10 @@ Resources:
   # is what publishes a new version from the current draft.
   SummaryPromptVersion:
     Type: AWS::Bedrock::PromptVersion
+    # Keep the previous published version so that it stays available as a rollback target.
+    UpdateReplacePolicy: Retain
+    # The default for stack deletion, stated explicitly: deleting the stack removes the version.
+    DeletionPolicy: Delete
     Properties:
       PromptArn: !GetAtt SummaryPrompt.Arn
       Description: !Sub "Published for prompt revision ${PromptRevision}."
@@ -64,47 +68,6 @@ Resources:
     Properties:
       RetentionInDays: 7
 
-  InvokePromptFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-      Policies:
-        - PolicyName: InvokeManagedPrompt
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              # Converse is called with the prompt version ARN as modelId, so the caller needs
-              # bedrock:RenderPrompt on the prompt and its versions. Amazon Bedrock API Reference,
-              # Converse, "Run inference on a prompt resource from Prompt management": "Check that
-              # you have bedrock:RenderPrompt permissions for the prompt resource."
-              - Sid: RenderManagedPrompt
-                Effect: Allow
-                Action: bedrock:RenderPrompt
-                Resource:
-                  - !GetAtt SummaryPrompt.Arn
-                  - !Sub "${SummaryPrompt.Arn}:*"
-              - Sid: InvokeModel
-                Effect: Allow
-                Action: bedrock:InvokeModel
-                Resource:
-                  # A cross-Region inference profile such as the default us.amazon.nova-lite-v1:0
-                  # routes a request to a Region that Amazon Bedrock selects inside its geography
-                  # ("Route model inference requests across AWS Regions with cross-Region
-                  # inference"), and the request is authorized against the foundation model in the
-                  # Region that serves it, so the foundation-model ARN cannot be pinned to one
-                  # Region. Foundation model ARNs have no account id.
-                  - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
-                  # The profile itself is scoped to exactly the identifier this stack deploys.
-                  - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/${ModelId}"
-
   InvokePromptFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -116,7 +79,34 @@ Resources:
         - arm64
       Timeout: 30
       MemorySize: 128
-      Role: !GetAtt InvokePromptFunctionRole.Arn
+      # AWS SAM adds AWSLambdaBasicExecutionRole to the role it creates. There is no AWS SAM
+      # policy template for bedrock:RenderPrompt, so the two statements below are inline.
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            # Converse is called with the prompt version ARN as modelId, so the caller needs
+            # bedrock:RenderPrompt on the prompt and its versions. Amazon Bedrock API Reference,
+            # Converse, "Run inference on a prompt resource from Prompt management": "Check that
+            # you have bedrock:RenderPrompt permissions for the prompt resource."
+            - Sid: RenderManagedPrompt
+              Effect: Allow
+              Action: bedrock:RenderPrompt
+              Resource:
+                - !GetAtt SummaryPrompt.Arn
+                - !Sub "${SummaryPrompt.Arn}:*"
+            - Sid: InvokeModel
+              Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource:
+                # A cross-Region inference profile such as the default us.amazon.nova-lite-v1:0
+                # routes a request to a Region that Amazon Bedrock selects inside its geography
+                # ("Route model inference requests across AWS Regions with cross-Region
+                # inference"), and the request is authorized against the foundation model in the
+                # Region that serves it, so the foundation-model ARN cannot be pinned to one
+                # Region. Foundation model ARNs have no account id.
+                - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
+                # The profile itself is scoped to exactly the identifier this stack deploys.
+                - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/${ModelId}"
       LoggingConfig:
         LogGroup: !Ref InvokePromptFunctionLogGroup
       Environment:
