@@ -1,0 +1,5 @@
+boto3>=1.34
+# bufbuild protobuf-py: the runtime the generated bindings import (Message,
+# to_binary/from_binary). Also needed to USE the generated module, not just to
+# generate it.
+protobuf-py>=0.5
