@@ -1,1 +1,5 @@
-boto3>=1.35.0
+# Pinned to the version this pattern was built and tested with. The AWS Lambda Python
+# runtime bundles its own AWS SDK for Python (Boto3), but the bundled version varies by runtime
+# version and AWS Region (AWS Lambda Developer Guide, "Runtime-included SDK versions"), so this
+# pattern ships a known version that supports Converse promptVariables for Prompt Management.
+boto3==1.43.107
