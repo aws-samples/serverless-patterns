@@ -1,0 +1,67 @@
+{
+  "title": "Amazon EventBridge enhanced custom event bus to Amazon SQS FIFO queue",
+  "description": "Deliver ordered events from an enhanced custom EventBridge event bus (AWS::EventsV2) to an Amazon SQS FIFO queue using a FIFO subscriber, with AWS SAM.",
+  "language": "YAML",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses the enhanced custom event bus in Amazon EventBridge (the AWS::EventsV2 service) to deliver ordered events to an Amazon SQS FIFO queue. Unlike classic EventBridge, there are no rules or targets: a single Subscriber resource bundles the event filter, the target, the retry policy, and the dead-letter destination.",
+      "The Subscriber is created with Type FIFO, so EventBridge preserves order within an event group (events are grouped by the publisher's EventGroupId at publish time). The subscriber sets the SQS MessageGroupId from the EventGroupId, so each event group becomes its own ordered group in the queue, and sets the SQS MessageDeduplicationId to the bus-assigned event id (aws:EventId), which is unique per accepted event and stable across retries.",
+      "Delivery uses an IAM role that EventBridge assumes to call sqs:SendMessage on both the target queue and the dead-letter queue, replacing the queue resource policy used in classic EventBridge. Events that exhaust the retry policy go to a FIFO dead-letter queue, where EventBridge keeps each group's failure records in order.",
+      "This pattern deploys one enhanced custom event bus with 14-day retention, one FIFO subscriber with a filter and retry policy, one SQS FIFO target queue, one SQS FIFO dead-letter queue, the IAM delivery role, and a CloudWatch Logs vended-log delivery for the subscriber."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-sqs-fifo/yaml/sam",
+      "templateURL": "serverless-patterns/eventbridge-custom-sqs-fifo/yaml/sam",
+      "projectFolder": "eventbridge-custom-sqs-fifo/yaml/sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing enhanced custom event buses in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-enhanced-custom-event-buses-in-amazon-eventbridge-for-enterprise-scale-event-driven-applications/"
+      },
+      {
+        "text": "AWS::EventsV2::EventBus CloudFormation reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-eventsv2-eventbus.html"
+      },
+      {
+        "text": "AWS::EventsV2::Subscriber CloudFormation reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-eventsv2-subscriber.html"
+      },
+      {
+        "text": "Amazon SQS FIFO queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shivapriya Pajjur",
+      "image": "https://serverlessland.com/assets/images/contributors/shivapriya-pajjur.png",
+      "bio": "Solutions Architect at AWS focused on serverless and event-driven architectures.",
+      "linkedin": "shivapriyap"
+    }
+  ]
+}
