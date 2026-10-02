@@ -208,6 +208,8 @@ aws lambda invoke --function-name $FUNCTION --cli-binary-format raw-in-base64-ou
 
 A request with a missing or wrong key returns `{"statusCode": 401, ... "body": "{\"error\": \"unauthorized\"}"}`.
 
+The check fails closed. If a key is configured but the function cannot read it (the parameter was deleted, the role lost access, or the read was throttled), every request returns `{"statusCode": 503, ... "body": "{\"error\": \"api key unavailable\"}"}` instead of skipping authentication, and the reason is written to the function log group.
+
 ## Notes
 
 * The function uses only the AWS SDK for Python (Boto3) that ships with the Python 3.13 managed runtime, so there is no `requirements.txt` and no build step.

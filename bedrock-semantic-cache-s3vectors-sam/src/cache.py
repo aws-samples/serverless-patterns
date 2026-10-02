@@ -32,23 +32,36 @@ _epoch = {"val": None, "ts": 0.0}
 _api_key = {"val": None, "loaded": False}
 
 
+class ApiKeyUnavailable(Exception):
+    """The API key is configured but could not be read, so requests must be refused."""
+
+
 def api_key():
     """Read the optional app-level key from Parameter Store, once per environment.
 
     Only the parameter name is configured on the function. The secret value is never
     stored in a Lambda environment variable; it is fetched here with decryption.
+
+    Fails closed: if a key is configured but cannot be read (missing parameter, access
+    denied, throttling), this raises instead of returning an empty key, so a transient
+    or permission error can never switch authentication off. A failed read is not
+    cached, so the next request retries.
     """
     if not API_KEY_PARAM:
         return ""
     if not _api_key["loaded"]:
         try:
-            _api_key["val"] = ssm.get_parameter(
+            value = ssm.get_parameter(
                 Name=API_KEY_PARAM, WithDecryption=True
             )["Parameter"]["Value"]
-        except Exception:
-            _api_key["val"] = ""
-        _api_key["loaded"] = True
-    return _api_key["val"] or ""
+        except Exception as e:
+            print(f"ERROR reading API key parameter {API_KEY_PARAM}: {type(e).__name__}")
+            raise ApiKeyUnavailable() from e
+        if not value:
+            print(f"ERROR API key parameter {API_KEY_PARAM} is empty")
+            raise ApiKeyUnavailable()
+        _api_key["val"], _api_key["loaded"] = value, True
+    return _api_key["val"]
 
 
 def current_epoch():
@@ -56,8 +69,13 @@ def current_epoch():
     if _epoch["val"] is None or now - _epoch["ts"] > 30:   # refresh at most every 30s
         try:
             _epoch["val"] = ssm.get_parameter(Name=EPOCH_PARAM)["Parameter"]["Value"]
-        except Exception:
-            _epoch["val"] = "1"
+        except Exception as e:
+            # Keep serving the last known epoch through a transient read error. With no
+            # known epoch yet, raise rather than guess, because a guessed epoch could
+            # serve entries that a force-invalidate already retired.
+            if _epoch["val"] is None:
+                raise
+            print(f"WARN epoch refresh failed, keeping {_epoch['val']}: {type(e).__name__}")
         _epoch["ts"] = now
     return _epoch["val"]
 
@@ -89,7 +107,10 @@ def llm(prompt, model):
 def handler(event, context):
     t0 = time.time()
     headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
-    expected_key = api_key()
+    try:
+        expected_key = api_key()
+    except ApiKeyUnavailable:
+        return _resp(503, {"error": "api key unavailable"})
     if expected_key and headers.get("x-api-key") != expected_key:
         return _resp(401, {"error": "unauthorized"})
     body = {}
