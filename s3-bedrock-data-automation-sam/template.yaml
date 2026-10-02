@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Extract structured data from unstructured files (documents, images, video, audio)
+  using Amazon Bedrock Data Automation (BDA). Upload a file to the input/ prefix of the
+  Amazon S3 bucket; an AWS Lambda function starts an asynchronous BDA job; BDA writes
+  structured JSON to the output/ prefix. The extraction is fully managed by BDA, so
+  there is no machine-learning code. (s3-bedrock-data-automation-sam)
+
+Parameters:
+  DataBucketName:
+    Type: String
+    Description: Globally unique name for the Amazon S3 bucket that holds input files and Bedrock Data Automation output.
+
+Rules:
+  # This pattern uses the US geography cross-Region inference profile
+  # us.data-automation-v1. Per
+  # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html the only
+  # source Regions that offer that profile are us-east-1, us-east-2 and
+  # us-west-2, so fail the deployment early anywhere else instead of handing the
+  # reader a stack that fails on every upload.
+  SupportedBdaSourceRegion:
+    Assertions:
+      - Assert:
+          Fn::Contains:
+            - - us-east-1
+              - us-east-2
+              - us-west-2
+            - Ref: AWS::Region
+        AssertDescription: >-
+          This pattern uses the US geography Amazon Bedrock Data Automation inference
+          profile us.data-automation-v1, which is offered in the source Regions
+          us-east-1, us-east-2 and us-west-2. Deploy in one of those Regions, or
+          switch the profile to the one for your geography as described at
+          https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html
+
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DataBucketName
+
+  # Bedrock Data Automation project, a native CloudFormation resource. This standard
+  # output configuration returns each document as Markdown text plus a generative
+  # summary. The project already processes image, video and audio files with service
+  # defaults; add Image, Video or Audio blocks here to control their standard output,
+  # or attach a CustomOutputConfiguration blueprint to extract named fields.
+  BDAProject:
+    Type: AWS::Bedrock::DataAutomationProject
+    Properties:
+      ProjectName: !Sub "${AWS::StackName}-project"
+      ProjectDescription: Standard document extraction (Markdown text plus generative summary).
+      ProjectType: ASYNC
+      StandardOutputConfiguration:
+        Document:
+          Extraction:
+            Granularity:
+              Types:
+                - DOCUMENT
+                - PAGE
+            BoundingBox:
+              State: DISABLED
+          GenerativeField:
+            State: ENABLED
+          OutputFormat:
+            TextFormat:
+              Types:
+                - MARKDOWN
+            AdditionalFileFormat:
+              State: DISABLED
+
+  # Owned by the stack rather than created implicitly by the Lambda service, so that
+  # deleting the stack removes it and no log group is left behind. CloudFormation
+  # generates the name, which keeps a second deployment in the same account from
+  # colliding. Logs expire after 7 days; raise RetentionInDays to keep them longer.
+  StartBdaFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  StartBdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-start-bda"
+      CodeUri: src/
+      Handler: handler.handler
+      Runtime: python3.13
+      Architectures:
+        - arm64
+      Timeout: 30
+      MemorySize: 128
+      LoggingConfig:
+        LogGroup: !Ref StartBdaFunctionLogGroup
+      # Inline statements rather than a named AWS SAM policy template: the templates
+      # that come closest (S3ReadPolicy, S3CrudPolicy) grant more actions on a wider
+      # resource than this pattern needs, and none of them covers Bedrock Data
+      # Automation. AWS SAM appends these statements to the function default execution
+      # role, which already carries the AWS managed basic execution policy for the
+      # CloudWatch Logs actions the Lambda service needs.
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            # Bedrock Data Automation reads the input object and writes the extraction
+            # output using this role, so the role needs both actions on the bucket even
+            # though the function itself never calls Amazon S3.
+            # See https://docs.aws.amazon.com/bedrock/latest/userguide/s3-bucket-access.html
+            - Sid: S3ReadInput
+              Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub "arn:${AWS::Partition}:s3:::${DataBucketName}/input/*"
+            # The output/ prefix here must match the OUTPUT_PREFIX environment variable
+            # below, which is the location the function hands to Bedrock Data
+            # Automation. Change one and you must change the other.
+            - Sid: S3WriteOutput
+              Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub "arn:${AWS::Partition}:s3:::${DataBucketName}/output/*"
+            # Scoped to the one project this stack creates.
+            - Sid: InvokeBdaProject
+              Effect: Allow
+              Action: bedrock:InvokeDataAutomationAsync
+              Resource: !GetAtt BDAProject.ProjectArn
+            # InvokeDataAutomationAsync also authorizes against the inference profile.
+            # us.data-automation-v1 is a cross-Region (US geography) profile, so the
+            # documented policy enumerates the four US Regions the profile can route to
+            # rather than wildcarding the Region:
+            # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html
+            - Sid: InvokeBdaProfile
+              Effect: Allow
+              Action: bedrock:InvokeDataAutomationAsync
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:us-east-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-east-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-west-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+                - !Sub "arn:${AWS::Partition}:bedrock:us-west-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+      Environment:
+        Variables:
+          BDA_PROJECT_ARN: !GetAtt BDAProject.ProjectArn
+          BDA_PROFILE_ARN: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+          OUTPUT_PREFIX: output
+      Events:
+        InputUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref DataBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: input/
+
+Outputs:
+  DataBucketName:
+    Description: Upload files to the input/ prefix; read results from the output/ prefix.
+    Value: !Ref DataBucket
+  BDAProjectArn:
+    Description: ARN of the Amazon Bedrock Data Automation project.
+    Value: !GetAtt BDAProject.ProjectArn
+  StartBdaFunctionName:
+    Description: AWS Lambda function that starts Bedrock Data Automation jobs on upload.
+    Value: !Ref StartBdaFunction
+  LogGroupName:
+    Description: CloudWatch Logs log group for the AWS Lambda function.
+    Value: !Ref StartBdaFunctionLogGroup
