@@ -1,1 +1,6 @@
-boto3>=1.37.0
+# The bedrock-data-automation-runtime client is not in every boto3 release, and the
+# boto3 version bundled with the Python managed runtime varies by runtime version and
+# AWS Region (see
+# https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html#python-sdk-included),
+# so pin the exact version this pattern was built and tested with.
+boto3==1.43.107
