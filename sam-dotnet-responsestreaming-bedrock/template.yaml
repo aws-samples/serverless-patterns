@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Story generator using Amazon Bedrock (Claude Sonnet) with Lambda Response Streaming
+  through API Gateway. Streams a generated story back to the client token-by-token.
+
+Globals:
+  Function:
+    Timeout: 120
+    MemorySize: 512
+    Runtime: dotnet10
+    Architectures:
+      - x86_64
+
+Resources:
+  # ─────────────────────────────────────────────────────────────────────
+  # REST API with response streaming
+  # ─────────────────────────────────────────────────────────────────────
+  StoryApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: story-streaming-api
+      Description: REST API with response streaming for Bedrock story generation
+
+  StoryResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref StoryApi
+      ParentId: !GetAtt StoryApi.RootResourceId
+      PathPart: story
+
+  StoryMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref StoryApi
+      ResourceId: !Ref StoryResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        ResponseTransferMode: STREAM
+        TimeoutInMillis: 120000
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${StoryFunction.Arn}/response-streaming-invocations
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: StoryMethod
+    Properties:
+      RestApiId: !Ref StoryApi
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref StoryApi
+      DeploymentId: !Ref ApiDeployment
+      StageName: prod
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Lambda Function — story generator with Bedrock streaming
+  # ─────────────────────────────────────────────────────────────────────
+  StoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: StoryStreaming
+      CodeUri: ./src/
+      Description: Streams a Bedrock-generated story via API Gateway response streaming
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+
+  # Permission for API Gateway to invoke the function via response streaming
+  StoryFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt StoryFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${StoryApi}/*
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL for the story streaming endpoint
+    Value: !Sub "https://${StoryApi}.execute-api.${AWS::Region}.amazonaws.com/prod/story"
+  StoryFunctionArn:
+    Description: Story streaming Lambda function ARN
+    Value: !GetAtt StoryFunction.Arn
