@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 580" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad6" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad6" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow6" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow6" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+    <marker id="arrow6red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#D13212"/>
+    </marker>
+    <marker id="arrow6green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1B660F"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="580" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad6)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad6)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 6: Error Handling &amp; Compensation</text>
+  <text x="385" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="405" y="36" fill="#D5DBDB" font-size="14">Retry policies, saga compensation, and interrupt handling</text>
+
+  <!-- Step 1: Validate Payment -->
+  <rect x="30" y="80" width="170" height="85" fill="url(#stepGrad6)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow6)"/>
+  <rect x="30" y="80" width="170" height="24" fill="#1B660F" rx="6"/>
+  <rect x="30" y="94" width="170" height="10" fill="#1B660F"/>
+  <text x="52" y="96" fill="#FFF" font-size="10" font-weight="bold">validate-payment</text>
+  <text x="43" y="117" fill="#16191F" font-size="9">Verify card details</text>
+  <text x="43" y="130" fill="#16191F" font-size="9">Check fraud signals</text>
+  <text x="43" y="148" fill="#687078" font-size="8" font-style="italic">Retry: default (3x, backoff)</text>
+
+  <!-- Arrow 1-2 -->
+  <line x1="200" y1="122" x2="230" y2="122" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow6)"/>
+
+  <!-- Step 2: Charge Payment (with retry details) -->
+  <rect x="235" y="72" width="280" height="130" fill="url(#stepGrad6)" stroke="#FF9900" stroke-width="2" rx="6" filter="url(#shadow6)"/>
+  <rect x="235" y="72" width="280" height="24" fill="#FF9900" rx="6"/>
+  <rect x="235" y="86" width="280" height="10" fill="#FF9900"/>
+  <text x="270" y="88" fill="#FFF" font-size="10" font-weight="bold">charge-payment (AT_MOST_ONCE)</text>
+
+  <text x="248" y="110" fill="#16191F" font-size="9" font-weight="bold">Custom Retry Policy:</text>
+  <text x="248" y="124" fill="#16191F" font-size="9">&#x2022; Skip: IllegalArgumentException</text>
+  <text x="248" y="138" fill="#16191F" font-size="9">&#x2022; Retry transient errors: up to 4x</text>
+  <text x="248" y="152" fill="#16191F" font-size="9">&#x2022; Backoff: exponential</text>
+
+  <!-- Attempt indicators -->
+  <rect x="248" y="162" width="80" height="18" fill="#FDECEA" stroke="#D13212" stroke-width="1" rx="3"/>
+  <text x="256" y="174" fill="#D13212" font-size="8">Attempt 0: FAIL</text>
+  <rect x="338" y="162" width="80" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="3"/>
+  <text x="344" y="174" fill="#1B660F" font-size="8">Attempt 1: OK &#x2713;</text>
+
+  <!-- StepInterruptedException branch -->
+  <line x1="375" y1="202" x2="375" y2="230" stroke="#D13212" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="375" y1="230" x2="375" y2="250" stroke="#D13212" stroke-width="1" stroke-dasharray="4" marker-end="url(#arrow6red)"/>
+  <rect x="295" y="255" width="170" height="45" fill="#FFF" stroke="#D13212" stroke-width="1.5" rx="4" stroke-dasharray="4"/>
+  <text x="305" y="272" fill="#D13212" font-size="8" font-weight="bold">StepInterruptedException</text>
+  <text x="305" y="286" fill="#687078" font-size="8">Check payment status externally</text>
+  <text x="305" y="296" fill="#687078" font-size="8">before retrying (idempotency)</text>
+
+  <!-- Arrow 2-3 -->
+  <line x1="515" y1="137" x2="560" y2="137" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow6)"/>
+
+  <!-- Step 3: Reserve Inventory -->
+  <rect x="565" y="95" width="170" height="85" fill="url(#stepGrad6)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow6)"/>
+  <rect x="565" y="95" width="170" height="24" fill="#1B660F" rx="6"/>
+  <rect x="565" y="109" width="170" height="10" fill="#1B660F"/>
+  <text x="585" y="111" fill="#FFF" font-size="10" font-weight="bold">reserve-inventory</text>
+  <text x="578" y="133" fill="#16191F" font-size="9">Reserve stock</text>
+  <text x="578" y="146" fill="#16191F" font-size="9">Lock quantity</text>
+  <text x="578" y="163" fill="#687078" font-size="8" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- SUCCESS branch -->
+  <line x1="735" y1="120" x2="785" y2="120" stroke="#1B660F" stroke-width="1.5" marker-end="url(#arrow6green)"/>
+  <rect x="740" y="105" width="50" height="14" fill="#E8F5E9" rx="2"/>
+  <text x="747" y="114" fill="#1B660F" font-size="7" font-weight="bold">SUCCESS</text>
+
+  <!-- COMPLETED badge -->
+  <rect x="790" y="107" width="100" height="28" fill="#E8F5E9" stroke="#1B660F" stroke-width="1.5" rx="14"/>
+  <text x="806" y="125" fill="#1B660F" font-size="11" font-weight="bold">COMPLETED</text>
+
+  <!-- FAIL branch -->
+  <line x1="650" y1="180" x2="650" y2="220" stroke="#D13212" stroke-width="1.5" marker-end="url(#arrow6red)"/>
+  <rect x="625" y="196" width="50" height="14" fill="#FDECEA" rx="2"/>
+  <text x="636" y="206" fill="#D13212" font-size="7" font-weight="bold">FAIL</text>
+
+  <!-- SAGA COMPENSATION box -->
+  <rect x="530" y="225" width="340" height="100" fill="#FFF" stroke="#D13212" stroke-width="2" rx="8" filter="url(#shadow6)"/>
+  <rect x="530" y="225" width="340" height="26" fill="#D13212" rx="8"/>
+  <rect x="530" y="241" width="340" height="10" fill="#D13212"/>
+  <text x="550" y="243" fill="#FFF" font-size="11" font-weight="bold">SAGA COMPENSATION</text>
+
+  <!-- Refund Payment step -->
+  <rect x="555" y="262" width="150" height="50" fill="url(#stepGrad6)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <rect x="555" y="262" width="150" height="20" fill="#D13212" rx="4"/>
+  <rect x="555" y="274" width="150" height="8" fill="#D13212"/>
+  <text x="580" y="276" fill="#FFF" font-size="9" font-weight="bold">refund-payment</text>
+  <text x="568" y="294" fill="#16191F" font-size="9">Reverse charge</text>
+  <text x="568" y="306" fill="#16191F" font-size="9">Notify customer</text>
+
+  <!-- Arrow to COMPENSATED -->
+  <line x1="705" y1="287" x2="745" y2="287" stroke="#D13212" stroke-width="1.5" marker-end="url(#arrow6red)"/>
+
+  <!-- COMPENSATED badge -->
+  <rect x="750" y="274" width="105" height="28" fill="#FDECEA" stroke="#D13212" stroke-width="1.5" rx="14"/>
+  <text x="760" y="292" fill="#D13212" font-size="10" font-weight="bold">COMPENSATED</text>
+
+  <!-- Key Concept Box -->
+  <rect x="30" y="350" width="1040" height="210" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow6)"/>
+  <rect x="30" y="350" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="368" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="370" fill="#FF9900" font-size="12" font-weight="bold">Key Concepts: Retry Semantics &amp; Saga Pattern</text>
+
+  <!-- AT_MOST_ONCE explanation -->
+  <text x="50" y="400" fill="#232F3E" font-size="11" font-weight="bold">AT_MOST_ONCE Semantics:</text>
+  <text x="50" y="416" fill="#16191F" font-size="10">If the function is interrupted during a step marked AT_MOST_ONCE, it will NOT automatically retry.</text>
+  <text x="50" y="432" fill="#16191F" font-size="10">Instead, a StepInterruptedException is thrown so you can check the external state before deciding to retry.</text>
+
+  <!-- Saga explanation -->
+  <text x="50" y="458" fill="#232F3E" font-size="11" font-weight="bold">Saga Compensation Pattern:</text>
+  <text x="50" y="474" fill="#16191F" font-size="10">When a later step fails, previously completed steps are compensated (reversed) to maintain consistency.</text>
+  <text x="50" y="490" fill="#16191F" font-size="10">Each step has an associated compensation action that undoes its effect.</text>
+
+  <!-- Retry config summary -->
+  <text x="50" y="516" fill="#232F3E" font-size="11" font-weight="bold">Custom Retry Configuration:</text>
+  <rect x="50" y="524" width="990" height="22" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="3"/>
+  <text x="65" y="539" fill="#545B64" font-size="9">retryOn(RuntimeException.class).skipOn(IllegalArgumentException.class).maxRetries(4).backoff(exponential) | Non-retryable errors skip immediately</text>
+</svg>

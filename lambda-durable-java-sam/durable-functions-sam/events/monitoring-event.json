@@ -1,0 +1,5 @@
+{
+  "jobId": "JOB-TEST-001",
+  "jobType": "DATA_EXPORT",
+  "maxPolls": 5
+}
