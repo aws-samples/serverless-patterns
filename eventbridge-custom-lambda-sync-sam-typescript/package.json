@@ -1,0 +1,24 @@
+{
+  "name": "eventbridge-custom-lambda-sync-sam-typescript",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ordered processing with a synchronous Lambda target on an EventBridge custom event bus (TypeScript).",
+  "license": "MIT-0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "publish-event": "tsx publisher/publish.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-eventbridgev2": "^3.1141.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.9.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^5.0.2"
+  }
+}
