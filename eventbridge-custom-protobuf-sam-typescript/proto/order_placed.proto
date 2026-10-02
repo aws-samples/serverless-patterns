@@ -1,0 +1,30 @@
+// The OrderPlaced domain event, as a Protocol Buffers schema.
+//
+// This is the SOURCE OF TRUTH for the sample. The Python bindings in
+// common/gen/ are GENERATED from this file by scripts/generate.sh (buf +
+// protoc-gen-py) and are git-ignored — regenerate them, don't hand-edit.
+//
+// The same schema is registered in the AWS Glue Schema Registry (DataFormat
+// PROTOBUF) so EventBridge can decode the payload server-side. Keep this file
+// and the Glue-registered schema in sync.
+//
+// Note: AWS Glue Schema Registry supports proto2 and proto3, but NOT protobuf
+// `extensions` or `groups`. This schema stays within that subset.
+syntax = "proto3";
+
+package com.example.orders;
+
+message OrderItem {
+  string sku = 1;
+  int32 qty = 2;
+}
+
+message OrderPlaced {
+  string order_id = 1;
+  string customer_id = 2;
+  double amount = 3;
+  string currency = 4;
+  repeated OrderItem items = 5;
+  // Milliseconds since the Unix epoch (UTC).
+  int64 placed_at = 6;
+}
