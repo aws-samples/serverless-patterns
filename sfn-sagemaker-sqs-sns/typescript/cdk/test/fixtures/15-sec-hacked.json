@@ -1,0 +1,77 @@
+{
+ "id": "sec-hacked",
+ "note": "security incident (canonical ticket c)",
+ "request": {
+  "state": "URGENT: our account was hacked and customer data is being exfiltrated right now.",
+  "questions": {
+   "department": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+     "billing": "charges, invoices, refunds, payment failures",
+     "technical": "bugs, outages, errors, performance",
+     "account_access": "login, password, MFA, locked accounts",
+     "sales": "pricing, plans, upgrades, quotes"
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this ticket for the customer?",
+    "criteria": [
+     "Low",
+     "Medium",
+     "High",
+     "Critical"
+    ]
+   },
+   "security_incident": {
+    "type": "noul",
+    "instructions": "Does this ticket report an active security incident such as a compromised account or data being exfiltrated?"
+   }
+  }
+ },
+ "response": {
+  "model": "strands-decider-2B-hobson-v19",
+  "answers": {
+   "department": {
+    "type": "choice",
+    "choice": "account_access",
+    "probabilities": {
+     "billing": 0.0536,
+     "technical": 0.0828,
+     "account_access": 0.851,
+     "sales": 0.0126
+    },
+    "confidence": 0.8014
+   },
+   "urgency": {
+    "type": "score",
+    "score": 2.3058,
+    "legend": {
+     "0": "Low",
+     "1": "Medium",
+     "2": "High",
+     "3": "Critical"
+    },
+    "probabilities": {
+     "0": 0.0919,
+     "1": 0.0979,
+     "2": 0.2229,
+     "3": 0.5874
+    },
+    "confidence": 0.4398
+   },
+   "security_incident": {
+    "type": "noul",
+    "noul": 0.9137
+   }
+  },
+  "usage": {
+   "input_tokens": 270,
+   "output_tokens": 3
+  },
+  "latency_ms": 1924.11
+ },
+ "http_status": 200,
+ "wall_ms": 1943.0
+}

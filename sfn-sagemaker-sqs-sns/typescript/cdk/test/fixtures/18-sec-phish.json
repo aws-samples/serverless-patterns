@@ -1,0 +1,77 @@
+{
+ "id": "sec-phish",
+ "note": "security incident",
+ "request": {
+  "state": "An employee entered their password on a phishing page and we now see logins from another country on their account.",
+  "questions": {
+   "department": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+     "billing": "charges, invoices, refunds, payment failures",
+     "technical": "bugs, outages, errors, performance",
+     "account_access": "login, password, MFA, locked accounts",
+     "sales": "pricing, plans, upgrades, quotes"
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this ticket for the customer?",
+    "criteria": [
+     "Low",
+     "Medium",
+     "High",
+     "Critical"
+    ]
+   },
+   "security_incident": {
+    "type": "noul",
+    "instructions": "Does this ticket report an active security incident such as a compromised account or data being exfiltrated?"
+   }
+  }
+ },
+ "response": {
+  "model": "strands-decider-2B-hobson-v19",
+  "answers": {
+   "department": {
+    "type": "choice",
+    "choice": "account_access",
+    "probabilities": {
+     "billing": 0.0228,
+     "technical": 0.1239,
+     "account_access": 0.847,
+     "sales": 0.0062
+    },
+    "confidence": 0.796
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.8158,
+    "legend": {
+     "0": "Low",
+     "1": "Medium",
+     "2": "High",
+     "3": "Critical"
+    },
+    "probabilities": {
+     "0": 0.1445,
+     "1": 0.2132,
+     "2": 0.3241,
+     "3": 0.3181
+    },
+    "confidence": 0.3911
+   },
+   "security_incident": {
+    "type": "noul",
+    "noul": 0.7355
+   }
+  },
+  "usage": {
+   "input_tokens": 274,
+   "output_tokens": 3
+  },
+  "latency_ms": 1649.25
+ },
+ "http_status": 200,
+ "wall_ms": 1666.4
+}

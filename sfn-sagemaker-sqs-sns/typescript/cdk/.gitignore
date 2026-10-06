@@ -1,0 +1,10 @@
+node_modules
+cdk.out
+cdk.context.json
+*.js
+!test/**/*.js
+*.d.ts
+package-lock.json
+build
+__pycache__
+*.pyc

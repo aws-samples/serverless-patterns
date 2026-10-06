@@ -1,0 +1,77 @@
+{
+ "id": "clear-billing-1",
+ "note": "clear billing",
+ "request": {
+  "state": "I was charged twice for my subscription this month. Please refund the duplicate charge.",
+  "questions": {
+   "department": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+     "billing": "charges, invoices, refunds, payment failures",
+     "technical": "bugs, outages, errors, performance",
+     "account_access": "login, password, MFA, locked accounts",
+     "sales": "pricing, plans, upgrades, quotes"
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this ticket for the customer?",
+    "criteria": [
+     "Low",
+     "Medium",
+     "High",
+     "Critical"
+    ]
+   },
+   "security_incident": {
+    "type": "noul",
+    "instructions": "Does this ticket report an active security incident such as a compromised account or data being exfiltrated?"
+   }
+  }
+ },
+ "response": {
+  "model": "strands-decider-2B-hobson-v19",
+  "answers": {
+   "department": {
+    "type": "choice",
+    "choice": "billing",
+    "probabilities": {
+     "billing": 0.9629,
+     "technical": 0.0145,
+     "account_access": 0.0052,
+     "sales": 0.0173
+    },
+    "confidence": 0.9506
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.8217,
+    "legend": {
+     "0": "Low",
+     "1": "Medium",
+     "2": "High",
+     "3": "Critical"
+    },
+    "probabilities": {
+     "0": 0.1367,
+     "1": 0.2087,
+     "2": 0.3508,
+     "3": 0.3038
+    },
+    "confidence": 0.4109
+   },
+   "security_incident": {
+    "type": "noul",
+    "noul": 0.1564
+   }
+  },
+  "usage": {
+   "input_tokens": 268,
+   "output_tokens": 3
+  },
+  "latency_ms": 32175.81
+ },
+ "http_status": 200,
+ "wall_ms": 32237.1
+}
