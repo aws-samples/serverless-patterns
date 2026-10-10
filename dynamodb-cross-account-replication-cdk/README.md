@@ -58,6 +58,8 @@ Important: this application uses various AWS services and there are costs associ
     cdk deploy --parameters ReplicaAccountId=<READER_ACCOUNT_ID> --parameters ExternalId=<EXTERNAL_ID> -c replicaRegion=us-west-2
     ```
 
+    The stack deploys to the Region configured for your AWS CLI (`us-east-1` if none is set). `replicaRegion` must be a different Region, so change it if your CLI Region is `us-west-2`.
+
 ## Testing
 
 ```bash
@@ -92,7 +94,7 @@ aws dynamodb get-item --table-name <TableName> \
 > **⚠️ Warning:** `cdk destroy` with `RemovalPolicy.DESTROY` will permanently delete the table and all its data. Back up any important data before destroying.
 
 ```bash
-cdk destroy
+cdk destroy -c replicaRegion=<REPLICA_REGION>
 ```
 
 ---

@@ -9,7 +9,7 @@
     "text": [
       "This pattern creates an Amazon DynamoDB global table (same-account, multi-Region) with an IAM role for cross-account read access.",
       "The reader account assumes the IAM role with an external ID and can query the table in either Region.",
-      "DynamoDB handles replication automatically with sub-second latency between regions.",
+      "DynamoDB handles replication automatically with sub-second latency between Regions.",
       "Point-in-time recovery is enabled for data protection."
     ]
   },
@@ -26,7 +26,7 @@
   },
   "deploy": { "text": ["cdk deploy --parameters ReplicaAccountId=<READER_ACCOUNT_ID> --parameters ExternalId=<EXTERNAL_ID> -c replicaRegion=us-west-2"] },
   "testing": { "text": ["See the README for testing instructions."] },
-  "cleanup": { "text": ["cdk destroy"] },
+  "cleanup": { "text": ["cdk destroy -c replicaRegion=<REPLICA_REGION>"] },
   "authors": [
     {
       "name": "Nithin Chandran R",
