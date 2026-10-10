@@ -18,12 +18,19 @@ export class AgentcoreGatewayLambdaStack extends cdk.Stack {
       description: "AgentCore Gateway Lambda tool target",
     });
 
-    // Gateway IAM role with confused-deputy protection
+    // The gateway name is known at synth time, so the role can be scoped to it
+    const gatewayName = `tool-gateway-${cdk.Names.uniqueId(this).slice(-8).toLowerCase()}`;
+
+    // Gateway IAM role with confused-deputy protection. The gateway ARN is
+    // gateway/<name>-<generated id>, so the SourceArn uses a wildcard suffix.
     const gatewayRole = new iam.Role(this, "GatewayRole", {
       assumedBy: new iam.ServicePrincipal("bedrock-agentcore.amazonaws.com", {
         conditions: {
           StringEquals: {
             "aws:SourceAccount": this.account,
+          },
+          ArnLike: {
+            "aws:SourceArn": `arn:${this.partition}:bedrock-agentcore:${this.region}:${this.account}:gateway/${gatewayName}-*`,
           },
         },
       }),
@@ -33,7 +40,7 @@ export class AgentcoreGatewayLambdaStack extends cdk.Stack {
 
     // AgentCore Gateway (MCP protocol, IAM auth)
     const gateway = new agentcore.CfnGateway(this, "Gateway", {
-      name: `tool-gateway-${cdk.Names.uniqueId(this).slice(-8).toLowerCase()}`,
+      name: gatewayName,
       protocolType: "MCP",
       authorizerType: "AWS_IAM",
       roleArn: gatewayRole.roleArn,
