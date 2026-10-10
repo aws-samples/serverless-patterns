@@ -1,6 +1,6 @@
-# AppSync Events — In-Flight Event Interception with AWS Lambda
+# AWS AppSync Events - In-Flight Event Interception with AWS Lambda
 
-This pattern deploys an AWS AppSync Events API with a **Direct Lambda OnPublish interceptor** — a Lambda function that intercepts, validates, and enriches events in-flight before they reach subscribers. Unlike the existing `appsync-events-bedrock-cdk` and `appsync-events-lambda-agentcore-cdk` patterns (which use Lambda as a *publisher*), this pattern uses Lambda as a real-time event *processor* wired directly into the AppSync channel namespace.
+This pattern deploys an AWS AppSync Events API with a **Direct Lambda OnPublish interceptor** - an AWS Lambda function that intercepts, validates, and enriches events in-flight before they reach subscribers. Unlike the existing `appsync-events-bedrock-cdk` and `appsync-events-lambda-agentcore-cdk` patterns (which use Lambda as a *publisher*), this pattern uses Lambda as a real-time event *processor* wired directly into the AppSync channel namespace.
 
 Use cases: payload validation, PII redaction, event enrichment with external data, rate limiting per publisher, and schema enforcement before delivery.
 

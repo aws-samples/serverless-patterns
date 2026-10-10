@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as appsync from 'aws-cdk-lib/aws-appsync';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -13,7 +14,7 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
     const eventFn = new lambda.Function(this, 'EventHandlerFn', {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
-      code: lambda.Code.fromAsset('src'),
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src')),
       timeout: cdk.Duration.seconds(10),
       logRetention: logs.RetentionDays.ONE_WEEK,
     });

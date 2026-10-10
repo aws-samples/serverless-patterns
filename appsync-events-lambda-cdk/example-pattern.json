@@ -3,7 +3,7 @@
   "description": "Deploy an AWS AppSync Events API with an AWS Lambda handler for real-time pub/sub message processing.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -12,9 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-events-lambda-cdk",
-      "templateURL": "serverless-patterns/appsync-events-lambda-cdk",
-      "projectFolder": "appsync-events-lambda-cdk"
+      "templateFile": "lib/appsync-events-lambda-stack.ts"
     }
   },
   "resources": {
@@ -26,15 +24,27 @@
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"],
-    "commands": ["npm install", "cdk bootstrap", "cdk deploy"]
+    "text": [
+      "cdk deploy"
+    ],
+    "commands": [
+      "npm install",
+      "cdk bootstrap",
+      "cdk deploy"
+    ]
   },
   "testing": {
-    "text": ["Publish events via HTTP endpoint"]
+    "text": [
+      "Publish events via HTTP endpoint"
+    ]
   },
   "cleanup": {
-    "text": ["cdk destroy"],
-    "commands": ["cdk destroy"]
+    "text": [
+      "cdk destroy"
+    ],
+    "commands": [
+      "cdk destroy"
+    ]
   },
   "authors": [
     {
@@ -44,7 +54,15 @@
     }
   ],
   "services": {
-    "from": [{"service": "appsync"}],
-    "to": [{"service": "lambda"}]
+    "from": [
+      {
+        "service": "appsync"
+      }
+    ],
+    "to": [
+      {
+        "service": "lambda"
+      }
+    ]
   }
 }
