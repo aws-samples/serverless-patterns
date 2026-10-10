@@ -137,14 +137,13 @@ BUCKET=BUCKET_NAME
 STACK=STACK_NAME
 ```
 
-1. Empty the Amazon S3 bucket (the bucket must be empty before AWS CloudFormation can delete it)
+1. Empty the Amazon S3 bucket (the bucket must be empty before the stack can delete it)
     ```bash
     aws s3 rm s3://$BUCKET --recursive --region $REGION
     ```
-1. Delete the stack
+1. Delete the stack with AWS SAM. Enter `y` at each confirmation prompt:
     ```bash
-    aws cloudformation delete-stack --stack-name $STACK --region $REGION
-    aws cloudformation wait stack-delete-complete --stack-name $STACK --region $REGION
+    sam delete --stack-name $STACK --region $REGION
     ```
 1. Confirm the stack has been deleted
     ```bash
