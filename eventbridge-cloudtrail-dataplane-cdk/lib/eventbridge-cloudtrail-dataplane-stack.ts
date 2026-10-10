@@ -40,7 +40,7 @@ export class EventbridgeCloudtrailDataplaneStack extends cdk.Stack {
     });
 
     // Enable EventBridge data plane events logging using advanced event selectors.
-    // CDK L2 addEventSelector only supports S3/Lambda/DynamoDB basic selectors,
+    // CDK L2 addEventSelector only supports S3 and Lambda basic selectors,
     // so we use the CfnTrail escape hatch for AWS::Events::EventBus.
     const cfnTrail = trail.node.defaultChild as cloudtrail.CfnTrail;
     cfnTrail.addPropertyOverride('AdvancedEventSelectors', [

@@ -42,12 +42,13 @@ EventBridge rules are region-local. The trail is multi-region, but the rule in t
 
 ## Testing
 
-The check puts one event, then polls the function log group every 10 seconds for up to 2 minutes. It prints `PASS` when a record is logged and exits non-zero otherwise.
+The check puts one event, then polls the function log group every 10 seconds for up to 2 minutes. It prints `PASS` when a record is logged and exits non-zero otherwise. Save the block as `smoke-test.sh` and run it with `bash smoke-test.sh` (the `exit 1` would close your shell if you pasted it into an interactive session). The AWS CLI default Region must be the Region you deployed to.
 
 ```bash
 STACK=EventbridgeCloudtrailDataplaneStack
 FN=$(aws cloudformation describe-stacks --stack-name $STACK \
   --query 'Stacks[0].Outputs[?OutputKey==`ProcessorFunctionName`].OutputValue' --output text)
+[ -n "$FN" ] || { echo "FAIL: stack output not found (check the CLI Region)"; exit 1; }
 START=$(( $(date +%s) * 1000 ))
 
 # Put a test event to the default event bus
@@ -58,7 +59,7 @@ N=0
 for i in $(seq 1 12); do
   N=$(aws logs filter-log-events --log-group-name "/aws/lambda/$FN" \
     --filter-pattern '"EventBridge data plane API call detected"' \
-    --start-time "$START" --query 'length(events)' --output text 2>/dev/null || echo 0)
+    --start-time "$START" --query 'length(events)' --output text || echo 0)
   [ "$N" -gt 0 ] && break
   sleep 10
 done
