@@ -26,7 +26,7 @@ The stack picks the Amazon Bedrock cross-Region inference profile for Anthropic 
 | `au.anthropic.claude-sonnet-5` | ap-southeast-2 |
 | `in.anthropic.claude-sonnet-5` | ap-south-1, ap-south-2 |
 
-There is no `apac.` profile for this model. Ensure model access is enabled for the profile in your target Region before deploying. The model id and the Region table are in `lib/apigw-lambda-bedrock-code-interpreter-stack.ts`; check the model card again if you target a different Claude version.
+The Claude Sonnet 5 model card lists no `apac.` profile. Ensure model access is enabled for the profile in your target Region before deploying. The model id and the Region table are in `lib/apigw-lambda-bedrock-code-interpreter-stack.ts`; check the model card again if you target a different Claude version.
 
 ## Architecture
 

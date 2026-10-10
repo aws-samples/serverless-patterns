@@ -26,7 +26,7 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
     // The Claude Sonnet 5 model card lists the geo inference profile ids us., eu.,
     // au., and in. (plus global.), each with its own list of source Regions:
     // https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5.html
-    // There is no apac. profile. The Regions below are the source Regions on that
+    // The model card lists no apac. profile. The Regions below are the source Regions on that
     // card that also have Amazon Bedrock AgentCore Built-in Tools:
     // https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html
     // The model name is a single constant, so bumping to a newer model is a
