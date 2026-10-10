@@ -21,9 +21,18 @@ exports.handler = async (event) => {
   const principal = callerArn.replace(/^(arn:[^:]+:sts::\d+:assumed-role\/[^/]+)\/.+$/, '$1');
   const role = ADMINS.includes(principal) ? 'admin' : 'reader';
 
-  const { action, resourceId } = JSON.parse(event.body || '{}');
-  if (!ACTIONS.includes(action) || !DOCUMENTS[resourceId]) {
-    return respond(400, { error: `Provide action (${ACTIONS.join(', ')}) and resourceId (${Object.keys(DOCUMENTS).join(', ')})` });
+  const usage = { error: `Provide action (${ACTIONS.join(', ')}) and resourceId (${Object.keys(DOCUMENTS).join(', ')})` };
+  let request;
+  try {
+    request = JSON.parse(event.body || '{}');
+  } catch (e) {
+    return respond(400, usage);
+  }
+  if (request === null || typeof request !== 'object' || Array.isArray(request)) return respond(400, usage);
+  const { action, resourceId } = request;
+  // Own-property check: inherited names such as constructor or __proto__ are not documents.
+  if (!ACTIONS.includes(action) || typeof resourceId !== 'string' || !Object.hasOwn(DOCUMENTS, resourceId)) {
+    return respond(400, usage);
   }
   const doc = DOCUMENTS[resourceId];
 

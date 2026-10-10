@@ -95,7 +95,7 @@ Redeploy with `-c ownerPrincipal="$CALLER"`, then the owner can write:
 call '{"action":"Write","resourceId":"doc-2"}'    # ALLOW
 ```
 
-Redeploy with `-c adminPrincipals="$CALLER"`, then the admin can delete:
+Redeploy with `-c adminPrincipals="$CALLER"` (keep `-c ownerPrincipal="$CALLER"` too, because context values are not remembered between deploys), then the admin can delete:
 
 ```bash
 call '{"action":"Delete","resourceId":"doc-1"}'   # ALLOW
