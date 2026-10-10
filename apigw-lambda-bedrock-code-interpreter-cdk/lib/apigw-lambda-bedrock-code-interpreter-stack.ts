@@ -23,16 +23,31 @@ export class ApigwLambdaBedrockCodeInterpreterStack extends cdk.Stack {
     });
 
     // Region-portable model configuration.
-    // Cross-Region inference profiles are prefixed by geo (us. / eu. / apac.).
-    // Derive the prefix from the deployment Region so the pattern works in US,
-    // EU, and APAC without code edits. The model name is a single constant, so
-    // bumping to a newer model (e.g. a later Claude Sonnet) is a one-line change.
+    // The Claude Sonnet 5 model card lists the geo inference profile ids us., eu.,
+    // au., and in. (plus global.), each with its own list of source Regions:
+    // https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5.html
+    // There is no apac. profile. The Regions below are the source Regions on that
+    // card that also have Amazon Bedrock AgentCore Built-in Tools:
+    // https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html
+    // The model name is a single constant, so bumping to a newer model is a
+    // one-line change (re-check this table for the new model).
     const modelName = 'anthropic.claude-sonnet-5';
-    const geoPrefix = this.region.startsWith('eu-')
-      ? 'eu'
-      : this.region.startsWith('ap-')
-        ? 'apac'
-        : 'us';
+    const geoPrefixByRegion: Record<string, string> = {
+      'us-east-1': 'us', 'us-east-2': 'us', 'us-west-1': 'us', 'us-west-2': 'us', 'ca-central-1': 'us',
+      'eu-central-1': 'eu', 'eu-north-1': 'eu', 'eu-south-1': 'eu', 'eu-south-2': 'eu',
+      'eu-west-1': 'eu', 'eu-west-2': 'eu', 'eu-west-3': 'eu',
+      'ap-southeast-2': 'au',
+      'ap-south-1': 'in', 'ap-south-2': 'in',
+    };
+    if (cdk.Token.isUnresolved(this.region)) {
+      throw new Error('The deploy Region could not be resolved. Set AWS_REGION or a default Region in your AWS CLI profile.');
+    }
+    const geoPrefix = geoPrefixByRegion[this.region];
+    if (!geoPrefix) {
+      throw new Error(
+        `Region ${this.region} is not supported by this pattern. Supported Regions: ${Object.keys(geoPrefixByRegion).join(', ')}. See the README.`,
+      );
+    }
     const inferenceProfileId = `${geoPrefix}.${modelName}`;
 
     // Foundation-model ARNs the chosen geo's inference profile can route to.

@@ -17,7 +17,16 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Supported Regions
 
-The stack derives the Amazon Bedrock cross-Region inference profile prefix (`us.`, `eu.`, `apac.`) from the deployment Region, so it deploys without edits in US, EU, and APAC Regions where the Anthropic Claude Sonnet inference profile is available. Ensure model access is enabled for the profile in your target Region before deploying. The model id is a single constant in `lib/apigw-lambda-bedrock-code-interpreter-stack.ts` if you want to target a different Claude Sonnet version.
+The stack picks the Amazon Bedrock cross-Region inference profile for Anthropic Claude Sonnet 5 from the deployment Region. The [Claude Sonnet 5 model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5.html) lists the geo profiles `us.`, `eu.`, `au.`, and `in.` (and `global.`), each with its own source Regions. The pattern also needs Amazon Bedrock AgentCore Built-in Tools in the same Region, listed on the [AgentCore supported Regions page](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html) (this page does not list Code Interpreter on a separate row). The stack supports the Regions that appear on both pages, and `cdk synth` and `cdk deploy` stop with an error in any other Region:
+
+| Inference profile | Deployment Regions |
+|---|---|
+| `us.anthropic.claude-sonnet-5` | us-east-1, us-east-2, us-west-1, us-west-2, ca-central-1 |
+| `eu.anthropic.claude-sonnet-5` | eu-central-1, eu-north-1, eu-south-1, eu-south-2, eu-west-1, eu-west-2, eu-west-3 |
+| `au.anthropic.claude-sonnet-5` | ap-southeast-2 |
+| `in.anthropic.claude-sonnet-5` | ap-south-1, ap-south-2 |
+
+There is no `apac.` profile for this model. Ensure model access is enabled for the profile in your target Region before deploying. The model id and the Region table are in `lib/apigw-lambda-bedrock-code-interpreter-stack.ts`; check the model card again if you target a different Claude version.
 
 ## Architecture
 
