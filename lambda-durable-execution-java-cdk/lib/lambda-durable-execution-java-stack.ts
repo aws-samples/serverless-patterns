@@ -33,7 +33,7 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "FunctionName", { value: fn.functionName });
     new cdk.CfnOutput(this, "FunctionAliasArn", {
-      value: alias.aliasName,
+      value: alias.functionArn,
       description: "Use this ARN to invoke the durable function",
     });
   }

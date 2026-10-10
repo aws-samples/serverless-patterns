@@ -1,5 +1,5 @@
 {
-  "title": "Lambda Durable Execution with Java SDK",
+  "title": "AWS Lambda Durable Execution with Java SDK",
   "description": "Build a resilient, multi-step order processing workflow using the AWS Lambda Durable Execution SDK for Java with automatic checkpointing and failure recovery.",
   "language": "Java",
   "level": "300",
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-execution-java-cdk",
-      "templateURL": "serverless-patterns/lambda-durable-execution-java-cdk",
-      "projectFolder": "lambda-durable-execution-java-cdk",
       "templateFile": "lib/lambda-durable-execution-java-stack.ts"
     }
   },
