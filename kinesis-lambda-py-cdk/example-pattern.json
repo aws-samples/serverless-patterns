@@ -1,26 +1,31 @@
 {
-  "title": "Kinesis to Lambda with error handling",
-  "description": "Create a Python Lambda function with Event Source as Kinesis Data source",
+  "title": "Amazon Kinesis Data Streams to AWS Lambda using CDK",
+  "description": "Create a serverless app using Amazon Kinesis Data Streams and AWS Lambda.",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using AWS CDK in Python.
-"In this example, the Kinesis Data Stream is used as an event source for the Lambda function which can be then be coded to process the data from the stream as per requirement."
+      "This pattern creates an Amazon Kinesis Data Stream that integrates with AWS Lambda using the AWS CDK.",
+      "In this example, the Kinesis data stream is used as an event source for the Lambda function which processes the data from the stream and catches any failures."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kinesis-lambda-py-cdk",
-      "templateURL": "serverless-patterns/kinesis-lambda-py-cdk",
-      "projectFolder": "svlsland",
-      "templateFile": "kinesis-lambda-py-cdk/svlsland/svlsland_stack.py"
+      "templateFile": "svlsland/svlsland_stack.py"
     }
   },
   "resources": {
     "bullets": [
+      {
+        "text": "Using AWS Lambda with Amazon Kinesis",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      },
+      {
+        "text": "Working with the AWS CDK in Java",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html"
+      },
       {
         "text": "AWS CDK Construct for Kinesis and Lambda",
         "link": "https://docs.aws.amazon.com/solutions/latest/constructs/aws-kinesisstreams-lambda.html"
@@ -42,13 +47,7 @@
       "Delete the stack: <code>cdk destroy</code>."
     ]
   },
-  "authors": [
-    {
-      "name": "Sushir V R",
-      "image": "https://avatars.githubusercontent.com/u/42473846?v=4",
-      "bio": "Cloud Engineer @ AWS",
-      "linkedin": "www.linkedin.com/in/sushirvr",
-      "twitter": ""
-    }
+  "contributors": [
+    "content/contributors/sushir-v-r.json"
   ]
 }

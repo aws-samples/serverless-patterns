@@ -1,10 +1,9 @@
 import express from "express";
-import AWS from "aws-sdk";
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
 const app = express();
 const port = 80;
-AWS.config.update({ region: process.env.region });
-const sns = new AWS.SNS({ apiVersion: "2010-03-31" });
+const snsClient = new SNSClient({ region: process.env.region });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -16,13 +15,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/sendmessage", async (req, res) => {
-  const params = {
+  const command = new PublishCommand({
     Message: req.body.Message,
     TopicArn: TOPIC_ARN,
-  };
+  });
 
   try {
-    const result = await sns.publish(params).promise();
+    const result = await snsClient.send(command);
     return res.status(200).send({
       body: "OK!",
       snsResponse: result,
@@ -33,6 +32,5 @@ app.post("/sendmessage", async (req, res) => {
 });
 
 app.listen(port, () => {
-  // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);
 });

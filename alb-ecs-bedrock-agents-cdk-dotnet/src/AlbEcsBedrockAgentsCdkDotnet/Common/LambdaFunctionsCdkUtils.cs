@@ -15,7 +15,7 @@ internal static class LambdaFunctionsCdkUtils
         // Build options for Lambda functions
         return new BundlingOptions()
         {
-            Image = Runtime.DOTNET_8.BundlingImage,
+            Image = Runtime.DOTNET_10.BundlingImage,
             User = "root",
             OutputType = BundlingOutput.ARCHIVED,
             Command = [

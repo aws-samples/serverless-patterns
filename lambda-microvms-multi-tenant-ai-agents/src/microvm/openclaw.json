@@ -1,0 +1,87 @@
+{
+  "gateway": {
+    "mode": "local",
+    "bind": "custom",
+    "customBindHost": "0.0.0.0",
+    "port": 18789,
+    "auth": { "mode": "token" },
+    "controlUi": { "allowedOrigins": ["*"] }
+  },
+  "models": {
+    "providers": {
+      "amazon-bedrock": {
+        "baseUrl": "https://bedrock-runtime.us-east-1.amazonaws.com",
+        "api": "bedrock-converse-stream",
+        "auth": "aws-sdk",
+        "models": [
+          {
+            "id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+            "name": "Claude Haiku 4.5 (Bedrock)",
+            "input": ["text", "image"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "us.anthropic.claude-sonnet-5",
+            "name": "Claude Sonnet 5 (Bedrock)",
+            "input": ["text", "image"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 1000000,
+            "maxTokens": 16384
+          },
+          {
+            "id": "us.anthropic.claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6 (Bedrock)",
+            "input": ["text", "image"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 1000000,
+            "maxTokens": 16384
+          },
+          {
+            "id": "global.anthropic.claude-opus-4-8",
+            "name": "Claude Opus 4.8 (Bedrock)",
+            "input": ["text", "image"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 1000000,
+            "maxTokens": 16384
+          },
+          {
+            "id": "us.anthropic.claude-opus-4-7",
+            "name": "Claude Opus 4.7 (Bedrock)",
+            "input": ["text", "image"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 1000000,
+            "maxTokens": 16384
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": { "primary": "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0" },
+      "heartbeat": { "every": "0m" }
+    }
+  },
+  "tools": {
+    "web": {
+      "search": { "enabled": true, "provider": "duckduckgo" },
+      "fetch": { "enabled": true }
+    }
+  },
+  "plugins": {
+    "allow": ["amazon-bedrock"],
+    "entries": {
+      "amazon-bedrock": {
+        "config": {
+          "discovery": {
+            "enabled": true,
+            "region": "us-east-1",
+            "providerFilter": ["anthropic"]
+          }
+        }
+      }
+    }
+  }
+}

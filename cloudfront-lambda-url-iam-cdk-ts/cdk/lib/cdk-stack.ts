@@ -64,7 +64,7 @@ export class CdkStack extends cdk.Stack {
     private createAuthEdgeFunction(functionArn: string) {
         const authFunction = new cloudfront.experimental.EdgeFunction(this, 'AuthLambdaEdge', {
             handler: 'authEdge.handler',
-            runtime: lambda.Runtime.NODEJS_16_X,
+            runtime: lambda.Runtime.NODEJS_24_X,
             code: lambda.Code.fromAsset(path.join(__dirname, '../lambda-edge'), {
                 bundling: {
                     command: [
@@ -72,7 +72,7 @@ export class CdkStack extends cdk.Stack {
                         "-c",
                         "npm install && cp -rT /asset-input/ /asset-output/",
                     ],
-                    image: lambda.Runtime.NODEJS_16_X.bundlingImage,
+                    image: lambda.Runtime.NODEJS_24_X.bundlingImage,
                     user: "root",
                 },
             }),

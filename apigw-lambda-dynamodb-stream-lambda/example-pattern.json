@@ -1,6 +1,6 @@
 {
-  "title": "API Gateway to Lambda, DynamoDB, Kinesis, Lambda integration",
-  "description": "API to trigger a Lambda function which save to DynamoDB, stream messages (with DynamoDB Stream) and trigger a Lambda function",
+  "title": "Amazon DynamoDB streams with Amazon API Gateway and AWS Lambda",
+  "description": "Saves items to DynamoDB through API Gateway. DynamoDB streams are then used to listen to new items and trigger downstream Lambda function",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-stream-lambda",
-      "templateURL": "serverless-patterns/apigw-lambda-dynamodb-stream-lambda",
-      "projectFolder": "apigw-lambda-dynamodb-stream-lambda",
-      "templateFile": "apigw-lambda-dynamodb-stream-lambda/sfn_athena_cdk_python_stack.py"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -52,15 +49,15 @@
   "authors": [
     {
       "name": "Thi Nguyen",
-      "image": "https://drive.google.com/file/d/188LpzUvUmHt1o7vzbwKw32S-fYabL-qY/view?usp=sharing",
       "bio": "Solutions Architect @ AWS",
-      "linkedin": "https://www.linkedin.com/in/ndthi"
+      "image": "https://drive.google.com/file/d/188LpzUvUmHt1o7vzbwKw32S-fYabL-qY/view?usp=sharing",
+      "linkedin": "ndthi"
     },
     {
       "name": "Vijay Konade",
-      "image": "vijay.png",
       "bio": "Cloud Support Eng @ AWS",
-      "linkedin": "https://www.linkedin.com/in/vijay-konade-14427479/"
+      "image": "vijay.png",
+      "linkedin": "vijay-konade-14427479"
     }
   ]
 }

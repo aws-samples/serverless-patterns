@@ -1,0 +1,52 @@
+{
+  "title": "Running long-running scripts with CodeBuild",
+  "description": "Create a CodeBuild project triggered by a scheduled EventBridge rule.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Developers sometimes encounter the 15-minute timeout limit for Lambda functions. This pattern demonstrates how to use AWS CodeBuild to run long-running scripts (scripts that run for more than 15 minutes) in a serverless application. This examples creates a CodeBuild project that runs a sample script triggered by a scheduled EventBridge rule, and a SNS topic to inform the completion of the CodeBuild project. A S3 bucket is also created to upload sample script."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda enables functions that can run up to 15 minutes",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2018/10/aws-lambda-supports-functions-that-can-run-up-to-15-minutes/"
+      },
+      {
+        "text": "Using AWS CodeBuild to execute administrative tasks",
+        "link": "https://aws.amazon.com/blogs/devops/using-aws-codebuild-to-execute-administrative-tasks/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "1. You can test the solution by accessing the Lambda console, finding the Lambda function, and clicking Test in the Code Source section.",
+      "2. You can also invoke the function from the CLI using <code>aws lambda invoke --function-name ENTER_FUNCTION_NAME output.txt</code>.",
+      "3. Go to the S3 console, locate the deployed S3 bucket, and view the object has been written."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/guyu-ye.json"
+  ]
+}

@@ -12,12 +12,12 @@
     "@types/aws-lambda": "^8.10.160",
     "@types/node": "^25.1.0",
     "aws-cdk": "2.1104.0",
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.28.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.236.0",
+    "aws-cdk-lib": "2.260.0",
     "constructs": "^10.4.5",
     "@aws-lambda-powertools/logger": "^2.30.2"
   }

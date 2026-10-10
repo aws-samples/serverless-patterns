@@ -9,7 +9,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1337.0",
+    "@aws-sdk/client-transcribe": "^3.600.0",
+    "@aws-sdk/client-translate": "^3.600.0",
+    "@aws-sdk/client-polly": "^3.600.0",
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/client-sfn": "^3.600.0",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0",
     "uuidv1": "^1.6.14"
   }
 }

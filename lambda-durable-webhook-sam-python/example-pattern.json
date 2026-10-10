@@ -1,5 +1,5 @@
 {
-  "title": "Webhook Receiver with Lambda durable functions",
+  "title": "Webhook Receiver with AWS Lambda durable functions",
   "description": "Receive and process webhooks durably with automatic checkpointing using Lambda durable functions and Python",
   "language": "Python",
   "level": "200",
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-webhook-sam-python",
-      "templateURL": "serverless-patterns/lambda-durable-webhook-sam-python",
-      "projectFolder": "lambda-durable-webhook-sam-python",
       "templateFile": "template.yaml"
     }
   },
@@ -60,8 +57,8 @@
   "authors": [
     {
       "name": "AWS Serverless Patterns",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/aws.png",
       "bio": "AWS Serverless Patterns Collection",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/aws.png",
       "linkedin": "aws"
     }
   ]

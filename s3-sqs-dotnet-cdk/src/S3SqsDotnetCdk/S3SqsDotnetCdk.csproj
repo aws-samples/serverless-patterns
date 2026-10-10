@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <!-- CDK Construct Library dependencies -->
-    <PackageReference Include="Amazon.CDK.Lib" Version="2.8.0" />
-    <PackageReference Include="Constructs" Version="10.0.43" />
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.253.0" />
+    <PackageReference Include="Constructs" Version="10.5.0" />
 
     <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />

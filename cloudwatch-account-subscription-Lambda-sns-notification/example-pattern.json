@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-account-subscription-Lambda-sns-notification",
-      "templateURL": "serverless-patterns/cloudwatch-account-subscription-Lambda-sns-notification",
-      "projectFolder": "cloudwatch-account-subscription-Lambda-sns-notification",
       "templateFile": "template.yaml"
     }
   },
@@ -55,8 +52,8 @@
   "authors": [
     {
       "name": "Shubham",
-      "image": "https://avatars.githubusercontent.com/u/150242047?s=400&u=aaa2db07529d3e1e82ec59daacb05b6abc7c3a5f&v=4",
       "bio": "Cloud Support Engineer - SVLS",
+      "image": "https://avatars.githubusercontent.com/u/150242047?s=400&u=aaa2db07529d3e1e82ec59daacb05b6abc7c3a5f&v=4",
       "linkedin": "shubham-more-1b6aa185"
     }
   ]

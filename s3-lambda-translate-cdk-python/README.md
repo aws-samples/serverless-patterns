@@ -28,7 +28,7 @@ If you have not yet run `aws configure` and set a default region, you must do so
 You must use a role that has sufficient permissions to create IAM roles, as well as CloudFormation resources
 
 #### Python >=3.8
-Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.10.
+Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.14.
 As `TranslateDocument` API is yet to be made available in the latest Boto3 library, a layer `python.zip` with Boto3 version >= 1.28.56 has been attached.
 
 #### AWS CDK

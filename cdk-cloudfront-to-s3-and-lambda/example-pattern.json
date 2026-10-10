@@ -1,0 +1,51 @@
+{
+  "title": "Amazon CloudFront to Amazon S3 and Amazon API Gateway",
+  "description": "CloudFront to S3 and API Gateway backed by TypeScript Lambda functions",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a CloudFront distribution and routes HTTP traffic to two backend services based on the URL. Any URLs that have a path beginning with /api/ are routed to an API Gateway which integrates with Lambda Functions which are written in TypeScript. All other traffic is routed to an S3 bucket.",
+      "The pattern also includes examples of using Lambda@Edge integrated with CloudFront to implement redirects, and to add CORS headers to API requests."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/static-site-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CDK Patterns",
+        "link": "https://cdkpatterns.com/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm i",
+      "npx cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "You can test the solution by accessing the CloudFront distribution domain using a web browser."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>npx cdk destroy --all</code>",
+      "2. See additional notes in the repo."
+    ]
+  },
+  "contributors": [
+    "content/contributors/adrian-hesketh.json"
+  ]
+}

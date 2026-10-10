@@ -1,6 +1,6 @@
-import * as AWS from 'aws-sdk';
+import { CodeCommitClient, PostCommentForPullRequestCommand } from '@aws-sdk/client-codecommit';
 
-const client = new AWS.CodeCommit({region: 'us-east-1'});
+const client = new CodeCommitClient({ region: 'us-east-1' });
 
 interface Variables {
     name: string,
@@ -61,13 +61,13 @@ interface publishComment {
 }
 
 const publishComment = async ({ afterCommitId, beforeCommitId, pullRequestId, repositoryName, comment }: publishComment) => {
-    await client.postCommentForPullRequest({
+    await client.send(new PostCommentForPullRequestCommand({
         afterCommitId,
         beforeCommitId,
         pullRequestId,
         repositoryName,
         content: comment
-    }).promise()
+    }))
 }
 
 const buildComment = (status: string, buildId: string) => {

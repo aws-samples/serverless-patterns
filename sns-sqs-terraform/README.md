@@ -2,7 +2,7 @@
 
 The Terraform stack deploys a SNS topic and an SQS queue. The SQS queue is subscribed to the SNS topic. SNS invokes the SQS queue when new messages are available. When messages are sent to the SNS topic, they are delivered as a JSON event payload to the SQS queue.
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sqs-lambda-terraform](https://serverlessland.com/patterns/sns-sqs-terraform)
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sqs-terraform](https://serverlessland.com/patterns/sns-sqs-terraform)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -58,14 +58,13 @@ When a message is received by the SNS topic, the message is sent to the SQS queu
 Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SNS topic and observe the message received by SQS (using values from Terraform output):
 
 1. Send a message to SNS:
-```bash
-aws sns publish --topic-arn ENTER_YOUR_SNS_TOPIC_ARN --subject testSubject --message testMessage
-```
+    ```bash
+    aws sns publish --topic-arn ENTER_YOUR_SNS_TOPIC_ARN --subject testSubject --message testMessage
+    ```
 1. Retrieve the message from SQS queue:
-```bash
-aws sqs receive-message --queue-url ENTER_YOUR_SQS_QUEUE_URL
-```
-
+    ```bash
+    aws sqs receive-message --queue-url ENTER_YOUR_SQS_QUEUE_URL
+    ```
 
 ## Cleanup
 

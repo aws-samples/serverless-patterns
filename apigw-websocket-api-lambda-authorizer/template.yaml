@@ -39,7 +39,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: WebSocketAPI::WebSocketAPI.Functions::OnConnectHandler
-      Runtime: dotnet6
+      Runtime: dotnet10
       CodeUri: './src/WebSocketAPI'
       MemorySize: 256
       Timeout: 30
@@ -53,7 +53,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: WebSocketAPI::WebSocketAPI.Functions::OnDisconnectHandler
-      Runtime: dotnet6
+      Runtime: dotnet10
       CodeUri: './src/WebSocketAPI'
       MemorySize: 256
       Timeout: 30
@@ -67,7 +67,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: WebSocketAPI::WebSocketAPI.Functions::SendMessageHandler
-      Runtime: dotnet6
+      Runtime: dotnet10
       CodeUri: './src/WebSocketAPI'
       MemorySize: 256
       Timeout: 30
@@ -220,7 +220,7 @@ Resources:
     Metadata:
       Tool: Amazon.Lambda.Annotations
     Properties:
-      Runtime: dotnet6
+      Runtime: dotnet10
       CodeUri: ./src/LambdaAuthorizer
       MemorySize: 1024
       Timeout: 30

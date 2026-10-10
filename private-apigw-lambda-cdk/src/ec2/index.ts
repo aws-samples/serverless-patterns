@@ -1,7 +1,7 @@
 
-import * as cdk from '@aws-cdk/core';
-import * as  ec2  from '@aws-cdk/aws-ec2';
-import { Role, ServicePrincipal, ManagedPolicy, CfnInstanceProfile } from '@aws-cdk/aws-iam'
+import * as cdk from 'aws-cdk-lib';
+import * as  ec2  from 'aws-cdk-lib/aws-ec2';
+import { Role, ServicePrincipal, ManagedPolicy, CfnInstanceProfile } from 'aws-cdk-lib/aws-iam'
 import config from "../api/config.json";
 
 export class Ec2Stack extends cdk.Stack {

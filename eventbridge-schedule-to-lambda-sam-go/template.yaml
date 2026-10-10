@@ -9,10 +9,12 @@ Description: (uksb-1tthgi812) (tag:eventbridge-schedule-to-lambda-sam-go)
 Resources:
   SchedulerLambdaFunction:
     Type: AWS::Serverless::Function 
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: src/
-      Handler: main
-      Runtime: go1.x
+      Handler: bootstrap
+      Runtime: provided.al2023
       Architectures:
         - x86_64
       Events:

@@ -1,0 +1,73 @@
+{
+  "title": "Amazon SNS to Amazon SQS to AWS Lambda to Amazon Data Firehose",
+  "description": "Save messages from an SNS FIFO topic into an S3 bucket, using SQS FIFO queue, Lambda and Firehose.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Terraform template in this pattern allows you to connect an SQS FIFO queue to Firehose to process messages sent by an SNS FIFO topic and save the result to an S3 bucket using a Lambda function as a bridge to Firehose."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "SNS FIFO topic",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html"
+      },
+      {
+        "text": "SQS FIFO queue",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon Data Firehose",
+        "link": "https://aws.amazon.com/kinesis/data-firehose/"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://aws.amazon.com/s3/"
+      },
+      {
+        "text": "Amazon CloudWatch",
+        "link": "https://aws.amazon.com/cloudwatch/"
+      },
+      {
+        "text": "Terraform AWS Provider",
+        "link": "https://registry.terraform.io/providers/hashicorp/aws/latest/docs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>terraform show</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/hicham-terkiba.json"
+  ]
+}

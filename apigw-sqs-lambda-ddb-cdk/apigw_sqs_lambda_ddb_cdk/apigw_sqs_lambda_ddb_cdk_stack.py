@@ -220,7 +220,7 @@ class ApigwSqsLambdaDdbCdkStack(Stack):
         pwrToolsLayer = lambda_.LayerVersion.from_layer_version_arn(self, 'powertools-layer', 'arn:aws:lambda:' + self._region + ':017000801446:layer:AWSLambdaPowertoolsPythonV2:32')
 
         fnSqsHandler = lambda_.Function(self, "SqsHandlerFunction",
-            runtime=lambda_.Runtime.PYTHON_3_10,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="index.lambda_handler",
             code=lambda_.Code.from_asset("lambda/sqs-handler/"),
             role=SqsHandlerLambdaExecutionRole,
@@ -236,7 +236,7 @@ class ApigwSqsLambdaDdbCdkStack(Stack):
         
         # Lambda - AuthorizerFunction
         fnAuthorizer = lambda_.Function(self, "AuthorizerFunction",
-            runtime=lambda_.Runtime.PYTHON_3_10,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="index.lambda_handler",
             code=lambda_.Code.from_asset("lambda/authorizer/"),
             role=AuthorizationLambdaRole,

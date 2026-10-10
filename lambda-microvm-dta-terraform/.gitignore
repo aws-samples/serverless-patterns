@@ -1,0 +1,10 @@
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+tfplan
+__pycache__/
+*.pyc
+*.egg-info/
+out/

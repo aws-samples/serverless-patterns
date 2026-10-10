@@ -1,0 +1,13 @@
+{
+  "name": "notification-service-lambda",
+  "version": "1.0.0",
+  "description": "Simple notification service",
+  "main": "index.js",
+  "type": "module",
+  "keywords": [
+    "aws",
+    "lambda"
+  ],
+  "author": "",
+  "license": "MIT"
+}

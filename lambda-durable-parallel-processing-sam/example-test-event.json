@@ -1,0 +1,23 @@
+{
+  "orderId": "ORD-12345",
+  "items": [
+    {
+      "productId": "PROD-001",
+      "quantity": 2,
+      "price": 29.99
+    },
+    {
+      "productId": "PROD-002",
+      "quantity": 1,
+      "price": 49.99
+    }
+  ],
+  "customer": {
+    "id": "CUST-789",
+    "address": {
+      "state": "CA",
+      "zipCode": "94102"
+    },
+    "paymentMethod": "credit_card"
+  }
+}

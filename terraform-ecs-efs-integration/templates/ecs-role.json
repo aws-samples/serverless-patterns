@@ -45,7 +45,7 @@
         "ecr:BatchGetImage",
         "ecr:GetDownloadUrlForLayer"
       ],
-      "Resource": "arn:aws:ecr:*:*:repository/${standard_resource_name}"
+      "Resource": "arn:aws:ecr:*:*:repository/${standard_resource_name}-efs-updater"
     },
     {
       "Sid": "ECSGrants",

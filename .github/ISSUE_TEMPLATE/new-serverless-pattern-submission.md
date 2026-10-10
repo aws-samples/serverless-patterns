@@ -25,7 +25,9 @@ Patterns may take up to 4-6 weeks to review, test, and merge but there is no SLA
 Note the following information for the model:
 - Description (intro.text) should be a 300-500 word explanation of how the pattern works.
 - Resources should like to AWS documentation and AWS blogs related to the post (1-5 maximum).
-- Author bio may include a LinkedIn and/or Twitter reference and a 1-sentence bio.
+- Author bio may include a LinkedIn and/or Twitter reference and a 1-sentence bio. Use your LinkedIn profile ID and Twitter handle, not URLs.
+- Returning authors with a profile page at https://serverlessland.com/about/your-name can list `"contributors": ["content/contributors/your-name.json"]` instead of `authors`.
+- Pull requests check "example-pattern.json" against the [pattern schema](https://github.com/aws-samples/serverless-patterns/blob/main/_scripts/pattern-schema.mjs). To check it locally, run `cd _scripts && npm i`, then from the repo root `node _scripts/validate.js your-pattern/example-pattern.json`.
 
 You must ensure that the sections of the model README.md are completed in full.
 

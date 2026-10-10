@@ -32,7 +32,7 @@ namespace Cdk
             // Lambda Function Build Commands
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -50,7 +50,7 @@ namespace Cdk
                 FunctionName= lambdaFunctionName,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "dynamodb-lambda::dynamodb_lambda.Function::FunctionHandler",
                 Role = lambdaIAMRole,                
                 Code = Code.FromAsset("../lambda/dynamodb-lambda/", new Amazon.CDK.AWS.S3.Assets.AssetOptions

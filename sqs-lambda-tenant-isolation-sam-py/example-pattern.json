@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda Tenant Isolation with Amazon SQS",
+  "description": "This pattern demonstrates AWS Lambda tenant isolation with Amazon SQS fair queues for multi-tenant message processing.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "It uses single Amazon SQS for multi-tenant application and isolating messages using MessageGroupId and invoking isolated AWS Lambda environments."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda tenant isolation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/tenant-isolation.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mitesh Purohit",
+      "bio": "Sr Solution Architect, AWS",
+      "linkedin": "mitup"
+    },
+    {
+      "name": "Ricardo Marques",
+      "bio": "Sr Serverless Specialist, AWS",
+      "linkedin": "ricardo-marques-aws"
+    }
+  ]
+}

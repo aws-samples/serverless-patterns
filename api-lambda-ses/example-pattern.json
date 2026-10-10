@@ -1,18 +1,17 @@
 {
-  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon SES",
-  "description": "This sample project demonstrates publishing an email through SES by invoking a Lambda function through a REST API.",
+  "title": "Amazon API Gateway REST API to AWS Lambda and Amazon SES",
+  "description": "This sample project demonstrates how to publish an email using Amazon SES (Amazon Simple Email Service) by invoking a Lambda function via a REST API",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
-    "headline": "Create an Amazon API Gateway REST API that invokes a Lambda function to send email through SES.",
-    "text": ["This pattern deploys a Amazon API Gateway REST API with Lambda Function integration and SES"]
+    "headline": "Create an Amazon API Gateway REST API that invokes Lambda and SES.",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API with Lambda function  and SES integration."
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/blob/main/apigw-lambda-ses",
-      "templateURL": "serverless-patterns/apigw-lambda-ses",
-      "projectFolder": "apigw-lambda-ses",
       "templateFile": "template.yml"
     }
   },
@@ -40,14 +39,14 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete </code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Himanshu Goyal",
+      "bio": "A Serverless Cloud Engineer and technical writer, dedicated to crafting efficient and scalable solutions using AWS services. My expertise in serverless architecture empowers me to create innovative and cost-effective cloud solutions. I enjoy sharing my knowledge with the serverless community through articles and patterns, helping others explore the vast potential of serverless computing.",
       "image": "https://drive.google.com/file/d/1wXvafYjTDUxW55EX12XbVJBdR135obFP/view?usp=sharing",
-      "bio": "A Serverless Cloud Engineer and technical writer, dedicated to crafting efficient and scalable solutions using AWS services. My expertise in serverless architecture empowers me to create innovative and cost-effective cloud solutions. I enjoy sharing my knowledge with the serverless community through articles and patterns, helping others explore the vast potential of serverless computing. ",
       "linkedin": "himanshugoyal20"
     }
   ]

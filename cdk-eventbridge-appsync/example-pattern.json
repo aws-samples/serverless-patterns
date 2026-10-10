@@ -1,0 +1,52 @@
+{
+  "title": "Amazon EventBridge to AWS AppSync",
+  "description": "Create an EventBridge event bus that sends events to an AppSync API",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, AWS AppSync is configured with a a schema to manage and read todos. The pattern uses an event bridge bus and an EventBridge API destination to trigger the AppSync GraphQL updateTodo mutation when an event that matches the defined rule is received. The AppSync API KEY is used as the mode of authorization."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/main.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      },
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy",
+      "See the GitHub repo for detailed instructions"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "To delete the stack, run: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/josh-kahn.json"
+  ]
+}

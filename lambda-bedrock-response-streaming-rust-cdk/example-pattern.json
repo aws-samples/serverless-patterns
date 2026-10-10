@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-bedrock-response-streaming-rust-cdk",
-      "templateURL": "serverless-patterns/lambda-bedrock-response-streaming-rust-cdk",
-      "projectFolder": "lambda-bedrock-response-streaming-rust-cdk",
       "templateFile": "cdk/lib/bedrock-streamer-stack.ts"
     }
   },
@@ -59,9 +56,9 @@
   "authors": [
     {
       "name": "Phil Callister",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/phil-callister.jpg",
       "bio": "I'm an Enterprise Solutions Architect at AWS, with a focus on Financial Services. As a passionate builder, I enjoy helping customers create innovative solutions to achieve their business objectives.",
-      "linkedin": "https://www.linkedin.com/in/philcallister/"
+      "image": "https://serverlessland.com/assets/images/resources/contributors/phil-callister.jpg",
+      "linkedin": "philcallister"
     }
   ]
 }

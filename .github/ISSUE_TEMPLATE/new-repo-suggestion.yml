@@ -1,4 +1,3 @@
-
 name: New repo suggestion form
 description: |
             To suggest a GitHub repo for inclusion in the Serverless Repo Collection, please complete the following form in full:
@@ -11,25 +10,53 @@ body:
       description: Describe what this project does (100-200 words)
     validations:
       required: true
-  - type: input 
+  - type: checkboxes
     id: language
     attributes:
-      label: language
-      description: (e.g. "English")
-    validations:
-      required: true
-  - type: input 
-    id: runtime
-    attributes:
-      label: runtime
-      description: (e.g. "Python")
-    validations:
-      required: true
+      label: Programming Language
+      description: Select all programming languages used in this repo
+      options:
+        - label: ".NET"
+          required: false
+        - label: "AWS CLI"
+          required: false
+        - label: "Bash"
+          required: false
+        - label: "Go"
+          required: false
+        - label: "Integration"
+          required: false
+        - label: "Java"
+          required: false
+        - label: "JSON"
+          required: false
+        - label: "Node.js"
+          required: false
+        - label: "OpenAPI"
+          required: false
+        - label: "PHP"
+          required: false
+        - label: "PowerShell"
+          required: false
+        - label: "Python"
+          required: false
+        - label: "Ruby"
+          required: false
+        - label: "Rust"
+          required: false
+        - label: "Spark"
+          required: false
+        - label: "TypeScript"
+          required: false
+        - label: "VTL"
+          required: false
+        - label: "YAML"
+          required: false
   - type: dropdown
     id: level
     attributes:
       label: Level
-      description: choose from 100(beginner) to 400 (expert) 
+      description: Choose from 100 (beginner) to 400 (expert)
       options:
         - "100"
         - "200"
@@ -41,36 +68,58 @@ body:
     id: type
     attributes:
       label: Type
-      description: choose from the options below 
+      description: Choose the content type
       options:
         - "Application"
+        - "Code Sample"
+        - "Demo"
         - "Examples"
+        - "How To"
         - "Tips"
+        - "Tooling"
         - "Workshop"
+    validations:
+      required: true
   - type: dropdown
     id: usecase
     attributes:
       label: Use case
-      description: choose from the options below 
+      description: Choose the primary use case
       options:
+        - "AI/ML/GenAI"
         - "Backend"
+        - "Data Processing"
+        - "Identity"
         - "Interactive workload"
         - "Observability"
         - "Performance"
+        - "Security"
+        - "Testing"
+        - "Web Application"
     validations:
       required: true
   - type: input
     id: image
     attributes:
       label: Primary image
-      description: (500x300 pixels, JPG or PNG) - provide link
+      description: Architecture diagram (500x300 pixels, JPG or PNG) - provide link
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: iac
     attributes:
-      label: IaC framework 
-      description: (e.g. "AWS SAM", "AWS CDK", "Terraform")
+      label: IaC framework
+      description: Choose the Infrastructure as Code framework used
+      options:
+        - "AWS CDK"
+        - "AWS CDK for Terraform"
+        - "AWS CLI"
+        - "AWS CloudFormation"
+        - "AWS SAM"
+        - "Pulumi"
+        - "Serverless Framework"
+        - "Terraform"
+        - "Terraform (with modules)"
     validations:
       required: true
   - type: checkboxes
@@ -80,19 +129,27 @@ body:
       options:
         - label: Amazon API Gateway
           required: false
+        - label: Amazon Bedrock
+          required: false
+        - label: Amazon CloudFront
+          required: false
+        - label: Amazon CloudWatch
+          required: false
+        - label: Amazon Cognito
+          required: false
         - label: Amazon DynamoDB
+          required: false
+        - label: Amazon ECS
           required: false
         - label: Amazon EventBridge
           required: false
-        - label: AWS IoT
+        - label: Amazon Kinesis
           required: false
-        - label: AWS Lambda
+        - label: Amazon OpenSearch
           required: false
         - label: Amazon Rekognition
           required: false
         - label: Amazon S3
-          required: false
-        - label: AWS Step Functions
           required: false
         - label: Amazon SNS
           required: false
@@ -102,25 +159,37 @@ body:
           required: false
         - label: Amazon Translate
           required: false
+        - label: AWS AppSync
+          required: false
+        - label: AWS Fargate
+          required: false
+        - label: AWS Glue
+          required: false
+        - label: AWS IoT
+          required: false
+        - label: AWS Lambda
+          required: false
+        - label: AWS Step Functions
+          required: false
   - type: input
     id: headline
     attributes:
       label: Description headline
-      description: (max 160 chars)
+      description: Short headline (max 160 chars)
     validations:
       required: true
   - type: input
     id: url
     attributes:
       label: Repo URL
-      description: Link to repo
+      description: Only AWS GitHub repos are supported (e.g. https://github.com/aws-samples/your-repo)
     validations:
       required: true
   - type: textarea
     id: resources
     attributes:
       label: Additional resources 
-      description: Additional resources (URLs, up to 5)
+      description: Additional resources (URLs, one per line, up to 5)
   - type: markdown
     attributes:
       value: |
@@ -150,12 +219,6 @@ body:
     attributes:
       value: |
         Thanks for taking the time to add a repo!
-  - type: input
-    id: leave
-    attributes:
-      label: leave
-      description: Leave blank
 labels: ["repo-issue"]
 assignees: 
-  - jbesw
-  - bls20AWS
+  - julianwood

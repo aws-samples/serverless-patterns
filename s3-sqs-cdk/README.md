@@ -1,4 +1,4 @@
-# Amazon S3 to AWS SQS 
+# Amazon S3 to Amazon SQS
 
 Sends notifications from S3 to SQS when an object is created
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (AWS CDK) Installed and account bootstrapped
 
 ## Deployment Instructions
 
@@ -52,11 +52,9 @@ This CDK stack creates an S3 bucket, allows you to upload objects to that bucket
 ## Testing
 
 1. Upload an object to the S3 bucket created by the deployment.
-
-```bash
-aws s3 cp 'test_upload.txt'  s3://<BUCKET_NAME>
-```
-
+    ```bash
+    aws s3 cp 'test_upload.txt' s3://<BUCKET_NAME>
+    ```
 2. You can then use the SQS CLI to fetch new messages from the queue:
     ```bash
     aws sqs receive-message --queue-url <QUEUE_URL> --max-number-of-messages 10
@@ -66,7 +64,7 @@ aws s3 cp 'test_upload.txt'  s3://<BUCKET_NAME>
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    cdk destroy
     ```
 1. Confirm the stack has been deleted
     ```bash

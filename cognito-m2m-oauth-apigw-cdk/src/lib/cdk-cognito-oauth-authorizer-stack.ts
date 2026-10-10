@@ -78,7 +78,7 @@ export class CdkCognitoOauthAuthorizerStack extends Stack {
     // User Lambda
 
     const apiLambda = new aws_lambda_nodejs.NodejsFunction(this, "UserLambda", {
-      runtime: aws_lambda.Runtime.NODEJS_16_X,
+      runtime: aws_lambda.Runtime.NODEJS_24_X,
       handler: "handler",
       entry: path.join(__dirname, "../src/lambda/user/index.ts"),
       bundling: {

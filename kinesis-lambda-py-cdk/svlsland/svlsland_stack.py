@@ -22,7 +22,7 @@ class SvlslandStack(Stack):
             self, 'sampleFn',
             handler='index.lambda_handler',
             code=lambda_.InlineCode(handler_code),
-            runtime=lambda_.Runtime.PYTHON_3_8,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             timeout=Duration.seconds(30)
         )
 

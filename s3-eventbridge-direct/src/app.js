@@ -2,9 +2,8 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const AWS = require('aws-sdk')
-AWS.config.update({ region: process.env.AWS_REGION })
-const s3 = new AWS.S3()
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3')
+const s3 = new S3Client({ region: process.env.AWS_REGION })
 
 /* S3 Event syntax from EventBridge
 
@@ -43,10 +42,10 @@ exports.handler = async (event) => {
     console.log(JSON.stringify(event, null, 2))
 
     // Read the object from S3
-    const s3Object = await s3.getObject({
+    const s3Object = await s3.send(new GetObjectCommand({
         Bucket: event.detail.bucket.name,
         Key: decodeURIComponent(event.detail.object.key.replace(/\+/g, " "))
-    }).promise()
+    }))
 
     // Logs out the buffer
     console.log(s3Object.Body)

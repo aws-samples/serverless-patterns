@@ -1,0 +1,50 @@
+{
+  "title": "Resizing images uploaded to Amazon S3 with AWS Lambda (.NET)",
+  "description": "Automate the creation of thumbnail images from new images on Amazon S3 leveraging Lambda and .NET",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon S3 bucket for image hosting with an AWS Lambda function that gets invoked when new images are added to the bucket. The Lambda function uses .NET 6 to create a thumbnail of the image and save the thumbnail back to the same S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using an Amazon S3 trigger to invoke a Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Building Lambda functions with C#",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-csharp.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo readme for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Empty the S3 bucket",
+      "sam delete --stack-name STACK_NAME"
+    ]
+  },
+  "contributors": [
+    "content/contributors/garrett-johnson.json"
+  ]
+}

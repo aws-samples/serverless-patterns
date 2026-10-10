@@ -1,0 +1,55 @@
+{
+  "title": "Amazon SNS to Amazon SQS",
+  "description": "Create an SQS queue that subscribes to an SNS topic.",
+  "language": "Integration",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use a SQS queue to receive messages published on a SNS topic.",
+      "This pattern creates the following resources: SNS topic, SQS queue, SNS topic subscription with SQS protocol, SQS queue resource policy for SNS to push messages.",
+      "This pattern can combined with any pattern using SQS as source to build the infrastructure answering the desired goal, for example SQS to Lambda pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "SNS fanout to SQS queues",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications",
+        "link": "https://aws.amazon.com/fr/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy --auto-approve</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/nicolas-diez.json"
+  ]
+}

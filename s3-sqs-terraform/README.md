@@ -1,4 +1,4 @@
-# AWS S3 to AWS SQS 
+# Amazon S3 to Amazon SQS
 
 Sends notifications from S3 to SQS when an object is created
 
@@ -38,20 +38,6 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 This template creates an S3 bucket, allows you to upload objects to that bucket, and will send you notifications from S3 to SQS when an object is created in that bucket.
-
-## Example event payload from EventBridge to SQS
-```
-{
-    "Messages": [
-        {
-            "Body": "{\"Records\":[{\"eventVersion\":\"2.1\",\"eventSource\":\"aws:s3\",\"awsRegion\":\"us-east-1\",\"eventTime\":\"2022-03-08T16:05:00.346Z\",\"eventName\":\"ObjectCreated:Put\",\"userIdentity\":{\"principalId\":\"AWS:AROAV3HPQRS4DCLCF333I:i-1234567890\"},\"requestParameters\":{\"sourceIPAddress\":\"1.1.1.1\"},\"responseElements\":{\"x-amz-request-id\":\"8E48JWWWWWXHY65\",\"x-amz-id-2\":\"3QiK7dwWWgAJkrT0r374ONYvUHVzJLPgX3qRBGhK3SJQ2LV/AO0wl3hdUU+OdPcWkXis3rPYhegSAXXdcQxJIytl+Qeqta5oKlhjomKTk=\"},\"s3\":{\"s3SchemaVersion\":\"1.0\",\"configurationId\":\"tf-s3-queue-20220308160319846800000003\",\"bucket\":{\"name\":\"serverlessland-terraform-s3-sqs-123456789100\",\"ownerIdentity\":{\"principalId\":\"A3TQVHWWWWJRXR\"},\"arn\":\"arn:aws:s3:::serverlessland-terraform-s3-sqs-123456789100\"},\"object\":{\"key\":\"README.md\",\"size\":2663,\"eTag\":\"6f9e107ffe28d4ff6wewe37a592f130b6\",\"sequencer\":\"006229999AC4E668A16\"}}}]}", 
-            "ReceiptHandle": "AQEBQhdUK6MGfKpMDQSNtVssi/i5L9R3EHHpks85r4sAaxocQguy4fmn4Ux9jSSesBKO/J7C46ttWXwwwwm6h++QvxJkxrcB/HzFSCFuvYQWF5oVo2cE4LSecWwHO9JV83KYRPmkplMKEomwoT/5eAKUf2ht4u3GhX5V8WWsqERV80whyl3/S7Om3ex8zP0Ci5x118Apqo6GgIQsqNmSx2H/FnWPZhMniNIA/wUHtDABr2zZ2ymk8DGiNMda5CyOtR8g1dNXpbiuG9BXMkgBzFmdavJTCe55yVUgj+3+kNDsUHVudqcBRKbUUemsr5mKPZmyJb6uk/dEh3UjvO4euTaE/3UkTErL/Nq/jzpzn4KNZEsoN7FxgBLB9c47YGdOq0l/fqvqMCt57bmo8tLf0fRZFMGRmjQQbPJd7rpEjV8LsL74=", 
-            "MD5OfBody": "bc3ca7772533df39aw7f7800163dd8ac", 
-            "MessageId": "62086638-761d-420a-a331-3dd106c504b7"
-        }
-    ]
-}
-```
 
 ## Testing
 

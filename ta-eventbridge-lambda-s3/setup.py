@@ -19,7 +19,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="s3_bucket_privatizer"),
 
     install_requires=[
-        "aws-cdk-lib==2.0.0-rc.33",
+        "aws-cdk-lib==2.253.0",
         "constructs>=10.0.0",
     ],
 

@@ -62,7 +62,7 @@ class S3LambdaTranslateServerless(Stack):
             self,
             "Boto3Layer",
             code=lambda_.Code.from_asset("./python.zip"),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_14],
         )
 
         # Log group for Lambda function
@@ -72,7 +72,7 @@ class S3LambdaTranslateServerless(Stack):
         lambda_function = lambda_.Function(
             self,
             "TranslateTextLambda",
-            runtime=lambda_.Runtime.PYTHON_3_10,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="lambda_function.lambda_handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
             timeout=Duration.minutes(1),

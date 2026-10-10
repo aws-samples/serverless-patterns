@@ -238,3 +238,6 @@ terraform.rc
 
 # This file gets generated as part of Maven shade plugin which can be ignored
 dependency-reduced-pom.xml
+
+# Claude Code
+.claude/

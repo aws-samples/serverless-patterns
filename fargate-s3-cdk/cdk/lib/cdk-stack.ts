@@ -11,11 +11,8 @@ export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const BUCKET_NAME = 'demo-bucket-serverless-patterns'
-
     const demoBucket = new Bucket(this, 'demoBucket', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      bucketName: BUCKET_NAME,
       encryption: BucketEncryption.KMS_MANAGED,
       enforceSSL: true,
       publicReadAccess: false,

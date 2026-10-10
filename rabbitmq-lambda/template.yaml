@@ -14,8 +14,8 @@ Resources:
       HostInstanceType: mq.m5.large
       PubliclyAccessible: true
       Users:
-        - Password: '{{resolve:secretsmanager:MQAccess:SecretString:password}}'
-          Username: '{{resolve:secretsmanager:MQAccess:SecretString:username}}'
+        - Password: '{{resolve:secretsmanager:MQaccess:SecretString:password}}'
+          Username: '{{resolve:secretsmanager:MQaccess:SecretString:username}}'
           
   MQConsumer:
     Type: AWS::Serverless::Function 

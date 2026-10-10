@@ -30,14 +30,14 @@ namespace Cdk
             {
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "dotnet-core-web-api",
                 Code = Code.FromAsset("../lambda/dotnet-core-web-api/dotnet-core-web-api", new AssetOptions  
                 {
                     // Note: Asset path should point to the folder where .csproj file is present. Also,this path should be relative to cdk.json
                     Bundling = new BundlingOptions
                     {
-                        Image = Runtime.DOTNET_6.BundlingImage,
+                        Image = Runtime.DOTNET_10.BundlingImage,
                         Command = new[]
                         {
                             "bash", "-c", string.Join(" && ", buildCommands)

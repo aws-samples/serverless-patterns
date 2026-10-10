@@ -1,25 +1,23 @@
 {
-  "title": "AWS Lambda to Amazon Eventbridge to SNS",
-  "description": "Create multiple Amazon Eventbridge Buses and Rules to orchestrate events to trigger Multiple SNS Topics using event patterns.",
+  "title": "AWS Lambda to Amazon EventBridge to Amazon SNS",
+  "description": "Route events from EventBridge to multiple SNS topics.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The AWS SAM template deploys three EventBridge Buses, six EventBridge Rules (2 per Bus),  four SNS Topics, three SQS queues and a Lambda function.  The lambda function is an event generator which sends events to EventBridge Buses that trigger appropriate Rules sending the payload to the appropriate SNS Topic.  SQS queues are attached to the Rules as Dead Letter Queues. Appropriate permissions are granted to EventBridge to trigger the SNS Topics and the Lambda function to put events in the EventBridge.",
-      "To make this easier to understand, here is an example.  Countries report cross-border transactions to their respective Reserve/Central Bank.  For simplicity, transactions originate from bank branches or ATM (automatic teller machines) as sub-domains (source) from all banks.  For simplicity we use three EventBridge Buses - (bluebank, redbank and greenbank).  The 'DetailType' is filtering for 'transaction type' and the 'Detail' section filters the 'Yes/No' reportable field.  Based on these combinations, events trigger different rules and send transaction payloads to SNS Topics of the ReserveBank and/or the Transaction Warehouses of the respective bank's SNS Topics.",
+      "The AWS SAM template deploys three EventBridge Buses, six EventBridge Rules (2 per bus),  four SNS Topics, three SQS queues and a Lambda function.  The lambda function is an event generator which sends events to EventBridge Buses that trigger appropriate Rules sending the payload to the appropriate SNS Topic. SQS queues are attached to the Rules as Dead Letter Queues. Appropriate permissions are granted to EventBridge to trigger the SNS Topics and the Lambda function to put events in the EventBridge.",
+      "Consider this example: countries report cross-border transactions to their respective central banks. For simplicity, transactions originate from bank branches or ATM (automatic teller machines) as sub-domains (source) from all banks. For simplicity we use three EventBridge Buses - (bluebank, redbank and greenbank). The 'DetailType' is filtering for 'transaction type' and the 'Detail' section filters the 'Yes/No' reportable field.  Based on these combinations, events trigger different rules and send transaction payloads to SNS Topics of the ReserveBank and/or the Transaction Warehouses of the respective bank's SNS topics."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge-sns-sam",
-      "templateURL": "serverless-patterns/lambda-eventbridge-sns-sam",
-      "projectFolder": "lambda-eventbridge-sns-sam",
-      "templateFile": "lambda-eventbridge-sns-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Permissions for Amazon EventBridge event buses",
@@ -28,40 +26,36 @@
       {
         "text": "Content filtering in Amazon EventBridge event patterns",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns-content-based-filtering.html"
+      },
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "1. From the output, get the 4 SNS Topic ARNs and subscribe 4 email addresses to the SNS Topics using this command structure.",
-      "aws sns subscribe --topic-arn ENTER_YOUR_TOPIC_ARN --protocol email-json --notification-endpoint ENTER_YOUR_EMAIL_ADDRESS",
-      "2. Click the confirmation link delivered to your emails to verify the endpoint.",
-      "3. Send an event to EventBridge using the Lamdba function:",
-      "- Get the 3 ARNs of the EventBridge Buses from the Output.",
-      "- Open the Lambda function code in your Lambda console and replace 'bus_a', 'bus_b' and 'bus_c' with the ARNs of the Buses created the SAM template.",
-      "- Deploy the function and 'Test' on the Console",
-      "- Alternatively, get the function name from the Cloud Formation Output and use the following CLI command to invoke the function a few times:",
-      "aws lambda invoke --function-name myfunction response.json",
-      "4. The function will randomly choose any of the 3 Buses and send an event.  The events will be classified 'reportable' or 'non-reportable'.  All 'reportable' events trigger notification with the payload to the 'ReserveBank SNS Topic' and another notification to the appropriate Bank Warehouse matching the Bus selected.  All 'non-reportable' events do not trigger the ReserveBank SNS Topic but trigger the respective Bank Warehouse matching the Bus selected."
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: sam delete --stack-name STACK_NAME.",
-      "Confirm the stack has been deleted"
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
-  "authors": [
-    {
-      "name": "Sylvester Kachi",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Sylvester is a Solutions Architect at AWS",
-      "linkedin": "https://www.linkedin.com/in/kachi-sylvester-3684ab32/"
-    }
+  "contributors": [
+    "content/contributors/sylvester-kachi.json"
   ]
 }

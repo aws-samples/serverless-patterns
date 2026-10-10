@@ -18,7 +18,7 @@ export class CdkStack extends Stack {
 
     // Lambda function
     const lambdaPutDynamoDB = new NodejsFunction(this, 'lambdaPutDynamoDBHandler', {
-      runtime: Runtime.NODEJS_12_X,
+      runtime: Runtime.NODEJS_24_X,
       memorySize: 1024,
       timeout: Duration.seconds(3),
       entry: path.join(__dirname, '../src/app.ts'),

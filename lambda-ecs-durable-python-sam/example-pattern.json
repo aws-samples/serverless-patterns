@@ -1,23 +1,20 @@
 {
-  "title": "AWS Lambda Durable Functions to Amazon ECS with Python",
+  "title": "AWS Lambda durable functions to Amazon ECS with Python",
   "description": "Invoke ECS tasks from Lambda durable functions with automatic checkpointing, state management, and resilient execution patterns",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
       "This pattern demonstrates AWS Lambda durable functions invoking Amazon ECS tasks with resilient, long-running execution capabilities:",
       "1. Durable Synchronous Pattern: Lambda uses checkpointed steps and durable waits to poll ECS task status. Can run for up to 1 year with automatic recovery from failures. No compute charges during wait periods.",
       "2. Durable Callback Pattern: Lambda uses checkpointed steps to reliably initiate ECS tasks. Each step (create record, start task, update status) is automatically checkpointed for guaranteed execution.",
-      "The pattern uses the AWS Durable Execution SDK for Python, providing automatic state management, checkpoint-based recovery, and cost-effective long-running workflows. Includes inline Python code in ECS containers, VPC networking, and DynamoDB for callback tracking."
+      "The pattern uses the AWS Durable Execution SDK for Python, providing automatic state management, checkpoint-based recovery, and cost-effective long-running workflows. Includes inline Python code in ECS containers, and VPC networking,"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ecs-python-sam",
-      "templateURL": "serverless-patterns/lambda-ecs-python-sam",
-      "projectFolder": "lambda-ecs-python-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -60,7 +57,6 @@
   "authors": [
     {
       "name": "Mian Tariq",
-      "image": "",
       "bio": "Senior Delivery Consultant",
       "linkedin": "mian-tariq"
     }

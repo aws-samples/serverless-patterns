@@ -1,0 +1,54 @@
+{
+  "title": "Amazon API Gateway canary deployment",
+  "description": "Create a serverless app using API Gateway and Lambda. Then create an API Gateway canary deployment",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an API Gateway canary deployment with a Lambda function behind an API Gateway REST API. Once the canary deployment is live, requests will be routed to the new and old version of the Lambda function at a rate of 50/50 using the Lambda alias from the APIGW stage variables to route traffic to the correct version."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "API Gateway Canary Deployment",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html"
+      },
+      {
+        "text": "API Gateway RESTful API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy MyServerlessApplicationStack"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the Canary Deployment stack:",
+      "<code>cdk destroy CanaryDeploymentStack</code>",
+      "2. Delete the Serverless application stack.",
+      "<code>cdk destroy MyServerlessApplicationStack</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/mitch-andrews.json"
+  ]
+}

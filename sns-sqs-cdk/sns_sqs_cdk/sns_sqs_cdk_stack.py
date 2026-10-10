@@ -1,9 +1,6 @@
 from aws_cdk import (
     Stack,
     CfnOutput,
-    RemovalPolicy,
-    Duration,
-    aws_iam as iam,
     aws_sns as sns,
     aws_sns_subscriptions as snssubs,
     aws_sqs as sqs
@@ -27,16 +24,6 @@ class SnsSqsCdkStack(Stack):
 
         # Add the SQS subscription to the sns topic
         MySnsTopic.add_subscription(sqsSubscription)
-
-        # Add policy statement to SQS Policy that is created as part of the new queue
-        iam.PolicyStatement(actions=['SQS:SendMessage'],
-                            effect=iam.Effect.ALLOW,
-                            conditions={'ArnEquals': MySnsTopic.topic_arn},
-                            resources=[MySqsQueue.queue_arn],
-                            principals=[
-                                iam.ServicePrincipal('sns.amazonaws.com')
-                            ]
-                            )
 
         CfnOutput(self, "SQS queue name", description="SQS queue name", value=MySqsQueue.queue_name)
         CfnOutput(self, "SQS queue ARN", description="SQS queue arn", value=MySqsQueue.queue_arn)

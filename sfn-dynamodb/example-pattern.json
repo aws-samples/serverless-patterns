@@ -1,0 +1,44 @@
+{
+  "title": "AWS Step Functions to Amazon DynamoDB",
+  "description": "Create an AWS Step Functionsworkflow to integrate with Amazon DynamoDB ",
+  "language": "YAML",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Step Functions workflow, that takes in a payload and puts the item in DynamoBb. Additionally, this workflow also shows how to read an item directly from the DynamoDB table. The SAM template contains the minimum IAM resources required to run the application."
+    ],
+    "text2": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": []
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow: <code>aws stepfunctions start-execution  --name \"test\" --state-machine-arn \"{StateMachinetoDDBArn}\" --input \"{\\\"id\\\":  \\\"12345\\\" }\"</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack <code> aws cloudformation delete-stack --stack-name STACK_NAME</code>"
+    ],
+    "test": []
+  },
+  "contributors": [
+    "content/contributors/revanth-anireddy.json"
+  ]
+}

@@ -35,7 +35,7 @@ class LambdaSnsSmsCdkStack(Stack):
                                                    code=aws_lambda.Code.from_asset('src'),
                                                    function_name='SMSPublisherFunction',
                                                    handler='app.handler',
-                                                   runtime=aws_lambda.Runtime.NODEJS_12_X,
+                                                   runtime=aws_lambda.Runtime.NODEJS_24_X,
                                                    timeout=Duration.seconds(3),
                                                    memory_size=128,
                                                    environment={'phoneNumber': phoneNumber.value_as_string,

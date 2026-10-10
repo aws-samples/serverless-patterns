@@ -24,14 +24,13 @@ Resources:
         Properties:
             Command:
                 Name: pythonshell
-                PythonVersion: "3"
+                PythonVersion: "3.9"
                 ScriptLocation: !Sub "s3://${ArtifactsBucket}/glue/scripts/feature_engineering.py"
             ExecutionProperty:
                 MaxConcurrentRuns: 1
             DefaultArguments:
-                "--extra-py-files": !Sub "s3://${ArtifactsBucket}/glue/libs/awswrangler-2.12.0-py3-none-any.whl"
+                "--library-set": "analytics"
                 "--config_path": !Sub "${ETLParametersPath}"
-            GlueVersion: "1.0"
             MaxCapacity: 1
             MaxRetries: 0
             Name: "Feature Engineering"

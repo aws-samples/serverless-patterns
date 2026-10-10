@@ -1,29 +1,25 @@
 {
-  "title": "Amazon API Gateway to Amazon Fifo SQS Queue to AWS Lambda to Amazon SNS",
-  "description": "Process HTTP Post requests using Lambda Fubction  while maintaining the order of the messages",
+  "title": "Amazon API Gateway to Amazon SQS FIFO Queue to AWS Lambda to Amazon SNS",
+  "description": "Process HTTP Post requests using Lambda Function while maintaining the order of the messages",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern is designed to deploy an Amazon API Gateway HTTP API with a single route at \"/\"",
+      "This pattern is designed to deploy an Amazon API Gateway HTTP API with a single route at \"/\".",
       "When the API Gateway receives a request from a client, it immediately sends the message to a FIFO (First-In-First-Out) queue.",
-      "The FIFO queue ensures that messages are processed in the order they were received, maintaining strict ordering",
-      "As the messages arrive in the FIFO queue, it automatically invokes a Lambda function responsible for message processing",
+      "The FIFO queue ensures that messages are processed in the order they were received, maintaining strict ordering.",
+      "As the messages arrive in the FIFO queue, it automatically invokes a Lambda function responsible for message processing.",
       "The Lambda function handles each message one by one in FIFO order.",
-      "Depending on the use case, the Lambda may perform various actions, such as data processing, validation, or invoking other AWS services.",
-      
-      "Once the Lambda function has processed a message, it publishes the relevant information or processed data to an SNS (Simple Notification Service) standard topic.",
-      "You can then Subscribe email addresses to the topic to be notified through the SNS topic, providing users with timely updates or notifications via email."
+      "Depending on the use case, the function may perform various actions, such as data processing, validation, or invoking other AWS services.",
+      "Once the Lambda function has processed a message, it publishes the processed data to an SNS (Simple Notification Service) standard topic.",
+      "You can then subscribe an email addresses to the topic, to be notified by email when ther are new messages."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-fifo-sqs-lambda-sns-sam",
-      "templateURL": "serverless-patterns/apigw-http-api-fifo-sqs-lambda-sns-sam",
-      "projectFolder": "apigw-http-api-fifo-sqs-lambda-sns-sam",
-      "templateFile": "apigw-http-api-fifo-sqs-lambda-sns-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -33,14 +29,13 @@
         "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html"
       },
       {
-        "text": "Lambda sqs fifo trigger",
+        "text": "Lambda SQS FIFO trigger",
         "link": "https://aws.amazon.com/blogs/compute/new-for-aws-lambda-sqs-fifo-as-an-event-source/"
-      }
+      },
       {
         "text": "Subscribe to an SNS topic",
         "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-create-subscribe-endpoint-to-topic.html"
-      }      
-      
+      }
     ]
   },
   "deploy": {
@@ -55,15 +50,10 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
-  "authors": [
-    {
-      "name": "Xivutiso Makhubela",
-      "image": "link-to-your-photo.jpg",
-      "bio": "I am a Startups Solutions Architect at Amazon Web Services",
-      "linkedin": "xivutiso"
-    }
+  "contributors": [
+    "content/contributors/xivutiso-makhubela.json"
   ]
 }

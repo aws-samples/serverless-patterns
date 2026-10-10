@@ -1,11 +1,11 @@
 
-import { LambdaRestApi, EndpointType } from "@aws-cdk/aws-apigateway";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as cdk from "@aws-cdk/core";
+import { LambdaRestApi, EndpointType } from "aws-cdk-lib/aws-apigateway";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as cdk from "aws-cdk-lib";
 import path from "path";
 import config from "./config.json";
-import {SecurityGroup, Vpc, Peer, Port, InterfaceVpcEndpoint, InterfaceVpcEndpointAwsService, SubnetType} from '@aws-cdk/aws-ec2';
-import {PolicyStatement, ServicePrincipal, Effect, PolicyDocument, AnyPrincipal } from '@aws-cdk/aws-iam';
+import {SecurityGroup, Vpc, Peer, Port, InterfaceVpcEndpoint, InterfaceVpcEndpointAwsService, SubnetType} from 'aws-cdk-lib/aws-ec2';
+import {PolicyStatement, ServicePrincipal, Effect, PolicyDocument, AnyPrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class ApiStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, vpc: Vpc) {
@@ -23,7 +23,7 @@ export class ApiStack extends cdk.Stack {
         service: InterfaceVpcEndpointAwsService.APIGATEWAY,
         vpc: vpc,
         subnets: vpc.selectSubnets({
-            subnetType: SubnetType.PRIVATE
+            subnetType: SubnetType.PRIVATE_WITH_EGRESS
         }),
         privateDnsEnabled: true,
         securityGroups: [apiGatewayEndpointSG]
@@ -32,10 +32,10 @@ export class ApiStack extends cdk.Stack {
     const handler = new lambda.Function(this, "handler", {
       code: new lambda.AssetCode(path.resolve(__dirname, "dist")),
       handler: `index.${config.api.handler}`,
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       vpc: vpc,
       vpcSubnets: vpc.selectSubnets({
-        subnetType: SubnetType.PRIVATE
+        subnetType: SubnetType.PRIVATE_WITH_EGRESS
       })
     });
 

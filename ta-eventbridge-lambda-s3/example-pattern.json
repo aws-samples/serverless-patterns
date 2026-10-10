@@ -1,0 +1,55 @@
+{
+  "title": "Trusted Advisor to Amazon EventBridge to AWS Lambda",
+  "description": "Create an EventBridge rule that invokes a Lambda function from Trusted Advisor",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern utilizes AWS Trusted Advisor to execute an AWS Lambda Function via Amazon EventBridge, to remove public access to an S3 bucket once it has been flagged as public.",
+      "Incorrectly configured S3 buckets can be the source of a data leak in your organization. This serverless pattern helps to automate the lock-down of your S3 buckets to prevent any accidental data leaks.",
+      "If an S3 bucket meets the use-case for being open to the public, simply \"Exclude & Refresh\" the specific resource in the AWS Trusted Advisor Console and they will be ignored."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "s3_bucket_privatizer/s3_bucket_privatizer_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/sean-kendall.json"
+  ]
+}

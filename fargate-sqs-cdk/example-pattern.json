@@ -1,0 +1,57 @@
+{
+  "title": "AWS Fargate to Amazon SQS",
+  "description": "Create an AWS Fargate service that interacts with SQS",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front.",
+      "The AWS Fargate service makes sendMessage and receiveMessage calls to an Amazon Simple Queue Service (SQS) queue. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library.",
+      "This makes use of the in-built ecs.ContainerImage.fromAsset method. The custom image has a base route / for health checks, /sendmessage for adding to the queue and /readmessage for reading messages from the queue.",
+      "Environment variables like the SQS Queue URL and AWS region are passed to the image to enable it to perform actions on the SQS Queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "Amazon SQS",
+        "link": "https://aws.amazon.com/sqs/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/glenn-chia-jin-wee.json"
+  ]
+}

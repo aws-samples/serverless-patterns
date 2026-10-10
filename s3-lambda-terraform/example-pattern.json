@@ -1,0 +1,52 @@
+{
+  "title": "Amazon S3 to AWS Lambda",
+  "description": "Create a Lambda function that receives events from S3.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Terraform template deploys a Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes ObjectCreated events from an Amazon S3 bucket. The Lambda code checks the uploaded file and console log the event."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Using AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Blog Series: Building scalable serverless applications with Amazon S3 and AWS Lambda.",
+        "link": "https://aws.amazon.com/blogs/compute/building-scalable-serverless-applications-with-amazon-s3-and-aws-lambda/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Change directory: <code>s3-sqs-terraform</code>.",
+      "2. Delete the stack: <code>terraform destroy</code>.",
+      "3. Confirm the stack has been deleted: <code>terraform show</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ezzeddine-el-ayoubi.json"
+  ]
+}

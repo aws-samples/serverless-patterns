@@ -1,0 +1,51 @@
+{
+  "title": "Amazon API Gateway integration with AWS WAF",
+  "description": "Create an Amazon API Gateway integration with AWS WAF",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern in CDK offers a example to generate an Amazon API Gateway with a greedy proxy (\"{proxy+}\") and \"ANY\" method from the specified path.",
+      "This means it will accept by default any method and any path. The Lambda function is configured for VPC access and returns only the path."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/waf/index.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CDK Patterns",
+        "link": "https://cdkpatterns.com/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk deploy --app 'ts-node .'"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Locate WAFAPIGatewayApi.ApiUrl from the CDK output. This is the API endpoint to be invoked in a browser."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>npx cdk destroy --app 'ts-node .'</code>",
+      "2. Confirm the removal and wait for the resource deletion to complete."
+    ]
+  },
+  "contributors": [
+    "content/contributors/rajneesh-ranjan.json",
+    "content/contributors/britney-tong.json"
+  ]
+}

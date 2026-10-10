@@ -1,0 +1,23 @@
+# A target that spawns /bin/sh — should match R004 (suspicious, not a failure
+# unless severity threshold is lowered). Demonstrates argv-only execution where
+# the target itself chooses to exec a shell.
+target:
+  type: command
+  argv: ["python3", "-c", "import subprocess;subprocess.run(['/bin/sh','-c','echo hi'])"]
+  timeoutSeconds: 30
+  workingDirectory: "workspace"
+  environment: {}
+
+collectors:
+  process: true
+  filesystem: true
+  canary: true
+  strace: true
+  network:
+    procNet: true
+    vpcFlowLogs: false
+
+policy:
+  failOnSeverity: high
+  failOnPolicyViolation: true
+  failClosed: false

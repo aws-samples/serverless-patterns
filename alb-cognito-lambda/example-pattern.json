@@ -1,6 +1,6 @@
 {
-  "title": "ALB, Cognito & Lambda Integration",
-  "description": "Create an ALB, Cognito & Lambda integration to fetch regional metrics",
+  "title": "ALB, Amazon Cognito and AWS Lambda integration",
+  "description": "Create an ALB, Cognito and Lambda integration to fetch regional metrics",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
@@ -8,16 +8,13 @@
     "headline": "How it works",
     "text": [
       "This pattern explains how to deploy a SAM application that integrates an Application Load Balancer, Cognito and Lambda to fetch Lambda regional metrics.",
-      "We will be deploying an Application load balancer in front of Lambda function. Access to Lambda function would be given after authenticating user via AWS Cognito",
-      "Once the authentication is successful, User will be redirected to an HTML page which will display list of Lambda's regional metrics"
+      "We will be deploying an Application Load Balancer in front of the Lambda function. Access to the Lambda function is given after authenticating user via AWS Cognito",
+      "Once the authentication is successful, the user is redirected to an HTML page which will display list of Lambda's regional metrics."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/alb-cognito-lambda",
-      "templateURL": "serverless-patterns/alb-cognito-lambda",
-      "projectFolder": "alb-cognito-lambda",
-      "templateFile": "alb-cognito-lambda/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -34,7 +31,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -50,10 +47,10 @@
   "authors": [
     {
       "name": "Jainam Shah",
-      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
       "bio": "Technical Account Manager @ AWS",
-      "linkedin": "https://www.linkedin.com/in/jainamshah92",
-      "twitter": "@imJshah92"
+      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
+      "linkedin": "jainamshah92",
+      "twitter": "imJshah92"
     }
   ]
 }

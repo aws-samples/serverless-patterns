@@ -1,5 +1,5 @@
 {
-  "title": "Lambda to Comprehend using REST API",
+  "title": "AWS Lambda to Amazon Comprehend using REST API",
   "description": "REST API backed by a Lambda function that invokes the Comprehend DetectSentiment API.",
   "language": "Python",
   "level": "100",
@@ -13,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-comprehend-sam",
-      "templateURL": "serverless-patterns/apigw-lambda-comprehend-sam",
-      "projectFolder": "apigw-lambda-comprehend-sam",
-      "templateFile": "apigw-lambda-comprehend-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -28,24 +25,30 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "Pascal Vogel",
-      "image": "https://avatars.githubusercontent.com/u/100202393?v=4",
-      "bio": "Pascal Vogel is a Solutions Architect at Amazon Web Services (AWS)."
+      "bio": "Pascal Vogel is a Solutions Architect at Amazon Web Services (AWS).",
+      "image": "https://avatars.githubusercontent.com/u/100202393?v=4"
     },
     {
       "name": "Diana Cheng",
-      "image": "https://avatars.githubusercontent.com/u/248259?v=4",
-      "bio": "Diana Cheng is a Senior Solutions Architect at Amazon Web Services (AWS)."
+      "bio": "Diana Cheng is a Senior Solutions Architect at Amazon Web Services (AWS).",
+      "image": "https://avatars.githubusercontent.com/u/248259?v=4"
     }
   ]
 }

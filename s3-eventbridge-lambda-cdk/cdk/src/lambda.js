@@ -1,17 +1,16 @@
-const AWS = require('aws-sdk')
-AWS.config.update({ region: process.env.AWS_REGION })
-const s3 = new AWS.S3()
+const { S3Client, PutObjectTaggingCommand } = require('@aws-sdk/client-s3')
+const s3 = new S3Client({ region: process.env.AWS_REGION })
 
 exports.handler = async (event) => {
     console.log(JSON.stringify(event, null, 2));
 
-    var params = {
-        Bucket: event.detail.bucket.name, 
-        Key: decodeURIComponent(event.detail.object.key.replace(/\+/g, " ")), 
+    const params = {
+        Bucket: event.detail.bucket.name,
+        Key: decodeURIComponent(event.detail.object.key.replace(/\+/g, " ")),
         Tagging: {
             TagSet: [
                 {
-                    Key: "TagAddedBy", 
+                    Key: "TagAddedBy",
                     Value: "S3EventProcessor"
                 }
             ]
@@ -19,7 +18,7 @@ exports.handler = async (event) => {
     };
 
     // Tag the S3 object using putObjectTagging
-    const response = await s3.putObjectTagging(params).promise();
+    const response = await s3.send(new PutObjectTaggingCommand(params));
 
     // Logs the response
     console.log(`Response from putObjectTagging SDK call ${JSON.stringify(response)}`);

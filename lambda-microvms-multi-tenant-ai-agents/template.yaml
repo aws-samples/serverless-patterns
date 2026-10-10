@@ -1,0 +1,503 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Multi-tenant OpenClaw on AWS Lambda MicroVMs — fully declarative infrastructure.
+  One MicroVM per tenant, per-tenant state on EFS, Bedrock via VPC endpoint,
+  push (Telegram webhook) orchestrator behind API Gateway.
+  The MicroVM image and the VPC egress connector are NATIVE CloudFormation resources
+  (AWS::Lambda::MicrovmImage / AWS::Lambda::NetworkConnector, GA 2026-06-22), so the
+  only imperative step deploy.sh performs is uploading the two zip artifacts to S3
+  (CloudFormation cannot author S3 object *contents*). Everything else is declared here,
+  and the orchestrator Lambda is wired via GetAtt — no post-deploy CLI patching.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: openclaw-mt
+    Description: Prefix for named resources.
+  GatewayToken:
+    Type: String
+    NoEcho: true
+    Default: poc-microvm-token-42
+    Description: Shared token OpenClaw's gateway requires (injected into each MicroVM).
+  BedrockModelId:
+    Type: String
+    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: Bedrock inference-profile model id used by the agent.
+  IdleReapSeconds:
+    Type: Number
+    Default: 3600
+    Description: Sweeper terminates a SUSPENDED tenant VM idle longer than this.
+  MicrovmImageKey:
+    Type: String
+    Default: microvm-images/openclaw.zip
+    Description: S3 key (in the artifact bucket) of the MicroVM image zip. deploy.sh uploads it before create.
+  OrchestratorCodeKey:
+    Type: String
+    Default: lambda/orchestrator.zip
+    Description: S3 key of the bundled orchestrator Lambda zip. deploy.sh uploads it before create.
+  BaseMemoryMiB:
+    Type: Number
+    Default: 2048
+    Description: MicroVM baseline memory (vCPU scales at 2GB=1vCPU).
+  ArtifactBucketName:
+    Type: String
+    Description: >
+      Existing S3 bucket holding the uploaded zips. deploy.sh creates it (CloudFormation
+      cannot pre-populate object contents, and the MicrovmImage/Lambda resources need the
+      objects to exist at create time), then passes the name here.
+
+Resources:
+
+  # ---------- Networking: private VM subnet + NAT internet egress ----------
+  # The agent needs general internet access (web fetch/search); Bedrock and EFS
+  # traffic still takes the VPCE/mount-target private paths, bypassing the NAT.
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsSupport: true      # required for VPCE private DNS
+      EnableDnsHostnames: true
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-vpc' }]
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-subnet' }]
+
+  Igw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-igw' }]
+
+  IgwAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref Igw
+
+  # Public subnet exists only to host the NAT gateway.
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-public' }]
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-public-rt' }]
+
+  PublicDefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IgwAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref Igw
+
+  PublicSubnetRtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  NatEip:
+    Type: AWS::EC2::EIP
+    DependsOn: IgwAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEip.AllocationId
+      SubnetId: !Ref PublicSubnet
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-nat' }]
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-private-rt' }]
+
+  PrivateDefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  PrivateSubnetRtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  # SG shared by EFS mount target, the VM's egress connector ENIs, and the Bedrock VPCE.
+  # Self-referencing ingress on 2049 (NFS) + 443 (HTTPS to Bedrock).
+  VpcSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub '${ProjectName} MicroVM egress + EFS + Bedrock VPCE'
+      VpcId: !Ref Vpc
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-sg' }]
+
+  SgSelfNfs:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref VpcSg
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
+      SourceSecurityGroupId: !Ref VpcSg
+
+  SgSelfHttps:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref VpcSg
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      SourceSecurityGroupId: !Ref VpcSg
+
+  # ---------- Bedrock runtime VPC endpoint (VM egress goes via VPC, no internet) ----------
+  BedrockVpce:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.bedrock-runtime'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref Subnet]
+      SecurityGroupIds: [!Ref VpcSg]
+
+  # Bedrock control-plane endpoint: the provider plugin's model discovery calls
+  # ListFoundationModels/ListInferenceProfiles on bedrock.<region> (not -runtime).
+  BedrockControlVpce:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.bedrock'
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref Subnet]
+      SecurityGroupIds: [!Ref VpcSg]
+
+  # ---------- EFS: per-tenant state lives under /tenants/<id> on this filesystem ----------
+  Efs:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      PerformanceMode: generalPurpose
+      ThroughputMode: elastic
+      FileSystemTags: [{ Key: Name, Value: !Sub '${ProjectName}-state' }]
+
+  EfsMountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref Efs
+      SubnetId: !Ref Subnet
+      SecurityGroups: [!Ref VpcSg]
+
+  # ---------- IAM: MicroVM build role (image creation: read artifact, write build logs) ----------
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-MicroVMBuildRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: [sts:AssumeRole, sts:TagSession]
+            Condition: { StringEquals: { aws:SourceAccount: !Ref AWS::AccountId } }
+      Policies:
+        - PolicyName: build
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [s3:GetObject]
+                Resource: !Sub 'arn:aws:s3:::${ArtifactBucketName}/*'
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/*'
+
+  # ---------- IAM: MicroVM execution role (runtime: Bedrock via inference profile + logs) ----------
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-MicroVMExecutionRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: [sts:AssumeRole, sts:TagSession]
+            Condition: { StringEquals: { aws:SourceAccount: !Ref AWS::AccountId } }
+      Policies:
+        - PolicyName: runtime
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Not tied to a specific model: OpenClaw may be pointed at different Bedrock
+              # models (see BedrockModelId, which only sets runtime config). Scope stays on the
+              # two invoke actions, but any foundation model / inference profile is allowed so
+              # swapping models needs no IAM change. Cross-region inference profiles need both
+              # the profile ARN and the underlying foundation-model ARNs in each routed region —
+              # the '*' region wildcards below cover that for any model.
+              - Sid: InvokeBedrock
+                Effect: Allow
+                Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+                Resource:
+                  - !Sub 'arn:aws:bedrock:*::foundation-model/*'
+                  - !Sub 'arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/*'
+                  - !Sub 'arn:aws:bedrock:*:${AWS::AccountId}:application-inference-profile/*'
+              - Sid: ListForDiscovery
+                Effect: Allow
+                Action: [bedrock:ListFoundationModels, bedrock:ListInferenceProfiles]
+                Resource: '*'
+              - Sid: RuntimeLogs
+                Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/*'
+
+  # ---------- IAM: network connector operator role (Lambda-core creates the VPC egress ENIs) ----------
+  # NOTE: trust MUST be plain lambda.amazonaws.com WITHOUT aws:SourceAccount — the connector
+  # service fails to assume a conditioned role ("unable to assume"). Verified live.
+  NetworkConnectorOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-NetworkConnectorOperatorRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: [sts:AssumeRole, sts:TagSession]
+      Policies:
+        - PolicyName: eni
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:CreateTags
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                Resource: '*'
+
+  # ---------- MicroVM image (native CFN resource; CFN runs the build on create/update) ----------
+  # CodeArtifact points at the zip deploy.sh uploaded to the artifact bucket. All props are
+  # required by the resource schema. EnvironmentVariables is a Key/Value array. EFS_ID is baked
+  # so efs-monitor.sh can derive the mount-target DNS name at runtime; AWS_REGION is reserved.
+  MicrovmImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Sub '${ProjectName}-openclaw'
+      BaseImageArn: !Sub 'arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1'
+      BaseImageVersion: '0'
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      Description: OpenClaw per-tenant agent image
+      CodeArtifact:
+        Uri: !Sub 's3://${ArtifactBucketName}/${MicrovmImageKey}'
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: !Ref BaseMemoryMiB
+      AdditionalOsCapabilities: [ALL]
+      EgressNetworkConnectors:
+        - !Sub 'arn:aws:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS'
+      Logging:
+        CloudWatch:
+          LogGroup: !Sub '/aws/lambda-microvms/${ProjectName}-openclaw'
+      # No hooks: the app has no /ready hook, and specifying a hooks Port without any hook
+      # enabled is rejected. The gateway boots fast enough that the platform snapshots after
+      # ENTRYPOINT init without a readiness gate (verified: hookless builds succeed).
+      Hooks:
+        MicrovmHooks: {}
+        MicrovmImageHooks: {}
+      EnvironmentVariables:
+        - Key: OPENCLAW_GATEWAY_TOKEN
+          Value: !Ref GatewayToken
+        - Key: EFS_ID
+          Value: !Ref Efs
+
+  # ---------- VPC egress network connector (native CFN resource) ----------
+  EgressConnector:
+    Type: AWS::Lambda::NetworkConnector
+    Properties:
+      Name: !Sub '${ProjectName}-egress'
+      OperatorRole: !GetAtt NetworkConnectorOperatorRole.Arn
+      Configuration:
+        VpcEgressConfiguration:
+          SubnetIds: [!Ref Subnet]
+          SecurityGroupIds: [!Ref VpcSg]
+          NetworkProtocol: IPv4
+          AssociatedComputeResourceTypes: [MicroVm]
+
+  # ---------- DynamoDB: tenant registry ----------
+  TenantsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-tenants'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: tenantId, AttributeType: S }]
+      KeySchema: [{ AttributeName: tenantId, KeyType: HASH }]
+      # The registry holds per-tenant secrets (botToken, webhookSecret). DynamoDB
+      # encrypts at rest by default with an AWS-owned key; we opt into the AWS managed
+      # KMS key (aws/dynamodb) so encryption is explicit and shows up in CloudTrail /
+      # key policies. Swap to a customer-managed CMK for rotation/audit control.
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+
+  # ---------- IAM: orchestrator Lambda role ----------
+  OrchestratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-OrchestratorRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: orchestrate
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: Logs
+                Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+              - Sid: MicroVMs
+                Effect: Allow
+                Action:
+                  - lambda:RunMicrovm
+                  - lambda:GetMicrovm
+                  - lambda:ListMicrovms
+                  - lambda:SuspendMicrovm
+                  - lambda:ResumeMicrovm
+                  - lambda:TerminateMicrovm
+                  - lambda:CreateMicrovmAuthToken
+                Resource: '*'
+              - Sid: PassExecRole
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt MicroVMExecutionRole.Arn
+                # Defense-in-depth: only allow passing this role to Lambda (the service
+                # that runs MicroVMs). Matches MicroVMExecutionRole's trust principal
+                # (lambda.amazonaws.com); if a future MicroVM API uses a different
+                # service principal, widen or drop this condition.
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: lambda.amazonaws.com
+              - Sid: PassConnectors
+                Effect: Allow
+                Action: lambda:PassNetworkConnector
+                Resource:
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:*'
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:network-connector:*'
+              - Sid: Registry
+                Effect: Allow
+                Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:Scan]
+                Resource: !GetAtt TenantsTable.Arn
+              - Sid: SelfInvoke
+                Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ProjectName}-orchestrator'
+
+  # ---------- Orchestrator Lambda ----------
+  # Code comes from the bundled zip deploy.sh uploaded to S3 (boto3 + lambda-microvms model
+  # overlay + handler.py). Every env var is wired declaratively via GetAtt — no post-deploy CLI.
+  OrchestratorFn:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-orchestrator'
+      Runtime: python3.12
+      Architectures: [arm64]
+      Handler: handler.handler
+      Role: !GetAtt OrchestratorRole.Arn
+      Timeout: 300
+      MemorySize: 512
+      Code:
+        S3Bucket: !Ref ArtifactBucketName
+        S3Key: !Ref OrchestratorCodeKey
+      Environment:
+        Variables:
+          TENANTS_TABLE: !Ref TenantsTable
+          EXEC_ROLE_ARN: !GetAtt MicroVMExecutionRole.Arn
+          INGRESS_CONNECTOR: !Sub 'arn:aws:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:ALL_INGRESS'
+          EGRESS_CONNECTOR: !GetAtt EgressConnector.Arn
+          IMAGE_ARN: !GetAtt MicrovmImage.ImageArn
+          IMAGE_VERSION: !GetAtt MicrovmImage.LatestActiveImageVersion
+          GATEWAY_TOKEN: !Ref GatewayToken
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          IDLE_REAP_SECONDS: !Ref IdleReapSeconds
+
+  # ---------- API Gateway HTTP API → orchestrator (payload v2 proxy) ----------
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub '${ProjectName}-api'
+      ProtocolType: HTTP
+      Target: !GetAtt OrchestratorFn.Arn
+
+  ApiInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OrchestratorFn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*'
+
+  # ---------- EventBridge: sweeper every 10 min ----------
+  SweeperRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub '${ProjectName}-sweeper'
+      ScheduleExpression: rate(10 minutes)
+      State: ENABLED
+      Targets:
+        - Id: orchestrator
+          Arn: !GetAtt OrchestratorFn.Arn
+          Input: '{"_sweeper":true}'
+
+  SweeperPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OrchestratorFn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt SweeperRule.Arn
+
+Outputs:
+  ApiEndpoint:
+    Description: Base URL; tenant webhooks are <ApiEndpoint>/tg/<tenantId>
+    Value: !GetAtt HttpApi.ApiEndpoint
+  ArtifactBucket:
+    Value: !Ref ArtifactBucketName
+  MicrovmImageArn:
+    Value: !GetAtt MicrovmImage.ImageArn
+  MicrovmImageVersion:
+    Value: !GetAtt MicrovmImage.LatestActiveImageVersion
+  EgressConnectorArn:
+    Value: !GetAtt EgressConnector.Arn
+  EfsId:
+    Value: !Ref Efs
+  OrchestratorFunctionName:
+    Value: !Ref OrchestratorFn
+  TenantsTable:
+    Value: !Ref TenantsTable

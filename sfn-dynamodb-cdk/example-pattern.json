@@ -1,0 +1,55 @@
+{
+  "title": "AWS Step Functions to Amazon DynamoDB",
+  "description": "Create an AWS Step Functionsworkflow to integrate with Amazon DynamoDB",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK application deploys a Step Functions workflow, that takes in a payload and puts the item in DynamoBb. Additionally, this workflow also shows how to read an item directly from the DynamoDB table. The CDK application contains the minimum IAM resources required to run the application. "
+    ],
+    "text2": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "sfn_dynamodb_cdk/sfn_dynamodb_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow: <code>aws stepfunctions start-execution  --name \"test\" --state-machine-arn \"{StateMachinetoDDBArn}\" --input \"{\\\"id\\\":  \\\"12345\\\" }\"</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ],
+    "test": []
+  },
+  "contributors": [
+    "content/contributors/revanth-anireddy.json"
+  ]
+}

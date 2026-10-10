@@ -1,0 +1,2 @@
+# No external Python dependencies — the service uses only the standard library.
+# The Claude Code CLI is installed via the Dockerfile, not pip.

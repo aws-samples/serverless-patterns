@@ -1,0 +1,6 @@
+boto3
+PyJWT
+cryptography
+requests
+strands-agents>=1.0.0
+mcp>=1.0.0

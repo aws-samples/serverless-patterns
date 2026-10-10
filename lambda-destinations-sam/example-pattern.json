@@ -1,5 +1,5 @@
 {
-  "title": "Lambda Destinations to Lambda and SQS with SAM",
+  "title": "AWS Lambda Destinations to AWS Lambda and Amazon SQS with AWS SAM",
   "description": "Lambda function that on success sends message to another function and on failure to SQS using Lambda destinations with SAM",
   "language": "Node.js",
   "level": "200",
@@ -13,17 +13,18 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-destinations-sam",
-      "templateURL": "serverless-patterns/lambda-destinations-sam",
-      "projectFolder": "lambda-destinations-sam",
-      "templateFile": "lambda-destinations-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "AWS Lambda Destinations",
+        "text": "Introducing AWS Lambda Destinations",
         "link": "https://aws.amazon.com/blogs/compute/introducing-aws-lambda-destinations/"
+      },
+      {
+        "text": "Asynchronous invocation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
       }
     ]
   },
@@ -45,10 +46,10 @@
   "authors": [
     {
       "name": "Omar Rosadio",
-      "image": "https://avatars.githubusercontent.com/u/10565035",
       "bio": "Cloud Engineer / AWS Community Builder in Serverless category.",
+      "image": "https://avatars.githubusercontent.com/u/10565035",
       "linkedin": "omaralonsorosadioportilla",
-      "twitter": "@omarrosadio"
+      "twitter": "omarrosadio"
     }
   ]
 }

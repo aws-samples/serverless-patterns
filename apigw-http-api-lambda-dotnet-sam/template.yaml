@@ -8,7 +8,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: HttpApi::HttpApi.LambdaEntryPoint::FunctionHandlerAsync
-      Runtime: dotnet6
+      Runtime: dotnet10
       CodeUri: HttpApi/
       MemorySize: 256
       Timeout: 30

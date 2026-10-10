@@ -1,6 +1,6 @@
-## Amazon EFS and Amazon ECS Integration
+# Amazon EFS and Amazon ECS Integration
 
-This pattern creates an Amazon EFS file system and integrates with ECS for a persisent file storage in a containerized environment.
+This pattern creates an Amazon EFS file system and integrates with ECS for a persistent file storage in a containerized environment.
 
 You will build a container as part of the build, publish it into ECR, and then publish it as an ECS Task in the end. A sample file will be created in the EFS (persistent file system) after the task has been completed. The security component is likewise handled by KMS Keys and IAM Roles.
 
@@ -21,10 +21,10 @@ Optionally, you can also specify env and organization (tagging purposes) and tas
 terraform init
 
 # terraform plan with sample values for vpc and subnet
-terraform plan  -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
+terraform plan -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]'
 
 # terraform apply
-terraform apply -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
+terraform apply -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]'
 ```
 
 Once deployed you can run the ECS task from the ECS Console or via AWS CLI which will create a sample file on the persistent storage using Amazon EFS
@@ -45,7 +45,7 @@ aws ecs run-task \
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.24 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
 | <a name="requirement_external"></a> [external](#requirement\_external) | >= 2.3 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2 |
 
@@ -53,7 +53,7 @@ aws ecs run-task \
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.24 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
 | <a name="provider_external"></a> [external](#provider\_external) | >= 2.3 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.2 |
 

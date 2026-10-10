@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+#MISE description="Refresh cross-region inference profile mapping for a model"
+#USAGE arg "<model_id>" help="Base model ID (e.g. anthropic.claude-haiku-4-5-20251001-v1:0)"
+
+"""Query all standard AWS regions for cross-region inference profiles
+matching the given model ID and upsert the mapping into
+cdk/constructs/inference_profiles.json.
+"""
+
+import json
+import os
+import re
+import sys
+
+from pathlib import Path
+
+import boto3
+
+MAPPING_FILE = Path(os.environ.get("MISE_PROJECT_DIR", ".")) / "cdk" / "constructs" / "inference_profiles.json"
+
+REGIONS = [
+    "us-east-1",
+    "us-east-2",
+    "us-west-1",
+    "us-west-2",
+    "eu-west-1",
+    "eu-west-2",
+    "eu-west-3",
+    "eu-central-1",
+    "eu-north-1",
+    "ap-southeast-1",
+    "ap-southeast-2",
+    "ap-northeast-1",
+    "ap-northeast-2",
+    "ap-northeast-3",
+    "ap-south-1",
+    "ca-central-1",
+    "sa-east-1",
+]
+
+MODEL_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]+\.[a-z][a-z0-9._-]+(:\d+)?$")
+
+
+def validate_model_id(model_id: str) -> None:
+    if not MODEL_ID_PATTERN.match(model_id):
+        print(f"Error: '{model_id}' is not a valid model ID.", file=sys.stderr)
+        print("Expected format: provider.model-name-version:N", file=sys.stderr)
+        print("Example: anthropic.claude-haiku-4-5-20251001-v1:0", file=sys.stderr)
+        sys.exit(1)
+
+
+def find_profiles_in_region(region: str, model_id: str) -> dict[str, str]:
+    """Query a region for cross-region inference profiles containing the model.
+
+    Returns {covered_region: profile_id} for each region in the profile's models array.
+    """
+    client = boto3.client("bedrock", region_name=region)
+    region_map = {}
+
+    try:
+        paginator = client.get_paginator("list_inference_profiles")
+        for page in paginator.paginate(typeEquals="SYSTEM_DEFINED"):
+            for profile in page.get("inferenceProfileSummaries", []):
+                profile_id = profile["inferenceProfileId"]
+
+                # Match profiles ending with the model ID, skip global profiles
+                if not profile_id.endswith(model_id):
+                    continue
+                if profile_id.startswith("global."):
+                    continue
+
+                # Extract covered regions from the models array
+                for model_ref in profile.get("models", []):
+                    arn = model_ref.get("modelArn", "")
+                    arn_parts = arn.split(":")
+                    if len(arn_parts) >= 4 and arn_parts[3]:
+                        region_map[arn_parts[3]] = profile_id
+
+    except Exception as e:
+        print(f"  Warning: could not query {region}: {e}", file=sys.stderr)
+
+    return region_map
+
+
+def main():
+    model_id = os.environ.get("usage_model_id", "").strip()
+    if not model_id:
+        print("Error: model_id argument is required.", file=sys.stderr)
+        sys.exit(1)
+
+    validate_model_id(model_id)
+    print(f"Refreshing inference profiles for: {model_id}")
+
+    all_regions: dict[str, str] = {}
+
+    for region in REGIONS:
+        print(f"  Querying {region}...", end="", flush=True)
+        region_map = find_profiles_in_region(region, model_id)
+        new_count = len(set(region_map.keys()) - set(all_regions.keys()))
+        all_regions.update(region_map)
+
+        if region_map:
+            print(f" found {new_count} new region(s)")
+        else:
+            print(" no profiles")
+
+    if not all_regions:
+        print(f"\nError: No cross-region inference profiles found for '{model_id}'.", file=sys.stderr)
+        print("Check the model ID is correct and supports cross-region inference.", file=sys.stderr)
+        sys.exit(1)
+
+    sorted_regions = dict(sorted(all_regions.items()))
+
+    # Load existing mapping or start fresh
+    if MAPPING_FILE.exists():
+        with open(MAPPING_FILE, encoding="utf-8") as f:
+            mappings = json.load(f)
+    else:
+        mappings = {}
+
+    mappings[model_id] = sorted_regions
+
+    MAPPING_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(MAPPING_FILE, "w", encoding="utf-8") as f:
+        json.dump(mappings, f, indent=2)
+        f.write("\n")
+
+    print(f"\nUpdated {MAPPING_FILE}")
+    print(f"Regions mapped for {model_id}:")
+    for r, pid in sorted_regions.items():
+        print(f"  {r} -> {pid}")
+
+
+if __name__ == "__main__":
+    main()

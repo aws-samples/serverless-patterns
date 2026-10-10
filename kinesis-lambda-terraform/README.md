@@ -1,6 +1,6 @@
-# AWS Kinesis Data Streams to AWS Lambda
+# Amazon Kinesis Data Streams to AWS Lambda
 
-This pattern creates an AWS Kinesis Data Stream, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is invoked.
+This pattern creates an AWS Kinesis Data Streams, a stream consumer, and an AWS Lambda function. When data is added to the stream, the Lambda function is invoked.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/kinesis-to-lambda-terraform](https://serverlessland.com/patterns/kinesis-to-lambda-terraform)
 

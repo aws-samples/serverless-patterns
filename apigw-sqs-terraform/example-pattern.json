@@ -1,0 +1,58 @@
+{
+  "title": "Amazon API Gateway HTTP API to Amazon SQS",
+  "description": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+  "language": "Integration",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, called \"Queue based leveling\", a serverless queue is introduced between your API Gateway and your workers, a Lambda function in this case.",
+      "The queue acts as a buffer to alleviate traffic spikes and ensure your workload can sustain the arriving load by buffering all the requests durably.",
+      "It also helps downstream consumers to process the incoming requests at a consistent pace."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "Using Amazon SQS dead-letter queues to replay messages",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-sqs-dead-letter-queues-to-replay-messages/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing in the README.md file in the repo."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ahmad-aboushady.json"
+  ]
+}

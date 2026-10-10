@@ -1,0 +1,48 @@
+{
+  "title": "CodeCommit to CodeBuild",
+  "description": "Create an integration between CodeCommit and Codebuild to run builds on PRs.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern allows you to validate your pull requests by running test on a Codebuild and post a comment on the specific PR."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/pipeline.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS CodeCommit",
+        "link": "https://aws.amazon.com/codecommit/"
+      },
+      {
+        "text": "AWS CodeBuild",
+        "link": "https://aws.amazon.com/codebuild/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/jeremy-care.json"
+  ]
+}

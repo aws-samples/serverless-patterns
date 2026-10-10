@@ -1,6 +1,6 @@
 {
   "title": "AWS Lamda to Amazon ElastiCache integration pattern",
-  "description": "Create a Redis Cluster in Amazon ElastiCache and read write with a Lambda function.",
+  "description": "Create a Redis Cluster in Amazon ElastiCache and read/write with a Lambda function.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
@@ -15,10 +15,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-elasticache-integrationpattern-cdk",
-      "templateURL": "serverless-patterns/lambda-elasticache-integrationpattern-cdk",
-      "projectFolder": "lambda-elasticache-integrationpattern-cdk",
-      "templateFile": "lambda-elasticache-integrationpattern-cdk/lib/lambda-elasticache-integrationpattern-cdk-stack.ts"
+      "templateFile": "lib/lambda-elasticache-integrationpattern-cdk-stack.ts"
     }
   },
   "resources": {
@@ -59,8 +56,8 @@
   "authors": [
     {
       "name": "Sushanth Kothapally",
-      "image": "https://avatars.githubusercontent.com/u/10820054?v=4",
       "bio": "Sushanth is a Solutions Architect at AWS. He is passionate about solving technical problems to meet business objectives.",
+      "image": "https://avatars.githubusercontent.com/u/10820054?v=4",
       "linkedin": "sushanthkothapally"
     }
   ]

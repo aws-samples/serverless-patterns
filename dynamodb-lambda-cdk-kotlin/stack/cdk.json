@@ -1,5 +1,5 @@
 {
-  "app": "../gradlew :stack:run",
+  "app": "gradle -q :stack:run",
 
   "context": {
 

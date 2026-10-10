@@ -13,14 +13,14 @@
     "@tsconfig/node24": "^24.0.3",
     "@types/node": "24.10.1",
     "aws-cdk": "2.1033.0",
-    "esbuild": "^0.27.1",
+    "esbuild": "^0.28.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3"
   },
   "dependencies": {
     "@aws-sdk/client-sfn": "^3.946.0",
     "@types/aws-lambda": "^8.10.159",
-    "aws-cdk-lib": "2.232.1",
+    "aws-cdk-lib": "2.260.0",
     "constructs": "^10.4.3"
   }
 }

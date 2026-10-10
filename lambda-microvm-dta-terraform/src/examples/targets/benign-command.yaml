@@ -1,0 +1,21 @@
+# A benign target: prints a line and writes a small file in the workspace.
+target:
+  type: command
+  argv: ["python3", "-c", "import pathlib;print('hello from target');pathlib.Path('artifact.txt').write_text('ok')"]
+  timeoutSeconds: 30
+  workingDirectory: "workspace"
+  environment: {}
+
+collectors:
+  process: true
+  filesystem: true
+  canary: true
+  strace: false
+  network:
+    procNet: true
+    vpcFlowLogs: false
+
+policy:
+  failOnSeverity: high
+  failOnPolicyViolation: true
+  failClosed: false

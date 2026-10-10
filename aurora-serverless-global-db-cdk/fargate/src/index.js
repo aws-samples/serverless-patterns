@@ -2,21 +2,21 @@ const express = require("express");
 const app = express();
 const port = 80;
 
-var AWS = require('aws-sdk');
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
 const Pool = require('pg').Pool
 
-var client = new AWS.SecretsManager({
+const client = new SecretsManagerClient({
   region: process.env.REGION
 });
 
 var pool;
 
-client.getSecretValue({ SecretId: 'aurora-serverless-global-db-secret' }, function (err, data) {
-  if (err) {
-    console.log(err, err.stack);
-  }
-  else {
-    secretParams = JSON.parse(data.SecretString);
+(async () => {
+  try {
+    const response = await client.send(
+      new GetSecretValueCommand({ SecretId: 'aurora-serverless-global-db-secret' })
+    );
+    const secretParams = JSON.parse(response.SecretString);
     pool = new Pool({
       user: secretParams.username,
       host: process.env.DB_HOST,
@@ -24,8 +24,10 @@ client.getSecretValue({ SecretId: 'aurora-serverless-global-db-secret' }, functi
       password: secretParams.password,
       port: process.env.DB_PORT
     });
+  } catch (err) {
+    console.log(err, err.stack);
   }
-});
+})();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

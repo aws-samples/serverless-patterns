@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "aws-sdk": "2.1693.0"
+    "@aws-sdk/client-kinesis": "^3.700.0"
   },
   "name": "producer",
   "version": "1.0.0",

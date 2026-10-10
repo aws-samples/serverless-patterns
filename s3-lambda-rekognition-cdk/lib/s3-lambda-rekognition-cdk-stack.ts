@@ -23,7 +23,7 @@ export class S3LambdaRekognitionCdkStack extends Stack {
     });
 
     const faceIndexLambda = new nodejs_lambda.NodejsFunction(this, "FaceIndexLambda", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, `/../lambda/IndexFace/index.ts`),
       handler: "handler",
       retryAttempts: 0,

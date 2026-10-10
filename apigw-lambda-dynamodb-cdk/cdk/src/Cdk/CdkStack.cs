@@ -18,7 +18,7 @@ namespace Cdk
             
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_6.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -59,7 +59,7 @@ namespace Cdk
             
             var handler = new Function(this, "DynamoDbHandler", new FunctionProps()
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Timeout = Duration.Seconds(30),
                 Environment = new Dictionary<string, string>(1)
                 {

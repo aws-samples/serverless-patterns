@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda to AWS Step Functions",
+  "description": "Invoke an AWS Step Functions workflow from AWS Lambda, with logging enabled",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the Express Workflow execution ARN and startDate."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Using AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Blog Series: Building scalable serverless applications with Amazon S3 and AWS Lambda.",
+        "link": "https://aws.amazon.com/blogs/compute/building-scalable-serverless-applications-with-amazon-s3-and-aws-lambda/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following Lambda CLI invoke command to invoke the function. Note, you must edit the {LambdaProxyArn} placeholder with the ARN of the deployed Lambda function. This is provided in the stack outputs.",
+      "<code>aws lambda invoke --function-name {LambdaProxyArn} --invocation-type Event --payload '{ \"IsHelloWorldExample\": \"Hello\" }' response.json --cli-binary-format raw-in-base64-out</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/benjamin-smith.json"
+  ]
+}

@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  rabbitmq_event_consumer_function
+
+  Sample SAM Template for rabbitmq-consumer-with-sam (Python)
+
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  LambdaRabbitMQConsumerPythonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: python-rabbitmq-consumer-dynamodb-sam
+      CodeUri: rabbitmq_event_consumer_function
+      Handler: lambda_function.lambda_handler
+      Runtime: PYTHON3_VERSION
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          DYNAMO_DB_TABLE: !Ref RabbitMQDynamoDBTable
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        SubnetIds:
+          - !Ref Subnet1
+          - !Ref Subnet2
+          - !Ref Subnet3
+      Events:
+        MQEvent:
+          Type: MQ
+          Properties:
+            BatchSize: 10
+            MaximumBatchingWindowInSeconds: 5
+            Broker: !Ref RabbitMQBrokerArn
+            Queues:
+              - !Ref RabbitMQQueue
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: !Ref SecretsManagerSecretForMQ
+              - Type: VIRTUAL_HOST
+                URI: !Ref RabbitMQVirtualHost
+
+      Policies:
+      - Statement:
+        - Sid: RabbitMQPermissionsPolicy
+          Effect: Allow
+          Action:
+          - mq:DescribeBroker
+          - secretsmanager:GetSecretValue
+          - ec2:CreateNetworkInterface
+          - ec2:DeleteNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeSubnets
+          - ec2:DescribeVpcs
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource: '*'
+      - Statement:
+        - Sid: DynamoDBPermissionsPolicy
+          Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:DeleteItem
+          - dynamodb:PutItem
+          - dynamodb:Scan
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:BatchGetItem
+          - dynamodb:DescribeTable
+          - dynamodb:ConditionCheckItem
+          Resource:
+          - !Join ['', ["arn:", "aws:", "dynamodb:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "table/", !Ref RabbitMQDynamoDBTable]]
+          - !Join ['', ["arn:", "aws:", "dynamodb:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":", "table/", !Ref RabbitMQDynamoDBTable, "/index/*"]]
+
+  RabbitMQDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: RabbitMQDynamoDBTablePython
+      PrimaryKey:
+        Name: MessageID
+        Type: String
+Parameters:
+  RabbitMQBrokerArn:
+    Type: String
+    Description: Enter the ARN of the RabbitMQ Broker
+    Default: RABBITMQ_BROKER_ARN
+  RabbitMQVirtualHost:
+    Type: String
+    Description: Enter the name of the RabbitMQ virtualhost from which the lambda function will consume messages
+    Default: RABBITMQ_VIRTUAL_HOST
+  RabbitMQQueue:
+    Type: String
+    Description: Enter the name of the RabbitMQ queue from which the lambda function will consume messages
+    Default: RABBITMQ_QUEUE_NAME
+  SecretsManagerSecretForMQ:
+    Type: String
+    Description: Enter the ARN of the secret that has username/password for Rabbit MQ
+    Default: RABBITMQ_SECRET_ARN
+  Subnet1:
+    Type: String
+    Description: The first of the three private subnets in the RabbitMQ broker's VPC
+    Default: RABBITMQ_SUBNET_ONE
+  Subnet2:
+    Type: String
+    Description: The second of the three private subnets in the RabbitMQ broker's VPC
+    Default: RABBITMQ_SUBNET_TWO
+  Subnet3:
+    Type: String
+    Description: The third of the three private subnets in the RabbitMQ broker's VPC
+    Default: RABBITMQ_SUBNET_THREE
+  SecurityGroup:
+    Type: String
+    Description: The security group associated with this function (use same RabbitMQ)
+    Default: SECURITY_GROUP
+Outputs:
+  LambdaRabbitMQConsumerPythonFunction:
+    Description: "Queue Consumer Lambda Function ARN"
+    Value: !GetAtt LambdaRabbitMQConsumerPythonFunction.Arn

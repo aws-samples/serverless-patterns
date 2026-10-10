@@ -1,19 +1,31 @@
 {
-  "title": "Amazon Managed Streaming for Apache Kafka (Amazon MSK) to AWS Lambda",
-  "description": "Create a Lambda function that uses an Amazon MSK Topic as an event source.",
+  "title": "Amazon MSK to AWS Lambda",
+  "description": "Create a Lambda function that subscribes to an MSK topic",
   "language": "Node.js",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
-  "videoId": "",
-  "level":"100",
+  "level": "100",
   "framework": "AWS SAM",
-  "services": {
-    "from": "MSK",
-    "to": "lambda"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Lambda is a consumer application for your Kafka topic. It processes records from one or more partitions and sends the payload to the target function. Lambda continues to process batches until there are no more messages in the topic."
+      "This pattern deploys a Lambda function that uses an Amazon MSK topic as an event source."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Using Amazon MSK as an event source for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/"
+      },
+      {
+        "text": "Using Lambda with Amazon MSK",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
+      }
     ]
   },
   "deploy": {
@@ -21,37 +33,26 @@
       "sam deploy --guided"
     ]
   },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda",
-      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/msk-lambda/template.yaml",
-      "readmeURL": ""
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Publish messages to the Amazon MSK topic. Follow the steps as outlined in Step 4 to create a client machine and publish messages to the MSK Topic.",
+      "2. Retrieve the logs from the Lambda function: <code> sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME</code>."
     ]
   },
-  "resources": {
-    "headline": "Additional resources",
-    "bullets": [
-      {
-        "text": "Using Lambda with Amazon MSK",
-        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html"
-      },
-      {
-        "text": "Using Amazon MSK as an event source for AWS Lambda",
-        "link": "https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/"
-      }      
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
-  "author": {
-    "headline": "Presented by Parnab Basak, AWS Solutions Architect",
-    "name": "Parnab Basak",
-    "imageURL": "https://avatars.githubusercontent.com/u/18371977?v=4",
-    "twitter": "@ParnabBasak",
-    "bio": "Parnab is a Solutions Architect for the Service Creation team in AWS. He specializes in creating net new solutions that are cloud native using modern s/w dev practices like Serverless, DevOps & Analytics"
-  }
+  "authors": [
+    {
+      "name": "Parnab Basak",
+      "bio": "Parnab is a Solutions Architect for the Service Creation team in AWS. He specializes in creating net new solutions that are cloud native using modern s/w dev practices like Serverless, DevOps & Analytics",
+      "image": "https://avatars.githubusercontent.com/u/18371977?v=4",
+      "twitter": "ParnabBasak"
+    }
+  ]
 }

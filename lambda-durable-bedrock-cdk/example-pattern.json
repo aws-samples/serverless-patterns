@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-bedrock-cdk",
-      "templateURL": "serverless-patterns/lambda-durable-bedrock-cdk",
-      "projectFolder": "lambda-durable-bedrock-cdk",
       "templateFile": "lib/lambda-durable-bedrock-stack.ts"
     }
   },

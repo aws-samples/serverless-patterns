@@ -1,0 +1,55 @@
+{
+  "title": "Cross-region Amazon EventBridge routing",
+  "description": "Create cross-region event bus routing with Amazon EventBridge",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to route events in one Region's event bus to an event bus in another region. The template shows how to configure an event rule to send matching events to target event buses in another region. It includes the necessary IAM permissions to allow the rule to invoke the target in another region."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "eventbus-source/template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Introducing cross-Region event routing with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-cross-region-event-routing-with-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd ./event-source",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Using curl or Postman, invoke the API Gateway endpoint, using a *region* query parameter to determine where the event should be routed. For example: <code>https://yourendpoint.execute-api.yourregion.amazonaws.com/Prod?region=us-east-1</code>.",
+      "2. The event is logged by the Lambda function target in the specified region."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/james-beswick.json"
+  ]
+}

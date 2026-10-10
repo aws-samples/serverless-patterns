@@ -1,11 +1,9 @@
 {
-  "title": "AI Chat with Amazon API Gateway (WebSockets), AWS Lambda, and Amazon Bedrock.",
-
+  "title": "AI Chat with Amazon API Gateway (WebSockets), AWS Lambda and Amazon Bedrock",
   "description": "WebSocket-Enabled AI Chat Using AWS Services.",
-
-  "language": "",
+  "language": "Python",
   "level": "200",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -17,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-websocket-lambda-bedrock-sam",
-      "templateURL": "serverless-patterns/apigw-websocket-lambda-bedrock-sam",
-      "projectFolder": "apigw-websocket-lambda-bedrock-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -61,10 +56,9 @@
   "authors": [
     {
       "name": "Mike Hume",
-      "image": "https://media.licdn.com/dms/image/D4E03AQEiUfmBiUOw_A/profile-displayphoto-shrink_200_200/0/1718324029612?e=1727308800&v=beta&t=ybhm76l-CP5xcUsHbdq2IaJOlfyycvQ6gNwuCSd3Z0w",
       "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
-      "linkedin": "michael-hume-4663bb64",
-      "twitter": ""
+      "image": "https://media.licdn.com/dms/image/D4E03AQEiUfmBiUOw_A/profile-displayphoto-shrink_200_200/0/1718324029612?e=1727308800&v=beta&t=ybhm76l-CP5xcUsHbdq2IaJOlfyycvQ6gNwuCSd3Z0w",
+      "linkedin": "michael-hume-4663bb64"
     }
   ]
 }

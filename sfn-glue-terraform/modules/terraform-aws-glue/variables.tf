@@ -4,7 +4,7 @@ variable "create" {
 
 
 variable "role_arn" {
-  default =""
+  default = ""
 }
 
 variable "connections" {

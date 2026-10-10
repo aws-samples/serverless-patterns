@@ -27,8 +27,8 @@ class FargateSecretsManagerStack(Stack):
                 generate_string_key="password",
                 include_space=False,
                 require_each_included_type=True
-              )
             )
+        )
 
         #Create Fargate Execution Role
         fargate_role = iam.Role(self, "FargateTaskExecutionRole",

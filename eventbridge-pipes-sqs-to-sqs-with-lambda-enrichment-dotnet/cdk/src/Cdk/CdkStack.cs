@@ -48,7 +48,7 @@ namespace Cdk
                 new FunctionProps
             {
                 FunctionName = "EnrichmentHandler",
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset("../cdk/src/code/EnrichmentHandler/output.zip"),
                 Handler = "EnrichmentHandler::EnrichmentHandler.Function::FunctionHandler",
                 Role = lambdaHandlerRole,

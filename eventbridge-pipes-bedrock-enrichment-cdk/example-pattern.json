@@ -1,0 +1,59 @@
+{
+  "title": "Amazon EventBridge Pipes with Amazon Bedrock AI Enrichment",
+  "description": "Enrich messages in-flight with AI classification and entity extraction using Amazon EventBridge Pipes and Amazon Bedrock",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Messages arrive in an Amazon SQS queue and are read by Amazon EventBridge Pipes.",
+      "The Pipe invokes an AWS Lambda enrichment function that calls Amazon Bedrock (Claude Sonnet 4.6) to classify sentiment, extract entities, and summarize the message.",
+      "The Pipe delivers the enriched output to its target, Amazon CloudWatch Logs. In parallel, the enrichment function persists each enriched record to Amazon DynamoDB for querying and downstream analytics."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/eventbridge-pipes-bedrock-enrichment-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes enrichment",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-enrichment.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModel API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd eventbridge-pipes-bedrock-enrichment-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a message to the Amazon SQS source queue.",
+      "Wait a few seconds for the Pipe to process.",
+      "Tail the Amazon CloudWatch Logs target log group (/pipes/bedrock-enriched-output) to see the enriched output delivered by the Pipe.",
+      "Query the Amazon DynamoDB table to see the persisted enriched record with sentiment, entities, and summary."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}

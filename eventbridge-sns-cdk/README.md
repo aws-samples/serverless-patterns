@@ -1,4 +1,4 @@
-# Amazon Eventbridge to Amazon SNS
+# Amazon EventBridge to Amazon SNS
 
 This CDK template deploys a SNS topic that is triggered by an EventBridge rule. The SNS topic policy provides the permission for EventBridge to invoke the SNS topic.
 

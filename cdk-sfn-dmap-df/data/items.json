@@ -1,0 +1,302 @@
+[
+    {
+        "itemId": "PROD-001",
+        "productName": "Wireless Mouse",
+        "category": "electronics",
+        "price": 29.99
+    },
+    {
+        "itemId": "PROD-002",
+        "productName": "USB-C Hub",
+        "category": "electronics",
+        "price": 49.99
+    },
+    {
+        "itemId": "PROD-003",
+        "productName": "Mechanical Keyboard",
+        "category": "electronics",
+        "price": 129.99
+    },
+    {
+        "itemId": "PROD-004",
+        "productName": "Cotton T-Shirt",
+        "category": "clothing",
+        "price": 14.99
+    },
+    {
+        "itemId": "PROD-005",
+        "productName": "Running Shoes",
+        "category": "clothing",
+        "price": 89.99
+    },
+    {
+        "itemId": "PROD-006",
+        "productName": "Desk Lamp",
+        "category": "home",
+        "price": 34.99
+    },
+    {
+        "itemId": "PROD-007",
+        "productName": "Bluetooth Speaker",
+        "category": "electronics",
+        "price": 59.99
+    },
+    {
+        "itemId": "PROD-008",
+        "productName": "Yoga Mat",
+        "category": "fitness",
+        "price": 24.99
+    },
+    {
+        "itemId": "PROD-009",
+        "productName": "Coffee Maker",
+        "category": "home",
+        "price": 79.99
+    },
+    {
+        "itemId": "PROD-010",
+        "productName": "Noise-Canceling Headphones",
+        "category": "electronics",
+        "price": 249.99
+    },
+    {
+        "itemId": "PROD-011",
+        "productName": "Wool Sweater",
+        "category": "clothing",
+        "price": 64.99
+    },
+    {
+        "itemId": "PROD-012",
+        "productName": "Standing Desk",
+        "category": "home",
+        "price": 399.99
+    },
+    {
+        "itemId": "PROD-013",
+        "productName": "Phone Case",
+        "category": "electronics",
+        "price": 12.99
+    },
+    {
+        "itemId": "PROD-014",
+        "productName": "Water Bottle",
+        "category": "fitness",
+        "price": 19.99
+    },
+    {
+        "itemId": "PROD-015",
+        "productName": "LED Monitor",
+        "category": "electronics",
+        "price": 199.99
+    },
+    {
+        "itemId": "PROD-016",
+        "productName": "Denim Jacket",
+        "category": "clothing",
+        "price": 74.99
+    },
+    {
+        "itemId": "PROD-017",
+        "productName": "Air Purifier",
+        "category": "home",
+        "price": 149.99
+    },
+    {
+        "itemId": "PROD-018",
+        "productName": "Resistance Bands",
+        "category": "fitness",
+        "price": 15.99
+    },
+    {
+        "itemId": "PROD-019",
+        "productName": "Webcam",
+        "category": "electronics",
+        "price": 69.99
+    },
+    {
+        "itemId": "PROD-020",
+        "productName": "Throw Pillow Set",
+        "category": "home",
+        "price": 39.99
+    },
+    {
+        "itemId": "PROD-021",
+        "productName": "Laptop Stand",
+        "category": "electronics",
+        "price": 44.99
+    },
+    {
+        "itemId": "PROD-022",
+        "productName": "Winter Coat",
+        "category": "clothing",
+        "price": 189.99
+    },
+    {
+        "itemId": "PROD-023",
+        "productName": "Blender",
+        "category": "home",
+        "price": 59.99
+    },
+    {
+        "itemId": "PROD-024",
+        "productName": "Foam Roller",
+        "category": "fitness",
+        "price": 22.99
+    },
+    {
+        "itemId": "PROD-025",
+        "productName": "4K Monitor",
+        "category": "electronics",
+        "price": 499.99
+    },
+    {
+        "itemId": "PROD-026",
+        "productName": "Linen Shirt",
+        "category": "clothing",
+        "price": 44.99
+    },
+    {
+        "itemId": "PROD-027",
+        "productName": "Robot Vacuum",
+        "category": "home",
+        "price": 299.99
+    },
+    {
+        "itemId": "PROD-028",
+        "productName": "Jump Rope",
+        "category": "fitness",
+        "price": 11.99
+    },
+    {
+        "itemId": "PROD-029",
+        "productName": "Portable Charger",
+        "category": "electronics",
+        "price": 34.99
+    },
+    {
+        "itemId": "PROD-030",
+        "productName": "Rain Jacket",
+        "category": "clothing",
+        "price": 99.99
+    },
+    {
+        "itemId": "PROD-031",
+        "productName": "Toaster Oven",
+        "category": "home",
+        "price": 69.99
+    },
+    {
+        "itemId": "PROD-032",
+        "productName": "Dumbbells Set",
+        "category": "fitness",
+        "price": 149.99
+    },
+    {
+        "itemId": "PROD-033",
+        "productName": "Wireless Earbuds",
+        "category": "electronics",
+        "price": 79.99
+    },
+    {
+        "itemId": "PROD-034",
+        "productName": "Hiking Boots",
+        "category": "clothing",
+        "price": 129.99
+    },
+    {
+        "itemId": "PROD-035",
+        "productName": "Smart Thermostat",
+        "category": "home",
+        "price": 179.99
+    },
+    {
+        "itemId": "PROD-036",
+        "productName": "Kettlebell",
+        "category": "fitness",
+        "price": 39.99
+    },
+    {
+        "itemId": "PROD-037",
+        "productName": "USB Microphone",
+        "category": "electronics",
+        "price": 89.99
+    },
+    {
+        "itemId": "PROD-038",
+        "productName": "Silk Scarf",
+        "category": "clothing",
+        "price": 54.99
+    },
+    {
+        "itemId": "PROD-039",
+        "productName": "Vacuum Sealer",
+        "category": "home",
+        "price": 64.99
+    },
+    {
+        "itemId": "PROD-040",
+        "productName": "Exercise Ball",
+        "category": "fitness",
+        "price": 24.99
+    },
+    {
+        "itemId": "PROD-041",
+        "productName": "Graphics Tablet",
+        "category": "electronics",
+        "price": 219.99
+    },
+    {
+        "itemId": "PROD-042",
+        "productName": "Leather Belt",
+        "category": "clothing",
+        "price": 34.99
+    },
+    {
+        "itemId": "PROD-043",
+        "productName": "Instant Pot",
+        "category": "home",
+        "price": 89.99
+    },
+    {
+        "itemId": "PROD-044",
+        "productName": "Pull-Up Bar",
+        "category": "fitness",
+        "price": 29.99
+    },
+    {
+        "itemId": "PROD-045",
+        "productName": "External SSD",
+        "category": "electronics",
+        "price": 109.99
+    },
+    {
+        "itemId": "PROD-046",
+        "productName": "Cashmere Gloves",
+        "category": "clothing",
+        "price": 59.99
+    },
+    {
+        "itemId": "PROD-047",
+        "productName": "Electric Kettle",
+        "category": "home",
+        "price": 44.99
+    },
+    {
+        "itemId": "PROD-048",
+        "productName": "Ab Roller",
+        "category": "fitness",
+        "price": 17.99
+    },
+    {
+        "itemId": "PROD-049",
+        "productName": "Streaming Webcam",
+        "category": "electronics",
+        "price": 159.99
+    },
+    {
+        "itemId": "PROD-050",
+        "productName": "Cotton Socks Pack",
+        "category": "clothing",
+        "price": 9.99
+    }
+]

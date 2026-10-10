@@ -1,0 +1,56 @@
+{
+  "title": "Amazon S3 to Amazon SNS to Amazon SQS to AWS Lambda",
+  "description": "Sends notifications from S3 to SNS to SQS to Lambda when an object is created.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template creates one S3 bucket, one SNS topic, one SQS queue and one Lambda function.",
+      "The SAM template contains all the information to deploy AWS resources(one S3 bucket, one SQS queue and one Lambda function) and also the permission required by these service to communicate.",
+      "You will be able to create and delete the CloudFormation stack using the CLI commands.",
+      "The S3 will send notifications to an SNS topic whenever an .png object is deleted. SNS has two subscribers, one SQS queue and one Lambda function. The Lambda function will be triggered whenever a new file is deleted in the S3 bucket. The SQS will also receive the deleted object event from the SNS topic.",
+      "This is fully functional example implemented in Java 25."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Building resilient serverless patterns by combining messaging services",
+        "link": "https://aws.amazon.com/blogs/compute/building-resilient-no-code-serverless-patterns-by-combining-messaging-services/"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --capabilities CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/razvan-minciuna.json"
+  ]
+}

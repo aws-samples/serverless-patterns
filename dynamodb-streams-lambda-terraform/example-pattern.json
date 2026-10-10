@@ -1,0 +1,54 @@
+{
+  "title": "Amazon DynamoDB to AWS Lambda",
+  "description": "Invoke a Lambda function from changes to a DynamoDB table using event-based filters",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Terraform template deploys a Lambda function, a DynamoDB table, and the minimum IAM resources required to run the application.",
+      "When items are written or updated in the DynamoDB table, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the contents of the table item that changed."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Docs: DynamoDB Streams and AWS Lambda Triggers",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.html"
+      },
+      {
+        "text": "Creating a scalable serverless import process for Amazon DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/creating-a-scalable-serverless-import-process-for-amazon-dynamodb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Change directory: <code>cd eventbridge-cloudwatch-terraform</code>.",
+      "2. Delete the stack: <code>terraform destroy</code>.",
+      "3. Confirm the stack has been deleted: <code>terraform show</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ezzeddine-el-ayoubi.json"
+  ]
+}

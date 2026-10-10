@@ -1,0 +1,52 @@
+{
+  "title": "SSM to AWS Lambda",
+  "description": "Create an SSM automation document that invokes a Lambda function",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to invoke a Lambda function from a Systems Manager automation document and pass in the document's run time execution parameters as input payload for the Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Systems Manager Automation",
+        "link": "https://github.com/awslabs/amazon-kinesis-data-generator"
+      },
+      {
+        "text": "Invoking a Lambda function from Systems Manager Automation",
+        "link": "https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-action-lamb.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/revanth-reddy-tumu.json"
+  ]
+}

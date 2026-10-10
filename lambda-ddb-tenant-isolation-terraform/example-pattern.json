@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ddb-tenant-isolation-terraform",
-      "templateURL": "serverless-patterns/lambda-ddb-tenant-isolation-terraform",
-      "projectFolder": "lambda-ddb-tenant-isolation-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -46,8 +43,8 @@
   "authors": [
     {
       "name": "Archana V",
-      "image": "https://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_200_200/B56ZZH3LL6H0AY-/0/1744962369852?e=1772668800&v=beta&t=y0t7bsQKJwy5McO395hDmW7QPu_K-a1WKXeTA0-ecno",
       "bio": "Solutions Architect at AWS",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_200_200/B56ZZH3LL6H0AY-/0/1744962369852?e=1772668800&v=beta&t=y0t7bsQKJwy5McO395hDmW7QPu_K-a1WKXeTA0-ecno",
       "linkedin": "archanavenkat"
     }
   ]

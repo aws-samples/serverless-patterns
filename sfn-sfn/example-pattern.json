@@ -1,0 +1,56 @@
+{
+  "title": "AWS Step Functions to AWS Step Functions",
+  "description": "Creates a Step Functions workflow to launch another state machine execution",
+  "language": "Node.js",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Step Functions Express Workflow can be started using the AWS CLI or from another service (e.g. API Gateway) to run an express workflow.",
+      "The SAM template deploys two Step Functions Express workflows: \"Parent\" and \"Child\". The SAM template contains the minimum IAM resources required to run the application with logging enabled."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Execute the Step Functions workflow:",
+      "<code>aws stepfunctions start-execution --state-machine-arn ENTER_YOUR_STATE_MACHINE_ARN</code>",
+      "2. View CloudWatch Logs to see events that Step Functions published to EventBridge:",
+      "<code>aws logs tail CLOUDWATCH_LOG_GROUP</code>",
+      "3. You see an event that was delivered to the event bus."
+    ]
+  },
+  "contributors": [
+    "content/contributors/shehryar-abbasi.json"
+  ]
+}

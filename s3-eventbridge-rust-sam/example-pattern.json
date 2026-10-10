@@ -1,57 +1,57 @@
 {
   "title": "Amazon S3 to Amazon EventBridge",
-  "description": "The SAM template deploys an S3 bucket that publishes events to Amazon EventBridge, and sets up a Lambda function to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application.",
+  "description": "Creates an S3 bucket that publishes events to EventBridge",
   "language": "Rust",
-  "level": "300",
+  "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Upload an object to the deployed S3 bucket.",
-      "The Lambda function is invoked with the event from S3, routed via EventBridge."
+      "The SAM template deploys an S3 bucket that publishes events to Amazon EventBridge, and sets up a Lambda function to show how to consume these events via an EventBridge rule. It deploys the the IAM resources required to run the application.",
+      "EventBridge consumes events directly from S3 buckets when the NoticationConfiguration is enabled, as shown in the template."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-eventbridge-rust-sam",
-      "templateURL": "serverless-patterns/s3-eventbridge-rust-sam",
-      "projectFolder": "s3-eventbridge-rust-sam",
       "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
-        "text": "Amazon EventBridge",
-        "link": "https://aws.amazon.com/eventbridge/"
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
       },
       {
-        "text": "Amazon S3",
-        "link": "https://aws.amazon.com/s3/"
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

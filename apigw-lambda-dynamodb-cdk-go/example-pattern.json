@@ -1,19 +1,31 @@
 {
-  "title": "API Gateway to Lambda to DynamoDB",
-  "description": "Create a Lambda function that receives a request from API Gateway and inserts a record into a DynamoDB table.",
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB",
+  "description": "Create a Lambda function that receives a request from API Gateway and puts an item into DynamoDB.",
   "language": "Go",
-  "architectureURL": "https://serverlessland.s3.amazonaws.com/assets/patterns/patterns-lambda-to-eventbridge.png",
-  "videoId": "",
-  "level":"200",
+  "level": "200",
   "framework": "AWS CDK",
-  "services": {
-    "from": "apigw",
-    "to": "dynamodb"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern explains how to deploy a CDK application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB using the Go programming language."
+      "This pattern explains how to deploy a CDK application with Amazon API Gateway, AWS Lambda, and Amazon DynamoDB. When an HTTP POST request is made to the Amazon API Gateway endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/main.go"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Docs: Writing Data to a Table",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WriteData.html"
+      },
+      {
+        "text": "Lambda CDK docs",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2//docs/aws-cdk-lib.aws_lambda-readme.html"
+      }
     ]
   },
   "deploy": {
@@ -22,37 +34,26 @@
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "cdk destroy"
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
     ]
   },
-  "gitHub": {
-    "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-cdk-golang",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-dynamodb-cdk-golang/README.md"
-    },
-    "payloads": [
-      {
-        "headline": "",
-        "payloadURL": ""
-      }
-    ]
-  },
-  "resources": {
-    "headline": "Additional resources",
-    "bullets": [    
-    ]
-  },
-  "author": {
-    "headline": "Presented by Abhishek Gupta, Principal Developer Advocate at AWS",
-    "name": "Abhishek Gupta",
-    "twitter": "abhi_tweeter",
-    "linkedin":"https://www.linkedin.com/in/abhirockzz/",
-    "imageURL":"https://abhirockzz.github.io/icon.jpg"
-  }
+  "authors": [
+    {
+      "name": "Abhishek Gupta",
+      "bio": "Principal Developer Advocate @ AWS",
+      "image": "https://abhirockzz.github.io/icon.jpg",
+      "linkedin": "abhirockzz",
+      "twitter": "abhi_tweeter"
+    }
+  ]
 }

@@ -1,0 +1,8 @@
+{
+  "body": "{\"ExpenseId\":\"EXP-001\",\"SubmittedBy\":\"jane.doe@example.com\",\"Description\":\"Client dinner - Q3 planning\",\"Amount\":142.50,\"Currency\":\"USD\",\"ManagerEmail\":\"john.manager@example.com\"}",
+  "httpMethod": "POST",
+  "path": "/expenses",
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}

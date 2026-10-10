@@ -1,0 +1,53 @@
+{
+  "title": "AWS AppSync to Amazon SQS",
+  "description": "Create an AppSync GraphQl API that sends messages to an SQS queue",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK template creates an AppSync API with an Amazon SQS as HTTP data source. An SQS queue is created, along with an IAM role that provides the AppSync API permission to send messages to that specific queue. Using the sendMessage query, you can add a message to the queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/main.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Simplify access to multiple microservices with AWS AppSync and AWS Amplify",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-microservices/"
+      },
+      {
+        "text": "HTTP resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/brice-pelle.json"
+  ]
+}

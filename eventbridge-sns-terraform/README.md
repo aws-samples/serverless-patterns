@@ -1,6 +1,6 @@
 # Amazon EventBridge to Amazon SNS
 
-The AWS SAM template deploys an SNS topic that is triggered by an EventBridge rule. The SNS topic policy provides the permission for EventBridge to invoke the SNS topic.
+This pattern creates an SNS topic that is triggered by an EventBridge rule. The SNS topic policy provides the permission for EventBridge to invoke the SNS topic.
 
 In this example, the EventBridge rule specified in `main.tf` filters the events based upon the criteria in the `aws_cloudwatch_event_rule` block. When matching events are sent to EventBridge that trigger the rule, they are delivered as a JSON event payload (see Example event payload from EventBridge to SNS in the README) to the SNS topic.
 

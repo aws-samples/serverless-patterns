@@ -1,11 +1,10 @@
 import express from "express";
-import AWS from "aws-sdk";
+import { SFNClient, StartExecutionCommand } from "@aws-sdk/client-sfn";
 import moment from "moment";
 
 const app = express();
 const port = 80;
-AWS.config.update({ region: process.env.region });
-const sfn = new AWS.StepFunctions({ apiVersion: "2016-11-23" });
+const sfnClient = new SFNClient({ region: process.env.region });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -19,16 +18,16 @@ app.get("/", (req, res) => {
 app.post("/startexecution", async (req, res) => {
   const rightNow = moment().format("YYYYMMDD-hhmmss");
 
-  const params = {
+  const command = new StartExecutionCommand({
     stateMachineArn: STATE_MACHINE_ARN,
     input: JSON.stringify({
       IsHelloWorldExample: req.body.IsHelloWorldExample,
     }),
     name: `ArchiveAt${rightNow}`,
-  };
+  });
 
   try {
-    const result = await sfn.startExecution(params).promise();
+    const result = await sfnClient.send(command);
     return res.status(200).send({
       body: "OK!",
       sfnResponse: result,
@@ -39,6 +38,5 @@ app.post("/startexecution", async (req, res) => {
 });
 
 app.listen(port, () => {
-  // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);
 });

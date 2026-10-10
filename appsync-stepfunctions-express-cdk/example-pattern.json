@@ -1,0 +1,53 @@
+{
+  "title": "AWS AppSync to AWS Step Functions",
+  "description": "Create an AppSync API with a Step Functions workflow",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This patterns contains a sample AWS CDK template for running Step Functions synchronous express workflows from an AppSync API."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/bin/appsync-stepfunctions-express-cdk.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      },
+      {
+        "text": "New Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy",
+      "See the GitHub repo for detailed instructions"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "To delete the stack, run: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ami-patel.json",
+    "content/contributors/michael-liendo.json"
+  ]
+}

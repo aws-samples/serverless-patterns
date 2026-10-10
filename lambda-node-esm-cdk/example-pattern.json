@@ -1,0 +1,56 @@
+{
+  "title": "AWS Lambda function for Node.js using TypeScript with ESM and ESBuild configured",
+  "description": "Create a Lambda function for Node.js with ESM modules configured and ESBuild bundle set up",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use ES modules with a Lambda function using TypeScript, ESBuild and CDK.",
+      "This template has the bundle properly configured in CDK to use ES modules in Node.js for leveraging dynamic imports or top-level await for instance."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/node-esm-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with the AWS CDK in TypeScript",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html"
+      },
+      {
+        "text": "Using Node.js ES modules and top-level await in AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-node-js-es-modules-and-top-level-await-in-aws-lambda/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Luca Mezzalira",
+      "bio": "Luca Mezzalira is Principal Serverless Specialist Solutions Architect at AWS, an international speaker, and a published author. Over the past 20 years, he’s mastered software architectures from frontend to the cloud, providing the right solution for the context of the job at hand.",
+      "image": "https://avatars.githubusercontent.com/u/210272?v=4",
+      "linkedin": "lucamezzalira",
+      "twitter": "lucamezzalira"
+    }
+  ]
+}

@@ -5,9 +5,7 @@
     "main": "app.js",
     "author": "SAM CLI",
     "license": "MIT",
-    "dependencies": {
-        "aws-sdk": "^2.1450.0"
-    },
+    "dependencies": {},
     "scripts": {
         "test": "mocha tests/unit/",
         "debug": "node --inspect=5859 app.js",

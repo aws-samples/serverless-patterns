@@ -1,9 +1,6 @@
-
 # Create an AWS Step Functions workflow to integrate with Amazon SQS using CDK.
 
-
-
-This CDK application deploys a Step Functions workflow, that takes in a payload and sends part of it to an Amazon SQS. In this pattern, the state machine does not wait for a callback from the queue. The application contains the minimum IAM resources required to run the workflow.
+This CDK application deploys a AWS Step Functions workflow, that takes in a payload and sends part of it to an Amazon SQS. In this pattern, the state machine does not wait for a callback from the queue. The application contains the minimum IAM resources required to run the workflow.
 You can find the SAM template for the same pattern [here](https://serverlessland.com/patterns/sfn-sqs)
 
 To manually create a virtualenv on MacOS and Linux:
@@ -43,7 +40,6 @@ Deploy your code
 $ cdk deploy
 ```
 
-
 ## How it works
 
 * Start the Step Function execution with the sample event payload 
@@ -52,10 +48,10 @@ $ cdk deploy
 
 ## Testing
 
-Run the following AWS CLI command to send a 'start-execution` command to start the Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed Step Functions workflow. This is provided in the stack outputs.
+Run the following AWS CLI command to send a 'start-execution` command to start the AWS Step Functions workflow. Note, you must edit the {StateMachineExpressSynctoLambda} placeholder with the ARN of the deployed AWS Step Functions workflow. This is provided in the stack outputs.
 
 ```bash
-aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMachineArn}" --input "{\"message\": {\"hello\" : \"world\" } }"
+aws stepfunctions start-execution --name "test" --state-machine-arn "{StateMachineArn}" --input "{\"message\": {\"hello\" : \"world\" } }"
 ```
 
 ### output:
@@ -67,10 +63,10 @@ aws stepfunctions start-execution  --name "test" --state-machine-arn "{StateMach
 }
 ```
 
-Note the `executionArn` from the above output and run the below  cli command to get the status of the execution
+Note the `executionArn` from the above output and run the below cli command to get the status of the execution
 
 ```bash
-aws stepfunctions describe-execution --execution-arn  "{executionArn}"
+aws stepfunctions describe-execution --execution-arn "{executionArn}"
 ```
 
 ### Get execution status output:
@@ -93,10 +89,10 @@ aws stepfunctions describe-execution --execution-arn  "{executionArn}"
     }
 }
 ```
-Once the `status` is `SUCCEEDED`, we can verify if the message got delivered to the SQS or not by running the below command
+Once the `status` is `SUCCEEDED`, we can verify if the message got delivered to the Amazon SQS or not by running the below command
 
 ```bash
-aws sqs receive-message --queue-url  "{QueueUrl}"
+aws sqs receive-message --queue-url "{QueueUrl}"
 ```
 
 ### Queue Message output:
@@ -120,7 +116,7 @@ aws sqs receive-message --queue-url  "{QueueUrl}"
     ```bash
     cdk destroy
     ```
-   
+
 ## Useful commands
 
  * `cdk ls`          list all stacks in the app

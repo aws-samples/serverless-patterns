@@ -1,0 +1,49 @@
+{
+  "title": "Amazon Cognito to HTTP APIs",
+  "description": "Create an HTTP API endpoint with a JWT authorizer backed by Amazon Cognito",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a nested stack with authentication configured using Cognito. It also deploys an HTTP API configured with a JWT authorizer based on the Cognito configuration and a Lambda function on a secure route. <br/> Note: when deploying this pattern, both <em>CAPABILITY_AUTO_EXPAND</em> and <em>CAPABILITY_IAM</em> are required."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Watch a video demonstration",
+        "link": "https://youtu.be/klOScYEojzY"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/eric-johnson.json"
+  ]
+}

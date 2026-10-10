@@ -1,10 +1,10 @@
-import * as AWSXRay from 'aws-xray-sdk';
-import * as AWSSDK from 'aws-sdk';
+import * as AWSXRay from 'aws-xray-sdk-core';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent } from "aws-lambda";
 
-
-const AWS = AWSXRay.captureAWS(AWSSDK);
-const docClient = new AWS.DynamoDB.DocumentClient();
+const client = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
+const docClient = DynamoDBDocumentClient.from(client);
 
 const table = process.env.DYNAMODB || "undefined"
 
@@ -14,7 +14,7 @@ const params = {
 
 async function scanItems(){
   try {
-    const data = await docClient.scan(params).promise()
+    const data = await docClient.send(new ScanCommand(params))
     return data
   } catch (err) {
     return err
