@@ -206,13 +206,9 @@ Each call documents its own permissions on its own page: [Enable resource tags o
     ```bash
     REGION=<the Region you deployed to>
     ```
-1. Delete the stack. This also deletes the function log group, which the stack owns:
+1. Delete the stack with AWS SAM. This also deletes the function log group, which the stack owns. Enter `y` at each confirmation prompt:
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION
-    ```
-1. Wait for the deletion to finish
-    ```bash
-    aws cloudformation wait stack-delete-complete --stack-name STACK_NAME --region $REGION
+    sam delete --stack-name STACK_NAME --region $REGION
     ```
 1. Confirm the stack has been deleted
     ```bash
