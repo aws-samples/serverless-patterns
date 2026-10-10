@@ -11,5 +11,4 @@ exports.handler = async (event) => {
     entryCount: detail.requestParameters?.entries?.length || 0,
     eventTime: detail.eventTime,
   }));
-  return { statusCode: 200 };
 };

@@ -38,17 +38,31 @@ Important: this application uses various AWS services and there are costs associ
 - A Lambda function processes the events, logging the caller identity, source IP, event bus, and entry count
 - This enables security teams to audit who is putting events to which bus
 
+EventBridge rules are region-local. The trail is multi-region, but the rule in this stack only matches events in the region where it is deployed, so deploy it in each region you want to alert in.
+
 ## Testing
 
+The check puts one event, then polls the function log group every 10 seconds for up to 2 minutes. It prints `PASS` when a record is logged and exits non-zero otherwise.
+
 ```bash
+STACK=EventbridgeCloudtrailDataplaneStack
+FN=$(aws cloudformation describe-stacks --stack-name $STACK \
+  --query 'Stacks[0].Outputs[?OutputKey==`ProcessorFunctionName`].OutputValue' --output text)
+START=$(( $(date +%s) * 1000 ))
+
 # Put a test event to the default event bus
 aws events put-events --entries '[{"Source":"test.app","DetailType":"TestEvent","Detail":"{\"key\":\"value\"}"}]'
 
-# Check Lambda logs (allow ~5 minutes for CloudTrail delivery)
-aws logs tail /aws/lambda/$(aws cloudformation describe-stacks \
-  --stack-name EventbridgeCloudtrailDataplaneStack \
-  --query 'Stacks[0].Outputs[?OutputKey==`ProcessorFunctionName`].OutputValue' --output text) \
-  --follow
+# Poll the function log group (12 tries x 10 s); exit non-zero if no record appears
+N=0
+for i in $(seq 1 12); do
+  N=$(aws logs filter-log-events --log-group-name "/aws/lambda/$FN" \
+    --filter-pattern '"EventBridge data plane API call detected"' \
+    --start-time "$START" --query 'length(events)' --output text 2>/dev/null || echo 0)
+  [ "$N" -gt 0 ] && break
+  sleep 10
+done
+[ "$N" -gt 0 ] && echo "PASS: $N record(s) logged" || { echo "FAIL: no record logged"; exit 1; }
 ```
 
 ## Cleanup
