@@ -10,10 +10,14 @@ Description: >
 Parameters:
   ModelId:
     Type: String
-    Default: us.amazon.nova-lite-v1:0
+    Default: ""
     Description: >
       Amazon Bedrock foundation model or inference profile identifier the prompt runs against
-      (must support the Converse API). The default is a cross-Region inference profile.
+      (must support the Converse API). Leave blank to use the Amazon Nova Lite cross-Region
+      inference profile for the deployment Region's geography (us.amazon.nova-lite-v1:0,
+      eu.amazon.nova-lite-v1:0 or apac.amazon.nova-lite-v1:0). In some Regions, for example
+      eu-central-1, Amazon Nova Lite cannot be invoked on demand by its model ID. In any other
+      geography a blank value uses the model ID amazon.nova-lite-v1:0.
   PromptRevision:
     Type: String
     Default: "1"
@@ -21,6 +25,13 @@ Parameters:
       Bump this value whenever you edit the prompt template or ModelId so that AWS CloudFormation
       replaces the published prompt version. AWS::Bedrock::PromptVersion is only replaced when its
       own properties change, so editing the prompt alone updates just the draft.
+
+Conditions:
+  UseDefaultModel: !Equals [!Ref ModelId, ""]
+  # The first part of the Region name, for example "eu" for eu-central-1, picks the geography.
+  IsUsGeo: !Equals [!Select [0, !Split ["-", !Ref "AWS::Region"]], us]
+  IsEuGeo: !Equals [!Select [0, !Split ["-", !Ref "AWS::Region"]], eu]
+  IsApGeo: !Equals [!Select [0, !Split ["-", !Ref "AWS::Region"]], ap]
 
 Resources:
   # A managed, versionable Amazon Bedrock prompt. The template text and its input variables live
@@ -35,7 +46,16 @@ Resources:
       Variants:
         - Name: v1
           TemplateType: TEXT
-          ModelId: !Ref ModelId
+          ModelId: !If
+            - UseDefaultModel
+            - !If
+              - IsUsGeo
+              - us.amazon.nova-lite-v1:0
+              - !If
+                - IsEuGeo
+                - eu.amazon.nova-lite-v1:0
+                - !If [IsApGeo, apac.amazon.nova-lite-v1:0, amazon.nova-lite-v1:0]
+            - !Ref ModelId
           TemplateConfiguration:
             Text:
               Text: "Summarize the following text in exactly one clear sentence:\n\n{{input}}"
@@ -106,7 +126,18 @@ Resources:
                 # Region. Foundation model ARNs have no account id.
                 - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
                 # The profile itself is scoped to exactly the identifier this stack deploys.
-                - !Sub "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/${ModelId}"
+                - !Sub
+                  - "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:inference-profile/${ResolvedModelId}"
+                  - ResolvedModelId: !If
+                    - UseDefaultModel
+                    - !If
+                      - IsUsGeo
+                      - us.amazon.nova-lite-v1:0
+                      - !If
+                        - IsEuGeo
+                        - eu.amazon.nova-lite-v1:0
+                        - !If [IsApGeo, apac.amazon.nova-lite-v1:0, amazon.nova-lite-v1:0]
+                    - !Ref ModelId
       LoggingConfig:
         LogGroup: !Ref InvokePromptFunctionLogGroup
       Environment:
