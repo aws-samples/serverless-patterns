@@ -57,8 +57,13 @@ Parameters:
       model needs both of those changed as well.
   LlmModel:
     Type: String
-    Default: amazon.nova-lite-v1:0
-    Description: Amazon Bedrock model used to generate the answer on a cache miss.
+    Default: ""
+    Description: >
+      Amazon Bedrock model used to generate the answer on a cache miss. Leave blank to use the
+      Amazon Nova Lite cross-Region inference profile for the deployment Region's geography
+      (us.amazon.nova-lite-v1:0, eu.amazon.nova-lite-v1:0 or apac.amazon.nova-lite-v1:0),
+      which works in Regions where the model cannot be invoked on demand by its model ID. Or
+      set any model ID or inference profile ID available in your Region.
 
 Conditions:
   HasApiKeyParam: !Not [!Equals [!Ref ApiKeyParameterName, ""]]
@@ -137,14 +142,18 @@ Resources:
         AuthType: AWS_IAM
       Policies:
         - Statement:
-            # Foundation models are account-less ARNs and the model id is a deploy time
-            # parameter, so the wildcard covers the embeddings model and the answer model
-            # without listing both. This is the scope AWS documents for InvokeModel.
+            # Both model ids are deploy time parameters. The answer model is called through a
+            # cross-Region inference profile by default, which needs InvokeModel on the profile
+            # in this Region and on the foundation model in every Region the profile can route
+            # to, hence the Region wildcard on the foundation-model ARN. This is the scope AWS
+            # documents for inference profiles.
             # https://docs.aws.amazon.com/bedrock/latest/userguide/security_iam_id-based-policy-examples.html
             - Sid: BedrockInvoke
               Effect: Allow
               Action: bedrock:InvokeModel
-              Resource: !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:*::foundation-model/*"
+                - !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*"
             # Only the three actions cache.py actually calls, and all three are index
             # level operations, so the index ARN alone is enough. GetVectors is required
             # because QueryVectors is called with returnMetadata set to true.

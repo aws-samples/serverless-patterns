@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Request access to the Amazon Bedrock foundation models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) used by this pattern, so that they are enabled in the Region you deploy to: the embeddings model `amazon.titan-embed-text-v2:0` and the text model `amazon.nova-lite-v1:0`
-* A Region where both [Amazon S3 Vectors](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html) and Amazon Bedrock are available. This pattern was built and tested in `us-east-1`
+* A Region where both [Amazon S3 Vectors](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html) and Amazon Bedrock are available. This pattern was tested in `us-east-1` and `eu-central-1`. By default the answer model is called through the Amazon Nova Lite cross Region inference profile for the geography of your Region (`us.`, `eu.` or `apac.` in front of the model ID), because in some Regions, for example `eu-central-1`, Amazon Nova Lite cannot be invoked on demand by its model ID. In a Region outside those geographies, set `LlmModel` during deployment
 * Python 3 available as `python3`. The Testing section uses it to print the JSON response returned by the function
 
 ## Deployment Instructions
@@ -54,7 +54,7 @@ Important: this application uses various AWS services and there are costs associ
     * **Parameter TtlSeconds [86400]**: press Enter to accept the default freshness window of one day
     * **Parameter ApiKeyParameterName []**: press Enter to leave this blank. The function URL already requires AWS Identity and Access Management (IAM) authentication. Only fill this in if you first created the parameter described in "Optional: application level API key" below
     * **Parameter EmbedModel [amazon.titan-embed-text-v2:0]**: press Enter to accept the default embeddings model
-    * **Parameter LlmModel [amazon.nova-lite-v1:0]**: press Enter to accept the default answer model
+    * **Parameter LlmModel []**: press Enter to leave this blank, which uses the Amazon Nova Lite inference profile for your Region's geography, for example `eu.amazon.nova-lite-v1:0` in `eu-central-1`. Or enter any model ID or inference profile ID that you can invoke in your Region
     * **Confirm changes before deploy**: enter `N`, or `Y` if you want to review the change set before it is executed
     * **Allow SAM CLI IAM role creation**: enter `Y`. The template creates the function execution role
     * **Disable rollback**: enter `N`
@@ -101,61 +101,76 @@ Correctness controls:
 1. Send a prompt. This is the first time it is asked, so it is a MISS and the answer comes from the model:
     ```
     aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
-    python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
     ```
-    The first command prints the invoke result and the second prints the function response without the long answer text:
+    Then print the function response without the long answer text. If the function returned an error, such as a model access error, this prints the error message instead:
+    ```
+    python3 -c "import json;p=json.load(open('response.json'));d=json.loads(p['body']) if 'body' in p else p;r=str(d.pop('response',''));print(d);print('response:',r[:80])"
+    ```
+    The two commands print:
     ```
     {
         "StatusCode": 200,
         "ExecutedVersion": "$LATEST"
     }
-    {'cached': False, 'similarity': None, 'epoch': '1', 'model': 'amazon.nova-lite-v1:0', 'latency_ms': 2509}
+    {'cached': False, 'similarity': None, 'epoch': '1', 'model': 'us.amazon.nova-lite-v1:0', 'latency_ms': 1568}
     response: The capital of France is Paris. Paris is not only the capital but also the large
     ```
     `latency_ms` and the wording of the answer vary from run to run.
 1. Send the same prompt again. It is now a HIT, served from the cache with no model call:
     ```
     aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
-    python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
+    ```
+    Then print the function response:
+    ```
+    python3 -c "import json;p=json.load(open('response.json'));d=json.loads(p['body']) if 'body' in p else p;r=str(d.pop('response',''));print(d);print('response:',r[:80])"
     ```
     ```
     {
         "StatusCode": 200,
         "ExecutedVersion": "$LATEST"
     }
-    {'cached': True, 'similarity': 0.9996, 'epoch': '1', 'matched_prompt': 'What is the capital of France?', 'model': 'amazon.nova-lite-v1:0', 'latency_ms': 232}
+    {'cached': True, 'similarity': 1.0, 'epoch': '1', 'matched_prompt': 'What is the capital of France?', 'model': 'us.amazon.nova-lite-v1:0', 'latency_ms': 250}
     response: The capital of France is Paris. Paris is not only the capital but also the large
     ```
 1. Ask the same question in different words. This is the semantic hit: the text does not match, the meaning does, and `matched_prompt` shows which entry was served:
     ```
     aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"Which city is the capital of France?\"}"}' response.json
-    python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
+    ```
+    Then print the function response:
+    ```
+    python3 -c "import json;p=json.load(open('response.json'));d=json.loads(p['body']) if 'body' in p else p;r=str(d.pop('response',''));print(d);print('response:',r[:80])"
     ```
     ```
     {
         "StatusCode": 200,
         "ExecutedVersion": "$LATEST"
     }
-    {'cached': True, 'similarity': 0.9854, 'epoch': '1', 'matched_prompt': 'What is the capital of France?', 'model': 'amazon.nova-lite-v1:0', 'latency_ms': 237}
+    {'cached': True, 'similarity': 0.9859, 'epoch': '1', 'matched_prompt': 'What is the capital of France?', 'model': 'us.amazon.nova-lite-v1:0', 'latency_ms': 224}
     response: The capital of France is Paris. Paris is not only the capital but also the large
     ```
 1. Negate the question. The wording is close enough to pass the similarity threshold, but the negation parity guard rejects the candidate, so this is a MISS and the model answers the question that was actually asked:
     ```
     aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"Which city is not the capital of France?\"}"}' response.json
-    python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
+    ```
+    Then print the function response:
+    ```
+    python3 -c "import json;p=json.load(open('response.json'));d=json.loads(p['body']) if 'body' in p else p;r=str(d.pop('response',''));print(d);print('response:',r[:80])"
     ```
     ```
     {
         "StatusCode": 200,
         "ExecutedVersion": "$LATEST"
     }
-    {'cached': False, 'similarity': None, 'epoch': '1', 'model': 'amazon.nova-lite-v1:0', 'latency_ms': 1264}
-    response: To answer this question, it's important to know that the capital of France is Pa
+    {'cached': False, 'similarity': None, 'epoch': '1', 'model': 'us.amazon.nova-lite-v1:0', 'latency_ms': 1195}
+    response: To answer this question, I will first list some well-known cities in France, and
     ```
 1. Force invalidate the whole cache. This bumps the epoch held in AWS Systems Manager Parameter Store:
     ```
     aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"action\":\"invalidate\"}"}' response.json
-    python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
+    ```
+    Then print the function response:
+    ```
+    python3 -c "import json;p=json.load(open('response.json'));d=json.loads(p['body']) if 'body' in p else p;r=str(d.pop('response',''));print(d);print('response:',r[:80])"
     ```
     ```
     {
@@ -168,14 +183,17 @@ Correctness controls:
 1. Ask the first question once more. Every entry cached under the previous epoch now misses, so the model answers again and the entry is re-cached under the new epoch. An execution environment that has not refreshed its cached epoch yet, which it does at most every 30 seconds, can still serve one hit:
     ```
     aws lambda invoke --region $REGION --function-name $FUNCTION --cli-binary-format raw-in-base64-out --payload '{"body":"{\"prompt\":\"What is the capital of France?\"}"}' response.json
-    python3 -c "import json;d=json.loads(json.load(open('response.json'))['body']);r=d.pop('response','');print(d);print('response:',r[:80])"
+    ```
+    Then print the function response:
+    ```
+    python3 -c "import json;p=json.load(open('response.json'));d=json.loads(p['body']) if 'body' in p else p;r=str(d.pop('response',''));print(d);print('response:',r[:80])"
     ```
     ```
     {
         "StatusCode": 200,
         "ExecutedVersion": "$LATEST"
     }
-    {'cached': False, 'similarity': None, 'epoch': '2', 'model': 'amazon.nova-lite-v1:0', 'latency_ms': 1144}
+    {'cached': False, 'similarity': None, 'epoch': '2', 'model': 'us.amazon.nova-lite-v1:0', 'latency_ms': 1354}
     response: The capital of France is Paris. Paris is not only the capital but also the large
     ```
 1. To read the function logs, use the `LogGroupName` output. The stack owns this log group, so it is deleted with the stack:
@@ -224,7 +242,7 @@ The key is read once per execution environment and kept for its lifetime, so rot
 * Amazon S3 Vectors allows up to 40 KB of metadata per vector, so a very long answer cannot be cached as metadata. See [Limitations and restrictions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html). The answer, prompt, model, timestamp and epoch are declared as non-filterable metadata keys so that they do not consume the smaller filterable metadata budget.
 * Semantic caching serves an answer that was written for a similar prompt, not the same prompt. It suits FAQ and support assistants, documentation question answering and other repetitive traffic. It does not suit answers that must be exact, fresh or specific to one user unless you also namespace entries per user, invalidate aggressively or verify equivalence before serving.
 * The negation parity guard covers ASCII English negation words, because the tokenizer keeps only ASCII letters. It does not catch opposites such as "cheapest" and "most expensive". For high stakes content, raise the threshold or verify a borderline candidate before serving it.
-* The function role allows `bedrock:InvokeModel` on `foundation-model/*`. In a Region where the model you want is reachable only through a cross Region inference profile (for example `us.amazon.nova-lite-v1:0`), set `LlmModel` to the inference profile id and add the inference profile ARN to the `BedrockInvoke` statement in template.yaml, keeping the foundation model ARN as well: "When you specify an inference profile in the Resource field in the first statement, you must also specify the foundation model in each Region associated with it." See [Prerequisites for inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-prereq.html).
+* The function role allows `bedrock:InvokeModel` on the inference profiles in the deployment Region and on `foundation-model/*` in every Region, because a cross Region inference profile can route a request to another Region in its geography: "When you specify an inference profile in the Resource field in the first statement, you must also specify the foundation model in each Region associated with it." See [Prerequisites for inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-prereq.html).
 
 ## Cleanup
 
@@ -232,15 +250,11 @@ The key is read once per execution environment and kept for its lifetime, so rot
     ```bash
     REGION=us-east-1
     ```
-1. Delete the stack, which also deletes the Lambda function, its execution role, the log group, the epoch parameter, and the Amazon S3 Vectors index and vector bucket with the cached vectors in them:
+1. Delete the stack with AWS SAM, which also deletes the Lambda function, its execution role, the log group, the epoch parameter, and the Amazon S3 Vectors index and vector bucket with the cached vectors in them. Enter `y` at each confirmation prompt:
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION
+    sam delete --stack-name STACK_NAME --region $REGION
     ```
-1. Wait for the deletion to complete:
-    ```bash
-    aws cloudformation wait stack-delete-complete --stack-name STACK_NAME --region $REGION
-    ```
-1. Confirm the stack has been deleted
+1. Confirm the stack has been deleted:
     ```bash
     aws cloudformation list-stacks --region $REGION --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```

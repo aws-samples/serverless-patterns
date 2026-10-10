@@ -24,7 +24,21 @@ EMBED_MODEL = os.environ.get("EMBED_MODEL", "amazon.titan-embed-text-v2:0")
 # Fixed per deployment, never taken from the request body: the cache key is the prompt
 # embedding alone, so a caller supplied model could be served an answer that a different
 # model generated. Entries still record the model that produced them.
-LLM_MODEL = os.environ.get("LLM_MODEL", "amazon.nova-lite-v1:0")
+# Cross-Region inference profile prefix by the first part of the Region name. In some
+# Regions (for example eu-central-1) Amazon Nova Lite can only be invoked through one of
+# these profiles, not on demand by its model ID, so the default always uses the profile.
+_GEO_PREFIX = {"us": "us", "eu": "eu", "ap": "apac"}
+
+
+def _default_llm(region):
+    prefix = _GEO_PREFIX.get(region.split("-")[0])
+    if not prefix:
+        raise RuntimeError(
+            f"No default Amazon Nova Lite inference profile for {region}; set LlmModel explicitly")
+    return f"{prefix}.amazon.nova-lite-v1:0"
+
+
+LLM_MODEL = os.environ.get("LLM_MODEL") or _default_llm(REGION)
 SIM_THRESHOLD = float(os.environ.get("SIM_THRESHOLD", "0.85"))
 TTL_SECONDS = int(os.environ.get("TTL_SECONDS", "86400"))
 API_KEY_PARAM = os.environ.get("API_KEY_PARAM", "")
