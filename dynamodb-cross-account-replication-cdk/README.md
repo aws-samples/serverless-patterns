@@ -1,6 +1,6 @@
 # Amazon DynamoDB Global Tables with Cross-Account Read Access
 
-This pattern deploys an Amazon DynamoDB Global Table (same-account, multi-region) and an IAM role that grants a separate AWS account read-only access to the table in both regions.
+This pattern deploys an Amazon DynamoDB Global Table (same-account, multi-region) and an AWS Identity and Access Management (IAM) role that grants a separate AWS account read-only access to the table in both regions.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-cross-account-replication-cdk
 
@@ -31,16 +31,20 @@ Important: this application uses various AWS services and there are costs associ
                                │ AssumeRole
 ┌──────────────────────────────┼────────────────────────────────────┐
 │  Reader Account              ▼                                    │
-│              GetItem / Query / Scan                               │
+│              GetItem / Query / BatchGetItem                       │
 └───────────────────────────────────────────────────────────────────┘
 ```
 
 - A DynamoDB Global Table is created with a replica in the specified region (same account)
-- An IAM role is created that can be assumed by the reader account
-- The role grants read-only access (`GetItem`, `Query`, `Scan`, `BatchGetItem`) to the table in **both** regions
+- An IAM role is created that the reader account can assume only when it passes the external ID you set at deploy time
+- The role grants read-only access (`GetItem`, `Query`, `BatchGetItem`) to the table in **both** regions
 - DynamoDB handles replication automatically with sub-second latency
 
 **Note:** This is same-account multi-region replication (Global Tables) with cross-account read access via IAM. For true cross-account Global Tables replication, use `TableV2MultiAccountReplica` in a separate stack deployed to the replica account.
+
+**Trust policy:** the role trusts the reader account and requires the `sts:ExternalId` you pass in `ExternalId`. Share that value only with the team that runs the reader workload. To limit the trust to one role or user in the reader account, add a condition on `aws:PrincipalArn` to the trust policy.
+
+**Encryption:** the table uses the default AWS-owned key, so no key policy changes are needed. If you switch to a customer-managed KMS key, make sure the key policy or the role's IAM policy lets the cross-account role use the key (for example `kms:Decrypt`) in each Region it reads from. See [DynamoDB encryption at rest usage notes](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/encryption.usagenotes.html) for the permissions DynamoDB requires on a customer managed key.
 
 ## Deployment Instructions
 
@@ -49,9 +53,9 @@ Important: this application uses various AWS services and there are costs associ
     cd serverless-patterns/dynamodb-cross-account-replication-cdk
     npm install
     ```
-2. Deploy with the reader account ID and replica region:
+2. Deploy with the reader account ID, an external ID of your choice (at least 8 characters), and the replica region:
     ```bash
-    cdk deploy --parameters ReplicaAccountId=123456789012 -c replicaRegion=us-west-2
+    cdk deploy --parameters ReplicaAccountId=<READER_ACCOUNT_ID> --parameters ExternalId=<EXTERNAL_ID> -c replicaRegion=us-west-2
     ```
 
 ## Testing
@@ -70,7 +74,7 @@ aws dynamodb get-item --table-name <TableName> \
 
 # Cross-account read (from reader account, assuming the role)
 aws sts assume-role --role-arn <CrossAccountRoleArn> \
-  --role-session-name reader-test
+  --role-session-name reader-test --external-id <EXTERNAL_ID>
 
 # Export the temporary credentials
 export AWS_ACCESS_KEY_ID=<AccessKeyId from above>

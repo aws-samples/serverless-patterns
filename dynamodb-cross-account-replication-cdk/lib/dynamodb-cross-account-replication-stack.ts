@@ -12,6 +12,12 @@ export class DynamodbCrossAccountReplicationStack extends cdk.Stack {
       description: 'AWS Account ID that will assume the cross-account read role',
     });
 
+    const externalId = new cdk.CfnParameter(this, 'ExternalId', {
+      type: 'String',
+      minLength: 8,
+      description: 'External ID the reader account must pass to sts:AssumeRole',
+    });
+
     // Replica region must be a literal (TableV2 does not accept tokens for replica regions)
     const replicaRegion = this.node.tryGetContext('replicaRegion') || 'us-west-2';
 
@@ -28,6 +34,8 @@ export class DynamodbCrossAccountReplicationStack extends cdk.Stack {
     // Cross-account read role — grants access to BOTH source and replica region ARNs
     const crossAccountRole = new iam.Role(this, 'CrossAccountReadRole', {
       assumedBy: new iam.AccountPrincipal(replicaAccountId.valueAsString),
+      // The reader must pass this value in sts:AssumeRole (confused-deputy protection)
+      externalIds: [externalId.valueAsString],
       description: 'Allows another account to read from the DynamoDB Global Table in any region',
     });
 
@@ -42,8 +50,18 @@ export class DynamodbCrossAccountReplicationStack extends cdk.Stack {
         table.tableArn,
         `${table.tableArn}/index/*`,
         // Replica region (table.tableArn is source-region-scoped)
-        `arn:aws:dynamodb:${replicaRegion}:${this.account}:table/${table.tableName}`,
-        `arn:aws:dynamodb:${replicaRegion}:${this.account}:table/${table.tableName}/index/*`,
+        this.formatArn({
+          service: 'dynamodb',
+          region: replicaRegion,
+          resource: 'table',
+          resourceName: table.tableName,
+        }),
+        this.formatArn({
+          service: 'dynamodb',
+          region: replicaRegion,
+          resource: 'table',
+          resourceName: `${table.tableName}/index/*`,
+        }),
       ],
     }));
 
