@@ -50,7 +50,17 @@ Return ONLY the Python code, no explanation. No markdown code fences."""
         )
 
         bedrock_body = json.loads(response['body'].read())
-        generated_code = bedrock_body['content'][0]['text'].strip()
+        # Claude Sonnet 5 uses adaptive thinking by default, so the first content
+        # block can be a thinking block. Join only the text blocks.
+        generated_code = ''.join(
+            block.get('text', '')
+            for block in bedrock_body.get('content', [])
+            if block.get('type') == 'text'
+        ).strip()
+        if not generated_code:
+            raise ValueError(
+                f"Model returned no text content (stop_reason: {bedrock_body.get('stop_reason')})"
+            )
         # Strip markdown fences if present
         if generated_code.startswith('```'):
             generated_code = '\n'.join(generated_code.split('\n')[1:-1])
