@@ -1,36 +1,49 @@
 const { VerifiedPermissionsClient, IsAuthorizedCommand } = require('@aws-sdk/client-verifiedpermissions');
 const client = new VerifiedPermissionsClient();
 
-const VALID_ROLES = ['admin', 'reader'];
+const ACTIONS = ['Read', 'Write', 'Delete'];
+
+// Demo documents. Owner and classification are server-side data, never request input.
+const OWNER = process.env.DEMO_OWNER_PRINCIPAL || 'no-owner-configured';
+const DOCUMENTS = {
+  'doc-1': { owner: OWNER, classification: 'confidential' },
+  'doc-2': { owner: OWNER, classification: 'public' }
+};
+const ADMINS = (process.env.ADMIN_PRINCIPALS || '').split(',').map((s) => s.trim()).filter(Boolean);
+
+const respond = (statusCode, body) => ({ statusCode, body: JSON.stringify(body) });
 
 exports.handler = async (event) => {
-  const body = JSON.parse(event.body || '{}');
-  const { userId, role, action, resourceId, classification } = body;
+  // Caller identity comes from the SigV4 signature checked by the AWS_IAM Function URL.
+  const callerArn = event.requestContext?.authorizer?.iam?.userArn;
+  if (!callerArn) return respond(403, { error: 'No caller identity' });
+  // Drop the session name so an assumed role is one stable principal.
+  const principal = callerArn.replace(/^(arn:[^:]+:sts::\d+:assumed-role\/[^/]+)\/.+$/, '$1');
+  const role = ADMINS.includes(principal) ? 'admin' : 'reader';
 
-  if (!userId || !role || !action || !resourceId) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields: userId, role, action, resourceId' }) };
+  const { action, resourceId } = JSON.parse(event.body || '{}');
+  if (!ACTIONS.includes(action) || !DOCUMENTS[resourceId]) {
+    return respond(400, { error: `Provide action (${ACTIONS.join(', ')}) and resourceId (${Object.keys(DOCUMENTS).join(', ')})` });
   }
+  const doc = DOCUMENTS[resourceId];
 
-  if (!VALID_ROLES.includes(role)) {
-    return { statusCode: 400, body: JSON.stringify({ error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` }) };
-  }
-
-  const params = {
+  const result = await client.send(new IsAuthorizedCommand({
     policyStoreId: process.env.POLICY_STORE_ID,
-    principal: { entityType: 'MyApp::User', entityId: userId },
+    principal: { entityType: 'MyApp::User', entityId: principal },
     action: { actionType: 'MyApp::Action', actionId: action },
     resource: { entityType: 'MyApp::Document', entityId: resourceId },
     entities: {
       entityList: [
-        { identifier: { entityType: 'MyApp::User', entityId: userId }, attributes: { role: { string: role } } },
-        { identifier: { entityType: 'MyApp::Document', entityId: resourceId }, attributes: { owner: { string: userId }, classification: { string: classification || 'public' } } }
+        { identifier: { entityType: 'MyApp::User', entityId: principal }, attributes: { role: { string: role } } },
+        {
+          identifier: { entityType: 'MyApp::Document', entityId: resourceId },
+          attributes: {
+            owner: { entityIdentifier: { entityType: 'MyApp::User', entityId: doc.owner } },
+            classification: { string: doc.classification }
+          }
+        }
       ]
     }
-  };
-
-  const result = await client.send(new IsAuthorizedCommand(params));
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ decision: result.decision, userId, action, resourceId, role })
-  };
+  }));
+  return respond(200, { decision: result.decision, principal, role, action, resourceId });
 };

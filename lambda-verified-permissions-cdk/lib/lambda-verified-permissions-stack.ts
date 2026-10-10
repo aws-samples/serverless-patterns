@@ -15,7 +15,7 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
           'MyApp': {
             entityTypes: {
               User: { shape: { type: 'Record', attributes: { role: { type: 'String' } } } },
-              Document: { shape: { type: 'Record', attributes: { owner: { type: 'String' }, classification: { type: 'String' } } } }
+              Document: { shape: { type: 'Record', attributes: { owner: { type: 'Entity', name: 'User' }, classification: { type: 'String' } } } }
             },
             actions: {
               Read: { appliesTo: { principalTypes: ['User'], resourceTypes: ['Document'] } },
@@ -71,7 +71,13 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src'),
-      environment: { POLICY_STORE_ID: policyStore.attrPolicyStoreId },
+      environment: {
+        POLICY_STORE_ID: policyStore.attrPolicyStoreId,
+        // Comma-separated principals that get the admin role, e.g. -c adminPrincipals=arn1,arn2
+        ADMIN_PRINCIPALS: this.node.tryGetContext('adminPrincipals') ?? '',
+        // Principal that owns the demo documents, e.g. -c ownerPrincipal=arn
+        DEMO_OWNER_PRINCIPAL: this.node.tryGetContext('ownerPrincipal') ?? ''
+      },
       timeout: cdk.Duration.seconds(10)
     });
 
