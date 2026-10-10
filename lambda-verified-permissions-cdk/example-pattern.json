@@ -1,1 +1,55 @@
-{"title":"Amazon Verified Permissions with AWS Lambda","description":"Deploy a Lambda function that authorizes requests using Amazon Verified Permissions Cedar policies.","language":"TypeScript","level":"300","framework":"CDK","introBox":{"headline":"How it works","text":["Lambda receives an authorization request and calls Amazon Verified Permissions IsAuthorized API with Cedar policies to make fine-grained access control decisions."]},"gitHub":{"template":{"repoURL":"https://github.com/aws-samples/serverless-patterns/tree/main/lambda-verified-permissions-cdk","templateURL":"serverless-patterns/lambda-verified-permissions-cdk","projectFolder":"lambda-verified-permissions-cdk"}},"resources":{"bullets":[{"text":"Amazon Verified Permissions","link":"https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/what-is-avp.html"}]},"deploy":{"text":["cdk deploy"],"commands":["npm install","cdk deploy"]},"testing":{"text":["Invoke the function URL with authorization request"]},"cleanup":{"text":["cdk destroy"],"commands":["cdk destroy"]},"authors":[{"name":"Nithin Chandran R","bio":"Technical Account Manager at AWS","linkedin":"nithin-chandran-r"}],"services":{"from":[{"service":"lambda"}],"to":[{"service":"verifiedpermissions"}]}}
+{
+  "title": "Amazon Verified Permissions with AWS Lambda",
+  "description": "Deploy an AWS Lambda function URL that authorizes requests with Amazon Verified Permissions Cedar policies, using the caller's IAM identity.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A client sends a SigV4-signed request to an AWS Lambda function URL with AWS_IAM authentication. The function reads the caller's IAM principal from the request context, maps it to a role on the server, and calls the Amazon Verified Permissions IsAuthorized API.",
+      "Four Cedar policies (admin, reader, document owner, and a confidential-document deny) make the fine-grained decision. The request body supplies only the action and the resource, never the principal, role, owner or classification."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/lambda-verified-permissions-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Verified Permissions",
+        "link": "https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/what-is-avp.html"
+      },
+      {
+        "text": "Invoking Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd src && npm install && cd ..",
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for signed curl requests that show ALLOW and DENY decisions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
