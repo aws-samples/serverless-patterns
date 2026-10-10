@@ -11,7 +11,7 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
 
     const modelId = new cdk.CfnParameter(this, "BedrockModelId", {
       type: "String",
-      default: "us.anthropic.claude-sonnet-4-20250514-v1:0",
+      default: "us.anthropic.claude-sonnet-4-6",
       description: "Bedrock inference profile model ID",
     });
 
@@ -41,10 +41,10 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
       new iam.PolicyStatement({
         actions: ["bedrock:InvokeModel"],
         resources: [
-          `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
-          `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
-          `arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
-          `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-20250514-v1:0`,
+          `arn:${this.partition}:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
+          `arn:${this.partition}:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-6`,
+          `arn:${this.partition}:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6`,
+          `arn:${this.partition}:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-6`,
         ],
       })
     );

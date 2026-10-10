@@ -1,9 +1,9 @@
 {
-  "title": "Lambda Managed Instances with Amazon Bedrock",
+  "title": "AWS Lambda Managed Instances with Amazon Bedrock",
   "description": "Run Amazon Bedrock model invocations on Lambda Managed Instances (EC2-backed compute) using AWS CDK, combining serverless simplicity with EC2 flexibility.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
