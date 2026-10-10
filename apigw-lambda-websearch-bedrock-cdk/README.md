@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Node.js 20+](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`)
 * CDK bootstrapped in your account/region (`cdk bootstrap`)
-* Amazon Bedrock model access enabled for Claude Sonnet 4 in us-east-1
+* Amazon Bedrock model access enabled for the model set in `MODEL_ID` (`us.anthropic.claude-sonnet-4-6`) in us-east-1
 
 ## Deployment Instructions
 
@@ -44,7 +44,7 @@ This pattern demonstrates **Retrieval-Augmented Generation (RAG) using live web 
 1. **Amazon API Gateway** receives user questions via POST /ask
 2. **AWS Lambda** orchestrates the two-step process:
    - Searches the live web via the Web Search Tool on Amazon Bedrock AgentCore Gateway (MCP protocol + SigV4)
-   - Passes search results as context to Amazon Bedrock (Claude Sonnet 4) for inference
+   - Passes search results as context to Amazon Bedrock (Claude, model set by `MODEL_ID`) for inference
 3. **Amazon Bedrock** synthesizes a grounded answer with numbered citation references
 4. Response includes the answer text and source URLs for verification
 

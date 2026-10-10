@@ -12,7 +12,7 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
     // Amazon Bedrock AgentCore Gateway with Web Search Tool connector
     const gateway = new agentcore.Gateway(this, 'WebSearchGateway', {
       gatewayName: 'grounded-search-gateway',
-      description: 'Amazon Bedrock AgentCore Gateway with Web Search for grounded AI answers',
+      description: 'Amazon Bedrock AgentCore Gateway with Web Search Tool for grounded AI answers',
       authorizerConfiguration: agentcore.GatewayAuthorizer.usingAwsIam(),
     });
 
@@ -52,7 +52,7 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
       environment: {
         GATEWAY_ID: gateway.gatewayId,
         GATEWAY_URL: gateway.gatewayUrl ?? '',
-        MODEL_ID: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',  // Update to latest model as needed
+        MODEL_ID: 'us.anthropic.claude-sonnet-4-6',  // Update to a newer model as needed; also update the two InvokeModel ARNs below and the fallback in src/handler/index.py
       },
     });
 
@@ -67,8 +67,8 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
     fn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
-        `arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4*`,
-        `arn:aws:bedrock:*:${this.account}:inference-profile/us.anthropic.claude-sonnet-4*`,
+        `arn:${this.partition}:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6`,
+        `arn:${this.partition}:bedrock:${this.region}:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-6`,
       ],
     }));
     fn.addToRolePolicy(new iam.PolicyStatement({
@@ -79,7 +79,7 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
     // Amazon API Gateway REST API as the user-facing endpoint
     const api = new apigateway.RestApi(this, 'GroundedSearchApi', {
       restApiName: 'Grounded AI Search',
-      description: 'Ask questions grounded in live web data via Amazon Bedrock AgentCore Web Search and Amazon Bedrock',
+      description: 'Ask questions grounded in live web data via the Web Search Tool on Amazon Bedrock AgentCore Gateway and Amazon Bedrock',
     });
 
     const askResource = api.root.addResource('ask');

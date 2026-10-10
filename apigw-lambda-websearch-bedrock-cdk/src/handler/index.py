@@ -115,7 +115,8 @@ def handler(event, context):
 
         gateway_url = os.environ['GATEWAY_URL']
         region = os.environ.get('AWS_REGION', 'us-east-1')
-        model_id = os.environ.get('MODEL_ID', 'us.anthropic.claude-sonnet-4-20250514-v1:0')
+        # Fallback only used if MODEL_ID is unset; keep in sync with the stack and update to the latest model as needed
+        model_id = os.environ.get('MODEL_ID', 'us.anthropic.claude-sonnet-4-6')
 
         # Step 1: Search the web for relevant facts
         search_results = search_web(gateway_url, region, question)
