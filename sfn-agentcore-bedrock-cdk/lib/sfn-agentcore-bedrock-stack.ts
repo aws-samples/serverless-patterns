@@ -18,7 +18,7 @@ export class SfnAgentcoreBedrockStack extends cdk.Stack {
 
     const bedrockModelIdParam = new cdk.CfnParameter(this, 'BedrockModelId', {
       type: 'String',
-      default: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+      default: 'us.anthropic.claude-sonnet-4-6',
       description: 'Bedrock model ID for aggregation',
     });
 
