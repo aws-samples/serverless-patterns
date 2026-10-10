@@ -35,6 +35,8 @@
   },
   "deploy": {
     "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
       "<code>npx cdk deploy</code>"
     ]
   },
