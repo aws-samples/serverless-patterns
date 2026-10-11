@@ -52,7 +52,7 @@
   },
   "cleanup": {
     "text": [
-      "1. Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME --region $REGION</code>, then <code>aws cloudformation wait stack-delete-complete --stack-name STACK_NAME --region $REGION</code>. This also removes the Amazon S3 Vectors index and vector bucket, the epoch parameter and the log group.",
+      "1. Delete the stack with AWS SAM: <code>sam delete --stack-name STACK_NAME --region $REGION</code>. Enter <code>y</code> at each confirmation prompt. This also removes the Amazon S3 Vectors index and vector bucket, the epoch parameter and the log group.",
       "2. Confirm with <code>aws cloudformation list-stacks --region $REGION --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
       "3. If you created the optional API key parameter, delete it: <code>aws ssm delete-parameter --name /semantic-cache/api-key --region $REGION</code>, then delete the local <code>response.json</code> written during testing. The shared AWS SAM CLI artifacts bucket is left in place."
     ]

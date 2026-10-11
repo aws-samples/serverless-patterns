@@ -31,10 +31,14 @@ Parameters:
   SimThreshold:
     Type: String
     Default: "0.85"
+    AllowedPattern: "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+    ConstraintDescription: must be a number from 0 to 1, for example 0.85
     Description: Cosine similarity threshold for a cache hit (0 to 1). Higher means stricter matching.
   TtlSeconds:
     Type: String
     Default: "86400"
+    AllowedPattern: "^[1-9][0-9]*$"
+    ConstraintDescription: must be a whole number of seconds greater than 0
     Description: Freshness window in seconds. Entries older than this are treated as a miss.
   ApiKeyParameterName:
     Type: String
