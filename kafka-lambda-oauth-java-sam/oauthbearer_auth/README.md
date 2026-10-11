@@ -140,15 +140,20 @@ bash scripts/producer_send.sh $KAFKA_TOPIC 10
 
 `sam local invoke` runs the function in a container on the client instance. A local run must not touch the real table, so test against [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) instead. When `sam local invoke` runs the function it sets `AWS_SAM_LOCAL=true`, and the handler then writes to `http://dynamodb-local:8000` rather than DynamoDB; deployed functions never see that variable.
 
-From this directory on the client EC2 instance:
+The client EC2 instance sets this up at boot: it starts DynamoDB Local in Docker on a network called `sam-local`, creates the template's table in it (`<stack-name>-sam-messages`), and sets `docker_network = "sam-local"` and `event = "events/event.json"` under `[default.local_invoke.parameters]` in `samconfig.toml` (`sam deploy --guided` keeps that section when it saves its own settings). So from this directory just run:
 
 ```bash
-bash scripts/local_dynamodb.sh          # starts DynamoDB Local, creates the table, configures sam local
 sam build
 sam local invoke
 ```
 
-`local_dynamodb.sh` runs DynamoDB Local in Docker on a network called `sam-local` and creates the same table the template defines (`<stack-name>-sam-messages`). It also sets `docker_network = "sam-local"` and `event = "events/event.json"` under `[default.local_invoke.parameters]` in `samconfig.toml`, so a plain `sam local invoke` puts the function's container on that network, where the handler can reach DynamoDB Local; the deploy settings in the same file are left alone. Re-run the script whenever DynamoDB Local isn't running, for example after the instance restarts. An error like `getaddrinfo ENOTFOUND dynamodb-local` means it isn't. Check what the function wrote with the `aws dynamodb scan --endpoint-url http://localhost:8000 ...` command the script prints. DynamoDB Local keeps its data in memory; `docker rm -f dynamodb-local` stops it and discards it.
+See what the function wrote with:
+
+```bash
+aws dynamodb scan --endpoint-url http://localhost:8000 --region "$AWS_REGION" --table-name "$STACK_NAME-sam-messages"
+```
+
+DynamoDB Local restarts with Docker and keeps its data in a Docker volume, so it survives an instance restart. If `sam local invoke` ever fails with `getaddrinfo ENOTFOUND dynamodb-local`, DynamoDB Local isn't running or `samconfig.toml` lost its local settings: run `bash scripts/local_dynamodb.sh`, which sets both up again and is safe to re-run. The boot run's output is in `~/local_dynamodb_output.txt`. To remove DynamoDB Local and its data: `docker rm -f dynamodb-local && docker volume rm dynamodb-local-data`.
 
 ## Cleanup
 
