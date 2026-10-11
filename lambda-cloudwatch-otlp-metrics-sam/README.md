@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region. Use one of the 16 Regions listed in Requirements.
-    * `Parameter AdotLayerArn`: the default is `arn:aws:lambda:us-east-1:901920570463:layer:aws-otel-python-amd64-ver-1-32-0:7`. Keep it for `us-east-1`, otherwise replace `us-east-1` in the ARN with your Region. To run the function on arm64, set `Architectures` to `arm64` in template.yaml and replace `amd64` with `arm64` in this ARN as well.
+    * `Parameter AdotLayerArn`: press Enter to leave it blank. The template then uses `arn:aws:lambda:<your Region>:901920570463:layer:aws-otel-python-amd64-ver-1-32-0:7`, the amd64 ADOT Python layer published in the Region you deploy to. To run the function on arm64, set `Architectures` to `arm64` in template.yaml and enter the same ARN with `amd64` replaced by `arm64` and your Region in it.
     * `Parameter ServiceName`: the default is `orders-service`. This becomes the `service.name` resource attribute, which is the `@resource.service.name` label you filter on in PromQL. Keep the default to follow the Testing section as written.
     * Confirm changes before deploy: accept the default
     * Allow SAM CLI to create IAM roles with the required permissions
