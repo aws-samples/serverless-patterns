@@ -1228,6 +1228,7 @@ Resources:
               # non-zero and would abort a script running under 'set -e'.
               cat > /home/ec2-user/kafka_oauth.env <<EOF
               export AWS_REGION=$AWS_REGION
+              export AWS_DEFAULT_REGION=$AWS_REGION
               export STACK_NAME=${AWS::StackName}
               export BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
               export INTERNAL_BOOTSTRAP=$INTERNAL_BOOTSTRAP
@@ -1242,6 +1243,11 @@ Resources:
               EOF
               # Make the same env available in interactive login shells too
               echo "source /home/ec2-user/kafka_oauth.env" >> /home/ec2-user/.bash_profile
+              # The AWS SDKs, and the SAM CLI built on them, take the region from
+              # AWS_DEFAULT_REGION or ~/.aws/config rather than AWS_REGION. Without this,
+              # `sam deploy --guided` offers us-east-1 whatever region this stack is in.
+              mkdir -p /home/ec2-user/.aws
+              printf '[default]\nregion = %s\n' "$AWS_REGION" > /home/ec2-user/.aws/config
 
               # Write the broker certificate into the stack's CA secret for the
               # Lambda event source mapping (SERVER_ROOT_CA_CERTIFICATE).
