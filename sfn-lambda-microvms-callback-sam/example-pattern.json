@@ -45,8 +45,8 @@
     "cleanup": {
         "headline": "Cleanup",
         "text": [
-            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
-            "2. Delete the artifact bucket: <code>aws s3 rb s3://ARTIFACT_BUCKET --force</code>."
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME --region $AWS_REGION</code>. Enter <code>y</code> at each confirmation prompt.",
+            "2. Delete the artifact bucket and the local zip: <code>aws s3 rb s3://$ARTIFACT_BUCKET --force --region $AWS_REGION</code>, then <code>rm worker.zip</code>."
         ]
     },
     "authors": [
