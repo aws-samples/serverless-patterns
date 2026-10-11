@@ -13,12 +13,12 @@ Parameters:
     Description: Globally unique name for the Amazon S3 bucket that holds input files and Bedrock Data Automation output.
 
 Rules:
-  # This pattern uses the US geography cross-Region inference profile
-  # us.data-automation-v1. Per
-  # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html the only
-  # source Regions that offer that profile are us-east-1, us-east-2 and
-  # us-west-2, so fail the deployment early anywhere else instead of handing the
-  # reader a stack that fails on every upload.
+  # Bedrock Data Automation must be called through a cross-Region inference profile
+  # for the source Region's geography. Per
+  # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html these source
+  # Regions offer the US, EU or APAC geography profile that this template selects,
+  # so fail the deployment early anywhere else instead of handing the reader a stack
+  # that fails on every upload.
   SupportedBdaSourceRegion:
     Assertions:
       - Assert:
@@ -26,13 +26,26 @@ Rules:
             - - us-east-1
               - us-east-2
               - us-west-2
+              - eu-central-1
+              - eu-west-1
+              - eu-west-2
+              - ap-south-1
+              - ap-southeast-2
+              - ap-northeast-1
             - Ref: AWS::Region
         AssertDescription: >-
-          This pattern uses the US geography Amazon Bedrock Data Automation inference
-          profile us.data-automation-v1, which is offered in the source Regions
-          us-east-1, us-east-2 and us-west-2. Deploy in one of those Regions, or
-          switch the profile to the one for your geography as described at
+          This pattern uses the Amazon Bedrock Data Automation inference profile for
+          the US, EU or APAC geography (us., eu. or apac.data-automation-v1), which is
+          offered in the source Regions us-east-1, us-east-2, us-west-2, eu-central-1,
+          eu-west-1, eu-west-2, ap-south-1, ap-southeast-2 and
+          ap-northeast-1. Deploy in one of those Regions, see
           https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html
+
+Conditions:
+  # The first part of the Region name, for example "eu" for eu-central-1, picks the
+  # geography of the inference profile.
+  IsEuGeo: !Equals [!Select [0, !Split ["-", !Ref "AWS::Region"]], eu]
+  IsApGeo: !Equals [!Select [0, !Split ["-", !Ref "AWS::Region"]], ap]
 
 Resources:
   DataBucket:
@@ -121,22 +134,22 @@ Resources:
               Action: bedrock:InvokeDataAutomationAsync
               Resource: !GetAtt BDAProject.ProjectArn
             # InvokeDataAutomationAsync also authorizes against the inference profile.
-            # us.data-automation-v1 is a cross-Region (US geography) profile, so the
-            # documented policy enumerates the four US Regions the profile can route to
-            # rather than wildcarding the Region:
+            # The profile is cross-Region, so it can route a job to any Region in its
+            # geography (bda-cris.html lists them). The Region is a wildcard and the
+            # resource is the one profile this stack uses, in this account only:
             # https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html
             - Sid: InvokeBdaProfile
               Effect: Allow
               Action: bedrock:InvokeDataAutomationAsync
-              Resource:
-                - !Sub "arn:${AWS::Partition}:bedrock:us-east-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
-                - !Sub "arn:${AWS::Partition}:bedrock:us-east-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
-                - !Sub "arn:${AWS::Partition}:bedrock:us-west-1:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
-                - !Sub "arn:${AWS::Partition}:bedrock:us-west-2:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+              Resource: !Sub
+                - "arn:${AWS::Partition}:bedrock:*:${AWS::AccountId}:data-automation-profile/${Geo}.data-automation-v1"
+                - Geo: !If [IsEuGeo, eu, !If [IsApGeo, apac, us]]
       Environment:
         Variables:
           BDA_PROJECT_ARN: !GetAtt BDAProject.ProjectArn
-          BDA_PROFILE_ARN: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:data-automation-profile/us.data-automation-v1"
+          BDA_PROFILE_ARN: !Sub
+            - "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:data-automation-profile/${Geo}.data-automation-v1"
+            - Geo: !If [IsEuGeo, eu, !If [IsApGeo, apac, us]]
           OUTPUT_PREFIX: output
       Events:
         InputUpload:

@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * Permissions in the deployment account for Amazon S3, AWS Lambda, Amazon CloudWatch Logs, AWS Identity and Access Management (IAM) and Amazon Bedrock Data Automation
-* This pattern uses the US geography cross-Region inference profile `us.data-automation-v1`, which Bedrock Data Automation offers in the source Regions `us-east-1`, `us-east-2` and `us-west-2`, so deploy in one of those three Regions. The template contains an AWS CloudFormation `Rules` assertion that stops the deployment in any other Region. For another geography, change the profile and the IAM policy in `template.yaml` as described in [Cross Region support required for Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html)
+* Bedrock Data Automation is called through the cross-Region inference profile for your Region's geography, which the template picks for you: `us.data-automation-v1`, `eu.data-automation-v1` or `apac.data-automation-v1`. Deploy in a source Region that offers one of those profiles: `us-east-1`, `us-east-2`, `us-west-2`, `eu-central-1`, `eu-west-1`, `eu-west-2`, `ap-south-1`, `ap-southeast-2` or `ap-northeast-1`, per [Cross Region support required for Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html). The template contains an AWS CloudFormation `Rules` assertion that stops the deployment in any other Region. This pattern was tested in `us-east-1` and `eu-central-1`
 
 ## Deployment Instructions
 
@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. During the prompts:
     * **Stack Name**: enter a stack name, for example `s3-bedrock-data-automation`
-    * **AWS Region**: enter `us-east-1`, `us-east-2` or `us-west-2` (see Requirements)
+    * **AWS Region**: enter one of the Regions listed in Requirements, for example `us-east-1` or `eu-central-1`
     * **Parameter DataBucketName**: no default, enter a globally unique Amazon S3 bucket name, for example `bda-demo-<your-account-id>`
     * **Confirm changes before deploy**: default `N`, accept the default to deploy without reviewing the change set
     * **Allow SAM CLI IAM role creation**: default `Y`, accept the default so AWS SAM can create the function execution role
@@ -60,7 +60,7 @@ Important: this application uses various AWS services and there are costs associ
 * Bedrock Data Automation reads the file, runs the managed extraction defined by the project, and writes structured JSON to the `output/` prefix.
 * The project (`AWS::Bedrock::DataAutomationProject`) is a native AWS CloudFormation resource, so the whole pipeline is infrastructure as code. The included standard output configuration returns each document as Markdown text (including tables) plus a generative summary.
 * The stack owns the function log group and keeps its logs for 7 days. To keep them for longer, change `RetentionInDays` on the `StartBdaFunctionLogGroup` resource in `template.yaml`.
-* Bedrock Data Automation requires a cross-Region inference profile. This pattern uses the US geography profile `us.data-automation-v1`, so a job started in a US source Region can be processed in any of `us-east-1`, `us-east-2`, `us-west-1` or `us-west-2`. The function execution role lists exactly those four profile ARNs, as the [Bedrock Data Automation documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html) prescribes.
+* Bedrock Data Automation requires a cross-Region inference profile. The template uses the profile for the deployment Region's geography, so a job started in, for example, `eu-central-1` can be processed in any Region of the EU geography that [Cross Region support required for Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html) lists for that source Region. The function execution role allows `bedrock:InvokeDataAutomationAsync` on that one profile in any Region of your account, plus the one project the stack creates.
 
 ## Testing
 
@@ -125,7 +125,7 @@ aws logs tail LOG_GROUP_NAME --since 10m --region $REGION
 
 A record that fails makes the function raise, so AWS Lambda runs the invocation two more times by default before discarding the event (see [How Lambda handles errors and retries with asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html)), and the failure also shows in the function `Errors` metric in Amazon CloudWatch. The most common cause is an unsupported file format (see [Prerequisites for using Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-limits.html)).
 
-If you deploy in a Region the inference profile does not cover, the stack does not get that far: the `Rules` assertion in the template fails the stack operation with `Parameter validation failed: assertion error: This pattern uses the US geography Amazon Bedrock Data Automation inference profile us.data-automation-v1, which is offered in the source Regions us-east-1, us-east-2 and us-west-2.` and no resources are created.
+If you deploy in a Region the inference profile does not cover, the stack does not get that far: the `Rules` assertion in the template fails the stack operation with `Parameter validation failed: assertion error: This pattern uses the Amazon Bedrock Data Automation inference profile for the US, EU or APAC geography ...` and no resources are created.
 
 ## Cleanup
 
