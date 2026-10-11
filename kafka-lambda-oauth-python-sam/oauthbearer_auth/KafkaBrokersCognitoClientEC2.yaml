@@ -1151,6 +1151,7 @@ Resources:
               yum erase awscli -y || true
               install_pkg docker
               service docker start
+              systemctl enable docker   # back up after a reboot, with DynamoDB Local
               usermod -a -G docker ec2-user
 
               # Install Python 3 + pip and the Kafka client libraries used by the
@@ -1330,6 +1331,13 @@ Resources:
               set_password "$CONSUMER_USERNAME" "$CONSUMER_SECRET_NAME"
 
               chown -R ec2-user:ec2-user /home/ec2-user
+
+              # Start DynamoDB Local for `sam local invoke` and point samconfig.toml at it,
+              # so local tests work out of the box and never write to the real table.
+              # Runs as ec2-user once the pattern folder is theirs. A failure here only
+              # affects local testing, so it doesn't fail the stack.
+              sudo -u ec2-user bash "$PATTERN_DIR/scripts/local_dynamodb.sh" > /home/ec2-user/local_dynamodb_output.txt 2>&1 \
+                || echo "WARN: local_dynamodb.sh failed; see /home/ec2-user/local_dynamodb_output.txt"
 
               # Wait for the brokers' SASL listeners to accept connections
               for i in $(seq 1 40); do

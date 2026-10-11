@@ -13,9 +13,11 @@
 #   sam build
 #   sam local invoke
 #
-# Re-run the script whenever DynamoDB Local isn't running, for example after the
-# instance restarts. It runs in memory: its data is gone once the container
-# stops. Stop it with: docker rm -f dynamodb-local
+# The client instance runs this at boot, so normally there's nothing to do. The
+# container restarts with Docker and keeps its data in the dynamodb-local-data
+# volume, so it also survives an instance restart. Re-running the script is
+# harmless. To remove DynamoDB Local and its data:
+#   docker rm -f dynamodb-local && docker volume rm dynamodb-local-data
 # =============================================================================
 set -eo pipefail
 source /home/ec2-user/kafka_oauth.env
@@ -24,6 +26,7 @@ NETWORK=sam-local
 CONTAINER=dynamodb-local
 PORT=8000
 IMAGE=public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:latest
+VOLUME=dynamodb-local-data
 # Same default the SAM template's DynamoDBTableName parameter gets
 TABLE="${DYNAMODB_TABLE_NAME:-$STACK_NAME-sam-messages}"
 LOCAL="--endpoint-url http://localhost:$PORT"
@@ -44,8 +47,12 @@ if ! docker ps --format '{{.Names}}' | grep -qx "$CONTAINER"; then
   # -sharedDb: one database for every caller. Without it DynamoDB Local keeps a
   # separate database per access key and region, and the function's credentials
   # differ from this shell's, so it wouldn't see the table created below.
-  docker run -d --name "$CONTAINER" --network "$NETWORK" -p "127.0.0.1:$PORT:8000" \
-    "$IMAGE" -jar DynamoDBLocal.jar -inMemory -sharedDb >/dev/null
+  # -dbPath on a named volume plus --restart unless-stopped: the table and its
+  # items survive container and instance restarts. --user root lets it write to
+  # the volume, which Docker creates root-owned.
+  docker run -d --name "$CONTAINER" --network "$NETWORK" --restart unless-stopped \
+    -p "127.0.0.1:$PORT:8000" -v "$VOLUME:/home/dynamodblocal/data" --user root \
+    "$IMAGE" -jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data >/dev/null
 fi
 
 for i in $(seq 1 30); do

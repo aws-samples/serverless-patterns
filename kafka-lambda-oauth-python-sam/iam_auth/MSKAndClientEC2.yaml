@@ -354,7 +354,7 @@ Resources:
               esac
               install_pkg git jq nmap-ncat wget tar unzip
               yum erase awscli -y || true
-              install_pkg docker && service docker start && usermod -a -G docker ec2-user
+              install_pkg docker && service docker start && systemctl enable docker && usermod -a -G docker ec2-user
 
               # Python 3 + pip for the Lambda consumer and the JSON sample apps
               install_pkg python3-pip
@@ -433,6 +433,13 @@ Resources:
               sed -i "s|PYTHON3_VERSION|$PYTHON3_VERSION|g" template.yaml
 
               chown -R ec2-user:ec2-user /home/ec2-user
+
+              # Start DynamoDB Local for `sam local invoke` and point samconfig.toml at it,
+              # so local tests work out of the box and never write to the real table.
+              # Runs as ec2-user once the pattern folder is theirs. A failure here only
+              # affects local testing, so it doesn't fail the stack.
+              sudo -u ec2-user bash "$PATTERN_DIR/scripts/local_dynamodb.sh" > /home/ec2-user/local_dynamodb_output.txt 2>&1 \
+                || echo "WARN: local_dynamodb.sh failed; see /home/ec2-user/local_dynamodb_output.txt"
 
               # Create the topic as admin (AWS_MSK_IAM)
               BOOTSTRAP_OK=false
