@@ -55,7 +55,7 @@
     "cleanup": {
         "text": [
             "Empty the Amazon S3 bucket: <code>aws s3 rm s3://YOUR_BUCKET --recursive --region REGION_NAME</code>.",
-            "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME --region REGION_NAME</code>."
+            "Delete the stack with AWS SAM: <code>sam delete --stack-name STACK_NAME --region REGION_NAME</code>. Enter <code>y</code> at each confirmation prompt."
         ]
     },
     "authors": [
