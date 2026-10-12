@@ -106,12 +106,15 @@
     "text": [
       "See the GitHub repo README.md for detailed testing instructions.",
       "Sample invocation payload: {\"prompt\":\"Use the emit_event tool to emit an event with source=agent.claims-processor, detail_type=ClaimApproved, detail={claimId: CLM-001, decision: approved, confidence: 0.94}\"}",
-      "After invoking, check the Runtime's CloudWatch Logs for a 200 OK from the Gateway MCP endpoint and the EventBridge event ID returned by the Lambda."
+      "After invoking, check the Runtime's Amazon CloudWatch Logs for a 200 OK from the Gateway MCP endpoint and the EventBridge event ID returned by the Lambda."
     ]
   },
   "cleanup": {
     "headline": "Cleanup",
-    "text": ["cd cdk", "cdk destroy"]
+    "text": [
+      "cd cdk",
+      "cdk destroy"
+    ]
   },
   "authors": [
     {

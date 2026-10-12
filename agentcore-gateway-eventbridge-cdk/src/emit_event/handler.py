@@ -5,8 +5,9 @@ Receives tool invocations from the AgentCore Gateway (MCP Lambda target),
 validates the event payload, and publishes to an EventBridge custom bus.
 
 The Gateway provides governance: schema validation on the tool input,
-JWT authentication, rate limiting, and observability. This Lambda focuses
-on the EventBridge integration and source-prefix enforcement.
+IAM (SigV4) authentication of the calling agent, rate limiting, and
+observability. This Lambda focuses on the EventBridge integration and
+source-prefix enforcement.
 """
 import boto3
 import json
@@ -25,7 +26,6 @@ def handler(event, context):
     source = body.get("source", "")
     detail_type = body.get("detail_type", "")
     detail = body.get("detail", {})
-    notify = body.get("notify", False)
 
     # Validate required fields
     if not source or not detail_type or not detail:
@@ -42,10 +42,6 @@ def handler(event, context):
                 {"error": f"Source must start with one of: {ALLOWED_SOURCES}"}
             ),
         }
-
-    # Add notify flag to detail for downstream rule filtering
-    if notify:
-        detail["notify"] = True
 
     # Emit to EventBridge
     response = events_client.put_events(

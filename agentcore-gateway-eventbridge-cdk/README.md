@@ -39,7 +39,7 @@ The tradeoff is added network latency per emission, which is generally negligibl
 
 ## How it works
 
-1. The agent (Strands, Claude Haiku 4.5) connects to the AgentCore Gateway via the **MCP Streamable HTTP transport** (2025-03-26 spec).
+1. The agent (Strands, Claude Haiku 5.5) connects to the AgentCore Gateway via the **MCP Streamable HTTP transport** (2025-03-26 spec).
 2. The Gateway's inbound authorization is **`AWS_IAM`** — every request must carry a valid AWS SigV4 signature (service `bedrock-agentcore`). The Runtime's execution role is granted `bedrock-agentcore:InvokeGateway` scoped to the Gateway ARN.
 3. **No MCP client SDK signs streamable-HTTP requests with SigV4 natively.** This pattern signs requests manually: [`agent-code/sigv4.py`](agent-code/sigv4.py) wraps `botocore.auth.SigV4Auth` as an `httpx.Auth` implementation and passes it to `streamablehttp_client(url, auth=sigv4_auth)`.
 4. The Gateway exposes an `emit_event` tool backed by a Lambda function.
@@ -53,7 +53,7 @@ The tradeoff is added network latency per emission, which is generally negligibl
 - [Node.js 20+](https://nodejs.org/en/download/) and npm
 - [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm i -g aws-cdk`), bootstrapped in the target account/region
 - [Docker](https://docs.docker.com/get-docker/) installed and running
-- Access to the Amazon Bedrock Claude Haiku 4.5 model (enable in the Amazon Bedrock console)
+- The bundled agent uses **Claude Haiku 5.5** through the US cross-Region inference profile `us.anthropic.claude-haiku-5-5` (set in [`agent-code/agent.py`](agent-code/agent.py)). Amazon Bedrock enables serverless models automatically, so there is no model access step, but the model must be available in the Region you deploy to. Check the [Claude Haiku 5.5 model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-5-5.html). Outside the US, change `MODEL_ID` to the matching geographic profile (`eu.`, `jp.`, `au.`) or to `global.anthropic.claude-haiku-5-5`.
 
 ## Deployment
 
@@ -81,7 +81,7 @@ aws bedrock-agentcore invoke-agent-runtime \
   --region us-east-1
 ```
 
-Verify success in the Runtime's CloudWatch Logs (`/aws/bedrock-agentcore/runtimes/<AgentRuntimeId>-DEFAULT`):
+Verify success in the Runtime's Amazon CloudWatch Logs (`/aws/bedrock-agentcore/runtimes/<AgentRuntimeId>-DEFAULT`):
 
 - `POST https://<gateway-url>/mcp "HTTP/1.1 200 OK"` confirms the SigV4-signed request to the Gateway succeeded.
 - The agent's response includes the EventBridge `Event ID` and a `Failed Count: 0`.

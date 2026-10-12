@@ -167,7 +167,18 @@ export class AgentCoreGatewayEventBridgeStack extends cdk.Stack {
             new iam.PolicyStatement({ actions: ['xray:PutTraceSegments', 'xray:PutTelemetryRecords', 'xray:GetSamplingRules', 'xray:GetSamplingTargets'], resources: ['*'] }),
             new iam.PolicyStatement({ actions: ['cloudwatch:PutMetricData'], resources: ['*'], conditions: { StringEquals: { 'cloudwatch:namespace': 'bedrock-agentcore' } } }),
             new iam.PolicyStatement({ sid: 'GetAgentAccessToken', actions: ['bedrock-agentcore:GetWorkloadAccessToken', 'bedrock-agentcore:GetWorkloadAccessTokenForJWT', 'bedrock-agentcore:GetWorkloadAccessTokenForUserId'], resources: [`arn:aws:bedrock-agentcore:${this.region}:${this.account}:workload-identity-directory/default`, `arn:aws:bedrock-agentcore:${this.region}:${this.account}:workload-identity-directory/default/workload-identity/${agentRuntimeName}-*`] }),
-            new iam.PolicyStatement({ sid: 'BedrockModelInvocation', actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'], resources: ['arn:aws:bedrock:*::foundation-model/*', `arn:aws:bedrock:${this.region}:${this.account}:*`] }),
+            new iam.PolicyStatement({
+              sid: 'BedrockModelInvocation',
+              actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
+              resources: [
+                // Foundation models in any Region: a cross-Region inference
+                // profile routes the request to a model in another Region.
+                'arn:aws:bedrock:*::foundation-model/*',
+                // Account-level resources are limited to inference profiles,
+                // not every Bedrock resource in the account.
+                `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/*`,
+              ],
+            }),
             new iam.PolicyStatement({
               sid: 'InvokeGateway',
               actions: ['bedrock-agentcore:InvokeGateway'],

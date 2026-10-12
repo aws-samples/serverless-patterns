@@ -28,6 +28,13 @@ app = BedrockAgentCoreApp()
 GATEWAY_URL = os.environ.get("GATEWAY_MCP_URL", "")
 AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
 
+# Claude Haiku 5.5 through the US geographic cross-Region inference profile.
+# The "us." prefix only works when the stack is deployed in a US Region. In
+# other geographies use the matching prefix ("eu.", "jp.", "au.") or the
+# global profile ("global.anthropic.claude-haiku-5-5"), and confirm the model
+# is available in your Region.
+MODEL_ID = "us.anthropic.claude-haiku-5-5"
+
 
 def create_mcp_client():
     """Create a fresh, SigV4-authenticated MCP client per invocation."""
@@ -48,12 +55,12 @@ def invoke(payload: dict) -> dict:
         if mcp_client:
             with mcp_client:
                 agent = Agent(
-                    model="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+                    model=MODEL_ID,
                     tools=mcp_client.list_tools_sync(),
                 )
                 result = agent(prompt)
         else:
-            agent = Agent(model="us.anthropic.claude-haiku-4-5-20251001-v1:0")
+            agent = Agent(model=MODEL_ID)
             result = agent(prompt)
 
         logger.info("Agent completed: %s", str(result)[:500])
