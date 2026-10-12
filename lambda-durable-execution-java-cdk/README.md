@@ -113,6 +113,8 @@ If the function is interrupted at any point, it replays from the beginning but s
 
 4. Monitor the durable execution in the Lambda console under the **Durable executions** tab.
 
+The stack sets the durable execution timeout to 15 minutes because Lambda rejects a synchronous invoke of a durable function whose execution timeout is longer than 15 minutes. For longer workflows, raise `executionTimeout` in the stack and invoke with `--invocation-type Event` (see [Invoking durable Lambda functions](https://docs.aws.amazon.com/lambda/latest/dg/durable-invoking.html)).
+
 ## Cleanup
 
 ```bash

@@ -15,7 +15,8 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
       memorySize: 512,
       description: "Durable order processing workflow using Java SDK",
       durableConfig: {
-        executionTimeout: cdk.Duration.hours(1),
+        // Lambda only accepts a synchronous invoke when this is 15 minutes or less
+        executionTimeout: cdk.Duration.minutes(15),
         retentionPeriod: cdk.Duration.days(7),
       },
     });
