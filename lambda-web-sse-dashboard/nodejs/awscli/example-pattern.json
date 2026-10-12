@@ -17,6 +17,7 @@
   },
   "gitHub": {
     "template": {
+      "patternPath": "lambda-web-sse-dashboard/nodejs/awscli",
       "templateFile": "index.js"
     }
   },
