@@ -1,0 +1,51 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda",
+  "description": "Create an Amazon API Gateway to AWS Lambda HTTP API",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway API and an AWS Lambda function using AWS Cloud Development Kit (AWS CDK) in Python. This template also has a sample CORS configuration. The sample application was developed in Python and it shows some context, event and environment variables properties."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CDK Patterns",
+        "link": "https://cdkpatterns.com/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following command to send an HTTP GET request to the HTTP APIs endpoint. Note that you must edit the {api_endpoint} placeholder with the URL of the deployed HTTP APIs endpoint. This is provided in the deployment outputs.",
+      "<code>curl -H \"Origin: https://www.example.com\" \"{api_endpoint}?path=parameter\" --verbose</code>",
+      "The output will show a JSON object created by the sample application."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>npx cdk destroy --app 'ts-node .'</code>",
+      "2. Confirm the removal and wait for the resource deletion to complete."
+    ]
+  },
+  "contributors": [
+    "content/contributors/eduardo-bortoluzzi.json"
+  ]
+}

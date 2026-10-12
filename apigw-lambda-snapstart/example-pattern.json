@@ -1,5 +1,5 @@
 {
-  "title": "Synchronous REST API with Lambda SnapStart",
+  "title": "Synchronous REST API with AWS Lambda SnapStart",
   "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and DynamoDB.",
   "language": "Java",
   "level": "400",
@@ -7,15 +7,12 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern is built using [Spring Boot 3](https://spring.io/projects/spring-boot) and leverages the [AWS Serverless Java Container](https://github.com/awslabs/aws-serverless-java-container) for seamless integration with AWS Lambda.",
-      "This pattern also demonstrates the usage of [SnapStart](https://aws.amazon.com/blogs/compute/reducing-java-cold-starts-on-aws-lambda-functions-with-snapstart/) to improve startup performance."
+      "This pattern is built using <a href='https://spring.io/projects/spring-boot' target='_blank'>Spring Boot 3</a> and leverages the <a href='https://github.com/awslabs/aws-serverless-java-container' target='_blank'>AWS Serverless Java Container</a> for seamless integration with AWS Lambda.",
+      "This pattern also demonstrates the usage of <a href='https://aws.amazon.com/blogs/compute/reducing-java-cold-starts-on-aws-lambda-functions-with-snapstart/' target='_blank'>SnapStart</a> to improve startup performance."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-snapstart",
-      "templateURL": "serverless-patterns/apigw-lambda-snapstart",
-      "projectFolder": "apigw-lambda-snapstart",
       "templateFile": "template.yaml"
     }
   },
@@ -54,8 +51,8 @@
   "authors": [
     {
       "name": "Mark Sailes",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/mark-sailes.jpg",
       "bio": "Mark is a specialist solutions architect working at AWS. His primary focus is improving the developer experience of builders using Java on AWS Lambda.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/mark-sailes.jpg",
       "linkedin": "mark-sailes",
       "twitter": "MarkSailes3"
     }

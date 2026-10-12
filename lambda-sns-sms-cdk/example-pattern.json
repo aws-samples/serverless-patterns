@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda to Amazon SNS",
+  "description": "Create a Lambda function that publishes directly to a phone number using SNS",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK template deploys a Lambda function with IAM permissions configured to publish an SMS message to a US phone number using a 10-digit long code (10DLC). The Lambda function publishes a message to the phone number when invoked. The AWS CDK template deploys the resources and the IAM permissions required to run the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Choosing between messaging services for serverless applications.",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      },
+      {
+        "text": "Publishing Messages in Amazon SNS",
+        "link": "https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/sns-examples-publishing-messages.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Use the AWS CLI to invoke the Lambda function. The function name is in the outputs of the AWS SAM deployment (the key is TopicPublisherFunction):",
+      "1. Invoke the Lambda function to publish a message to SNS: <code>aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json</code>."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ian-larson.json"
+  ]
+}

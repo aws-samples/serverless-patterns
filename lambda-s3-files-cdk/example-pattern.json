@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-files-cdk",
-      "templateURL": "serverless-patterns/lambda-s3-files-cdk",
-      "projectFolder": "lambda-s3-files-cdk",
       "templateFile": "lib/lambda-s3-files-stack.ts"
     }
   },

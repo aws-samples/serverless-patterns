@@ -1,18 +1,19 @@
 {
-  "title": "Kinesis to Kinesis with filtering using EventBridge Pipes",
-  "description": "This pattern will connect Kinesis streams together with EventBridge Pipes. The source stream is filtered into multiple Kinesis streams downstream.",
-  "language": "",
+  "title": "Amazon Kinesis to Amazon Kinesis with filtering using Amazon EventBridge Pipes",
+  "description": "This pattern will connect Kinesis data streams together with EventBridge Pipes. The source stream is filtered into multiple Kinesis streams downstream.",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
-    "text": ["Kinesis stream is configured as the pipe source, and filters are created to filter records to downstream kinesis streams. This pattern allows you to filter kinesis streams into other kinesis streams."]
+    "text": [
+      "Kinesis stream is configured as the pipe source, and filters are created to filter records to downstream kinesis streams. This pattern allows you to filter kinesis streams into other kinesis streams.",
+      "<h5>How the pattern works</h5>",
+      "EventBridge Pipes is used to filter records from the source Kinesis stream into downstream consumers. Records are base64 encoded in Kinesis and EventBridge Pipes decodes the message and supports filtering on the payload of the message."
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/eventbridge-pipes-kinesis-to-kinesis-with-filtering",
-      "templateURL": "serverless-patterns/eventbridge-pipes-kinesis-to-kinesis-with-filtering",
-      "projectFolder": "eventbridge-pipes-kinesis-to-kinesis-with-filtering",
       "templateFile": "template.yaml"
     }
   },
@@ -23,7 +24,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -37,19 +38,25 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

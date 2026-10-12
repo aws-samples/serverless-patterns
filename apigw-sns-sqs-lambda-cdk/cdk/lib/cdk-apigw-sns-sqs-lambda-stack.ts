@@ -23,7 +23,7 @@ export class CdkApigwSnsSqsLambdaStack extends Stack {
     const subscriberQueueOne = new sqs.Queue(this, 'SubscriberQueueOne');    
     topic.addSubscription(new subscriptions.SqsSubscription(subscriberQueueOne));
     const workerLambdaTypeOne = new lambda.Function(this, 'workerLambdaTypeOneHandler',{
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'app.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../src')),
       events: [new SqsEventSource(subscriberQueueOne)]
@@ -32,7 +32,7 @@ export class CdkApigwSnsSqsLambdaStack extends Stack {
     const subscriberQueueTwo = new sqs.Queue(this, 'SubscriberQueueTwo');
     topic.addSubscription(new subscriptions.SqsSubscription(subscriberQueueTwo));
     const workerLambdaTypeTwo = new lambda.Function(this, 'workerLambdaTypeTwoHandler',{
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'app.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../src')),
       events: [new SqsEventSource(subscriberQueueTwo)]

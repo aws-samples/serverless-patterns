@@ -16,7 +16,7 @@ export class AsyncFunctionsStack extends cdk.Stack {
 		/* Lambda function that recieves messages */
 		const reciever = new Function(this, 'RecieverFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'reciever.handler',
 		});
 
@@ -26,7 +26,7 @@ export class AsyncFunctionsStack extends cdk.Stack {
 		/* Lambda function that sends messages */
 		const sender = new Function(this, 'SenderFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'senderDestination.handler',
 			retryAttempts: 0,
 			onSuccess: new LambdaDestination(reciever),

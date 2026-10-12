@@ -1,0 +1,49 @@
+{
+  "title": "Amazon CloudFront to AWS Lambda@Edge",
+  "description": "CloudFront to Lambda@Edge",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon Cloudfront distribution, a Lambda@Edge function and a Amazon S3 Bucket and demonstrates how to generate content at edge."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cloudfront_lambda_edge_cdk_python/cloudfront_lambda_edge_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CDK Patterns",
+        "link": "https://cdkpatterns.com/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>cdk destroy</code>",
+      "2. See additional notes in the repo."
+    ]
+  },
+  "contributors": [
+    "content/contributors/corneliu-croitoru.json"
+  ]
+}

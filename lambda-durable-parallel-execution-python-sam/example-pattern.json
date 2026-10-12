@@ -17,9 +17,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-parallel-execution-python-sam",
-      "templateURL": "serverless-patterns/lambda-durable-parallel-execution-python-sam",
-      "projectFolder": "lambda-durable-parallel-execution-python-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -44,25 +41,32 @@
     ]
   },
   "deploy": {
-    "text": ["sam build", "sam deploy --guided"]
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "Anup Rajpara",
-      "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
       "bio": "Anup is a Sr. Technical Account Manager at Amazon Web Services. He is passionate about serverless & event-driven architectures.",
+      "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
       "linkedin": "anup-rajpara-developer"
     },
     {
       "name": "Sahil Bhimjiani",
-      "image": "https://drive.google.com/file/d/1E2p7S5UtU36x6Sk1xPS3XnSGJyIUoqK7/view?usp=drivesdk",
       "bio": "Sahil Bhimjiani is a Solutions Architect at Amazon Web Services.",
+      "image": "https://drive.google.com/file/d/1E2p7S5UtU36x6Sk1xPS3XnSGJyIUoqK7/view?usp=drivesdk",
       "linkedin": "sahil9701"
     }
   ]

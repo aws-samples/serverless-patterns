@@ -22,7 +22,7 @@ export class ApigwLambdaDynamodbCdkTsStack extends Stack {
     )
 
     const lambda_backend = new NodejsFunction(this, "lambdaFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "handler",
       entry: path.join(__dirname, '../src/index.ts'),
       tracing: lambda.Tracing.ACTIVE,

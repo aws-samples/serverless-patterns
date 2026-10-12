@@ -1,6 +1,6 @@
 {
-  "title": "Lambda Function URL",
-  "description": "Creates a Lambda function with a function URL",
+  "title": "AWS Lambda function URL",
+  "description": "Create an AWS Lambda function with a function URL using Terraform.",
   "language": "Node.js",
   "level": "100",
   "framework": "Terraform",
@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-function-url-terraform",
-      "templateURL": "serverless-patterns/lambda-function-url-terraform",
-      "projectFolder": "lambda-function-url-terraform",
-      "templateFile": "lambda-function-url-terraform/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {
@@ -52,9 +49,8 @@
   "authors": [
     {
       "name": "Stephen Monaghan",
-      "image": "",
       "bio": "Solutions Architect, AWS",
-      "linkedin": "https://www.linkedin.com/in/stephen-monaghan-61873194/"
+      "linkedin": "stephen-monaghan-61873194"
     }
   ]
 }

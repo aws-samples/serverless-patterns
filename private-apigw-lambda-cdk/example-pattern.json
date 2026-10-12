@@ -1,0 +1,55 @@
+{
+  "title": "Amazon API Gateway Private API with AWS Lambda",
+  "description": "Create an Amazon API Gateway Private API with AWS VPC Lambda proxy integration",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern in CDK offers a example to generate an Amazon API Gateway Private API endpoint with a greedy proxy (\"{proxy+}\") and \"ANY\" method from the specified path, meaning it will accept by default any method and any path. The VPC Lambda function provided in JavaScript only returns the path."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/index.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Creating a private API in Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html"
+      },
+      {
+        "text": "How to invoke a private API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-api-test-invoke-url.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk bootstrap aws://accountnumber/region",
+      "npx cdk deploy --app 'ts-node .' --all"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/rajneesh-ranjan.json",
+    "content/contributors/britney-tong.json"
+  ]
+}

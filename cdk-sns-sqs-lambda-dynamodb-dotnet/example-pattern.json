@@ -1,30 +1,21 @@
 {
   "title": "Serverless Data Enrichment Pipeline with Persistence",
-  "description": "This pattern helps you deploy a CDK stack with SNS, SQS, Lambda and DynamoDB. The pattern uses these AWS services to create a serverless data enrichment pipeline with persistence of data in SQS. The Lambda functions are used to consume data from SQS queues, perform enrichment, update DynamoDB table. The enriched data is further sent to another SQS queue.",
+  "description": "This pattern helps you deploy a CDK stack with SNS, SQS, Lambda and DynamoDB. ",
   "language": ".NET",
   "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
+      "The pattern uses these AWS services to create a serverless data enrichment pipeline with persistence of data in SQS. The Lambda functions are used to consume data from SQS queues, perform enrichment, and update DynamoDB tables. The enriched data is further sent to another SQS queue.",
       "Data Pipeline Stack #1, relay the raw message from SNS to DynamoDB.",
       "Data Pipeline Stack #2, relay the enrich message from SNS and route it to DynamoDB & SQS."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-sns-sqs-lambda-dynamodb-dotnet",
-      "templateURL": "serverless-patterns/cdk-sns-sqs-lambda-dynamodb-dotnet",
-      "projectFolder": "cdk-sns-sqs-lambda-dynamodb-dotnet",
-      "templateFile": "/cdk-sns-sqs-lambda-dynamodb-dotnet/src/Datapipeline/"
+      "templateFile": "src/Datapipeline/CrossStackProp.cs"
     }
-  },
-  "resources": {
-    "bullets": [
-      {
-        "text": "SNS >> SQS >> Lambda >> DynamoDB >> SQS"
-      }
-    ]
   },
   "deploy": {
     "text": [
@@ -44,10 +35,9 @@
   "authors": [
     {
       "name": "Sakthivel Chellapparimanam",
-      "image": "",
       "bio": "AWS - Cloud Application Architect",
-      "linkedin": "https://www.linkedin.com/in/srcsakthivel",
-      "twitter": "@srcsakthivel"
+      "linkedin": "srcsakthivel",
+      "twitter": "srcsakthivel"
     }
   ]
 }

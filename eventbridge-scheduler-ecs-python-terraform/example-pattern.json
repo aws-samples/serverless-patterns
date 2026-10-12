@@ -1,5 +1,5 @@
 {
-  "title": "Scheduled Amazon ECS Task Execution Using Amazon EventBridge and Terraform",
+  "title": "Amazon EventBridge Cron to Amazon ECS Task",
   "description": "Use Amazon EventBridge to schedule and trigger ECS Fargate tasks on a cron schedule, deployed with Terraform as IaC.",
   "language": "Python",
   "level": "200",
@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-stepfunction-durable-lambda-function",
-      "templateURL": "serverless-patterns/cdk-stepfunction-durable-lambda-function",
-      "projectFolder": "cdk-stepfunction-durable-lambda-function",
-      "templateFile": "cdk_stepfunction_durable_lambda_function/cdk_stepfunction_durable_lambda_function_stack.py"
+      "templateFile": "eventbridge-ecs.tf"
     }
   },
   "resources": {
@@ -41,7 +38,11 @@
     ]
   },
   "deploy": {
-    "text": ["terraform init", "terraform plan", "terraform apply"]
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
   },
   "testing": {
     "text": [

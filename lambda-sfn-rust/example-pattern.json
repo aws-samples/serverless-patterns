@@ -1,54 +1,56 @@
 {
-  "title": "Invoke an AWS Step Functions workflow from AWS Lambda",
-  "description": "The SAM template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the Express Workflow execution ARN and startDate.",
+  "title": "AWS Lambda to AWS Step Functions",
+  "description": "Invoke an AWS Step Functions workflow from AWS Lambda, with logging enabled",
   "language": "Rust",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string.",
-      "The Express Workflow results are logged in Amazon CloudWatch Logs.",
-      "The Lambda function returns the Express Workflow execution ARN and startDate."
-    ]
+      "The SAM template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs. The Lambda function returns the Express Workflow execution ARN and startDate."
+    ],
+    "test": ""
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sfn-rust",
-      "templateURL": "serverless-patterns/lambda-sfn-rust",
-      "projectFolder": "lambda-sfn-rust",
       "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
-        "text": "AWS Step Functions",
-        "link": "https://aws.amazon.com/step-functions/"
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Run the following Lambda CLI invoke command to invoke the function. Note, you must edit the {LambdaProxyArn} placeholder with the ARN of the deployed Lambda function. This is provided in the stack outputs.",
+      "<code>aws lambda invoke --function-name {LambdaProxyArn} --invocation-type Event --payload '{ \"IsHelloWorldExample\": \"Hello\" }' response.json --cli-binary-format raw-in-base64-out</code>"
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

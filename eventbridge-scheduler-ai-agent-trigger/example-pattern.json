@@ -7,14 +7,11 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern demonstrates how to trigger an Amazon Bedrock AI Agent on a recurring schedule using Amazon EventBridge Scheduler. An orchestrator AWS Lambda function, invoked by the scheduler, sends a task payload to the Bedrock Agent, which processes the input, generates an execution summary, and persists the result to a DynamoDB table via an action group Lambda. The pattern includes retry logic, a dead-letter queue for failed invocations, and least-privilege IAM policies scoped to the agent alias ARN."
+      "This pattern demonstrates how to invoke an Amazon Bedrock AI Agent on a recurring schedule using Amazon EventBridge Scheduler. An orchestrator AWS Lambda function, invoked by the scheduler, sends a task payload to the Amazon Bedrock Agent, which processes the input, generates an execution summary, and persists the result to an Amazon DynamoDB table. The pattern includes retry logic, a dead-letter queue for failed invocations, and least-privilege IAM policies scoped to the agent alias ARN."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ai-agent-trigger",
-      "templateURL": "serverless-patterns/eventbridge-scheduler-ai-agent-trigger",
-      "projectFolder": "eventbridge-scheduler-ai-agent-trigger",
       "templateFile": "main.tf"
     }
   },
@@ -50,8 +47,8 @@
   "authors": [
     {
       "name": "Rajil Paloth",
-      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
       "bio": "ProServe Delivery Consultant at AWS",
+      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
       "linkedin": "paloth"
     }
   ]

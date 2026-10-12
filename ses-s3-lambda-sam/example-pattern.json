@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/ses-s3-lambda-sam",
-      "templateURL": "serverless-patterns/ses-s3-lambda-sam",
-      "projectFolder": "ses-s3-lambda-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -30,14 +27,12 @@
       {
         "text": "Deliver to S3 bucket action in Amazon SES",
         "link": "https://docs.aws.amazon.com/ses/latest/dg/receiving-email-action-s3.html"
-      }    
+      }
     ]
   },
   "deploy": {
     "text": [
-      "See the GitHub repo for detailed deployment instructions.",
-      "sam deploy -g",
-      "aws ses set-active-receipt-rule-set  --rule-set-name {EmailReceiptRuleSet} --region {your-region}"
+      "sam deploy -g"
     ]
   },
   "testing": {
@@ -55,8 +50,8 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "linkedin": "biswanathmukherjee"
     }
   ]

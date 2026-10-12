@@ -4,7 +4,7 @@ using Amazon.CDK;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.OpenSearchServerless;
 using Amazon.CDK.AWS.S3;
-using Amazon.CDK.AwsBedrock;
+using Amazon.CDK.AWS.Bedrock;
 using Constructs;
 
 namespace AlbEcsBedrockAgentsCdkDotnet.BedrockAgent;

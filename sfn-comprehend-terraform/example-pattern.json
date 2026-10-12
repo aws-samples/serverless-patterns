@@ -1,7 +1,7 @@
 {
-  "title": "AWS Step Functions integration with Amazon Comprehend using terraform",
+  "title": "AWS Step Functions integration with Amazon Comprehend using Terraform",
   "description": "The Terraform template deploys an AWS Step Functions workflow with Amazon Comprehend and returns the sentiment analysis done by Amazon Comprehend.",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-comprehend-terraform",
-      "templateURL": "serverless-patterns/sfn-comprehend-terraform",
-      "projectFolder": "sfn-comprehend-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -57,9 +54,7 @@
   "authors": [
     {
       "name": "Rahul Sringeri",
-      "image": "",
-      "bio": "Technical Account Manager at AWS EMEA for Strategic Accounts",
-      "linkedin": ""
+      "bio": "Technical Account Manager at AWS EMEA for Strategic Accounts"
     }
   ]
 }

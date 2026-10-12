@@ -1,0 +1,59 @@
+{
+  "title": "Amazon API Gateway canary deployment",
+  "description": "Create a serverless app using API Gateway and Lambda. Then create an API Gateway canary deployment",
+  "language": "Java",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an API Gateway canary deployment with a Lambda function behind an API Gateway REST API. Once the canary deployment is live, requests will be routed to the new and old version of the Lambda function at a rate of 50/50 using the Lambda alias from the APIGW stage variables to route traffic to the correct version."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/main/java/com/myorg/MyServerlessApplicationStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Build an API Gateway REST API with Lambda integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-with-lambda-integration.html"
+      },
+      {
+        "text": "Working with the AWS CDK in Java",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-java.html"
+      },
+      {
+        "text": "AWS CLI start-execution",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/start-execution.html#start-execution"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy MyServerlessApplicationStack",
+      "cdk deploy MyServerlessApplicationStack -c env=dev ",
+      "cdk deploy CanaryDeploymentStack"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the Canary Deployment stack:",
+      "<code>cdk destroy CanaryDeploymentStack</code>",
+      "2. Delete the Serverless application stack.",
+      "<code>cdk destroy MyServerlessApplicationStack</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/muhammed-soyer.json"
+  ]
+}

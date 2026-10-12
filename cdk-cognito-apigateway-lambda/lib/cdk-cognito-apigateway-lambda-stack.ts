@@ -12,7 +12,7 @@ export class CdkCognitoApigatewayLambdaStack extends Stack {
     //AWS Lambda resource
 
     const userLambda = new lambda.Function(this, 'UserHanlder', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset('lambda'),
       handler: 'user.handler'
     })

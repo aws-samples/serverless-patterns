@@ -1,10 +1,11 @@
-const AWS = require('aws-sdk');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
 
-exports.handler = async (event, context, callback) => {
+const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const queue = new SQSClient({});
 
-    // retrieve dynamo name from environment variable
-    const dynamoDB = new AWS.DynamoDB.DocumentClient();
-    const queue = new AWS.SQS();
+exports.handler = async (event) => {
 
     // loop through all sqs records
     for (const record of event.Records) {
@@ -20,12 +21,12 @@ exports.handler = async (event, context, callback) => {
         };
 
         // check if item exists in dynamo
-        const dynamoRecord = await dynamoDB.get({
+        const dynamoRecord = await dynamoDB.send(new GetCommand({
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Key: {
                 'id': correlationId
             }
-        }).promise();
+        }));
         // if item exists, update item
         if (dynamoRecord.Item) {
             item.body = Object.assign(dynamoRecord.Item.body, item.body);
@@ -36,31 +37,31 @@ exports.handler = async (event, context, callback) => {
             item.count = 1;
         }
         // put item in dynamo
-        const result = await dynamoDB.put({
+        const result = await dynamoDB.send(new PutCommand({
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Item: item,
             ReturnValues: 'ALL_OLD'
-        }).promise();
+        }));
 
         // if item is last, trigger aggregation
         // and delete item from Dynamo
         if (item.count === total) {
-            await queue.sendMessage({
+            await queue.send(new SendMessageCommand({
                 QueueUrl: process.env.DESTINATION_QUEUE_URL,
                 MessageBody: JSON.stringify(item.body)
-            }).promise();
-            await dynamoDB.delete({
+            }));
+            await dynamoDB.send(new DeleteCommand({
                 TableName: process.env.DYNAMODB_TABLE_NAME,
                 Key: {
                     'id': correlationId
                 }
-            }).promise();
+            }));
         }
     }
 
     //complete
-    callback(null, {
+    return {
         statusCode: '200',
         body: JSON.stringify({ 'status': 'complete' })
-    });
+    };
 };

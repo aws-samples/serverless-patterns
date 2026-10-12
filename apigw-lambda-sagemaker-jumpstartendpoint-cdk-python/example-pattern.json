@@ -1,22 +1,18 @@
 {
-  "title": "Accessing Amazon SageMaker Endpoint via API Gateway and Lambda",
-  "description": "This pattern deploys a SageMaker Jumpstart model (Flan T5 XL) endpoint. It also uses a Lambda function and API Gateway to integrate the endpoint",
+  "title": "Amazon SageMaker endpoint via Amazon API Gateway and AWS Lambda",
+  "description": "Deploys a SageMaker Jumpstart model endpoint and an API Gateway endpoint.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a Amazon SageMaker Jumpstart model (Flan T5 XL from HuggingFace) endpoint using Amazon SageMaker. The model can be changed by modifying the MODEL_ID attribute in app.py file.",
-      "The pattern also adds a Lambda function with API Gateway integration to query the endpoint.",
+      "The model deployed in this pattern can be changed by modifying the MODEL_ID attribute in app.py file.",
       "The API Gateway is protected using an API Key. To query the API Gateway endpoint, x-api-key header needs to be added to the HTTP request."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-sagemaker-jumpstartendpoint-cdk-python",
-      "templateURL": "serverless-patterns/apigw-lambda-sagemaker-jumpstartendpoint-cdk-python",
-      "projectFolder": "apigw-lambda-sagemaker-jumpstartendpoint-cdk-python",
       "templateFile": "stack/ApigwLambdaSagemakerJumpstartendpointStack.py"
     }
   },
@@ -50,9 +46,9 @@
   "authors": [
     {
       "name": "Kaustav Dey",
-      "image": "https://avatars.githubusercontent.com/u/13236519",
       "bio": "Solution Architect at AWS",
-      "linkedin": "https://www.linkedin.com/in/kaustavbecs/"
+      "image": "https://avatars.githubusercontent.com/u/13236519",
+      "linkedin": "kaustavbecs"
     }
   ]
 }

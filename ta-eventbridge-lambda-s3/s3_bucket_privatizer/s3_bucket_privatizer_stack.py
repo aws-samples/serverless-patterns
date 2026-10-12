@@ -29,7 +29,7 @@ class S3BucketPrivatizerStack(Stack):
         dependencies_layer = aws_lambda.LayerVersion(self, "dependenciesLayer",
                                                     code=aws_lambda.Code.from_asset(
                                                         "lambda_functions/dependencies_layer/"),
-                                                    compatible_runtimes=[aws_lambda.Runtime.PYTHON_3_8],
+                                                    compatible_runtimes=[aws_lambda.Runtime.PYTHON_3_14],
                                                     )
         # create SNS target
         email_notification_topic = sns.Topic(self, 'taEmailNotificationTopic',
@@ -51,7 +51,7 @@ class S3BucketPrivatizerStack(Stack):
         ta_check_s3_open_lambda_function_code = aws_lambda.AssetCode('lambda_functions/s3openbucket')
         ta_check_s3_open_lambda_function = aws_lambda.Function(self, 'ta_s3_open_bucket',
                                                                code=ta_check_s3_open_lambda_function_code,
-                                                               runtime=aws_lambda.Runtime.PYTHON_3_8,
+                                                               runtime=aws_lambda.Runtime.PYTHON_3_14,
                                                                handler='s3openbucket.lambda_handler',
                                                                description='Function Triggered from Trusted Advisor '
                                                                            'to Block public access to an S3 Bucket',
@@ -92,7 +92,7 @@ class S3BucketPrivatizerStack(Stack):
         ta_refresh_lambda_function_code = aws_lambda.AssetCode('lambda_functions/refreshTrustedAdvisorCheck')
         ta_refresh_lambda_function = aws_lambda.Function(self, 'refresh_ta_check',
                                                          code=ta_refresh_lambda_function_code,
-                                                         runtime=aws_lambda.Runtime.PYTHON_3_8,
+                                                         runtime=aws_lambda.Runtime.PYTHON_3_14,
                                                          handler='refreshTrustedAdvisorCheck.lambda_handler',
                                                          description='Refreshes Trusted Advisor checks',
                                                          function_name='ta-refresh-ta-check-lambda-function',

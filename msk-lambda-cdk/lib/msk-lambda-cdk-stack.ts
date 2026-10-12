@@ -39,7 +39,7 @@ export class MskLambdaCdkStack extends Stack {
 
 
     let transactionHandler = new NodejsFunction(this, "TransactionHandler", {
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_24_X,
       entry: 'lambda/transaction-handler.js',
       handler: 'handler',
       vpc: vpc,

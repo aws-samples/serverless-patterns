@@ -1,9 +1,9 @@
 {
-  "title": "Invoke cross account Lambda function directly via Step function",
+  "title": "Invoke cross account AWS Lambda function directly via Step function",
   "description": "Create a Step function which invokes cross account Lambda function",
   "language": "Python",
   "level": "200",
-  "framework": "AWS CDK",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -13,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-lambda-function-crossaccount",
-      "templateURL": "serverless-patterns/sfn-lambda-function-crossaccount",
-      "projectFolder": "sfn-lambda-function-crossaccount",
-      "templateFile": "sfn-lambda-function-crossaccount/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -49,8 +46,8 @@
   "authors": [
     {
       "name": "Shivam Rajawat",
-      "image": "https://shivamrajawat.s3.amazonaws.com/shivamrajawat.jpg",
       "bio": "I am a Cloud Support Engineer (Serverless) at AWS and I love to solve complex problems.",
+      "image": "https://shivamrajawat.s3.amazonaws.com/shivamrajawat.jpg",
       "linkedin": "shivam-rajawat-a42b68124"
     }
   ]

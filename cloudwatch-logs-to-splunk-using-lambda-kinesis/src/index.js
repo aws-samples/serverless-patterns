@@ -21,14 +21,18 @@ const loggerConfig = {
 
 const SplunkLogger = require('./lib/mysplunklogger');
 const zlib = require('zlib');
+const { promisify } = require('util');
+
+const gunzip = promisify(zlib.gunzip);
 
 const logger = new SplunkLogger(loggerConfig);
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     
     const records = event.Records;
-    records.forEach((rec, idx) => {
+    let count = 0;
+    for (const rec of records) {
    
         // CloudWatch Logs data is base64 encoded so decode here
         //const payload = Buffer.from(event.awslogs.data, 'base64');
@@ -37,45 +41,36 @@ exports.handler = (event, context, callback) => {
         const payload = Buffer.from(rec.kinesis.data, 'base64');
         //console.log("receied payload:" + payload);
         // CloudWatch Logs are gzip compressed so expand here
-        zlib.gunzip(payload, (err, result) => {
-            if (err) {
-                callback(err);
-            } else {
-                const parsed = JSON.parse(result.toString('ascii'));
-                //console.log('Decoded payload:', JSON.stringify(parsed, null, 2));
-                let count = 0;
-                if (parsed.logEvents) {
-                    parsed.logEvents.forEach((item) => {
-                        /* Log event to Splunk with explicit event timestamp.
-                        - Use optional 'context' argument to send Lambda metadata e.g. awsRequestId, functionName.
-                        - Change "item.timestamp" below if time is specified in another field in the event.
-                        - Change to "logger.log(item.message, context)" if no time field is present in event. */
-                        logger.logWithTime(item.timestamp, item.message, context);
-                        /* Alternatively, UNCOMMENT logger call below if you want to override Splunk input settings */
-                        /* Log event to Splunk with any combination of explicit timestamp, index, source, sourcetype, and host.
-                        - Complete list of input settings available at http://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#services.2Fcollector */
-                        // logger.logEvent({
-                        //     time: new Date(item.timestamp).getTime() / 1000,
-                        //     host: 'serverless',
-                        //     source: `lambda:${context.functionName}`,
-                        //     sourcetype: 'httpevent',
-                        //     index: 'main',
-                        //     event: item.message,
-                        // });
-                        count += 1;
-                    });
-                }
-                // Send all the events in a single batch to Splunk
-                logger.flushAsync((error, response) => {
-                    if (error) {
-                        callback(error);
-                    } else {
-                        console.log(`Response from Splunk:\n${response}`);
-                        console.log(`Successfully processed ${count} log event(s).`);
-                        callback(null, count); // Return number of log events
-                    }
-                });
-            }
+        const result = await gunzip(payload);
+        const parsed = JSON.parse(result.toString('ascii'));
+        //console.log('Decoded payload:', JSON.stringify(parsed, null, 2));
+        if (parsed.logEvents) {
+            parsed.logEvents.forEach((item) => {
+                /* Log event to Splunk with explicit event timestamp.
+                - Use optional 'context' argument to send Lambda metadata e.g. awsRequestId, functionName.
+                - Change "item.timestamp" below if time is specified in another field in the event.
+                - Change to "logger.log(item.message, context)" if no time field is present in event. */
+                logger.logWithTime(item.timestamp, item.message, context);
+                /* Alternatively, UNCOMMENT logger call below if you want to override Splunk input settings */
+                /* Log event to Splunk with any combination of explicit timestamp, index, source, sourcetype, and host.
+                - Complete list of input settings available at http://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#services.2Fcollector */
+                // logger.logEvent({
+                //     time: new Date(item.timestamp).getTime() / 1000,
+                //     host: 'serverless',
+                //     source: `lambda:${context.functionName}`,
+                //     sourcetype: 'httpevent',
+                //     index: 'main',
+                //     event: item.message,
+                // });
+                count += 1;
+            });
+        }
+        // Send all the events in a single batch to Splunk
+        const response = await new Promise((resolve, reject) => {
+            logger.flushAsync((error, data) => (error ? reject(error) : resolve(data)));
         });
-    });
+        console.log(`Response from Splunk:\n${response}`);
+    }
+    console.log(`Successfully processed ${count} log event(s).`);
+    return count; // Return number of log events
 };

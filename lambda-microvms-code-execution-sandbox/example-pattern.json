@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvms-code-execution-sandbox",
-      "templateURL": "serverless-patterns/lambda-microvms-code-execution-sandbox",
-      "projectFolder": "lambda-microvms-code-execution-sandbox",
       "templateFile": "src/app.py"
     }
   },
@@ -44,14 +41,14 @@
   },
   "cleanup": {
     "text": [
-      "bash cleanup.sh"
+      "<code>bash cleanup.sh</code>"
     ]
   },
   "authors": [
     {
       "name": "Alexander Vladimirov",
-      "image": "https://avatars.githubusercontent.com/u/55249162?v=4",
       "bio": "Senior Serverless Solutions Architect at AWS, specializing in Agentic AI Workloads.",
+      "image": "https://avatars.githubusercontent.com/u/55249162?v=4",
       "linkedin": "avladi"
     }
   ]

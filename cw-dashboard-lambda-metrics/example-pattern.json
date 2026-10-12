@@ -1,20 +1,17 @@
 {
-  "title": "Amazon CloudWatch Dashboard Monitoring with Lambda PowerTools",
-  "description": "The CDK Stack deploys CloudWatch Dashboard with AWS Lambda Metrics.",
+  "title": "Amazon CloudWatch Dashboard Monitoring with AWS Lambda PowerTools",
+  "description": "The CDK Stack deploys a CloudWatch Dashboard with AWS Lambda Metrics.",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Lambda Function is instrumented with Lambda Insights and leverage Powertool for custom metrics reporting."
+      "A Lambda function is instrumented with Lambda Insights using Lambda Powertools for custom metrics reporting."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cw-dashboard-lambda-metrics",
-      "templateURL": "serverless-patterns/cw-dashboard-lambda-metrics",
-      "projectFolder": "cw-dashboard-lambda-metrics",
       "templateFile": "lambda_monitoring/lambda_monitoring_stack.py"
     }
   },
@@ -27,6 +24,10 @@
       {
         "text": "Amazon CloudWatch Dashboards",
         "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html"
+      },
+      {
+        "text": "Powertools for AWS Lambda (Python)",
+        "link": "https://docs.powertools.aws.dev/lambda/python/latest/"
       }
     ]
   },

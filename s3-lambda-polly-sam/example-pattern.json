@@ -1,6 +1,6 @@
 {
-  "title": "S3 - Lambda - Polly",
-  "description": "Invoke Polly through lambda on uploading file into S3",
+  "title": "Amazon S3 to AWS Lambda to Amazon Polly",
+  "description": "Convert text to speech when uploading a file into S3",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -8,15 +8,12 @@
     "headline": "How it works",
     "text": [
       "This sample project demonstrates how convert text to speech by uploading the text to S3.",
-      "The S3 use event trigger to invoke lambda function with uses Polly for conversion to speech."
+      "The S3 uses an event trigger to invoke a Lambda function which uses Amazon Polly for to convert the text to speech."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-polly-sam",
-      "templateURL": "serverless-patterns/s3-lambda-polly-sam",
-      "projectFolder": "s3-lambda-polly-sam",
-      "templateFile": "s3-lambda-polly-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -49,8 +46,8 @@
   "authors": [
     {
       "name": "Bubai Bal",
-      "image": "./bubai.png",
       "bio": "Solution Architect, AWS",
+      "image": "./bubai.png",
       "linkedin": "bubai-bal"
     }
   ]

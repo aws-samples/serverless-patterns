@@ -3,7 +3,7 @@
   "description": "Strands SDK agent on Lambda uses AgentCore Gateway (MCP) to call WeatherAPI.com via an OpenAPI target with Cognito JWT auth and API key injection.",
   "language": "Python",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -18,9 +18,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/strands-agentcore-openapi",
-      "templateURL": "serverless-patterns/strands-agentcore-openapi",
-      "projectFolder": "strands-agentcore-openapi",
       "templateFile": "template.yaml"
     }
   },
@@ -81,10 +78,9 @@
   "authors": [
     {
       "name": "Mike Hume",
-      "image": "https://serverlessland.com/assets/images/contributors/mike-hume.jpg",
       "bio": "AWS Senior Solutions Architect & UKPS Serverless Lead.",
-      "linkedin": "michael-hume-4663bb64",
-      "twitter": ""
+      "image": "https://serverlessland.com/assets/images/contributors/mike-hume.jpg",
+      "linkedin": "michael-hume-4663bb64"
     }
   ]
 }

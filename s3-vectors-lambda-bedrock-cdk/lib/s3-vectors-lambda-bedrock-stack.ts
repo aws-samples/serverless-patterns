@@ -51,7 +51,7 @@ export class S3VectorsLambdaBedrockStack extends cdk.Stack {
 
     // Ingest function — embeds text and stores in S3 Vectors
     const ingestFn = new lambda.Function(this, "IngestFn", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "ingest.handler",
       code: lambda.Code.fromAsset("src"),
       timeout: cdk.Duration.minutes(5),
@@ -64,7 +64,7 @@ export class S3VectorsLambdaBedrockStack extends cdk.Stack {
 
     // Query function — searches S3 Vectors and generates answer with Bedrock
     const queryFn = new lambda.Function(this, "QueryFn", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "query.handler",
       code: lambda.Code.fromAsset("src"),
       timeout: cdk.Duration.minutes(2),

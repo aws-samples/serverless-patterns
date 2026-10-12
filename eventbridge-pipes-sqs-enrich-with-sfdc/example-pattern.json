@@ -1,7 +1,7 @@
 {
-  "title": "Enrich SQS message data with EventBridge Pipes using Salesforce via API Destination",
+  "title": "Enrich Amazon SQS message data with Amazon EventBridge Pipes using Salesforce via API Destination",
   "description": "This pattern shows how to use EventBridge Pipes to enrich SQS message data using Salesforce via API destination and then send response to Pipe target.",
-  "language": "",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
@@ -10,13 +10,10 @@
       "The sample project demonstrates how to use Amazon EventBridge Pipes to enrich data using Salesforce via API destination before sending it to the target. The pattern uses SQS message as a source to EventBridge Pipe, Pipe enriches the data by calling the Salesforce API via an API destination using input from the SQS message. Pipe extracts data from SQS message and sends it as path parameter(s) to API. Response from API is sent to an EventBridge Pipe target of Amazon CloudWatch logs."
     ]
   },
-    "gitHub": {
-      "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-enrich-with-sfdc",
-        "templateURL": "serverless-patterns/eventbridge-pipes-sqs-enrich-with-sfdc",
-        "projectFolder": "eventbridge-pipes-sqs-enrich-with-sfdc",
-        "templateFile": "template.yaml"
-      }
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
   },
   "resources": {
     "bullets": [
@@ -25,7 +22,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -56,10 +53,10 @@
   "authors": [
     {
       "name": "Rohan Mehta",
-      "image": "https://phonetool.amazon.com/users/merohan",
       "bio": "Cloud Application Architect at AWS",
-      "linkedin": "https://www.linkedin.com/in/rohan-mehta-dev/",
-      "twitter": "@rohanmehta_dev"
+      "image": "https://phonetool.amazon.com/users/merohan",
+      "linkedin": "rohan-mehta-dev",
+      "twitter": "rohanmehta_dev"
     }
   ]
 }

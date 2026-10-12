@@ -1,25 +1,23 @@
 {
-  "title": "Lambda function with ECR Image",
+  "title": "AWS Lambda function with ECR image",
   "description": "Create a Lambda function with a container image",
   "language": "YAML",
-  "level": "200",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This template will create a lambda function running with an ECR container image.",
-      "You will need to already have the ECR image created in your account"
+      "This template will create a Lambda function running with an ECR container image.",
+      "You will need to already have the ECR image created in your account."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ecr",
-      "templateURL": "serverless-patterns/lambda-ecr",
-      "projectFolder": "lambda-ecr",
-      "templateFile": "lambda-ecr/template.yml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Working with Lambda container images",
@@ -29,25 +27,28 @@
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "Enter the Image URI in the parameters of the template. Once deployed, you can invoke the Lambda function."
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Alice Goumain",
-      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
       "bio": "Cloud Support Engineer in Serverless @ AWS",
-      "linkedin": "https://www.linkedin.com/in/alice-goumain/"
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "linkedin": "alice-goumain"
     }
   ]
 }

@@ -33,7 +33,7 @@ export class MyCdkProjectStack extends cdk.Stack {
     
     // Create a Lambda function
     const lambdaFn = new lambda.Function(this, 'MyLambdaFunction', {
-      runtime: lambda.Runtime.PYTHON_3_8,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'index.lambda_handler',
       code: lambda.Code.fromAsset('lambda'),
     });

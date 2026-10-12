@@ -1,52 +1,63 @@
 {
   "title": "AWS Lambda to Amazon SQS",
-  "description": "The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.",
+  "description": "Create a Lambda function that publishes to an SQS queue",
   "language": "Rust",
-  "level": "300",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "The Lambda function publishes a message to the SQS queue when invoked."
+      "This pattern deploys a SQS Queue and a Lambda function that once triggered will send a message to the Sqs Queue. The CDK application contains the minimum IAM resources required to run the application."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-sqs-rust-sam",
-      "templateURL": "serverless-patterns/lambda-sqs-rust-sam",
-      "projectFolder": "lambda-sqs-rust-sam",
       "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
-        "text": "Amazon SQS",
-        "link": "https://aws.amazon.com/sqs/"
+        "text": "Rust Runtime for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/opensource/rust-runtime-for-aws-lambda/"
+      },
+      {
+        "text": "Rust for JavaScript developers: CSV comparison",
+        "link": "https://dfrasca.hashnode.dev/rust-for-javascript-developers-csv-comparison/"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications.",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "See detailed testing instructions in the repo."
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

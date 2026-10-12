@@ -8,7 +8,7 @@ export class CdkStack extends Stack {
   
       // lambda function
       const myFunction = new Function(this, "myFunction", {
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_24_X,
         code: Code.fromAsset("functions"),
         handler: "handler.app"
       });

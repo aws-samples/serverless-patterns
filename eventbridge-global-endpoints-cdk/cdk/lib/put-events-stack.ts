@@ -22,7 +22,7 @@ export class PutEventsStack extends Stack {
 		/* Lambda function that put messages */
 		const putFunction = new Function(this, 'PutFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../function')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'put-events.handler',
 			timeout: Duration.minutes(15),
 			environment: {

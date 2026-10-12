@@ -16,7 +16,7 @@ export async function handler(event: any) {
         TableName: process.env.TABLE_NAME,
         Item: marshall({
           id: v4(),
-          username: faker.internet.userName(),
+          username: faker.internet.username(),
           email: faker.internet.email(),
           avatar: faker.image.avatar(),
           birthdate: faker.date.birthdate().toISOString(),

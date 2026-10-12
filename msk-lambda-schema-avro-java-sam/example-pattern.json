@@ -15,10 +15,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-schema-avro-java-sam",
-      "templateURL": "serverless-patterns/msk-lambda-schema-avro-java-sam",
-      "projectFolder": "msk-lambda-schema-avro-java-sam",
-      "templateFile": "template.yaml"
+      "templateFile": "template_original.yaml"
     }
   },
   "resources": {
@@ -50,10 +47,14 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
     "text": [

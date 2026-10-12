@@ -1,6 +1,6 @@
 {
-  "title": "Amazon EventBridge Schedule to Lambda",
-  "description": "Creates an EventBridge schedule to invoke a Lambda every 5 minutes",
+  "title": "Amazon EventBridge Schedule to AWS Lambda",
+  "description": "Creates an EventBridge schedule to invoke a Typescript Lambda every 5 minutes",
   "language": "TypeScript",
   "level": "200",
   "framework": "Terraform",
@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-terraform-typescript",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-terraform-typescript",
-      "projectFolder": "eventbridge-schedule-to-lambda-terraform-typescript",
-      "templateFile": "eventbridge-schedule-to-lambda-terraform-typescript/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {

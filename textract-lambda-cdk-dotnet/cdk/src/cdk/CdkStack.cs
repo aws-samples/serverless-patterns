@@ -54,7 +54,7 @@ namespace Cdk
 
             var buildOption = new BundlingOptions()
             {
-                Image = Runtime.DOTNET_8.BundlingImage,
+                Image = Runtime.DOTNET_10.BundlingImage,
                 User = "root",
                 OutputType = BundlingOutput.ARCHIVED,
                 Command = new string[]{
@@ -71,7 +71,7 @@ namespace Cdk
                 FunctionName = lambdaFunctionName,
                 MemorySize = 512,
                 Timeout = Duration.Seconds(30),
-                Runtime = Runtime.DOTNET_8,
+                Runtime = Runtime.DOTNET_10,
                 Handler = "TextractLambda::TextractLambda.Function::FunctionHandler",
                 Role = lambdaIAMRole,
                 Code = Code.FromAsset("../TextractLambda/", new Amazon.CDK.AWS.S3.Assets.AssetOptions

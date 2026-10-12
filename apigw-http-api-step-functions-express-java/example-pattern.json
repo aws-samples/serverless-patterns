@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-step-functions-express-java",
-      "projectFolder": "apigw-http-api-step-functions-express-java",
-      "templateFile": "src/main/java/com/myorg/HttpApiGatewayStepFunctionsStack.java",
-      "templateURL": "serverless-patterns/apigw-http-api-step-functions-express-java"
+      "templateFile": "src/main/java/com/myorg/HttpApiGatewayStepFunctionsStack.java"
     }
   },
   "resources": {
@@ -39,8 +36,8 @@
   "authors": [
     {
       "name": "Matt Ridehalgh",
-      "image": "https://avatars.githubusercontent.com/u/9155962",
       "bio": "Matt Ridehalgh is a Solutions Architect at AWS.",
+      "image": "https://avatars.githubusercontent.com/u/9155962",
       "linkedin": "matthew-ridehalgh",
       "twitter": "mrideh"
     }

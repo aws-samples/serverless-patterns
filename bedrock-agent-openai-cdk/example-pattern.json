@@ -1,13 +1,9 @@
 {
   "title": "Amazon Bedrock Agent with OpenAI model",
-  "description": "Deploy an Amazon Bedrock Agent powered by OpenAI GPT OSS with a Lambda action group for tool use.",
+  "description": "Deploy an Amazon Bedrock Agent powered by OpenAI GPT OSS with an AWS Lambda action group for tool use.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
-  "services": {
-    "from": "bedrock",
-    "to": "lambda"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -17,28 +13,40 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-agent-openai-cdk",
-      "templateURL": "serverless-patterns/bedrock-agent-openai-cdk",
-      "projectFolder": "bedrock-agent-openai-cdk",
       "templateFile": "lib/bedrock-agent-openai-stack.ts"
     }
   },
   "resources": {
     "bullets": [
-      { "text": "Amazon Bedrock Agents", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html" },
-      { "text": "OpenAI models on Amazon Bedrock", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-openai.html" },
-      { "text": "Bedrock Agent action groups", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents-action-create.html" }
+      {
+        "text": "Amazon Bedrock Agents",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html"
+      },
+      {
+        "text": "OpenAI models on Amazon Bedrock",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-openai.html"
+      },
+      {
+        "text": "Bedrock Agent action groups",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents-action-create.html"
+      }
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"],
+    "text": [
+      "cdk deploy"
+    ],
     "file": "lib/bedrock-agent-openai-stack.ts"
   },
   "testing": {
-    "text": ["See the README for testing instructions."]
+    "text": [
+      "See the README for testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["cdk destroy"]
+    "text": [
+      "cdk destroy"
+    ]
   },
   "authors": [
     {

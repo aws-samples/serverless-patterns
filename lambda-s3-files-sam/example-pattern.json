@@ -1,5 +1,5 @@
 {
-  "title": "Amazon S3 Bucket as a File System on AWS Lambda with Amazon S3 Files",
+  "title": "AWS Lambda using Amazon S3 Files",
   "description": "This pattern mounts an Amazon S3 bucket as a file system on AWS Lambda using Amazon S3 Files. Read data with standard Python file I/O.",
   "language": "Python",
   "level": "200",
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-files-sam",
-      "templateURL": "serverless-patterns/lambda-s3-files-sam",
-      "projectFolder": "lambda-s3-files-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -59,8 +56,8 @@
   "authors": [
     {
       "name": "Serda Kasaci Yildirim",
-      "image": "https://drive.google.com/file/d/1rzVS1hrIMdqy6P9i7-o7OBLNc0xY0FVB/view?usp=sharing",
       "bio": "Serda is a Solutions Architect at Amazon Web Services based in Vienna, focused on serverless technologies, event-driven architecture, and application modernization.",
+      "image": "https://drive.google.com/file/d/1rzVS1hrIMdqy6P9i7-o7OBLNc0xY0FVB/view?usp=sharing",
       "linkedin": "serdakasaci"
     }
   ]

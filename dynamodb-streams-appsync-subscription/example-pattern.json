@@ -1,5 +1,5 @@
 {
-  "title": "DynamoDB Streams to AppSync subscription",
+  "title": "Amazon DynamoDB streams to AWS AppSync subscription",
   "description": "Listen to DynamoDB changes using AppSync subscriptions",
   "language": "TypeScript",
   "level": "300",
@@ -14,20 +14,17 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-streams-appsync-subscription",
-      "templateURL": "serverless-patterns/dynamodb-streams-appsync-subscription",
-      "projectFolder": "dynamodb-streams-appsync-subscription",
-      "templateFile": "dynamodb-streams-appsync-subscription/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "AWS Appsync",
+        "text": "AWS AppSync",
         "link": "https://aws.amazon.com/appsync/"
       },
       {
-        "text": "AWS Re:Post - Listen to external DB changes using AppSync",
+        "text": "AWS re:Post - Listen to external DB changes using AppSync",
         "link": "https://repost.aws/knowledge-center/appsync-notify-subscribers-real-time"
       }
     ]
@@ -50,10 +47,10 @@
   "authors": [
     {
       "name": "Alexis Philippart de Foy",
+      "bio": "I am a Startup Solutions Architect, Serverless enthusiast and former Startup Founder.",
       "image": "https://media.licdn.com/dms/image/C4D03AQFyN5GLrFk-0g/profile-displayphoto-shrink_800_800/0/1586853008031?e=1693440000&v=beta&t=0BtjX92oZxhHUrrIzh55wah8V1OiwOAOyigPtfAcZdo",
-      "bio": " I am a Startup Solutions Architect, Serverless enthusiast and former Startup Founder.",
       "linkedin": "apdf",
-      "twitter": "@aphilippartd"
+      "twitter": "aphilippartd"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "title": "Amazon SQS to Amazon EventBridge event bus using Amazon EventBridge Pipes",
   "description": "This pattern creates an Amazon EventBridge Pipe to deliver messages from an Amazon SQS queue to Amazon EventBridge Event Bus.",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "Terraform",
   "introBox": {
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-eventbus-terraform",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-eventbus-terraform",
-      "projectFolder": "eventbridge-pipes-sqs-to-eventbus-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -51,8 +48,8 @@
   "authors": [
     {
       "name": "Chaitanya Gummadi",
-      "image": "https://gravatar.com/avatar/a9b30c6e727f613f3f44a44016e36998719404ea7451c750f402a21f2dd72937.jpg?size=256",
       "bio": "Chaitanya is a Senior Cloud Support Engineer with Amazon Web Services (AWS) based in Texas.",
+      "image": "https://gravatar.com/avatar/a9b30c6e727f613f3f44a44016e36998719404ea7451c750f402a21f2dd72937.jpg?size=256",
       "linkedin": "cgummadi"
     }
   ]

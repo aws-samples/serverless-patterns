@@ -1,20 +1,17 @@
 {
-  "title": "SQS to AWS Batch Job Queue using EventBridge Pipes",
-  "description": "This pattern uses SQS and triggers AWS Batch Job Queue directly with optional filtering supported.",
+  "title": "Amazon SQS to AWS Batch job queue using Amazon EventBridge Pipes",
+  "description": "This pattern uses SQS and triggers AWS Batch job queue directly with optional filtering supported.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "SQS queue is polled and messages are sent to AWS Batch Job Queue. SQS messages are filtered before reaching AWS Batch Job Queue, and custom events in AWS Batch Jobs are raised."
+      "SQS queue is polled and messages are sent to AWS Batch job queue. SQS messages are filtered before reaching AWS Batch job queue, and custom events in AWS Batch jobs are raised."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-aws-batch-with-filters",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-aws-batch-with-filters",
-      "projectFolder": "eventbridge-pipes-sqs-to-aws-batch-with-filters",
       "templateFile": "template.yaml"
     }
   },
@@ -25,7 +22,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -44,16 +41,20 @@
     ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "Sayan Moitra",
-      "image": "./smoitra.png",
       "bio": "Sayan is a Solutions Architect working with Amazon Web Services.",
+      "image": "./smoitra.png",
       "linkedin": "sayanmoitra"
     }
   ]

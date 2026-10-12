@@ -1,5 +1,5 @@
 {
-  "title": "Route53 to ALB to ECS Fargate",
+  "title": "Route53 to ALB to ECS AWS Fargate",
   "description": "This pattern shows how to deploy a containerized Web API as an ECS fargate service, and expose it with a custom domain using Route53",
   "language": ".NET",
   "level": "200",
@@ -15,10 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/route53-alb-fargate-cdk-dotnet",
-      "projectFolder": "route53-alb-fargate-cdk-dotnet",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/route53-alb-fargate-cdk-dotnet/README.md",
-      "templateURL": "serverless-patterns/route53-alb-fargate-cdk-dotnet",
       "templateFile": "src/Route53AlbFargateCdkDotnet/Route53AlbFargateCdkDotnetStack.cs"
     }
   },
@@ -40,8 +36,8 @@
   "authors": [
     {
       "name": "Ankush Jain",
-      "image": "https://avatars.githubusercontent.com/u/13661966?v=4",
       "bio": "Application Development Consultant at AWS Professional Services.",
+      "image": "https://avatars.githubusercontent.com/u/13661966?v=4",
       "linkedin": "ankush-jain-developer",
       "twitter": "ankushjain358"
     }

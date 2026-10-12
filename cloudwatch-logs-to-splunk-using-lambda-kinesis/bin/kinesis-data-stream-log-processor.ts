@@ -83,7 +83,7 @@ export class KinesisDataStreamLogProcessorStack extends Stack {
     const fnLogProcessor = new Function(this, "LogProcessorFunction", {
       functionName: "fnLogProcessor",
       handler: "index.handler",
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_24_X,
       code: new AssetCode(`./src`),
       memorySize: 512,
       timeout: Duration.seconds(300),

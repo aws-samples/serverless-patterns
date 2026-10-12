@@ -56,7 +56,7 @@ class Auth0IntegrationStack(Stack):
         auth0_process_failed_login_lambda = _lambda.Function(
             self, 
             id='Auth0ProcessFailedLoginLambda',
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('src'),
             handler='Auth0ProcessFailedLogin.handler',
             role=lambda_role,

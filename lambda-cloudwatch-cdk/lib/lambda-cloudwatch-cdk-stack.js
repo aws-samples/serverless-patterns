@@ -33,7 +33,7 @@ class LambdaCloudWatchCdkStack extends Stack {
       this,
       'lambdaCloudWatch',
       {
-        runtime: lambda.Runtime.NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         memorySize: 1024,
         timeout: Duration.seconds(3),
         entry: path.join(__dirname, '../src/app.js'),

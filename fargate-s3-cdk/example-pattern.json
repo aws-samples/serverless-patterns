@@ -1,0 +1,58 @@
+{
+  "title": "AWS Fargate to Amazon S3",
+  "description": "Create an AWS Fargate service that reads and writes to S3",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with an Application Load Balancer in-front.",
+      "The AWS Fargate service has endpoints that provide examples to list and get objects from a bucket and put objects into a bucket. This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library.",
+      "This makes use of the in-built ecs.ContainerImage.fromAsset method. The custom image has a base route / for health checks, /putobject for adding objects, /getobject for retrieving the contents of a specified object, and /listobjects for listing all the files in a bucket. Environment variables like the the S3 bucket name and AWS region are passed to the image to enable it to put items to the S3 bucket.",
+      "This project also shows how to set up a S3 Gateway Endpoint to the VPC and configure additional bucket policies that require actions to come from the S3 Gateway Endpoint. This is in addition to the built-in grantReadWrite that CDK provides.",
+      "To learn more, see the GitHub repo."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "S3 to Lambda patterns",
+        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/glenn-chia-jin-wee.json"
+  ]
+}

@@ -1,6 +1,6 @@
 {
-  "title": "Message Aggregator with SQS, Lambda and DynamoDB",
-  "description": "Creates a Lambda function that keep tracks of single messages using DynamoDB and forward a single aggregate message to a different SQS queue.",
+  "title": "Message Aggregator with Amazon SQS, AWS Lambda and Amazon DynamoDB",
+  "description": "Creates a Lambda function that groups and tracks messages using DynamoDB. Once messages are aggregated a new message is raised on a destination SQS queue.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-dynamodb-message-aggregator-cdk",
-      "templateURL": "serverless-patterns/sqs-lambda-dynamodb-message-aggregator-cdk",
-      "projectFolder": "sqs-lambda-dynamodb-message-aggregator-cdk",
-      "templateFile": "sqs-lambda-dynamodb-message-aggregator-cdk/src/lib/src-stack.ts"
+      "templateFile": "src/lib/src-stack.ts"
     }
   },
   "resources": {
@@ -46,8 +43,8 @@
   "authors": [
     {
       "name": "Raffaele Garofalo (Raf)",
-      "image": "https://avatars.githubusercontent.com/raffaeu",
       "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Community).",
+      "image": "https://avatars.githubusercontent.com/raffaeu",
       "linkedin": "raffaeu",
       "twitter": "raffaeu"
     }

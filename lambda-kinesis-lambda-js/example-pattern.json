@@ -1,20 +1,17 @@
 {
-  "title": "Lambda to Kinesis Data Stream to Lambda with JS and SAM",
-  "description": "A demonstration of serverless producer-consumer use case using AWS Lambda and AWS Kinesis Data Stream.",
+  "title": "AWS Lambda to Amazon Kinesis Data Stream to AWS Lambda using Node.js and AWS SAM",
+  "description": "Push and consume records to and from a Kinesis Data Stream With Lambda..",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern talks about how to use Lambda functions with nodejs runtime to push and read records from a Kinesis Data Stream.This specifically demonstrates the implementation of serverless producer and consumer for a stream."
+      "This pattern creates two Lambda functions, one that puts data into the Kinesis Data Stream and another one that is invoked when there is data in the stream."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-kinesis-lambda-js",
-      "templateURL": "serverless-patterns/lambda-kinesis-lambda-js",
-      "projectFolder": "lambda-kinesis-lambda-js",
       "templateFile": "template.yaml"
     }
   },
@@ -39,15 +36,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: sam delete"
+      "Delete the stack: <code>sam delete</code>"
     ]
   },
   "authors": [
     {
       "name": "Saborni Bhattacharya",
-      "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
       "bio": "I am Saborni working as a Cloud Engineer at AWS SE Serverless.",
-      "linkedin": "saborni-bhattacharya-5b523812a/"
+      "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+      "linkedin": "saborni-bhattacharya-5b523812a"
     }
   ]
 }

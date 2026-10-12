@@ -1,5 +1,5 @@
 {
-  "title": "Lambda to MemoryDB",
+  "title": "AWS Lambda to MemoryDB",
   "description": "Create Lambda Functions to interact with MemoryDB.",
   "language": "Java",
   "level": "200",
@@ -13,10 +13,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-memorydb",
-      "templateURL": "serverless-patterns/apigw-lambda-memorydb",
-      "projectFolder": "apigw-lambda-memorydb",
-      "templateFile": "apigw-lambda-memorydb/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -49,9 +46,8 @@
   "authors": [
     {
       "name": "Mansi Doshi",
-      "image": "",
       "bio": "Mansi is a Cloud Consultant at Amazon Web Services based in India.",
-      "linkedin": "https://www.linkedin.com/in/mansi-doshi-2a448177"
+      "linkedin": "mansi-doshi-2a448177"
     }
   ]
 }

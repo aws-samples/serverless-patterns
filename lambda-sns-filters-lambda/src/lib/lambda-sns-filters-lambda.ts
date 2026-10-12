@@ -17,7 +17,7 @@ export class LambdaSNSFiltersLambdaStack extends cdk.Stack {
 		/* Lambda function that sends messages */
 		const sender = new Function(this, 'SenderFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'senderFilter.handler',
 			environment: {
 				TOPIC_ARN: snsTopic.topicArn,
@@ -30,13 +30,13 @@ export class LambdaSNSFiltersLambdaStack extends cdk.Stack {
 		/* Lambda function that consumes */
 		const consumerRed = new Function(this, 'ConsumerRedFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'consumerRed.handler',
 		});
 
 		const consumerAll = new Function(this, 'ConsumerAllFunction', {
 			code: Code.fromAsset(path.join(__dirname, '../functions')),
-			runtime: Runtime.NODEJS_16_X,
+			runtime: Runtime.NODEJS_24_X,
 			handler: 'consumer.handler',
 		});
 

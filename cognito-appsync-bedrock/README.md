@@ -9,7 +9,7 @@ This pattern demonstrates how to invoke Amazon Bedrock models from AWS AppSync u
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Node and NPM](https://nodejs.org/en/download/) installed (Node.js 20.x recommended as used by the Lambda function)
+- [Node and NPM](https://nodejs.org/en/download/) installed (Node.js 24.x recommended as used by the Lambda function)
 - [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed
 - This pattern is region-driven. Deploy it in an AWS Region that supports the selected Bedrock model or inference profile.
 - The default Bedrock target is the global Amazon Nova 2 Lite inference profile `global.amazon.nova-2-lite-v1:0`, which is available from `ap-south-1` and other [documented source Regions](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-amazon-nova-2-lite.html#model-card-amazon-nova-2-lite-regions).

@@ -1,0 +1,56 @@
+{
+  "title": "Amazon DynamoDB to Amazon Kinesis",
+  "description": "Deploy a DynamoDB table that uses a Kinesis stream",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK stack deploys a DynamoDB table and a Kinesis Data Stream.",
+      "When new items are added to the DynamoDB table, the item-level changes in the table will be streamed to the Kinesis Data Stream."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/bin/dynamodb-kinesis-cdk.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Creating a single-table design with Amazon DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/"
+      },
+      {
+        "text": "Building serverless applications with streaming data: Part 1",
+        "link": "https://aws.amazon.com/blogs/compute/building-serverless-applications-with-streaming-data-part-1/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "After deployment, add an item to the DynamoDB table. Go to the CloudWatch Metrics for the deployed Kinesis Data Stream. You will see incoming record metrics for the item data."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/milena-godau.json"
+  ]
+}

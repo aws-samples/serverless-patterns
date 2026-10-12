@@ -47,7 +47,7 @@ export class S3LambdaDynamodbCdkStack extends Stack {
       effect: Effect.ALLOW
     }));
     const lambdaFunction = new lambda.Function(this, 'dataload', {
-      runtime: lambda.Runtime.PYTHON_3_7,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'data-load.handler',
       code: lambda.Code.fromAsset('code'),
       role: lambdaRole,

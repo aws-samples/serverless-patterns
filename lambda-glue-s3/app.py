@@ -60,7 +60,7 @@ class CdkGlueStack(Stack):
         my_lambda = _lambda.Function(
             self, 'GlueHandler',
             function_name="MyGlueHandler",
-            runtime=_lambda.Runtime.PYTHON_3_7,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             code=_lambda.Code.from_asset('functions'),
             handler='glue.handler',
             environment={

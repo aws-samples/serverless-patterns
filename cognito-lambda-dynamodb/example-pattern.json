@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns",
-      "templateURL": "serverless-patterns/cognito-lambda-dynamodb",
-      "projectFolder": "cognito-lambda-dynamodb/cdk",
-      "templateFile": "lib/cdk-stack.ts"
+      "templateFile": "cdk/lib/cdk-stack.ts"
     }
   },
   "resources": {
@@ -37,7 +34,10 @@
     ]
   },
   "deploy": {
-    "text": ["cdk synth", "cdk deploy"]
+    "text": [
+      "cdk synth",
+      "cdk deploy"
+    ]
   },
   "testing": {
     "text": [
@@ -45,15 +45,17 @@
     ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk destroy</code>."]
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
   },
   "authors": [
     {
       "name": "Vidit Shah",
-      "bio":"Software Engineer working @ServerlessCreed,making Serverless Courses and workshops",
+      "bio": "Software Engineer working @ServerlessCreed,making Serverless Courses and workshops",
+      "image": "https://media.licdn.com/dms/image/v2/D4D03AQHbL_7ZCYfUGQ/profile-displayphoto-shrink_200_200/B4DZUXcQlTGkAY-/0/1739855039564?e=2147483647&v=beta&t=MhOEFqsUDaKnLypK8eYYRqqD8Uq9xHUnijO5tN-fMpc",
       "linkedin": "vidit-shah",
-      "twitter": "Vidit_210/",
-      "image": "https://media.licdn.com/dms/image/v2/D4D03AQHbL_7ZCYfUGQ/profile-displayphoto-shrink_200_200/B4DZUXcQlTGkAY-/0/1739855039564?e=2147483647&v=beta&t=MhOEFqsUDaKnLypK8eYYRqqD8Uq9xHUnijO5tN-fMpc"
+      "twitter": "Vidit_210"
     }
   ]
 }

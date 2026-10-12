@@ -1,6 +1,6 @@
 {
   "title": "Amazon DynamoDB and Amazon S3 zero-ETL integration using AWS Glue",
-  "description": "Create a Amazon DynamoDB and S3 bucket and integrate them using an AWS Glue job for zero-ETL data transfer.",
+  "description": "Create an Amazon DynamoDB and S3 bucket and integrate them using an AWS Glue job for zero-ETL data transfer.",
   "language": "Python",
   "level": "200",
   "framework": "Terraform",
@@ -13,9 +13,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-glue-s3-terraform",
-      "templateURL": "serverless-patterns/dynamodb-glue-s3-terraform",
-      "projectFolder": "dynamodb-glue-s3-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -55,10 +52,8 @@
   "authors": [
     {
       "name": "Kiran Ramamurthy",
-      "image": "",
       "bio": "I am a Senior Partner Solutions Architect for Enterprise Transformation. I work predominantly with partners and specialize in migrations and modernization.",
-      "linkedin": "kiran-ramamurthy-a96341b",
-      "twitter": ""
+      "linkedin": "kiran-ramamurthy-a96341b"
     }
   ]
 }

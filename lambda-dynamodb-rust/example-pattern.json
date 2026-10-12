@@ -1,34 +1,37 @@
 {
-  "title": "AWS Lambda To Amazon DynamoDB",
-  "description": "This pattern creates a Lambda function that persist data into DynamoDB",
+  "title": "AWS Lambda to Amazon DynamoDB",
+  "description": "Persist an item to a DynamoDB table from a Lambda function",
   "language": "Rust",
-  "level": "300",
+  "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates a Lambda function that persist data into DynamoDB"
-    ]
+      "The SAM template deploys a Lambda function, a DynamoDB table, and the minimum IAM resources required to run the application. A Lambda function uses the AWS SDK to persist an item to a DynamoDB table."
+    ],
+    "test": ""
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-dynamodb-rust",
-      "templateURL": "serverless-patterns/lambda-dynamodb-rust",
-      "projectFolder": "lambda-dynamodb-rust",
       "templateFile": "template.yml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
-        "text": "Amazon DynamoDB",
-        "link": "https://aws.amazon.com/dynamodb/"
+        "text": "AWS Docs: Writing Data to a Table",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WriteData.html"
+      },
+      {
+        "text": "Creating a scalable serverless import process for Amazon DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/creating-a-scalable-serverless-import-process-for-amazon-dynamodb/"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -38,15 +41,15 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
-      "headline": "Presented by Daniele Frasca",
       "name": "Daniele Frasca",
-      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
       "linkedin": "daniele-frasca",
       "twitter": "dfrasca80"
     }

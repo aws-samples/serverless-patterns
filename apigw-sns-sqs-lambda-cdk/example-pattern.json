@@ -1,0 +1,58 @@
+{
+  "title": "Amazon API Gateway to Amazon SNS to Amazon SQS",
+  "description": "Create an Amazon API Gateway API that integrates with Amazon SNS and Amazon SQS",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application demonstrates how to set up a topic-queue-chaining pattern using Amazon SNS and Amazon SQS behind an Amazon API Gateway. This architecture helps in setting up a highly scalable API that can consume messages/events, fan them out and process them asynchronously.",
+      "This stack deploys an Amazon API Gateway REST API that publishes requests to an SNS Topic. The SNS topic fans out these requests to 2 SQS Queues. Requests in each of these queues are processed by Lambda functions. These functions log the requests to the console [CloudWatch Logs groups]."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/app.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "Using Amazon SQS dead-letter queues to replay messages",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-sqs-dead-letter-queues-to-replay-messages/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/hariram-ronda.json"
+  ]
+}
