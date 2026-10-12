@@ -8,6 +8,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage. Please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+Important: the MicroVM execution role uses the AWS-managed `ReadOnlyAccess` policy, which can read data across the whole account (for example Amazon S3 object contents and Amazon DynamoDB items) and is extended automatically when AWS launches new services. Anyone with shell access to the MicroVM, and the agent itself, can read that data. Deploy into a sandbox or non-production account that holds no sensitive data, or narrow the role first; see [Things to check for your own account](#things-to-check-for-your-own-account).
+
 ## How it works
 
 ![Codex CLI Agent on AWS Lambda MicroVMs architecture](images/architecture.png)
@@ -83,8 +85,16 @@ export IMAGE_NAME="codex-cli-agent"
 export S3_BUCKET="microvm-artifacts-${ACCOUNT_ID}-${AWS_REGION}"
 export S3_KEY="deployments/${IMAGE_NAME}.zip"
 
-# 1. Artifact bucket and upload
+# 1. Artifact bucket (Block Public Access, SSE-S3, TLS-only) and upload
 aws s3 mb "s3://${S3_BUCKET}" --region "${AWS_REGION}"
+aws s3api put-public-access-block --bucket "${S3_BUCKET}" --region "${AWS_REGION}" \
+  --public-access-block-configuration \
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+aws s3api put-bucket-encryption --bucket "${S3_BUCKET}" --region "${AWS_REGION}" \
+  --server-side-encryption-configuration \
+  '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+aws s3api put-bucket-policy --bucket "${S3_BUCKET}" --region "${AWS_REGION}" --policy \
+  '{"Version":"2012-10-17","Statement":[{"Sid":"DenyInsecureTransport","Effect":"Deny","Principal":"*","Action":"s3:*","Resource":["arn:'"${AWS_PARTITION}"':s3:::'"${S3_BUCKET}"'","arn:'"${AWS_PARTITION}"':s3:::'"${S3_BUCKET}"'/*"],"Condition":{"Bool":{"aws:SecureTransport":"false"}}}]}'
 (cd src && zip -qr /tmp/app.zip . -x '*__pycache__*' -x '*.pyc' -x '.DS_Store')
 aws s3 cp /tmp/app.zip "s3://${S3_BUCKET}/${S3_KEY}" --region "${AWS_REGION}"
 
@@ -233,6 +243,7 @@ stty cols 120 rows 40 2>/dev/null; export COLUMNS=120 LINES=40 TERM=xterm-256col
 
 ## Things to check for your own account
 
+- **`ReadOnlyAccess`** lets the agent, and anyone with shell access, read data across the whole account, not just describe resources; AWS extends the policy as new services launch. For an account with sensitive data, replace it in the `MicroVMExecutionRole` in [template.yaml](template.yaml) with a customer-managed policy that grants only the read actions and resources the agent needs, and/or attach a permissions boundary. If the role has to stay broader for other callers, the `aws:ViaAWSMCPService` and `aws:CalledViaAWSMCP` condition keys can restrict only agent traffic; see [The AWS MCP Server](#the-aws-mcp-server).
 - **Model support** changes over time and differs between the Responses API and `bedrock list-foundation-models`; verify with a single `codex exec` before relying on a model.
 - **`AmazonBedrockMantleInferenceAccess`** is AWS-maintained and grants more than inference; review the [policy document](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonBedrockMantleInferenceAccess.html) if your account has stricter requirements. The `MicroVMExecutionRole` comments in [template.yaml](template.yaml) describe the narrower alternatives.
 - **`AdditionalOsCapabilities: [ALL]`** grants elevated Linux capabilities inside the VM boundary ([what it enables](https://docs.aws.amazon.com/lambda/latest/dg/microvms-images.html#microvms-images-os-capabilities)). The property comment in [template.yaml](template.yaml) states what Codex's sandbox needs and when an empty list is sufficient.

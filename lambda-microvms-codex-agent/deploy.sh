@@ -70,8 +70,24 @@ echo ""
 
 # -- Step 1: Amazon S3 bucket -------------------------------------------------
 echo ">>> Step 1: Ensuring Amazon S3 bucket..."
+# The security settings below are applied only to a bucket this script creates.
+# S3_BUCKET can point at a bucket you already own, and put-bucket-policy would
+# replace that bucket's existing policy. S3 already applies Block Public Access
+# and SSE-S3 to new buckets by default; setting them explicitly keeps the bucket
+# locked down even if those account defaults are relaxed.
 if ! aws s3api head-bucket --bucket "${S3_BUCKET}" --region "${AWS_REGION}" 2>/dev/null; then
     aws s3 mb "s3://${S3_BUCKET}" --region "${AWS_REGION}"
+    aws s3api put-public-access-block --bucket "${S3_BUCKET}" --region "${AWS_REGION}" \
+      --public-access-block-configuration \
+      BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+    aws s3api put-bucket-encryption --bucket "${S3_BUCKET}" --region "${AWS_REGION}" \
+      --server-side-encryption-configuration \
+      '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+    # Deny any request not made over TLS.
+    BUCKET_ARN="arn:${AWS_PARTITION}:s3:::${S3_BUCKET}"
+    aws s3api put-bucket-policy --bucket "${S3_BUCKET}" --region "${AWS_REGION}" --policy \
+      '{"Version":"2012-10-17","Statement":[{"Sid":"DenyInsecureTransport","Effect":"Deny","Principal":"*","Action":"s3:*","Resource":["'"${BUCKET_ARN}"'","'"${BUCKET_ARN}"'/*"],"Condition":{"Bool":{"aws:SecureTransport":"false"}}}]}'
+    echo "    Created ${S3_BUCKET} with Block Public Access, SSE-S3, and TLS-only policy."
 fi
 
 # -- Step 2: Package and upload -----------------------------------------------
