@@ -42,7 +42,7 @@ EventBridge rules are region-local. The trail is multi-region, but the rule in t
 
 ## Testing
 
-The check puts one event, then polls the function log group every 10 seconds for up to 2 minutes. It prints `PASS` when a record is logged and exits non-zero otherwise. Save the block as `smoke-test.sh` and run it with `bash smoke-test.sh` (the `exit 1` would close your shell if you pasted it into an interactive session). The AWS CLI default Region must be the Region you deployed to.
+The check puts one event, then polls the function log group every 15 seconds for up to 20 minutes. It prints `PASS` when a record is logged and exits non-zero otherwise. CloudTrail delivers events with a delay of several minutes, and a newly created trail can take noticeably longer, so the check waits up to 20 minutes instead of a fixed short time. Save the block as `smoke-test.sh` and run it with `bash smoke-test.sh` (the `exit 1` would close your shell if you pasted it into an interactive session). The AWS CLI default Region must be the Region you deployed to.
 
 ```bash
 STACK=EventbridgeCloudtrailDataplaneStack
@@ -54,14 +54,14 @@ START=$(( $(date +%s) * 1000 ))
 # Put a test event to the default event bus
 aws events put-events --entries '[{"Source":"test.app","DetailType":"TestEvent","Detail":"{\"key\":\"value\"}"}]'
 
-# Poll the function log group (12 tries x 10 s); exit non-zero if no record appears
+# Poll the function log group (80 tries x 15 s = 20 minutes); exit non-zero if no record appears
 N=0
-for i in $(seq 1 12); do
+for i in $(seq 1 80); do
   N=$(aws logs filter-log-events --log-group-name "/aws/lambda/$FN" \
     --filter-pattern '"EventBridge data plane API call detected"' \
-    --start-time "$START" --query 'length(events)' --output text || echo 0)
+    --start-time "$START" --query 'events[].eventId' --output text | wc -w | tr -d ' ')
   [ "$N" -gt 0 ] && break
-  sleep 10
+  sleep 15
 done
 [ "$N" -gt 0 ] && echo "PASS: $N record(s) logged" || { echo "FAIL: no record logged"; exit 1; }
 ```
