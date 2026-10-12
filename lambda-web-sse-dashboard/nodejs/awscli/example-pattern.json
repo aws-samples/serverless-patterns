@@ -3,7 +3,9 @@
   "description": "Stream live metrics to the browser over server-sent events (SSE) from a zero-dependency Node.js HTTP server running as an AWS Lambda Web Function.",
   "language": "Node.js",
   "level": "200",
+  "highlight": "true",
   "framework": "AWS CLI",
+  "patternGroup": "lambda-web-sse-dashboard",
   "introBox": {
     "headline": "How it works",
     "text": [

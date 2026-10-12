@@ -3,7 +3,9 @@
   "description": "Run an unmodified Express.js REST API as a Lambda Web Function that reads and writes items in an Amazon DynamoDB table, using AWS SAM.",
   "language": "Node.js",
   "level": "200",
+  "highlight": "true",
   "framework": "AWS SAM",
+  "patternGroup": "lambda-web-dynamodb-api",
   "introBox": {
     "headline": "How it works",
     "text": [

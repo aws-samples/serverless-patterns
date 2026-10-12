@@ -3,7 +3,9 @@
   "description": "Stream live metrics to many browsers over Server-Sent Events from a zero-dependency Node.js Lambda Web Function, using AWS SAM.",
   "language": "Node.js",
   "level": "200",
+  "highlight": "true",
   "framework": "AWS SAM",
+  "patternGroup": "lambda-web-sse-dashboard",
   "introBox": {
     "headline": "How it works",
     "text": [
