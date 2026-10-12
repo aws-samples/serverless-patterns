@@ -52,7 +52,7 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
       environment: {
         GATEWAY_ID: gateway.gatewayId,
         GATEWAY_URL: gateway.gatewayUrl ?? '',
-        MODEL_ID: 'us.anthropic.claude-sonnet-4-6',  // Update to a newer model as needed; also update the two InvokeModel ARNs below and the fallback in src/handler/index.py
+        MODEL_ID: 'us.anthropic.claude-sonnet-5-5',  // Update to a newer model as needed; also update the two InvokeModel ARNs below and the fallback in src/handler/index.py
       },
     });
 
@@ -67,8 +67,8 @@ export class ApigwLambdaWebsearchBedrockStack extends cdk.Stack {
     fn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock:InvokeModel'],
       resources: [
-        `arn:${this.partition}:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6`,
-        `arn:${this.partition}:bedrock:${this.region}:${this.account}:inference-profile/us.anthropic.claude-sonnet-4-6`,
+        `arn:${this.partition}:bedrock:*::foundation-model/anthropic.claude-sonnet-5-5`,
+        `arn:${this.partition}:bedrock:${this.region}:${this.account}:inference-profile/us.anthropic.claude-sonnet-5-5`,
       ],
     }));
     fn.addToRolePolicy(new iam.PolicyStatement({

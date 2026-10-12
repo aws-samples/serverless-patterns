@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Node.js 20+](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`)
 * CDK bootstrapped in your account/region (`cdk bootstrap`)
-* Amazon Bedrock model access enabled for the model set in `MODEL_ID` (`us.anthropic.claude-sonnet-4-6`) in us-east-1
+* Amazon Bedrock model access enabled for the model set in `MODEL_ID` (`us.anthropic.claude-sonnet-5-5`) in us-east-1
 
 ## Deployment Instructions
 
