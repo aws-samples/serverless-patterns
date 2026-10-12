@@ -58,10 +58,10 @@
       "This pattern shows a Lambda-less, event-driven invocation of an Amazon Bedrock AgentCore Runtime agent. The CDK stack is self-contained: it builds and deploys the AgentCore Runtime (from a bundled agent container image) along with all the EventBridge plumbing.",
       "An EventBridge rule matches events on a custom bus and routes them to an API Destination whose HTTPS endpoint is the AgentCore Runtime InvokeAgentRuntime API.",
       "The EventBridge Connection authenticates using the OAuth client_credentials flow against an Amazon Cognito user pool (machine-to-machine). The AgentCore Runtime validates the resulting JWT via its inbound identity (customJwtAuthorizer) configuration, which the stack wires to the same Cognito user pool at creation time.",
-      "Because API Destinations enforce a 5-second response timeout, the AgentCore Runtime is invoked in asynchronous mode: the agent entrypoint acknowledges the request immediately and continues processing the event in the background.",
+      "Because API Destinations enforce a 5-second response timeout, the agent entrypoint acknowledges the request immediately and continues processing the event in the background. The background work is registered with the AgentCore SDK's @app.async_task decorator, so the runtime reports HealthyBusy and keeps the session alive until the agent finishes.",
       "The endpoint URL uses the agent runtime ID plus an accountId query parameter instead of a URL-encoded ARN, because API Destinations automatically decode percent-encoded sequences in target URLs.",
-      "Deliveries that fail after retries are captured in an SQS dead-letter queue for inspection and redrive.",
-      "IAM permissions follow least privilege: the AgentCore Runtime execution role grants only ecr:BatchGetImage and ecr:GetDownloadUrlForLayer to the specific ECR repository, scoped CloudWatch Logs and X-Ray permissions, and bedrock:InvokeModel for foundation models. The EventBridge rule's target role has only events:InvokeApiDestination on the specific API Destination. The SQS DLQ enforces SSL in transit."
+      "Deliveries that fail after retries are captured in an Amazon SQS dead-letter queue for inspection and redrive. The DLQ covers delivery failures only: once the runtime has acknowledged, a failure in the background agent work is logged and is not retried. Delivery is at-least-once and the pattern does no deduplication; the rule forwards the EventBridge event ID so production code can use it as an idempotency key.",
+      "IAM permissions follow least privilege: the AgentCore Runtime execution role grants only ecr:BatchGetImage and ecr:GetDownloadUrlForLayer to the specific ECR repository, scoped CloudWatch Logs and X-Ray permissions, and bedrock:InvokeModel limited to foundation models and inference profiles. The EventBridge rule's target role has only events:InvokeApiDestination on the specific API Destination. The SQS DLQ enforces SSL in transit."
     ]
   },
   "gitHub": {
@@ -83,12 +83,20 @@
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html"
       },
       {
+        "text": "Handle asynchronous and long running agents with AgentCore Runtime",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-long-run.html"
+      },
+      {
         "text": "AgentCore Runtime inbound JWT authorizer",
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html"
       },
       {
         "text": "Cognito machine-to-machine authorization (client credentials grant)",
         "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html"
+      },
+      {
+        "text": "Asynchronous patterns for calling Amazon Bedrock AgentCore agents in serverless pipelines",
+        "link": "https://aws.amazon.com/blogs/machine-learning/asynchronous-patterns-for-calling-amazon-bedrock-agentcore-agents-in-serverless-pipelines/"
       }
     ]
   },
@@ -108,7 +116,10 @@
   },
   "cleanup": {
     "headline": "Cleanup",
-    "text": ["cd cdk", "cdk destroy"]
+    "text": [
+      "cd cdk",
+      "cdk destroy"
+    ]
   },
   "authors": [
     {

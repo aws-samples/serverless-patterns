@@ -27,8 +27,14 @@ import { Construct } from 'constructs';
  * 1. ASYNC execution: API Destinations enforce a hard 5-second timeout on
  *    target responses. Agent reasoning takes far longer than 5 seconds, so
  *    the AgentCore Runtime must acknowledge the request immediately (HTTP 2xx)
- *    and continue processing in the background (async invocation mode).
- *    See agent-code/agent.py for the entrypoint implementation.
+ *    and continue processing in the background. The background work is
+ *    registered with @app.async_task so the runtime reports HealthyBusy
+ *    and stays alive until it finishes. See agent-code/agent.py.
+ *
+ *    Consequence: EventBridge treats the event as delivered once the ack is
+ *    returned. The DLQ below captures DELIVERY failures only (401/403, 5xx,
+ *    timeouts). Failures inside the background agent work are logged by
+ *    the runtime and are not retried or sent to the DLQ.
  *
  * 2. URL encoding gotcha: API Destinations automatically decode %XX sequences
  *    in the endpoint URL. A URL-encoded runtime ARN in the path (which
@@ -42,6 +48,18 @@ import { Construct } from 'constructs';
  *    token endpoint; the AgentCore Runtime validates the JWT via its inbound
  *    identity (customJwtAuthorizer), configured at creation time against the
  *    same Cognito user pool — no two-step deploy required.
+ *
+ * Production hardening not included in this minimal pattern:
+ * - Idempotency: EventBridge delivery is at-least-once, so the agent can
+ *   receive the same event more than once. The rule forwards the event ID
+ *   as "eventId"; check it against an idempotency store (for example
+ *   Amazon DynamoDB) before performing side effects.
+ * - Alarms: add an Amazon CloudWatch alarm on the DLQ's
+ *   ApproximateNumberOfMessagesVisible metric so failed deliveries are
+ *   noticed.
+ * - Background outcomes: report agent success or failure durably (a
+ *   follow-up EventBridge event, a DynamoDB record, or a Step Functions
+ *   task-token callback) so failed processing can be inspected and redriven.
  */
 export class EventBridgeAgentCoreStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -192,7 +210,14 @@ export class EventBridgeAgentCoreStack extends cdk.Stack {
             new iam.PolicyStatement({
               sid: 'BedrockModelInvocation',
               actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
-              resources: ['arn:aws:bedrock:*::foundation-model/*', `arn:aws:bedrock:${this.region}:${this.account}:*`],
+              resources: [
+                // Foundation models in any Region: a cross-Region inference
+                // profile routes the request to a model in another Region.
+                'arn:aws:bedrock:*::foundation-model/*',
+                // Account-level resources are limited to inference profiles,
+                // not every Bedrock resource in the account.
+                `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/*`,
+              ],
             }),
           ],
         }),
@@ -249,6 +274,9 @@ export class EventBridgeAgentCoreStack extends cdk.Stack {
     });
 
     // Failed deliveries (after retries) land here for inspection/redrive.
+    // This covers delivery failures only: once the runtime returns its 2xx
+    // ack, a failure in the background agent work never reaches this queue.
+    // Production: add a CloudWatch alarm on ApproximateNumberOfMessagesVisible.
     const dlq = new sqs.Queue(this, 'DeliveryDlq', {
       queueName: 'agentcore-invoke-dlq',
       retentionPeriod: cdk.Duration.days(14),
@@ -273,6 +301,8 @@ export class EventBridgeAgentCoreStack extends cdk.Stack {
         // Shape the payload the agent receives. AgentCore Runtime expects a
         // JSON body; the "prompt" key is what a typical agent entrypoint
         // reads. Adjust to match your agent's input contract.
+        // eventId is the EventBridge event ID. Delivery is at-least-once,
+        // so use it as the idempotency key in production.
         event: events.RuleTargetInput.fromObject({
           prompt: events.EventField.fromPath('$.detail.prompt'),
           orderId: events.EventField.fromPath('$.detail.orderId'),
