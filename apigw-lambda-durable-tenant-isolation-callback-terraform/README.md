@@ -1,4 +1,4 @@
-# Serverless multi-tenant workflow with external callback using Lambda durable functions
+# Serverless multi-tenant workflow with external callback using AWS Lambda durable functions
 
 ![architecture](architecture/architecture.png)
 
@@ -10,7 +10,7 @@ Multiple tenants can have workflows suspended simultaneously. Each tenant's exec
 
 The combination of durable execution and tenant isolation is essential for this use case. During the suspension period, tenant-specific data from Step 1 — such as cached configuration, validated credentials, or computed intermediate results — remains in the execution environment's memory. Without per-tenant isolation, a different tenant's invocation could be routed to that same environment during the wait, exposing the suspended tenant's in-memory state. Without durable execution, the function cannot suspend and resume across the wait boundary, forcing you to externalize all intermediate state to a database and build a separate mechanism to trigger resumption.
 
-Please note that this pattern deploys API Gateway endpoints with no authorization. Production deployments should secure all endpoints with an appropriate authorization mechanism such as AWS IAM authorization, Amazon Cognito user pools, or API key usage plans.
+Please note that this pattern deploys Amazon API Gateway endpoints with no authorization. Production deployments should secure all endpoints with an appropriate authorization mechanism such as AWS IAM authorization, Amazon Cognito user pools, or API key usage plans.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-durable-tenant-isolation-callback-terraform
 
@@ -52,8 +52,8 @@ Important: this application uses various AWS services and there are costs associ
     var.aws_region
     - Enter a value: {enter the region for deployment, e.g. us-west-2}
 
-    var.prefix
-    - Enter a value: {enter any prefix to associate with resources, or press Enter for default "durable-tenant"}
+    `var.prefix` is not prompted — it defaults to `durable-tenant`. To override it,
+    pass `-var="prefix=your-prefix"` or set it in a `terraform.tfvars` file.
 
 7. Note the outputs from the Terraform deployment process. These contain the endpoint URLs used for testing.
 
@@ -65,7 +65,7 @@ This pattern addresses a common SaaS requirement: processing tenant requests tha
 
 2. **Step 1 executes and checkpoints** — The workflow function validates the request (e.g., checks business rules, caches tenant configuration) and creates a checkpoint. This step will not re-execute if the function is interrupted or resumed later.
 
-3. **Workflow suspends** — The function calls `waitForCallback`, which suspends execution at zero compute cost. A callback token is logged to CloudWatch. In production, this token would be sent to the external system (payment provider, approval system, etc.).
+3. **Workflow suspends** — The function calls `waitForCallback`, which suspends execution at zero compute cost. A callback token is logged to Amazon CloudWatch. In production, this token would be sent to the external system (payment provider, approval system, etc.).
 
 4. **External confirmation arrives** — The external system sends the callback token and result payload to the `/callback` endpoint. This triggers the workflow to resume from its checkpoint.
 

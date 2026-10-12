@@ -63,7 +63,8 @@ resource "aws_iam_role_policy" "callback_policy" {
         "lambda:SendDurableExecutionCallbackFailure",
         "lambda:SendDurableExecutionCallbackHeartbeat"
       ]
-      Resource = "*"
+      # Least privilege: scope to this account/Region's functions for this pattern
+      Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${var.prefix}-*"
     }]
   })
 }
