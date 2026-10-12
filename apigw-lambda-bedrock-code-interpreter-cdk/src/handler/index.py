@@ -84,25 +84,16 @@ Return ONLY the Python code, no explanation. No markdown code fences."""
                 },
             )
 
-            # Parse EventStream response
+            # Parse the EventStream response. InvokeCodeInterpreter returns the stream
+            # under 'stream' (not 'body'); each 'result' event carries stdout and stderr.
             result_text = ''
             error_text = ''
-            event_stream = exec_response.get('body', {})
-            for event in event_stream:
-                if 'chunk' in event:
-                    chunk = event['chunk']
-                    sc = chunk.get('structuredContent', {})
-                    if sc.get('stdout'):
-                        result_text += sc['stdout']
-                    if sc.get('stderr'):
-                        error_text += sc['stderr']
-                elif 'result' in event:
-                    r = event['result']
-                    sc = r.get('structuredContent', {})
-                    if sc.get('stdout'):
-                        result_text += sc['stdout']
-                    if sc.get('stderr'):
-                        error_text += sc['stderr']
+            for stream_event in exec_response.get('stream', []):
+                sc = stream_event.get('result', {}).get('structuredContent', {})
+                if sc.get('stdout'):
+                    result_text += sc['stdout']
+                if sc.get('stderr'):
+                    error_text += sc['stderr']
 
             stdout = result_text or 'Code executed successfully (no stdout output)'
             stderr = error_text
