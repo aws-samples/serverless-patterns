@@ -43,6 +43,18 @@ import { Construct } from 'constructs';
  * Context values:
  *   -c dashboardAccessIp=1.2.3.4/32   grant Dashboards access to a CIDR
  *   -c enableTransform=false          index the raw EventBridge envelope
+ *
+ * Production hardening not included in this minimal pattern:
+ * - The rule target has no DLQ. After EventBridge's default retry policy
+ *   (24 hours, 185 attempts) a record Firehose keeps rejecting is dropped.
+ *   Add an Amazon SQS deadLetterQueue and retryAttempts to the target.
+ * - EventBridge delivery is at-least-once, so the same event can reach
+ *   Firehose twice and be indexed as two documents. (Firehose's own
+ *   retries keep a stable document ID, so they do not duplicate.) The
+ *   EventBridge event ID is kept in the document's `id` field for
+ *   deduplication at query time.
+ * - No alarms. Add Amazon CloudWatch alarms on the Firehose
+ *   DeliveryToAmazonOpenSearchService.Success metric and on DLQ depth.
  */
 export class EventBridgeOpenSearchStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -165,7 +177,7 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
         volumeSize: 20,
         volumeType: ec2.EbsDeviceVolumeType.GP3,
       },
-      // Single node, so no zone awareness and no dedicated master.
+      // Single node, so no zone awareness and no dedicated cluster manager nodes.
       zoneAwareness: { enabled: false },
       enforceHttps: true,
       nodeToNodeEncryption: true,
@@ -378,6 +390,9 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
       },
     });
 
+    // No deadLetterQueue here, to keep the pattern minimal. Without one, an
+    // event Firehose keeps rejecting is dropped once EventBridge's default
+    // retry policy is exhausted. See "Production hardening" above.
     rule.addTarget(new targets.FirehoseDeliveryStream(deliveryStream));
 
     // Imported constructs carry no dependency edge of their own.

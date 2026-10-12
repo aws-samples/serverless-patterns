@@ -1,8 +1,8 @@
 # Amazon EventBridge to Amazon OpenSearch via Amazon Data Firehose
 
-This pattern gives you **full-text search over every event on an EventBridge bus**, usually within about 60 seconds of emission. A catch-all rule captures all events on a custom bus and streams them to an OpenSearch domain through Amazon Data Firehose, where OpenSearch Dashboards makes them searchable, filterable, and chartable.
+This pattern gives you **full-text search over every event on an EventBridge bus**, usually within about 60 seconds of emission. A catch-all rule captures all events on a custom bus and streams them to an Amazon OpenSearch Service domain through Amazon Data Firehose, where OpenSearch Dashboards makes them searchable, filterable, and chartable.
 
-CloudWatch metrics tell you *how many* events flowed. This tells you *what was in them*.
+Amazon CloudWatch metrics tell you *how many* events flowed. This tells you *what was in them*.
 
 ![Architecture](architecture.png)
 
@@ -40,9 +40,9 @@ Because the rule is a catch-all, you get this for every event on the bus without
 2. A catch-all rule matches the event. The pattern is `{"source": [{"prefix": ""}]}` — every EventBridge event carries a `source`, so an empty prefix matches all of them. An entirely empty pattern is rejected by EventBridge.
 3. The rule's IAM role calls `firehose:PutRecord` on the delivery stream.
 4. Firehose buffers for **60 seconds or 1 MB**, whichever comes first. This is the minimum Firehose allows and it defines the latency of the pattern.
-5. A Lambda transform flattens each EventBridge envelope (see below).
+5. An AWS Lambda transform flattens each EventBridge envelope (see below).
 6. Firehose signs its request with SigV4 using its delivery role and indexes each document into `events-YYYY-MM-DD`.
-7. Every document is also written to the S3 bucket under `events/`. Records that fail to transform or deliver land under `errors/`.
+7. Every document is also written to the Amazon S3 bucket under `events/`. Records that fail to transform or deliver land under `errors/`.
 
 ### What the transform does
 
@@ -196,6 +196,21 @@ PUT _index_template/events
 
 The field names here match the flattened output of the transform. If you deploy with `-c enableTransform=false`, map `detail-type` and `detail.*` instead.
 
+## Delivery semantics
+
+Each hop retries on its own, and each has a failure mode worth knowing before you rely on the index:
+
+- **EventBridge → Firehose.** The rule target has no dead-letter queue. If Firehose rejects the record (for example, when throttled), EventBridge retries with its default policy, for up to 24 hours and 185 attempts, and then drops the event.
+- **Firehose → OpenSearch.** Firehose retries delivery for 300 seconds. Documents still failing after that are written to S3 under `errors/`, and the failure is logged to `FirehoseLogGroup`. They are not replayed into OpenSearch automatically.
+- **Duplicates.** EventBridge delivery is at-least-once, so the same event can reach Firehose twice and is then indexed as two documents. Firehose's own retries do not cause this: with the default document ID option, Firehose keeps the same document ID across delivery attempts. Each document stores the EventBridge event ID in its `id` field, so you can deduplicate at query time, for example with `collapse` on `id`.
+- **No alarms.** Nothing notifies you when deliveries fail. You have to check the log group or the `errors/` prefix.
+
+These are deliberate omissions to keep the pattern minimal. For production:
+
+- Add an Amazon SQS dead-letter queue and a retry policy to the rule target.
+- Add CloudWatch alarms on the Firehose `DeliveryToAmazonOpenSearchService.Success` metric and on the DLQ's `ApproximateNumberOfMessagesVisible` metric.
+- Plan how records under `errors/` get redriven, for example with a Lambda function that re-submits them to the delivery stream.
+
 ## Cleanup
 
 ```bash
@@ -213,7 +228,7 @@ For a low-volume demo the domain dominates the bill:
 - Data Firehose: $0.029 per GB ingested
 - Lambda transform, EventBridge, and S3: negligible at demo volume
 
-Destroy the stack when you are done. For production, size the domain to your retention and query load, move to Multi-AZ with a dedicated master, and consider UltraWarm for older indices.
+Destroy the stack when you are done. For production, size the domain to your retention and query load, move to Multi-AZ with dedicated cluster manager nodes, and consider UltraWarm for older indices.
 
 ---
 

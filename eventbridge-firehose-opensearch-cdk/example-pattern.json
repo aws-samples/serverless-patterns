@@ -64,7 +64,8 @@
       "Firehose buffers for 60 seconds or 1 MB, whichever comes first. That buffer is the floor Firehose allows and it sets the end-to-end latency of the pattern.",
       "Before indexing, a Lambda transform flattens the EventBridge envelope: detail-type is renamed to detail_type so it needs no escaping in queries, and the fields inside detail are promoted to the top level so a dashboard can filter on claimId rather than detail.claimId. Envelope fields win on collision, so a business payload carrying its own source key is indexed as detail_source instead of masking the real event source.",
       "Documents land in a daily-rotated index, events-YYYY-MM-DD, and every document is also written to an S3 bucket, which makes that bucket an audit trail rather than only a dead letter destination.",
-      "Firehose authenticates to OpenSearch with SigV4 using its delivery role. A managed domain authorizes each request against its own access policy, so the role is granted access on both sides: an identity policy on the role and a domain access policy naming that role as principal."
+      "Firehose authenticates to OpenSearch with SigV4 using its delivery role. A managed domain authorizes each request against its own access policy, so the role is granted access on both sides: an identity policy on the role and a domain access policy naming that role as principal.",
+      "EventBridge delivery is at-least-once, so an event can occasionally be indexed twice; each document keeps the EventBridge event ID in its id field for deduplication at query time. The pattern adds no dead-letter queue on the rule target and no alarms. The README lists what to add for production."
     ]
   },
   "gitHub": {
@@ -116,7 +117,10 @@
   },
   "cleanup": {
     "headline": "Cleanup",
-    "text": ["cd cdk", "cdk destroy"]
+    "text": [
+      "cd cdk",
+      "cdk destroy"
+    ]
   },
   "authors": [
     {
