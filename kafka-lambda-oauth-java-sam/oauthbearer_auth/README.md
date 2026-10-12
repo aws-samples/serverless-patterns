@@ -1,175 +1,164 @@
-# kafka-lambda-oauth-java-sam / oauthbearer_auth
-# Java AWS Lambda consumer for a self-managed Apache Kafka cluster with OAuth (SASL/OAUTHBEARER) authentication
+# Java AWS Lambda consumer for Apache Kafka with OAuth authentication through Amazon Cognito
 
-A Lambda function consumes from a **self-managed Apache Kafka** cluster (3 brokers on Amazon EC2, KRaft mode) that authenticates clients with **SASL/OAUTHBEARER**, using an **Amazon Cognito User Pool** as the OAuth 2.0 identity provider. The function parses each Kafka message and writes its fields plus the Kafka metadata to **Amazon DynamoDB**.
+This serverless pattern shows how to deploy and run an AWS Lambda function, written in Java, with an Apache Kafka event source that uses OAuth 2.0 authentication through an external identity provider.
 
-It is the self-managed-Kafka + OAuth counterpart of the [`msk-lambda-iam-java-sam`](https://github.com/aws-samples/serverless-patterns/tree/main/msk-lambda-iam-java-sam) pattern (Amazon MSK with IAM auth).
-
-> This is the `oauthbearer_auth` variant. Its siblings for the other self-managed Kafka event-source auth types (`iam_auth`, `iam_oauthbearer_auth`) sit alongside it under `kafka-lambda-oauth-java-sam`.
-
-Files and folders:
-
-- `kafka_event_consumer_function/src/main/java` - Code for the application's Lambda function (parses each Kafka message and writes it to DynamoDB).
-- `kafka_event_consumer_function/src/test/java` - Unit tests for the application code.
-- `kafka_json_apps` - Standalone Java producer/consumer sample apps (Datafaker JSON) used from the client EC2 instance.
-- `scripts` - Helper scripts installed on the client EC2 instance (token refresh, admin/producer/consumer, negative tests).
-- `events` - Invocation events you can use to invoke the function locally.
-- `template_original.yaml` - SAM template for the function, its `OAUTHBEARER_AUTH` event source mapping, and the DynamoDB table. The client's UserData writes `template.yaml` from it with this environment's values.
-- `scripts/deploy_lambda_oauth_cli.sh` - Deploys the Lambda function and its self-managed Kafka OAUTHBEARER event source via the AWS CLI.
-- `KafkaBrokersCognitoClientEC2.yaml` - A CloudFormation template that deploys the self-managed Kafka cluster (3 broker EC2 instances), an Amazon Cognito User Pool, and a client EC2 machine with all pre-requisites installed, so you can build, deploy and test the Lambda function.
-
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+The function consumes records from a self-managed Apache Kafka cluster using SASL/OAUTHBEARER authentication with an external OAuth 2.0 identity provider. Amazon Cognito acts as the provider: the event source mapping obtains access tokens with the client credentials grant, using the `OAUTHBEARER_AUTH` authentication type, and the brokers validate them against the user pool's JSON Web Key Set (JWKS).
 
 ## Architecture
 
 ![Architecture diagram](architecture.png)
 
+- A three-broker Apache Kafka cluster (KRaft mode) on Amazon EC2 in private subnets, accepting SASL/OAUTHBEARER over TLS.
+- An Amazon Cognito user pool that issues access tokens to the AWS Lambda poller and the sample clients.
+- AWS Secrets Manager secrets holding the poller's client credentials and the brokers' CA certificate.
+- An Amazon EC2 client instance with the Kafka tools, the AWS SAM CLI, and this pattern's scripts preinstalled.
+- An AWS Lambda function with a self-managed Apache Kafka event source (`OAUTHBEARER_AUTH`, `OAUTHBEARER_SCOPE`, `SERVER_ROOT_CA_CERTIFICATE`) in the VPC.
+- An Amazon DynamoDB table that receives one item per Kafka record.
+
+Each record the producer sends is delivered to the AWS Lambda function in batches. The function logs every record to Amazon CloudWatch Logs and stores its fields, together with the Kafka topic, partition, and offset, in Amazon DynamoDB.
+
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* Your account must be **allowlisted** for the self-managed Kafka event-source `OAUTHBEARER_AUTH` type (the CLI deploy step depends on it).
+- An AWS account and an IAM principal with permissions to create the resources in `KafkaBrokersCognitoClientEC2.yaml`, including named IAM roles.
+- The [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), if you deploy the template from the command line. Everything else, including the AWS SAM CLI and the Java toolchain, is installed on the Amazon EC2 client instance.
 
-## Run the CloudFormation template to create the Kafka cluster, Cognito User Pool and client EC2 machine
+## Files
 
-Deploy `KafkaBrokersCognitoClientEC2.yaml` from the AWS CloudFormation console (or CLI). There are **no password parameters** - the three role users' passwords are generated into AWS Secrets Manager. You may optionally override the usernames (`AdminUsername`, `ProducerUsername`, `ConsumerUsername`), the Java version, the Kafka download URL, the topic name, and (when deploying from your own fork) `ServerlessLandGithubLocation` and `ServerlessLandGithubBranch`. Put only the repository URL in `ServerlessLandGithubLocation` and the branch name in `ServerlessLandGithubBranch` (default `main`) - don't append `-b <branch>` to the URL.
+| File | Description |
+|---|---|
+| `KafkaBrokersCognitoClientEC2.yaml` | AWS CloudFormation template that creates the VPC, the Kafka brokers, the Amazon Cognito user pool and app clients, the AWS Secrets Manager secrets, and the Amazon EC2 client instance. |
+| `template_original.yaml` | AWS SAM template for the AWS Lambda function, its Apache Kafka event source, and the Amazon DynamoDB table. At boot, the client instance writes `template.yaml` from it with this environment's values. |
+| `events/event.json` | Sample Kafka event for `sam local invoke`. |
+| `kafka_event_consumer_function/src/main/java/.../HandlerMSK.java` | AWS Lambda function handler. Decodes each Kafka record and writes its fields to Amazon DynamoDB. |
+| `kafka_event_consumer_function/pom.xml` | Maven build file for the AWS Lambda function. |
+| `kafka_json_apps/src/main/java/.../KafkaJsonProducer.java` | Producer that publishes sample JSON records to the topic. |
+| `kafka_json_apps/src/main/java/.../KafkaJsonConsumer.java` | Consumer that reads the topic, for testing the cluster without AWS Lambda. |
+| `scripts/deploy_lambda_oauth_cli.sh` | Deploys the AWS Lambda function and its event source with the AWS CLI, as an alternative to AWS SAM. |
+| `scripts/teardown_lambda_cli.sh` | Deletes the resources that the AWS CLI deploy script created. |
+| `scripts/producer_send.sh` | Sends sample JSON records to a topic. |
+| `scripts/consumer_receive.sh` | Reads records from a topic. |
+| `scripts/admin_create_topic.sh` | Creates the topic and its access rules. The client instance runs it at boot. |
+| `scripts/local_dynamodb.sh` | Starts DynamoDB Local for `sam local invoke`. The client instance runs it at boot. |
+| `scripts/bad_invalid_credentials.sh`, `scripts/bad_unauthorized_operations.sh` | Negative tests that show the cluster rejecting invalid credentials and unauthorized operations. |
+| `architecture.png` | Architecture diagram. |
 
-Wait for the stack to reach `CREATE_COMPLETE`. It creates a VPC (1 public / 3 private subnets, NAT), 3 Kafka broker EC2 instances, an Amazon Cognito User Pool (+ domain, resource server, `client_credentials` app client, and three users), and a client EC2 instance with Java, Maven, Docker, the AWS CLI, the AWS SAM CLI, Kafka CLI tools, the built producer/consumer apps and the helper scripts installed.
+## Deploy the AWS CloudFormation template
 
-* [Connect to the client EC2 machine] - Once the stack is created, go to the EC2 console, select `KafkaClientInstance`, and use **"Connect using EC2 Instance Connect"**. (The private brokers have no public IP - reach them, if needed, with **"Connect using EC2 Instance Connect Endpoint"**.) The stack doesn't reach `CREATE_COMPLETE` until the client's UserData has finished (downloading Kafka, building the apps, creating the topic and ACLs) and signalled CloudFormation, so the client is ready as soon as the stack is. If setup fails, the stack fails too - see `/var/log/kafka-client-setup.log` on the instance, or the stack events.
-
-* [Check the topic + ACL bootstrap] - On the client instance (in `/home/ec2-user`) run `cat bootstrap_acls_output.txt`. You should see the topic created and the producer/consumer ACLs applied. If it shows an error (e.g. the brokers were not ready yet), re-run `bash scripts/admin_create_topic.sh $KAFKA_TOPIC`.
-
-## Authentication and authorization model
-
-| Role | Cognito user (default) | Kafka principal | Allowed |
-|---|---|---|---|
-| Admin | `kafka-admin` | `User:kafka-admin` | Super user - create topics/partitions, manage ACLs |
-| Producer | `kafka-producer` | `User:kafka-producer` | `WRITE` to topics only |
-| Consumer | `kafka-consumer` | `User:kafka-consumer` | `READ` from topics + `READ` on consumer groups |
-| Lambda poller | `client_credentials` app client | `User:<client-id>` | Super user (machine identity for the event source) |
-
-Each user's password is generated into Secrets Manager. `scripts/refresh_token.sh <role>` fetches that role's password, exchanges it for a Cognito access token (`USER_PASSWORD_AUTH`), and writes a per-role `client.properties`:
-
-```properties
-bootstrap.servers=<broker IPs:9092>
-security.protocol=SASL_SSL
-sasl.mechanism=OAUTHBEARER
-ssl.truststore.location=<PKCS12 truststore>
-ssl.truststore.password=changeit
-ssl.truststore.type=PKCS12
-sasl.login.callback.handler.class=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
-sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.access.token="<JWT>" ;
-```
-
-## Test the cluster with the producer, consumer and admin clients
-
-From `/home/ec2-user` on the client EC2 instance:
-
-* **Admin - create a topic** (only the admin user is authorized):
-  ```bash
-  bash scripts/admin_create_topic.sh <topic-name> [partitions]
-  ```
-* **Producer - send Faker-generated JSON** (`firstName`, `lastName`, `streetAddress`, `apartmentNumber`, `city`, `state`, `zip`, `phoneNumber`, `email`):
-  ```bash
-  bash scripts/producer_send.sh <topic-name> <number-of-messages>
-  ```
-* **Consumer - receive and pretty-print each message**:
-  ```bash
-  bash scripts/consumer_receive.sh <topic-name> [group-id]
-  ```
-
-### Negative tests (bad actors)
-
-* Invalid credentials / token: `bash scripts/bad_invalid_credentials.sh`
-* Valid user, unauthorized operation (producer creates a topic, consumer produces, producer consumes - all denied): `bash scripts/bad_unauthorized_operations.sh [topic-name]`
-
-## Deploy the Lambda consumer
-
-### Deploy with AWS SAM
-
-The client's UserData already wrote `template.yaml` from `template_original.yaml`, filling in the broker endpoints, subnets, security group, topic, and the ARNs of two secrets the CloudFormation stack owns:
-
-* `<stack-name>-poller-oauth-creds` holds the poller app client's `oauthClientId`, `oauthClientSecret` and `oauthTokenEndpointUrl`, built from the Cognito resources at stack creation.
-* `<stack-name>-broker-ca` holds the brokers' self-signed certificate in its `certificate` field. The client writes it at boot from `/home/ec2-user/kafka.crt`.
-
-Build and deploy from this directory on the client EC2 instance, accepting the defaults at every prompt:
+Deploy `KafkaBrokersCognitoClientEC2.yaml` from the [AWS CloudFormation console](https://console.aws.amazon.com/cloudformation/) (**Create stack** > **With new resources** > **Upload a template file**, then acknowledge the creation of named IAM resources), or from the AWS CLI on your machine:
 
 ```bash
-# AWS_REGION and STACK_NAME are read from ~/kafka_oauth.env, written at boot
+aws cloudformation deploy \
+  --template-file KafkaBrokersCognitoClientEC2.yaml \
+  --stack-name kafka-oauth-java \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --s3-bucket <amzn-s3-bucket-in-the-same-region>
+```
+
+The `JavaVersion` parameter selects the AWS Lambda runtime (default `java21`). To clone a fork or branch of this repository onto the client instance, set `ServerlessLandGithubLocation` and `ServerlessLandGithubBranch`. Pass parameters with `--parameter-overrides`, for example `--parameter-overrides JavaVersion=java21`.
+
+`KafkaBrokersCognitoClientEC2.yaml` is larger than the 51,200-byte limit for inline templates, so the AWS CLI uploads it to the Amazon S3 bucket you name in `--s3-bucket`. The AWS CloudFormation console handles this for you.
+
+The stack reaches `CREATE_COMPLETE` only after the brokers and the client instance have finished setting up.
+
+## Connect to the Amazon EC2 client instance
+
+When the stack reaches `CREATE_COMPLETE`, open the [Amazon EC2 console](https://console.aws.amazon.com/ec2/), select the instance named **KafkaClientInstance**, choose **Connect**, and connect with **EC2 Instance Connect**.
+
+The client instance has already created the Kafka topic and written `template.yaml` with this stack's values. Your shell loads the environment from `~/kafka_oauth.env`, including `STACK_NAME`, `KAFKA_TOPIC`, and `AWS_REGION`.
+
+## Deploy the AWS Lambda function
+
+Choose one of the following options.
+
+### Option A: AWS SAM
+
+```bash
 cd ~/serverless-patterns/kafka-lambda-oauth-java-sam/oauthbearer_auth
 sam build
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region "$AWS_REGION" --stack-name "$STACK_NAME-sam" --guided
+sam deploy --guided --stack-name "$STACK_NAME-sam"
 ```
 
-The template creates the DynamoDB table (`<stack-name>-sam-messages`) and the event source mapping with `OAUTHBEARER_AUTH`, `OAUTHBEARER_SCOPE` (`kafka/consume`), `SERVER_ROOT_CA_CERTIFICATE`, and the VPC subnets and security group. SAM grants the execution role `secretsmanager:GetSecretValue` on both secrets and the network-interface permissions on its own.
+Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets.
 
-SAM support for these authentication types arrived in SAM translator 1.114.0. CloudFormation runs that transform during `sam deploy`, so build and deploy work today, but the SAM CLI still bundles an older translator: skip `sam validate` until it catches up, because it rejects them.
+To test the function locally before you deploy, run `sam local invoke --event ./events/event.json` after `sam build`. The client instance runs DynamoDB Local at boot, and the function writes to it whenever it runs under `sam local`, so a local test never touches the deployed table.
 
-Wait for the event source mapping to reach `Enabled`:
+### Option B: AWS CLI script
 
 ```bash
+cd ~/serverless-patterns/kafka-lambda-oauth-java-sam/oauthbearer_auth/scripts
+bash ./deploy_lambda_oauth_cli.sh
+```
+
+## Send messages to the topic
+
+```bash
+cd ~/serverless-patterns/kafka-lambda-oauth-java-sam/oauthbearer_auth/scripts
+sh ./producer_send.sh $KAFKA_TOPIC 10
+```
+
+## Verify the AWS Lambda function received the messages
+
+Set `FN` to the name of the function you deployed:
+
+```bash
+# Option A (AWS SAM)
 FN=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME-sam" \
   --query "Stacks[0].Outputs[?OutputKey=='LambdaKafkaConsumerJavaFunction'].OutputValue" --output text)
-aws lambda list-event-source-mappings --function-name "$FN" \
-  --query 'EventSourceMappings[].[UUID,State,LastProcessingResult]' --output table
+
+# Option B (AWS CLI script)
+FN="$STACK_NAME-consumer"
 ```
 
-### Alternative: deploy with the AWS CLI
-
-`deploy_lambda_oauth_cli.sh` deploys the same consumer with `aws lambda create-event-source-mapping`, under its own names (`<stack-name>-consumer`, `<stack-name>-messages`) and with its own copies of the two secrets (`<stack-name>-consumer-oauth-creds`, `<stack-name>-consumer-broker-ca`). The commands below use the SAM names.
+Then read the function's logs in Amazon CloudWatch Logs. Each record appears as a `Received this message from Kafka` entry:
 
 ```bash
-bash scripts/deploy_lambda_oauth_cli.sh
+aws logs tail "/aws/lambda/${FN##*:}" --since 15m
 ```
 
-## Test the sample application end to end
+You can also open the `/aws/lambda/<function-name>` log group in the [Amazon CloudWatch console](https://console.aws.amazon.com/cloudwatch/).
 
-Produce some messages, then confirm the function consumed them and wrote them to DynamoDB:
+## Verify the records in Amazon DynamoDB
+
+The function writes one item per record to the table `<stack-name>-sam-messages` (Option A) or `<stack-name>-messages` (Option B). After sending 10 messages, the table holds 10 new items:
 
 ```bash
-bash scripts/producer_send.sh $KAFKA_TOPIC 10
+aws dynamodb scan --table-name "$STACK_NAME-sam-messages" --select COUNT    # Option A
+aws dynamodb scan --table-name "$STACK_NAME-messages" --select COUNT        # Option B
 ```
 
-* **CloudWatch Logs**: the function logs each Kafka message (topic, partition, offset, timestamp, timestampType, decoded key/value). A single invocation receives a batch of messages as a map keyed by `topic-partition`; the key and value of each message are base64-encoded and are decoded by the handler.
-* **DynamoDB**: check the `<stack-name>-sam-messages` table - each item is keyed by `topicPartition` (partition key) + `offset` (sort key) and carries the Kafka metadata plus each field of the JSON payload:
-  ```bash
-  aws dynamodb scan --table-name "$STACK_NAME-sam-messages" --max-items 5
-  ```
-
-## Test the function locally
-
-`sam local invoke` runs the function in a container on the client instance. A local run must not touch the real table, so test against [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) instead. When `sam local invoke` runs the function it sets `AWS_SAM_LOCAL=true`, and the handler then writes to `http://dynamodb-local:8000` rather than DynamoDB; deployed functions never see that variable.
-
-The client EC2 instance sets this up at boot: it starts DynamoDB Local in Docker on a network called `sam-local`, creates the template's table in it (`<stack-name>-sam-messages`), and sets `docker_network = "sam-local"` and `event = "events/event.json"` under `[default.local_invoke.parameters]` in `samconfig.toml` (`sam deploy --guided` keeps that section when it saves its own settings). So from this directory just run:
-
-```bash
-sam build
-sam local invoke
-```
-
-See what the function wrote with:
-
-```bash
-aws dynamodb scan --endpoint-url http://localhost:8000 --region "$AWS_REGION" --table-name "$STACK_NAME-sam-messages"
-```
-
-DynamoDB Local restarts with Docker and keeps its data in a Docker volume, so it survives an instance restart. If `sam local invoke` ever fails with `getaddrinfo ENOTFOUND dynamodb-local`, DynamoDB Local isn't running or `samconfig.toml` lost its local settings: run `bash scripts/local_dynamodb.sh`, which sets both up again and is safe to re-run. The boot run's output is in `~/local_dynamodb_output.txt`. To remove DynamoDB Local and its data: `docker rm -f dynamodb-local && docker volume rm dynamodb-local-data`.
+To browse the items, open the table in the [Amazon DynamoDB console](https://console.aws.amazon.com/dynamodbv2/) and choose **Explore table items**.
 
 ## Cleanup
 
-1. Delete the Lambda function the same way you created it. `sam delete` only removes what is in the SAM stack, and the teardown script only removes what the CLI script created, so use the one that matches your deploy:
-   * **Deployed with SAM** (`sam deploy`): `sam delete` removes the function, its event source mapping, its execution role, and the DynamoDB table. Use the stack name you gave `sam deploy` if it wasn't `"$STACK_NAME-sam"`.
+1. Delete the AWS Lambda function with the tool you deployed it with. Each tool removes only the resources it created.
+
+   - Option A (AWS SAM):
+
      ```bash
+     cd ~/serverless-patterns/kafka-lambda-oauth-java-sam/oauthbearer_auth
      sam delete --stack-name "$STACK_NAME-sam"
      ```
-   * **Deployed with the CLI script** (`scripts/deploy_lambda_oauth_cli.sh`): the teardown script removes the function, its event source mapping, its execution role, the DynamoDB table, and the two secrets it created (`<stack-name>-consumer-oauth-creds`, `<stack-name>-consumer-broker-ca`).
+
+   - Option B (AWS CLI script):
+
      ```bash
-     bash scripts/teardown_lambda_cli.sh
+     cd ~/serverless-patterns/kafka-lambda-oauth-java-sam/oauthbearer_auth/scripts
+     bash ./teardown_lambda_cli.sh
      ```
 
-2. Delete the CloudFormation stack (Kafka brokers, Cognito User Pool, client EC2, and the two secrets above) from the console. If deletion fails, retry with Force Delete - ENIs created by the Lambda event source in the VPC can delay VPC deletion.
+2. Delete the AWS CloudFormation stack from the console or from your machine:
 
-3. (Optional) Remove the Kafka download/cert cache bucket, which is created outside the stack and reused across redeploys:
+   ```bash
+   aws cloudformation delete-stack --stack-name kafka-oauth-java
+   ```
+
+3. Optionally, delete the Amazon S3 bucket the brokers use to cache the Kafka download and the broker certificate. It is created outside the stack and reused across deployments:
+
    ```bash
    aws s3 rb "s3://kafka-oauth-cache-$(aws sts get-caller-identity --query Account --output text)-<region>" --force
    ```
+
+----
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0
