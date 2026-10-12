@@ -1,0 +1,15 @@
+# Build / packaging artifacts (never committed)
+.aws-sam/
+build/
+*.zip
+
+# Trivy binary is fetched into the build context by deploy.sh at package time
+src/microvm-app/trivy
+
+# Holmes security-scan artifacts
+.holmes/
+
+# Local / editor
+.DS_Store
+__pycache__/
+*.pyc
