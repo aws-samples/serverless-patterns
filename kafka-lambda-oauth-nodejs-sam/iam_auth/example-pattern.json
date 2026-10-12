@@ -1,17 +1,16 @@
 {
-    "title": "AWS Lambda consumer for Amazon MSK via a self-managed Kafka event source with IAM_AUTH (Node.js)",
-    "description": "Creates a Lambda function that consumes from an Amazon MSK cluster (IAM auth) declared as a self-managed Kafka event source using the IAM_AUTH auth type; the consumer writes each message to DynamoDB.",
+    "title": "AWS Lambda consumer for Amazon MSK with IAM authentication (Node.js)",
+    "description": "The function consumes from an Amazon Managed Streaming for Apache Kafka (Amazon MSK) cluster that uses IAM access control. The cluster is attached as a self-managed Apache Kafka event source with the IAM_AUTH authentication type, so the event source mapping signs each connection with the function's execution role, and IAM policies grant access to the cluster, topic, and consumer group.",
     "language": "Node.js",
     "level": "300",
     "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern provisions a self-managed Apache Kafka cluster (3 brokers on 3 EC2 instances, KRaft mode) plus a 4th EC2 instance that acts as a Kafka client and SAM deployment host.",
-            "The CloudFormation template creates an Amazon MSK cluster with IAM authentication and a client EC2 instance. The Lambda event source is declared as SELF-MANAGED (not MSK) and pointed at the cluster's IAM bootstrap endpoint (:9098) with the IAM_AUTH auth type.",
-            "Authorization is by IAM policy: three IAM roles (admin/producer/consumer) give the interactive clients distinct kafka-cluster permissions, and the Lambda execution role is granted read access.",
-            "This deploys via the AWS CLI (scripts/deploy_lambda_iam_cli.sh) because AWS SAM does not support the IAM_AUTH self-managed event-source auth type yet. This is an under-development capability.",
-            "For detailed deployment instructions see the README.md"
+            "Amazon MSK with IAM authentication: the event source mapping signs each connection with the function's execution role (IAM_AUTH), and IAM policies authorize access to the cluster, topic, and consumer group.",
+            "The AWS CloudFormation template MSKAndClientEC2.yaml creates the Kafka cluster and an Amazon EC2 client instance; the AWS Lambda function and its event source are deployed with AWS SAM or the AWS CLI.",
+            "The function decodes each Kafka record, logs it to Amazon CloudWatch Logs, and writes its fields to Amazon DynamoDB.",
+            "For detailed deployment instructions, see the README.md."
         ]
     },
     "gitHub": {
@@ -19,7 +18,7 @@
             "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kafka-lambda-oauth-nodejs-sam/iam_auth",
             "templateURL": "serverless-patterns/kafka-lambda-oauth-nodejs-sam/iam_auth",
             "projectFolder": "kafka-lambda-oauth-nodejs-sam/iam_auth",
-            "templateFile": "template.yaml"
+            "templateFile": "template_original.yaml"
         }
     },
     "resources": {
@@ -29,21 +28,22 @@
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
             },
             {
-                "text": "Amazon Cognito User Pools OAuth 2.0 endpoints",
-                "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html"
+                "text": "Configuring cluster authentication methods in AWS Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-cluster-auth.html"
+            },
+            {
+                "text": "AWS SAM SelfManagedKafka event source",
+                "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html"
             },
             {
                 "text": "Apache Kafka SASL/OAUTHBEARER authentication",
                 "link": "https://kafka.apache.org/documentation/#security_sasl_oauthbearer"
-            },
-            {
-                "text": "Strimzi OAuth for Apache Kafka",
-                "link": "https://github.com/strimzi/strimzi-kafka-oauth"
             }
         ]
     },
     "deploy": {
         "text": [
+            "sam build",
             "sam deploy --guided"
         ]
     },
@@ -54,15 +54,15 @@
     },
     "cleanup": {
         "text": [
-            "Delete the SAM stack: <code>sam delete</code>.",
-            "Delete the CloudFormation stack that created the Kafka brokers, Cognito User Pool and client EC2 instance."
+            "Delete the AWS Lambda function: <code>sam delete</code>, or <code>scripts/teardown_lambda_cli.sh</code> if you deployed it with the AWS CLI.",
+            "Delete the AWS CloudFormation stack created from MSKAndClientEC2.yaml."
         ]
     },
     "authors": [
-      {
-        "name": "Indranil Banerjee",
-        "bio": "AWS - Senior Solutions Architect",
-        "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
-      }
+        {
+            "name": "Indranil Banerjee",
+            "bio": "AWS - Senior Solutions Architect",
+            "linkedin": "indranil-banerjee-b00a261"
+        }
     ]
-  }
+}

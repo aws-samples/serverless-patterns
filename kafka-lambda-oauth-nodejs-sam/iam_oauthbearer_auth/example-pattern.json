@@ -1,17 +1,16 @@
 {
-    "title": "AWS Lambda consumer for self-managed Apache Kafka with IAM Outbound (SASL/OAUTHBEARER) auth (Node.js)",
-    "description": "Creates a Lambda function that consumes from a self-managed Apache Kafka cluster on EC2, secured with SASL/OAUTHBEARER using AWS IAM Outbound Identity Federation (no external IdP) - the poller and clients present AWS-minted web-identity tokens.",
+    "title": "AWS Lambda consumer for self-managed Apache Kafka with OAuth through AWS IAM (Node.js)",
+    "description": "The function consumes from a self-managed Apache Kafka cluster on Amazon EC2 that authenticates clients with SASL/OAUTHBEARER, using tokens issued by AWS Identity and Access Management (IAM). With IAM outbound identity federation, the event source mapping obtains a signed web identity token for the function's execution role (IAM_OAUTHBEARER_AUTH); the brokers validate it against the account's AWS STS issuer and authorize the role through Kafka ACLs.",
     "language": "Node.js",
     "level": "300",
     "framework": "AWS SAM",
     "introBox": {
         "headline": "How it works",
         "text": [
-            "This pattern provisions a self-managed Apache Kafka cluster (3 brokers on 3 EC2 instances, KRaft mode) plus a 4th EC2 instance that acts as a Kafka client and SAM deployment host.",
-            "The Kafka brokers are configured for SASL/OAUTHBEARER, validating AWS-minted web-identity (OIDC) tokens against the AWS STS Outbound Identity Federation JWKS endpoint, with a required audience. There is no external identity provider.",
-            "The Lambda event source poller mints a web-identity token from its execution role (sts:GetWebIdentityToken) and presents it to the brokers. The interactive admin/producer/consumer clients assume dedicated IAM roles and mint their own tokens, so Kafka ACLs still distinguish them.",
-            "This deploys via the AWS CLI (scripts/deploy_lambda_oauth_cli.sh) using IAM_OAUTHBEARER_AUTH + OAUTHBEARER_AUDIENCE, since AWS SAM does not support these event-source auth types yet. This is an under-development capability.",
-            "For detailed deployment instructions see the README.md"
+            "Self-managed Apache Kafka with SASL/OAUTHBEARER using tokens issued by AWS IAM: through IAM outbound identity federation, the event source mapping obtains a web identity token for the function's execution role (IAM_OAUTHBEARER_AUTH), with no identity provider or secret.",
+            "The AWS CloudFormation template KafkaBrokersClientEC2.yaml creates the Kafka cluster and an Amazon EC2 client instance; the AWS Lambda function and its event source are deployed with AWS SAM or the AWS CLI.",
+            "The function decodes each Kafka record, logs it to Amazon CloudWatch Logs, and writes its fields to Amazon DynamoDB.",
+            "For detailed deployment instructions, see the README.md."
         ]
     },
     "gitHub": {
@@ -19,7 +18,7 @@
             "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kafka-lambda-oauth-nodejs-sam/iam_oauthbearer_auth",
             "templateURL": "serverless-patterns/kafka-lambda-oauth-nodejs-sam/iam_oauthbearer_auth",
             "projectFolder": "kafka-lambda-oauth-nodejs-sam/iam_oauthbearer_auth",
-            "templateFile": "template.yaml"
+            "templateFile": "template_original.yaml"
         }
     },
     "resources": {
@@ -29,21 +28,22 @@
                 "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
             },
             {
-                "text": "Amazon Cognito User Pools OAuth 2.0 endpoints",
-                "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html"
+                "text": "Configuring cluster authentication methods in AWS Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-cluster-auth.html"
+            },
+            {
+                "text": "AWS SAM SelfManagedKafka event source",
+                "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html"
             },
             {
                 "text": "Apache Kafka SASL/OAUTHBEARER authentication",
                 "link": "https://kafka.apache.org/documentation/#security_sasl_oauthbearer"
-            },
-            {
-                "text": "Strimzi OAuth for Apache Kafka",
-                "link": "https://github.com/strimzi/strimzi-kafka-oauth"
             }
         ]
     },
     "deploy": {
         "text": [
+            "sam build",
             "sam deploy --guided"
         ]
     },
@@ -54,15 +54,15 @@
     },
     "cleanup": {
         "text": [
-            "Delete the SAM stack: <code>sam delete</code>.",
-            "Delete the CloudFormation stack that created the Kafka brokers, Cognito User Pool and client EC2 instance."
+            "Delete the AWS Lambda function: <code>sam delete</code>, or <code>scripts/teardown_lambda_cli.sh</code> if you deployed it with the AWS CLI.",
+            "Delete the AWS CloudFormation stack created from KafkaBrokersClientEC2.yaml."
         ]
     },
     "authors": [
-      {
-        "name": "Indranil Banerjee",
-        "bio": "AWS - Senior Solutions Architect",
-        "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
-      }
+        {
+            "name": "Indranil Banerjee",
+            "bio": "AWS - Senior Solutions Architect",
+            "linkedin": "indranil-banerjee-b00a261"
+        }
     ]
-  }
+}
