@@ -14,7 +14,7 @@ Parameters:
     AllowedPattern: ^[a-zA-Z0-9-_]+$
     MaxLength: 64
     Description: >-
-      Name of the MicroVM image. Also used for the CloudWatch log group name
+      Name of the MicroVM image. Also used for the Amazon CloudWatch log group name
       (/aws/lambda-microvms/<ImageName>), and by deploy.sh and cleanup.sh to
       derive the stack name. Changing it replaces the image.
   ModelId:
@@ -151,9 +151,10 @@ Resources:
       # this path, so it is used as-is instead of a hand-picked action list that
       # would need updating whenever the service or Codex changes. It grants more
       # than inference: bedrock-mantle read actions, bearer-token authentication,
-      # Amazon Bedrock web search, and a conditional aws-marketplace:Subscribe that
-      # only applies when Amazon Bedrock itself is completing a third-party model
-      # subscription on the caller's behalf. Review the current policy document
+      # Amazon Bedrock web search, and conditional aws-marketplace:Subscribe and
+      # aws-marketplace:ViewSubscriptions that only apply when Amazon Bedrock
+      # itself is completing a third-party model subscription on the caller's
+      # behalf. Review the current policy document
       # before attaching it in an account with stricter requirements:
       # https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonBedrockMantleInferenceAccess.html
       #
@@ -168,14 +169,15 @@ Resources:
       # installed, and ReadOnlyAccess covers everything the agent reaches through
       # the AWS MCP Server. Adding it would widen the role for no caller.
       #
-      # This is a dependency on Codex, not on AWS. Amazon Bedrock offers the
-      # Responses API on both the bedrock-mantle and bedrock-runtime endpoints, and
-      # which one Codex's amazon-bedrock provider targets is decided by the Codex
-      # release, not by this template. If a Codex upgrade starts failing with
+      # The endpoint follows model_provider in codex-config.toml.tmpl. The
+      # built-in `amazon-bedrock` provider used here targets bedrock-mantle. Codex
+      # also ships a built-in `amazon-bedrock-runtime` provider for the
+      # bedrock-runtime endpoint; switching to it needs bedrock:InvokeModel (attach
+      # the AmazonBedrockLimitedAccess managed policy alongside the policy above)
+      # and global.-prefixed model IDs. If a Codex upgrade starts failing with
       #   not authorized to perform: bedrock:InvokeModel
-      # the provider has moved to bedrock-runtime, and the fix is to attach the
-      # AmazonBedrockLimitedAccess managed policy (or a bedrock:InvokeModel
-      # statement) alongside the policy above.
+      # while model_provider is still amazon-bedrock, the provider's endpoint has
+      # changed in that release and the same fix applies.
       ManagedPolicyArns:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonBedrockMantleInferenceAccess"
@@ -203,10 +205,14 @@ Resources:
     DependsOn: MicroVMExecutionRole
     Properties:
       Name: !Ref ImageName
-      # Base image name and version are platform-supplied values, so check the AWS
-      # Lambda MicroVMs documentation for the current ones before pinning newer.
+      # MicroVM base image: the Lambda-managed Amazon Linux 2023 OS the Dockerfile
+      # runs on (distinct from the container base image in the Dockerfile's FROM).
+      # BaseImageVersion is required here. Versions are deprecated and then expire,
+      # so list the current ones and bump this when a newer one is AVAILABLE:
+      #   aws lambda-microvms list-managed-microvm-image-versions \
+      #     --image-identifier arn:<partition>:lambda:<region>:aws:microvm-image:al2023-1
       BaseImageArn: !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
-      BaseImageVersion: "0"
+      BaseImageVersion: "1"
       BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
       CodeArtifact:
         Uri: !Sub "s3://${S3Bucket}/${S3Key}"

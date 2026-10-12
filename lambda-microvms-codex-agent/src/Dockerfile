@@ -1,11 +1,13 @@
-# The base image is pinned by the pattern and only changes when this line is
-# edited. The Python version itself is not significant: the image needs a
-# recent python3 for app.py and for the MCP proxy's virtual environment.
+# Container base image for the application. It runs on top of the Lambda-managed
+# MicroVM base image (Amazon Linux 2023), which is pinned separately in
+# template.yaml (BaseImageArn/BaseImageVersion). The tag tracks the Python 3.14
+# line, so patch releases arrive on rebuild. Before bumping the minor, confirm
+# mcp-proxy-for-aws-cli supports it (currently >=3.10,<3.15).
 FROM python:3.14-slim
 
 # The two third-party components are installed at their latest release by
 # default, so every rebuild picks up new Codex and proxy versions, including any
-# behaviour changes. For reproducible rebuilds, pin them by editing these two
+# behavior changes. For reproducible rebuilds, pin them by editing these two
 # defaults; they are the only place a version needs to change.
 #   CODEX_VERSION      "latest" or an x.y.z release (passed to the installer as CODEX_RELEASE)
 #   MCP_PROXY_VERSION  "latest" or an exact PyPI version such as 1.2.3
@@ -13,15 +15,20 @@ ARG CODEX_VERSION=latest
 ARG MCP_PROXY_VERSION=latest
 
 # git is not optional here: Codex refuses to run outside a Git repository unless
-# --skip-git-repo-check is passed, and /workspace is initialised as one below.
+# --skip-git-repo-check is passed, and /workspace is initialized as one below.
 # bubblewrap backs Codex's workspace-write sandbox on Linux. Codex ships a
 # bundled copy and warns on every run when it finds none on PATH; installing the
 # distro package silences that and uses the kernel-matched build.
+# procps provides `ps`, which the slim base image omits. Codex's background app
+# server runs `ps -p <pid> -o stat= -o lstart=` to record its own process, and
+# without it every `codex` command fails with "failed to invoke ps for
+# pid-managed app server" unless --no-daemon is passed.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         curl \
         ca-certificates \
         bubblewrap \
+        procps \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Codex CLI ────────────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@
 #   IMAGE_NAME   MicroVM image name; derives the stack name (default: codex-cli-agent)
 #   MICROVM_ID   terminate only this MicroVM (default: every MicroVM on the image)
 #   S3_BUCKET    artifact bucket (default: microvm-artifacts-<account>-<region>)
-#   KEEP_BUCKET  set to 1 to leave the bucket itself in place
+#   KEEP_BUCKET  set to 1 to leave the bucket itself in place (use when S3_BUCKET is a bucket you already own)
 #   FORCE        set to 1 to skip the confirmation prompt
 #
 # Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -72,7 +72,7 @@ if [ -n "${TARGETS}" ]; then
 else
     echo "  MicroVMs:        (none found)"
 fi
-echo "  CFN stack:       ${STACK_NAME}  (IAM roles, MicroVM image, log group)"
+echo "  CloudFormation:  ${STACK_NAME}  (IAM roles, MicroVM image, log group)"
 echo "  S3 artifacts:    s3://${S3_BUCKET}/deployments/"
 if [ "${KEEP_BUCKET:-0}" != "1" ]; then
     echo "  S3 bucket:       s3://${S3_BUCKET}  (set KEEP_BUCKET=1 to retain)"

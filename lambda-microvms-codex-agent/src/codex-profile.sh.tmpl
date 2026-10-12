@@ -1,7 +1,8 @@
 # Shell environment for Codex CLI inside the AWS Lambda MicroVM.
 #
-# Rendered by app.py to /etc/profile.d/codex-agent.sh at MicroVM start (see
-# codex-config.toml.tmpl for how placeholders are resolved). Interactive shells
+# Rendered by app.py to /etc/profile.d/codex-agent.sh at MicroVM start and on
+# every /run and /resume (see codex-config.toml.tmpl for how placeholders are
+# resolved). Interactive shells
 # opened through the SHELL_INGRESS connector are spawned by the shell agent and
 # do NOT inherit the image's ENV, so anything the shell needs has to be written
 # here and sourced from the bash init files.

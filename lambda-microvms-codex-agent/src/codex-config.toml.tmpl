@@ -11,7 +11,7 @@
 # Any line whose placeholder cannot be resolved is dropped rather than left
 # blank, so an unresolved Region falls back to the AWS SDK default chain instead
 # of silently targeting the wrong one. Make changes here in the template; the
-# rendered file is overwritten on every hook.
+# rendered file is overwritten at startup and on every /run and /resume hook.
 
 # Amazon Bedrock is a built-in provider. Authentication is AWS-native: no ChatGPT
 # sign-in, no OPENAI_API_KEY, no Amazon Bedrock API key. Codex resolves credentials
@@ -20,8 +20,8 @@
 model_provider = "amazon-bedrock"
 model = "__CODEX_MODEL__"
 
-# Codex's own sandbox, layered inside the MicroVM boundary. workspace-write lets
-# it edit files under /workspace but not the rest of the filesystem.
+# Codex's own sandbox, layered inside the MicroVM boundary. workspace-write
+# limits writes to /workspace and temporary directories.
 sandbox_mode = "workspace-write"
 
 [sandbox_workspace_write]

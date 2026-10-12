@@ -7,7 +7,7 @@ against Amazon Bedrock, authenticated through the execution role.
 
 This process has two jobs:
 
-1. Render the Codex configuration from the MicroVM environment before signalling
+1. Render the Codex configuration from the MicroVM environment before signaling
    readiness, and again on /run and /resume. Nothing about the Region is baked
    into the image: AWS_REGION is supplied by the platform (it is a reserved
    environment variable and cannot be set on the image), the model comes from
