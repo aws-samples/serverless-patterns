@@ -1,0 +1,58 @@
+{
+  "title": "Remote MCP server with an IAM-protected backend API on AWS Lambda Web Functions",
+  "description": "Run a remote MCP server as an AWS Lambda Web Function that calls an existing HTTP API on a second Web Function, protected with IamAuth and SigV4.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS CLI",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys two AWS Lambda Web Functions. The first is a remote MCP server that speaks MCP over Streamable HTTP at <code>/mcp</code>. The second is a plain HTTP API with no MCP code, standing in for a service you already run.",
+      "The API's endpoint uses the <code>IamAuth</code> auth type, so Lambda only forwards requests signed with AWS Signature Version 4 by a principal that has <code>lambda:InvokeWebFunctionEndpoint</code>. The MCP server signs each request with its own execution role, whose policy allows invoking only that endpoint. Lambda removes the <code>Authorization</code> header after validating the signature, so the API code does no authentication of its own.",
+      "The MCP server exposes two tools. <code>get_current_time</code> runs in the MCP server. <code>run_cpu_work</code> calls the API, which runs 1-20 seconds of SHA-256 hashing and streams a JSON line every second. The MCP server relays each line to the MCP client as a progress notification over a Server-Sent Events stream, and a client cancel closes the backend connection and stops the work.",
+      "Running the CPU work in its own function keeps the MCP server responsive and lets each function scale on its own. The MCP server endpoint uses the <code>ApplicationManaged</code> auth type, which makes it public. Add authentication to it before using this pattern outside a demo."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "mcp-server/index.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html"
+      },
+      {
+        "text": "Model Context Protocol",
+        "link": "https://modelcontextprotocol.io"
+      },
+      {
+        "text": "Signing AWS API requests with Signature Version 4",
+        "link": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Set a name prefix, <code>export STACK=lambda-web-mcp-server</code>, then deploy the API: <code>aws lambda-web deploy --name $STACK-cpu-api --code cpu-api --timeout-seconds 60</code>.",
+      "Switch its endpoint to IamAuth: <code>aws lambda-web update-web-function-endpoint --function-name $STACK-cpu-api --endpoint-name dev --auth-type IamAuth</code>.",
+      "See the GitHub repo for creating the MCP server's execution role and deploying the MCP server."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete both functions and their endpoints: <code>aws lambda-web delete-web-function --function-name $STACK-mcp</code> and <code>aws lambda-web delete-web-function --function-name $STACK-cpu-api</code>.",
+      "See the GitHub repo for removing the execution roles and log groups."
+    ]
+  },
+  "contributors": [
+    "content/contributors/julian-wood.json"
+  ]
+}

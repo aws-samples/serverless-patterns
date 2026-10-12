@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda Web Functions SSE Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      transition: background 0.3s;
+    }
+    .status-dot.connected { background: #22c55e; }
+    .main { padding: 1.5rem 2rem; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+    }
+    .card-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+    }
+    .card-value {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .card-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 0.25rem;
+    }
+    .card-value.green { color: #22c55e; }
+    .card-value.blue { color: #3b82f6; }
+    .card-value.amber { color: #f59e0b; }
+    .card-value.purple { color: #a855f7; }
+    .card-value.rose { color: #f43f5e; }
+    .card-value.cyan { color: #06b6d4; }
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 768px) {
+      .charts { grid-template-columns: 1fr; }
+    }
+    .chart-container {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+    }
+    .chart-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #cbd5e1;
+    }
+    canvas { width: 100% !important; }
+    .info-bar {
+      margin-top: 1.5rem;
+      padding: 1rem 1.5rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      font-size: 0.8rem;
+      color: #64748b;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .info-bar span { color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lambda Web Functions Real-Time Dashboard</h1>
+    <div class="status">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Connecting...</span>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Active SSE Connections</div>
+        <div class="card-value green" id="connections">-</div>
+        <div class="card-sub">Peak: <span id="peakConnections">-</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Requests / sec</div>
+        <div class="card-value blue" id="rps">-</div>
+        <div class="card-sub">Total: <span id="totalRequests">-</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">CPU Usage</div>
+        <div class="card-value amber" id="cpu">-</div>
+        <div class="card-sub">Simulated workload</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Memory (MB)</div>
+        <div class="card-value purple" id="memory">-</div>
+        <div class="card-sub">Heap allocation</div>
+      </div>
+      <div class="card">
+        <div class="card-label">p99 Latency (ms)</div>
+        <div class="card-value cyan" id="latency">-</div>
+        <div class="card-sub">Response time</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Error Rate (%)</div>
+        <div class="card-value rose" id="errorRate">-</div>
+        <div class="card-sub">5xx responses</div>
+      </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-container">
+        <div class="chart-title">CPU & Memory Over Time</div>
+        <canvas id="chartCpuMem" height="200"></canvas>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">Requests/sec & Latency Over Time</div>
+        <canvas id="chartReqLatency" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="info-bar">
+      <div>Region: <span id="region">-</span></div>
+      <div>Uptime: <span id="uptime">-</span></div>
+      <div>Transport: <span>Server-Sent Events (SSE)</span></div>
+      <div>Runtime: <span>Lambda Web Functions (nodejs24.x)</span></div>
+    </div>
+  </div>
+
+  <script>
+    const MAX_POINTS = 60;
+
+    // Chart setup
+    const chartOpts = {
+      responsive: true,
+      animation: { duration: 300 },
+      scales: {
+        x: { display: false },
+        y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }
+      },
+      plugins: { legend: { labels: { color: '#94a3b8', boxWidth: 12 } } }
+    };
+
+    const labels = [];
+    const cpuData = [], memData = [], rpsData = [], latData = [];
+
+    const chartCpuMem = new Chart(document.getElementById('chartCpuMem'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'CPU %', data: cpuData, borderColor: '#f59e0b', borderWidth: 2, pointRadius: 0, tension: 0.3 },
+          { label: 'Memory MB', data: memData, borderColor: '#a855f7', borderWidth: 2, pointRadius: 0, tension: 0.3 }
+        ]
+      },
+      options: chartOpts
+    });
+
+    const chartReqLatency = new Chart(document.getElementById('chartReqLatency'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Req/s', data: rpsData, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, tension: 0.3 },
+          { label: 'p99 ms', data: latData, borderColor: '#06b6d4', borderWidth: 2, pointRadius: 0, tension: 0.3 }
+        ]
+      },
+      options: chartOpts
+    });
+
+    function formatUptime(secs) {
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+      return h > 0 ? `${h}h ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+    }
+
+    function updateDashboard(d) {
+      document.getElementById('connections').textContent = d.activeConnections;
+      document.getElementById('peakConnections').textContent = d.peakConnections;
+      document.getElementById('rps').textContent = d.requestsPerSec;
+      document.getElementById('totalRequests').textContent = d.totalRequests.toLocaleString();
+      document.getElementById('cpu').textContent = d.cpuPercent.toFixed(1) + '%';
+      document.getElementById('memory').textContent = d.memoryMB.toFixed(0);
+      document.getElementById('latency').textContent = d.p99Latency;
+      document.getElementById('errorRate').textContent = d.errorRate.toFixed(2);
+      document.getElementById('region').textContent = d.region;
+      document.getElementById('uptime').textContent = formatUptime(d.uptime);
+
+      // Update charts
+      const time = new Date(d.timestamp).toLocaleTimeString();
+      labels.push(time);
+      cpuData.push(d.cpuPercent);
+      memData.push(d.memoryMB);
+      rpsData.push(d.requestsPerSec);
+      latData.push(d.p99Latency);
+
+      if (labels.length > MAX_POINTS) {
+        labels.shift(); cpuData.shift(); memData.shift();
+        rpsData.shift(); latData.shift();
+      }
+
+      chartCpuMem.update();
+      chartReqLatency.update();
+    }
+
+    // SSE connection
+    function connect() {
+      const es = new EventSource('/api/events');
+
+      es.onopen = () => {
+        document.getElementById('statusDot').classList.add('connected');
+        document.getElementById('statusText').textContent = 'Connected (SSE)';
+      };
+
+      es.onmessage = (e) => {
+        try {
+          updateDashboard(JSON.parse(e.data));
+        } catch {}
+      };
+
+      es.onerror = () => {
+        document.getElementById('statusDot').classList.remove('connected');
+        document.getElementById('statusText').textContent = 'Reconnecting...';
+        es.close();
+        setTimeout(connect, 3000);
+      };
+    }
+
+    connect();
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "title": "Webhook ingestion on AWS Lambda Web Functions with Amazon DynamoDB",
+  "description": "Receive Stripe, GitHub and generic webhooks on a Lambda Web Function, verify HMAC-SHA256 signatures and store each event once in DynamoDB.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a webhook receiver as an AWS Lambda Web Function with an Amazon DynamoDB table. Providers such as Stripe or GitHub POST directly to the function's HTTPS endpoint, which replaces the usual API Gateway plus Lambda pair with a single Express server. Because Lambda Web Functions forward the HTTP request unchanged, the app reads the raw request body, which is what signature verification needs; there is no base64 decoding or event mapping.",
+      "<code>POST /webhooks/{provider}</code> runs four steps. First it verifies the signature with the provider's scheme: Stripe's <code>stripe-signature</code> header (timestamp plus HMAC-SHA256 over <code>t.body</code>), GitHub's <code>x-hub-signature-256</code> header (<code>sha256=</code> prefix), or a generic <code>x-webhook-signature</code> hex digest. All comparisons use <code>crypto.timingSafeEqual</code>, and a missing or wrong signature returns 401 before the body is parsed. Second it parses the JSON. Third it derives a stable event id per provider (GitHub's <code>x-github-delivery</code> header, otherwise the payload <code>id</code>). Fourth it writes the event with a conditional <code>PutItem</code> on <code>attribute_not_exists(eventId)</code>: the first delivery is stored and later redeliveries return 200 with <code>duplicate: true</code>, so provider retries are idempotent. A TTL attribute expires events after 30 days.",
+      "The secrets arrive as <code>NoEcho</code> template parameters mapped to environment variables; in production load them from AWS Secrets Manager or SSM Parameter Store instead. <code>POST /test/fire</code> builds a correctly signed sample request for any provider so the flow can be exercised without an external account. It signs with the real secret, so it is gated by the <code>EnableTestEndpoint</code> parameter, which defaults to <code>false</code>. <code>GET /events</code> and <code>GET /events/{eventId}</code> read back what was stored.",
+      "A single <code>AWS::Serverless::WebFunction</code> resource expands into <code>AWS::Lambda::WebFunction</code>, an immutable <code>AWS::Lambda::WebFunctionRevision</code> and an <code>AWS::Lambda::WebFunctionEndpoint</code>. The endpoint uses <code>AuthType</code> <code>ApplicationManaged</code> because providers cannot SigV4-sign their calls; the HMAC signature is the authentication. The explicit execution role carries CloudWatch Logs plus <code>PutItem</code>, <code>GetItem</code> and <code>Scan</code> scoped to the table ARN."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Serverless Application Model (SAM) documentation",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
+      },
+      {
+        "text": "Amazon DynamoDB: Time to Live (TTL)",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
+      },
+      {
+        "text": "Stripe: verify webhook signatures",
+        "link": "https://docs.stripe.com/webhooks#verify-manually"
+      },
+      {
+        "text": "GitHub: validating webhook deliveries",
+        "link": "https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name lambda-web-webhooks-sam</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jon Loinaz Anton",
+      "bio": "Enterprise Solutions Architect at AWS based in Spain, helping large organizations adopt serverless and generative AI.",
+      "linkedin": "jonloinaz"
+    }
+  ]
+}
