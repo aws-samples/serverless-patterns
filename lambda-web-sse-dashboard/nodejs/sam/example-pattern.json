@@ -1,6 +1,6 @@
 {
-  "title": "Server-Sent Events dashboard on AWS Lambda Web Functions",
-  "description": "Stream live metrics to many browsers over Server-Sent Events from a zero-dependency Node.js Lambda Web Function, using AWS SAM.",
+  "title": "Real-time metrics dashboard with Server-Sent Events on AWS Lambda Web Functions",
+  "description": "Stream live metrics to the browser over server-sent events (SSE) from a zero-dependency Node.js HTTP server running as an AWS Lambda Web Function.",
   "language": "Node.js",
   "level": "200",
   "highlight": "true",
@@ -9,14 +9,15 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a real-time metrics dashboard that uses Server-Sent Events (SSE) as an AWS Lambda Web Function. With the Lambda invocation model a function returns one response per invocation and the execution environment is frozen afterwards, so it cannot hold a long-lived HTTP connection per browser. Lambda Web Functions run a persistent HTTP server inside a microVM that keeps serving while connections are open, so the same Node.js code that would run on a container or a VM works here unchanged. The app has no dependencies: it uses <code>http.createServer</code>, <code>fs</code> and <code>path</code> only.",
-      "<code>GET /api/events</code> responds with <code>Content-Type</code> <code>text/event-stream</code> and never ends the response. The server keeps every open response in a <code>Set</code>, generates a metrics snapshot every two seconds and writes it to all clients as a <code>data:</code> line. <code>POST /api/metrics</code> accepts any JSON body and broadcasts it immediately to every connected client, which is how a deployment tool or a job could push custom events. <code>GET /api/status</code> returns the current snapshot once, and <code>GET /</code> serves a small Chart.js dashboard that opens an <code>EventSource</code> and plots the stream.",
-      "The connection set and the counters (active connections, peak connections, total requests) are per sandbox. Each sandbox handles many concurrent connections; when traffic grows the service adds sandboxes, and a client is only reached by broadcasts from the sandbox holding its connection. That is the right scope for dashboards, progress feeds and notifications from the instance itself. For fan-out that must reach every client regardless of sandbox, publish the events through a shared channel such as DynamoDB Streams or SNS and have each sandbox subscribe.",
-      "The template sets <code>Timeout</code> to 900 seconds, the maximum, because an SSE response lasts as long as the request timeout; the browser <code>EventSource</code> reconnects automatically afterwards. A single <code>AWS::Serverless::WebFunction</code> expands into the function, an immutable revision and a public HTTPS endpoint (<code>AuthType</code> <code>ApplicationManaged</code>), and SAM generates the execution role with CloudWatch Logs permissions."
+      "This pattern deploys a plain Node.js HTTP server as an AWS Lambda Web Function. It has no framework, no dependencies, and no build step. The server streams a metrics snapshot to the browser every 2 seconds over a single SSE connection that stays open.",
+      "A web function runs a real server process. The runtime passes the listen address in the <code>AWS_LAMBDA_HTTP_ENDPOINT</code> environment variable, and the server listens on it as it would anywhere else. Because the process stays alive between requests, it can hold long-lived connections open and push data to the client, which the Lambda event model cannot do.",
+      "The dashboard reports values the process measures about itself: execution environment uptime, CPU time consumed, open SSE connections, and the serving Region. Select Generate CPU load to run about 1.5 seconds of SHA-256 hashing and watch CPU time climb and fall back. The environment stays up for minutes while using a fraction of a second of CPU, because you pay for active CPU time, not time spent waiting.",
+      "Each execution environment handles many concurrent requests (64 by default, up to 128). As environments near that limit, Lambda adds more and scales back to zero when traffic falls. Optionally, deploy a second <code>MultiRegion</code> endpoint to get one global URL that uses Amazon Route 53 latency-based routing to serve each request from the nearest Region."
     ]
   },
   "gitHub": {
     "template": {
+      "patternPath": "lambda-web-sse-dashboard/nodejs/sam",
       "templateFile": "template.yaml"
     }
   },
