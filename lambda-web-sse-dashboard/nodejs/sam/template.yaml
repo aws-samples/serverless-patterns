@@ -2,8 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Serverless patterns - Server-Sent Events dashboard on AWS Lambda Web
-  Functions (SAM). Zero-dependency Node.js app that keeps many SSE
-  connections open per sandbox and broadcasts metrics every 2 seconds.
+  Functions (SAM). Zero-dependency Node.js app that streams measured
+  uptime, CPU time and connection counts to the browser every 2 seconds.
 
 Parameters:
   CodeBucket:

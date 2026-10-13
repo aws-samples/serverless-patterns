@@ -1,10 +1,10 @@
-# Server-Sent Events dashboard on AWS Lambda Web Functions (SAM)
+# Real-time metrics dashboard with Server-Sent Events on AWS Lambda Web Functions (SAM)
 
-This pattern deploys a real-time metrics dashboard that streams updates to browsers over Server-Sent Events (SSE) from an AWS Lambda Web Function. With the Lambda invocation model, a function returns one response per invocation and the execution environment is frozen afterwards, so it cannot hold a long-lived HTTP connection. Lambda Web Functions run a persistent HTTP server that keeps serving while connections stay open, so this zero-dependency Node.js app (`http`, `fs`, `path` only) runs unchanged locally and on AWS.
+This pattern deploys a zero-dependency Node.js HTTP server as an AWS Lambda Web Function that streams live metrics to the browser over Server-Sent Events (SSE). It uses a plain Node.js HTTP server rather than a framework, so there are no dependencies and no build step. The dashboard makes the behaviours that distinguish Web Functions from the Lambda event model visible: long-lived HTTP connections, active-CPU time versus wall-clock uptime, and many concurrent requests per execution environment with scale-out.
 
-`GET /api/events` keeps the response open and receives a metrics broadcast every 2 seconds; `POST /api/metrics` pushes a custom event to every connected client; `GET /` serves a Chart.js dashboard that plots the stream. A single `AWS::Serverless::WebFunction` resource creates the function, an immutable revision and a public HTTPS endpoint.
+A single `AWS::Serverless::WebFunction` resource creates the function, an immutable revision and a public HTTPS endpoint. The app is the same as the [AWS CLI variant](../awscli/) of this pattern; only the deployment differs.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-web-sse-dashboard-nodejs-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -67,77 +67,86 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-* `src/index.js` creates the server with `http.createServer` and listens on the address in the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable. The runtime sets it to `0.0.0.0:3000` and probes it for readiness; when the variable is absent (local development) the app falls back to the same value.
-* Routes:
-  * `GET /api/events` answers `200` with `Content-Type: text/event-stream` and **never ends the response**. The response object is added to a `Set` of clients, receives an initial snapshot immediately, and is removed when the request closes.
-  * A `setInterval` generates a metrics snapshot every 2 seconds and writes it to every client as a `data: {...}\n\n` line. The metrics are synthetic sine waves plus the real per-sandbox counters (`activeConnections`, `peakConnections`, `totalRequests`, `uptime`).
-  * `POST /api/metrics` accepts any JSON body and broadcasts it right away to all connected clients as a `custom` field. Invalid JSON returns **400**.
-  * `GET /api/status` returns one snapshot; `GET /` and other paths serve files from `public/` (path traversal outside `public/` returns 404).
-* **Scope of the connection set.** Clients and counters live in the sandbox's memory. One sandbox serves many concurrent connections; when traffic grows the service adds sandboxes, and a broadcast only reaches the clients connected to the sandbox that emits it. That is the right scope for per-instance dashboards, progress feeds or notifications about work the sandbox itself is doing. For fan-out that must reach every client regardless of sandbox, publish events through a shared channel (DynamoDB Streams, SNS, EventBridge) and let each sandbox subscribe and relay.
-* `template.yaml` sets `Timeout: 900` (the maximum) because an SSE response lasts as long as the request timeout. When the timeout closes the stream, the browser `EventSource` reconnects on its own. The single `AWS::Serverless::WebFunction` expands into `AWS::Lambda::WebFunction`, `AWS::Lambda::WebFunctionRevision` (immutable code + configuration) and `AWS::Lambda::WebFunctionEndpoint` (HTTPS endpoint routed 100% to that revision); SAM generates the execution role with `AWSLambdaBasicExecutionRole`.
-* `AuthType: ApplicationManaged` means the endpoint is **public: anyone with the URL can reach it**. Protect `POST /api/metrics` before real use, or change to `AuthType: IamAuth` to accept only SigV4-signed requests.
-* On `SIGTERM` the interval is cleared, every open SSE response is ended and the server closes.
+The dashboard is a single Node.js HTTP server (`src/index.js`) that reports what it measures about itself: how long the execution environment has been alive, how much CPU it has used, how many streaming connections it is holding open, and which Region is serving the request. Every value is measured from the running process; none of it is synthetic.
 
-Key runtime constraints:
+A Web Function runs a real server process, so the runtime provides the address to listen on in the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable (in `host:port` form). The server reads it and starts listening, exactly as it would anywhere else:
 
-* Runtime is `nodejs24.x`; the code uses ESM (`"type": "module"` in `package.json`).
-* The entry point is `index.js` at the zip root, with `public/` next to it.
-* Bind the host and port from `AWS_LAMBDA_HTTP_ENDPOINT`. A hardcoded port that does not match it fails the readiness probe.
+```javascript
+const [HOST, PORT_STR] = (process.env.AWS_LAMBDA_HTTP_ENDPOINT ?? `0.0.0.0:${process.env.PORT || 3000}`).split(':');
+server.listen(Number(PORT_STR) || 3000, HOST);
+```
+
+The server exposes these routes:
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/` | Dashboard UI (static HTML/CSS/JS, Chart.js from CDN) |
+| `GET` | `/api/events` | SSE stream: holds the connection open and pushes a metrics snapshot every 2 seconds |
+| `GET` | `/api/work?ms=1500` | Performs genuine CPU work (repeated SHA-256 hashing) for the requested duration (50 to 5000 ms) |
+| `GET` | `/api/ping` | Tiny response the browser times to measure round-trip latency to the serving Region |
+| `GET` | `/api/status` | Current metrics snapshot as JSON |
+
+The dashboard updates every two seconds over a single HTTP connection that stays open. Because a Web Function environment is a long-lived process, it keeps the connection open and keeps pushing data to the browser. The Lambda event model handles one request per invocation and then freezes the environment until the next one; a frozen environment runs no code, so it cannot hold a connection open.
+
+Template notes:
+
+* `Timeout: 900` (the maximum), because an SSE response lasts as long as the request timeout. When the timeout closes the stream, the browser `EventSource` reconnects on its own.
+* The single `AWS::Serverless::WebFunction` expands into `AWS::Lambda::WebFunction`, `AWS::Lambda::WebFunctionRevision` (immutable code and configuration) and `AWS::Lambda::WebFunctionEndpoint` (HTTPS endpoint routed 100% to that revision). SAM generates the execution role with `AWSLambdaBasicExecutionRole`.
+* `AuthType: ApplicationManaged` means the endpoint is **public: anyone with the URL can reach it**, including `/api/work`, which runs CPU work that you pay for. Use `AuthType: IamAuth` to accept only SigV4-signed requests.
+* Runtime is `nodejs24.x` with ESM (`"type": "module"`); the entry point is `index.js` at the zip root, with `public/` next to it.
 
 To deploy a code change, upload the zip under a **new key** (for example `function-v2.zip`) and deploy again with the new `CodeKey`. CloudFormation only creates a new revision when the revision's properties change, so re-deploying with an unchanged key reports "No changes to deploy".
 
 ## Testing
 
-Run the app locally first. The same code runs unchanged on AWS:
+### Run locally
+
+Start the server locally and browse to `http://localhost:3000/` to see the dashboard streaming from the local process:
 
 ```bash
-cd src
-node index.js
-# SSE Dashboard listening on 0.0.0.0:3000
+cd src && npm start
 ```
 
-Open `http://localhost:3000/` in a browser to see the dashboard, or use curl:
+### On the deployed endpoint
+
+Read the endpoint domain from the stack outputs:
 
 ```bash
-# Hold an SSE connection open for 10 seconds: one "data:" line every 2 seconds
-curl -N --max-time 10 http://localhost:3000/api/events
+export YOUR_ENDPOINT="https://$(aws cloudformation describe-stacks \
+  --stack-name lambda-web-sse-dashboard-sam --region $AWS_REGION \
+  --query "Stacks[0].Outputs[?OutputKey=='EndpointDomainName'].OutputValue" --output text)"
 ```
 
-After deployment, read the endpoint domain and repeat against AWS:
+**Active-CPU time vs. uptime.** Browse to `$YOUR_ENDPOINT` and compare the **Environment uptime** and **CPU time consumed** cards. The environment stays alive for minutes but uses only a fraction of a second of CPU: you pay for the CPU time your code uses (plus memory and requests), not for wall-clock time spent waiting. Select **Generate CPU load** and the app runs a cryptographic hashing loop for about 1.5 seconds; the CPU line climbs, then falls back to near zero when the work stops. See the [AWS Lambda pricing page](https://aws.amazon.com/lambda/pricing/) for details.
+
+You can also drive the work from the command line:
 
 ```bash
-ENDPOINT=$(aws cloudformation describe-stacks \
-  --stack-name lambda-web-sse-dashboard-sam \
-  --region $AWS_REGION \
-  --query "Stacks[0].Outputs[?OutputKey=='EndpointDomainName'].OutputValue" \
-  --output text)
-
-# Dashboard
-open https://$ENDPOINT/      # or paste the URL in a browser
-
-# Three concurrent SSE clients on the same endpoint for 7 seconds
-for i in 1 2 3; do curl -sN --max-time 7 https://$ENDPOINT/api/events > /tmp/sse-$i.txt & done
-sleep 2
-
-# Push a custom event: it reaches every client connected to the same sandbox
-curl -s -X POST https://$ENDPOINT/api/metrics -H 'Content-Type: application/json' -d '{"deploy":"v2"}'
-# {"success":true,"broadcastTo":3}
-wait
-
-grep -c '^data:' /tmp/sse-1.txt          # ~4 snapshots + the custom event
-grep -o '"activeConnections":[0-9]*' /tmp/sse-1.txt | sort | uniq -c
-#   4 "activeConnections":3
-grep -o '"custom":{[^}]*}' /tmp/sse-1.txt
-# "custom":{"deploy":"v2"}
-
-# One-shot snapshot
-curl -s https://$ENDPOINT/api/status
-# {"timestamp":"...","region":"us-east-1","uptime":42,"activeConnections":0,"peakConnections":3,"totalRequests":9,...}
+curl "$YOUR_ENDPOINT/api/work?ms=1500"
 ```
 
-If `broadcastTo` is smaller than the number of clients you opened, the clients landed on different sandboxes; see "Scope of the connection set" above.
+**Concurrency and scale-out.** Each execution environment handles many requests at once, not one at a time. As environments approach their concurrency limit, Lambda adds more, and removes them again when traffic falls, scaling back to zero. Generate load by sending 300 streaming requests to the `/api/events` endpoint rather than a burst of quick responses. curl keeps 200 connections open at once, each for 90 seconds, and starts the remaining 100 as the first ones finish, so the test takes about 3 minutes:
 
-View the logs written by the sandboxes:
+```bash
+curl -sN --parallel --parallel-immediate --parallel-max 200 --max-time 90 \
+  "$YOUR_ENDPOINT/api/events?[1-300]" > /dev/null
+```
+
+The dashboard reflects the active SSE connections and peak for the currently connected environment. Each environment reports only its own connections, because Lambda routes each request independently with no session affinity.
+
+The runtime writes a per-environment summary record to Amazon CloudWatch Logs every minute (instance id, request count, peak concurrency, CPU time). Aggregate them across the fleet with a CloudWatch Logs Insights query on the stack's log group:
+
+```bash
+QID=$(aws logs start-query --region $AWS_REGION \
+  --log-group-name /aws/lambda/web/lambda-web-sse-dashboard-sam \
+  --start-time $(($(date +%s)-300)) --end-time $(date +%s) \
+  --query-string 'filter type="platform.invokeSummary" | stats count_distinct(record.instanceId) as environments, sum(record.metrics.requests) as totalRequests, max(record.metrics.concurrentRequests) as peakConcurrency, sum(record.metrics.cpuTimeMs)/1000 as totalCpuSeconds' \
+  --query queryId --output text) && sleep 6 && aws logs get-query-results --region $AWS_REGION --query-id "$QID"
+```
+
+In a sample run, the streams landed on 5 execution environments: three held 64 connections each (the default limit), and the others held 50 and 8. The first load test after you create the stack can spread across many more environments, each holding only a few connections; later runs pack connections as shown. The query can count more environments than the streams used, because environments from earlier traffic stay alive for a while and still write summary records. Run it again a minute or two after the test to include the last summary records.
+
+View the logs written by the environments:
 
 ```bash
 aws logs tail /aws/lambda/web/lambda-web-sse-dashboard-sam --region $AWS_REGION --follow
