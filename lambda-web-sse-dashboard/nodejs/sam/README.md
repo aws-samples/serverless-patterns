@@ -144,7 +144,7 @@ QID=$(aws logs start-query --region $AWS_REGION \
   --query queryId --output text) && sleep 6 && aws logs get-query-results --region $AWS_REGION --query-id "$QID"
 ```
 
-In a sample run in `us-east-2`, Lambda spread the 300 streams across about 100 execution environments: most held 2 connections, and a few held 13 or 14. Lambda decides placement, so your numbers will differ from run to run. The query can count more environments than the streams used, because environments from earlier traffic stay alive for a while and still write summary records. Run it again a minute or two after the test to include the last summary records.
+In a sample run, the streams landed on 5 execution environments: three held 64 connections each (the default limit), and the others held 50 and 8. The first load test after you create the stack can spread across many more environments, each holding only a few connections; later runs pack connections as shown. The query can count more environments than the streams used, because environments from earlier traffic stay alive for a while and still write summary records. Run it again a minute or two after the test to include the last summary records.
 
 View the logs written by the environments:
 
