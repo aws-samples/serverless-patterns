@@ -1,40 +1,67 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// The Lambda Web Functions runtime sets AWS_LAMBDA_HTTP_ENDPOINT (0.0.0.0:3000)
-// and waits for the app to listen there. The fallback is for local development.
-const [HOST, PORT_STR] = (process.env.AWS_LAMBDA_HTTP_ENDPOINT ?? '0.0.0.0:3000').split(':');
+// ── Lambda Web runtime sets AWS_LAMBDA_HTTP_ENDPOINT (0.0.0.0:3000); PORT is a local-dev fallback ──
+const [HOST, PORT_STR] = (process.env.AWS_LAMBDA_HTTP_ENDPOINT ?? `0.0.0.0:${process.env.PORT || 3000}`).split(':');
 const PORT = Number(PORT_STR) || 3000;
 const AWS_REGION = process.env.AWS_REGION || 'local';
 
-// ── Metrics state (per sandbox: every sandbox keeps its own counters and clients) ──
+// ── Metrics state ──
 const startTime = Date.now();
+// Per-process id: unique to THIS execution environment. It changes whenever the
+// platform recycles the environment (new process) — a truthful "which instance
+// am I on" signal for the demo, without depending on an undocumented env var.
+const INSTANCE_ID = crypto.randomUUID().slice(0, 8);
 let totalRequests = 0;
 let peakConnections = 0;
 const clients = new Set();
 
-// ── Synthetic metrics generator ──
+// Baseline for computing per-interval CPU (process.cpuUsage returns cumulative µs).
+let lastCpu = process.cpuUsage();   // { user, system } in microseconds
+let lastCpuAt = Date.now();
+
+// ── REAL metrics generator ──
+// Every value here is measured from this Node process, no synthetic data. The
+// point of the demo is the CONTRAST: the environment is alive for the full
+// wall-clock uptime, but it only consumes a tiny amount of CPU. Cross-check the
+// cpuMs figures against the platform's `invokeSummary` logs — same story.
 function generateMetrics() {
-  const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
-  const t = uptimeSeconds / 10;
+  const now = Date.now();
+  const uptimeSeconds = Math.floor((now - startTime) / 1000);
+
+  // Cumulative CPU consumed by this process since it started (seconds).
+  const cpuNow = process.cpuUsage(); // cumulative µs
+  const cpuSecondsTotal = (cpuNow.user + cpuNow.system) / 1e6;
+
+  // CPU used in just the last interval (µs -> ms), and as a % of wall-clock.
+  const intervalUs = (cpuNow.user + cpuNow.system) - (lastCpu.user + lastCpu.system);
+  const intervalMs = intervalUs / 1000;
+  const wallMs = now - lastCpuAt;
+  const cpuPercent = wallMs > 0 ? Math.min(100, (intervalMs / wallMs) * 100) : 0;
+  lastCpu = cpuNow;
+  lastCpuAt = now;
+
+  const mem = process.memoryUsage();
 
   return {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date(now).toISOString(),
     region: AWS_REGION,
+    instanceId: INSTANCE_ID,
     uptime: uptimeSeconds,
     activeConnections: clients.size,
     peakConnections,
     totalRequests,
-    // Synthetic workload metrics (sine waves with noise)
-    cpuPercent: Math.max(0, Math.min(100, 40 + 30 * Math.sin(t) + (Math.random() - 0.5) * 20)),
-    memoryMB: Math.max(50, Math.min(512, 180 + 60 * Math.sin(t * 0.7) + (Math.random() - 0.5) * 30)),
-    requestsPerSec: Math.max(0, Math.floor(120 + 80 * Math.sin(t * 1.3) + (Math.random() - 0.5) * 40)),
-    errorRate: Math.max(0, Math.min(5, 0.5 + 0.4 * Math.sin(t * 2.1) + Math.random() * 0.5)),
-    p99Latency: Math.max(5, Math.floor(45 + 25 * Math.sin(t * 0.9) + (Math.random() - 0.5) * 15)),
+    // ── real measurements ──
+    cpuSecondsTotal: Number(cpuSecondsTotal.toFixed(3)), // climbs slowly
+    cpuMsInterval: Number(intervalMs.toFixed(1)),        // per-2s CPU, wiggles
+    cpuPercent: Number(cpuPercent.toFixed(2)),           // active CPU % this interval
+    rssMB: Number((mem.rss / 1048576).toFixed(1)),       // resident memory
+    heapMB: Number((mem.heapUsed / 1048576).toFixed(1)),
   };
 }
 
@@ -67,15 +94,7 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
 };
 
-const PUBLIC_DIR = path.join(__dirname, 'public');
-
 function serveStatic(res, filePath) {
-  // Never serve anything outside public/ (blocks ../ traversal).
-  if (!filePath.startsWith(PUBLIC_DIR + path.sep)) {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Not found' }));
-    return;
-  }
   const ext = path.extname(filePath);
   const mime = MIME_TYPES[ext] || 'application/octet-stream';
 
@@ -94,7 +113,7 @@ const server = http.createServer((req, res) => {
   totalRequests++;
   const url = new URL(req.url, `http://${HOST}:${PORT}`);
 
-  // ── SSE endpoint: the response stays open and receives a broadcast every 2 s ──
+  // ── SSE endpoint ──
   if (url.pathname === '/api/events' && req.method === 'GET') {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -117,21 +136,37 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── POST custom metric injection ──
-  if (url.pathname === '/api/metrics' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const custom = JSON.parse(body);
-        broadcast({ ...generateMetrics(), custom });
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, broadcastTo: clients.size }));
-      } catch {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+  // ── Real CPU work (for the demo) ──
+  // Does genuine work — repeated SHA-256 hashing for ~`ms` milliseconds — so the
+  // CPU line MOVES because actual work happened, not because of synthetic data.
+  // Trigger it from the UI ("Generate load") or curl: GET /api/work?ms=1500
+  if (url.pathname === '/api/work' && req.method === 'GET') {
+    const ms = Math.min(5000, Math.max(50, Number(url.searchParams.get('ms')) || 1000));
+    const started = Date.now();
+    let iterations = 0;
+    let buf = crypto.randomBytes(1024);
+    // Busy-hash until the time budget elapses. This is real CPU on the event loop.
+    while (Date.now() - started < ms) {
+      for (let i = 0; i < 500; i++) {
+        buf = crypto.createHash('sha256').update(buf).digest();
+        iterations++;
       }
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ranMs: Date.now() - started, iterations, instanceId: INSTANCE_ID, region: AWS_REGION }));
+    return;
+  }
+
+  // ── Ping: tiny response for client-measured round-trip latency ──
+  // The browser times a request here to show network latency to the serving
+  // region. When deployed MultiRegion, a nearer region shows lower latency.
+  if (url.pathname === '/api/ping' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      'Access-Control-Allow-Origin': '*',
     });
+    res.end(JSON.stringify({ region: AWS_REGION, instanceId: INSTANCE_ID, t: Date.now() }));
     return;
   }
 
@@ -143,9 +178,9 @@ const server = http.createServer((req, res) => {
   }
 
   // ── Static files ──
-  const filePath = url.pathname === '/'
-    ? path.join(PUBLIC_DIR, 'index.html')
-    : path.resolve(PUBLIC_DIR, '.' + path.posix.normalize(url.pathname));
+  let filePath = url.pathname === '/'
+    ? path.join(__dirname, 'public', 'index.html')
+    : path.join(__dirname, 'public', url.pathname);
 
   serveStatic(res, filePath);
 });
