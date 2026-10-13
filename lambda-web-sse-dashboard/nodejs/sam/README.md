@@ -119,23 +119,29 @@ open https://$ENDPOINT/      # or paste the URL in a browser
 for i in 1 2 3; do curl -sN --max-time 7 https://$ENDPOINT/api/events > /tmp/sse-$i.txt & done
 sleep 2
 
-# Push a custom event: it reaches every client connected to the same sandbox
-curl -s -X POST https://$ENDPOINT/api/metrics -H 'Content-Type: application/json' -d '{"deploy":"v2"}'
-# {"success":true,"broadcastTo":3}
+# Push a custom event: it reaches every client connected to the sandbox
+# that serves this POST
+curl -s -w '\n' -X POST https://$ENDPOINT/api/metrics -H 'Content-Type: application/json' -d '{"deploy":"v2"}'
+# {"success":true,"broadcastTo":2}
 wait
 
-grep -c '^data:' /tmp/sse-1.txt          # ~4 snapshots + the custom event
-grep -o '"activeConnections":[0-9]*' /tmp/sse-1.txt | sort | uniq -c
-#   4 "activeConnections":3
-grep -o '"custom":{[^}]*}' /tmp/sse-1.txt
-# "custom":{"deploy":"v2"}
+# Snapshots per client, the connections each client's sandbox saw, and
+# whether the custom event reached it
+for i in 1 2 3; do
+  echo "client $i: $(grep -c '^data:' /tmp/sse-$i.txt) events," \
+    "$(grep -o '"activeConnections":[0-9]*' /tmp/sse-$i.txt | sort -u | tr '\n' ' ')" \
+    "custom=$(grep -c '"custom":{"deploy":"v2"}' /tmp/sse-$i.txt)"
+done
+# client 1: 5 events, "activeConnections":2  custom=1
+# client 2: 4 events, "activeConnections":1  custom=0
+# client 3: 5 events, "activeConnections":2  custom=1
 
 # One-shot snapshot
 curl -s https://$ENDPOINT/api/status
 # {"timestamp":"...","region":"us-east-1","uptime":42,"activeConnections":0,"peakConnections":3,"totalRequests":9,...}
 ```
 
-If `broadcastTo` is smaller than the number of clients you opened, the clients landed on different sandboxes; see "Scope of the connection set" above.
+`broadcastTo` varies from run to run: Lambda can place the three connections on one, two or three sandboxes, and only the clients on the sandbox that serves the `POST` get the custom event. See "Scope of the connection set" above. Wait a few seconds between runs, because a sandbox can count a closed connection for a moment after curl exits.
 
 View the logs written by the sandboxes:
 
