@@ -10,18 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-prompt --> [AWS Lambda] --embed-----> Amazon Bedrock (Amazon Titan Text Embeddings V2, 1024 dimensions)
-                 |
-                 |--search---------> Amazon S3 Vectors (cosine top 5; the answer is in the vector metadata)
-                 |                      |-- HIT (similar enough, fresh, current epoch, same negation parity)
-                 |                      |      --> return the cached answer, no LLM call
-                 |                      |-- MISS
-                 |--generate-------> Amazon Bedrock text model (writes the answer)
-                 |--store----------> Amazon S3 Vectors (embedding + answer + model + created_at + epoch)
-                 |--return
-  (the force invalidation epoch is held in AWS Systems Manager Parameter Store)
-```
+![Architecture diagram: a client calls an AWS Lambda function that embeds the prompt with Amazon Bedrock, searches Amazon S3 Vectors for a similar prompt, and only calls the Amazon Bedrock text model on a miss](images/architecture.png)
 
 The AWS SAM template deploys these resources, and the request flow between them is:
 
