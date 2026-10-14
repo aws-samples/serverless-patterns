@@ -40,8 +40,12 @@ logger = logging.getLogger(__name__)
 # Global board instance — initialized by the lifecycle hooks server
 board: Board | None = None
 
-# Max bytes we are willing to buffer for a single file upload (25 MB).
-MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+# Max bytes for a single file upload. This app is only reached through the
+# session middleware's Lambda proxy, whose binding constraint is Lambda's 6 MB
+# synchronous payload cap — not this app's own buffering. Keep this aligned with
+# the middleware's MAX_UPLOAD_BYTES (~5.4 MB) so the app's 413 matches reality
+# instead of accepting files the proxy can never deliver.
+MAX_UPLOAD_BYTES = int(6 * 1024 * 1024 * 0.9)  # ~5.4 MB, matches middleware
 
 
 def set_board(b: Board):

@@ -80,9 +80,19 @@ CORS_HEADERS = {
     "Access-Control-Allow-Headers": "Content-Type, X-Client-Id, X-File-Name",
 }
 
-# Max body we are willing to proxy (API Gateway hard-caps payloads at ~10 MB,
-# so keep uploads under that when routed through the middleware).
-MAX_PROXY_BYTES = 9 * 1024 * 1024
+# The binding limit on this path is Lambda's 6 MB synchronous invoke
+# request/response payload cap (NOT API Gateway's ~10 MB) — every file byte
+# crosses the Lambda proxy integration both ways. Keep a margin for headers and
+# the API Gateway JSON envelope.
+LAMBDA_SYNC_PAYLOAD_LIMIT = 6 * 1024 * 1024
+#
+# Upload: the request body is the raw file; cap it just under the limit.
+MAX_UPLOAD_BYTES = int(LAMBDA_SYNC_PAYLOAD_LIMIT * 0.9)  # ~5.4 MB raw
+#
+# Download: binary responses are base64-encoded for the proxy integration, which
+# inflates by 4/3. The RESPONSE the Lambda returns is ~4/3 * raw, so the raw file
+# must stay under ~3/4 of the limit to fit. Cap raw download bytes accordingly.
+MAX_DOWNLOAD_BYTES = int(LAMBDA_SYNC_PAYLOAD_LIMIT * 0.9 * 3 / 4)  # ~4.05 MB raw
 
 
 # --------------------------------------------------------------------------
@@ -348,8 +358,14 @@ def proxy_to_microvm(event, method: str, path: str):
     data = None
     if raw is not None and method in ("POST", "PUT", "PATCH"):
         data = base64.b64decode(raw) if event.get("isBase64Encoded") else raw.encode("utf-8")
-        if len(data) > MAX_PROXY_BYTES:
-            return _resp(413, {"error": "Payload too large to proxy (limit ~9 MB)"})
+        if len(data) > MAX_UPLOAD_BYTES:
+            # Fail with a clear 413 here rather than letting the Lambda invoke
+            # layer reject it with an opaque API Gateway error.
+            return _resp(413, {
+                "error": f"Upload too large: {len(data)} bytes exceeds the "
+                         f"{MAX_UPLOAD_BYTES}-byte proxy limit (Lambda's 6 MB "
+                         f"synchronous payload cap)."
+            })
 
     # Forward select headers from the browser; always inject the auth token.
     fwd_headers = {"X-aws-proxy-auth": session["authToken"]}
@@ -403,6 +419,17 @@ def _passthrough(status: int, content_type: str, body_bytes: bytes):
     """
     headers = dict(CORS_HEADERS)
     headers["Content-Type"] = content_type or "application/octet-stream"
+    # Guard the Lambda response payload cap. Binary bodies base64-inflate by 4/3,
+    # so a raw body over MAX_DOWNLOAD_BYTES would produce a >6 MB Lambda response
+    # that fails opaquely at the invoke layer. Return a clear 413 instead.
+    if len(body_bytes) > MAX_DOWNLOAD_BYTES:
+        logger.warning("Response body %d bytes exceeds download proxy limit %d",
+                       len(body_bytes), MAX_DOWNLOAD_BYTES)
+        return _resp(413, {
+            "error": f"File too large to download through the proxy: "
+                     f"{len(body_bytes)} bytes exceeds the {MAX_DOWNLOAD_BYTES}-byte "
+                     f"limit (Lambda's 6 MB response cap, after base64 inflation)."
+        })
     is_text = content_type.startswith("text/") or content_type.startswith("application/json")
     if is_text:
         try:

@@ -120,7 +120,14 @@ The **MicroVM app** (`src/microvm/`) runs a notes + files REST API plus lifecycl
 | `GET` | `/files/{name}/text` | Get a text file's contents (`415` if not text) |
 | `PUT` | `/files/{name}/text` | Edit a text file — `{content}` |
 
-> File transfers go through API Gateway, which caps payloads at ~10 MB, so uploads via the UI are limited to ~9 MB.
+> File transfers cross the middleware Lambda (a synchronous proxy integration),
+> whose binding limit is Lambda's **6 MB** request/response payload cap — not API
+> Gateway's larger limit. Every file byte traverses the Lambda proxy both ways, so:
+> uploads are capped at ~5.4 MB, and downloads at ~4 MB raw (binary responses are
+> base64-encoded for the proxy, inflating ~33%, so a 4 MB file becomes a ~5.4 MB
+> response). Over-limit transfers return a clear `413` from the middleware. For
+> larger files, have the browser use presigned S3 URLs instead of proxying bytes
+> through Lambda.
 
 ## Security
 
