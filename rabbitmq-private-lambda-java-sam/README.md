@@ -4,9 +4,9 @@ This pattern is an example of a Lambda function written in Java that consumes me
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- rabbitmq_consumer_dynamo_sam/rabbit_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (RabbitMQ) messages and write them to an Amazon DynamoDB table
-- rabbit_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (RabbitMQ cluster)
-- rabbit_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
+- rabbitmq_consumer_dynamo_sam/rabbitmq_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (RabbitMQ) messages and write them to an Amazon DynamoDB table
+- rabbitmq_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (RabbitMQ cluster)
+- rabbitmq_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
 - RabbitMQAndClientEC2.yaml - An AWS CloudFormation template file that can be used to deploy an Amazon MQ (RabbitMQ) cluster and also deploy an EC2 instance with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
 - create_rabbit_queue.sh - A shell script that can be used to connect to the Amazon MQ (RabbitMQ) brokers to create virtualhosts, exchanges and queues, required for the lambda functions event listener
 
@@ -39,7 +39,7 @@ We cloned the serverless-patterns Github repository on the EC2 instance already 
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/rabbit-private-lambda-java-sam
+    cd serverless-patterns/rabbitmq-private-lambda-java-sam
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
@@ -47,11 +47,11 @@ Change directory to the pattern directory:
 Build your application with the `sam build` command.
 
 ```bash
-cd rabbit_consumer_dynamo_sam
+cd rabbitmq_consumer_dynamo_sam
 sam build
 ```
 
-The SAM CLI installs dependencies defined in `rabbitmq_consumer_dynamo_sam/rabbit_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `rabbitmq_consumer_dynamo_sam/rabbitmq_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 ## Test the build locally
 
@@ -290,7 +290,7 @@ Once the lambda function is deployed, send some messages to the Amazon MQ (Rabbi
 
 For your convenience, a Java program and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
 ```
-cd /home/ec2-user/serverless-patterns/rabbit-private-lambda-java-sam/rabbit_message_sender_json
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_message_sender_json
 chmod +x commands.sh
 ```
 
@@ -338,7 +338,7 @@ aws dynamodb scan --table-name RabbitMQDynamoDBTableJava --select "COUNT"
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/rabbit-private-lambda-java-sam/rabbit_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_consumer_dynamo_sam
 sam delete
 
 ```
