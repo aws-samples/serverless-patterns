@@ -8,16 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-   AWS Lambda                                  Amazon CloudWatch
-   +----------------------------+              +--------------------------+
-   |  handler.py                |   OTLP       |  OTLP metrics endpoint   |
-   |  OpenTelemetry metrics API |  over HTTP   |  monitoring.<region>     |
-   |            |               |  SigV4       |  .amazonaws.com          |
-   |            v               | -----------> |                          |
-   |  ADOT layer collector      |              |  queried with PromQL     |
-   +----------------------------+              +--------------------------+
-```
+![Architecture diagram: an AWS Lambda handler records OpenTelemetry metrics, the ADOT layer collector sends them over OTLP to the Amazon CloudWatch OTLP metrics endpoint, and they are queried with PromQL](images/architecture.png)
 
 The AWS SAM template deploys these resources, and the data flow between them is:
 
