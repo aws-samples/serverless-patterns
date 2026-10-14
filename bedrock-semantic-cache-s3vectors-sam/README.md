@@ -4,6 +4,12 @@ This pattern puts an AWS Lambda function in front of Amazon Bedrock and returns 
 
 This is different from the prompt caching that Amazon Bedrock offers natively. Native prompt caching reuses an exact prompt prefix, so a single changed character is a miss (see [Prompt caching for faster model inference](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)). This pattern matches on meaning instead, so "What is the capital of France?" and "Which city is the capital of France?" hit the same cache entry. The two features complement each other.
 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-semantic-cache-s3vectors-sam
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Architecture
+
 ```
 prompt --> [AWS Lambda] --embed-----> Amazon Bedrock (Amazon Titan Text Embeddings V2, 1024 dimensions)
                  |
@@ -17,13 +23,17 @@ prompt --> [AWS Lambda] --embed-----> Amazon Bedrock (Amazon Titan Text Embeddin
   (the force invalidation epoch is held in AWS Systems Manager Parameter Store)
 ```
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-semantic-cache-s3vectors-sam
+The AWS SAM template deploys these resources, and the request flow between them is:
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+1. A caller invokes the AWS Lambda function, either through its function URL with AWS IAM (SigV4) authentication or with `aws lambda invoke`.
+2. The function embeds the prompt with Amazon Titan Text Embeddings V2 on Amazon Bedrock.
+3. It queries the Amazon S3 Vectors index (`AWS::S3Vectors::VectorBucket` and `AWS::S3Vectors::Index`) for the nearest stored prompts. A valid match is a hit and is returned with no model call.
+4. On a miss it calls the Amazon Bedrock text model with the Converse API, stores the embedding and the answer back in Amazon S3 Vectors, and returns the answer.
+5. The cache epoch used for force invalidation is an AWS Systems Manager Parameter Store parameter. The function's AWS IAM execution role allows only the Amazon Bedrock, Amazon S3 Vectors and Parameter Store actions the code calls (plus decrypting the optional API key, if you configure one), and the function writes its logs to an Amazon CloudWatch Logs log group that the stack owns.
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS Identity and Access Management (AWS IAM) user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
@@ -52,7 +62,7 @@ Important: this application uses various AWS services and there are costs associ
     * **Parameter VectorIndex [prompt-cache]**: press Enter to accept the default index name
     * **Parameter SimThreshold [0.85]**: press Enter to accept the default cosine similarity threshold for a cache hit
     * **Parameter TtlSeconds [86400]**: press Enter to accept the default freshness window of one day
-    * **Parameter ApiKeyParameterName []**: press Enter to leave this blank. The function URL already requires AWS Identity and Access Management (IAM) authentication. Only fill this in if you first created the parameter described in "Optional: application level API key" below
+    * **Parameter ApiKeyParameterName []**: press Enter to leave this blank. The function URL already requires IAM authentication. Only fill this in if you first created the parameter described in "Optional: application level API key" below
     * **Parameter EmbedModel [amazon.titan-embed-text-v2:0]**: press Enter to accept the default embeddings model
     * **Parameter LlmModel []**: press Enter to leave this blank, which uses the Amazon Nova Lite inference profile for your Region's geography, for example `eu.amazon.nova-lite-v1:0` in `eu-central-1`. Or enter any model ID or inference profile ID that you can invoke in your Region
     * **Confirm changes before deploy**: enter `N`, or `Y` if you want to review the change set before it is executed
