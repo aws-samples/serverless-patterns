@@ -8,13 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-  upload file                ObjectCreated              invoke async
-  to input/  --> Amazon S3  ------------->  AWS Lambda  ------------>  Bedrock Data Automation
-                    ^                       (start job)                (managed extraction)
-                    |                                                          |
-                    +---------------- structured JSON to output/ --------------+
-```
+![Architecture diagram: a file uploaded to the input prefix of an Amazon S3 bucket invokes an AWS Lambda function that starts an Amazon Bedrock Data Automation job, which writes structured JSON back to the output prefix](images/architecture.png)
 
 The AWS SAM template deploys these resources, and the data flow between them is:
 
