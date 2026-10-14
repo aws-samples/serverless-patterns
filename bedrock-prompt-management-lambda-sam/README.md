@@ -8,14 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-   {"input": "..."}          Converse (modelId = prompt version ARN,
-        |                              promptVariables = {...})
-        v                                      |
-   AWS Lambda  ------------------------------> Amazon Bedrock
-   (no prompt text,                   managed prompt + published version
-    only the version ARN)             (template, variables, model)
-```
+![Architecture diagram: AWS CloudFormation deploys an Amazon Bedrock managed prompt and a published version, and an AWS Lambda function invokes that version through the Amazon Bedrock Converse API](images/architecture.png)
 
 The AWS SAM template deploys these resources, and the request flow between them is:
 
