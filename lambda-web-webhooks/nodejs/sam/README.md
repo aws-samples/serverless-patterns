@@ -156,7 +156,7 @@ Repeat steps 1 to 4 with `"provider":"github"` (header `x-hub-signature-256`) an
 
 To receive real Stripe events, register `https://<EndpointDomainName>/webhooks/stripe` in the Stripe dashboard, redeploy with `StripeWebhookSecret=<the whsec_... shown by Stripe>` and `EnableTestEndpoint=false` (the default).
 
-View the logs written by the sandboxes:
+View the logs written by the execution environments:
 
 ```bash
 aws logs tail /aws/lambda/web/lambda-web-webhooks-sam --region $AWS_REGION --follow

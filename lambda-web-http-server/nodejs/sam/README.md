@@ -2,7 +2,7 @@
 
 This pattern deploys the smallest possible Lambda Web Function: a Node.js server built with the standard `http` module and no dependencies, exposed through a public HTTPS endpoint. Lambda Web Functions run a long-lived HTTP server (Express, Hono, Next.js, or plain `http.createServer`) and forward requests to it directly. There is no handler, no event object and no response mapping: the same `index.js` runs locally with `node index.js` and on AWS without changes.
 
-The app tracks how many requests each sandbox is serving at the same time and returns those counters in every response, which makes the multi-request concurrency model visible.
+The app tracks how many requests each execution environment is serving at the same time and returns those counters in every response, which makes the multi-request concurrency model visible.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -68,12 +68,12 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * `src/index.js` creates a server with `http.createServer` and listens on the address in the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable. The Lambda Web Functions runtime sets it to `0.0.0.0:3000` and probes that address for readiness; when the variable is absent (local development) the app falls back to the same value. `PORT` and `HOSTNAME` are **not** set by the runtime.
-* Each sandbox handles many concurrent requests on one Node.js process. The app keeps three in-memory counters (`currentConcurrency`, `peakConcurrency`, `totalRequests`) and adds a 100 ms artificial delay so that parallel requests overlap and the counters grow. Counters are per sandbox: a second sandbox starts from zero.
+* Each execution environment handles many concurrent requests on one Node.js process. The app keeps three in-memory counters (`currentConcurrency`, `peakConcurrency`, `totalRequests`) and adds a 100 ms artificial delay so that parallel requests overlap and the counters grow. Counters are per execution environment: a second execution environment starts from zero.
 * The single `AWS::Serverless::WebFunction` in `template.yaml` expands into three CloudFormation resources:
   * `AWS::Lambda::WebFunction`: the function itself
   * `AWS::Lambda::WebFunctionRevision`: an immutable snapshot of code + configuration
   * `AWS::Lambda::WebFunctionEndpoint`: the HTTPS endpoint, routed 100% to that revision
-* `ExecutionRoleArn` is omitted, so SAM generates an execution role with `AWSLambdaBasicExecutionRole` (CloudWatch Logs). `LoggingConfig.LogGroup` names the log group the sandboxes write to.
+* `ExecutionRoleArn` is omitted, so SAM generates an execution role with `AWSLambdaBasicExecutionRole` (CloudWatch Logs). `LoggingConfig.LogGroup` names the log group the execution environments write to.
 * `AuthType: ApplicationManaged` means the endpoint is **public: anyone with the URL can reach it**. The application must implement its own authentication, input validation and rate limiting. Change to `AuthType: IamAuth` to accept only SigV4-signed requests (sign with service name `lambda`).
 * `AutoDeploymentMode: LatestRevision` routes traffic to the newest revision automatically. For manual, weighted routing between two revisions set `AutoDeploymentMode: Disabled` and `RevisionWeights`.
 * On `SIGTERM` the server stops accepting connections and exits once in-flight requests finish.
@@ -130,14 +130,14 @@ Expected response (values vary):
 }
 ```
 
-Send 20 requests in parallel and watch `peakConcurrency` rise, which shows several requests being served by the same sandbox at once:
+Send 20 requests in parallel and watch `peakConcurrency` rise, which shows several requests being served by the same execution environment at once:
 
 ```bash
 seq 20 | xargs -P 20 -I{} curl -s https://$ENDPOINT/ -o /dev/null
 curl -s https://$ENDPOINT/ | grep -E 'peakConcurrency|totalRequests'
 ```
 
-View the logs written by the sandboxes:
+View the logs written by the execution environments:
 
 ```bash
 aws logs tail /aws/lambda/web/lambda-web-http-server-sam --region $AWS_REGION --follow

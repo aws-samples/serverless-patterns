@@ -27,7 +27,7 @@ const SECRETS = {
   generic: process.env.GENERIC_WEBHOOK_SECRET,
 };
 
-// ── DynamoDB (one client per sandbox, reused across requests) ──
+// ── DynamoDB (one client per execution environment, reused across requests) ──
 const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 // ── Express app ──

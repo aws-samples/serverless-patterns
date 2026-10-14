@@ -68,7 +68,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 * `src/index.js` is a plain Express 5 app wrapped in `http.createServer`. It listens on the address in the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable, which the runtime sets to `0.0.0.0:3000` and probes for readiness; when the variable is absent (local development) it falls back to the same value.
-* The DynamoDB `DocumentClient` is created once per sandbox and reused across the many concurrent requests one sandbox serves. Credentials come from the function's execution role; no keys are configured in code.
+* The DynamoDB `DocumentClient` is created once per execution environment and reused across the many concurrent requests one execution environment serves. Credentials come from the function's execution role; no keys are configured in code.
 * Routes:
   * `POST /items` writes the item with `attribute_not_exists(id)`, so a duplicate `id` returns **409**; missing `id` or `name` returns **400**.
   * `GET /items/{id}` returns the item or **404**.
@@ -136,7 +136,7 @@ curl -s https://$ENDPOINT/items/missing
 # {"error":"Item not found","id":"missing"}
 ```
 
-View the request log written by the sandboxes:
+View the request log written by the execution environments:
 
 ```bash
 aws logs tail /aws/lambda/web/lambda-web-dynamodb-api-sam --region $AWS_REGION --follow

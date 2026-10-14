@@ -12,7 +12,7 @@ if (!TABLE_NAME) {
   process.exit(1);
 }
 
-// The SDK client is created once per sandbox and reused across requests.
+// The SDK client is created once per execution environment and reused across requests.
 // Credentials come from the function's execution role.
 const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
