@@ -129,6 +129,13 @@ The message "Successfully created/updated stack - <StackName> in <Region>" indic
 
 After deployment, create documents in the Collection to generate stream records.
 
+The EC2 instance enables change streams on the collection when it starts. If the event source mapping on the Lambda function shows `PROBLEM: modifyChangeStreams has not been run`, enable them again from the instance. The script is safe to run more than once:
+
+```
+cd /home/ec2-user/mongoshell
+sh ./docdb_db_collection.sh
+```
+
 For your convenience, a Java program and a shell script are included on the EC2 instance provisioned by CloudFormation.
 
 ```
