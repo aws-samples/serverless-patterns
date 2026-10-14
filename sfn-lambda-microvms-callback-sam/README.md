@@ -6,9 +6,33 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+## Architecture
+
+```
+  start-execution
+        |
+        v
+  AWS Step Functions --RunMicrovm (job in run hook payload)--> AWS Lambda MicroVM
+        |                                                        (worker image)
+        |  stores the task token in Amazon DynamoDB                    |
+        |  and waits (.waitForTaskToken, heartbeat timeout)            |
+        |<--- SendTaskSuccess / SendTaskFailure / SendTaskHeartbeat ---+
+        |
+        +--TerminateMicrovm (always: success, failure, timeout)
+```
+
+The AWS SAM template deploys these resources, and the flow between them is:
+
+1. You start an AWS Step Functions execution with the job as its input.
+2. The state machine calls `RunMicrovm` through the AWS SDK integration, which starts an AWS Lambda MicroVM from the worker image (`AWS::Lambda::MicrovmImage`) and passes the job in the run hook payload.
+3. The state machine stores its task token in an Amazon DynamoDB table under the MicroVM ID and pauses with the `.waitForTaskToken` integration pattern.
+4. The worker inside the MicroVM looks up the task token, sends a heartbeat every 20 seconds while it works, and reports the result with `SendTaskSuccess` or `SendTaskFailure`.
+5. The state machine then calls `TerminateMicrovm`, on every path: success, failure, a missed heartbeat or the maximum duration.
+6. Separate AWS IAM roles for the state machine and the MicroVM allow only the actions each one needs, and the worker writes its output to an Amazon CloudWatch Logs log group that the stack owns.
+
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS Identity and Access Management (AWS IAM) user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured, recent enough to include the `aws lambda-microvms` commands (tested with 2.35.21)
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
