@@ -47,7 +47,7 @@ EGRESS_CONNECTOR = os.environ.get(
     "EGRESS_CONNECTOR",
     f"arn:aws:lambda:{REGION}:aws:network-connector:aws-network-connector:INTERNET_EGRESS",
 )
-LOG_GROUP = os.environ.get("MICROVM_LOG_GROUP", "/aws/lambda-microvms/sticky-notes-demo")
+LOG_GROUP = os.environ.get("MICROVM_LOG_GROUP", "/aws/lambda-microvms/state-persistence-demo")
 APP_PORT = int(os.environ.get("APP_PORT", "8080"))
 
 

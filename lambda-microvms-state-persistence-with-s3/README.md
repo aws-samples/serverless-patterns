@@ -2,7 +2,7 @@
 
 This pattern demonstrates **Lambda MicroVMs state persistence**. A user adds sticky notes and uploads files inside a Firecracker MicroVM; when that MicroVM is terminated and a new one launches for the same user, everything is restored from Amazon S3. A small session middleware (AWS Lambda + Amazon DynamoDB behind Amazon API Gateway) reconnects a returning user to their running MicroVM, or launches a fresh one that restores their last session.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [MicroVM Patterns](https://serverlessland.com/patterns?services=lambda-microvms)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-microvms-sticky-notes-board
+    cd lambda-microvms-state-persistence-with-s3
     ```
 1. Deploy the resources with a single command. `deploy.sh` is a thin bootstrap around a CloudFormation stack (`template.yaml`):
     ```bash
@@ -38,7 +38,7 @@ Important: this application uses various AWS services and there are costs associ
     | Variable | Default | Purpose |
     |----------|---------|---------|
     | `AWS_REGION` | `us-east-1` | Target region |
-    | `STACK_NAME` | `sticky-notes-board-demo` | CloudFormation stack name + resource label |
+    | `STACK_NAME` | `state-persistence-demo` | CloudFormation stack name + resource label |
     | `STATE_BUCKET` | `<STACK_NAME>-state-<accountId>` | S3 bucket for staging + notes/files |
     | `API_STAGE` | `prod` | API Gateway stage |
 
@@ -202,7 +202,7 @@ MicroVMs are created at runtime, not by the stack, so CloudFormation won't remov
    the MicroVM image name — see `StackLabel` in `deploy.sh`):
     ```bash
     export AWS_REGION=us-east-1
-    export STACK_NAME=sticky-notes-board-demo
+    export STACK_NAME=state-persistence-demo
     ```
 1. Terminate only the MicroVMs launched from **this demo's image**. The
    `--image-identifier` filter scopes `list-microvms` to this image, so the loop

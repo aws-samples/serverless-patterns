@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Deploy the Lambda MicroVM Sticky Notes Board.
+# Deploy the Lambda MicroVMs state persistence with S3 demo.
 #
 # The S3 bucket must exist before the CloudFormation stack, because the MicroVM
 # image's CodeArtifact.Uri points at the staged artifact. So this script:
@@ -12,7 +12,7 @@
 #
 # Configuration (env vars, all optional):
 #   AWS_REGION    default us-east-1
-#   STACK_NAME    default sticky-notes-demo
+#   STACK_NAME    default state-persistence-demo
 #   STATE_BUCKET  default <STACK_NAME>-state-<accountId>
 #   API_STAGE     default prod
 #
@@ -25,7 +25,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 cd "$HERE"
 
 AWS_REGION="${AWS_REGION:-us-east-1}"
-STACK_NAME="${STACK_NAME:-sticky-notes-board-demo}"
+STACK_NAME="${STACK_NAME:-state-persistence-demo}"
 API_STAGE="${API_STAGE:-prod}"
 
 command -v aws >/dev/null 2>&1 || { echo "ERROR: aws CLI not found on PATH"; exit 1; }

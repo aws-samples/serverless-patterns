@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  Lambda MicroVM Sticky Notes Board — MicroVM image + session middleware
+  Lambda MicroVMs state persistence with S3 — MicroVM image + session middleware
   (DynamoDB, Lambda, API Gateway). The S3 state/staging bucket is created by
   deploy.sh before this stack (the MicroVM artifact must be staged first), and
   passed in as a parameter.
@@ -12,7 +12,7 @@ Description: >
 Parameters:
   StackLabel:
     Type: String
-    Default: sticky-notes-demo
+    Default: state-persistence-demo
     Description: Label used to name the MicroVM image and tag resources.
     AllowedPattern: "^[a-z0-9][a-z0-9\\-]{1,40}[a-z0-9]$"
     ConstraintDescription: 3-42 chars, lowercase alphanumeric and hyphens, no leading/trailing hyphen.
@@ -176,7 +176,7 @@ Resources:
     # GetAtt/Ref in Properties below, so no explicit DependsOn is needed.
     Properties:
       Name: !Ref StackLabel
-      Description: Sticky Notes Board MicroVM (notes + files, S3-persisted)
+      Description: State-persistence demo MicroVM (notes + files, S3-persisted)
       BaseImageArn: !Sub "arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
       BaseImageVersion: "0"
       BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
