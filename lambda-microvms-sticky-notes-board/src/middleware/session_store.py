@@ -28,6 +28,7 @@ from datetime import datetime, timezone
 import boto3
 
 TABLE_NAME = os.environ.get("SESSIONS_TABLE", "microvm-sessions")
+STATUS_INDEX = os.environ.get("SESSIONS_STATUS_INDEX", "status-index")
 
 _dynamodb = boto3.resource("dynamodb")
 _table = _dynamodb.Table(TABLE_NAME)
@@ -86,6 +87,51 @@ def mark_closed(client_id: str) -> None:
         ExpressionAttributeNames={"#s": "status"},
         ExpressionAttributeValues={":c": "closed", ":u": _now_iso()},
     )
+
+
+# Returned by count_running() when the running-session count can't be
+# determined (e.g. the status GSI is still backfilling right after stack
+# creation). Callers treat it as "cap not evaluable" rather than a hard error.
+COUNT_UNKNOWN = -1
+
+
+def count_running() -> int:
+    """
+    Count sessions currently marked "running" via the status GSI.
+
+    Used to enforce a hard cap on concurrently live MicroVMs before launching a
+    new one, so a flood of fabricated clientIds can't spin up unbounded billable
+    MicroVMs. Uses Select=COUNT and paginates, so it never materializes items.
+
+    Returns COUNT_UNKNOWN (-1) if the GSI is not yet readable — a newly created
+    index backfills asynchronously and raises ValidationException
+    ("Cannot read from backfilling global secondary index") until it is ACTIVE.
+    That window is brief (empty/near-empty table at stack creation), so rather
+    than 500 the request we report the count as unknown and let the caller
+    proceed; stage throttling and reserved concurrency remain as backstops.
+    """
+    from botocore.exceptions import ClientError
+    from boto3.dynamodb.conditions import Key
+
+    total = 0
+    kwargs = {
+        "IndexName": STATUS_INDEX,
+        "KeyConditionExpression": Key("status").eq("running"),
+        "Select": "COUNT",
+    }
+    try:
+        while True:
+            resp = _table.query(**kwargs)
+            total += resp.get("Count", 0)
+            start_key = resp.get("LastEvaluatedKey")
+            if not start_key:
+                return total
+            kwargs["ExclusiveStartKey"] = start_key
+    except ClientError as e:
+        msg = e.response.get("Error", {}).get("Message", "")
+        if "backfilling" in msg or e.response.get("Error", {}).get("Code") == "ValidationException":
+            return COUNT_UNKNOWN
+        raise
 
 
 def token_is_valid(session: dict, skew_seconds: int = 120) -> bool:

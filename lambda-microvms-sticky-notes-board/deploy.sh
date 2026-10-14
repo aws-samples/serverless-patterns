@@ -88,17 +88,28 @@ echo "    middleware lambda -> s3://${STATE_BUCKET}/${MIDDLEWARE_KEY}"
 
 # ── Step 3: deploy the CloudFormation stack ────────────────────────────────────
 echo "==> [3/4] CloudFormation deploy"
+# Always-passed overrides.
+PARAM_OVERRIDES=(
+  StackLabel="$STACK_NAME"
+  StateBucket="$STATE_BUCKET"
+  ArtifactKey="$ARTIFACT_KEY"
+  MiddlewareKey="$MIDDLEWARE_KEY"
+  ApiStageName="$API_STAGE"
+)
+# Optional security/cost controls — forwarded only when set, otherwise the
+# template defaults apply (see the Security section of the README).
+[ -n "${ALLOWED_ORIGINS:-}" ]                 && PARAM_OVERRIDES+=( AllowedOrigins="$ALLOWED_ORIGINS" )
+[ -n "${MAX_LIVE_MICROVMS:-}" ]               && PARAM_OVERRIDES+=( MaxLiveMicrovms="$MAX_LIVE_MICROVMS" )
+[ -n "${API_RATE_LIMIT:-}" ]                  && PARAM_OVERRIDES+=( ApiRateLimit="$API_RATE_LIMIT" )
+[ -n "${API_BURST_LIMIT:-}" ]                 && PARAM_OVERRIDES+=( ApiBurstLimit="$API_BURST_LIMIT" )
+[ -n "${MIDDLEWARE_RESERVED_CONCURRENCY:-}" ] && PARAM_OVERRIDES+=( MiddlewareReservedConcurrency="$MIDDLEWARE_RESERVED_CONCURRENCY" )
+
 aws cloudformation deploy \
   --template-file template.yaml \
   --stack-name "$STACK_NAME" \
   --region "$AWS_REGION" \
   --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides \
-    StackLabel="$STACK_NAME" \
-    StateBucket="$STATE_BUCKET" \
-    ArtifactKey="$ARTIFACT_KEY" \
-    MiddlewareKey="$MIDDLEWARE_KEY" \
-    ApiStageName="$API_STAGE" \
+  --parameter-overrides "${PARAM_OVERRIDES[@]}" \
   --no-fail-on-empty-changeset
 
 # ── Step 4: outputs ────────────────────────────────────────────────────────────

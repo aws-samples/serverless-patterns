@@ -52,6 +52,7 @@ import logging
 import os
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from middleware import session_store as sessions
@@ -66,6 +67,10 @@ EXECUTION_ROLE_ARN = os.environ.get("EXECUTION_ROLE_ARN", "")
 STATE_BUCKET = os.environ.get("STATE_BUCKET", "")
 TOKEN_TTL_MINUTES = int(os.environ.get("TOKEN_TTL_MINUTES", "30"))
 APP_PORT = int(os.environ.get("APP_PORT", "8080"))
+# Hard cap on concurrently live MicroVMs. Launching is refused once this many
+# sessions are "running", so abuse of this (demo-unauthenticated) endpoint can't
+# spin up unbounded billable MicroVMs. 0 disables the cap.
+MAX_LIVE_MICROVMS = int(os.environ.get("MAX_LIVE_MICROVMS", "10"))
 
 # CORS headers returned on every response. The browser only ever sees this
 # API Gateway origin, so these are the only CORS headers that matter.
@@ -112,6 +117,9 @@ def lambda_handler(event, context):
             return terminate_session(client_id)
 
         return _resp(404, {"error": f"No route for {method} {path}"})
+    except CapacityExceeded as e:
+        # 429 so clients (and any abuse) back off instead of retrying hard.
+        return _resp(429, {"error": str(e)})
     except Exception as e:  # pragma: no cover - surface errors as 500 JSON
         logger.exception("Unhandled error")
         return _resp(500, {"error": str(e)})
@@ -125,6 +133,10 @@ def lambda_handler(event, context):
 # SUSPENDED/SUSPENDING resumes transparently on ingress (autoResumeEnabled),
 # PENDING is still coming up. Only a terminal state means we must relaunch.
 REUSABLE_STATES = {"PENDING", "RUNNING", "SUSPENDING", "SUSPENDED"}
+
+
+class CapacityExceeded(Exception):
+    """Raised when launching a new MicroVM would exceed MAX_LIVE_MICROVMS."""
 
 
 def open_session(client_id: str):
@@ -198,11 +210,36 @@ def _resolve_microvm(client_id: str) -> tuple[dict | None, bool]:
                 "microvmId": microvm_id,
                 "restored": False,
             }, True
+        # The stored MicroVM is gone/terminal. Mark the session closed now so it
+        # stops counting toward MAX_LIVE_MICROVMS (e.g. when the platform's idle
+        # policy terminated it without a DELETE /session call).
+        sessions.mark_closed(client_id)
         logger.info("MicroVM %s for %s is %s -> relaunching", microvm_id, client_id, state)
 
     # No reusable MicroVM -> launch a fresh one. State restores from S3 in /run.
     if not (IMAGE_ARN and EXECUTION_ROLE_ARN and STATE_BUCKET):
         return None, False
+
+    # Enforce the hard cap on concurrently live MicroVMs before launching. This
+    # bounds billable MicroVMs if the (demo-unauthenticated) endpoint is abused
+    # with a flood of fabricated clientIds. A production authorizer is still the
+    # primary control; this is the backstop. Set MAX_LIVE_MICROVMS=0 to disable.
+    if MAX_LIVE_MICROVMS > 0:
+        running = sessions.count_running()
+        if running == sessions.COUNT_UNKNOWN:
+            # GSI still backfilling (brief, right after stack creation). Can't
+            # evaluate the cap; allow the launch rather than 500. Throttling and
+            # reserved concurrency still bound the blast radius.
+            logger.warning("Running-session count unavailable (GSI backfilling); "
+                           "skipping cap check for %s", client_id)
+        elif running >= MAX_LIVE_MICROVMS:
+            logger.warning(
+                "Refusing launch for %s: %d running MicroVMs >= cap %d",
+                client_id, running, MAX_LIVE_MICROVMS,
+            )
+            raise CapacityExceeded(
+                f"MicroVM capacity reached ({running}/{MAX_LIVE_MICROVMS} running)"
+            )
 
     logger.info("Launching new MicroVM for %s", client_id)
     launched = mvm.run_microvm(
@@ -296,6 +333,11 @@ def proxy_to_microvm(event, method: str, path: str):
     sub_path = path[idx + len("/api"):] or "/"
     if not sub_path.startswith("/"):
         sub_path = "/" + sub_path
+    # API Gateway delivers the path already URL-decoded, so a filename like
+    # "Tag itau.pdf" arrives with a literal space. Re-encode each segment
+    # (keeping the "/" separators) before building the target URL, otherwise
+    # urllib rejects it: "URL can't contain control characters".
+    sub_path = "/".join(urllib.parse.quote(seg, safe="") for seg in sub_path.split("/"))
     qs = event.get("rawQueryString") or ""
     target = f"https://{session['endpoint']}{sub_path}"
     if qs:
@@ -318,7 +360,9 @@ def proxy_to_microvm(event, method: str, path: str):
 
     req = urllib.request.Request(target, data=data, method=method, headers=fwd_headers)
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
+        # Below the function's 29s timeout so a slow MicroVM fails cleanly as a
+        # 502 here, rather than the function being killed mid-request.
+        with urllib.request.urlopen(req, timeout=25) as r:
             return _passthrough(r.status, r.headers.get("Content-Type", ""), r.read())
     except urllib.error.HTTPError as e:
         # Relay the MicroVM's own error response (e.g. 404 note not found).

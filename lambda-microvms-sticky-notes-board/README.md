@@ -122,6 +122,59 @@ The **MicroVM app** (`src/microvm/`) runs a notes + files REST API plus lifecycl
 
 > File transfers go through API Gateway, which caps payloads at ~10 MB, so uploads via the UI are limited to ~9 MB.
 
+## Security
+
+This pattern is a **demo**. By default the HTTP API has **no authorizer** — the UI
+sends only a `clientId`, and the middleware launches a MicroVM for each distinct
+one. That is deliberate so the sample runs with zero setup, but it means anyone who
+knows the URL can open sessions. **Do not expose this as-is beyond a personal demo.**
+
+What the stack does ship to bound abuse and cost:
+
+- **MicroVM cap** — `MaxLiveMicrovms` (default `10`): the middleware counts
+  `running` sessions (via a DynamoDB `status` GSI) and returns `429` instead of
+  launching once the cap is reached, so a loop over fabricated `clientId`s can't
+  spin up unbounded billable MicroVMs. Set to `0` to disable.
+- **Stage throttling** — `ApiRateLimit` (default `5` req/s) and `ApiBurstLimit`
+  (default `10`) on the API Gateway stage.
+- **Reserved Lambda concurrency** — `MiddlewareReservedConcurrency` (default `10`)
+  caps how fast launch logic can run.
+- **Scoped IAM** — the MicroVM execution role writes only to this stack's log group
+  (not account-wide `CloudWatchLogsFullAccess`) and reads/writes only the
+  `microvm-state/*` and `microvm-files/*` S3 prefixes.
+
+**For anything beyond a personal demo, you must add authentication.** Put an
+authorizer on the HTTP API — a [JWT authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+(e.g. backed by Amazon Cognito or another OIDC provider) or an
+[IAM authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-access-control-iam.html)
+for service-to-service callers — and derive the `clientId` from the verified identity
+(the token `sub`) instead of trusting a client-supplied value, so one user cannot open
+or proxy to another user's session. These are the API Gateway-native paved paths; pick
+the one that matches your callers.
+
+**CORS** defaults to `AllowedOrigins: "*"` so the demo UI works from any localhost
+port. A wildcard lets any web page call the API from a visitor's browser — set
+`AllowedOrigins` to your UI's exact origin (comma-separated for several) in
+production.
+
+These controls are CloudFormation parameters. `deploy.sh` forwards them when the
+matching environment variable is set (otherwise the template defaults apply):
+
+| Env var | Parameter | Default |
+|---------|-----------|---------|
+| `ALLOWED_ORIGINS` | `AllowedOrigins` | `*` |
+| `MAX_LIVE_MICROVMS` | `MaxLiveMicrovms` | `10` |
+| `API_RATE_LIMIT` | `ApiRateLimit` | `5` |
+| `API_BURST_LIMIT` | `ApiBurstLimit` | `10` |
+| `MIDDLEWARE_RESERVED_CONCURRENCY` | `MiddlewareReservedConcurrency` | `10` |
+
+```bash
+ALLOWED_ORIGINS="https://notes.example.com" \
+MAX_LIVE_MICROVMS=25 \
+API_RATE_LIMIT=20 API_BURST_LIMIT=40 \
+./deploy.sh
+```
+
 ## Testing
 
 1. Serve the static web UI (no build step):
@@ -138,25 +191,34 @@ The **MicroVM app** (`src/microvm/`) runs a notes + files REST API plus lifecycl
 
 MicroVMs are created at runtime, not by the stack, so CloudFormation won't remove them. Terminate them first, then delete the stack and the bucket.
 
-1. Terminate any running MicroVMs for this image:
+1. Set the region and the stack name you deployed with (the stack name is also
+   the MicroVM image name — see `StackLabel` in `deploy.sh`):
     ```bash
     export AWS_REGION=us-east-1
+    export STACK_NAME=sticky-notes-board-demo
+    ```
+1. Terminate only the MicroVMs launched from **this demo's image**. The
+   `--image-identifier` filter scopes `list-microvms` to this image, so the loop
+   never touches MicroVMs from other images in the account:
+    ```bash
     aws lambda-microvms list-microvms --region "$AWS_REGION" \
-      --query "microvms[].microvmId" --output text | tr '\t' '\n' | while read -r id; do
+      --image-identifier "$STACK_NAME" \
+      --query "items[].microvmId" --output text | tr '\t' '\n' | while read -r id; do
         [ -n "$id" ] && aws lambda-microvms terminate-microvm --microvm-identifier "$id" --region "$AWS_REGION"
       done
     ```
 1. Delete the stack:
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME --region "$AWS_REGION"
+    aws cloudformation delete-stack --stack-name "$STACK_NAME" --region "$AWS_REGION"
     ```
 1. Confirm the stack has been deleted:
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    aws cloudformation list-stacks --region "$AWS_REGION" \
+      --query "StackSummaries[?contains(StackName,'$STACK_NAME')].StackStatus"
     ```
 1. Empty and remove the S3 state bucket (not managed by the stack):
     ```bash
-    export STATE_BUCKET=STACK_NAME-state-$(aws sts get-caller-identity --query Account --output text)
+    export STATE_BUCKET="${STACK_NAME}-state-$(aws sts get-caller-identity --query Account --output text)"
     aws s3 rb "s3://$STATE_BUCKET" --force
     ```
 
