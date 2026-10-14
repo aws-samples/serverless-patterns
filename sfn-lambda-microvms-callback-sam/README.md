@@ -8,18 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Architecture
 
-```
-  start-execution
-        |
-        v
-  AWS Step Functions --RunMicrovm (job in run hook payload)--> AWS Lambda MicroVM
-        |                                                        (worker image)
-        |  stores the task token in Amazon DynamoDB                    |
-        |  and waits (.waitForTaskToken, heartbeat timeout)            |
-        |<--- SendTaskSuccess / SendTaskFailure / SendTaskHeartbeat ---+
-        |
-        +--TerminateMicrovm (always: success, failure, timeout)
-```
+![Architecture diagram: an AWS Step Functions workflow starts an AWS Lambda MicroVM, stores the task token in Amazon DynamoDB, waits for the worker to call back, and always terminates the MicroVM](images/architecture.png)
 
 The AWS SAM template deploys these resources, and the flow between them is:
 
