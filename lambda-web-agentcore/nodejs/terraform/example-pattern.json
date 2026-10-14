@@ -1,0 +1,75 @@
+{
+  "title": "Streaming AI agent chat with Lambda Web Functions and AgentCore Runtime",
+  "description": "Serve a chat UI from an AWS Lambda Web Function behind Amazon CloudFront and stream a Strands agent's answer from AgentCore Runtime token by token.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "Terraform",
+  "patternGroup": "lambda-web-agentcore",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a fully serverless chat app for an AI agent. An Express server running as an AWS Lambda Web Function serves the chat UI and calls a Strands agent hosted on Amazon Bedrock AgentCore Runtime, which calls Claude Sonnet 5.5 on Amazon Bedrock. The answer streams back as server-sent events, token by token, from the model through AgentCore Runtime and the Web Function to the browser.",
+      "A Web Function runs a real, long-lived server process, so the server holds each chat response open and writes every chunk the moment it arrives. Amazon CloudFront is the app's single public URL. It adds a secret origin header that the server checks, so the Web Function endpoint cannot be used to bypass CloudFront, and it is where you would attach a custom domain or AWS WAF.",
+      "The agent is deployed to AgentCore Runtime as a .zip file with direct code deployment, so there is no container image, Docker or Amazon ECR repository. AgentCore Runtime runs each session in its own microVM, and the browser creates one session per tab, so every user gets a private, multi-turn conversation.",
+      "Both compute services scale with traffic, scale to zero when idle, and bill for the CPU your code actually uses rather than CPU time spent waiting for the model. The Web Function endpoint has a request rate limit and a maximum number of execution environments, which cap the traffic and the model spend of the public app."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-web-agentcore/nodejs/terraform",
+      "patternPath": "lambda-web-agentcore/nodejs/terraform",
+      "templateURL": "serverless-patterns/lambda-web-agentcore/nodejs/terraform",
+      "projectFolder": "lambda-web-agentcore/nodejs/terraform",
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html"
+      },
+      {
+        "text": "Scaling behavior for Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-scaling.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Runtime direct code deployment for Python",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-code-deploy-python.html"
+      },
+      {
+        "text": "AgentCore Runtime execution role permissions",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-permissions.html"
+      },
+      {
+        "text": "Strands Agents",
+        "link": "https://strandsagents.com"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply -var \"aws_region=us-east-1\""
+    ]
+  },
+  "testing": {
+    "text": [
+      "Open the <code>app_url</code> output in a browser and chat with the agent. See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the resources: <code>terraform destroy -var \"aws_region=us-east-1\"</code>, using the Region you deployed to."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manish S",
+      "image": "",
+      "bio": "AWS Support Engineer, trying to build things",
+      "linkedin": "manish-s-84199221b",
+      "twitter": ""
+    }
+  ]
+}
