@@ -44,7 +44,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 ins
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/msk-Lambda-iam-node-sam
+    cd serverless-patterns/msk-lambda-iam-node-sam
     ```
 ## Use the SAM CLI to build and test locally
 
@@ -114,7 +114,7 @@ REPORT RequestId: 05ddf736-39f9-4956-a8b1-d651883cdcba  Init Duration: 0.10 ms  
 To deploy your application for the first time, run the following in your shell:
 
 ```bash
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-Lambda-iam-node-sam --guided
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-iam-node-sam --guided
 ```
 
 The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
@@ -185,7 +185,7 @@ The code in this example prints out the fields in the Kafka message and also dec
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/msk-Lambda-iam-node-sam
+cd /home/ec2-user/serverless-patterns/msk-lambda-iam-node-sam
 sam delete
 
 ```

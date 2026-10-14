@@ -22,10 +22,10 @@ Parameters:
     Default: nodejs24.x
   MSKKafkaVersion:
     Type: String
-    Default: 3.5.1
+    Default: 3.9.x
   ApacheKafkaInstallerLocation:
     Type: String
-    Default: https://archive.apache.org/dist/kafka/3.5.1/kafka_2.13-3.5.1.tgz
+    Default: https://archive.apache.org/dist/kafka/3.9.1/kafka_2.13-3.9.1.tgz
   KafkaTopicForLambda:
     Type: String
     Default: MskIamNodejsLambdaTopic
@@ -1165,7 +1165,7 @@ Resources:
     Type: AWS::KMS::Alias
     Condition: CreateProvisionedCluster
     Properties: 
-      AliasName: alias/mskstack_secret_manager_key
+      AliasName: !Sub 'alias/${AWS::StackName}-secret-manager-key'
       TargetKeyId: !Ref 'CredentialsKMSKey'
 
   CredentialsSecret:
