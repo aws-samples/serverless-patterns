@@ -56,7 +56,13 @@ This template deploys a full-stack application where Application Load Balancer w
 
 ## Testing
 
-Once the SAM deploymeny is successful, you will get a custom LoadBalancerDNSNAme as output. Eg: alb.awsuser.myinstance.com. Navigate to this domain name and you will see a Cognito authentication page. Click on Sign Up and create a user. Once the Sign Up is successful, you will be directed to a page which will show regional metrics related to Lambda functions present in your account.
+Once the SAM deployment is successful, you get the `LoadBalancerDNSNAme` and `UserPoolId` outputs. The user pool doesn't allow self sign-up, so create a user first. Cognito emails a temporary password to the address you give:
+
+```
+aws cognito-idp admin-create-user --user-pool-id <UserPoolId> --username you@example.com --user-attributes Name=email,Value=you@example.com Name=email_verified,Value=true
+```
+
+Navigate to the `LoadBalancerDNSNAme` domain, for example `alb.awsuser.myinstance.com`, and sign in with the temporary password. Cognito asks you to set a new password of at least 12 characters with upper and lower case letters, a number and a symbol. You're then directed to a page that shows regional metrics for the Lambda functions in your account.
 
 ## Cleanup
  

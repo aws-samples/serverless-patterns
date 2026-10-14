@@ -224,12 +224,12 @@ Resources:
           Required: 'true'
       Policies:
         PasswordPolicy:
-          MinimumLength: 6
-          RequireLowercase: false
-          RequireNumbers: false
-          RequireSymbols: false
-          RequireUppercase: false
-          TemporaryPasswordValidityDays: 21
+          MinimumLength: 12
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+          TemporaryPasswordValidityDays: 7
   UserPoolDomain: # Provides Cognito Login Page
     Type: 'AWS::Cognito::UserPoolDomain'
     Properties:
@@ -256,3 +256,6 @@ Resources:
 Outputs:
   LoadBalancerDNSNAme:
     Value: !Ref Subdomain
+  UserPoolId:
+    Description: Cognito user pool to add users to
+    Value: !Ref UserPool
