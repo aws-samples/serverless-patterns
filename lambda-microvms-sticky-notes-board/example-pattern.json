@@ -1,5 +1,5 @@
 {
-  "title": "AWS Lambda MicroVMs Sticky Notes Board with AWS Lambda MicroVMs",
+  "title": "State persistence for AWS Lambda MicroVMs with Amazon S3",
   "description": "A Sticky Notes Board that shows Lambda MicroVM state persistence: notes and files survive a MicroVM terminating and relaunching, restored from S3 per client.",
   "language": "Python",
   "level": "300",
