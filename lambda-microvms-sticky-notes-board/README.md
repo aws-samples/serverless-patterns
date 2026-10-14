@@ -1,4 +1,4 @@
-# Lambda MicroVMs Sticky Notes Board
+# AWS Lambda MicroVMs Sticky Notes Board
 
 This pattern demonstrates **Lambda MicroVMs state persistence**. A user adds sticky notes and uploads files inside a Firecracker MicroVM; when that MicroVM is terminated and a new one launches for the same user, everything is restored from Amazon S3. A small session middleware (AWS Lambda + Amazon DynamoDB behind Amazon API Gateway) reconnects a returning user to their running MicroVM, or launches a fresh one that restores their last session.
 
