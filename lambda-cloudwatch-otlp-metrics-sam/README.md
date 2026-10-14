@@ -2,6 +2,12 @@
 
 This pattern records custom application metrics in an AWS Lambda function using the OpenTelemetry metrics API and sends them to Amazon CloudWatch over the OpenTelemetry Protocol (OTLP). The AWS Distro for OpenTelemetry (ADOT) Lambda layer runs a collector next to the function that signs each request with AWS Signature Version 4 (SigV4) and forwards it to the Amazon CloudWatch OTLP metrics endpoint. The function makes no PutMetricData calls, writes no embedded metric format logs, and performs no request signing of its own. The metrics are then queried with Prometheus Query Language (PromQL).
 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-cloudwatch-otlp-metrics-sam
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+
+## Architecture
+
 ```
    AWS Lambda                                  Amazon CloudWatch
    +----------------------------+              +--------------------------+
@@ -13,13 +19,16 @@ This pattern records custom application metrics in an AWS Lambda function using 
    +----------------------------+              +--------------------------+
 ```
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-cloudwatch-otlp-metrics-sam
+The AWS SAM template deploys these resources, and the data flow between them is:
 
-Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
+1. The AWS Lambda function records a counter and a histogram with the OpenTelemetry metrics API on every invocation.
+2. The AWS Distro for OpenTelemetry (ADOT) Lambda layer runs a collector as a Lambda extension in the same execution environment. It receives the metrics, signs each request with SigV4 using the function's AWS IAM execution role, and sends it over OTLP to the Amazon CloudWatch OTLP metrics endpoint for the Region.
+3. Amazon CloudWatch stores the metrics, and you query them with PromQL through the CloudWatch Prometheus-compatible HTTP API or in Query Studio.
+4. The function's AWS IAM execution role allows `cloudwatch:PutMetricData`, which the OTLP metrics endpoint requires, and the function and collector write their logs to an Amazon CloudWatch Logs log group that the stack owns.
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS Identity and Access Management (AWS IAM) user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
