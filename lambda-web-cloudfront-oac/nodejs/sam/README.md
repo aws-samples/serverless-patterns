@@ -168,7 +168,7 @@ for i in 1 2 3; do curl -si "$CLOUDFRONT_URL/cached" | grep -i 'x-cache\|generat
 
 To confirm that the policy ties the function to one distribution, create a second distribution with the same origin and OAC and request `/whoami` through it: it returns `403`. Disable and delete that distribution afterwards.
 
-View the logs written by the sandboxes:
+View the logs written by the execution environments:
 
 ```bash
 aws logs tail /aws/lambda/web/lambda-web-cloudfront-oac-sam --region $AWS_REGION --follow
