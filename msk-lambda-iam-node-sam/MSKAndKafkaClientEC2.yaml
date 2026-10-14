@@ -539,6 +539,8 @@ Resources:
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/NODEJS_VERSION/$NODEJS_VERSION/g" template.yaml
+            sed -i "s|PERMISSIONS_BOUNDARY_ARN|${SamFunctionPermissionsBoundary}|g" template.yaml
+            sed -i "s|ROLE_PATH|/${AWS::StackName}/|g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -830,6 +832,8 @@ Resources:
             sed -i "s/CLUSTER_ID/$CLUSTER_ID/g" template.yaml
             sed -i "s/KAFKA_TOPIC/$KAFKA_TOPIC/g" template.yaml
             sed -i "s/NODEJS_VERSION/$NODEJS_VERSION/g" template.yaml
+            sed -i "s|PERMISSIONS_BOUNDARY_ARN|${SamFunctionPermissionsBoundary}|g" template.yaml
+            sed -i "s|ROLE_PATH|/${AWS::StackName}/|g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -880,7 +884,6 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AWSCertificateManagerPrivateCAFullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess
         - arn:aws:iam::aws:policy/AWSLambda_FullAccess
       Policies:
         - PolicyName: MSKConfigurationAccess
@@ -895,32 +898,52 @@ Resources:
                   }
               ]
           }'
-        - PolicyName: CloudformationDeploy
-          PolicyDocument: !Sub '{
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-            "Effect": "Allow",
-            "Action": [
-                "iam:*"
-            ],
-            "Resource": "*"
-        }
-              ]
-          }' 
+        - PolicyName: SamDeployIamAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ManageSamFunctionRolesWithBoundary
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PermissionsBoundary': !Ref SamFunctionPermissionsBoundary
+              - Sid: ReadAndDeleteSamFunctionRoles
+                Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:GetRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:ListAttachedRolePolicies
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:DeleteRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+              - Sid: PassSamFunctionRolesToLambda
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PassedToService': lambda.amazonaws.com
+              - Sid: DenyPassingOtherRoles
+                Effect: Deny
+                Action: iam:PassRole
+                NotResource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
         - PolicyName: MSKProducerPermissions
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: SecretsAccess
+              - Sid: GlueSchemaAccess
                 Effect: Allow
                 Action:
-                  - 'secretsmanager:*'
-                  - 'kms:*'
                   - 'glue:*Schema*'
-                  - 'iam:CreatePolicy'
-                  - 'iam:Tag*'
-                  - 'iam:AttachRolePolicy'
                 Resource: '*'
         - PolicyName: MSKConnectAuthentication
           PolicyDocument: !Sub '{
@@ -1001,6 +1024,43 @@ Resources:
                 }
             ]
         }'         
+
+  SamFunctionPermissionsBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions boundary for the Lambda function roles that sam deploy creates from the client instance
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - kafka:DescribeCluster
+              - kafka:DescribeClusterV2
+              - kafka:GetBootstrapBrokers
+              - kafka-cluster:Connect
+              - kafka-cluster:DescribeCluster
+              - kafka-cluster:AlterCluster
+              - kafka-cluster:DescribeClusterDynamicConfiguration
+              - kafka-cluster:AlterClusterDynamicConfiguration
+              - kafka-cluster:DescribeTopic
+              - kafka-cluster:ReadData
+              - kafka-cluster:WriteData
+              - kafka-cluster:WriteDataIdempotently
+              - kafka-cluster:DescribeGroup
+              - kafka-cluster:AlterGroup
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DeleteNetworkInterface
+              - ec2:DetachNetworkInterface
+              - ec2:AssignPrivateIpAddresses
+              - ec2:UnassignPrivateIpAddresses
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: '*'
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile

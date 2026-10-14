@@ -577,6 +577,8 @@ Resources:
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
             sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
             sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
+            sed -i "s|PERMISSIONS_BOUNDARY_ARN|${SamFunctionPermissionsBoundary}|g" template.yaml
+            sed -i "s|ROLE_PATH|/${AWS::StackName}/|g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -876,6 +878,8 @@ Resources:
             sed -i "s/VPC_ID/$VPC_ID/g" template.yaml
             sed -i "s/LAMBDA_SECURITY_GROUP_ID/$LAMBDA_SECURITY_GROUP_ID/g" template.yaml
             sed -i "s/SUBNET_IDS/$SUBNET_IDS/g" template.yaml
+            sed -i "s|PERMISSIONS_BOUNDARY_ARN|${SamFunctionPermissionsBoundary}|g" template.yaml
+            sed -i "s|ROLE_PATH|/${AWS::StackName}/|g" template.yaml
             
             # Get IP CIDR range for EC2 Instance Connect
             cd /home/ec2-user
@@ -935,7 +939,6 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AWSCertificateManagerPrivateCAFullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess
         - arn:aws:iam::aws:policy/AWSLambda_FullAccess
         - arn:aws:iam::aws:policy/AmazonSQSFullAccess
       Policies:
@@ -951,29 +954,48 @@ Resources:
                   }
               ]
           }'
-        - PolicyName: CloudformationDeploy
-          PolicyDocument: !Sub '{
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-            "Effect": "Allow",
-            "Action": [
-                "iam:*"
-            ],
-            "Resource": "*"
-        }
-              ]
-          }' 
+        - PolicyName: SamDeployIamAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ManageSamFunctionRolesWithBoundary
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PermissionsBoundary': !Ref SamFunctionPermissionsBoundary
+              - Sid: ReadAndDeleteSamFunctionRoles
+                Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:GetRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:ListAttachedRolePolicies
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:DeleteRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+              - Sid: PassSamFunctionRolesToLambda
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PassedToService': lambda.amazonaws.com
+              - Sid: DenyPassingOtherRoles
+                Effect: Deny
+                Action: iam:PassRole
+                NotResource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
         - PolicyName: MSKProducerPermissions
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: SecretsAccess
-                Effect: Allow
-                Action:
-                  - 'secretsmanager:*'
-                  - 'kms:*'
-                Resource: '*'
               - Sid: SQSPermissions
                 Effect: Allow
                 Action:
@@ -986,13 +1008,10 @@ Resources:
                   - 'sqs:ListQueues'
                   - 'sqs:ListQueueTags'
                 Resource: '*'
-              - Sid: GlueAndIAMPermissions
+              - Sid: GluePermissions
                 Effect: Allow
                 Action:
                   - 'glue:*Schema*'
-                  - 'iam:CreatePolicy'
-                  - 'iam:Tag*'
-                  - 'iam:AttachRolePolicy'
                 Resource: '*'
         - PolicyName: MSKConnectAuthentication
           PolicyDocument: !Sub '{
@@ -1073,6 +1092,55 @@ Resources:
                 }
             ]
         }'         
+
+  SamFunctionPermissionsBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions boundary for the Lambda function roles that sam deploy creates from the client instance
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - kafka:DescribeCluster
+              - kafka:DescribeClusterV2
+              - kafka:GetBootstrapBrokers
+              - kafka-cluster:Connect
+              - kafka-cluster:DescribeCluster
+              - kafka-cluster:AlterCluster
+              - kafka-cluster:DescribeClusterDynamicConfiguration
+              - kafka-cluster:AlterClusterDynamicConfiguration
+              - kafka-cluster:DescribeTopic
+              - kafka-cluster:ReadData
+              - kafka-cluster:WriteData
+              - kafka-cluster:WriteDataIdempotently
+              - kafka-cluster:DescribeGroup
+              - kafka-cluster:AlterGroup
+              - glue:GetSchemaByDefinition
+              - glue:GetSchemaVersion
+              - glue:GetRegistry
+              - glue:ListSchemas
+              - glue:ListSchemaVersions
+              - glue:RegisterSchemaVersion
+              - glue:PutSchemaVersionMetadata
+              - glue:GetSchemaVersionsDiff
+              - glue:QuerySchemaVersionMetadata
+              - glue:CreateSchema
+              - glue:CreateRegistry
+              - sqs:SendMessage
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DeleteNetworkInterface
+              - ec2:DetachNetworkInterface
+              - ec2:AssignPrivateIpAddresses
+              - ec2:UnassignPrivateIpAddresses
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: '*'
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile

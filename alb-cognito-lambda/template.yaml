@@ -44,13 +44,16 @@ Resources:
             Service:
             - "lambda.amazonaws.com"
           Action: "sts:AssumeRole"
-      ManagedPolicyArns: 
-      - "arn:aws:iam::aws:policy/AdministratorAccess"
       Policies:
       - PolicyName: !Sub "${LambdaFunctionName}-policy"
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
+          - Effect: "Allow"
+            Action:
+            - "ec2:DescribeRegions"
+            - "lambda:GetAccountSettings"
+            Resource: "*"
           - Effect: "Allow"
             Action:
             - "logs:CreateLogStream"
@@ -61,7 +64,7 @@ Resources:
   LambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "ALBLambda"
+      FunctionName: !Ref LambdaFunctionName
       Description: An Application Load Balancer Lambda Target that returns regional metrics
       Handler: index.lambda_handler
       Runtime: python3.14
@@ -206,7 +209,7 @@ Resources:
     Properties:
       UserPoolName: UserPool-ALB-Cognito-Lambda
       AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: false # Disable self-registration
+        AllowAdminCreateUserOnly: true # Disable self-registration
         InviteMessageTemplate:
           EmailSubject: !Sub '${AWS::StackName}: temporary password'
           EmailMessage: 'Use the username {username} and the temporary password {####} to log in for the first time.'

@@ -16,6 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * A custom domain name (e.g., awsuser.myinstance.com). You can register domain using AWS Route 53 - https://aws.amazon.com/getting-started/hands-on/get-a-domain/
 * A valid SSL certificate (e.g., Amazon Certificate Manager) for the custom domain name. You can use a wildcard certificate for *.awsuser.myinstance.com - https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains-prerequisites.html
 * A PrettyTable Lambda Layer for your Lambda function. Download zip file from here - https://github.com/jainam1992/aws-lambda-code-samples/blob/main/prettyTable.zip . Once you have downloaded the Layer .zip file, you can add the layer and upload the .zip file using these steps - https://docs.aws.amazon.com/lambda/latest/dg/invocation-layers.html#invocation-layers-using. Note the ARN of the created layer.
+* The layer code runs with the Lambda function's IAM role. The role allows only `ec2:DescribeRegions`, `lambda:GetAccountSettings` and writing to the function's own log group. Only use a layer you've built or reviewed yourself.
 
 ## Deployment Instructions
 
