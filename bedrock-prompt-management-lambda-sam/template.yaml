@@ -5,7 +5,7 @@ Description: >
   and a published version are defined as native AWS CloudFormation resources; an AWS Lambda
   function invokes the prompt by its version ARN through the Amazon Bedrock Converse API.
   Update or roll back the prompt by publishing a new version, so the function code never changes.
-  (bedrock-prompt-management-lambda-sam)
+  (uksb-1tthgi812)(tag:bedrock-prompt-management-lambda-sam)
 
 Parameters:
   ModelId:
