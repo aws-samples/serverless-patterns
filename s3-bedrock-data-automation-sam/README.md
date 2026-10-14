@@ -6,6 +6,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+## Architecture
+
 ```
   upload file                ObjectCreated              invoke async
   to input/  --> Amazon S3  ------------->  AWS Lambda  ------------>  Bedrock Data Automation
@@ -14,14 +16,22 @@ Important: this application uses various AWS services and there are costs associ
                     +---------------- structured JSON to output/ --------------+
 ```
 
+The AWS SAM template deploys these resources, and the data flow between them is:
+
+1. You upload a file to the `input/` prefix of the Amazon S3 bucket that the stack creates.
+2. The Amazon S3 `ObjectCreated` event invokes the AWS Lambda function.
+3. The function calls `InvokeDataAutomationAsync` with the Bedrock Data Automation project (`AWS::Bedrock::DataAutomationProject`) and the inference profile for your Region's geography, then returns. It does not wait for the result.
+4. Bedrock Data Automation reads the file and writes the structured JSON result to the `output/` prefix of the same bucket.
+5. The function's AWS IAM execution role can only read `input/`, write `output/` and start jobs on this one project and profile. The function writes its logs to an Amazon CloudWatch Logs log group that the stack owns.
+
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS Identity and Access Management (AWS IAM) user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * A way for `sam build` to build the function: either [Python](https://www.python.org/downloads/) 3.13 on your PATH, matching the function's `python3.13` runtime, or `sam build --use-container`, which builds the function inside a Lambda-like container image and "requires Docker to be installed" (AWS SAM Developer Guide, [Introduction to building with AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-build.html)).
-* Permissions in the deployment account for Amazon S3, AWS Lambda, Amazon CloudWatch Logs, AWS Identity and Access Management (IAM) and Amazon Bedrock Data Automation
+* Permissions in the deployment account for Amazon S3, AWS Lambda, Amazon CloudWatch Logs, AWS IAM and Amazon Bedrock Data Automation
 * Bedrock Data Automation is called through the cross-Region inference profile for your Region's geography, which the template picks for you: `us.data-automation-v1`, `eu.data-automation-v1` or `apac.data-automation-v1`. Deploy in a source Region that offers one of those profiles: `us-east-1`, `us-east-2`, `us-west-2`, `eu-central-1`, `eu-west-1`, `eu-west-2`, `ap-south-1`, `ap-southeast-2` or `ap-northeast-1`, per [Cross Region support required for Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html). The template contains an AWS CloudFormation `Rules` assertion that stops the deployment in any other Region.
 * This pattern was tested in `us-east-1` and `eu-central-1`.
 
