@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Serverless patterns - Node.js HTTP server on AWS Lambda Web Functions (SAM).
-  A zero-dependency http.createServer app that reports per-sandbox concurrency.
+  A zero-dependency http.createServer app that reports per-environment concurrency.
 
 Parameters:
   CodeBucket:
