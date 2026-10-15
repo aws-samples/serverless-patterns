@@ -115,19 +115,6 @@ Resources:
       RouteTableIds:
         - !Ref PrivateRouteTable
 
-  # S3 Files Interface Endpoint — for NFS mount operations
-  S3FilesInterfaceEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      VpcId: !Ref VPC
-      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3-outposts"
-      VpcEndpointType: Interface
-      SubnetIds:
-        - !Ref PrivateSubnet
-      SecurityGroupIds:
-        - !Ref LambdaSecurityGroup
-      PrivateDnsEnabled: true
-
   # -----------------------------------------------------------------------
   # S3 Bucket
   # -----------------------------------------------------------------------
