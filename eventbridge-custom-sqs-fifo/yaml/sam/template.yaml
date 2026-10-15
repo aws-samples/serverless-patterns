@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  eventbridge-custom-sqs-fifo
+
+  Deliver ordered events from an enhanced custom EventBridge event bus
+  (AWS::EventsV2) to an Amazon SQS FIFO queue, using a FIFO Subscriber and an
+  IAM delivery role.
+
+Resources:
+
+  # Retention enables replay. It matches the DLQ's 14 days, because a DLQ record
+  # holds event ids, not events, and the events must still be on the bus to redrive.
+  OrdersBus:
+    Type: AWS::EventsV2::EventBus
+    Properties:
+      Name: !Sub '${AWS::StackName}-orders-bus'
+      Description: Enhanced custom event bus delivering ordered events to an SQS FIFO queue
+      StorageConfiguration:
+        RetentionPeriodInDays: 14
+
+  # No ContentBasedDeduplication: the subscriber supplies MessageDeduplicationId.
+  TargetQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${AWS::StackName}-target.fifo'
+      FifoQueue: true
+
+  # FIFO so failure records stay in order per event group (EventBridge sets their
+  # MessageGroupId). ContentBasedDeduplication is a precaution: failure records are
+  # not documented to carry a dedup id.
+  DeliveryDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub '${AWS::StackName}-delivery-dlq.fifo'
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  # EventBridge assumes this role to send to the target queue and the DLQ.
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:subscriber/*'
+      Policies:
+        - PolicyName: deliver-to-sqs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource:
+                  - !GetAtt TargetQueue.Arn
+                  - !GetAtt DeliveryDLQ.Arn
+
+  # Delivers matching events in order within each event group (EventGroupId).
+  OrdersSubscriber:
+    Type: AWS::EventsV2::Subscriber
+    Properties:
+      Name: !Sub '${AWS::StackName}-to-fifo'
+      EventBusArn: !Ref OrdersBus          # also orders creation after the bus
+      Type: FIFO
+      FilterConfiguration:
+        Filters:
+          - Scope: DATA
+            Pattern: '{"detail-type":["OrderPlaced"],"source":["com.example.orders"]}'
+      InvokeConfiguration:
+        TargetArn: !GetAtt TargetQueue.Arn
+        RoleArn: !GetAtt DeliveryRole.Arn
+        SqsParameters:
+          # Per-message fields must be expressions; a literal dedup id would make
+          # SQS discard every message after the first.
+          MessageGroupId: '{% $events.SystemMetadata.EventGroupId %}'
+          # Not the publisher's DeduplicationId: the bus scopes it to one event
+          # group, but SQS deduplicates across the whole queue.
+          MessageDeduplicationId: '{% $events.SystemMetadata."aws:EventId" %}'
+      RetryPolicy:
+        MaxRetryAttempts: 10
+        MaxEventAgeInSeconds: 3600
+      OnFailureConfiguration:
+        Arn: !GetAtt DeliveryDLQ.Arn
+      LogConfiguration:
+        Level: INFO
+        IncludePayload: ON_ERROR_ONLY   # FULL logs every event body; use it only while debugging
+
+  # Subscriber delivery logs. The log group name must start with /aws/vendedlogs/
+  # for CloudWatch Logs to manage its resource policy.
+  SubscriberLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/vendedlogs/${AWS::StackName}-subscriber'
+      RetentionInDays: 7
+
+  SubscriberLogSource:
+    Type: AWS::Logs::DeliverySource
+    Properties:
+      Name: !Sub '${AWS::StackName}-sub-source'
+      LogType: INFO_LOGS
+      ResourceArn: !Ref OrdersSubscriber
+
+  SubscriberLogDestination:
+    Type: AWS::Logs::DeliveryDestination
+    Properties:
+      Name: !Sub '${AWS::StackName}-sub-dest'
+      DestinationResourceArn: !GetAtt SubscriberLogGroup.Arn
+
+  SubscriberLogDelivery:
+    Type: AWS::Logs::Delivery
+    Properties:
+      DeliverySourceName: !Ref SubscriberLogSource
+      DeliveryDestinationArn: !GetAtt SubscriberLogDestination.Arn
+
+Outputs:
+  EventBusArn:
+    Description: ARN of the enhanced custom event bus (use this to publish)
+    Value: !Ref OrdersBus
+  SubscriberArn:
+    Description: ARN of the FIFO subscriber
+    Value: !Ref OrdersSubscriber
+  TargetQueueUrl:
+    Description: URL of the SQS FIFO target queue
+    Value: !Ref TargetQueue
+  TargetQueueArn:
+    Description: ARN of the SQS FIFO target queue
+    Value: !GetAtt TargetQueue.Arn
+  DeliveryDLQUrl:
+    Description: URL of the delivery dead-letter queue
+    Value: !Ref DeliveryDLQ
+  SubscriberLogGroup:
+    Description: CloudWatch Logs group receiving subscriber delivery logs
+    Value: !Ref SubscriberLogGroup
