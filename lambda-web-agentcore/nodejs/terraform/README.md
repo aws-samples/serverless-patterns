@@ -4,6 +4,8 @@ This pattern deploys a fully serverless chat app for an AI agent. A Node.js web 
 
 Both compute services are serverless: they scale with traffic and scale to zero when idle. Both bill for the CPU your code actually uses, not for CPU time spent waiting, and an AI workload spends most of its time waiting for the model. Memory is billed while an execution environment or session exists. See [AWS Lambda Web Functions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html) and [Amazon Bedrock AgentCore pricing](https://aws.amazon.com/bedrock/agentcore/pricing/).
 
+This pattern is based on the [Lambda Web Functions and AgentCore Runtime integration sample](https://github.com/aws-samples/sample-genai-strats/tree/main/agentcore/lambda-web-function-integration) by Anton Aleksandrov.
+
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-web-agentcore-nodejs-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.

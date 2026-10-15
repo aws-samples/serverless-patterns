@@ -1,5 +1,5 @@
 {
-  "title": "Streaming AI agent chat with Lambda Web Functions and AgentCore Runtime",
+  "title": "Streaming AI agent chat with AWS Lambda Web Functions and AgentCore Runtime",
   "description": "Serve a chat UI from an AWS Lambda Web Function behind Amazon CloudFront and stream a Strands agent's answer from AgentCore Runtime token by token.",
   "language": "Node.js",
   "level": "300",
@@ -69,6 +69,13 @@
       "image": "",
       "bio": "AWS Support Engineer, trying to build things",
       "linkedin": "manish-s-84199221b",
+      "twitter": ""
+    },
+    {
+      "name": "Anton Aleksandrov",
+      "image": "https://avatars.githubusercontent.com/u/3949873?v=4",
+      "bio": "Principal Solutions Architect, AWS Serverless",
+      "linkedin": "antonal80",
       "twitter": ""
     }
   ]
