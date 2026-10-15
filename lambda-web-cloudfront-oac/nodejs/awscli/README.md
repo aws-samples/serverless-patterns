@@ -34,11 +34,25 @@ Important: this application uses various AWS services and there are costs associ
 
 The script runs these steps. You can run them one at a time instead:
 
-1. Deploy the Web Function with an `IamAuth` endpoint. The AWS CLI creates the function, a logs-only execution role, a versioned artifact bucket and an endpoint named `dev`:
+1. Deploy the Web Function with an `IamAuth` endpoint. The AWS CLI packages the `src` folder, and creates the function, a logs-only execution role, a versioned artifact bucket and an endpoint named `dev`:
     ```bash
-    aws lambda-web deploy --name lambda-web-cloudfront-oac --code . --auth-type IamAuth --create
+    aws lambda-web deploy --name lambda-web-cloudfront-oac --code src --auth-type IamAuth --create
     ```
     From this moment the endpoint rejects unsigned requests. It is never public.
+1. Create a cache policy. The managed `CachingOptimized` policy leaves the query string and the `Authorization` header out of the cache key, and CloudFront forwards `Authorization` to the origin only when the cache policy includes it. This policy keeps the `CachingOptimized` TTLs and compression and adds both, so each signed-in viewer gets their own cache entries:
+    ```bash
+    aws cloudfront create-cache-policy --cache-policy-config '{
+      "Name": "lambda-web-cloudfront-oac",
+      "MinTTL": 1, "DefaultTTL": 86400, "MaxTTL": 31536000,
+      "ParametersInCacheKeyAndForwardedToOrigin": {
+        "EnableAcceptEncodingGzip": true,
+        "EnableAcceptEncodingBrotli": true,
+        "HeadersConfig": { "HeaderBehavior": "whitelist", "Headers": { "Quantity": 1, "Items": ["Authorization"] } },
+        "CookiesConfig": { "CookieBehavior": "none" },
+        "QueryStringsConfig": { "QueryStringBehavior": "all" }
+      }
+    }'
+    ```
 1. Create the Origin Access Control. `OriginAccessControlOriginType` must be `lambda` and `SigningBehavior` must be `always-amz-auth`; CloudFront rejects `always` for Web Function origins:
     ```bash
     aws cloudfront create-origin-access-control --origin-access-control-config '{
@@ -48,17 +62,20 @@ The script runs these steps. You can run them one at a time instead:
       "OriginAccessControlOriginType": "lambda"
     }'
     ```
-1. Create the distribution with the function's endpoint domain as an HTTPS custom origin and the OAC attached to it. The script uses two managed policies: `CachingOptimized`, so CloudFront caches by path and honours the origin's `Cache-Control` headers, and `AllViewerExceptHostHeader`, which forwards the viewer's headers and query string but not the `Host` header. Lambda routes on `Host`, so the origin request must carry the endpoint domain, not the viewer's.
-1. Attach a resource policy to the function that lets the CloudFront service principal invoke the `dev` endpoint, with an `AWS:SourceArn` condition naming your distribution:
+1. Create the distribution with the function's endpoint domain as an HTTPS custom origin and the OAC attached to it. The script uses the cache policy from the previous step and the managed `AllViewerExceptHostHeader` origin request policy, which forwards the viewer's headers and query string but not the `Host` header. Lambda routes on `Host`, so the origin request must carry the endpoint domain, not the viewer's.
+1. Attach a resource policy to the function that lets the CloudFront service principal invoke the `dev` endpoint, with an `AWS:SourceArn` condition naming your distribution. The ARNs take the partition and account from your own identity:
     ```bash
-    aws lambda-web put-resource-policy --resource-arn arn:aws:lambda:$AWS_REGION:<account-id>:web-function/lambda-web-cloudfront-oac --policy '{
+    CALLER_ARN=$(aws sts get-caller-identity --query Arn --output text)
+    PARTITION=$(echo $CALLER_ARN | cut -d: -f2)
+    ACCOUNT_ID=$(echo $CALLER_ARN | cut -d: -f5)
+    aws lambda-web put-resource-policy --resource-arn arn:$PARTITION:lambda:$AWS_REGION:$ACCOUNT_ID:web-function/lambda-web-cloudfront-oac --policy '{
       "Version": "2012-10-17",
       "Statement": [{
         "Effect": "Allow",
         "Principal": { "Service": "cloudfront.amazonaws.com" },
         "Action": "lambda:InvokeWebFunctionEndpoint",
-        "Resource": "arn:aws:lambda:'$AWS_REGION':<account-id>:web-function/lambda-web-cloudfront-oac/endpoint/dev",
-        "Condition": { "StringEquals": { "AWS:SourceArn": "arn:aws:cloudfront::<account-id>:distribution/<distribution-id>" } }
+        "Resource": "arn:'$PARTITION':lambda:'$AWS_REGION':'$ACCOUNT_ID':web-function/lambda-web-cloudfront-oac/endpoint/dev",
+        "Condition": { "StringEquals": { "AWS:SourceArn": "arn:'$PARTITION':cloudfront::'$ACCOUNT_ID':distribution/<distribution-id>" } }
       }]
     }'
     ```
@@ -78,7 +95,7 @@ Direct request ──HTTPS (unsigned)──────────────�
 Three settings work together:
 
 * **`IamAuth` on the endpoint.** Lambda validates a SigV4 signature on every request and returns `403` when it is missing or invalid. Your code never runs for those requests.
-* **OAC of type `lambda` with `always-amz-auth`.** CloudFront signs each origin request with its own service credentials. The viewer's own `Authorization` header, if any, is preserved and forwarded to your application, so existing sign-in flows keep working.
+* **OAC of type `lambda` with `always-amz-auth`.** CloudFront signs each origin request with its own service credentials. The viewer's own `Authorization` header, if any, is preserved and forwarded to your application, because the cache policy includes it, so existing sign-in flows keep working.
 * **Resource policy with `AWS:SourceArn`.** The signature proves the caller is CloudFront; the policy decides which CloudFront distribution is allowed. Another distribution in any account, even one using the same OAC configuration, gets `403`.
 
 After validating the signature, Lambda removes the `Authorization` header it used, so the application sees the request without CloudFront's credentials. The application exposes two routes:
@@ -97,6 +114,7 @@ Two things this pattern does not do: it does not make the endpoint private at th
 ### Run locally
 
 ```bash
+cd src
 npm start
 curl http://127.0.0.1:3000/whoami
 ```
@@ -110,17 +128,24 @@ export CLOUDFRONT_URL="https://<distribution-domain>.cloudfront.net"
 export ORIGIN_URL="https://<endpoint-domain>.lambda-web.us-east-1.on.aws"
 ```
 
-Through CloudFront, the request reaches the function. `viaCloudFront` is `true`, `authorizationHeaderPresent` is `false`, and the `cloudfront` object lists headers such as your viewer country:
+Directly at the origin, the request is rejected before it reaches the application:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' "$ORIGIN_URL/whoami"
+# 403
+```
+
+Through CloudFront, the same request reaches the function. `viaCloudFront` is `true`, `authorizationHeaderPresent` is `false`, and the `cloudfront` object lists headers such as your viewer country:
 
 ```bash
 curl -s "$CLOUDFRONT_URL/whoami"
 ```
 
-Directly at the origin, the same request is rejected before it reaches the application:
+Send your own `Authorization` header and the application receives it, while CloudFront's signature is still removed:
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' "$ORIGIN_URL/whoami"
-# 403
+curl -s -H 'Authorization: Bearer example-token' "$CLOUDFRONT_URL/whoami" | grep authorizationHeaderPresent
+#   "authorizationHeaderPresent": true,
 ```
 
 Edge caching: the first request is a miss and later ones within 60 seconds are hits with the same `generatedAt` value:
@@ -140,7 +165,7 @@ To confirm that the policy ties the function to one distribution, create a secon
 
 Use the same `AWS_REGION` as the deploy. CloudFront needs a distribution to be disabled and fully deployed before it can be deleted, so that part takes a few minutes.
 
-1. Disable and delete the distribution and the OAC:
+1. Disable and delete the distribution, the OAC and the cache policy:
     ```bash
     DIST_ID=$(aws cloudfront list-distributions \
       --query "DistributionList.Items[?Comment=='lambda-web-cloudfront-oac'].Id | [0]" --output text)
@@ -156,6 +181,11 @@ Use the same `AWS_REGION` as the deploy. CloudFront needs a distribution to be d
       --query "OriginAccessControlList.Items[?Name=='lambda-web-cloudfront-oac'].Id | [0]" --output text)
     aws cloudfront delete-origin-access-control --id $OAC_ID \
       --if-match $(aws cloudfront get-origin-access-control --id $OAC_ID --query ETag --output text)
+
+    CACHE_POLICY_ID=$(aws cloudfront list-cache-policies --type custom \
+      --query "CachePolicyList.Items[?CachePolicy.CachePolicyConfig.Name=='lambda-web-cloudfront-oac'].CachePolicy.Id | [0]" --output text)
+    aws cloudfront delete-cache-policy --id $CACHE_POLICY_ID \
+      --if-match $(aws cloudfront get-cache-policy --id $CACHE_POLICY_ID --query ETag --output text)
     ```
 1. Delete the function. This also removes its endpoint, revisions and resource policy:
     ```bash

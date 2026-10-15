@@ -126,6 +126,25 @@ export class LambdaWebCloudFrontOacStack extends cdk.Stack {
       },
     });
 
+    // Cache key = path + query string + the viewer's Authorization header.
+    // The managed CachingOptimized policy leaves query strings and
+    // Authorization out of the key, and CloudFront forwards Authorization to
+    // the origin only when the cache policy includes it. This policy keeps
+    // CachingOptimized's TTLs and compression and adds both, so each
+    // signed-in viewer gets their own cache entries.
+    const cachePolicy = new cloudfront.CachePolicy(this, 'CachePolicy', {
+      cachePolicyName: functionName,
+      comment: 'Path, query string and Authorization header in the cache key',
+      minTtl: cdk.Duration.seconds(1),
+      defaultTtl: cdk.Duration.days(1),
+      maxTtl: cdk.Duration.days(365),
+      enableAcceptEncodingGzip: true,
+      enableAcceptEncodingBrotli: true,
+      headerBehavior: cloudfront.CacheHeaderBehavior.allowList('Authorization'),
+      cookieBehavior: cloudfront.CacheCookieBehavior.none(),
+      queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(),
+    });
+
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       comment: functionName,
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
@@ -139,8 +158,7 @@ export class LambdaWebCloudFrontOacStack extends cdk.Stack {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
         compress: true,
-        // Cache by path and honour the origin's Cache-Control headers.
-        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        cachePolicy,
         // Forward viewer headers and query string, but not Host: Lambda routes
         // on Host, so the origin request must carry the endpoint domain.
         originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,

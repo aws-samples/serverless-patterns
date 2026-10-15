@@ -76,17 +76,18 @@ Viewer ──HTTPS──▶ CloudFront ──SigV4-signed HTTPS (OAC)──▶ W
 Direct request ──HTTPS (unsigned)──────────────────────────┘ 403 Forbidden
 ```
 
-`template.yaml` declares four resources:
+`template.yaml` declares five resources:
 
-* **`WebFunction`** (`AWS::Serverless::WebFunction`) with `AuthType: IamAuth`, `EndpointType: HomeRegion` and `EndpointName: prod`. SAM expands it into `AWS::Lambda::WebFunction`, an immutable `AWS::Lambda::WebFunctionRevision` (code + configuration) and an `AWS::Lambda::WebFunctionEndpoint` routed 100% to that revision, plus a logs-only execution role (`WebFunctionRole`) because `ExecutionRoleArn` is not set. The generated logical IDs are `WebFunctionRevision` and `WebFunctionEndpoint`, which is how the other resources reference the endpoint's `DomainName` and `EndpointArn`.
+* **`WebFunction`** (`AWS::Serverless::WebFunction`) with `AuthType: IamAuth`, `EndpointType: HomeRegion` and `EndpointName: dev`. SAM expands it into `AWS::Lambda::WebFunction`, an immutable `AWS::Lambda::WebFunctionRevision` (code + configuration) and an `AWS::Lambda::WebFunctionEndpoint` routed 100% to that revision, plus a logs-only execution role (`WebFunctionRole`) because `ExecutionRoleArn` is not set. The generated logical IDs are `WebFunctionRevision` and `WebFunctionEndpoint`, which is how the other resources reference the endpoint's `DomainName` and `EndpointArn`.
 * **`OriginAccessControl`** (`AWS::CloudFront::OriginAccessControl`) with `OriginAccessControlOriginType: lambda`, `SigningProtocol: sigv4` and `SigningBehavior: always-amz-auth`. CloudFront rejects `always` for Web Function origins.
-* **`Distribution`** (`AWS::CloudFront::Distribution`) with the endpoint domain as an HTTPS-only custom origin and the OAC attached to it. It uses two managed policies: `CachingOptimized`, so CloudFront caches by path and honours the origin's `Cache-Control` headers, and `AllViewerExceptHostHeader`, which forwards the viewer's headers and query string but not the `Host` header. Lambda routes on `Host`, so the origin request must carry the endpoint domain, not the viewer's. CloudFront is a global service, but the distribution is created from the stack's Region like any other resource.
-* **`EndpointResourcePolicy`** (`AWS::Lambda::ResourcePolicy`) attached to the function (`ResourceArn` is the web-function ARN). It allows `lambda:InvokeWebFunctionEndpoint` on the `prod` endpoint for the `cloudfront.amazonaws.com` service principal, with an `AWS:SourceArn` condition naming this stack's distribution.
+* **`CachePolicy`** (`AWS::CloudFront::CachePolicy`) with the path, the query string and the viewer's `Authorization` header in the cache key. The managed `CachingOptimized` policy leaves the last two out, and CloudFront forwards `Authorization` to the origin only when the cache policy includes it. It keeps the `CachingOptimized` TTLs and compression, so CloudFront still honours the origin's `Cache-Control` headers, and each signed-in viewer gets their own cache entries.
+* **`Distribution`** (`AWS::CloudFront::Distribution`) with the endpoint domain as an HTTPS-only custom origin and the OAC attached to it. It uses the cache policy above and the managed `AllViewerExceptHostHeader` origin request policy, which forwards the viewer's headers and query string but not the `Host` header. Lambda routes on `Host`, so the origin request must carry the endpoint domain, not the viewer's. CloudFront is a global service, but the distribution is created from the stack's Region like any other resource.
+* **`EndpointResourcePolicy`** (`AWS::Lambda::ResourcePolicy`) attached to the function (`ResourceArn` is the web-function ARN). It allows `lambda:InvokeWebFunctionEndpoint` on the `dev` endpoint for the `cloudfront.amazonaws.com` service principal, with an `AWS:SourceArn` condition naming this stack's distribution.
 
 Three settings work together:
 
 * **`IamAuth` on the endpoint.** Lambda validates a SigV4 signature on every request and returns `403` when it is missing or invalid. Your code never runs for those requests.
-* **OAC of type `lambda` with `always-amz-auth`.** CloudFront signs each origin request with its own service credentials. The viewer's own `Authorization` header, if any, is preserved and forwarded to your application, so existing sign-in flows keep working.
+* **OAC of type `lambda` with `always-amz-auth`.** CloudFront signs each origin request with its own service credentials. The viewer's own `Authorization` header, if any, is preserved and forwarded to your application, because the cache policy includes it, so existing sign-in flows keep working.
 * **Resource policy with `AWS:SourceArn`.** The signature proves the caller is CloudFront; the policy decides which CloudFront distribution is allowed. Another distribution in any account, even one using the same OAC configuration, gets `403`.
 
 After validating the signature, Lambda removes the `Authorization` header it used, so the application sees the request without CloudFront's credentials. The application exposes two routes:
@@ -99,8 +100,6 @@ After validating the signature, Lambda removes the `Authorization` header it use
 The server reads its listen address from the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable that the runtime sets (`0.0.0.0:3000`). When the variable is absent, it binds `127.0.0.1` for local development.
 
 Two things this pattern does not do: it does not make the endpoint private at the network layer (the endpoint domain is still resolvable; it just denies unsigned requests), and it does not add a custom domain or AWS WAF. Both attach to the distribution in the usual way.
-
-Tooling note: `AWS::Serverless::WebFunction`, `AWS::Lambda::ResourcePolicy` and the `always-amz-auth` signing behavior are newer than the schemas bundled with some releases of `cfn-lint` and the local SAM translator, so `sam validate --lint` may report them as unknown. `sam validate` without `--lint` and `sam deploy` work, because CloudFormation applies the transform and validates the template server-side.
 
 ## Testing
 
@@ -153,6 +152,13 @@ curl -s "$CLOUDFRONT_URL/whoami"
     "x-amz-cf-id": "V0WgrFhIBruF08hcIXhQJpZNKjPpml0qTQ9g3MTxPKHdN2C2k9V3lQ=="
   }
 }
+```
+
+Send your own `Authorization` header and the application receives it, while CloudFront's signature is still removed:
+
+```bash
+curl -s -H 'Authorization: Bearer example-token' "$CLOUDFRONT_URL/whoami" | grep authorizationHeaderPresent
+#   "authorizationHeaderPresent": true,
 ```
 
 Edge caching: the first request is a miss and later ones within 60 seconds are hits with the same `generatedAt` value:

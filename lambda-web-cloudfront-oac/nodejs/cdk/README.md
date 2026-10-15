@@ -56,7 +56,8 @@ Important: this application uses various AWS services and there are costs associ
 | `lambda.CfnWebFunctionRevision` | `AWS::Lambda::WebFunctionRevision` | Immutable code + configuration (`nodejs24.x`, 30 s request timeout, bucket/key/version of the zip) |
 | `lambda.CfnWebFunctionEndpoint` | `AWS::Lambda::WebFunctionEndpoint` | `IamAuth`, `HomeRegion`, 100% of traffic to the revision above |
 | `cloudfront.CfnOriginAccessControl` | `AWS::CloudFront::OriginAccessControl` | Type `lambda`, SigV4, `always-amz-auth` |
-| `cloudfront.Distribution` + `HttpOrigin` | `AWS::CloudFront::Distribution` | The endpoint domain as an HTTPS-only custom origin with the OAC attached; managed `CachingOptimized` and `AllViewerExceptHostHeader` policies |
+| `cloudfront.CachePolicy` | `AWS::CloudFront::CachePolicy` | Path, query string and the viewer's `Authorization` header in the cache key, with the `CachingOptimized` TTLs and compression |
+| `cloudfront.Distribution` + `HttpOrigin` | `AWS::CloudFront::Distribution` | The endpoint domain as an HTTPS-only custom origin with the OAC attached; the cache policy above and the managed `AllViewerExceptHostHeader` origin request policy |
 | `lambda.CfnResourcePolicy` | `AWS::Lambda::ResourcePolicy` | Allows `lambda:InvokeWebFunctionEndpoint` for `cloudfront.amazonaws.com` when `AWS:SourceArn` is this distribution |
 
 The endpoint is created as `IamAuth`, so there is no moment at which it is public. The resource policy references the distribution ID and the distribution references the endpoint domain, so CloudFormation orders them correctly without explicit dependencies.
@@ -72,7 +73,7 @@ Direct request ──HTTPS (unsigned)──────────────�
 Three settings work together:
 
 * **`IamAuth` on the endpoint.** Lambda validates a SigV4 signature on every request and returns `403` when it is missing or invalid. Your code never runs for those requests.
-* **OAC of type `lambda` with `always-amz-auth`.** CloudFront signs each origin request with its own service credentials. The viewer's own `Authorization` header, if any, is preserved and forwarded to your application, so existing sign-in flows keep working. CloudFront rejects `SigningBehavior: always` for Web Function origins.
+* **OAC of type `lambda` with `always-amz-auth`.** CloudFront signs each origin request with its own service credentials. The viewer's own `Authorization` header, if any, is preserved and forwarded to your application, because the cache policy includes it, so existing sign-in flows keep working. CloudFront rejects `SigningBehavior: always` for Web Function origins.
 * **Resource policy with `AWS:SourceArn`.** The signature proves the caller is CloudFront; the policy decides which CloudFront distribution is allowed. Another distribution in any account, even one using the same OAC configuration, gets `403`.
 
 After validating the signature, Lambda removes the `Authorization` header it used, so the application sees the request without CloudFront's credentials. The application exposes two routes:
@@ -84,7 +85,7 @@ After validating the signature, Lambda removes the `Authorization` header it use
 
 The server reads its listen address from the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable that the runtime sets (`0.0.0.0:3000`). When the variable is absent, it binds `127.0.0.1` for local development.
 
-The distribution uses two managed policies: `CachingOptimized`, so CloudFront caches by path and honours the origin's `Cache-Control` headers, and `AllViewerExceptHostHeader`, which forwards the viewer's headers and query string but not the `Host` header. Lambda routes on `Host`, so the origin request must carry the endpoint domain, not the viewer's.
+The distribution uses its own cache policy and the managed `AllViewerExceptHostHeader` origin request policy. The managed `CachingOptimized` cache policy leaves the query string and the `Authorization` header out of the cache key, and CloudFront forwards `Authorization` to the origin only when the cache policy includes it. The stack's cache policy keeps the `CachingOptimized` TTLs and compression, so CloudFront still honours the origin's `Cache-Control` headers, and adds both, so each signed-in viewer gets their own cache entries. `AllViewerExceptHostHeader` forwards the viewer's headers and query string but not the `Host` header. Lambda routes on `Host`, so the origin request must carry the endpoint domain, not the viewer's.
 
 Code updates work through CloudFormation's replacement semantics. `BucketDeployment` names the zip after its content hash, so a code change produces a new S3 key and version ID. Every property of `AWS::Lambda::WebFunctionRevision` is create-only, so CloudFormation creates a new revision, updates the endpoint's `RevisionWeights` to point at it, and deletes the old revision once the update succeeds.
 
@@ -124,6 +125,13 @@ Through CloudFront, the request reaches the function. `viaCloudFront` is `true`,
 curl -s "$CLOUDFRONT_URL/whoami"
 ```
 
+Send your own `Authorization` header and the application receives it, while CloudFront's signature is still removed:
+
+```bash
+curl -s -H 'Authorization: Bearer example-token' "$CLOUDFRONT_URL/whoami" | grep authorizationHeaderPresent
+#   "authorizationHeaderPresent": true,
+```
+
 Edge caching: the first request is a miss and later ones within 60 seconds are hits with the same `generatedAt` value:
 
 ```bash
@@ -135,7 +143,7 @@ for i in 1 2 3; do curl -si "$CLOUDFRONT_URL/cached" | grep -i 'x-cache\|generat
 # ...
 ```
 
-To see a code update roll out, edit the `message` string in `src/index.js` and run `cdk deploy` again. The endpoint keeps its domain and its `IamAuth` setting, the origin still returns `403`, and `curl "$CLOUDFRONT_URL/cached?v=2"` (a new cache key) shows the new message.
+To see a code update roll out, edit the `message` string in `src/index.js` and run `cdk deploy` again. The endpoint keeps its domain and its `IamAuth` setting, the origin still returns `403`, and `curl "$CLOUDFRONT_URL/cached?v=2"` shows the new message, because the query string is part of the cache key.
 
 To confirm that the policy ties the function to one distribution, create a second distribution with the same origin and OAC and request `/whoami` through it: it returns `403`. Disable and delete that distribution afterwards.
 

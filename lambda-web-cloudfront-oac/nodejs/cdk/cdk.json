@@ -3,8 +3,5 @@
   "watch": {
     "include": ["**"],
     "exclude": ["README.md", "cdk*.json", "**/*.d.ts", "**/*.js", "tsconfig.json", "package*.json", "node_modules", "src"]
-  },
-  "context": {
-    "@aws-cdk/core:newStyleStackSynthesis": true
   }
 }
