@@ -31,6 +31,9 @@
 
 * { box-sizing: border-box; }
 
+/* The composer sets display: flex, so make the hidden attribute win. */
+[hidden] { display: none !important; }
+
 html, body {
   height: 100%;
   margin: 0;
@@ -135,6 +138,60 @@ body {
 
 @keyframes pulse {
   50% { opacity: 0.2; }
+}
+
+/* Login */
+
+#login {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(360px, 100%);
+}
+
+#login-form h1 {
+  margin: 0 0 4px;
+  font-weight: 500;
+  font-size: 22px;
+  text-align: center;
+}
+
+#secret {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+#login-button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--panel-bg);
+  font: inherit;
+  cursor: pointer;
+}
+
+#login-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+#login-error {
+  margin: 0;
+  color: var(--error);
+  text-align: center;
 }
 
 /* Composer */

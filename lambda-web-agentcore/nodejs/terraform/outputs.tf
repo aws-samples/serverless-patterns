@@ -8,6 +8,11 @@ output "web_function_endpoint_url" {
   value       = "https://${awscc_lambda_web_function_endpoint.webapp.domain_name}/"
 }
 
+output "login_secret_arn" {
+  description = "ARN of the AWS Secrets Manager secret that holds the chat app's login secret."
+  value       = aws_secretsmanager_secret.login.arn
+}
+
 output "web_function_name" {
   description = "Name of the Lambda Web Function."
   value       = awscc_lambda_web_function.webapp.function_name

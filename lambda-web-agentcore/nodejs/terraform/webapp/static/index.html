@@ -10,15 +10,24 @@
   <main id="chat-panel">
     <header id="chat-header">Lambda Web Functions + AgentCore Runtime integration</header>
 
-    <div id="messages">
+    <div id="login">
+      <form id="login-form">
+        <h1>Enter the login secret to continue</h1>
+        <input id="secret" type="password" placeholder="Login secret" autocomplete="off" aria-label="Login secret" autofocus>
+        <button id="login-button" type="submit">Enter</button>
+        <p id="login-error" role="alert" hidden></p>
+      </form>
+    </div>
+
+    <div id="messages" hidden>
       <div id="empty-state">
-        <img id="arch-diagram" src="/arch.png" alt="Architecture: Browser, Amazon CloudFront, AWS Lambda Web Function, Amazon Bedrock AgentCore Runtime, Claude Sonnet 5.5 on Amazon Bedrock">
+        <img id="arch-diagram" src="/arch.png" alt="Architecture: Browser, Amazon CloudFront, AWS Lambda Web Function, Amazon Bedrock AgentCore Runtime, Claude Haiku 5.5 on Amazon Bedrock">
         <h1>What can I help with?</h1>
       </div>
     </div>
 
-    <form id="composer">
-      <textarea id="prompt" rows="1" placeholder="Message the agent..." autofocus></textarea>
+    <form id="composer" hidden>
+      <textarea id="prompt" rows="1" maxlength="100" placeholder="Message the agent (up to 100 characters)..." aria-label="Message"></textarea>
       <button id="send" type="submit" title="Send">&#x2191;</button>
       <button id="stop" type="button" title="Stop" hidden>&#x25A0;</button>
     </form>

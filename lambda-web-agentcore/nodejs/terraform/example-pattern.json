@@ -8,10 +8,10 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys a fully serverless chat app for an AI agent. An Express server running as an AWS Lambda Web Function serves the chat UI and calls a Strands agent hosted on Amazon Bedrock AgentCore Runtime, which calls Claude Sonnet 5.5 on Amazon Bedrock. The answer streams back as server-sent events, token by token, from the model through AgentCore Runtime and the Web Function to the browser.",
+      "This pattern deploys a fully serverless chat app for an AI agent. An Express server running as an AWS Lambda Web Function serves the chat UI and calls a Strands agent hosted on Amazon Bedrock AgentCore Runtime, which calls Claude Haiku 5.5 on Amazon Bedrock. The answer streams back as server-sent events, token by token, from the model through AgentCore Runtime and the Web Function to the browser.",
       "A Web Function runs a real, long-lived server process, so the server holds each chat response open and writes every chunk the moment it arrives. Amazon CloudFront is the app's single public URL. It adds a secret origin header that the server checks, so the Web Function endpoint cannot be used to bypass CloudFront, and it is where you would attach a custom domain or AWS WAF.",
-      "The agent is deployed to AgentCore Runtime as a .zip file with direct code deployment, so there is no container image, Docker or Amazon ECR repository. AgentCore Runtime runs each session in its own microVM, and the browser creates one session per tab, so every user gets a private, multi-turn conversation.",
-      "Both compute services scale with traffic, scale to zero when idle, and bill for the CPU your code actually uses rather than CPU time spent waiting for the model. The Web Function endpoint has a request rate limit and a maximum number of execution environments, which cap the traffic and the model spend of the public app."
+      "The agent is deployed to AgentCore Runtime as a .zip file with direct code deployment, so there is no container image, Docker or Amazon ECR repository. AgentCore Runtime runs each session in its own microVM, and every sign-in gets its own session, so every user gets a private, multi-turn conversation.",
+      "The app asks for a login secret that Terraform generates and stores in AWS Secrets Manager, then issues a signed session token that the browser sends with every message. Prompts are capped at 100 characters and answers at 200 output tokens. Both compute services scale to zero when idle and bill for the CPU your code actually uses rather than time spent waiting for the model."
     ]
   },
   "gitHub": {
@@ -42,6 +42,10 @@
         "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-permissions.html"
       },
       {
+        "text": "AWS Secrets Manager",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+      },
+      {
         "text": "Strands Agents",
         "link": "https://strandsagents.com"
       }
@@ -55,7 +59,7 @@
   },
   "testing": {
     "text": [
-      "Open the <code>app_url</code> output in a browser and chat with the agent. See the GitHub repo for detailed testing instructions."
+      "Print the login secret: <code>aws secretsmanager get-secret-value --secret-id \"$(terraform output -raw login_secret_arn)\" --region us-east-1 --query SecretString --output text</code>, using the Region you deployed to. Open the <code>app_url</code> output in a browser, enter the login secret and chat with the agent. See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {

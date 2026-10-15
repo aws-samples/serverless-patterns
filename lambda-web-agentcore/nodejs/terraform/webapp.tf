@@ -96,6 +96,15 @@ resource "aws_iam_role_policy" "webapp" {
           "${aws_bedrockagentcore_agent_runtime.agent.agent_runtime_arn}/*",
         ]
       },
+      {
+        Sid    = "ReadSignInSecrets"
+        Effect = "Allow"
+        Action = "secretsmanager:GetSecretValue"
+        Resource = [
+          aws_secretsmanager_secret.login.arn,
+          aws_secretsmanager_secret.session_signing_key.arn,
+        ]
+      },
     ]
   })
 }
@@ -152,12 +161,19 @@ resource "awscc_lambda_web_function_revision" "webapp" {
     # A streamed response lasts as long as the request timeout, so leave room for long answers.
     timeout_seconds = 300
     environment_variables = {
-      AGENT_RUNTIME_ARN    = aws_bedrockagentcore_agent_runtime.agent.agent_runtime_arn
-      ORIGIN_VERIFY_SECRET = random_password.origin_verify.result
+      AGENT_RUNTIME_ARN       = aws_bedrockagentcore_agent_runtime.agent.agent_runtime_arn
+      ORIGIN_VERIFY_SECRET    = random_password.origin_verify.result
+      LOGIN_SECRET_ARN        = aws_secretsmanager_secret.login.arn
+      SESSION_SIGNING_KEY_ARN = aws_secretsmanager_secret.session_signing_key.arn
     }
   }
 
-  depends_on = [aws_s3_bucket_policy.code, aws_cloudwatch_log_group.webapp]
+  depends_on = [
+    aws_s3_bucket_policy.code,
+    aws_cloudwatch_log_group.webapp,
+    aws_secretsmanager_secret_version.login,
+    aws_secretsmanager_secret_version.session_signing_key,
+  ]
 
   lifecycle {
     create_before_destroy = true
@@ -168,7 +184,9 @@ resource "awscc_lambda_web_function_endpoint" "webapp" {
   function_name = awscc_lambda_web_function.webapp.function_name
   endpoint_name = "default"
   endpoint_type = "HomeRegion"
-  # The app authorizes requests itself (the CloudFront origin header). See README for adding sign-in.
+  # ApplicationManaged means the app authenticates requests itself: it checks the CloudFront origin
+  # header, the login secret and a signed session token. For an API with no web UI, use IamAuth
+  # instead, so callers must sign requests with SigV4.
   auth_type = "ApplicationManaged"
 
   throttle_config = { rate_limit = var.rate_limit }

@@ -13,12 +13,12 @@ locals {
   region     = var.aws_region
   name       = "lambda-web-agentcore-${random_string.suffix.result}"
 
-  # Pick the Claude Sonnet 5.5 inference profile that matches the Region's geography.
+  # Pick the Claude Haiku 5.5 inference profile that matches the Region's geography.
   geography = split("-", local.region)[0]
   model_id = var.model_id != "" ? var.model_id : (
-    contains(["us", "eu"], local.geography) ? "${local.geography}.anthropic.claude-sonnet-5-5" : "global.anthropic.claude-sonnet-5-5"
+    contains(["us", "eu"], local.geography) ? "${local.geography}.anthropic.claude-haiku-5-5" : "global.anthropic.claude-haiku-5-5"
   )
-  # The foundation model behind the profile, for example anthropic.claude-sonnet-5-5.
+  # The foundation model behind the profile, for example anthropic.claude-haiku-5-5.
   foundation_model_id = try(regex("^(?:us|eu|apac|au|jp|ca|global)\\.(.+)$", local.model_id)[0], local.model_id)
 
   build_dir = abspath("${path.module}/build")

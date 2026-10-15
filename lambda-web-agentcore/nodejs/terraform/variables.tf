@@ -6,7 +6,7 @@ variable "aws_region" {
 
 variable "model_id" {
   description = <<-EOT
-    Amazon Bedrock inference profile ID that the agent calls. Leave empty to use Claude Sonnet 5.5
+    Amazon Bedrock inference profile ID that the agent calls. Leave empty to use Claude Haiku 5.5
     through the cross-Region inference profile for the geography of aws_region: us. in US Regions,
     eu. in Europe and global. anywhere else.
   EOT
