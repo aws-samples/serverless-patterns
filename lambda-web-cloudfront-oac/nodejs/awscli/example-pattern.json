@@ -38,7 +38,7 @@
   "deploy": {
     "text": [
       "Set your Region, <code>export AWS_REGION=us-east-1</code>, then run <code>./deploy.sh</code>.",
-      "The script deploys the Web Function with <code>aws lambda-web deploy --auth-type IamAuth</code>, creates the OAC and the distribution, attaches the resource policy and waits for the distribution to deploy."
+      "The script deploys the Web Function with <code>aws lambda-web deploy --auth-type IamAuth</code>, creates the OAC, a cache policy that forwards the viewer's Authorization header, and the distribution, attaches the resource policy and waits for the distribution to deploy."
     ]
   },
   "testing": {
@@ -48,7 +48,7 @@
   },
   "cleanup": {
     "text": [
-      "Disable and delete the CloudFront distribution and the OAC, then <code>aws lambda-web delete-web-function --function-name lambda-web-cloudfront-oac</code>.",
+      "Disable and delete the CloudFront distribution, then delete the cache policy and the OAC, then <code>aws lambda-web delete-web-function --function-name lambda-web-cloudfront-oac</code>.",
       "See the GitHub repo for removing the execution role and log groups."
     ]
   },

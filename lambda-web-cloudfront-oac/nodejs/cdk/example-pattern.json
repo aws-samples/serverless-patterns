@@ -38,7 +38,7 @@
   "deploy": {
     "text": [
       "Run <code>npm install</code>, then <code>cdk deploy</code> in the pattern directory (bootstrap the account and Region first if needed).",
-      "The stack creates the versioned code bucket, uploads the application, and defines the Web Function, its revision and <code>IamAuth</code> endpoint, the OAC, the CloudFront distribution and the resource policy."
+      "The stack creates the versioned code bucket, uploads the application, and defines the Web Function, its revision and <code>IamAuth</code> endpoint, the OAC, a cache policy that forwards the viewer's Authorization header, the CloudFront distribution and the resource policy."
     ]
   },
   "testing": {
@@ -48,7 +48,7 @@
   },
   "cleanup": {
     "text": [
-      "Run <code>cdk destroy</code>. The stack disables and deletes the distribution, empties and deletes the code bucket and removes the log group."
+      "Run <code>cdk destroy</code>. The stack disables and deletes the distribution and the cache policy, empties and deletes the code bucket and removes the log group."
     ]
   },
   "authors": [

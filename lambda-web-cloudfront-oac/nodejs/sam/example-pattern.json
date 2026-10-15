@@ -38,7 +38,7 @@
   "deploy": {
     "text": [
       "Create a versioning-enabled S3 bucket whose policy lets lambda.amazonaws.com read objects, zip <code>src/</code> and upload it, then run <code>sam deploy --stack-name lambda-web-cloudfront-oac-sam --capabilities CAPABILITY_IAM --s3-bucket &lt;bucket&gt; --parameter-overrides CodeBucket=&lt;bucket&gt; CodeKey=&lt;key&gt;</code>.",
-      "One template creates the Web Function with an <code>IamAuth</code> endpoint, the OAC, the CloudFront distribution and the resource policy; see the GitHub repo for the bucket setup."
+      "One template creates the Web Function with an <code>IamAuth</code> endpoint, the OAC, a cache policy that forwards the viewer's Authorization header, the CloudFront distribution and the resource policy; see the GitHub repo for the bucket setup."
     ]
   },
   "testing": {
@@ -48,7 +48,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack with <code>sam delete --stack-name lambda-web-cloudfront-oac-sam</code>. CloudFormation disables and removes the distribution, the OAC and the function with its endpoint and resource policy.",
+      "Delete the stack with <code>sam delete --stack-name lambda-web-cloudfront-oac-sam</code>. CloudFormation disables and removes the distribution, the cache policy, the OAC and the function with its endpoint and resource policy.",
       "See the GitHub repo for removing the log groups and the code bucket."
     ]
   },
