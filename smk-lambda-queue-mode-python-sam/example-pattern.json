@@ -1,0 +1,70 @@
+{
+  "title": "Self-managed Apache Kafka Queue mode to AWS Lambda (KIP-932)",
+  "description": "Lambda ESM for self-managed Kafka 4.2+ using Queue mode (KIP-932 Share Groups). Multiple pollers process the same partition concurrently, breaking the partition-count ceiling.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "services": {
+    "from": "kafka",
+    "to": "lambda"
+  },
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "With Queue consumption mode (ConsumptionMode: Queue), Lambda event pollers use Kafka Share Groups (KIP-932) instead of traditional consumer groups. Multiple pollers can read from the same partition concurrently — parallelism is decoupled from partition count.",
+      "This pattern deploys: a dedicated VPC with private subnets and VPC endpoints, a self-managed Kafka 4.2+ broker on EC2 with share groups enabled, a Python Lambda worker function with partial batch response, a producer Lambda for testing, and CloudWatch observability.",
+      "Deployment is split into four independent stacks so you can skip the network and broker stacks if you have existing infrastructure."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/smk-lambda-queue-mode-python-sam",
+      "templateURL": "serverless-patterns/smk-lambda-queue-mode-python-sam",
+      "projectFolder": "smk-lambda-queue-mode-python-sam",
+      "templateFile": "stacks/3-app.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Lambda with self-managed Apache Kafka",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
+      },
+      {
+        "text": "Apache Kafka event poller scaling modes in Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-scaling-modes.html"
+      },
+      {
+        "text": "Configuring error handling controls for Kafka event sources",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-retry-configurations.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See README.md for full deployment instructions including three paths: full deployment, bring-your-own Kafka, and bring-your-own Kafka and VPC."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the ESM first: <code>aws lambda delete-event-source-mapping --uuid &lt;esm-uuid&gt;</code>, then delete stacks in reverse order: <code>kafka-queue-observability</code>, <code>kafka-queue-app</code>, <code>kafka-queue-broker</code>, <code>kafka-queue-network</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vaibhav Jain",
+      "bio": "AWS - Senior Delivery Consultant. Specializes in data platform modernization and large-scale distributed systems.",
+      "linkedin": "vaibhavjainv"
+    },
+    {
+      "name": "Hardith Murari",
+      "bio": "AWS - Delivery Consultant. Specializes in Application Architecture and Modernization.",
+      "linkedin": "hardithsuvarna"
+    }
+  ]
+}
