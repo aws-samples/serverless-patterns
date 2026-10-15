@@ -7,6 +7,26 @@
   --text: #1f1f1f;
   --accent: #1f1f1f;
   --error: #dc2626;
+  --shadow: rgba(0, 0, 0, 0.08);
+  color-scheme: light dark;
+}
+
+/* Follow the operating system's dark mode setting. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f11;
+    --panel-bg: #1c1c1f;
+    --surface: #2a2a2e;
+    --code-bg: #141416;
+    --border: #34343a;
+    --text: #ececec;
+    --accent: #ececec;
+    --error: #f87171;
+    --shadow: rgba(0, 0, 0, 0.5);
+  }
+
+  /* The architecture image has a white background, so frame it as a card. */
+  #arch-diagram { border-radius: 10px; }
 }
 
 * { box-sizing: border-box; }
@@ -37,7 +57,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--panel-bg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px var(--shadow);
   overflow: hidden;
 }
 

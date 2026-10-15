@@ -78,6 +78,16 @@ AgentCore Runtime keeps each session in its own microVM for as long as the sessi
 | `webapp.tf` | The web app package (built with npm), its execution role, and the Web Function with its revision and endpoint |
 | `cloudfront.tf` | The CloudFront distribution in front of the Web Function endpoint |
 
+You can set these variables with `-var` on `terraform apply`:
+
+| Variable | Default | Description |
+|---|---|---|
+| `aws_region` | `us-east-1` | Region to deploy to |
+| `model_id` | empty | Amazon Bedrock inference profile for the agent. Empty picks Claude Sonnet 5.5 for the Region's geography |
+| `rate_limit` | `100` | Requests per second the Web Function endpoint accepts before it returns HTTP 429 |
+| `max_environments` | `2` | Maximum number of Web Function execution environments |
+| `log_retention_days` | `7` | Days to keep the Web Function and agent logs |
+
 Notes on the choices in the templates:
 
 * **No container image.** The agent is a .zip file in Amazon S3 that contains `main.py` and Linux arm64 wheels for its dependencies. AgentCore Runtime runs it on its managed Python 3.13 runtime, so there is no Dockerfile, no image build and no Amazon ECR repository.
@@ -123,8 +133,8 @@ Notes on the choices in the templates:
 
 This pattern is a starting point. Before you put it in front of real users, review the following:
 
-* **There is no sign-in.** Anyone who has the CloudFront URL can chat with the agent, and every message invokes the model in your account. The endpoint's `rate_limit` (100 requests per second by default) and `max_environments` (2 by default) variables cap the traffic it accepts. To restrict access, add authentication, for example with Amazon Cognito, and attach AWS WAF with a rate-based rule to the CloudFront distribution. See [Lambda Web Function endpoint access control](https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html) and [Using AWS WAF to control access to your content](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-awswaf.html).
-* **The origin header is a shared secret.** Terraform generates it and stores it in the Terraform state and in the Web Function revision's environment variables. Protect the state file, for example with an encrypted remote backend. Run `terraform apply -replace=random_password.origin_verify` to rotate it.
+* **There is no sign-in.** Anyone who has the CloudFront URL can chat with the agent, and every message invokes the model in your account. The endpoint's `rate_limit` (100 requests per second by default) and `max_environments` (2 by default) variables cap the traffic it accepts. To restrict access, add authentication, for example with Amazon Cognito, and attach AWS WAF with a rate-based rule to the CloudFront distribution. See [AWS Lambda Web Functions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html) for the endpoint authentication options and [Using AWS WAF to control access to your content](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-awswaf.html).
+* **The origin header is a shared secret.** Terraform generates it and stores it in the Terraform state and in the Web Function revision's environment variables. Protect the state file, for example with an encrypted remote backend.
 * **Sessions are per browser tab.** The session ID only separates conversations. It is not an identity, so do not use it to authorize access to user data.
 
 ## Cleanup
@@ -134,7 +144,7 @@ This pattern is a starting point. Before you put it in front of real users, revi
     terraform destroy -var "aws_region=us-east-1"
     ```
     Enter `yes` when Terraform asks you to confirm. Deleting the CloudFront distribution takes a few minutes.
-1. Confirm that the resources have been deleted. The command prints an empty list:
+1. Confirm that the resources have been deleted. The command prints nothing:
     ```bash
     terraform state list
     ```
