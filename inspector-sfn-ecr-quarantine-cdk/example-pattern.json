@@ -1,0 +1,116 @@
+{
+  "title": "Auto-quarantine vulnerable Amazon ECR images",
+  "description": "An Amazon Inspector finding on a vulnerable Amazon ECR image triggers an AWS Step Functions workflow via Amazon EventBridge that quarantines the image and sends Amazon SNS.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternType": "Standalone",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern automatically quarantines a vulnerable container image the moment Amazon Inspector raises a HIGH or CRITICAL finding on it.",
+      "An Amazon Inspector finding on an Amazon ECR container image is routed by an Amazon EventBridge rule (source aws.inspector2, detail-type Inspector2 Finding, filtered to HIGH/CRITICAL severity and the AWS_ECR_CONTAINER_IMAGE resource type) to an AWS Step Functions STANDARD workflow.",
+      "The workflow reads the image manifest by digest with ecr:BatchGetImage and writes the same manifest back under a quarantine tag with ecr:PutImage - a pure control-plane re-tag that needs no AWS Lambda function - then publishes an Amazon SNS notification. Retry and Catch drive a failure-notification path.",
+      "It is the first Amazon Inspector serverless pattern that acts on a finding rather than only notifying."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/inspector-sfn-ecr-quarantine-cdk",
+      "templateURL": "serverless-patterns/inspector-sfn-ecr-quarantine-cdk",
+      "projectFolder": "inspector-sfn-ecr-quarantine-cdk",
+      "templateFile": "cdk/lib/inspector-sfn-ecr-quarantine-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge event schema for Amazon Inspector events",
+        "link": "https://docs.aws.amazon.com/inspector/latest/user/eventbridge-integration.html"
+      },
+      {
+        "text": "Call AWS SDK services from AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "Amazon ECR PutImage API reference",
+        "link": "https://docs.aws.amazon.com/AmazonECR/latest/APIReference/API_PutImage.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd inspector-sfn-ecr-quarantine-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cd inspector-sfn-ecr-quarantine-cdk/cdk</code>",
+      "<code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://avatars.githubusercontent.com/u/NithinChandranR-AWS",
+      "bio": "Solutions Architect at AWS.",
+      "linkedin": "",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 15,
+      "y": 50,
+      "service": "inspector",
+      "label": "Amazon Inspector"
+    },
+    "icon2": {
+      "x": 40,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon3": {
+      "x": 65,
+      "y": 50,
+      "service": "stepfunctions",
+      "label": "AWS Step Functions"
+    },
+    "icon4": {
+      "x": 90,
+      "y": 30,
+      "service": "ecr",
+      "label": "Amazon ECR"
+    },
+    "icon5": {
+      "x": 90,
+      "y": 70,
+      "service": "sns",
+      "label": "Amazon SNS"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon3",
+      "to": "icon4"
+    },
+    "line4": {
+      "from": "icon3",
+      "to": "icon5"
+    }
+  }
+}
