@@ -1,0 +1,183 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  apigw-cloudwatch-logs-proxy
+
+  Amazon API Gateway REST API that acts as a proxy to Amazon CloudWatch Logs using a direct AWS service integration. Clients call the API over HTTPS to put log events into, and get log events from, a CloudWatch Logs log group and stream.
+
+Resources:
+  # CloudWatch Log Group used for testing the proxy
+  MyLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: my-cw-log-group
+      RetentionInDays: 7
+
+  # Log stream created under the log group for testing
+  MyLogStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref MyLogGroup
+      LogStreamName: log-stream-1
+
+  # IAM role assumed by API Gateway to call the CloudWatch Logs API
+  ApiGatewayCloudWatchLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLogsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:GetLogEvents
+                  - logs:PutLogEvents
+                Resource: !Sub '${MyLogGroup.Arn}:*'
+
+  # REST API
+  ProxyApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${AWS::StackName}-cloudwatch-logs-proxy'
+      Description: REST API that proxies requests to Amazon CloudWatch Logs
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # /getLog resource
+  GetLogResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ProxyApi
+      ParentId: !GetAtt ProxyApi.RootResourceId
+      PathPart: getLog
+
+  # /putLog resource
+  PutLogResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ProxyApi
+      ParentId: !GetAtt ProxyApi.RootResourceId
+      PathPart: putLog
+
+  # POST /getLog -> CloudWatch Logs GetLogEvents
+  GetLogMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ProxyApi
+      ResourceId: !Ref GetLogResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Credentials: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
+        Uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:logs:action/GetLogEvents'
+        PassthroughBehavior: NEVER
+        RequestParameters:
+          integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+          integration.request.header.X-Amz-Target: "'Logs_20140328.GetLogEvents'"
+        RequestTemplates:
+          application/json: |
+            {
+              "logGroupName": "$input.path('$.logGroupName')",
+              "logStreamName": "$input.path('$.logStreamName')"
+            }
+        IntegrationResponses:
+          - StatusCode: '200'
+          - StatusCode: '400'
+            SelectionPattern: '4\d{2}'
+          - StatusCode: '500'
+            SelectionPattern: '5\d{2}'
+      MethodResponses:
+        - StatusCode: '200'
+        - StatusCode: '400'
+        - StatusCode: '500'
+
+  # POST /putLog -> CloudWatch Logs PutLogEvents
+  PutLogMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ProxyApi
+      ResourceId: !Ref PutLogResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Credentials: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
+        Uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:logs:action/PutLogEvents'
+        PassthroughBehavior: NEVER
+        RequestParameters:
+          integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+          integration.request.header.X-Amz-Target: "'Logs_20140328.PutLogEvents'"
+        RequestTemplates:
+          application/json: |
+            #set($inputRoot = $input.path('$'))
+            {
+              "logGroupName": "$inputRoot.logGroupName",
+              "logStreamName": "$inputRoot.logStreamName",
+              #if($inputRoot.sequenceToken.length() > 0) "sequenceToken": "$inputRoot.sequenceToken",#end
+              "logEvents": [
+                {
+                  "timestamp": $inputRoot.ts,
+                  "message": "$inputRoot.message"
+                }
+              ]
+            }
+        IntegrationResponses:
+          - StatusCode: '200'
+          - StatusCode: '400'
+            SelectionPattern: '4\d{2}'
+          - StatusCode: '500'
+            SelectionPattern: '5\d{2}'
+      MethodResponses:
+        - StatusCode: '200'
+        - StatusCode: '400'
+        - StatusCode: '500'
+
+  # Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - GetLogMethod
+      - PutLogMethod
+    Properties:
+      RestApiId: !Ref ProxyApi
+
+  # Stage
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: s1
+      RestApiId: !Ref ProxyApi
+      DeploymentId: !Ref ApiDeployment
+
+Outputs:
+  ApiBaseUrl:
+    Description: Base invoke URL for the CloudWatch Logs proxy API
+    Value: !Sub 'https://${ProxyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/s1'
+
+  PutLogUrl:
+    Description: POST logGroupName, logStreamName, ts, message (and optional sequenceToken) here to put a log event
+    Value: !Sub 'https://${ProxyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/s1/putLog'
+
+  GetLogUrl:
+    Description: POST logGroupName and logStreamName here to get log events
+    Value: !Sub 'https://${ProxyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/s1/getLog'
+
+  LogGroupName:
+    Description: Name of the CloudWatch Log Group used for testing
+    Value: !Ref MyLogGroup
+
+  LogStreamName:
+    Description: Name of the CloudWatch Log Stream used for testing
+    Value: !Ref MyLogStream
