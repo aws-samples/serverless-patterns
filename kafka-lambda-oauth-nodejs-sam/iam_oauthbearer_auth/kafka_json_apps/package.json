@@ -1,0 +1,10 @@
+{
+  "name": "kafka-json-apps",
+  "version": "1.0.0",
+  "description": "Faker-based Kafka JSON producer/consumer over SASL/OAUTHBEARER",
+  "type": "module",
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "@faker-js/faker": "^9.0.0"
+  }
+}

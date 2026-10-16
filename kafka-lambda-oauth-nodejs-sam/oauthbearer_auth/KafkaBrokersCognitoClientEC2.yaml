@@ -1,0 +1,1520 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Creates a self-managed Apache Kafka cluster (3 brokers on 3 EC2 instances, KRaft mode)
+  configured for SASL/OAUTHBEARER authentication against an Amazon Cognito User Pool,
+  plus a 4th "client" EC2 instance pre-loaded with Java, Node.js, Docker, the AWS CLI and
+  the AWS SAM CLI so that the accompanying Lambda pattern can be built, deployed and tested.
+
+Parameters:
+  AdminUsername:
+    Type: String
+    Description: Cognito username for the Kafka ADMIN client (super user - may create topics and manage ACLs).
+    Default: kafka-admin
+    MinLength: 1
+  ProducerUsername:
+    Type: String
+    Description: Cognito username for the Kafka PRODUCER client (authorized to WRITE to topics only).
+    Default: kafka-producer
+    MinLength: 1
+  ConsumerUsername:
+    Type: String
+    Description: Cognito username for the Kafka CONSUMER client (authorized to READ from topics only).
+    Default: kafka-consumer
+    MinLength: 1
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  JavaVersion:
+    Type: String
+    Description: Amazon Corretto (Java) version installed on the EC2 Kafka brokers and client to run Apache Kafka and its CLI tools. This does NOT set the Lambda runtime - the Lambda consumer uses the Node.js runtime defined in the SAM template / deploy script.
+    AllowedValues:
+      - java11
+      - java17
+      - java21
+      - java25
+    Default: java21
+  NodeVersion:
+    Type: String
+    Description: Node.js runtime for the Lambda consumer. The client instance's UserData substitutes this into the SAM template (template.yaml) in place of the NODE_VERSION placeholder.
+    AllowedValues:
+      - nodejs20.x
+      - nodejs22.x
+      - nodejs24.x
+    Default: nodejs22.x
+  ApacheKafkaInstallerLocation:
+    Type: String
+    Description: Download URL for the Apache Kafka distribution (Scala 2.13 build).
+    Default: https://archive.apache.org/dist/kafka/3.9.0/kafka_2.13-3.9.0.tgz
+  StrimziOAuthVersion:
+    Type: String
+    Description: Version of the Strimzi kafka-oauth libraries used for SASL/OAUTHBEARER on the brokers and client.
+    Default: 0.15.0
+  NimbusJoseJwtVersion:
+    Type: String
+    Description: Version of the nimbus-jose-jwt library (transitive dependency of the Strimzi OAuth libraries).
+    Default: 9.37.3
+  KafkaClusterId:
+    Type: String
+    Description: >
+      Shared KRaft cluster ID (base64-encoded UUID). Must be identical on all three brokers.
+      Generate your own with 'kafka-storage.sh random-uuid' or keep the default.
+    Default: 4L6g3nShT-eMCtK--X86sw
+  KafkaTopicForLambda:
+    Type: String
+    Default: KafkaOAuthBearerLambdaTopic
+  ServerlessLandGithubLocation:
+    Type: String
+    Default: https://github.com/aws-samples/serverless-patterns/
+    Description: Git URL of the serverless-patterns repository (or your fork) that the client instance clones. URL only - put the branch in ServerlessLandGithubBranch.
+  ServerlessLandGithubBranch:
+    Type: String
+    Default: main
+    AllowedPattern: '^[A-Za-z0-9._/-]+$'
+    Description: Branch of ServerlessLandGithubLocation to clone, for example main or a feature branch in your fork.
+
+Mappings:
+  SubnetConfig:
+    VPC:
+      CIDR: '10.0.0.0/16'
+    PublicOne:
+      CIDR: '10.0.0.0/24'
+    PrivateSubnetOne:
+      CIDR: '10.0.1.0/24'
+    PrivateSubnetTwo:
+      CIDR: '10.0.2.0/24'
+    PrivateSubnetThree:
+      CIDR: '10.0.3.0/24'
+  BrokerConfig:
+    Broker1:
+      PrivateIp: '10.0.1.10'
+      NodeId: '1'
+    Broker2:
+      PrivateIp: '10.0.2.10'
+      NodeId: '2'
+    Broker3:
+      PrivateIp: '10.0.3.10'
+      NodeId: '3'
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaOAuthVPC'
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: 'Name'
+          Value: 'PublicSubnet'
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetOne', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetOne'
+  PrivateSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetTwo', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetTwo'
+  PrivateSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 2
+          - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref 'VPC'
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetThree', 'CIDR']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: 'Name'
+          Value: 'PrivateSubnetThree'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  NATEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATEIP.AllocationId
+      SubnetId: !Ref 'PublicSubnetOne'
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaOAuthNATGateway'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetOne
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGateway'
+  PrivateSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetOne
+  PrivateSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetTwo
+  PrivateSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetThree
+
+  # ---- Cognito User Pool used as the OAuth 2.0 identity provider ----
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AWS::StackName}-kafka-oauth-pool"
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "${AWS::StackName}-kafka-client"
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AccessTokenValidity: 1
+      TokenValidityUnits:
+        AccessToken: hours
+
+  # Hosted-UI domain, resource server + scope, and a machine-to-machine app
+  # client (client_credentials grant) used by the AWS Lambda self-managed Kafka
+  # event source poller to mint OAuth tokens.
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Domain: !Sub "${AWS::StackName}-${AWS::AccountId}"
+
+  CognitoResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Identifier: kafka
+      Name: kafka
+      Scopes:
+        - ScopeName: consume
+          ScopeDescription: Consume Kafka messages
+
+  CognitoPollerClient:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn: CognitoResourceServer
+    Properties:
+      ClientName: !Sub "${AWS::StackName}-kafka-poller"
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: true
+      AllowedOAuthFlows:
+        - client_credentials
+      AllowedOAuthScopes:
+        - kafka/consume
+      AllowedOAuthFlowsUserPoolClient: true
+      SupportedIdentityProviders:
+        - COGNITO
+
+  # ---- Generated passwords for the three role users (kept in Secrets Manager,
+  #      never passed as CloudFormation parameters). The template stores a JSON
+  #      { "username": ..., "password": ... } for each role. ----
+  AdminUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${AWS::StackName}-kafka-admin-credentials"
+      Description: Cognito credentials for the Kafka admin client
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${AdminUsername}"}'
+        GenerateStringKey: password
+        PasswordLength: 20
+        RequireEachIncludedType: true
+        ExcludePunctuation: true
+
+  ProducerUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${AWS::StackName}-kafka-producer-credentials"
+      Description: Cognito credentials for the Kafka producer client
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${ProducerUsername}"}'
+        GenerateStringKey: password
+        PasswordLength: 20
+        RequireEachIncludedType: true
+        ExcludePunctuation: true
+
+  ConsumerUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${AWS::StackName}-kafka-consumer-credentials"
+      Description: Cognito credentials for the Kafka consumer client
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${ConsumerUsername}"}'
+        GenerateStringKey: password
+        PasswordLength: 20
+        RequireEachIncludedType: true
+        ExcludePunctuation: true
+
+  CognitoAdminUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Username: !Ref AdminUsername
+      MessageAction: SUPPRESS
+
+  CognitoProducerUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Username: !Ref ProducerUsername
+      MessageAction: SUPPRESS
+
+  CognitoConsumerUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Username: !Ref ConsumerUsername
+      MessageAction: SUPPRESS
+
+  # ---- Security Groups ----
+  KafkaBrokerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for the self-managed Kafka brokers
+      GroupName: !Sub "${AWS::StackName}-kafka-broker-sg"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        # Kafka client (9092), controller (9093) and inter-broker (9094) traffic
+        # from anywhere inside the VPC (brokers, client instance and Lambda ENIs).
+        - IpProtocol: tcp
+          FromPort: 9092
+          ToPort: 9094
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+        # SSH from within the VPC (used by EC2 Instance Connect endpoint)
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+  KafkaClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for the Kafka client / SAM deployment EC2 instance
+      GroupName: !Sub "${AWS::StackName}-kafka-client-sg"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+  # ---- IAM role / instance profile for the EC2 instances ----
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+      Policies:
+        - PolicyName: CognitoAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cognito-idp:InitiateAuth'
+                  - 'cognito-idp:AdminInitiateAuth'
+                  - 'cognito-idp:AdminSetUserPassword'
+                  - 'cognito-idp:AdminGetUser'
+                  - 'cognito-idp:DescribeUserPool'
+                  - 'cognito-idp:DescribeUserPoolClient'
+                Resource: '*'
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:GetSecretValue'
+                  - 'secretsmanager:DescribeSecret'
+                Resource:
+                  - !Ref AdminUserSecret
+                  - !Ref ProducerUserSecret
+                  - !Ref ConsumerUserSecret
+              # Let the CLI Lambda deploy script (run on the client) create the
+              # OAuth + broker-CA secrets it wires into the event source mapping.
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:CreateSecret'
+                  - 'secretsmanager:PutSecretValue'
+                  - 'secretsmanager:TagResource'
+                  - 'secretsmanager:GetSecretValue'
+                  - 'secretsmanager:DescribeSecret'
+                Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AWS::StackName}-*'
+        - PolicyName: DynamoDBDeployAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              # The CLI Lambda deploy script (run on the client) creates the
+              # DynamoDB table the consumer writes to.
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:CreateTable'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:DeleteTable'
+                  - 'dynamodb:TagResource'
+                  - 'dynamodb:ListTables'
+                Resource: '*'
+              # Read the consumer's table to check results, and let `sam local
+              # invoke` (which runs with these credentials) write to it. Covers both
+              # the SAM table (<stack>-sam-messages) and the CLI's (<stack>-messages).
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:Scan'
+                Resource: !Sub 'arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${AWS::StackName}-*'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Join ['-', ['EC2KafkaOAuthProfile', !Ref 'AWS::StackName']]
+      Roles:
+        - !Ref EC2Role
+
+  # ---- Kafka broker EC2 instances (KRaft mode, SASL/OAUTHBEARER) ----
+  KafkaBroker1:
+    Type: AWS::EC2::Instance
+    DependsOn: PrivateRoute
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SubnetId: !Ref PrivateSubnetOne
+      PrivateIpAddress: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+      SecurityGroupIds: [!GetAtt KafkaBrokerSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaBroker1'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp3
+            DeleteOnTermination: true
+      UserData:
+        Fn::Base64:
+          Fn::Sub:
+            - |
+              #!/bin/bash -xe
+              exec > /var/log/kafka-broker-setup.log 2>&1
+
+              NODE_ID=${node_id}
+              BROKER_IP=${broker_ip}
+              QUORUM_VOTERS=${quorum_voters}
+              REGION=${region}
+              USER_POOL_ID=${user_pool_id}
+              KAFKA_URL=${kafka_installer}
+              STRIMZI_VERSION=${strimzi_version}
+              NIMBUS_VERSION=${nimbus_version}
+              KAFKA_CLUSTER_ID=${kafka_cluster_id}
+              ADMIN_USERNAME=${admin_username}
+              POLLER_CLIENT_ID=${poller_client_id}
+
+              install_pkg() {
+                for i in 1 2 3 4 5; do
+                  yum install -y "$@" && return 0
+                  echo "yum install $* failed, retry $i"; sleep 5
+                done
+                return 1
+              }
+              yum update -y
+              install_pkg java-17-amazon-corretto-headless wget tar
+
+              cd /home/ec2-user
+              KAFKA_TGZ=$(basename "$KAFKA_URL")
+              KAFKA_DIR=$(basename "$KAFKA_TGZ" .tgz)
+              # Download Kafka once (broker 1 seeds it to an S3 cache); the other
+              # brokers and the client fetch it from S3 in-region instead of each
+              # pulling the throttled archive.apache.org copy. The cache bucket
+              # persists across redeploys, so later deploys skip the download.
+              KCREGION=${region}
+              ACCOUNT_ID=$(aws sts get-caller-identity --region "$KCREGION" --query Account --output text)
+              KAFKA_CACHE_BUCKET="kafka-oauth-cache-$ACCOUNT_ID-$KCREGION"
+              KAFKA_S3_URI="s3://$KAFKA_CACHE_BUCKET/kafka/$KAFKA_TGZ"
+              SEEDER=false
+              if [ "$NODE_ID" = "1" ]; then SEEDER=true; fi
+              download_from_archive() {
+                for attempt in 1 2 3 4 5 6; do
+                  wget --timeout=60 --read-timeout=120 --tries=2 -O "$KAFKA_TGZ" "$KAFKA_URL" && test -s "$KAFKA_TGZ" && return 0
+                  echo "Kafka archive download attempt $attempt failed; retrying in 20s..."; sleep 20
+                done
+                return 1
+              }
+              if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                echo "Fetching Kafka from S3 cache $KAFKA_S3_URI"
+                aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                echo "Seeder: downloading Kafka from $KAFKA_URL then publishing to S3"
+                download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+                aws s3 mb "s3://$KAFKA_CACHE_BUCKET" --region "$KCREGION" 2>/dev/null || true
+                aws s3 cp "$KAFKA_TGZ" "$KAFKA_S3_URI" --region "$KCREGION" || true
+              else
+                echo "Waiter: polling S3 cache for Kafka (seeded by broker 1)"
+                for i in $(seq 1 90); do
+                  if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for Kafka in S3 cache... ($i)"; sleep 20
+                done
+                test -s "$KAFKA_TGZ" || download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+              fi
+              test -s "$KAFKA_TGZ" || { echo "FATAL: Kafka archive missing"; exit 1; }
+              tar -xzf "$KAFKA_TGZ"
+              ln -sfn /home/ec2-user/$KAFKA_DIR /home/ec2-user/kafka
+
+              cd /home/ec2-user/kafka/libs
+              MVN=https://repo1.maven.org/maven2
+              wget -q $MVN/io/strimzi/kafka-oauth-common/$STRIMZI_VERSION/kafka-oauth-common-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-server/$STRIMZI_VERSION/kafka-oauth-server-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-server-plain/$STRIMZI_VERSION/kafka-oauth-server-plain-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-client/$STRIMZI_VERSION/kafka-oauth-client-$STRIMZI_VERSION.jar
+              wget -q $MVN/com/nimbusds/nimbus-jose-jwt/$NIMBUS_VERSION/nimbus-jose-jwt-$NIMBUS_VERSION.jar
+
+              ISSUER="https://cognito-idp.$REGION.amazonaws.com/$USER_POOL_ID"
+              JWKS="$ISSUER/.well-known/jwks.json"
+
+              # --- TLS for the SASL_SSL client listener. Broker 1 (seeder) makes ONE
+              # self-signed cert with all three broker IPs as SANs and publishes the
+              # PKCS12 keystore + cert PEM to S3; the other brokers fetch the keystore.
+              mkdir -p /home/ec2-user/kafka/config
+              CERT_S3="s3://$KAFKA_CACHE_BUCKET/tls"
+              KEYSTORE=/home/ec2-user/kafka/config/kafka.keystore.p12
+              if aws s3 ls "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" >/dev/null 2>&1; then
+                aws s3 cp "$CERT_S3/kafka.keystore.p12" "$KEYSTORE" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                openssl req -x509 -newkey rsa:2048 -days 3650 -nodes \
+                  -keyout /tmp/kafka.key -out /tmp/kafka.crt -subj "/CN=kafka-oauth" \
+                  -addext "subjectAltName=IP:10.0.1.10,IP:10.0.2.10,IP:10.0.3.10"
+                openssl pkcs12 -export -in /tmp/kafka.crt -inkey /tmp/kafka.key -name kafka \
+                  -out "$KEYSTORE" -passout pass:changeit
+                aws s3 cp "$KEYSTORE" "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" || true
+                aws s3 cp /tmp/kafka.crt "$CERT_S3/kafka.crt" --region "$KCREGION" || true
+              else
+                for i in $(seq 1 60); do
+                  if aws s3 ls "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$CERT_S3/kafka.keystore.p12" "$KEYSTORE" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for TLS keystore in S3 cache... ($i)"; sleep 10
+                done
+              fi
+
+              cd /home/ec2-user/kafka
+              cat > config/kraft-oauth.properties <<EOF
+              process.roles=broker,controller
+              node.id=$NODE_ID
+              controller.quorum.voters=$QUORUM_VOTERS
+              listeners=CLIENT://$BROKER_IP:9092,CONTROLLER://$BROKER_IP:9093,INTERNAL://$BROKER_IP:9094
+              advertised.listeners=CLIENT://$BROKER_IP:9092,INTERNAL://$BROKER_IP:9094
+              listener.security.protocol.map=CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,CLIENT:SASL_SSL
+              controller.listener.names=CONTROLLER
+              inter.broker.listener.name=INTERNAL
+              listener.name.client.ssl.keystore.location=/home/ec2-user/kafka/config/kafka.keystore.p12
+              listener.name.client.ssl.keystore.password=changeit
+              listener.name.client.ssl.key.password=changeit
+              listener.name.client.ssl.keystore.type=PKCS12
+              sasl.enabled.mechanisms=OAUTHBEARER
+              listener.name.client.sasl.enabled.mechanisms=OAUTHBEARER
+              listener.name.client.oauthbearer.sasl.server.callback.handler.class=io.strimzi.kafka.oauth.server.JaasServerOauthValidatorCallbackHandler
+              listener.name.client.oauthbearer.sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.jwks.endpoint.uri="$JWKS" oauth.valid.issuer.uri="$ISSUER" oauth.username.claim="username" oauth.fallback.username.claim="client_id" oauth.check.access.token.type="false" unsecuredLoginStringClaim_sub="kafka-broker" ;
+              authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+              allow.everyone.if.no.acl.found=false
+              super.users=User:ANONYMOUS;User:$ADMIN_USERNAME;User:$POLLER_CLIENT_ID
+              num.partitions=3
+              offsets.topic.replication.factor=3
+              transaction.state.log.replication.factor=3
+              transaction.state.log.min.isr=2
+              default.replication.factor=3
+              min.insync.replicas=2
+              auto.create.topics.enable=true
+              log.dirs=/home/ec2-user/kraft-combined-logs
+              EOF
+
+              /home/ec2-user/kafka/bin/kafka-storage.sh format -t "$KAFKA_CLUSTER_ID" -c /home/ec2-user/kafka/config/kraft-oauth.properties --ignore-formatted
+
+              chown -R ec2-user:ec2-user /home/ec2-user
+
+              cat > /etc/systemd/system/kafka.service <<EOF
+              [Unit]
+              Description=Apache Kafka (KRaft) broker
+              After=network-online.target
+              Wants=network-online.target
+              [Service]
+              Type=simple
+              User=root
+              Environment="KAFKA_HEAP_OPTS=-Xmx2G -Xms2G"
+              ExecStart=/home/ec2-user/kafka/bin/kafka-server-start.sh /home/ec2-user/kafka/config/kraft-oauth.properties
+              Restart=on-failure
+              RestartSec=10
+              [Install]
+              WantedBy=multi-user.target
+              EOF
+
+              systemctl daemon-reload
+              systemctl enable kafka
+              systemctl start kafka
+            - node_id: !FindInMap ['BrokerConfig', 'Broker1', 'NodeId']
+              broker_ip: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+              quorum_voters: !Sub
+                - "1@${b1}:9093,2@${b2}:9093,3@${b3}:9093"
+                - b1: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+                  b2: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+                  b3: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+              region: !Ref 'AWS::Region'
+              user_pool_id: !Ref CognitoUserPool
+              kafka_installer: !Ref ApacheKafkaInstallerLocation
+              strimzi_version: !Ref StrimziOAuthVersion
+              nimbus_version: !Ref NimbusJoseJwtVersion
+              kafka_cluster_id: !Ref KafkaClusterId
+              admin_username: !Ref AdminUsername
+              poller_client_id: !Ref CognitoPollerClient
+
+  KafkaBroker2:
+    Type: AWS::EC2::Instance
+    DependsOn: PrivateRoute
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SubnetId: !Ref PrivateSubnetTwo
+      PrivateIpAddress: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+      SecurityGroupIds: [!GetAtt KafkaBrokerSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaBroker2'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp3
+            DeleteOnTermination: true
+      UserData:
+        Fn::Base64:
+          Fn::Sub:
+            - |
+              #!/bin/bash -xe
+              exec > /var/log/kafka-broker-setup.log 2>&1
+
+              NODE_ID=${node_id}
+              BROKER_IP=${broker_ip}
+              QUORUM_VOTERS=${quorum_voters}
+              REGION=${region}
+              USER_POOL_ID=${user_pool_id}
+              KAFKA_URL=${kafka_installer}
+              STRIMZI_VERSION=${strimzi_version}
+              NIMBUS_VERSION=${nimbus_version}
+              KAFKA_CLUSTER_ID=${kafka_cluster_id}
+              ADMIN_USERNAME=${admin_username}
+              POLLER_CLIENT_ID=${poller_client_id}
+
+              install_pkg() {
+                for i in 1 2 3 4 5; do
+                  yum install -y "$@" && return 0
+                  echo "yum install $* failed, retry $i"; sleep 5
+                done
+                return 1
+              }
+              yum update -y
+              install_pkg java-17-amazon-corretto-headless wget tar
+
+              cd /home/ec2-user
+              KAFKA_TGZ=$(basename "$KAFKA_URL")
+              KAFKA_DIR=$(basename "$KAFKA_TGZ" .tgz)
+              # Download Kafka once (broker 1 seeds it to an S3 cache); the other
+              # brokers and the client fetch it from S3 in-region instead of each
+              # pulling the throttled archive.apache.org copy. The cache bucket
+              # persists across redeploys, so later deploys skip the download.
+              KCREGION=${region}
+              ACCOUNT_ID=$(aws sts get-caller-identity --region "$KCREGION" --query Account --output text)
+              KAFKA_CACHE_BUCKET="kafka-oauth-cache-$ACCOUNT_ID-$KCREGION"
+              KAFKA_S3_URI="s3://$KAFKA_CACHE_BUCKET/kafka/$KAFKA_TGZ"
+              SEEDER=false
+              if [ "$NODE_ID" = "1" ]; then SEEDER=true; fi
+              download_from_archive() {
+                for attempt in 1 2 3 4 5 6; do
+                  wget --timeout=60 --read-timeout=120 --tries=2 -O "$KAFKA_TGZ" "$KAFKA_URL" && test -s "$KAFKA_TGZ" && return 0
+                  echo "Kafka archive download attempt $attempt failed; retrying in 20s..."; sleep 20
+                done
+                return 1
+              }
+              if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                echo "Fetching Kafka from S3 cache $KAFKA_S3_URI"
+                aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                echo "Seeder: downloading Kafka from $KAFKA_URL then publishing to S3"
+                download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+                aws s3 mb "s3://$KAFKA_CACHE_BUCKET" --region "$KCREGION" 2>/dev/null || true
+                aws s3 cp "$KAFKA_TGZ" "$KAFKA_S3_URI" --region "$KCREGION" || true
+              else
+                echo "Waiter: polling S3 cache for Kafka (seeded by broker 1)"
+                for i in $(seq 1 90); do
+                  if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for Kafka in S3 cache... ($i)"; sleep 20
+                done
+                test -s "$KAFKA_TGZ" || download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+              fi
+              test -s "$KAFKA_TGZ" || { echo "FATAL: Kafka archive missing"; exit 1; }
+              tar -xzf "$KAFKA_TGZ"
+              ln -sfn /home/ec2-user/$KAFKA_DIR /home/ec2-user/kafka
+
+              cd /home/ec2-user/kafka/libs
+              MVN=https://repo1.maven.org/maven2
+              wget -q $MVN/io/strimzi/kafka-oauth-common/$STRIMZI_VERSION/kafka-oauth-common-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-server/$STRIMZI_VERSION/kafka-oauth-server-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-server-plain/$STRIMZI_VERSION/kafka-oauth-server-plain-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-client/$STRIMZI_VERSION/kafka-oauth-client-$STRIMZI_VERSION.jar
+              wget -q $MVN/com/nimbusds/nimbus-jose-jwt/$NIMBUS_VERSION/nimbus-jose-jwt-$NIMBUS_VERSION.jar
+
+              ISSUER="https://cognito-idp.$REGION.amazonaws.com/$USER_POOL_ID"
+              JWKS="$ISSUER/.well-known/jwks.json"
+
+              # --- TLS for the SASL_SSL client listener. Broker 1 (seeder) makes ONE
+              # self-signed cert with all three broker IPs as SANs and publishes the
+              # PKCS12 keystore + cert PEM to S3; the other brokers fetch the keystore.
+              mkdir -p /home/ec2-user/kafka/config
+              CERT_S3="s3://$KAFKA_CACHE_BUCKET/tls"
+              KEYSTORE=/home/ec2-user/kafka/config/kafka.keystore.p12
+              if aws s3 ls "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" >/dev/null 2>&1; then
+                aws s3 cp "$CERT_S3/kafka.keystore.p12" "$KEYSTORE" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                openssl req -x509 -newkey rsa:2048 -days 3650 -nodes \
+                  -keyout /tmp/kafka.key -out /tmp/kafka.crt -subj "/CN=kafka-oauth" \
+                  -addext "subjectAltName=IP:10.0.1.10,IP:10.0.2.10,IP:10.0.3.10"
+                openssl pkcs12 -export -in /tmp/kafka.crt -inkey /tmp/kafka.key -name kafka \
+                  -out "$KEYSTORE" -passout pass:changeit
+                aws s3 cp "$KEYSTORE" "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" || true
+                aws s3 cp /tmp/kafka.crt "$CERT_S3/kafka.crt" --region "$KCREGION" || true
+              else
+                for i in $(seq 1 60); do
+                  if aws s3 ls "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$CERT_S3/kafka.keystore.p12" "$KEYSTORE" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for TLS keystore in S3 cache... ($i)"; sleep 10
+                done
+              fi
+
+              cd /home/ec2-user/kafka
+              cat > config/kraft-oauth.properties <<EOF
+              process.roles=broker,controller
+              node.id=$NODE_ID
+              controller.quorum.voters=$QUORUM_VOTERS
+              listeners=CLIENT://$BROKER_IP:9092,CONTROLLER://$BROKER_IP:9093,INTERNAL://$BROKER_IP:9094
+              advertised.listeners=CLIENT://$BROKER_IP:9092,INTERNAL://$BROKER_IP:9094
+              listener.security.protocol.map=CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,CLIENT:SASL_SSL
+              controller.listener.names=CONTROLLER
+              inter.broker.listener.name=INTERNAL
+              listener.name.client.ssl.keystore.location=/home/ec2-user/kafka/config/kafka.keystore.p12
+              listener.name.client.ssl.keystore.password=changeit
+              listener.name.client.ssl.key.password=changeit
+              listener.name.client.ssl.keystore.type=PKCS12
+              sasl.enabled.mechanisms=OAUTHBEARER
+              listener.name.client.sasl.enabled.mechanisms=OAUTHBEARER
+              listener.name.client.oauthbearer.sasl.server.callback.handler.class=io.strimzi.kafka.oauth.server.JaasServerOauthValidatorCallbackHandler
+              listener.name.client.oauthbearer.sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.jwks.endpoint.uri="$JWKS" oauth.valid.issuer.uri="$ISSUER" oauth.username.claim="username" oauth.fallback.username.claim="client_id" oauth.check.access.token.type="false" unsecuredLoginStringClaim_sub="kafka-broker" ;
+              authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+              allow.everyone.if.no.acl.found=false
+              super.users=User:ANONYMOUS;User:$ADMIN_USERNAME;User:$POLLER_CLIENT_ID
+              num.partitions=3
+              offsets.topic.replication.factor=3
+              transaction.state.log.replication.factor=3
+              transaction.state.log.min.isr=2
+              default.replication.factor=3
+              min.insync.replicas=2
+              auto.create.topics.enable=true
+              log.dirs=/home/ec2-user/kraft-combined-logs
+              EOF
+
+              /home/ec2-user/kafka/bin/kafka-storage.sh format -t "$KAFKA_CLUSTER_ID" -c /home/ec2-user/kafka/config/kraft-oauth.properties --ignore-formatted
+
+              chown -R ec2-user:ec2-user /home/ec2-user
+
+              cat > /etc/systemd/system/kafka.service <<EOF
+              [Unit]
+              Description=Apache Kafka (KRaft) broker
+              After=network-online.target
+              Wants=network-online.target
+              [Service]
+              Type=simple
+              User=root
+              Environment="KAFKA_HEAP_OPTS=-Xmx2G -Xms2G"
+              ExecStart=/home/ec2-user/kafka/bin/kafka-server-start.sh /home/ec2-user/kafka/config/kraft-oauth.properties
+              Restart=on-failure
+              RestartSec=10
+              [Install]
+              WantedBy=multi-user.target
+              EOF
+
+              systemctl daemon-reload
+              systemctl enable kafka
+              systemctl start kafka
+            - node_id: !FindInMap ['BrokerConfig', 'Broker2', 'NodeId']
+              broker_ip: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+              quorum_voters: !Sub
+                - "1@${b1}:9093,2@${b2}:9093,3@${b3}:9093"
+                - b1: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+                  b2: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+                  b3: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+              region: !Ref 'AWS::Region'
+              user_pool_id: !Ref CognitoUserPool
+              kafka_installer: !Ref ApacheKafkaInstallerLocation
+              strimzi_version: !Ref StrimziOAuthVersion
+              nimbus_version: !Ref NimbusJoseJwtVersion
+              kafka_cluster_id: !Ref KafkaClusterId
+              admin_username: !Ref AdminUsername
+              poller_client_id: !Ref CognitoPollerClient
+
+  KafkaBroker3:
+    Type: AWS::EC2::Instance
+    DependsOn: PrivateRoute
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SubnetId: !Ref PrivateSubnetThree
+      PrivateIpAddress: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+      SecurityGroupIds: [!GetAtt KafkaBrokerSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaBroker3'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp3
+            DeleteOnTermination: true
+      UserData:
+        Fn::Base64:
+          Fn::Sub:
+            - |
+              #!/bin/bash -xe
+              exec > /var/log/kafka-broker-setup.log 2>&1
+
+              NODE_ID=${node_id}
+              BROKER_IP=${broker_ip}
+              QUORUM_VOTERS=${quorum_voters}
+              REGION=${region}
+              USER_POOL_ID=${user_pool_id}
+              KAFKA_URL=${kafka_installer}
+              STRIMZI_VERSION=${strimzi_version}
+              NIMBUS_VERSION=${nimbus_version}
+              KAFKA_CLUSTER_ID=${kafka_cluster_id}
+              ADMIN_USERNAME=${admin_username}
+              POLLER_CLIENT_ID=${poller_client_id}
+
+              install_pkg() {
+                for i in 1 2 3 4 5; do
+                  yum install -y "$@" && return 0
+                  echo "yum install $* failed, retry $i"; sleep 5
+                done
+                return 1
+              }
+              yum update -y
+              install_pkg java-17-amazon-corretto-headless wget tar
+
+              cd /home/ec2-user
+              KAFKA_TGZ=$(basename "$KAFKA_URL")
+              KAFKA_DIR=$(basename "$KAFKA_TGZ" .tgz)
+              # Download Kafka once (broker 1 seeds it to an S3 cache); the other
+              # brokers and the client fetch it from S3 in-region instead of each
+              # pulling the throttled archive.apache.org copy. The cache bucket
+              # persists across redeploys, so later deploys skip the download.
+              KCREGION=${region}
+              ACCOUNT_ID=$(aws sts get-caller-identity --region "$KCREGION" --query Account --output text)
+              KAFKA_CACHE_BUCKET="kafka-oauth-cache-$ACCOUNT_ID-$KCREGION"
+              KAFKA_S3_URI="s3://$KAFKA_CACHE_BUCKET/kafka/$KAFKA_TGZ"
+              SEEDER=false
+              if [ "$NODE_ID" = "1" ]; then SEEDER=true; fi
+              download_from_archive() {
+                for attempt in 1 2 3 4 5 6; do
+                  wget --timeout=60 --read-timeout=120 --tries=2 -O "$KAFKA_TGZ" "$KAFKA_URL" && test -s "$KAFKA_TGZ" && return 0
+                  echo "Kafka archive download attempt $attempt failed; retrying in 20s..."; sleep 20
+                done
+                return 1
+              }
+              if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                echo "Fetching Kafka from S3 cache $KAFKA_S3_URI"
+                aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                echo "Seeder: downloading Kafka from $KAFKA_URL then publishing to S3"
+                download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+                aws s3 mb "s3://$KAFKA_CACHE_BUCKET" --region "$KCREGION" 2>/dev/null || true
+                aws s3 cp "$KAFKA_TGZ" "$KAFKA_S3_URI" --region "$KCREGION" || true
+              else
+                echo "Waiter: polling S3 cache for Kafka (seeded by broker 1)"
+                for i in $(seq 1 90); do
+                  if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for Kafka in S3 cache... ($i)"; sleep 20
+                done
+                test -s "$KAFKA_TGZ" || download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+              fi
+              test -s "$KAFKA_TGZ" || { echo "FATAL: Kafka archive missing"; exit 1; }
+              tar -xzf "$KAFKA_TGZ"
+              ln -sfn /home/ec2-user/$KAFKA_DIR /home/ec2-user/kafka
+
+              cd /home/ec2-user/kafka/libs
+              MVN=https://repo1.maven.org/maven2
+              wget -q $MVN/io/strimzi/kafka-oauth-common/$STRIMZI_VERSION/kafka-oauth-common-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-server/$STRIMZI_VERSION/kafka-oauth-server-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-server-plain/$STRIMZI_VERSION/kafka-oauth-server-plain-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-client/$STRIMZI_VERSION/kafka-oauth-client-$STRIMZI_VERSION.jar
+              wget -q $MVN/com/nimbusds/nimbus-jose-jwt/$NIMBUS_VERSION/nimbus-jose-jwt-$NIMBUS_VERSION.jar
+
+              ISSUER="https://cognito-idp.$REGION.amazonaws.com/$USER_POOL_ID"
+              JWKS="$ISSUER/.well-known/jwks.json"
+
+              # --- TLS for the SASL_SSL client listener. Broker 1 (seeder) makes ONE
+              # self-signed cert with all three broker IPs as SANs and publishes the
+              # PKCS12 keystore + cert PEM to S3; the other brokers fetch the keystore.
+              mkdir -p /home/ec2-user/kafka/config
+              CERT_S3="s3://$KAFKA_CACHE_BUCKET/tls"
+              KEYSTORE=/home/ec2-user/kafka/config/kafka.keystore.p12
+              if aws s3 ls "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" >/dev/null 2>&1; then
+                aws s3 cp "$CERT_S3/kafka.keystore.p12" "$KEYSTORE" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                openssl req -x509 -newkey rsa:2048 -days 3650 -nodes \
+                  -keyout /tmp/kafka.key -out /tmp/kafka.crt -subj "/CN=kafka-oauth" \
+                  -addext "subjectAltName=IP:10.0.1.10,IP:10.0.2.10,IP:10.0.3.10"
+                openssl pkcs12 -export -in /tmp/kafka.crt -inkey /tmp/kafka.key -name kafka \
+                  -out "$KEYSTORE" -passout pass:changeit
+                aws s3 cp "$KEYSTORE" "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" || true
+                aws s3 cp /tmp/kafka.crt "$CERT_S3/kafka.crt" --region "$KCREGION" || true
+              else
+                for i in $(seq 1 60); do
+                  if aws s3 ls "$CERT_S3/kafka.keystore.p12" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$CERT_S3/kafka.keystore.p12" "$KEYSTORE" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for TLS keystore in S3 cache... ($i)"; sleep 10
+                done
+              fi
+
+              cd /home/ec2-user/kafka
+              cat > config/kraft-oauth.properties <<EOF
+              process.roles=broker,controller
+              node.id=$NODE_ID
+              controller.quorum.voters=$QUORUM_VOTERS
+              listeners=CLIENT://$BROKER_IP:9092,CONTROLLER://$BROKER_IP:9093,INTERNAL://$BROKER_IP:9094
+              advertised.listeners=CLIENT://$BROKER_IP:9092,INTERNAL://$BROKER_IP:9094
+              listener.security.protocol.map=CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,CLIENT:SASL_SSL
+              controller.listener.names=CONTROLLER
+              inter.broker.listener.name=INTERNAL
+              listener.name.client.ssl.keystore.location=/home/ec2-user/kafka/config/kafka.keystore.p12
+              listener.name.client.ssl.keystore.password=changeit
+              listener.name.client.ssl.key.password=changeit
+              listener.name.client.ssl.keystore.type=PKCS12
+              sasl.enabled.mechanisms=OAUTHBEARER
+              listener.name.client.sasl.enabled.mechanisms=OAUTHBEARER
+              listener.name.client.oauthbearer.sasl.server.callback.handler.class=io.strimzi.kafka.oauth.server.JaasServerOauthValidatorCallbackHandler
+              listener.name.client.oauthbearer.sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.jwks.endpoint.uri="$JWKS" oauth.valid.issuer.uri="$ISSUER" oauth.username.claim="username" oauth.fallback.username.claim="client_id" oauth.check.access.token.type="false" unsecuredLoginStringClaim_sub="kafka-broker" ;
+              authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+              allow.everyone.if.no.acl.found=false
+              super.users=User:ANONYMOUS;User:$ADMIN_USERNAME;User:$POLLER_CLIENT_ID
+              num.partitions=3
+              offsets.topic.replication.factor=3
+              transaction.state.log.replication.factor=3
+              transaction.state.log.min.isr=2
+              default.replication.factor=3
+              min.insync.replicas=2
+              auto.create.topics.enable=true
+              log.dirs=/home/ec2-user/kraft-combined-logs
+              EOF
+
+              /home/ec2-user/kafka/bin/kafka-storage.sh format -t "$KAFKA_CLUSTER_ID" -c /home/ec2-user/kafka/config/kraft-oauth.properties --ignore-formatted
+
+              chown -R ec2-user:ec2-user /home/ec2-user
+
+              cat > /etc/systemd/system/kafka.service <<EOF
+              [Unit]
+              Description=Apache Kafka (KRaft) broker
+              After=network-online.target
+              Wants=network-online.target
+              [Service]
+              Type=simple
+              User=root
+              Environment="KAFKA_HEAP_OPTS=-Xmx2G -Xms2G"
+              ExecStart=/home/ec2-user/kafka/bin/kafka-server-start.sh /home/ec2-user/kafka/config/kraft-oauth.properties
+              Restart=on-failure
+              RestartSec=10
+              [Install]
+              WantedBy=multi-user.target
+              EOF
+
+              systemctl daemon-reload
+              systemctl enable kafka
+              systemctl start kafka
+            - node_id: !FindInMap ['BrokerConfig', 'Broker3', 'NodeId']
+              broker_ip: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+              quorum_voters: !Sub
+                - "1@${b1}:9093,2@${b2}:9093,3@${b3}:9093"
+                - b1: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+                  b2: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+                  b3: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+              region: !Ref 'AWS::Region'
+              user_pool_id: !Ref CognitoUserPool
+              kafka_installer: !Ref ApacheKafkaInstallerLocation
+              strimzi_version: !Ref StrimziOAuthVersion
+              nimbus_version: !Ref NimbusJoseJwtVersion
+              kafka_cluster_id: !Ref KafkaClusterId
+              admin_username: !Ref AdminUsername
+              poller_client_id: !Ref CognitoPollerClient
+
+  KafkaClientEC2Instance:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT60M
+    DependsOn:
+      - KafkaBroker1
+      - KafkaBroker2
+      - KafkaBroker3
+      - CognitoAdminUser
+      - CognitoProducerUser
+      - CognitoConsumerUser
+      - AdminUserSecret
+      - ProducerUserSecret
+      - ConsumerUserSecret
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SubnetId: !Ref PublicSubnetOne
+      SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags:
+        - Key: 'Name'
+          Value: 'KafkaClientInstance'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp3
+            DeleteOnTermination: true
+      UserData:
+        Fn::Base64:
+          Fn::Sub:
+            - |
+              #!/bin/bash -xe
+              exec > /var/log/kafka-client-setup.log 2>&1
+
+              # Report how setup ended. The instance's CreationPolicy keeps the stack in
+              # CREATE_IN_PROGRESS until this signal arrives, so CREATE_COMPLETE means the
+              # client is ready, and a failed setup fails the stack with the exit code.
+              dnf install -y aws-cfn-bootstrap || yum install -y aws-cfn-bootstrap || true
+              trap '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource KafkaClientEC2Instance --region ${AWS::Region}' EXIT
+
+              JAVA_VERSION=${java_version}
+              NODE_VERSION=${node_version}
+              AWS_REGION=${region}
+              KAFKA_URL=${kafka_installer}
+              STRIMZI_VERSION=${strimzi_version}
+              NIMBUS_VERSION=${nimbus_version}
+              BOOTSTRAP_SERVERS=${bootstrap_servers}
+              KAFKA_TOPIC=${kafka_topic}
+              USER_POOL_ID=${user_pool_id}
+              APP_CLIENT_ID=${app_client_id}
+              ADMIN_USERNAME=${admin_username}
+              PRODUCER_USERNAME=${producer_username}
+              CONSUMER_USERNAME=${consumer_username}
+              ADMIN_SECRET_NAME=${admin_secret}
+              PRODUCER_SECRET_NAME=${producer_secret}
+              CONSUMER_SECRET_NAME=${consumer_secret}
+              SUBNET1=${subnet1}
+              SUBNET2=${subnet2}
+              SUBNET3=${subnet3}
+              LAMBDA_SG=${lambda_sg}
+              SERVERLESS_LAND_GITHUB_LOCATION="${serverless_land_github_location}"
+              SERVERLESS_LAND_GITHUB_BRANCH="${serverless_land_github_branch}"
+              POLLER_OAUTH_SECRET_ARN=${poller_oauth_secret_arn}
+              BROKER_CA_SECRET_ARN=${broker_ca_secret_arn}
+              CLIENT_SG=${client_sg}
+              KAFKA_HOME=/home/ec2-user/kafka
+              KAFKA_JSON_APPS_DIR=/home/ec2-user/kafka_json_apps
+
+              install_pkg() {
+                for i in 1 2 3 4 5; do
+                  yum install -y "$@" && return 0
+                  echo "yum install $* failed, retry $i"; sleep 5
+                done
+                return 1
+              }
+              yum update -y
+
+              case "$JAVA_VERSION" in
+                java11) install_pkg java-11-amazon-corretto-devel ;;
+                java17) install_pkg java-17-amazon-corretto-devel ;;
+                java21) install_pkg java-21-amazon-corretto-devel ;;
+                java25) install_pkg java-25-amazon-corretto-devel ;;
+                *) install_pkg java-21-amazon-corretto-devel ;;
+              esac
+              install_pkg git jq nmap-ncat wget tar unzip
+              yum erase awscli -y || true
+              install_pkg docker
+              service docker start
+              systemctl enable docker   # back up after a reboot, with DynamoDB Local
+              usermod -a -G docker ec2-user
+
+              # Node.js matching the Lambda runtime (NodeVersion), for `sam build` and the
+              # sample apps. AL2023 ships Node.js as namespaced nodejsNN packages and picks
+              # the active node/npm with alternatives, so install that major version and
+              # make it the active one.
+              NODE_MAJOR=$(echo "$NODE_VERSION" | sed 's/^nodejs//; s/\.x$//')
+              install_pkg "nodejs$NODE_MAJOR" "nodejs$NODE_MAJOR-npm"
+              alternatives --set node "/usr/bin/node-$NODE_MAJOR"
+              node --version
+              npm --version
+
+              # AWS CLI v2
+              cd /home/ec2-user
+              curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip -q awscliv2.zip
+              ./aws/install || ./aws/install --update
+
+              # AWS SAM CLI
+              cd /home/ec2-user
+              mkdir -p awssam && cd awssam
+              wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+              unzip -q aws-sam-cli-linux-x86_64.zip -d sam-installation
+              ./sam-installation/install || ./sam-installation/install --update
+
+              # Allow the browser-based "EC2 Instance Connect" console option to SSH
+              # into this public client instance. Look up THIS region's EC2 Instance
+              # Connect service prefix list and authorize port 22 from it (region
+              # agnostic - no hardcoded IDs). The private brokers have no public IP,
+              # so use the EC2 Instance Connect Endpoint to reach them instead.
+              EIC_PL=$(aws ec2 describe-managed-prefix-lists --region "$AWS_REGION" --filters "Name=prefix-list-name,Values=com.amazonaws.$AWS_REGION.ec2-instance-connect" --query "PrefixLists[0].PrefixListId" --output text 2>/dev/null || true)
+              if [ -n "$EIC_PL" ] && [ "$EIC_PL" != "None" ]; then
+                aws ec2 authorize-security-group-ingress --region "$AWS_REGION" --group-id "$CLIENT_SG" --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,PrefixListIds=[{PrefixListId=$EIC_PL}]" 2>/dev/null || true
+                echo "Authorized SSH from EC2 Instance Connect prefix list $EIC_PL on $CLIENT_SG"
+              fi
+
+              # Kafka CLI tools + Strimzi client OAuth libraries
+              cd /home/ec2-user
+              KAFKA_TGZ=$(basename "$KAFKA_URL")
+              KAFKA_DIR=$(basename "$KAFKA_TGZ" .tgz)
+              # Download Kafka once (broker 1 seeds it to an S3 cache); the other
+              # brokers and the client fetch it from S3 in-region instead of each
+              # pulling the throttled archive.apache.org copy. The cache bucket
+              # persists across redeploys, so later deploys skip the download.
+              KCREGION=${region}
+              ACCOUNT_ID=$(aws sts get-caller-identity --region "$KCREGION" --query Account --output text)
+              KAFKA_CACHE_BUCKET="kafka-oauth-cache-$ACCOUNT_ID-$KCREGION"
+              KAFKA_S3_URI="s3://$KAFKA_CACHE_BUCKET/kafka/$KAFKA_TGZ"
+              SEEDER=false
+              if [ "$NODE_ID" = "1" ]; then SEEDER=true; fi
+              download_from_archive() {
+                for attempt in 1 2 3 4 5 6; do
+                  wget --timeout=60 --read-timeout=120 --tries=2 -O "$KAFKA_TGZ" "$KAFKA_URL" && test -s "$KAFKA_TGZ" && return 0
+                  echo "Kafka archive download attempt $attempt failed; retrying in 20s..."; sleep 20
+                done
+                return 1
+              }
+              if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                echo "Fetching Kafka from S3 cache $KAFKA_S3_URI"
+                aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION"
+              elif [ "$SEEDER" = "true" ]; then
+                echo "Seeder: downloading Kafka from $KAFKA_URL then publishing to S3"
+                download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+                aws s3 mb "s3://$KAFKA_CACHE_BUCKET" --region "$KCREGION" 2>/dev/null || true
+                aws s3 cp "$KAFKA_TGZ" "$KAFKA_S3_URI" --region "$KCREGION" || true
+              else
+                echo "Waiter: polling S3 cache for Kafka (seeded by broker 1)"
+                for i in $(seq 1 90); do
+                  if aws s3 ls "$KAFKA_S3_URI" --region "$KCREGION" >/dev/null 2>&1; then
+                    aws s3 cp "$KAFKA_S3_URI" "$KAFKA_TGZ" --region "$KCREGION" && break
+                  fi
+                  echo "waiting for Kafka in S3 cache... ($i)"; sleep 20
+                done
+                test -s "$KAFKA_TGZ" || download_from_archive || { echo "FATAL: unable to download Kafka from $KAFKA_URL"; exit 1; }
+              fi
+              test -s "$KAFKA_TGZ" || { echo "FATAL: Kafka archive missing"; exit 1; }
+              tar -xzf "$KAFKA_TGZ"
+              ln -sfn /home/ec2-user/$KAFKA_DIR /home/ec2-user/kafka
+              cd /home/ec2-user/kafka/libs
+              MVN=https://repo1.maven.org/maven2
+              wget -q $MVN/io/strimzi/kafka-oauth-common/$STRIMZI_VERSION/kafka-oauth-common-$STRIMZI_VERSION.jar
+              wget -q $MVN/io/strimzi/kafka-oauth-client/$STRIMZI_VERSION/kafka-oauth-client-$STRIMZI_VERSION.jar
+              wget -q $MVN/com/nimbusds/nimbus-jose-jwt/$NIMBUS_VERSION/nimbus-jose-jwt-$NIMBUS_VERSION.jar
+
+              # Fetch the broker TLS cert (seeded to S3 by broker 1) and build a
+              # PKCS12 truststore so the SASL_SSL producer/consumer/admin clients
+              # trust the brokers. kafka.crt is also the CA for the Lambda ESM.
+              KAFKA_TRUSTSTORE=/home/ec2-user/kafka/config/kafka.truststore.p12
+              for i in $(seq 1 60); do
+                if aws s3 ls "s3://$KAFKA_CACHE_BUCKET/tls/kafka.crt" --region "$KCREGION" >/dev/null 2>&1; then
+                  aws s3 cp "s3://$KAFKA_CACHE_BUCKET/tls/kafka.crt" /home/ec2-user/kafka.crt --region "$KCREGION" && break
+                fi
+                echo "waiting for broker TLS cert in S3 cache... ($i)"; sleep 10
+              done
+              keytool -importcert -noprompt -alias kafka -file /home/ec2-user/kafka.crt \
+                -keystore "$KAFKA_TRUSTSTORE" -storetype PKCS12 -storepass changeit
+
+              # Clone only this pattern's folder (Node.js apps + scripts + SAM template)
+              cd /home/ec2-user
+              git clone --depth 1 --filter=blob:none --sparse --branch "$SERVERLESS_LAND_GITHUB_BRANCH" "$SERVERLESS_LAND_GITHUB_LOCATION" serverless-patterns
+              # Non-cone mode checks out only this folder; the default cone mode would
+              # also check out every file at the repository root.
+              git -C serverless-patterns sparse-checkout set --no-cone '/kafka-lambda-oauth-nodejs-sam/oauthbearer_auth/'
+              PATTERN_DIR=/home/ec2-user/serverless-patterns/kafka-lambda-oauth-nodejs-sam/oauthbearer_auth
+
+              # Install the producer/consumer JSON apps (Node.js) and scripts
+              mkdir -p /home/ec2-user/kafka_json_apps
+              cp "$PATTERN_DIR"/kafka_json_apps/*.mjs /home/ec2-user/kafka_json_apps/
+              cp "$PATTERN_DIR"/kafka_json_apps/package.json /home/ec2-user/kafka_json_apps/
+              ( cd /home/ec2-user/kafka_json_apps && npm install --omit=dev )
+              mkdir -p /home/ec2-user/scripts
+              cp "$PATTERN_DIR"/scripts/*.sh /home/ec2-user/scripts/
+              chmod +x /home/ec2-user/scripts/*.sh
+
+              # Export environment used by all helper scripts. Written to a dedicated
+              # env file (not just .bash_profile) so scripts can source only these
+              # clean exports without pulling in /etc/profile.d scripts that return
+              # non-zero and would abort a script running under 'set -e'.
+              cat > /home/ec2-user/kafka_oauth.env <<EOF
+              export AWS_REGION=$AWS_REGION
+              export AWS_DEFAULT_REGION=$AWS_REGION
+              export STACK_NAME=${AWS::StackName}
+              export USER_POOL_ID=$USER_POOL_ID
+              export APP_CLIENT_ID=$APP_CLIENT_ID
+              export BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
+              export KAFKA_TOPIC=$KAFKA_TOPIC
+              export KAFKA_HOME=$KAFKA_HOME
+              export KAFKA_JSON_APPS_DIR=$KAFKA_JSON_APPS_DIR
+              export KAFKA_TRUSTSTORE=$KAFKA_TRUSTSTORE
+              export ADMIN_USERNAME=$ADMIN_USERNAME
+              export PRODUCER_USERNAME=$PRODUCER_USERNAME
+              export CONSUMER_USERNAME=$CONSUMER_USERNAME
+              export ADMIN_SECRET_NAME=$ADMIN_SECRET_NAME
+              export PRODUCER_SECRET_NAME=$PRODUCER_SECRET_NAME
+              export CONSUMER_SECRET_NAME=$CONSUMER_SECRET_NAME
+              EOF
+              # Make the same env available in interactive login shells too
+              echo "source /home/ec2-user/kafka_oauth.env" >> /home/ec2-user/.bash_profile
+              # The AWS SDKs, and the SAM CLI built on them, take the region from
+              # AWS_DEFAULT_REGION or ~/.aws/config rather than AWS_REGION. Without this,
+              # `sam deploy --guided` offers us-east-1 whatever region this stack is in.
+              mkdir -p /home/ec2-user/.aws
+              printf '[default]\nregion = %s\n' "$AWS_REGION" > /home/ec2-user/.aws/config
+
+              # Write the broker certificate into the stack's CA secret for the
+              # Lambda event source mapping (SERVER_ROOT_CA_CERTIFICATE).
+              python3 -c 'import json,sys;print(json.dumps({"certificate":open(sys.argv[1]).read()}))' /home/ec2-user/kafka.crt > /tmp/broker-ca.json
+              aws secretsmanager put-secret-value --region "$AWS_REGION" --secret-id "$BROKER_CA_SECRET_ARN" --secret-string file:///tmp/broker-ca.json \
+                || echo "WARN: could not write the broker CA secret; sam deploy will fail until it holds kafka.crt"
+              rm -f /tmp/broker-ca.json
+
+              # Substitute the SAM template placeholders
+              cd "$PATTERN_DIR"
+              cp template_original.yaml template.yaml
+              sed -i "s|BOOTSTRAP_SERVER_1|10.0.1.10:9092|g" template.yaml
+              # <main-stack>-sam-messages: unique per language deploy, distinct from the CLI's table
+              sed -i "s|MESSAGES_TABLE_NAME|${AWS::StackName}-sam-messages|g" template.yaml
+              sed -i "s|BOOTSTRAP_SERVER_2|10.0.2.10:9092|g" template.yaml
+              sed -i "s|BOOTSTRAP_SERVER_3|10.0.3.10:9092|g" template.yaml
+              sed -i "s|SUBNET_1|$SUBNET1|g" template.yaml
+              sed -i "s|SUBNET_2|$SUBNET2|g" template.yaml
+              sed -i "s|SUBNET_3|$SUBNET3|g" template.yaml
+              sed -i "s|LAMBDA_SG|$LAMBDA_SG|g" template.yaml
+              sed -i "s|KAFKA_TOPIC|$KAFKA_TOPIC|g" template.yaml
+              sed -i "s|NODE_VERSION|$NODE_VERSION|g" template.yaml
+              sed -i "s|BROKER_CA_SECRET_ARN|$BROKER_CA_SECRET_ARN|g" template.yaml
+              sed -i "s|OAUTH_SECRET_ARN|$POLLER_OAUTH_SECRET_ARN|g" template.yaml
+              sed -i "s|OAUTH_SCOPE|kafka/consume|g" template.yaml
+
+              # Set permanent passwords for the three Cognito role users from Secrets Manager
+              set_password() {
+                local username="$1" secret="$2" pw
+                pw="$(aws secretsmanager get-secret-value --region "$AWS_REGION" --secret-id "$secret" --query SecretString --output text | jq -r .password)"
+                aws cognito-idp admin-set-user-password --region "$AWS_REGION" --user-pool-id "$USER_POOL_ID" --username "$username" --password "$pw" --permanent
+              }
+              set_password "$ADMIN_USERNAME" "$ADMIN_SECRET_NAME"
+              set_password "$PRODUCER_USERNAME" "$PRODUCER_SECRET_NAME"
+              set_password "$CONSUMER_USERNAME" "$CONSUMER_SECRET_NAME"
+
+              chown -R ec2-user:ec2-user /home/ec2-user
+
+              # Start DynamoDB Local for `sam local invoke` and point samconfig.toml at it,
+              # so local tests work out of the box and never write to the real table.
+              # Runs as ec2-user once the pattern folder is theirs. A failure here only
+              # affects local testing, so it doesn't fail the stack.
+              sudo -u ec2-user bash "$PATTERN_DIR/scripts/local_dynamodb.sh" > /home/ec2-user/local_dynamodb_output.txt 2>&1 \
+                || echo "WARN: local_dynamodb.sh failed; see /home/ec2-user/local_dynamodb_output.txt"
+
+              # Wait for the brokers' SASL listeners to accept connections
+              for i in $(seq 1 40); do
+                if nc -z 10.0.1.10 9092 && nc -z 10.0.2.10 9092 && nc -z 10.0.3.10 9092; then
+                  echo "brokers reachable"; break
+                fi
+                echo "waiting for brokers... ($i)"; sleep 15
+              done
+
+              # Bootstrap authorization: admin grants the consumer group-read ACL and
+              # creates the default topic (with producer WRITE / consumer READ ACLs).
+              bootstrap_acls() {
+                local props
+                props="$(sudo -u ec2-user bash /home/ec2-user/scripts/refresh_token.sh admin)" || return 1
+                "$KAFKA_HOME"/bin/kafka-acls.sh --bootstrap-server "$BOOTSTRAP_SERVERS" --command-config "$props" \
+                  --add --allow-principal "User:$CONSUMER_USERNAME" --operation Read --group '*' || return 1
+                sudo -u ec2-user bash /home/ec2-user/scripts/admin_create_topic.sh "$KAFKA_TOPIC" 3 || return 1
+              }
+              BOOTSTRAP_OK=false
+              for i in 1 2 3 4 5 6 7 8; do
+                if bootstrap_acls > /home/ec2-user/bootstrap_acls_output.txt 2>&1; then
+                  echo "ACL/topic bootstrap succeeded"; BOOTSTRAP_OK=true; break
+                fi
+                echo "bootstrap attempt $i failed; retrying in 20s..."; sleep 20
+              done
+              if [ "$BOOTSTRAP_OK" != true ]; then
+                echo "ERROR: topic bootstrap failed after 8 attempts; see /home/ec2-user/bootstrap_acls_output.txt"; exit 1
+              fi
+              chown -R ec2-user:ec2-user /home/ec2-user
+            - java_version: !Ref JavaVersion
+              node_version: !Ref NodeVersion
+              region: !Ref 'AWS::Region'
+              kafka_installer: !Ref ApacheKafkaInstallerLocation
+              strimzi_version: !Ref StrimziOAuthVersion
+              nimbus_version: !Ref NimbusJoseJwtVersion
+              bootstrap_servers: !Sub
+                - "${b1}:9092,${b2}:9092,${b3}:9092"
+                - b1: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+                  b2: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+                  b3: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+              kafka_topic: !Ref KafkaTopicForLambda
+              user_pool_id: !Ref CognitoUserPool
+              app_client_id: !Ref CognitoUserPoolClient
+              admin_username: !Ref AdminUsername
+              producer_username: !Ref ProducerUsername
+              consumer_username: !Ref ConsumerUsername
+              admin_secret: !Ref AdminUserSecret
+              producer_secret: !Ref ProducerUserSecret
+              consumer_secret: !Ref ConsumerUserSecret
+              subnet1: !Ref PrivateSubnetOne
+              subnet2: !Ref PrivateSubnetTwo
+              subnet3: !Ref PrivateSubnetThree
+              lambda_sg: !GetAtt KafkaBrokerSecurityGroup.GroupId
+              client_sg: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+              serverless_land_github_location: !Ref ServerlessLandGithubLocation
+              serverless_land_github_branch: !Ref ServerlessLandGithubBranch
+              poller_oauth_secret_arn: !Ref PollerOAuthSecret
+              broker_ca_secret_arn: !Ref BrokerCASecret
+
+  # Broker CA trust anchor for the Lambda event source mapping
+  # (SERVER_ROOT_CA_CERTIFICATE). The brokers generate their certificate at boot,
+  # so this starts with a placeholder and the client instance writes the real PEM
+  # into the "certificate" field. Owned by this stack, so it's deleted with it.
+  BrokerCASecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${AWS::StackName}-broker-ca"
+      Description: Kafka broker CA certificate (PEM) for the Lambda event source mapping
+      SecretString: '{"certificate":"written-by-the-client-instance-at-boot"}'
+
+  # Client-credentials secret for the Lambda event source mapping
+  # (OAUTHBEARER_AUTH). Lambda requires exactly these three keys.
+  PollerOAuthSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${AWS::StackName}-poller-oauth-creds"
+      Description: Cognito client credentials the Lambda Kafka poller uses
+      SecretString: !Sub
+        - '{"oauthClientId":"${id}","oauthClientSecret":"${secret}","oauthTokenEndpointUrl":"https://${AWS::StackName}-${AWS::AccountId}.auth.${AWS::Region}.amazoncognito.com/oauth2/token"}'
+        - id: !Ref CognitoPollerClient
+          secret: !GetAtt CognitoPollerClient.ClientSecret
+
+  EC2InstanceEndpoint:
+    Type: AWS::EC2::InstanceConnectEndpoint
+    Properties:
+      # PreserveClientIp must be false so the endpoint reaches the instance from
+      # its own ENI (a VPC-private IP allowed by the instance security group).
+      # With it true, the instance sees the caller's real public IP, which the
+      # security group (which only allows the VPC CIDR on port 22) would drop.
+      PreserveClientIp: false
+      SecurityGroupIds:
+        - !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      SubnetId: !Ref PublicSubnetOne
+
+Outputs:
+  VPCId:
+    Description: The ID of the VPC created
+    Value: !Ref 'VPC'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  PrivateSubnetOne:
+    Description: The ID of private subnet one
+    Value: !Ref 'PrivateSubnetOne'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetOne"
+  PrivateSubnetTwo:
+    Description: The ID of private subnet two
+    Value: !Ref 'PrivateSubnetTwo'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetTwo"
+  PrivateSubnetThree:
+    Description: The ID of private subnet three
+    Value: !Ref 'PrivateSubnetThree'
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnetThree"
+  KafkaBrokerSecurityGroupId:
+    Description: Security group ID used by the Kafka brokers (also used for the Lambda ESM ENIs)
+    Value: !GetAtt KafkaBrokerSecurityGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-KafkaBrokerSecurityGroupId"
+  BootstrapServers:
+    Description: Kafka bootstrap servers (broker private IP:port)
+    Value: !Sub
+      - "${b1}:9092,${b2}:9092,${b3}:9092"
+      - b1: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
+        b2: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
+        b3: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
+    Export:
+      Name: !Sub "${AWS::StackName}-BootstrapServers"
+  CognitoUserPoolId:
+    Description: Amazon Cognito User Pool ID (OAuth identity provider)
+    Value: !Ref CognitoUserPool
+    Export:
+      Name: !Sub "${AWS::StackName}-CognitoUserPoolId"
+  CognitoUserPoolClientId:
+    Description: Amazon Cognito User Pool App Client ID (USER_PASSWORD_AUTH, used by the Kafka clients)
+    Value: !Ref CognitoUserPoolClient
+    Export:
+      Name: !Sub "${AWS::StackName}-CognitoUserPoolClientId"
+  PollerClientId:
+    Description: Cognito app client ID (client_credentials) used by the Lambda self-managed Kafka poller
+    Value: !Ref CognitoPollerClient
+    Export:
+      Name: !Sub "${AWS::StackName}-PollerClientId"
+  OAuthTokenEndpoint:
+    Description: Cognito OAuth2 token endpoint for the client_credentials grant
+    Value: !Sub "https://${AWS::StackName}-${AWS::AccountId}.auth.${AWS::Region}.amazoncognito.com/oauth2/token"
+    Export:
+      Name: !Sub "${AWS::StackName}-OAuthTokenEndpoint"
+  OAuthScope:
+    Description: OAuth scope the Lambda poller requests
+    Value: kafka/consume
+    Export:
+      Name: !Sub "${AWS::StackName}-OAuthScope"
+  KafkaTopicForLambda:
+    Description: The Kafka topic the Lambda function will consume from
+    Value: !Ref KafkaTopicForLambda
+    Export:
+      Name: !Sub "${AWS::StackName}-KafkaTopicForLambda"
+  AdminUsername:
+    Description: Cognito username of the Kafka admin (super user)
+    Value: !Ref AdminUsername
+  ProducerUsername:
+    Description: Cognito username of the Kafka producer (WRITE only)
+    Value: !Ref ProducerUsername
+  ConsumerUsername:
+    Description: Cognito username of the Kafka consumer (READ only)
+    Value: !Ref ConsumerUsername
+  AdminSecretArn:
+    Description: Secrets Manager secret holding the admin user's generated password
+    Value: !Ref AdminUserSecret
+  ProducerSecretArn:
+    Description: Secrets Manager secret holding the producer user's generated password
+    Value: !Ref ProducerUserSecret
+  ConsumerSecretArn:
+    Description: Secrets Manager secret holding the consumer user's generated password
+    Value: !Ref ConsumerUserSecret
+  EC2InstanceEndpointID:
+    Description: The ID of the EC2 Instance Connect Endpoint
+    Value: !Ref EC2InstanceEndpoint

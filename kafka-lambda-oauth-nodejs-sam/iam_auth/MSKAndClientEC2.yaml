@@ -1,0 +1,518 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Creates an Amazon MSK (provisioned) cluster with IAM authentication, plus a
+  client EC2 instance pre-loaded with Java, Node.js, Docker, the AWS CLI, the AWS
+  SAM CLI, the Kafka CLI tools and the aws-msk-iam-auth library. The accompanying
+  Lambda pattern consumes from this cluster declared as a SELF-MANAGED Kafka
+  event source using the IAM_AUTH auth type (per the "Kafka OAuth & IAM Testing
+  Manual", Route B). Three IAM roles (admin/producer/consumer) give the
+  interactive clients distinct MSK-IAM principals for authorization.
+
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+  MSKKafkaVersion:
+    Type: String
+    Default: 3.6.0
+  JavaVersion:
+    Type: String
+    Description: Amazon Corretto (Java) version installed on the EC2 client to run the Apache Kafka CLI tools. This does NOT set the Lambda runtime - the Lambda consumer uses the Node.js runtime defined in the SAM template / deploy script.
+    AllowedValues: [java11, java17, java21, java25]
+    Default: java21
+  NodeVersion:
+    Type: String
+    Description: Node.js runtime for the Lambda consumer. The client instance's UserData substitutes this into the SAM template (template.yaml) in place of the NODE_VERSION placeholder.
+    AllowedValues:
+      - nodejs20.x
+      - nodejs22.x
+      - nodejs24.x
+    Default: nodejs22.x
+  ApacheKafkaInstallerLocation:
+    Type: String
+    Description: Kafka distribution download URL (for the client-side CLI tools).
+    Default: https://archive.apache.org/dist/kafka/3.9.0/kafka_2.13-3.9.0.tgz
+  MskIamAuthJarUrl:
+    Type: String
+    Description: aws-msk-iam-auth "all" jar used by the Kafka CLI/clients for AWS_MSK_IAM auth.
+    Default: https://github.com/aws/aws-msk-iam-auth/releases/download/v2.2.0/aws-msk-iam-auth-2.2.0-all.jar
+  KafkaTopicForLambda:
+    Type: String
+    Default: KafkaIamLambdaTopic
+  ServerlessLandGithubLocation:
+    Type: String
+    Default: https://github.com/aws-samples/serverless-patterns/
+    Description: Git URL of the serverless-patterns repository (or your fork) that the client instance clones. URL only - put the branch in ServerlessLandGithubBranch.
+  ServerlessLandGithubBranch:
+    Type: String
+    Default: main
+    AllowedPattern: '^[A-Za-z0-9._/-]+$'
+    Description: Branch of ServerlessLandGithubLocation to clone, for example main or a feature branch in your fork.
+  Ec2InstanceConnectPrefixListId:
+    Type: String
+    Description: >
+      AWS-managed prefix list ID for EC2 Instance Connect in this region
+      (com.amazonaws.<region>.ec2-instance-connect). Blank to skip; the client
+      UserData also looks it up for the stack's region and authorizes it automatically.
+    Default: ""
+
+Mappings:
+  SubnetConfig:
+    VPC:
+      CIDR: '10.0.0.0/16'
+    PublicOne:
+      CIDR: '10.0.0.0/24'
+    PrivateSubnetOne:
+      CIDR: '10.0.1.0/24'
+    PrivateSubnetTwo:
+      CIDR: '10.0.2.0/24'
+    PrivateSubnetThree:
+      CIDR: '10.0.3.0/24'
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      Tags: [{Key: Name, Value: MskIamVPC}]
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: {Fn::Select: [0, {Fn::GetAZs: {Ref: 'AWS::Region'}}]}
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      MapPublicIpOnLaunch: true
+      Tags: [{Key: Name, Value: PublicSubnet}]
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: {Fn::Select: [0, {Fn::GetAZs: {Ref: 'AWS::Region'}}]}
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetOne', 'CIDR']
+      Tags: [{Key: Name, Value: PrivateSubnetOne}]
+  PrivateSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: {Fn::Select: [1, {Fn::GetAZs: {Ref: 'AWS::Region'}}]}
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetTwo', 'CIDR']
+      Tags: [{Key: Name, Value: PrivateSubnetTwo}]
+  PrivateSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: {Fn::Select: [2, {Fn::GetAZs: {Ref: 'AWS::Region'}}]}
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateSubnetThree', 'CIDR']
+      Tags: [{Key: Name, Value: PrivateSubnetThree}]
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: {VpcId: !Ref VPC, InternetGatewayId: !Ref InternetGateway}
+  NATEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: GatewayAttachement
+    Properties: {Domain: vpc}
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATEIP.AllocationId
+      SubnetId: !Ref PublicSubnetOne
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: {VpcId: !Ref VPC}
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: {SubnetId: !Ref PublicSubnetOne, RouteTableId: !Ref PublicRouteTable}
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: {VpcId: !Ref VPC}
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NATGateway
+  PrivateSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: {RouteTableId: !Ref PrivateRouteTable, SubnetId: !Ref PrivateSubnetOne}
+  PrivateSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: {RouteTableId: !Ref PrivateRouteTable, SubnetId: !Ref PrivateSubnetTwo}
+  PrivateSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: {RouteTableId: !Ref PrivateRouteTable, SubnetId: !Ref PrivateSubnetThree}
+
+  KafkaClientInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Kafka client / SAM deployment EC2 instance
+      GroupName: !Sub "${AWS::StackName}-kafka-client-sg"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - {IpProtocol: tcp, FromPort: 22, ToPort: 22, CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']}
+
+  MSKSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: MSK cluster security group
+      GroupName: !Sub "${AWS::StackName}-msk-sg"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        # IAM (9098), TLS (9094) and plaintext (9092) from the client SG and Lambda ENIs (VPC CIDR)
+        - {IpProtocol: tcp, FromPort: 9092, ToPort: 9098, CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']}
+
+  # ---- IAM roles the interactive clients assume for distinct MSK-IAM principals ----
+  KafkaAdminRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-kafka-admin"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: [{Effect: Allow, Principal: {AWS: !GetAtt EC2Role.Arn}, Action: 'sts:AssumeRole'}]
+      Policies:
+        - PolicyName: MskAdmin
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: ['kafka-cluster:*']
+                Resource:
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/${AWS::StackName}-cluster/*'
+  KafkaProducerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-kafka-producer"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: [{Effect: Allow, Principal: {AWS: !GetAtt EC2Role.Arn}, Action: 'sts:AssumeRole'}]
+      Policies:
+        - PolicyName: MskProduce
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: ['kafka-cluster:Connect', 'kafka-cluster:DescribeCluster']
+                Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*'
+              - Effect: Allow
+                Action: ['kafka-cluster:DescribeTopic', 'kafka-cluster:WriteData']
+                Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-cluster/*'
+  KafkaConsumerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-kafka-consumer"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: [{Effect: Allow, Principal: {AWS: !GetAtt EC2Role.Arn}, Action: 'sts:AssumeRole'}]
+      Policies:
+        - PolicyName: MskConsume
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: ['kafka-cluster:Connect', 'kafka-cluster:DescribeCluster']
+                Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*'
+              - Effect: Allow
+                Action: ['kafka-cluster:DescribeTopic', 'kafka-cluster:ReadData']
+                Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-cluster/*'
+              - Effect: Allow
+                Action: ['kafka-cluster:AlterGroup', 'kafka-cluster:DescribeGroup']
+                Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/${AWS::StackName}-cluster/*'
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: [{Effect: Allow, Principal: {Service: ec2.amazonaws.com}, Action: 'sts:AssumeRole'}]
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonMSKFullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Policies:
+        - PolicyName: KafkaClusterAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              # The instance (admin) manages topics/ACLs and can assume the client roles.
+              - Effect: Allow
+                Action: ['kafka-cluster:*']
+                Resource:
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/${AWS::StackName}-cluster/*'
+              - Effect: Allow
+                Action: 'sts:AssumeRole'
+                Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-*'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Join ['-', ['EC2MskIamProfile', !Ref 'AWS::StackName']]
+      Roles: [!Ref EC2Role]
+
+  MSKCluster:
+    Type: AWS::MSK::Cluster
+    Properties:
+      ClusterName: !Sub "${AWS::StackName}-cluster"
+      KafkaVersion: !Ref MSKKafkaVersion
+      NumberOfBrokerNodes: 3
+      BrokerNodeGroupInfo:
+        ClientSubnets: [!Ref PrivateSubnetOne, !Ref PrivateSubnetTwo, !Ref PrivateSubnetThree]
+        InstanceType: kafka.m5.large
+        SecurityGroups: [!GetAtt MSKSecurityGroup.GroupId]
+        StorageInfo:
+          EBSStorageInfo: {VolumeSize: 100}
+      ClientAuthentication:
+        Sasl:
+          Iam: {Enabled: true}
+        Unauthenticated: {Enabled: false}
+      EncryptionInfo:
+        EncryptionInTransit: {ClientBroker: TLS, InCluster: true}
+
+  KafkaClientEC2Instance:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT60M
+    DependsOn: [MSKCluster, PrivateRoute, KafkaAdminRole, KafkaProducerRole, KafkaConsumerRole]
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SubnetId: !Ref PublicSubnetOne
+      SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
+      ImageId: !Ref LatestAmiId
+      Tags: [{Key: Name, Value: KafkaClientInstance}]
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs: {VolumeSize: 50, VolumeType: gp3, DeleteOnTermination: true}
+      UserData:
+        Fn::Base64:
+          Fn::Sub:
+            - |
+              #!/bin/bash -xe
+              exec > /var/log/kafka-client-setup.log 2>&1
+
+              # Report how setup ended. The instance's CreationPolicy keeps the stack in
+              # CREATE_IN_PROGRESS until this signal arrives, so CREATE_COMPLETE means the
+              # client is ready, and a failed setup fails the stack with the exit code.
+              dnf install -y aws-cfn-bootstrap || yum install -y aws-cfn-bootstrap || true
+              trap '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource KafkaClientEC2Instance --region ${AWS::Region}' EXIT
+
+              JAVA_VERSION=${java_version}
+              NODE_VERSION=${node_version}
+              AWS_REGION=${region}
+              KAFKA_URL=${kafka_installer}
+              MSK_IAM_JAR_URL=${msk_iam_jar_url}
+              MSK_CLUSTER_ARN=${msk_cluster_arn}
+              KAFKA_TOPIC=${kafka_topic}
+              SUBNET1=${subnet1}
+              SUBNET2=${subnet2}
+              SUBNET3=${subnet3}
+              MSK_SG=${msk_sg}
+              CLIENT_SG=${client_sg}
+              ADMIN_ROLE_ARN=${admin_role_arn}
+              PRODUCER_ROLE_ARN=${producer_role_arn}
+              CONSUMER_ROLE_ARN=${consumer_role_arn}
+              EIC_PL=${eic_prefix_list}
+              SERVERLESS_LAND_GITHUB_LOCATION="${serverless_land_github_location}"
+              SERVERLESS_LAND_GITHUB_BRANCH="${serverless_land_github_branch}"
+              KAFKA_HOME=/home/ec2-user/kafka
+              KAFKA_JSON_APPS_DIR=/home/ec2-user/kafka_json_apps
+
+              install_pkg() { for i in 1 2 3 4 5; do yum install -y "$@" && return 0; sleep 5; done; return 1; }
+              yum update -y
+              case "$JAVA_VERSION" in
+                java11) install_pkg java-11-amazon-corretto-devel ;;
+                java17) install_pkg java-17-amazon-corretto-devel ;;
+                java21) install_pkg java-21-amazon-corretto-devel ;;
+                java25) install_pkg java-25-amazon-corretto-devel ;;
+                *) install_pkg java-21-amazon-corretto-devel ;;
+              esac
+              install_pkg git jq nmap-ncat wget tar unzip
+              yum erase awscli -y || true
+              install_pkg docker && service docker start && systemctl enable docker && usermod -a -G docker ec2-user
+
+              # Node.js matching the Lambda runtime (NodeVersion), for `sam build` and the
+              # sample apps. AL2023 ships Node.js as namespaced nodejsNN packages and picks
+              # the active node/npm with alternatives, so install that major version and
+              # make it the active one.
+              NODE_MAJOR=$(echo "$NODE_VERSION" | sed 's/^nodejs//; s/\.x$//')
+              install_pkg "nodejs$NODE_MAJOR" "nodejs$NODE_MAJOR-npm"
+              alternatives --set node "/usr/bin/node-$NODE_MAJOR"
+              node --version
+              npm --version
+
+              # AWS CLI v2
+              cd /home/ec2-user
+              curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+              unzip -q awscliv2.zip && ./aws/install || ./aws/install --update
+
+              # AWS SAM CLI
+              cd /home/ec2-user && mkdir -p awssam && cd awssam
+              wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+              unzip -q aws-sam-cli-linux-x86_64.zip -d sam-installation && (./sam-installation/install || ./sam-installation/install --update)
+
+              # Kafka CLI tools + aws-msk-iam-auth jar
+              cd /home/ec2-user
+              KAFKA_TGZ=$(basename "$KAFKA_URL"); KAFKA_DIR=$(basename "$KAFKA_TGZ" .tgz)
+              for i in 1 2 3 4 5 6; do wget --timeout=60 --read-timeout=120 --tries=2 -O "$KAFKA_TGZ" "$KAFKA_URL" && test -s "$KAFKA_TGZ" && break; sleep 20; done
+              tar -xzf "$KAFKA_TGZ" && ln -sfn /home/ec2-user/$KAFKA_DIR /home/ec2-user/kafka
+              wget -q "$MSK_IAM_JAR_URL" -O /home/ec2-user/kafka/libs/aws-msk-iam-auth-all.jar
+
+              # Clone the pattern and install the Node.js JSON sample apps
+              cd /home/ec2-user
+              git clone --depth 1 --filter=blob:none --sparse --branch "$SERVERLESS_LAND_GITHUB_BRANCH" "$SERVERLESS_LAND_GITHUB_LOCATION" serverless-patterns
+              # Non-cone mode checks out only this folder; the default cone mode would
+              # also check out every file at the repository root.
+              git -C serverless-patterns sparse-checkout set --no-cone '/kafka-lambda-oauth-nodejs-sam/iam_auth/'
+              PATTERN_DIR=/home/ec2-user/serverless-patterns/kafka-lambda-oauth-nodejs-sam/iam_auth
+              mkdir -p "$KAFKA_JSON_APPS_DIR" && cp "$PATTERN_DIR"/kafka_json_apps/*.mjs "$PATTERN_DIR"/kafka_json_apps/package.json "$KAFKA_JSON_APPS_DIR"/
+              ( cd "$KAFKA_JSON_APPS_DIR" && npm install --omit=dev )
+              mkdir -p /home/ec2-user/scripts && cp "$PATTERN_DIR"/scripts/*.sh /home/ec2-user/scripts/ && chmod +x /home/ec2-user/scripts/*.sh
+
+              # Resolve the IAM bootstrap brokers (port 9098)
+              BOOTSTRAP_SERVERS=$(aws kafka get-bootstrap-brokers --region "$AWS_REGION" --cluster-arn "$MSK_CLUSTER_ARN" --query 'BootstrapBrokerStringSaslIam' --output text)
+
+              cat > /home/ec2-user/kafka_oauth.env <<EOF
+              export AWS_REGION=$AWS_REGION
+              export AWS_DEFAULT_REGION=$AWS_REGION
+              export STACK_NAME=${AWS::StackName}
+              export BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS
+              export KAFKA_TOPIC=$KAFKA_TOPIC
+              export KAFKA_HOME=$KAFKA_HOME
+              export KAFKA_JSON_APPS_DIR=$KAFKA_JSON_APPS_DIR
+              export MSK_CLUSTER_ARN=$MSK_CLUSTER_ARN
+              export ADMIN_ROLE_ARN=$ADMIN_ROLE_ARN
+              export PRODUCER_ROLE_ARN=$PRODUCER_ROLE_ARN
+              export CONSUMER_ROLE_ARN=$CONSUMER_ROLE_ARN
+              EOF
+              echo "source /home/ec2-user/kafka_oauth.env" >> /home/ec2-user/.bash_profile
+              # The AWS SDKs, and the SAM CLI built on them, take the region from
+              # AWS_DEFAULT_REGION or ~/.aws/config rather than AWS_REGION. Without this,
+              # `sam deploy --guided` offers us-east-1 whatever region this stack is in.
+              mkdir -p /home/ec2-user/.aws
+              printf '[default]\nregion = %s\n' "$AWS_REGION" > /home/ec2-user/.aws/config
+
+              # Substitute the SAM template placeholders
+              cd "$PATTERN_DIR"
+              cp template_original.yaml template.yaml
+              # kafka-cluster IAM resources are named after the cluster: arn:...:cluster/<name>/<uuid>
+              MSK_CLUSTER_NAME=$(echo "$MSK_CLUSTER_ARN" | cut -d/ -f2)
+              sed -i "s|MSK_CLUSTER_NAME|$MSK_CLUSTER_NAME|g" template.yaml
+              BS1=$(echo "$BOOTSTRAP_SERVERS" | cut -d, -f1)
+              BS2=$(echo "$BOOTSTRAP_SERVERS" | cut -d, -f2)
+              BS3=$(echo "$BOOTSTRAP_SERVERS" | cut -d, -f3)
+              sed -i "s|BOOTSTRAP_SERVER_1|$BS1|g; s|BOOTSTRAP_SERVER_2|$BS2|g; s|BOOTSTRAP_SERVER_3|$BS3|g" template.yaml
+              # <main-stack>-sam-messages: unique per language deploy, distinct from the CLI's table
+              sed -i "s|MESSAGES_TABLE_NAME|${AWS::StackName}-sam-messages|g" template.yaml
+              sed -i "s|SUBNET_1|$SUBNET1|g; s|SUBNET_2|$SUBNET2|g; s|SUBNET_3|$SUBNET3|g" template.yaml
+              sed -i "s|LAMBDA_SG|$MSK_SG|g; s|KAFKA_TOPIC|$KAFKA_TOPIC|g" template.yaml
+              sed -i "s|NODE_VERSION|$NODE_VERSION|g" template.yaml
+
+              chown -R ec2-user:ec2-user /home/ec2-user
+
+              # Start DynamoDB Local for `sam local invoke` and point samconfig.toml at it,
+              # so local tests work out of the box and never write to the real table.
+              # Runs as ec2-user once the pattern folder is theirs. A failure here only
+              # affects local testing, so it doesn't fail the stack.
+              sudo -u ec2-user bash "$PATTERN_DIR/scripts/local_dynamodb.sh" > /home/ec2-user/local_dynamodb_output.txt 2>&1 \
+                || echo "WARN: local_dynamodb.sh failed; see /home/ec2-user/local_dynamodb_output.txt"
+
+              # Create the topic as admin (AWS_MSK_IAM)
+              BOOTSTRAP_OK=false
+              for i in 1 2 3 4 5 6 7 8; do
+                if sudo -u ec2-user bash /home/ec2-user/scripts/admin_create_topic.sh "$KAFKA_TOPIC" 3 > /home/ec2-user/topic_creator_output.txt 2>&1; then
+                  echo "topic created"; BOOTSTRAP_OK=true; break
+                fi
+                echo "topic create attempt $i failed; retrying in 20s..."; sleep 20
+              done
+              if [ "$BOOTSTRAP_OK" != true ]; then
+                echo "ERROR: topic bootstrap failed after 8 attempts; see /home/ec2-user/topic_creator_output.txt"; exit 1
+              fi
+              chown -R ec2-user:ec2-user /home/ec2-user
+
+              # Allow the browser EC2 Instance Connect option to reach the client
+              if [ -z "$EIC_PL" ]; then
+                EIC_PL=$(aws ec2 describe-managed-prefix-lists --region "$AWS_REGION" --filters "Name=prefix-list-name,Values=com.amazonaws.$AWS_REGION.ec2-instance-connect" --query "PrefixLists[0].PrefixListId" --output text 2>/dev/null || true)
+              fi
+              if [ -n "$EIC_PL" ] && [ "$EIC_PL" != "None" ]; then
+                aws ec2 authorize-security-group-ingress --region "$AWS_REGION" --group-id "$CLIENT_SG" --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,PrefixListIds=[{PrefixListId=$EIC_PL}]" 2>/dev/null || true
+              fi
+            - java_version: !Ref JavaVersion
+              node_version: !Ref NodeVersion
+              region: !Ref 'AWS::Region'
+              kafka_installer: !Ref ApacheKafkaInstallerLocation
+              msk_iam_jar_url: !Ref MskIamAuthJarUrl
+              msk_cluster_arn: !Ref MSKCluster
+              kafka_topic: !Ref KafkaTopicForLambda
+              subnet1: !Ref PrivateSubnetOne
+              subnet2: !Ref PrivateSubnetTwo
+              subnet3: !Ref PrivateSubnetThree
+              msk_sg: !GetAtt MSKSecurityGroup.GroupId
+              client_sg: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+              admin_role_arn: !GetAtt KafkaAdminRole.Arn
+              producer_role_arn: !GetAtt KafkaProducerRole.Arn
+              consumer_role_arn: !GetAtt KafkaConsumerRole.Arn
+              eic_prefix_list: !Ref Ec2InstanceConnectPrefixListId
+              serverless_land_github_location: !Ref ServerlessLandGithubLocation
+              serverless_land_github_branch: !Ref ServerlessLandGithubBranch
+
+  EC2InstanceEndpoint:
+    Type: AWS::EC2::InstanceConnectEndpoint
+    Properties:
+      PreserveClientIp: false
+      SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
+      SubnetId: !Ref PublicSubnetOne
+
+Outputs:
+  MSKClusterArn:
+    Description: MSK cluster ARN
+    Value: !Ref MSKCluster
+    Export: {Name: !Sub "${AWS::StackName}-MSKClusterArn"}
+  PrivateSubnetOne:
+    Value: !Ref PrivateSubnetOne
+    Export: {Name: !Sub "${AWS::StackName}-PrivateSubnetOne"}
+  PrivateSubnetTwo:
+    Value: !Ref PrivateSubnetTwo
+    Export: {Name: !Sub "${AWS::StackName}-PrivateSubnetTwo"}
+  PrivateSubnetThree:
+    Value: !Ref PrivateSubnetThree
+    Export: {Name: !Sub "${AWS::StackName}-PrivateSubnetThree"}
+  MSKSecurityGroupId:
+    Description: Security group used by MSK (also used for the Lambda ESM ENIs)
+    Value: !GetAtt MSKSecurityGroup.GroupId
+    Export: {Name: !Sub "${AWS::StackName}-MSKSecurityGroupId"}
+  KafkaTopicForLambda:
+    Value: !Ref KafkaTopicForLambda
+    Export: {Name: !Sub "${AWS::StackName}-KafkaTopicForLambda"}
+  KafkaAdminRoleArn:
+    Value: !GetAtt KafkaAdminRole.Arn
+  KafkaProducerRoleArn:
+    Value: !GetAtt KafkaProducerRole.Arn
+  KafkaConsumerRoleArn:
+    Value: !GetAtt KafkaConsumerRole.Arn
+  EC2InstanceEndpointID:
+    Value: !Ref EC2InstanceEndpoint
