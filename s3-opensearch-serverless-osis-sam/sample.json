@@ -1,0 +1,3 @@
+{"timestamp": "2024-01-01T10:00:00Z", "level": "INFO", "service": "checkout", "message": "order placed", "order_id": "1001"}
+{"timestamp": "2024-01-01T10:00:05Z", "level": "ERROR", "service": "checkout", "message": "payment failed", "order_id": "1002"}
+{"timestamp": "2024-01-01T10:00:09Z", "level": "INFO", "service": "shipping", "message": "label created", "order_id": "1001"}

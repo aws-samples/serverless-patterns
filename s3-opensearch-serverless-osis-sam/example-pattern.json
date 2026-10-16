@@ -1,0 +1,64 @@
+{
+  "title": "Amazon S3 to Amazon OpenSearch Serverless with OpenSearch Ingestion",
+  "description": "Ingest JSON objects from Amazon S3 into Amazon OpenSearch Serverless using an Amazon OpenSearch Ingestion (OSIS) pipeline.",
+  "language": "YAML",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to build a fully serverless ingestion path from Amazon S3 into an Amazon OpenSearch Serverless collection using an Amazon OpenSearch Ingestion (OSIS) pipeline. OpenSearch Ingestion is a fully managed, serverless data collector built on Data Prepper that ingests, filters, transforms, and routes data to an OpenSearch destination without you having to run or scale any ingestion infrastructure. It is a common building block for log analytics, search indexing, and observability workloads where files land in Amazon S3 and need to be searchable in near real time.",
+      "The flow works as follows. A client uploads a newline-delimited JSON (JSON Lines) object to the source S3 bucket. The bucket is configured to publish an s3:ObjectCreated event notification to an Amazon SQS queue. The OSIS pipeline uses the Amazon S3 source, which continuously polls the SQS queue; when a message indicates that a new object was created, the pipeline reads that object from the bucket. The pipeline parses the object one line at a time using the newline codec, and a parse_json processor converts each line into a structured document. The documents are then indexed into the OpenSearch Serverless collection through the pipeline's OpenSearch sink, which sets the serverless flag and authenticates to the collection with AWS SigV4.",
+      "Security and reliability are built in. The pipeline assumes a dedicated IAM role that is scoped to read the source bucket, consume from the SQS queue, write to the dead-letter bucket, and access the collection. The OpenSearch Serverless collection is protected by encryption, network, and data-access policies, and only the pipeline role and the principal you supply at deploy time are granted data access. Documents that fail to be indexed are written to a separate dead-letter S3 (DLQ) bucket. Using a separate DLQ bucket is a deliberate design choice: writing failed records back into the source bucket would re-trigger the S3 to SQS notification and create an ingestion loop. The pipeline also publishes audit logs to Amazon CloudWatch Logs and scales automatically between the configured minimum and maximum OpenSearch Compute Units (OCUs).",
+      "This pattern deploys two Amazon S3 buckets (source and dead-letter), two Amazon SQS queues (an ingest queue and its dead-letter queue), an Amazon OpenSearch Serverless collection with its encryption, network, and data-access policies, an Amazon OpenSearch Ingestion pipeline, a CloudWatch log group, and the IAM role that the pipeline assumes. It is deployed with AWS SAM and requires no custom application code. Important: this example uses AWS services that may incur costs beyond the Free Tier, and the network policy allows public access for demo simplicity; for production, restrict access using a VPC endpoint."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-opensearch-serverless-osis-sam",
+      "templateURL": "serverless-patterns/s3-opensearch-serverless-osis-sam",
+      "projectFolder": "s3-opensearch-serverless-osis-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using an OpenSearch Ingestion pipeline with Amazon S3",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/configure-client-s3.html"
+      },
+      {
+        "text": "Ingesting data into Amazon OpenSearch Serverless collections",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-clients.html"
+      },
+      {
+        "text": "Amazon OpenSearch Ingestion",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ingestion.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Empty both S3 buckets, then delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sudhansu",
+      "image": "https://drive.google.com/file/d/1uTQ3MbFvziRfBPWHsVsD5vbVyGuFO665/view?usp=sharing",
+      "bio": "Serverless builder contributing to Serverless Land patterns.",
+      "linkedin": "sudhansu-mohapatra-83a51811a",
+      "twitter": ""
+    }
+  ]
+}
