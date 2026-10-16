@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An Amazon API Gateway REST API that integrates with Amazon Connect CreateNotification API. (tag:apigw-connect-notification)
+
+Parameters:
+  ConnectInstanceId:
+    Type: String
+    Description: The Amazon Connect instance ID (found in the instance ARN)
+    AllowedPattern: '[a-z0-9\-]+'
+    ConstraintDescription: Must be a valid Connect instance ID (lowercase alphanumeric and hyphens)
+
+Resources:
+  APIGatewayRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: APIGatewayConnectPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'connect:CreateNotification'
+                Resource:
+                  - !Sub 'arn:aws:connect:${AWS::Region}:${AWS::AccountId}:instance/${ConnectInstanceId}'
+                  - !Sub 'arn:aws:connect:${AWS::Region}:${AWS::AccountId}:instance/${ConnectInstanceId}/*'
+                  - !Sub 'arn:aws:connect:${AWS::Region}:${AWS::AccountId}:instance/${ConnectInstanceId}/notification/*'
+
+  Api:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: apigw-connect-notification
+      Description: Amazon Connect Notification integration REST API
+
+  notifications:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: 'notifications'
+
+  notificationsMethodPost:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref notifications
+      HttpMethod: POST
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS
+        Credentials: !GetAtt APIGatewayRole.Arn
+        IntegrationHttpMethod: PUT
+        # More info: https://docs.aws.amazon.com/connect/latest/APIReference/API_CreateNotification.html
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:connect:path/notifications/${ConnectInstanceId}'
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          application/json: !Sub |
+            {
+              "Content": $input.json('$.content'),
+              "Recipients": $input.json('$.recipients')
+              #if($input.path('$.priority') != "")
+              ,"Priority": "$input.path('$.priority')"
+              #end
+              #if($input.path('$.expiresAt') != "")
+              ,"ExpiresAt": $input.path('$.expiresAt')
+              #end
+              #if($input.path('$.clientToken') != "")
+              ,"ClientToken": "$input.path('$.clientToken')"
+              #end
+              #if($input.path('$.tags') != "")
+              ,"Tags": $input.json('$.tags')
+              #end
+            }
+        IntegrationResponses:
+          - StatusCode: '200'
+      MethodResponses:
+        - StatusCode: '200'
+
+  ApiDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn:
+      - notificationsMethodPost
+    Properties:
+      RestApiId: !Ref Api
+      StageName: 'prod'
+
+Outputs:
+  ApiRootUrl:
+    Description: Root Url of the API
+    Value: !Sub
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod'
+      - ApiId: !Ref Api
+  NotificationEndpoint:
+    Description: POST endpoint for sending notifications
+    Value: !Sub
+      - 'https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/notifications'
+      - ApiId: !Ref Api
