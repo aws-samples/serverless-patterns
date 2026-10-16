@@ -1,0 +1,46 @@
+{
+  "title": "Amazon CloudFront Origin Access Control for AWS Lambda Web Function",
+  "description": "Securely access your Lambda Web Function behind Amazon CloudFront using Origin Access Control",
+  "language": "Nodejs",
+  "level": "200",
+  "framework": "SAM",
+  "introBox": {
+      "headline": "How it works",
+      "text": [
+          "The SAM template creates a Lambda Web Function, an initial revision whose code is read from an Amazon S3 .zip package, and an IamAuth endpoint that routes traffic to that revision. A CloudFront distribution is configured with the endpoint domain as a custom origin, and an Origin Access Control (OAC) of origin type 'lambda' with signing behavior 'always-amz-auth' is attached. CloudFront signs each origin request with SigV4 and the IamAuth endpoint authorizes it, so the Web Function endpoint can only be reached through CloudFront and not directly on its own domain. A resource-based permission grants the CloudFront service principal lambda:InvokeWebFunctionEndpoint scoped to the distribution, and caching is disabled by default for dynamic responses."
+      ]
+  },
+  "gitHub": {
+      "template": {
+          "repoURL": "https://github.com/aws-samples/serverless-patterns/cloudfront-lambdawebfunction-oac-sam",
+          "templateURL": "serverless-patterns/cloudfront-lambdawebfunction-oac-sam",
+          "projectFolder": "cloudfront-lambdawebfunction-oac-sam",
+          "templateFile": "template.yaml"
+      }
+  },
+  "resources": {},
+  "deploy": {
+      "text": [
+          "See the GitHub repo for detailed build and deploy instructions."
+      ]
+  },
+  "testing": {
+      "text": [
+          "See the GitHub repo for detailed testing instructions."
+      ]
+  },
+  "cleanup": {
+      "text": [
+          "See the GitHub repo for detailed cleanup instructions."
+      ]
+  },
+  "authors": [
+      {
+          "name": "Shekhar Shrinivasan",
+          "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
+          "bio": "Senior Technical Consultant (TAM)",
+          "linkedin": "https://www.linkedin.com/in/shekhar-shrinivasan/",
+          "twitter": ""
+      }
+  ]
+}
