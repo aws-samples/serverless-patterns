@@ -1,0 +1,28 @@
+{
+  "name": "lambda-microvms-sandbox-sdk-client",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Client for the AWS Lambda MicroVMs sandbox SDK pattern (Rayito SDK)",
+  "license": "MIT-0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sandbox": "tsx sandbox.ts",
+    "build-agent-image": "tsx build-agent-image.ts",
+    "agent": "tsx agent.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.1138.0",
+    "@aws-sdk/client-secrets-manager": "^3.1138.0",
+    "@aws/bedrock-token-generator": "^1.1.0",
+    "rayito": "0.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
