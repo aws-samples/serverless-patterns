@@ -1,0 +1,3 @@
+# The consumer needs no third-party packages: EventBridge decodes the Protobuf
+# payload against the Glue registry server-side and delivers Data as JSON, so
+# the handler uses only the Python standard library.
