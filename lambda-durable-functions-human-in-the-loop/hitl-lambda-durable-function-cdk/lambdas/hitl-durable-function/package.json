@@ -1,0 +1,19 @@
+{
+  "name": "human-in-the-loop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws/durable-execution-sdk-js": "^1.0.2",
+    "@aws/durable-execution-sdk-js-eslint-plugin": "^0.0.1",
+    "@aws/durable-execution-sdk-js-testing": "^0.0.1",
+    "@aws-sdk/client-sns": "^3.0.0",
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  }
+}
