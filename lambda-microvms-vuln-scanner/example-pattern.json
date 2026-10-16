@@ -1,0 +1,65 @@
+{
+  "title": "Vulnerability and Security Scanning Tool on AWS Lambda MicroVMs",
+  "description": "Build an AWS Lambda MicroVM image that runs a vulnerability scanner (Trivy) in a Firecracker-isolated, single-tenant sandbox, one disposable VM per untrusted artifact.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CloudFormation",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern builds a Lambda MicroVM image containing a vulnerability and security scanner (Trivy). CloudFormation creates the image declaratively with the native AWS::Lambda::MicrovmImage resource, reading a pre-staged code artifact from Amazon S3, and provisions the IAM build and execution roles plus a CloudWatch log group.",
+      "Launching a MicroVM from the image is a runtime operation. A caller runs a fresh, single-tenant MicroVM per untrusted artifact (run-microvm), submits the artifact to the scanner over the MicroVM's authenticated HTTPS endpoint (port 8080, JWE token in X-aws-proxy-auth), collects the Trivy JSON report, and terminates the MicroVM.",
+      "The scanner reaches vulnerability feeds through the AWS-managed INTERNET_EGRESS connector; ingress is provided per launch via HTTP_INGRESS. Lambda invokes lifecycle hooks on port 9000. Because the pattern provisions only the reusable building blocks, it can be plugged into any trigger: an S3 event, an API, a CI/CD stage, or a queue consumer."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs core concepts",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/microvms-how-it-works.html"
+      },
+      {
+        "text": "Running and using MicroVMs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/microvms-launching.html"
+      },
+      {
+        "text": "AWS::Lambda::MicrovmImage CloudFormation resource reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html"
+      },
+      {
+        "text": "Trivy vulnerability and security scanner",
+        "link": "https://trivy.dev/"
+      }
+    ]
+  },
+  "deploy": {
+    "headline": "Deploy the pattern",
+    "text": [
+      "chmod +x scripts/deploy.sh",
+      "./scripts/deploy.sh vuln-scanner us-east-1"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo README for the run-microvm, auth-token, and /scan commands to launch a MicroVM and scan an artifact."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Terminate any running MicroVMs, then: aws cloudformation delete-stack --stack-name vuln-scanner --region <region>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abhishek Agawane",
+      "image": "https://drive.google.com/file/d/1E-5koDaKEaMUtOctX32I9TLwfh3kgpAq/view?usp=drivesdk",
+      "bio": "Abhishek Agawane is a Security Consultant at Amazon Web Services with more than 8 years of industry experience. He helps organizations architect resilient, secure, and efficient cloud environments, guiding them through complex challenges and large-scale infrastructure transformations.",
+      "linkedin": "agawabhi"
+    }
+  ]
+}
