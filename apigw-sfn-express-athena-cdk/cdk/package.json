@@ -1,0 +1,24 @@
+{
+  "name": "apigw-sfn-express-athena-cdk",
+  "version": "1.0.0",
+  "description": "Amazon API Gateway to AWS Step Functions Express to Amazon Athena synchronous query (zero AWS Lambda)",
+  "bin": {
+    "app": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "aws-cdk": "2.147.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.5"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.147.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  }
+}
