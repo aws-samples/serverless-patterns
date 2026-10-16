@@ -7,7 +7,9 @@ import com.amazonaws.samples.durable.models.SnsEventParser;
 import software.amazon.lambda.durable.DurableContext;
 import software.amazon.lambda.durable.DurableHandler;
 import software.amazon.lambda.durable.config.StepConfig;
+import software.amazon.lambda.durable.retry.RetryDecision;
 import software.amazon.lambda.durable.retry.RetryStrategies;
+import software.amazon.lambda.durable.retry.RetryStrategy;
 import software.amazon.lambda.durable.retry.JitterStrategy;
 
 /**
@@ -27,19 +29,26 @@ public class OrderProcessingHandler extends DurableHandler<Map<String, Object>, 
         Map<String, Object> event = SnsEventParser.extractMessage(rawEvent);
         context.getLogger().info("Starting order processing chain for: " + event.get("orderId"));
 
+        // Retry transient errors with backoff, but fail validation errors immediately
+        RetryStrategy backoff = RetryStrategies.exponentialBackoff(
+                3, Duration.ofSeconds(2), Duration.ofSeconds(30), 2.0, JitterStrategy.FULL);
         StepConfig retryConfig = StepConfig.builder()
-                .retryStrategy(RetryStrategies.exponentialBackoff(
-                        3, Duration.ofSeconds(2), Duration.ofSeconds(30), 2.0, JitterStrategy.FULL))
+                .retryStrategy((error, attempt) -> error instanceof IllegalArgumentException
+                        ? RetryDecision.fail()
+                        : backoff.makeRetryDecision(error, attempt))
                 .build();
 
         // Step 1: Validate the order
         Map<String, Object> validationResult = context.step("validate-order", Map.class, stepCtx -> {
             stepCtx.getLogger().info("Validating order...");
             String orderId = (String) event.get("orderId");
-            double amount = ((Number) event.get("totalAmount")).doubleValue();
             if (orderId == null || orderId.isEmpty()) {
                 throw new IllegalArgumentException("Order ID is required");
             }
+            if (!(event.get("totalAmount") instanceof Number)) {
+                throw new IllegalArgumentException("Order amount is required");
+            }
+            double amount = ((Number) event.get("totalAmount")).doubleValue();
             if (amount <= 0) {
                 throw new IllegalArgumentException("Order amount must be positive");
             }

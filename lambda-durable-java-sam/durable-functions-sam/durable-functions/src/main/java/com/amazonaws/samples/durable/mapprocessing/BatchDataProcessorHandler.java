@@ -10,7 +10,9 @@ import software.amazon.lambda.durable.DurableContext;
 import software.amazon.lambda.durable.DurableHandler;
 import software.amazon.lambda.durable.config.CompletionConfig;
 import software.amazon.lambda.durable.config.MapConfig;
+import software.amazon.lambda.durable.config.StepConfig;
 import software.amazon.lambda.durable.model.MapResult;
+import software.amazon.lambda.durable.retry.RetryStrategies;
 
 /**
  * PATTERN: Map Processing (Collection Processing)
@@ -57,6 +59,11 @@ public class BatchDataProcessorHandler extends DurableHandler<Map<String, Object
                 .completionConfig(CompletionConfig.toleratedFailureCount(toleratedFailures))
                 .build();
 
+        // Validation failures are permanent, so fail the item immediately instead of retrying
+        StepConfig noRetry = StepConfig.builder()
+                .retryStrategy(RetryStrategies.Presets.NO_RETRY)
+                .build();
+
         MapResult<Map<String, Object>> processingResult = context.map(
                 "process-batch-items",
                 batch,
@@ -71,7 +78,7 @@ public class BatchDataProcessorHandler extends DurableHandler<Map<String, Object
                             throw new RuntimeException("Validation failed for item: " + item.get("itemId"));
                         }
                         return "VALID";
-                    });
+                    }, noRetry);
 
                     Map<String, Object> transformed = ctx.step("transform-" + index, Map.class, stepCtx -> {
                         stepCtx.getLogger().info("Transforming item: " + item.get("itemId"));

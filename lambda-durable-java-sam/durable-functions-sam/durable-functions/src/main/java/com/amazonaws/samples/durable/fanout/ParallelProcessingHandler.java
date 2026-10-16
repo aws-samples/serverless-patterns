@@ -7,8 +7,6 @@ import com.amazonaws.samples.durable.models.SnsEventParser;
 import software.amazon.lambda.durable.DurableContext;
 import software.amazon.lambda.durable.DurableFuture;
 import software.amazon.lambda.durable.DurableHandler;
-import software.amazon.lambda.durable.config.CompletionConfig;
-import software.amazon.lambda.durable.config.ParallelConfig;
 import software.amazon.lambda.durable.model.MapResult;
 import software.amazon.lambda.durable.model.ParallelResult;
 

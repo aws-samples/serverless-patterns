@@ -9,8 +9,6 @@ import software.amazon.lambda.durable.DurableHandler;
 import software.amazon.lambda.durable.TypeToken;
 import software.amazon.lambda.durable.config.WaitForConditionConfig;
 import software.amazon.lambda.durable.model.WaitForConditionResult;
-import software.amazon.lambda.durable.retry.JitterStrategy;
-import software.amazon.lambda.durable.retry.WaitStrategies;
 import software.amazon.lambda.durable.retry.WaitForConditionWaitStrategy;
 
 /**
@@ -31,7 +29,10 @@ public class JobMonitorHandler extends DurableHandler<Map<String, Object>, Map<S
         Map<String, Object> event = SnsEventParser.extractMessage(rawEvent);
         context.getLogger().info("Starting job monitor");
 
-        String jobId = (String) event.getOrDefault("jobId", "JOB-" + System.currentTimeMillis());
+        // Generate a default ID inside a step so it stays the same on every replay
+        String jobId = event.containsKey("jobId")
+                ? (String) event.get("jobId")
+                : context.step("generate-job-id", String.class, stepCtx -> "JOB-" + System.currentTimeMillis());
         int maxPolls = ((Number) event.getOrDefault("maxPolls", 5)).intValue();
 
         // Step 1: Submit or acknowledge the job

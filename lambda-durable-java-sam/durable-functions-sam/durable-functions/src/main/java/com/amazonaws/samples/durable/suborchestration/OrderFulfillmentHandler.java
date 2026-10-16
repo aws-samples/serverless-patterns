@@ -1,7 +1,6 @@
 package com.amazonaws.samples.durable.suborchestration;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 
 import com.amazonaws.samples.durable.models.SnsEventParser;
@@ -32,7 +31,10 @@ public class OrderFulfillmentHandler extends DurableHandler<Map<String, Object>,
         Map<String, Object> event = SnsEventParser.extractMessage(rawEvent);
         context.getLogger().info("Starting order fulfillment orchestration");
 
-        String orderId = (String) event.getOrDefault("orderId", "ORD-" + System.currentTimeMillis());
+        // Generate a default ID inside a step so it stays the same on every replay
+        String orderId = event.containsKey("orderId")
+                ? (String) event.get("orderId")
+                : context.step("generate-order-id", String.class, stepCtx -> "ORD-" + System.currentTimeMillis());
         double amount = ((Number) event.getOrDefault("amount", 149.99)).doubleValue();
         String customerId = (String) event.getOrDefault("customerId", "CUST-001");
 
@@ -56,11 +58,10 @@ public class OrderFulfillmentHandler extends DurableHandler<Map<String, Object>,
 
         DurableFuture<Map<String, Object>> inventoryFuture = context.runInChildContextAsync(
                 "inventory-workflow", (Class<Map<String, Object>>) (Class<?>) Map.class,
-                child -> reserveInventory(child, orderId, event)
+                child -> reserveInventory(child, orderId)
         );
 
         // Wait for both concurrent sub-workflows to complete
-        DurableFuture.allOf(paymentFuture, inventoryFuture);
         Map<String, Object> paymentResult = paymentFuture.get();
         Map<String, Object> inventoryResult = inventoryFuture.get();
 
@@ -122,7 +123,7 @@ public class OrderFulfillmentHandler extends DurableHandler<Map<String, Object>,
         });
     }
 
-    private Map<String, Object> reserveInventory(DurableContext child, String orderId, Map<String, Object> event) {
+    private Map<String, Object> reserveInventory(DurableContext child, String orderId) {
         Map<String, Object> availability = child.step("check-availability", Map.class, stepCtx -> {
             stepCtx.getLogger().info("Checking inventory availability for order: " + orderId);
             return Map.of(

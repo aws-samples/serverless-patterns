@@ -96,4 +96,26 @@ class MapProcessingPatternTest {
         Map<String, Object> summary = (Map<String, Object>) output.get("summary");
         assertEquals(3, ((Number) summary.get("totalItems")).intValue());
     }
+
+    @Test
+    void doesNotRetryValidationFailures() {
+        var handler = new BatchDataProcessorHandler();
+        var runner = LocalDurableTestRunner.create(MAP_TYPE, handler);
+
+        Map<String, Object> input = Map.of(
+                "batchSize", 5,
+                "maxConcurrency", 5,
+                "toleratedFailures", 1
+        );
+
+        var result = runner.runUntilComplete(input);
+
+        assertEquals(ExecutionStatus.SUCCEEDED, result.getStatus());
+        var failedValidation = result.getOperation("validate-4");
+        assertNotNull(failedValidation);
+        long attempts = failedValidation.getEvents().stream()
+                .filter(e -> "StepStarted".equals(e.eventTypeAsString()))
+                .count();
+        assertEquals(1, attempts, "Validation failures should fail the item without retrying");
+    }
 }

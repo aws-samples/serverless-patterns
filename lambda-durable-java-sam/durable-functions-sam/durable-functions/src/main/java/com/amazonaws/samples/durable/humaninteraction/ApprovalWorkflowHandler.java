@@ -39,7 +39,10 @@ public class ApprovalWorkflowHandler extends DurableHandler<Map<String, Object>,
         Map<String, Object> event = SnsEventParser.extractMessage(rawEvent);
         context.getLogger().info("Starting approval workflow");
 
-        String requestId = (String) event.getOrDefault("requestId", "REQ-" + System.currentTimeMillis());
+        // Generate a default ID inside a step so it stays the same on every replay
+        String requestId = event.containsKey("requestId")
+                ? (String) event.get("requestId")
+                : context.step("generate-request-id", String.class, stepCtx -> "REQ-" + System.currentTimeMillis());
         double amount = ((Number) event.getOrDefault("amount", 5000)).doubleValue();
         String requestor = (String) event.getOrDefault("requestor", "employee@example.com");
 

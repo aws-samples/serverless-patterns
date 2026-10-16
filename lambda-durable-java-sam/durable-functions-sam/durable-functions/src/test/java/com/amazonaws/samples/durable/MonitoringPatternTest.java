@@ -72,4 +72,22 @@ class MonitoringPatternTest {
         int pollAttempts = ((Number) output.get("pollAttempts")).intValue();
         assertTrue(pollAttempts >= 2, "Should have polled at least twice");
     }
+
+    @Test
+    void generatedJobIdIsStableAcrossReplays() {
+        var handler = new JobMonitorHandler();
+        var runner = LocalDurableTestRunner.create(MAP_TYPE, handler);
+
+        // No jobId in the input, so the handler generates one; polling forces replays
+        Map<String, Object> input = Map.of("maxPolls", 4);
+
+        var result = runner.runUntilComplete(input);
+
+        assertEquals(ExecutionStatus.SUCCEEDED, result.getStatus());
+        String generatedId = result.getOperation("generate-job-id").getStepResult(String.class);
+        Map<String, Object> output = result.getResult(Map.class);
+        assertEquals(generatedId, output.get("jobId"));
+        Map<String, Object> ack = result.getOperation("acknowledge-job").getStepResult(Map.class);
+        assertEquals(generatedId, ack.get("jobId"));
+    }
 }

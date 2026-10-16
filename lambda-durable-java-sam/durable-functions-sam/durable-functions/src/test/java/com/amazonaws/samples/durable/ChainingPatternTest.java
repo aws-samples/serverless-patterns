@@ -82,4 +82,23 @@ class ChainingPatternTest {
         assertEquals(ExecutionStatus.FAILED, result.getStatus());
         assertTrue(result.getError().isPresent());
     }
+
+    @Test
+    void doesNotRetryValidationErrors() {
+        var handler = new OrderProcessingHandler();
+        var runner = LocalDurableTestRunner.create(MAP_TYPE, handler);
+
+        Map<String, Object> input = Map.of(
+                "orderId", "ORD-TEST-004",
+                "totalAmount", -10.00
+        );
+
+        var result = runner.runUntilComplete(input);
+
+        assertEquals(ExecutionStatus.FAILED, result.getStatus());
+        long attempts = result.getOperation("validate-order").getEvents().stream()
+                .filter(e -> "StepStarted".equals(e.eventTypeAsString()))
+                .count();
+        assertEquals(1, attempts, "Validation errors should fail without retrying");
+    }
 }
