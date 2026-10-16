@@ -14,11 +14,11 @@ This application leverages multiple AWS services, and there are associated costs
 A Lambda Web Function uses a three-part resource model — a **Web Function** (container), one or more immutable **revisions** (code + configuration), and one or more **endpoints** (HTTPS entry points that route traffic to revisions). Your code is a real HTTP server that listens on the host:port Lambda provides (`AWS_LAMBDA_HTTP_ENDPOINT`), rather than an event handler that returns a response object. Web Functions currently support the Node.js runtime, and code is supplied **only** as a `.zip` package in an Amazon S3 bucket.
 
 ## Requirements
-[Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-[Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-[AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-An Amazon S3 bucket (versioning recommended) to hold the Web Function `.zip` deployment package.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* An Amazon S3 bucket (versioning recommended) to hold the Web Function `.zip` deployment package.
 
 ## Deployment Instructions
 Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
