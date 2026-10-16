@@ -1,0 +1,25 @@
+{
+  "name": "appsync-aurora-serverless-v2-rds-data-api-cdk",
+  "version": "1.0.0",
+  "description": "AWS AppSync GraphQL API backed by Amazon Aurora Serverless v2 via the RDS Data API (zero AWS Lambda)",
+  "bin": {
+    "app": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "aws-cdk": "^2.1000.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.5"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.185.0",
+    "constructs": "^10.3.0"
+  }
+}
