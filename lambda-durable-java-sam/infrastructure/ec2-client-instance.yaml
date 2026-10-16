@@ -84,7 +84,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        CidrIp: 10.0.0.0/16
+        CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
 
   ClientEC2Instance:
     Type: AWS::EC2::Instance
@@ -268,7 +268,7 @@ Resources:
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
     Properties:
-      PreserveClientIp: true
+      PreserveClientIp: false
       SecurityGroupIds:
         - !GetAtt ClientInstanceSecurityGroup.GroupId
       SubnetId: !Ref PublicSubnetOne

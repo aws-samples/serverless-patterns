@@ -171,5 +171,4 @@
   <text x="735" y="458" fill="#545B64" font-size="9">trackingNumber: "TRACK-..."</text>
   <text x="735" y="472" fill="#545B64" font-size="9">transactionId: "TXN-..."</text>
 
-  <text x="903" y="440" fill="#687078" font-size="9" font-style="italic">&#x2192; DynamoDB</text>
 </svg>

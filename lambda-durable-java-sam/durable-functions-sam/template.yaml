@@ -18,23 +18,6 @@ Resources:
     Properties:
       TopicName: !Ref SNSTopicName
 
-  # DynamoDB table for storing results
-  DurableFunctionsDynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: DurableFunctionsResultsTable
-      AttributeDefinitions:
-        - AttributeName: ExecutionId
-          AttributeType: S
-        - AttributeName: Timestamp
-          AttributeType: S
-      KeySchema:
-        - AttributeName: ExecutionId
-          KeyType: HASH
-        - AttributeName: Timestamp
-          KeyType: RANGE
-      BillingMode: PAY_PER_REQUEST
-
   # IAM Role for Durable Lambda Functions
   DurableFunctionRole:
     Type: AWS::IAM::Role
@@ -50,20 +33,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
       Policies:
-        - PolicyName: DynamoDBAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - dynamodb:GetItem
-                  - dynamodb:PutItem
-                  - dynamodb:UpdateItem
-                  - dynamodb:Query
-                  - dynamodb:Scan
-                Resource:
-                  - !GetAtt DurableFunctionsDynamoDBTable.Arn
-                  - !Sub "${DurableFunctionsDynamoDBTable.Arn}/index/*"
         - PolicyName: SNSAccess
           PolicyDocument:
             Version: '2012-10-17'
@@ -83,7 +52,8 @@ Resources:
                   - lambda:SendDurableExecutionCallbackSuccess
                   - lambda:SendDurableExecutionCallbackFailure
                   - lambda:SendDurableExecutionCallbackHeartbeat
-                Resource: "*"
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:durable-*-example*"
 
   # Example 1: Chaining Pattern - Sequential steps with data passing
   ChainingFunction:
@@ -104,9 +74,6 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 14
-      Environment:
-        Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
 
   ChainingFunctionVersion:
     Type: AWS::Lambda::Version
@@ -157,9 +124,6 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 14
-      Environment:
-        Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
 
   FanOutFunctionVersion:
     Type: AWS::Lambda::Version
@@ -212,7 +176,6 @@ Resources:
         RetentionPeriodInDays: 14
       Environment:
         Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
           SNS_TOPIC_ARN: !Ref DurableFunctionsSNSTopic
 
   HumanInteractionFunctionVersion:
@@ -264,9 +227,6 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 14
-      Environment:
-        Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
 
   MonitoringFunctionVersion:
     Type: AWS::Lambda::Version
@@ -319,7 +279,6 @@ Resources:
         RetentionPeriodInDays: 14
       Environment:
         Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
           SNS_TOPIC_ARN: !Ref DurableFunctionsSNSTopic
 
   TimerFunctionVersion:
@@ -371,9 +330,6 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 14
-      Environment:
-        Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
 
   ErrorHandlingFunctionVersion:
     Type: AWS::Lambda::Version
@@ -424,9 +380,6 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 14
-      Environment:
-        Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
 
   MapProcessingFunctionVersion:
     Type: AWS::Lambda::Version
@@ -477,9 +430,6 @@ Resources:
       DurableConfig:
         ExecutionTimeout: 3600
         RetentionPeriodInDays: 14
-      Environment:
-        Variables:
-          DYNAMO_DB_TABLE: !Ref DurableFunctionsDynamoDBTable
 
   SubOrchestrationFunctionVersion:
     Type: AWS::Lambda::Version
@@ -515,9 +465,6 @@ Outputs:
   SNSTopicArn:
     Description: SNS Topic ARN for triggering durable functions
     Value: !Ref DurableFunctionsSNSTopic
-  DynamoDBTableName:
-    Description: DynamoDB Table for storing results
-    Value: !Ref DurableFunctionsDynamoDBTable
   ECRRepositoryUri:
     Description: ECR Repository URI for container images
     Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/durable-functions-java-examples"

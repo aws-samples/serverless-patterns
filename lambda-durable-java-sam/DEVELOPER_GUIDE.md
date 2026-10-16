@@ -36,11 +36,6 @@
 │                    │  │      Checkpoint Store (managed)     │   │ │
 │                    │  └────────────────────────────────────┘   │ │
 │                    └──────────────────────────────────────────┘ │
-│                         │                                        │
-│                         ▼                                        │
-│                    ┌──────────┐                                   │
-│                    │ DynamoDB │                                   │
-│                    └──────────┘                                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -51,7 +46,6 @@
 | **SNS Topic** | Event source that triggers the durable functions |
 | **Lambda Durable Functions** | Business logic with automatic checkpointing |
 | **Checkpoint Store** | Managed by Lambda; stores step results and execution state |
-| **DynamoDB** | Optional application state for this workshop |
 | **ECR** | Container registry for the Java function images |
 | **Producer (EC2/CLI)** | Sends messages to SNS to trigger workflows |
 

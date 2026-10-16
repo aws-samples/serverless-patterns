@@ -26,8 +26,6 @@ import software.amazon.lambda.durable.retry.WaitForConditionWaitStrategy;
  */
 public class JobMonitorHandler extends DurableHandler<Map<String, Object>, Map<String, Object>> {
 
-    private static int pollCount = 0;
-
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> rawEvent, DurableContext context) {
         Map<String, Object> event = SnsEventParser.extractMessage(rawEvent);

@@ -5,7 +5,7 @@ This project demonstrates **AWS Lambda Durable Functions** patterns in Java. It 
 ## Architecture
 
 ```
-SNS Topic (Producer) --> Lambda Durable Functions (Consumers) --> DynamoDB (Results)
+SNS Topic (Producer) --> Lambda Durable Functions (Consumers)
 ```
 
 - **SNS Message Sender**: A Java CLI application that sends messages to SNS to trigger the durable functions
@@ -27,7 +27,7 @@ SNS Topic (Producer) --> Lambda Durable Functions (Consumers) --> DynamoDB (Resu
 
 ## Prerequisites
 
-- AWS Account with permissions for Lambda, SNS, DynamoDB, ECR, IAM, CloudFormation
+- AWS Account with permissions for Lambda, SNS, ECR, IAM, CloudFormation
 - Java 21 (Amazon Corretto recommended)
 - Maven 3.8+
 - Docker
@@ -370,20 +370,53 @@ java -cp target/sns-message-sender-1.0-SNAPSHOT.jar \
 
 ## Completing the Human Interaction Callback
 
-After triggering the `approval` pattern, check CloudWatch Logs for the callback ID, then:
+After you trigger the `approval` pattern, the execution pauses at the `wait-for-approval` callback. The callback ID is not written to CloudWatch Logs. It is recorded in the execution history as a `CallbackStarted` event. You can find it in the Lambda console (function > **Durable executions** > select the execution > **Events** tab) or with the CLI:
+
+```bash
+FUNCTION_NAME=durable-human-interaction-example
+
+# SNS invokes the "live" alias; durable executions are tracked per published version
+VERSION=$(aws lambda get-alias --function-name $FUNCTION_NAME --name live \
+  --query FunctionVersion --output text)
+
+# Get the ARN of the most recently started running execution
+EXECUTION_ARN=$(aws lambda list-durable-executions-by-function \
+  --function-name $FUNCTION_NAME \
+  --qualifier $VERSION \
+  --statuses RUNNING \
+  --query 'sort_by(DurableExecutions, &StartTimestamp)[-1].DurableExecutionArn' \
+  --output text)
+echo $EXECUTION_ARN
+
+# Read the callback ID from the CallbackStarted event
+CALLBACK_ID=$(aws lambda get-durable-execution-history \
+  --durable-execution-arn "$EXECUTION_ARN" \
+  --query "Events[?EventType=='CallbackStarted' && Name=='wait-for-approval'] | [0].CallbackStartedDetails.CallbackId" \
+  --output text)
+```
+
+Then complete the callback:
 
 ```bash
 # To approve:
 aws lambda send-durable-execution-callback-success \
-  --callback-id <CALLBACK_ID_FROM_LOGS> \
+  --callback-id "$CALLBACK_ID" \
   --cli-binary-format raw-in-base64-out \
   --result '{"decision":"APPROVED","approver":"manager@example.com"}'
 
 # To reject:
 aws lambda send-durable-execution-callback-failure \
-  --callback-id <CALLBACK_ID_FROM_LOGS> \
+  --callback-id "$CALLBACK_ID" \
   --error ErrorType=Rejected,ErrorMessage="Budget exceeded policy limit"
 ```
+
+> **Note:** A rejected execution still shows a status of `SUCCEEDED`. `ApprovalWorkflowHandler` catches the `CallbackFailedException` and returns a result with `"status":"REJECTED"`, so the workflow completes normally. The rejection is a business outcome, not an execution failure. Check the result to see the decision:
+>
+> ```bash
+> aws lambda get-durable-execution --durable-execution-arn "$EXECUTION_ARN" \
+>   --query Result --output text
+> # {"pattern":"HUMAN_INTERACTION","requestId":"REQ-...","status":"REJECTED","reason":"Rejected: Budget exceeded policy limit"}
+> ```
 
 ## Step Diagrams
 
