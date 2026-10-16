@@ -39,7 +39,7 @@ class ErrorHandlingPatternTest {
     }
 
     @Test
-    void inventoryFailureResultsInFailedExecution() {
+    void inventoryFailureTriggersCompensation() {
         var handler = new ResilientPaymentHandler();
         var runner = LocalDurableTestRunner.create(MAP_TYPE, handler);
 
@@ -51,11 +51,18 @@ class ErrorHandlingPatternTest {
 
         var result = runner.runUntilComplete(input);
 
-        assertEquals(ExecutionStatus.FAILED, result.getStatus());
+        assertEquals(ExecutionStatus.SUCCEEDED, result.getStatus());
+
+        Map<String, Object> output = result.getResult(Map.class);
+        assertEquals("COMPENSATED", output.get("status"));
 
         var inventoryOp = result.getOperation("reserve-inventory");
         assertNotNull(inventoryOp);
         assertEquals(OperationStatus.FAILED, inventoryOp.getStatus());
+
+        var refundOp = result.getOperation("refund-payment");
+        assertNotNull(refundOp, "Compensation step should have run");
+        assertEquals(OperationStatus.SUCCEEDED, refundOp.getStatus());
     }
 
     @Test
@@ -93,6 +100,9 @@ class ErrorHandlingPatternTest {
 
         var paymentOp = result.getOperation("charge-payment");
         assertNotNull(paymentOp);
-        assertTrue(paymentOp.getAttempt() >= 1, "Payment should have retried at least once");
+        long attempts = paymentOp.getEvents().stream()
+                .filter(e -> "StepStarted".equals(e.eventTypeAsString()))
+                .count();
+        assertTrue(attempts >= 2, "Payment should fail on the first attempt and be retried");
     }
 }

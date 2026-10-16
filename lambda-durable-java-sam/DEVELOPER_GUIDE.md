@@ -209,7 +209,7 @@ Map<String, Object> result = context.step("api-call", Map.class, stepCtx -> {
 
 **StepContext** provides:
 - `stepCtx.getLogger()` - Durable logger
-- `stepCtx.getAttempt()` - Current retry attempt (0-based)
+- `stepCtx.getAttempt()` - Current attempt number (1-based; the first attempt is 1)
 - `stepCtx.isReplaying()` - Whether this is a replay
 
 ### Wait
@@ -431,7 +431,9 @@ Map<String, Object> payment = context.step("charge", Map.class, s -> charge());
 
 try {
     context.step("ship", Map.class, s -> shipOrder());
-} catch (StepFailedException e) {
+} catch (StepFailedException | ShippingException e) {
+    // A failed step rethrows the original exception type when the SDK can
+    // reconstruct it, and StepFailedException otherwise, so catch both
     // Compensation: refund the payment
     context.step("refund", Map.class, s -> refund(payment.get("txnId")));
     return Map.of("status", "COMPENSATED");

@@ -350,7 +350,7 @@ java -cp target/sns-message-sender-1.0-SNAPSHOT.jar \
 Trigger with `simulateInventoryFailure=true` by modifying the event or using the AWS CLI directly:
 ```bash
 aws lambda invoke \
-  --function-name durable-error-handling-example:1 \
+  --function-name durable-error-handling-example:live \
   --cli-binary-format raw-in-base64-out \
   --payload '{"orderId":"ORD-FAIL","amount":99.99,"simulateInventoryFailure":true}' \
   response.json && cat response.json
@@ -359,16 +359,16 @@ aws lambda invoke \
 ### What happens
 
 1. **Validate** - Standard retry (3 attempts, exponential backoff)
-2. **Charge payment** - Custom retry strategy + at-most-once semantics
+2. **Charge payment** - Custom retry strategy + at-most-once semantics. The first attempt simulates a gateway timeout, so the execution history shows a failed attempt, a 2-second wait, and a successful retry
 3. **Reserve inventory** - If this fails, triggers compensation
-4. **Compensation** - Refunds the payment (saga pattern)
+4. **Compensation** - Refunds the payment (saga pattern). The execution ends `SUCCEEDED` with `"status":"COMPENSATED"` because the failure is handled
 
 ### Key takeaway
 
 - `RetryStrategies.exponentialBackoff()` for standard retries
 - Custom `RetryStrategy` lambda for error-type filtering
 - `StepSemantics.AT_MOST_ONCE_PER_RETRY` prevents double-charging
-- Catch `StepFailedException` to implement compensation logic
+- Catch the step's exception type (and `StepFailedException`) to implement compensation logic
 - Between retry attempts, the function suspends (no compute)
 
 ---

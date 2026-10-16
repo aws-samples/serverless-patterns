@@ -23,12 +23,26 @@ import software.amazon.lambda.durable.retry.RetryStrategy;
  * 2. Custom retry strategies with error-type filtering
  * 3. At-most-once semantics for non-idempotent operations
  * 4. Saga pattern: compensation logic when later steps fail
- * 5. Catching and handling StepFailedException
+ * 5. Catching step failures (the original exception type, or StepFailedException)
  *
  * Flow: Validate -> Charge Payment (with retries) -> Reserve Inventory
  *       If inventory fails -> Refund Payment (compensation)
  */
 public class ResilientPaymentHandler extends DurableHandler<Map<String, Object>, Map<String, Object>> {
+
+    /** Transient payment gateway error that the retry strategy should retry. */
+    public static class PaymentGatewayException extends RuntimeException {
+        public PaymentGatewayException(String message) {
+            super(message);
+        }
+    }
+
+    /** Business failure that triggers saga compensation. */
+    public static class InventoryUnavailableException extends RuntimeException {
+        public InventoryUnavailableException(String message) {
+            super(message);
+        }
+    }
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> rawEvent, DurableContext context) {
@@ -76,9 +90,9 @@ public class ResilientPaymentHandler extends DurableHandler<Map<String, Object>,
             paymentResult = context.step("charge-payment", Map.class, stepCtx -> {
                 stepCtx.getLogger().info("Charging payment: $" + amount + " for order: " + orderId);
                 stepCtx.getLogger().info("Attempt: " + stepCtx.getAttempt());
-                // Simulate transient failure on first attempt
-                if (stepCtx.getAttempt() == 0) {
-                    throw new RuntimeException("Payment gateway timeout - transient error");
+                // Simulate transient failure on first attempt (attempts are 1-based)
+                if (stepCtx.getAttempt() <= 1) {
+                    throw new PaymentGatewayException("Payment gateway timeout - transient error");
                 }
                 return Map.of(
                         "orderId", orderId,
@@ -99,13 +113,15 @@ public class ResilientPaymentHandler extends DurableHandler<Map<String, Object>,
                     "status", "INTERRUPTED",
                     "paymentResult", paymentResult
             );
-        } catch (StepFailedException e) {
+        } catch (StepFailedException | PaymentGatewayException e) {
+            // After retries are exhausted the SDK rethrows the original exception type when it
+            // can reconstruct it, and StepFailedException otherwise, so handle both.
             context.getLogger().info("Payment failed permanently: " + e.getMessage());
             return Map.of(
                     "pattern", "ERROR_HANDLING",
                     "orderId", orderId,
                     "status", "PAYMENT_FAILED",
-                    "error", e.getErrorObject().errorMessage()
+                    "error", String.valueOf(e.getMessage())
             );
         }
 
@@ -120,7 +136,7 @@ public class ResilientPaymentHandler extends DurableHandler<Map<String, Object>,
             inventoryResult = context.step("reserve-inventory", Map.class, stepCtx -> {
                 stepCtx.getLogger().info("Reserving inventory for order: " + orderId);
                 if (simulateInventoryFailure) {
-                    throw new RuntimeException("Inventory unavailable - out of stock");
+                    throw new InventoryUnavailableException("Inventory unavailable - out of stock");
                 }
                 return Map.of(
                         "orderId", orderId,
@@ -128,7 +144,7 @@ public class ResilientPaymentHandler extends DurableHandler<Map<String, Object>,
                         "status", "RESERVED"
                 );
             }, inventoryConfig);
-        } catch (StepFailedException e) {
+        } catch (StepFailedException | InventoryUnavailableException e) {
             // SAGA COMPENSATION: Inventory failed, refund the payment
             context.getLogger().info("Inventory reservation failed - initiating compensation");
 
