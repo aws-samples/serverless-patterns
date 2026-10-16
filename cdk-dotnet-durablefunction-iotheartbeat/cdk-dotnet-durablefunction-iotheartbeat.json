@@ -1,0 +1,63 @@
+{
+  "title": "Lambda Durable Function — IoT Heartbeat Monitor with Eternal Orchestration (.NET)",
+  "description": "An eternal durable function that monitors IoT device heartbeats indefinitely, alerting via SNS when a device goes offline, and using continue-as-new to prevent unbounded history growth.",
+  "language": ".NET",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda durable function that runs indefinitely using the eternal orchestration (continue-as-new) pattern. It monitors heartbeat signals from an IoT device by periodically checking DynamoDB for the latest heartbeat timestamp.",
+      "If no heartbeat arrives within a configurable timeout, the function marks the device offline and publishes an alert to SNS. Heartbeats are received via a separate Lambda behind API Gateway with API key authentication.",
+      "After a configurable number of cycles, the orchestration restarts with fresh execution history to prevent unbounded checkpoint growth — demonstrating the continue-as-new pattern for long-lived serverless workflows."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-dotnet-durablefunction-iotheartbeat",
+      "templateURL": "serverless-patterns/cdk-dotnet-durablefunction-iotheartbeat",
+      "projectFolder": "cdk-dotnet-durablefunction-iotheartbeat",
+      "templateFile": "cdk.json"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Build multi-step applications and AI workflows with Lambda durable functions",
+        "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+      },
+      {
+        "text": "Amazon SNS",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Doug Perkes",
+      "image": "",
+      "bio": "Senior Solutions Architect at AWS, focused on .NET and serverless.",
+      "linkedin": "dougperkes",
+      "twitter": ""
+    }
+  ]
+}
