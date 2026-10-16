@@ -1,0 +1,99 @@
+{
+  "title": "Amazon Macie to AWS Step Functions to Amazon S3 Quarantine",
+  "description": "Automated sensitive data response: Amazon Macie findings trigger AWS Step Functions to classify severity and quarantine objects in Amazon S3",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an automated sensitive data response pipeline.",
+      "Amazon Macie scans Amazon S3 objects for sensitive data and publishes findings to Amazon EventBridge.",
+      "An Amazon EventBridge rule triggers an AWS Step Functions state machine that classifies findings by severity.",
+      "High-severity findings result in automatic object quarantine (moved to a separate Amazon S3 bucket).",
+      "Medium-severity findings result in object tagging with finding metadata.",
+      "All findings trigger Amazon SNS notifications to the security team."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/macie-sfn-s3-quarantine-cdk",
+      "templateURL": "serverless-patterns/macie-sfn-s3-quarantine-cdk",
+      "projectFolder": "macie-sfn-s3-quarantine-cdk",
+      "templateFile": "cdk/lib/macie-sfn-s3-quarantine-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Macie - Sensitive data discovery",
+        "link": "https://docs.aws.amazon.com/macie/latest/user/"
+      },
+      {
+        "text": "AWS Step Functions - Serverless workflow orchestration",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon EventBridge - Serverless event bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd macie-sfn-s3-quarantine-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy --parameters NotificationEmail=your-email@example.com</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "macie",
+      "label": "Amazon Macie"
+    },
+    "icon2": {
+      "x": 40,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon3": {
+      "x": 60,
+      "y": 50,
+      "service": "sfn",
+      "label": "AWS Step Functions"
+    },
+    "icon4": {
+      "x": 80,
+      "y": 50,
+      "service": "s3",
+      "label": "Amazon S3"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon3",
+      "to": "icon4"
+    }
+  }
+}
