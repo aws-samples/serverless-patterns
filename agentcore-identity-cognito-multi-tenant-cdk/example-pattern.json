@@ -1,0 +1,75 @@
+{
+  "title": "Multi-tenant Amazon Bedrock AgentCore Runtime with Amazon Cognito",
+  "description": "Authenticate an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito and enforce per-tenant data isolation using AgentCore Identity inbound JWT authorization.",
+  "language": "Python",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern secures an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito acting as the OAuth 2.0 / JWT identity provider.",
+      "Two Cognito groups represent two tenants. AgentCore Identity validates the inbound Cognito JWT via a custom JWT authorizer before the request reaches the agent.",
+      "The agent resolves the caller's tenant from the validated 'cognito:groups' claim and exposes a DynamoDB tool bound to that tenant. It queries a single table partitioned by tenant_id.",
+      "Because the tenant is fixed from the token and not the prompt, the agent can only ever read the caller's tenant data - providing prompt-injection-resistant multi-tenant isolation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-identity-cognito-multi-tenant-cdk",
+      "templateURL": "serverless-patterns/agentcore-identity-cognito-multi-tenant-cdk",
+      "projectFolder": "agentcore-identity-cognito-multi-tenant-cdk",
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configure inbound JWT authorizer for AgentCore",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Identity",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/identity.html"
+      },
+      {
+        "text": "Amazon Cognito as an identity provider for AgentCore",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/identity-idp-cognito.html"
+      },
+      {
+        "text": "SaaS multi-tenancy on AWS",
+        "link": "https://docs.aws.amazon.com/whitepapers/latest/saas-architecture-fundamentals/tenant-isolation.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "python3 -m venv .venv",
+      "source .venv/bin/activate",
+      "pip3 install -r requirements.txt",
+      "export CDK_DEFAULT_REGION=us-west-2",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Seed data: <code>cd test && ./seed_tenant_data.sh &lt;TenantTableName&gt; us-west-2</code>",
+      "Get a token for a tenant user: <code>./get_token.sh</code>",
+      "Invoke the agent: <code>export AGENT_ARN=&lt;AgentRuntimeArn&gt; && export BEARER_TOKEN=&lt;token&gt; && python test_multi_tenant.py \"List my orders\"</code>",
+      "Repeat for a second tenant user and confirm each caller only sees its own tenant's data."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sudhanshu Saurav",
+      "image": "link-to-your-photo.jpg",
+      "bio": "Contributor to the Serverless Patterns Collection.",
+      "linkedin": "",
+      "twitter": ""
+    }
+  ]
+}
