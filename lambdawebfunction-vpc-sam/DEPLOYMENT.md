@@ -119,7 +119,7 @@ Point the sample at a private endpoint reachable only inside your VPC (for examp
 Then invoke the endpoint. Because it is `IamAuth`, the request must be **SigV4-signed with the service name `lambda`**. Invoke from inside the account (CloudShell, or EC2 with an instance role) so credentials are picked up and signed correctly. Replace `<WebFunctionEndpointDomain>` below with your endpoint domain from the stack outputs (`WebFunctionEndpointDomain`):
 
     python3 - <<'EOF'
-    import urllib.request, hashlib
+    import urllib.request, hashlib, re, html as _html
     import botocore.session
     from botocore.auth import SigV4Auth
     from botocore.awsrequest import AWSRequest
@@ -130,15 +130,37 @@ Then invoke the endpoint. Because it is `IamAuth`, the request must be **SigV4-s
     SigV4Auth(creds, "lambda", "us-east-1").add_auth(req)
     resp = urllib.request.urlopen(urllib.request.Request(url, headers=dict(req.headers)))
     body = resp.read().decode()
-    print()  # blank line so the output is separated from the command above
+
+    # Render the card's content as readable text (instead of dumping raw HTML).
+    def grab(pat, default="n/a"):
+        m = re.search(pat, body, re.S)
+        return _html.unescape(m.group(1).strip()) if m else default
+    title    = grab(r"<h1>([^<]+)</h1>").replace("\xa0", " ")
+    subtitle = grab(r'<div class="card__header">.*?<p>([^<]+)</p>')
+    status   = grab(r'stat__num">([^<]+)<')
+    detail   = grab(r'internal target<br>([^<]+)<')
+    reply    = grab(r'resp__body">([^<]+)<', default=None)
+    badge    = grab(r'class="badge">([^<]+)<')
+    meta     = re.findall(r"<dt>([^<]+)</dt><dd>([^<]+)</dd>", body)
+    print()
     print("=" * 60)
-    print(f"HTTP {resp.status}  |  {len(body)} bytes")
+    print(f"# {title}\n")
+    print(f"{subtitle}\n")
+    print(f"HTTP {resp.status}  |  {len(body)} bytes\n")
+    print(f"Egress status : {status}")
+    print(f"Detail        : {detail}")
+    if reply:
+        print(f"Target reply  : {reply}")
+    print()
+    for k, v in meta:
+        if k not in ("Status", "Latency", "Content-Type", "Size"):
+            print(f"{k:<13}: {v}")
+    print(f"\n{badge}")
     print("=" * 60)
-    print(body)
     EOF
 
-The in-account invoke script prints a header (`HTTP 200 | <N> bytes`) before the HTML so the
-response stands out in the terminal. The returned page reports one of three egress states:
+The invoke script renders the card's content as readable text in the terminal (not raw HTML),
+showing the status, detail, target reply, and metadata. The page reports one of three egress states:
 
 | State | When | What the page shows |
 |---|---|---|

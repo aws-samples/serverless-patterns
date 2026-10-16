@@ -84,7 +84,7 @@ This sets `INTERNAL_TARGET_URL` on the new revision (leave the flag off and the 
 Because the endpoint uses `IamAuth`, every request must be **SigV4-signed with the service name `lambda`**. Invoke from inside the account (CloudShell, or an EC2 instance with an instance role) so credentials are picked up and signed correctly. Replace `<WebFunctionEndpointDomain>` below with your endpoint domain from the stack outputs (`WebFunctionEndpointDomain`):
 
     python3 - <<'EOF'
-    import urllib.request, hashlib
+    import urllib.request, hashlib, re, html as _html
     import botocore.session
     from botocore.auth import SigV4Auth
     from botocore.awsrequest import AWSRequest
@@ -95,11 +95,33 @@ Because the endpoint uses `IamAuth`, every request must be **SigV4-signed with t
     SigV4Auth(creds, "lambda", "us-east-1").add_auth(req)
     resp = urllib.request.urlopen(urllib.request.Request(url, headers=dict(req.headers)))
     body = resp.read().decode()
-    print()  # blank line so the output is separated from the command above
+
+    # Render the card's content as readable text (instead of dumping raw HTML).
+    def grab(pat, default="n/a"):
+        m = re.search(pat, body, re.S)
+        return _html.unescape(m.group(1).strip()) if m else default
+    title    = grab(r"<h1>([^<]+)</h1>").replace("\xa0", " ")
+    subtitle = grab(r'<div class="card__header">.*?<p>([^<]+)</p>')
+    status   = grab(r'stat__num">([^<]+)<')
+    detail   = grab(r'internal target<br>([^<]+)<')
+    reply    = grab(r'resp__body">([^<]+)<', default=None)
+    badge    = grab(r'class="badge">([^<]+)<')
+    meta     = re.findall(r"<dt>([^<]+)</dt><dd>([^<]+)</dd>", body)
+    print()
     print("=" * 60)
-    print(f"HTTP {resp.status}  |  {len(body)} bytes")
+    print(f"# {title}\n")
+    print(f"{subtitle}\n")
+    print(f"HTTP {resp.status}  |  {len(body)} bytes\n")
+    print(f"Egress status : {status}")
+    print(f"Detail        : {detail}")
+    if reply:
+        print(f"Target reply  : {reply}")
+    print()
+    for k, v in meta:
+        if k not in ("Status", "Latency", "Content-Type", "Size"):
+            print(f"{k:<13}: {v}")
+    print(f"\n{badge}")
     print("=" * 60)
-    print(body)
     EOF
 
 ### What you'll see
@@ -112,12 +134,27 @@ The returned page reports one of three egress states, depending on whether `INTE
 | **Reachable** | Target is set and responded | Green status "Reachable", plus a **Response from private target** panel with the HTTP status, latency, content-type, size, and a snippet of the actual response body (e.g. `Hello from a private VPC resource`). This is the end-to-end egress proof. |
 | **Unreachable** | Target is set but the call failed | Red status "Unreachable" with the reason (for example `timeout (check routing / security groups)`). Almost always a subnet-routing or security-group issue, not a pattern defect — the target's security group must allow inbound from the connector's security group. |
 
-The in-account invoke script also prints a header line before the HTML so the response is easy to spot in the terminal:
+The invoke script above renders the card's content as readable text in the terminal, so you see the same information without the raw HTML. For a **Reachable** result it prints:
 
     ============================================================
-    HTTP 200  |  3734 bytes
+    # Hello from AWS !
+
+    AWS Lambda Web Function with private VPC egress via a network connector
+
+    HTTP 200  |  3749 bytes
+
+    Egress status : Reachable
+    Detail        : HTTP 200 in 7 ms via VPC egress
+    Target reply  : Hello from a private VPC resource
+
+    App          : lambda-web-function-vpc
+    Egress       : VPC network connector (ENIs in your subnets)
+    Listening on : 0.0.0.0:3000
+
+    ⚡ Private resource reached through your VPC
     ============================================================
-    <!doctype html> ...
+
+The colors described above (amber/green/red) are CSS styling visible only when the HTML is rendered in a browser; the terminal shows the same states as the text labels above.
 
 ## Deploying new code (new revisions)
 
