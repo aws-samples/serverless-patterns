@@ -1,0 +1,110 @@
+{
+  "Comment": "Run a job on an AWS Lambda MicroVM, wait for the job to call back with its result, and always terminate the MicroVM.",
+  "QueryLanguage": "JSONata",
+  "StartAt": "Start MicroVM",
+  "States": {
+    "Start MicroVM": {
+      "Type": "Task",
+      "Comment": "Launch a MicroVM from the worker image. The job input travels in the run hook payload. The execution ARN (its last 128 characters, the token limit) is the idempotency token, so a retried call never starts a second MicroVM. Tokens are account wide, so the execution name alone is not unique enough.",
+      "Resource": "arn:aws:states:::aws-sdk:lambdamicrovms:runMicrovm",
+      "Arguments": {
+        "ImageIdentifier": "${ImageArn}",
+        "ExecutionRoleArn": "${ExecutionRoleArn}",
+        "EgressNetworkConnectors": ["${EgressConnectorArn}"],
+        "MaximumDurationInSeconds": "{% ${MaximumDurationInSeconds} %}",
+        "ClientToken": "{% $substring($states.context.Execution.Id, -128) %}",
+        "RunHookPayload": "{% $string({'job': $states.input}) %}"
+      },
+      "Assign": {
+        "microvmId": "{% $states.result.MicrovmId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["LambdaMicrovms.ThrottlingException", "LambdaMicrovms.InternalServerException", "LambdaMicrovms.InsufficientCapacityException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Start failed"
+        }
+      ],
+      "Next": "Wait for job result"
+    },
+    "Wait for job result": {
+      "Type": "Task",
+      "Comment": "Store the task token under the MicroVM ID and pause. The worker reads the token and calls SendTaskSuccess, SendTaskFailure and SendTaskHeartbeat. Missing heartbeats or the overall timeout end the wait.",
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:putItem.waitForTaskToken",
+      "Arguments": {
+        "TableName": "${TaskTokenTable}",
+        "Item": {
+          "microvmId": { "S": "{% $microvmId %}" },
+          "taskToken": { "S": "{% $states.context.Task.Token %}" },
+          "executionArn": { "S": "{% $states.context.Execution.Id %}" },
+          "expiresAt": { "N": "{% $string($floor($toMillis($now()) / 1000) + 86400) %}" }
+        }
+      },
+      "HeartbeatSeconds": "{% ${HeartbeatSeconds} %}",
+      "TimeoutSeconds": "{% ${MaximumDurationInSeconds} %}",
+      "Output": "{% $states.result %}",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Assign": {
+            "jobError": "{% $states.errorOutput %}"
+          },
+          "Next": "Terminate MicroVM after failure"
+        }
+      ],
+      "Next": "Terminate MicroVM"
+    },
+    "Terminate MicroVM": {
+      "Type": "Task",
+      "Comment": "The job has reported its result, so stop the MicroVM and its billing.",
+      "Resource": "arn:aws:states:::aws-sdk:lambdamicrovms:terminateMicrovm",
+      "Arguments": {
+        "MicrovmIdentifier": "{% $microvmId %}"
+      },
+      "Output": "{% $states.input %}",
+      "Retry": [
+        {
+          "ErrorEquals": ["LambdaMicrovms.ThrottlingException", "LambdaMicrovms.InternalServerException", "LambdaMicrovms.ConflictException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 5,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    },
+    "Terminate MicroVM after failure": {
+      "Type": "Task",
+      "Comment": "The job failed, stopped heartbeating or timed out. Stop the MicroVM before failing the execution.",
+      "Resource": "arn:aws:states:::aws-sdk:lambdamicrovms:terminateMicrovm",
+      "Arguments": {
+        "MicrovmIdentifier": "{% $microvmId %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["LambdaMicrovms.ThrottlingException", "LambdaMicrovms.InternalServerException", "LambdaMicrovms.ConflictException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 5,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Job failed"
+    },
+    "Job failed": {
+      "Type": "Fail",
+      "Error": "{% $jobError.Error ? $jobError.Error : 'JobFailed' %}",
+      "Cause": "{% $jobError.Cause ? $jobError.Cause : 'The job stopped sending heartbeats or ran longer than the maximum duration.' %}"
+    },
+    "Start failed": {
+      "Type": "Fail",
+      "Error": "{% $states.input.Error ? $states.input.Error : 'StartFailed' %}",
+      "Cause": "{% $states.input.Cause ? $states.input.Cause : 'The MicroVM could not be started.' %}"
+    }
+  }
+}
