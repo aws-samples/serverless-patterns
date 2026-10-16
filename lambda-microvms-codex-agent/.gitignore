@@ -1,0 +1,7 @@
+# Python bytecode. deploy.sh already excludes these from the uploaded artifact,
+# so they only ever appear from running app.py locally.
+__pycache__/
+*.pyc
+
+# Build artifacts
+*.zip
