@@ -1,0 +1,5 @@
+{
+  "batchSize": 10,
+  "maxConcurrency": 3,
+  "toleratedFailures": 2
+}

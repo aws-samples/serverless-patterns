@@ -1,0 +1,74 @@
+{
+  "title": "AWS Lambda Durable Functions Examples Written in Java and deployed using AWS SAM",
+  "description": "Demonstrates multiple patterns of AWS Lambda Durable Functions written in Java and deployed using AWS SAM",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides example of AWS Lambda durable functions written in Java and deployed using AWS SAM",
+      "The different patterns demonstrated are chaining, fan-out/fan-in, human interaction, monitoring/polling, timers, error handling with saga compensation, map processing, and sub-orchestration",
+      "For detailed deployment instructions instructions see the README.md"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-java-sam",
+      "templateURL": "serverless-patterns/lambda-durable-java-sam",
+      "projectFolder": "durable-functions-sam",
+      "templateFile": "durable-functions-sam/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "AWS Lambda durable functions",
+        "link": "https://aws.amazon.com/lambda/lambda-durable-functions/"
+      },
+      {
+        "text": "AWS Durable Execution SDK Java",
+        "link": "https://github.com/aws/aws-durable-execution-sdk-java/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": ["sam deploy --guided"]
+  },
+  "testing": {
+    "text": ["See the GitHub repo for detailed testing instructions."]
+  },
+  "cleanup": {
+    "text": ["Delete the template: <code>sam delete</code>."]
+  },
+  "authors": [
+    {
+      "name": "Indranil Banerjee",
+      "bio": "AWS - Senior Solutions Architect",
+      "image": "https://media.licdn.com/dms/image/v2/C5603AQEL3BG6JZca6A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1653972622784?e=1787184000&v=beta&t=02c8Cs3dvk26XyKhsvieC9FcPEXa8toJnWlUk-rDsU0",
+      "linkedin": "https://www.linkedin.com/in/indranil-banerjee-b00a261/"
+    },
+    {
+      "name": "Christian Tomeldan",
+      "bio": "AWS - Senior Solutions Architect",
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQFUq1LazkLjeg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1516572681599?e=1785974400&v=beta&t=hQ4v986Zvjbw5su8_9Xuhj3QWOhmdv7NRh7kbFtOEBI",
+      "linkedin": "https://www.linkedin.com/in/christian-tomeldan/"
+    },
+    {
+      "name": "Ajjay Govindaram",
+      "bio": "AWS - Senior Solutions Architect",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQETCOkwv00Lag/profile-displayphoto-crop_800_800/B56ZuQzht7GwAU-/0/1767660985531?e=1785974400&v=beta&t=HoKdUUL1BBmr0OpLFn9nnGwJclVB2UPh_4cxtP7XA_s",
+      "linkedin": "https://www.linkedin.com/in/ajjaykumar/"
+    },
+    {
+      "name": "Greg Medard",
+      "bio": "AWS - Solutions Architect",
+      "image": "https://media.licdn.com/dms/image/v2/C4E03AQGveSDnRH9aCg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1565226836110?e=1787184000&v=beta&t=XYi5wg0YCeRS5kigIA58hKRYrogUahMkzzLFtzowm5o",
+      "linkedin": "https://www.linkedin.com/in/gregorymedard/"
+    }    
+  ]
+}
