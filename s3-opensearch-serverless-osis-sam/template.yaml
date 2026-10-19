@@ -9,14 +9,14 @@ Description: >-
 Parameters:
   AccessARN:
     Description: >-
-      ARN of the IAM role or user that will access the OpenSearch dashboard /
+      ARN of the IAM role or user that will access OpenSearch Dashboards / the
       collection (for example, the principal you use in the AWS console).
     Type: String
   DeploymentName:
     Description: Unique lowercase value used to name the resources in this stack.
     Default: demo-s3-oss-osis
     Type: String
-    AllowedPattern: ^[a-z][a-z0-9-]{2,31}$
+    AllowedPattern: ^[a-z][a-z0-9-]{2,27}$
 
 Resources:
 
@@ -216,7 +216,17 @@ Resources:
       Type: network
       Description: Network policy for the collection.
       # AllowFromPublic is used here for a simple demo. For production, restrict
-      # access using a VPC endpoint (SourceVPCEs) instead.
+      # access with a VPC endpoint. Note that when the policy is restricted,
+      # OpenSearch Ingestion creates its own managed VPC endpoint to reach the
+      # collection, and that endpoint must also be allowed by this network
+      # policy. Give the sink's aws: block a serverless_options.network_policy_name
+      # pointing at this policy so the pipeline adds its own endpoint to it, e.g.:
+      #   aws:
+      #     serverless: true
+      #     serverless_options:
+      #       network_policy_name: "<this-network-policy-name>"
+      # See https://docs.aws.amazon.com/opensearch-service/latest/developerguide/pipeline-collection-access.html
+      # and https://docs.opensearch.org/latest/data-prepper/pipelines/configuration/sinks/opensearch/
       Policy: !Sub >-
         [{"Rules":[{"ResourceType":"collection","Resource":["collection/${DeploymentName}"]},{"ResourceType":"dashboard","Resource":["collection/${DeploymentName}"]}],"AllowFromPublic":true}]
 
@@ -227,7 +237,7 @@ Resources:
       Type: data
       Description: Data access policy for the pipeline role and the console principal.
       Policy: !Sub >-
-        [{"Description":"Access for pipeline and admin","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:*"]},{"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],"Principal":["${AccessARN}","arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]}]
+        [{"Description":"Pipeline role","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:CreateIndex","aoss:UpdateIndex","aoss:DescribeIndex","aoss:WriteDocument"]}],"Principal":["arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]},{"Description":"Console principal","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:*"]},{"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],"Principal":["${AccessARN}"]}]
 
   # ---------------------------------------------------------------------------
   # CloudWatch log group for pipeline audit logs.
@@ -273,6 +283,7 @@ Resources:
                   queue_url: "${IngestQueue}"
                   maximum_messages: 10
                   visibility_timeout: "90s"
+                  visibility_duplication_protection: true
                 aws:
                   region: "${AWS::Region}"
                   sts_role_arn: "${PipelineRole.Arn}"
@@ -313,7 +324,7 @@ Outputs:
     Description: OpenSearch Serverless collection endpoint.
     Value: !GetAtt OpenSearchServerless.CollectionEndpoint
   DevToolsURL:
-    Description: Direct URL to Dev Tools within the OpenSearch dashboard to query the index.
+    Description: Direct URL to Dev Tools within OpenSearch Dashboards to query the index.
     Value: !Sub "${OpenSearchServerless.DashboardEndpoint}/app/dev_tools#/console"
   DataAccessPolicyEditURL:
     Description: Direct URL to modify the data access policy if you need to add principals.

@@ -39,7 +39,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided"
+      "sam deploy --capabilities CAPABILITY_NAMED_IAM --guided"
     ]
   },
   "testing": {

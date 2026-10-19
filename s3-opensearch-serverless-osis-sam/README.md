@@ -23,20 +23,30 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd s3-opensearch-serverless-osis-sam
+    cd serverless-patterns/s3-opensearch-serverless-osis-sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam deploy --capabilities CAPABILITY_NAMED_IAM --guided
     ```
 
-1. Identify the ARN of the role (or user) being used to access the console for this deployment. If it does not have the `AdministratorAccess` AWS managed policy (or a similarly permissive equivalent), attach the `AmazonOpenSearchServiceFullAccess` AWS managed policy. Access for allowed principals can be edited later via the `DataAccessPolicyEditURL` from the stack outputs.
+1. Identify the ARN of the role (or user) being used to access the console for this deployment. If it does not have the `AdministratorAccess` AWS managed policy (or a similarly permissive equivalent), attach an inline IAM policy granting `aoss:APIAccessAll` on the collection and `aoss:DashboardsAccessAll` on `dashboards/default` (the `AmazonOpenSearchServiceFullAccess` managed policy only grants `es:*` for OpenSearch Service domains and does not cover OpenSearch Serverless, so it will not work here), for example:
+    ```json
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        { "Effect": "Allow", "Action": "aoss:APIAccessAll", "Resource": "arn:aws:aoss:<region>:<account-id>:collection/*" },
+        { "Effect": "Allow", "Action": "aoss:DashboardsAccessAll", "Resource": "arn:aws:aoss:<region>:<account-id>:dashboards/default" }
+      ]
+    }
+    ```
+    Access for allowed principals can be edited later via the `DataAccessPolicyEditURL` from the stack outputs.
 
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
     * Enter the ARN identified in the previous step in the `AccessARN` parameter
-    * Enter the `DeploymentName` parameter (up to 32 characters without spaces; "a-z", "0-9", or "-")
+    * Enter the `DeploymentName` parameter (up to 28 characters without spaces; "a-z", "0-9", or "-")
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
@@ -70,7 +80,7 @@ A sample newline-delimited JSON (JSON Lines) file, `sample.json`, is included in
 
 1. Wait a short time for the pipeline to poll the SQS queue and ingest the object (typically under a minute).
 
-1. From the OpenSearch dashboard Dev Tools console (`DevToolsURL` from the stack outputs), search the index. You should see the three documents from the uploaded file, each parsed into structured fields with the S3 source metadata (`bucket` and `key`) added by the pipeline:
+1. From the OpenSearch Dashboards Dev Tools console (`DevToolsURL` from the stack outputs), search the index. You should see the three documents from the uploaded file, each parsed into structured fields with the S3 source metadata (`bucket` and `key`) added by the pipeline:
     ```
     GET s3-logs/_search
     ```
