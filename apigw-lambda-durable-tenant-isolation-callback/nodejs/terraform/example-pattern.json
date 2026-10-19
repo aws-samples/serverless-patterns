@@ -1,6 +1,6 @@
 {
-  "title": "Serverless multi-tenant workflow with external callback using Lambda durable functions",
-  "description": "This pattern implements a multi-tenant workflow API that suspends execution while waiting for external confirmation and resumes processing when a callback arrives, with per-tenant compute isolation ensuring workflow state remains private throughout the suspension period.",
+  "title": "Serverless multi-tenant workflow with external callback using AWS Lambda durable functions",
+  "description": "A multi-tenant workflow API that pauses while it waits for an external callback and then resumes, with per-tenant compute isolation keeping workflow state private.",
   "language": "Node.js",
   "level": "300",
   "framework": "Terraform",
@@ -53,7 +53,7 @@
       "name": "Annangarachari R",
       "image": "https://media.licdn.com/dms/image/v2/C5603AQHDdhBrpBtWsg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1651409742725?e=1759363200&v=beta&t=7-EnqmtXjWlH2uA8oSMCwnLfFFvlWtf42-aC8NSZukw",
       "bio": "Serverless Enthusiast",
-      "linkedin": "https://www.linkedin.com/in/annangarachari-r/"
+      "linkedin": "annangarachari-r"
     }
   ]
 }
