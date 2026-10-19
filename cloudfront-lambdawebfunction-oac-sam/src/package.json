@@ -1,0 +1,7 @@
+{
+  "name": "cloudfront-lambdawebfunction-oac-sam-app",
+  "version": "1.0.0",
+  "description": "Sample Lambda Web Function HTTP server (ESM) fronted by CloudFront with OAC.",
+  "type": "module",
+  "main": "index.js"
+}
