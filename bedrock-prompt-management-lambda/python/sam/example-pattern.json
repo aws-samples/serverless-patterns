@@ -4,25 +4,7 @@
     "language": "Python",
     "level": "200",
     "framework": "AWS SAM",
-    "patternArch": {
-        "icon1": {
-            "x": 30,
-            "y": 50,
-            "service": "lambda-event-functions",
-            "label": "AWS Lambda "
-        },
-        "icon2": {
-            "x": 70,
-            "y": 50,
-            "service": "bedrock",
-            "label": "Bedrock managed prompt + version"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2",
-            "label": "Converse API"
-        }
-    },
+    "patternGroup": "bedrock-prompt-management-lambda",
     "introBox": {
         "headline": "How it works",
         "text": [
@@ -35,10 +17,6 @@
     },
     "gitHub": {
         "template": {
-            "patternPath": "bedrock-prompt-management-lambda-sam",
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-prompt-management-lambda-sam",
-            "templateURL": "serverless-patterns/bedrock-prompt-management-lambda-sam",
-            "projectFolder": "bedrock-prompt-management-lambda-sam",
             "templateFile": "template.yaml"
         }
     },
