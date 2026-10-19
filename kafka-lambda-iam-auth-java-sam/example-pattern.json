@@ -1,0 +1,68 @@
+{
+    "title": "AWS Lambda consumer for Amazon MSK with IAM authentication (Java)",
+    "description": "The function consumes from an Amazon Managed Streaming for Apache Kafka (Amazon MSK) cluster that uses IAM access control. The cluster is attached as a self-managed Apache Kafka event source with the IAM_AUTH authentication type, so the event source mapping signs each connection with the function's execution role, and IAM policies grant access to the cluster, topic, and consumer group.",
+    "language": "Java",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Amazon MSK with IAM authentication: the event source mapping signs each connection with the function's execution role (IAM_AUTH), and IAM policies authorize access to the cluster, topic, and consumer group.",
+            "The AWS CloudFormation template MSKAndClientEC2.yaml creates the Kafka cluster and an Amazon EC2 client instance; the AWS Lambda function and its event source are deployed with AWS SAM or the AWS CLI.",
+            "The function decodes each Kafka record, logs it to Amazon CloudWatch Logs, and writes its fields to Amazon DynamoDB.",
+            "For detailed deployment instructions, see the README.md."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kafka-lambda-iam-auth-java-sam",
+            "templateURL": "serverless-patterns/kafka-lambda-iam-auth-java-sam",
+            "projectFolder": "kafka-lambda-iam-auth-java-sam",
+            "templateFile": "template_original.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using AWS Lambda with self-managed Apache Kafka",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
+            },
+            {
+                "text": "Configuring cluster authentication methods in AWS Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-cluster-auth.html"
+            },
+            {
+                "text": "AWS SAM SelfManagedKafka event source",
+                "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html"
+            },
+            {
+                "text": "Apache Kafka SASL/OAUTHBEARER authentication",
+                "link": "https://kafka.apache.org/documentation/#security_sasl_oauthbearer"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the AWS Lambda function: <code>sam delete</code>, or <code>scripts/teardown_lambda_cli.sh</code> if you deployed it with the AWS CLI.",
+            "Delete the AWS CloudFormation stack created from MSKAndClientEC2.yaml."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Indranil Banerjee",
+            "bio": "AWS - Senior Solutions Architect",
+            "linkedin": "indranil-banerjee-b00a261"
+        }
+    ]
+}
