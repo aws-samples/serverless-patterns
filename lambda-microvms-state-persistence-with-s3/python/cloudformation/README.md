@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-microvms-state-persistence-with-s3
+    cd serverless-patterns/lambda-microvms-state-persistence-with-s3/python/cloudformation
     ```
 1. Deploy the resources with a single command. `deploy.sh` is a thin bootstrap around a CloudFormation stack (`template.yaml`):
     ```bash

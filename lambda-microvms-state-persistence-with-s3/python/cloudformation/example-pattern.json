@@ -4,6 +4,7 @@
   "language": "Python",
   "level": "300",
   "framework": "AWS CloudFormation",
+  "patternGroup": "lambda-microvms-state-persistence-with-s3",
   "introBox": {
     "headline": "How it works",
     "text": [
