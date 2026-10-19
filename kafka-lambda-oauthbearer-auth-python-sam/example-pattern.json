@@ -1,0 +1,68 @@
+{
+    "title": "AWS Lambda consumer for self-managed Apache Kafka with OAuth through Amazon Cognito (Python)",
+    "description": "The function consumes from a self-managed Apache Kafka cluster on Amazon EC2 that authenticates clients with SASL/OAUTHBEARER. Amazon Cognito stands in for any OAuth 2.0 identity provider: the event source mapping obtains access tokens with the client credentials grant (OAUTHBEARER_AUTH), and the brokers validate them against the user pool's JSON Web Key Set.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Self-managed Apache Kafka with SASL/OAUTHBEARER through an external OAuth 2.0 provider (Amazon Cognito): the event source mapping obtains access tokens with the client credentials grant (OAUTHBEARER_AUTH).",
+            "The AWS CloudFormation template KafkaBrokersCognitoClientEC2.yaml creates the Kafka cluster and an Amazon EC2 client instance; the AWS Lambda function and its event source are deployed with AWS SAM or the AWS CLI.",
+            "The function decodes each Kafka record, logs it to Amazon CloudWatch Logs, and writes its fields to Amazon DynamoDB.",
+            "For detailed deployment instructions, see the README.md."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kafka-lambda-oauthbearer-auth-python-sam",
+            "templateURL": "serverless-patterns/kafka-lambda-oauthbearer-auth-python-sam",
+            "projectFolder": "kafka-lambda-oauthbearer-auth-python-sam",
+            "templateFile": "template_original.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using AWS Lambda with self-managed Apache Kafka",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
+            },
+            {
+                "text": "Configuring cluster authentication methods in AWS Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-cluster-auth.html"
+            },
+            {
+                "text": "AWS SAM SelfManagedKafka event source",
+                "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html"
+            },
+            {
+                "text": "Apache Kafka SASL/OAUTHBEARER authentication",
+                "link": "https://kafka.apache.org/documentation/#security_sasl_oauthbearer"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the AWS Lambda function: <code>sam delete</code>, or <code>scripts/teardown_lambda_cli.sh</code> if you deployed it with the AWS CLI.",
+            "Delete the AWS CloudFormation stack created from KafkaBrokersCognitoClientEC2.yaml."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Indranil Banerjee",
+            "bio": "AWS - Senior Solutions Architect",
+            "linkedin": "indranil-banerjee-b00a261"
+        }
+    ]
+}
