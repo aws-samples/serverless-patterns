@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-durable-ddb-streams-python-sam
+    cd serverless-patterns/lambda-durable-ddb-streams/python/sam
     ```
 1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
