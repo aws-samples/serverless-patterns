@@ -4,6 +4,7 @@
   "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
+  "patternGroup": "eventbridge-custom-bus-dynamodb",
   "introBox": {
     "headline": "How it works",
     "text": [
