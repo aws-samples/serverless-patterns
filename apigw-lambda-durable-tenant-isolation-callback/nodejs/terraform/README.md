@@ -12,7 +12,7 @@ The combination of durable execution and tenant isolation is essential for this 
 
 Please note that this pattern deploys Amazon API Gateway endpoints with no authorization. Production deployments should secure all endpoints with an appropriate authorization mechanism such as AWS IAM authorization, Amazon Cognito user pools, or API key usage plans.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-durable-tenant-isolation-callback-terraform
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-durable-tenant-isolation-callback-nodejs-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd apigw-lambda-durable-tenant-isolation-callback-terraform
+    cd serverless-patterns/apigw-lambda-durable-tenant-isolation-callback/nodejs/terraform
     ```
 3. Install Lambda function dependencies:
     ```
@@ -178,7 +178,7 @@ Navigate to CloudWatch Logs → `/aws/lambda/{prefix}-workflow`. Each tenant's l
 
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-lambda-durable-tenant-isolation-callback-terraform
+    cd serverless-patterns/apigw-lambda-durable-tenant-isolation-callback/nodejs/terraform
     ```
 
 1. Delete all created resources:

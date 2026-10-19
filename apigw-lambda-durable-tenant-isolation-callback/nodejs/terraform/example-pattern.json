@@ -4,6 +4,7 @@
   "language": "Node.js",
   "level": "300",
   "framework": "Terraform",
+  "patternGroup": "apigw-lambda-durable-tenant-isolation-callback",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -13,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-durable-tenant-isolation-callback-terraform",
-      "templateURL": "serverless-patterns/apigw-lambda-durable-tenant-isolation-callback-terraform",
-      "projectFolder": "apigw-lambda-durable-tenant-isolation-callback-terraform",
       "templateFile": "main.tf"
     }
   },
