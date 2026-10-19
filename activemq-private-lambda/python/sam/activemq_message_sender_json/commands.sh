@@ -5,4 +5,4 @@
 # Example sh commands.sh firstbatch 100
 export AWS_DEFAULT_REGION=AWS_REGION
 
-PYTHON3_VERSION /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json/activemq_producer.py ACTIVEMQ_BROKER_ENDPOINT ACTIVEMQ_QUEUE_NAME $1 $2
+PYTHON3_VERSION /home/ec2-user/serverless-patterns/activemq-private-lambda/python/sam/activemq_message_sender_json/activemq_producer.py ACTIVEMQ_BROKER_ENDPOINT ACTIVEMQ_QUEUE_NAME $1 $2

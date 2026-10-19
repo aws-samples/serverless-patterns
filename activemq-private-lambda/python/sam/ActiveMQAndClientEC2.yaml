@@ -579,13 +579,13 @@ Resources:
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone -n --depth=1 --filter=tree:0 $SERVERLESS_LAND_GITHUB_LOCATION
             cd ./serverless-patterns
-            git sparse-checkout set --no-cone /activemq-private-lambda-python-sam
+            git sparse-checkout set --no-cone /activemq-private-lambda/python/sam
             git checkout
-            cd activemq-private-lambda-python-sam
+            cd activemq-private-lambda/python/sam
             sudo chown -R ec2-user .
 
             #Substitute SAM template variables
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda/python/sam
             cd activemq_consumer_dynamo_sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
@@ -607,7 +607,7 @@ Resources:
             sudo chown -R ec2-user .
 
             #Update Shell script for sending ActiveMQ messages to Lambda function
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda/python/sam/activemq_message_sender_json
             sudo chown ec2-user ./commands.sh
             source /home/ec2-user/.bash_profile
             echo "ACTIVEMQ_BROKER_ENDPOINT=$activemq_broker_endpoint"
@@ -618,7 +618,7 @@ Resources:
 
 
             #Update Shell script for browsing messages in ActiveMQ queue
-            cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam
+            cd /home/ec2-user/serverless-patterns/activemq-private-lambda/python/sam
             sudo chown ec2-user ./activemq_queue_browser.sh
             source /home/ec2-user/.bash_profile
             sed -i "s|ACTIVEMQ_BROKER_ENDPOINT_ONE|${activemq_broker_endpoint1}|g" activemq_queue_browser.sh

@@ -51,7 +51,7 @@ We clone the serverless-patterns Github repository on the EC2 instance by runnin
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/activemq-private-lambda-python-sam
+    cd serverless-patterns/activemq-private-lambda/python/sam
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
@@ -118,7 +118,7 @@ In this case, change directory from the root directory where you cloned the http
 Copy the template_original.yaml file to template.yaml
 
     ```
-    cd serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam
+    cd serverless-patterns/activemq-private-lambda/python/sam/activemq_consumer_dynamo_sam
     cp ./template_original.yaml ./template.yaml
     
     ```
@@ -126,7 +126,7 @@ Replace the parameters in the template.yaml file with their correct values. Inst
 
 In case you need to get the correct values, you can log in to the Amazon EC2 instance created by the AWS CloudFormation template.
 
-Then cd ~/serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam.
+Then cd ~/serverless-patterns/activemq-private-lambda/python/sam/activemq_consumer_dynamo_sam.
 
 cat the template.yaml file and note the default values for each of the below parameters and replace them in the template.yaml file in your local machine.
 
@@ -168,7 +168,7 @@ You can then run the sam build and sam deploy commands to build and deploy the l
 Before running the commands above, make sure to set the AWS_PROFILE on your local machine to point to the correct AWS account and the AWS_REGION to the correct region.
 
     ```
-    cd serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam
+    cd serverless-patterns/activemq-private-lambda/python/sam/activemq_consumer_dynamo_sam
     sam build
     sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name activemq-lambda-python-sam --guided
     
@@ -207,7 +207,7 @@ For your convenience, a Python script and a shell script has been created on the
 You should see a script called commands.sh. Run that script by passing a random string and a number between 1 and 500. Either send at least 10 messages or wait for 300 seconds (check the values of BatchSize: 100 and MaximumBatchingWindowInSeconds: 5 in the template.yaml file)
 
 ```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_message_sender_json
+cd /home/ec2-user/serverless-patterns/activemq-private-lambda/python/sam/activemq_message_sender_json
 chmod +x commands.sh
 $PYTHON3_VERSION -m venv ./myenv && source ./myenv/bin/activate && pip install -r requirements.txt
 sh ./commands.sh firstBatch 100
@@ -253,7 +253,7 @@ aws dynamodb scan --table-name ActiveMQDynamoDBTablePython --select "COUNT"
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-python-sam/activemq_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/activemq-private-lambda/python/sam/activemq_consumer_dynamo_sam
 sam delete
 
 ```
