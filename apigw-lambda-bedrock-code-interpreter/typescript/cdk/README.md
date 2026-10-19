@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon API Gateway REST API backed by an AWS Lambda function that uses Amazon Bedrock to generate Python analysis code from natural language questions, then executes it safely in Amazon Bedrock AgentCore Code Interpreter.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-bedrock-code-interpreter-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-bedrock-code-interpreter-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -50,7 +50,7 @@ Neither Amazon Bedrock nor Amazon Bedrock AgentCore Code Interpreter alone can s
 1. Clone the repository:
     ```bash
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/apigw-lambda-bedrock-code-interpreter-cdk
+    cd serverless-patterns/apigw-lambda-bedrock-code-interpreter/typescript/cdk
     ```
 
 2. Install dependencies:
