@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon EventBridge Custom Event Bus with two subscribers that write events to an Amazon DynamoDB table, with no AWS Lambda function in the path. Both subscribers use a *universal target* to call a DynamoDB API action directly, building the request from the event with a JSONata expression: one calls `PutItem` for each event, the other groups events and calls `BatchWriteItem` with up to 25 events per call.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-custom-bus-dynamodb
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-custom-bus-dynamodb-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
