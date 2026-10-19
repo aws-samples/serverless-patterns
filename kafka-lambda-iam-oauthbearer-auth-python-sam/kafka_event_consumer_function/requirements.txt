@@ -1,0 +1,5 @@
+# The Lambda consumer only uses the Python standard library plus boto3, and
+# boto3 is already included in the AWS Lambda Python managed runtime, so there
+# are no packaged runtime dependencies. (boto3 is listed here only so local
+# unit tests / linting can install it.)
+boto3>=1.34.0
