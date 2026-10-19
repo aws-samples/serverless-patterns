@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentCore Chat</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main id="chat-panel">
+    <header id="chat-header">Lambda Web Functions + AgentCore Runtime integration</header>
+
+    <div id="login">
+      <form id="login-form">
+        <h1>Enter the login secret to continue</h1>
+        <input id="secret" type="password" placeholder="Login secret" autocomplete="off" aria-label="Login secret" autofocus>
+        <button id="login-button" type="submit">Enter</button>
+        <p id="login-error" role="alert" hidden></p>
+      </form>
+    </div>
+
+    <div id="messages" hidden>
+      <div id="empty-state">
+        <img id="arch-diagram" src="/arch.png" alt="Architecture: Browser, Amazon CloudFront, AWS Lambda Web Function, Amazon Bedrock AgentCore Runtime, Claude Haiku 5.5 on Amazon Bedrock">
+        <h1>What can I help with?</h1>
+      </div>
+    </div>
+
+    <form id="composer" hidden>
+      <textarea id="prompt" rows="1" maxlength="100" placeholder="Message the agent (up to 100 characters)..." aria-label="Message"></textarea>
+      <button id="send" type="submit" title="Send">&#x2191;</button>
+      <button id="stop" type="button" title="Stop" hidden>&#x25A0;</button>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js" integrity="sha384-fgGyf7Mo7DURSOMnOy7ed+dkq5Job205Gnzu6QIg0BOHKaqt4D76Dt8VlDCzcMHV" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@18.1.1/lib/marked.umd.js" integrity="sha384-rATToyt6602Jnq8c7w8HZwmyOUgPL7mzxX01FBWoV48ns/EgkakGozpES+PnaYOI" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.17/dist/purify.min.js" integrity="sha384-P0JNneQf81HOl9VwNXK76cQ9VMD6Nfsnepxb0cCOg8+UzEdzgPHAPV4wVQrvYQSx" crossorigin="anonymous"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
