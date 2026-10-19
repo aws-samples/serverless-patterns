@@ -2,7 +2,7 @@
 
 This pattern defines an Amazon Bedrock managed prompt and a published prompt version as native AWS CloudFormation resources, and invokes that prompt from AWS Lambda through the Amazon Bedrock Converse API. The prompt text lives in Amazon Bedrock Prompt Management, not in the function, so you change or roll back the prompt by publishing a new version and repointing the function at it, with no function code change.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-prompt-management-lambda-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-prompt-management-lambda-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -38,7 +38,7 @@ To change the prompt, you publish a new version and point the function at it. Th
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/bedrock-prompt-management-lambda-sam
+    cd serverless-patterns/bedrock-prompt-management-lambda/python/sam
     ```
 1. The function has a Python dependency, so build it first, then deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
