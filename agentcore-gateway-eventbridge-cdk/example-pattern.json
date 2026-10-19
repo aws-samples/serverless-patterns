@@ -3,13 +3,13 @@
   "description": "An AI agent on AgentCore Runtime emits business events to EventBridge through a governed AgentCore Gateway MCP tool, authenticated with IAM SigV4.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "patternArch": {
     "icon1": {
       "x": 10,
       "y": 50,
       "service": "bedrock",
-      "label": "AgentCore Runtime"
+      "label": "Amazon Bedrock AgentCore Runtime"
     },
     "icon2": {
       "x": 35,
@@ -21,13 +21,13 @@
       "x": 40,
       "y": 50,
       "service": "bedrock",
-      "label": "AgentCore Gateway"
+      "label": "Amazon Bedrock AgentCore Gateway"
     },
     "icon4": {
       "x": 70,
       "y": 50,
       "service": "lambda",
-      "label": "emit_event Lambda"
+      "label": "AWS Lambda (emit_event)"
     },
     "icon5": {
       "x": 95,
@@ -64,9 +64,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-gateway-eventbridge-cdk",
-      "templateURL": "serverless-patterns/agentcore-gateway-eventbridge-cdk",
-      "projectFolder": "agentcore-gateway-eventbridge-cdk",
       "templateFile": "cdk/lib/agentcore-gateway-eventbridge-stack.ts"
     }
   },
