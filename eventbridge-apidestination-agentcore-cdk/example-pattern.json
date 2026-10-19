@@ -3,7 +3,7 @@
   "description": "Invoke an AgentCore Runtime agent directly from EventBridge without any Lambda glue code, using an API Destination with Cognito M2M OAuth.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "patternArch": {
     "icon1": {
       "x": 20,
@@ -15,7 +15,7 @@
       "x": 50,
       "y": 50,
       "service": "eventbridge-api-destination",
-      "label": "API Destination"
+      "label": "Amazon EventBridge API Destination"
     },
     "icon3": {
       "x": 80,
@@ -33,7 +33,7 @@
       "x": 50,
       "y": 80,
       "service": "sqs",
-      "label": "Dead-letter queue"
+      "label": "Amazon SQS (DLQ)"
     },
     "line1": {
       "from": "icon1",
@@ -66,9 +66,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-apidestination-agentcore-cdk",
-      "templateURL": "serverless-patterns/eventbridge-apidestination-agentcore-cdk",
-      "projectFolder": "eventbridge-apidestination-agentcore-cdk",
       "templateFile": "cdk/lib/eventbridge-agentcore-stack.ts"
     }
   },

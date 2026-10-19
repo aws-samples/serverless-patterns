@@ -94,8 +94,8 @@ These are deliberate omissions to keep the pattern minimal. For production:
 
 - [AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) with sufficient permissions
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cli.html) installed and configured
-- [Node.js 20+](https://nodejs.org/en/download/) and npm
-- [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm i -g aws-cdk`), bootstrapped in the target account/region
+- [Node.js 22+](https://nodejs.org/en/download/) and npm
+- [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm i -g aws-cdk`), bootstrapped in the target account and Region (`cdk bootstrap aws://ACCOUNT-ID/REGION`)
 - [Docker](https://docs.docker.com/get-docker/) installed and running (the CDK build packages the agent into a container image)
 - The bundled agent uses **Claude Haiku 5.5** through the US cross-Region inference profile `us.anthropic.claude-haiku-5-5` (set in [`agent-code/agent.py`](agent-code/agent.py)). Amazon Bedrock enables serverless models automatically, so there is no model access step, but the model must be available in the Region you deploy to. Check the [Claude Haiku 5.5 model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-5-5.html). Outside the US, change `MODEL_ID` to the matching geographic profile (`eu.`, `jp.`, `au.`) or to `global.anthropic.claude-haiku-5-5`.
 
