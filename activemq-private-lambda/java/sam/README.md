@@ -39,7 +39,7 @@ We cloned the serverless-patterns Github repository on the EC2 instance already 
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/activemq-private-lambda-java-sam
+    cd serverless-patterns/activemq-private-lambda/java/sam
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
@@ -51,7 +51,7 @@ cd activemq_consumer_dynamo_sam
 sam build
 ```
 
-The SAM CLI installs dependencies defined in `activemq-private-lambda-java-sam/activemq_consumer_dynamo_sam/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `activemq-private-lambda/java/sam/activemq_consumer_dynamo_sam/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 
 ## Test the build locally
@@ -115,7 +115,7 @@ Once the lambda function is deployed, send some messages to the Amazon MQ (Apach
 For your convenience, a Java program and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
 
 ```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_message_sender_json
+cd /home/ec2-user/serverless-patterns/activemq-private-lambda/java/sam/activemq_message_sender_json
 chmod +x commands.sh
 ```
 
@@ -163,7 +163,7 @@ aws dynamodb scan --table-name ActiveMQDynamoDBTableJava --select "COUNT"
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/activemq-private-lambda-java-sam/activemq_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/activemq-private-lambda/java/sam/activemq_consumer_dynamo_sam
 sam delete
 
 ```

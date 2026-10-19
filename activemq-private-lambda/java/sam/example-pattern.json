@@ -4,6 +4,7 @@
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",
+  "patternGroup": "activemq-private-lambda",
   "introBox": {
     "headline": "How it works",
     "text": [
