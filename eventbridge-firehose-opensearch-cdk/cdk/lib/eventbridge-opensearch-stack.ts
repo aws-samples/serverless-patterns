@@ -47,7 +47,10 @@ import { Construct } from 'constructs';
  * Production hardening not included in this minimal pattern:
  * - The rule target has no DLQ. After EventBridge's default retry policy
  *   (24 hours, 185 attempts) a record Firehose keeps rejecting is dropped.
- *   Add an Amazon SQS deadLetterQueue and retryAttempts to the target.
+ *   targets.FirehoseDeliveryStream has no deadLetterQueue prop, so set
+ *   DeadLetterConfig and RetryPolicy on the underlying CfnRule target and
+ *   give the queue a resource policy allowing sqs:SendMessage from
+ *   events.amazonaws.com on this rule's ARN. See the README.
  * - EventBridge delivery is at-least-once, so the same event can reach
  *   Firehose twice and be indexed as two documents. (Firehose's own
  *   retries keep a stable document ID, so they do not duplicate.) The
@@ -55,6 +58,10 @@ import { Construct } from 'constructs';
  *   deduplication at query time.
  * - No alarms. Add Amazon CloudWatch alarms on the Firehose
  *   DeliveryToAmazonOpenSearchService.Success metric and on DLQ depth.
+ * - The optional Dashboards statement grants es:ESHttp* to every client
+ *   behind the allowed CIDR, including writes and deletes. Use
+ *   fine-grained access control for per-user authentication.
+ * - Nothing deletes old daily indices. Add an ISM retention policy.
  */
 export class EventBridgeOpenSearchStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -69,6 +76,18 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
           .map((cidr) => cidr.trim())
           .filter((cidr) => cidr.length > 0)
       : [];
+
+    // The Dashboards statement grants es:ESHttp* (read, write and delete) to
+    // every client in these ranges, so refuse a range that opens the domain
+    // to the whole internet.
+    for (const cidr of dashboardAccessIps) {
+      if (/\/0$/.test(cidr)) {
+        throw new Error(
+          `dashboardAccessIp "${cidr}" would open the OpenSearch domain to the whole internet. ` +
+            'Pass your own address, e.g. 1.2.3.4/32.',
+        );
+      }
+    }
 
     // Transform is on by default; it is what makes the data pleasant to query.
     const enableTransform = this.node.tryGetContext('enableTransform') !== 'false';
@@ -390,9 +409,24 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
       },
     });
 
-    // No deadLetterQueue here, to keep the pattern minimal. Without one, an
-    // event Firehose keeps rejecting is dropped once EventBridge's default
-    // retry policy is exhausted. See "Production hardening" above.
+    // No DLQ here, to keep the pattern minimal. Without one, an event
+    // Firehose keeps rejecting is dropped once EventBridge's default retry
+    // policy is exhausted. This target has no deadLetterQueue prop; to add
+    // one, override the CfnRule target:
+    //
+    //   const dlq = new sqs.Queue(this, 'RuleDlq', { enforceSSL: true });
+    //   dlq.addToResourcePolicy(new iam.PolicyStatement({
+    //     principals: [new iam.ServicePrincipal('events.amazonaws.com')],
+    //     actions: ['sqs:SendMessage'],
+    //     resources: [dlq.queueArn],
+    //     conditions: { ArnEquals: { 'aws:SourceArn': rule.ruleArn } },
+    //   }));
+    //   const cfnRule = rule.node.defaultChild as events.CfnRule;
+    //   cfnRule.addPropertyOverride('Targets.0.DeadLetterConfig.Arn', dlq.queueArn);
+    //   cfnRule.addPropertyOverride('Targets.0.RetryPolicy', {
+    //     MaximumRetryAttempts: 10,
+    //     MaximumEventAgeInSeconds: 3600,
+    //   });
     rule.addTarget(new targets.FirehoseDeliveryStream(deliveryStream));
 
     // Imported constructs carry no dependency edge of their own.

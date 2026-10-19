@@ -1,9 +1,9 @@
 {
-  "title": "Amazon EventBridge to Amazon OpenSearch via Amazon Data Firehose",
-  "description": "Monitor every event flowing through an EventBridge bus in near real time by streaming it to OpenSearch through Amazon Data Firehose, with daily index rotation, payload flattening, and an S3 backup of all documents.",
+  "title": "Amazon EventBridge to Amazon OpenSearch Service via Amazon Data Firehose",
+  "description": "Stream every event on an EventBridge bus to OpenSearch through Amazon Data Firehose for near real-time search, with payload flattening, daily index rotation and an S3 backup.",
   "language": "TypeScript",
   "level": "200",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "patternArch": {
     "icon1": {
       "x": 10,
@@ -21,13 +21,13 @@
       "x": 40,
       "y": 15,
       "service": "lambda",
-      "label": "Transform Lambda"
+      "label": "AWS Lambda (transform)"
     },
     "icon4": {
       "x": 75,
       "y": 50,
       "service": "opensearch",
-      "label": "Amazon OpenSearch"
+      "label": "Amazon OpenSearch Service"
     },
     "icon5": {
       "x": 75,
@@ -70,9 +70,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-firehose-opensearch-cdk",
-      "templateURL": "serverless-patterns/eventbridge-firehose-opensearch-cdk",
-      "projectFolder": "eventbridge-firehose-opensearch-cdk",
       "templateFile": "cdk/lib/eventbridge-opensearch-stack.ts"
     }
   },

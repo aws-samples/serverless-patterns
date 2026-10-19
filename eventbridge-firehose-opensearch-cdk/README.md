@@ -1,4 +1,4 @@
-# Amazon EventBridge to Amazon OpenSearch via Amazon Data Firehose
+# Amazon EventBridge to Amazon OpenSearch Service via Amazon Data Firehose
 
 This pattern gives you **full-text search over every event on an EventBridge bus**, usually within about 60 seconds of emission. A catch-all rule captures all events on a custom bus and streams them to an Amazon OpenSearch Service domain through Amazon Data Firehose, where OpenSearch Dashboards makes them searchable, filterable, and chartable.
 
@@ -74,7 +74,7 @@ Disable the transform with `-c enableTransform=false` to index the raw envelope 
 | Rule → Firehose | Rule target IAM role with `firehose:PutRecord`, `firehose:PutRecordBatch`, scoped to the stream |
 | Firehose → OpenSearch | SigV4 with the delivery role, granted on **both** sides: an identity policy on the role and a domain access policy naming it as principal |
 | Firehose → Lambda / S3 / Logs | Same delivery role |
-| Operator → Dashboards | Anonymous, restricted to the CIDR passed as `dashboardAccessIp` |
+| Operator → Dashboards | Anonymous, restricted to the CIDR passed as `dashboardAccessIp`. The statement grants `es:ESHttp*`, so anyone whose traffic leaves from that CIDR (a shared office NAT, for example) can also write to and delete indices, not only browse Dashboards. See [Production considerations](#production-considerations). |
 
 Two details are easy to get wrong here. A managed domain authorizes every request against its own access policy, so an identity policy alone is not enough. And Firehose needs `es:DescribeDomain`, `es:DescribeDomainConfig`, and `es:DescribeDomains` to resolve the domain endpoint before it can deliver anything — `grantIndexWrite()` does not include those.
 
@@ -82,8 +82,8 @@ Two details are easy to get wrong here. A managed domain authorizes every reques
 
 - [AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) with sufficient permissions
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cli.html) installed and configured
-- [Node.js 20+](https://nodejs.org/en/download/) and npm
-- [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm i -g aws-cdk`), bootstrapped in the target account and Region
+- [Node.js 22+](https://nodejs.org/en/download/) and npm
+- [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm i -g aws-cdk`), bootstrapped in the target account and Region (`cdk bootstrap aws://ACCOUNT-ID/REGION`)
 - Your public IP, to reach OpenSearch Dashboards: `curl -s https://checkip.amazonaws.com`
 
 ## Deployment
@@ -103,7 +103,7 @@ Context values:
 
 | Value | Default | Effect |
 |---|---|---|
-| `dashboardAccessIp` | none | CIDR(s) granted Dashboards access, e.g. `1.2.3.4/32`. Comma-separate for several: `1.2.3.4/32,5.6.7.8/32` |
+| `dashboardAccessIp` | none | CIDR(s) granted Dashboards access, e.g. `1.2.3.4/32`. Comma-separate for several: `1.2.3.4/32,5.6.7.8/32`. A `/0` range such as `0.0.0.0/0` is rejected at synth time. |
 | `enableTransform` | `true` | Set `false` to index the raw EventBridge envelope |
 
 Changing the allowed CIDRs later is cheap. It updates only the domain access policy, so the redeploy takes seconds rather than rebuilding the domain.
@@ -196,6 +196,35 @@ PUT _index_template/events
 
 The field names here match the flattened output of the transform. If you deploy with `-c enableTransform=false`, map `detail-type` and `detail.*` instead.
 
+### Optional: delete old indices with an ISM policy
+
+The S3 bucket has a lifecycle rule, but nothing removes the daily `events-YYYY-MM-DD` indices. On a single `t3.small.search` node they accumulate until the domain runs out of disk or heap. An [Index State Management (ISM)](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ism.html) policy with an `ism_template` matching `events-*` deletes each index after a retention window. This one keeps 7 days:
+
+```json
+PUT _plugins/_ism/policies/events-retention
+{
+  "policy": {
+    "description": "Delete event indices after 7 days",
+    "default_state": "hot",
+    "states": [
+      {
+        "name": "hot",
+        "actions": [],
+        "transitions": [{ "state_name": "delete", "conditions": { "min_index_age": "7d" } }]
+      },
+      {
+        "name": "delete",
+        "actions": [{ "delete": {} }],
+        "transitions": []
+      }
+    ],
+    "ism_template": { "index_patterns": ["events-*"], "priority": 100 }
+  }
+}
+```
+
+The `ism_template` only attaches the policy to indices created after the policy exists. To cover indices that already exist, run `POST _plugins/_ism/add/events-*` with the body `{ "policy_id": "events-retention" }`. The full event history stays in S3 regardless.
+
 ## Delivery semantics
 
 Each hop retries on its own, and each has a failure mode worth knowing before you rely on the index:
@@ -205,11 +234,33 @@ Each hop retries on its own, and each has a failure mode worth knowing before yo
 - **Duplicates.** EventBridge delivery is at-least-once, so the same event can reach Firehose twice and is then indexed as two documents. Firehose's own retries do not cause this: with the default document ID option, Firehose keeps the same document ID across delivery attempts. Each document stores the EventBridge event ID in its `id` field, so you can deduplicate at query time, for example with `collapse` on `id`.
 - **No alarms.** Nothing notifies you when deliveries fail. You have to check the log group or the `errors/` prefix.
 
-These are deliberate omissions to keep the pattern minimal. For production:
+These are deliberate omissions to keep the pattern minimal.
 
-- Add an Amazon SQS dead-letter queue and a retry policy to the rule target.
+### Production considerations
+
+- Add an Amazon SQS dead-letter queue and a retry policy to the rule target. `targets.FirehoseDeliveryStream` only accepts a `message` prop, so set `DeadLetterConfig` and `RetryPolicy` on the underlying `CfnRule` target instead. Because the DLQ is configured outside the console, the queue also needs a resource policy allowing `sqs:SendMessage` from `events.amazonaws.com`, conditioned on the rule ARN ([Using dead-letter queues](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rule-dlq.html)):
+
+
+  ```ts
+  const dlq = new sqs.Queue(this, 'RuleDlq', { enforceSSL: true });
+  dlq.addToResourcePolicy(new iam.PolicyStatement({
+    principals: [new iam.ServicePrincipal('events.amazonaws.com')],
+    actions: ['sqs:SendMessage'],
+    resources: [dlq.queueArn],
+    conditions: { ArnEquals: { 'aws:SourceArn': rule.ruleArn } },
+  }));
+  const cfnRule = rule.node.defaultChild as events.CfnRule;
+  cfnRule.addPropertyOverride('Targets.0.DeadLetterConfig.Arn', dlq.queueArn);
+  cfnRule.addPropertyOverride('Targets.0.RetryPolicy', {
+    MaximumRetryAttempts: 10,
+    MaximumEventAgeInSeconds: 3600,
+  });
+  ```
+
 - Add CloudWatch alarms on the Firehose `DeliveryToAmazonOpenSearchService.Success` metric and on the DLQ's `ApproximateNumberOfMessagesVisible` metric.
 - Plan how records under `errors/` get redriven, for example with a Lambda function that re-submits them to the delivery stream.
+- Replace the IP-based Dashboards statement with [fine-grained access control](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html). It puts per-user authentication behind the access policy and gives Dashboards a real login, instead of trusting every client behind an allowed CIDR.
+- Add an ISM retention policy for the daily indices (see [above](#optional-delete-old-indices-with-an-ism-policy)).
 
 ## Cleanup
 
