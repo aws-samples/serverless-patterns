@@ -1,17 +1,13 @@
 #!/bin/bash
 # =============================================================================
-# Deploy the Node.js Kafka consumer as a Lambda function with a SELF-MANAGED KAFKA
-# event source using IAM_AUTH, via the AWS CLI.
+# Deploy the Node.js Kafka consumer as an AWS Lambda function with a self-managed
+# Apache Kafka event source that uses IAM authentication (IAM_AUTH), with the
+# AWS CLI. This is the alternative to `sam deploy`.
 #
-# The MSK cluster (IAM auth) is declared to Lambda as a SELF-MANAGED event source
-# pointed at its IAM bootstrap endpoint (:9098) with the IAM_AUTH flag (per the
-# "Kafka OAuth & IAM Testing Manual", Route B). The poller authenticates with the
-# function's execution role via SASL/AWS_MSK_IAM - no secret, no trust anchor.
-# AWS SAM does not support this auth type, so we use the AWS CLI directly.
-#
-# Reuses the same Node.js consumer (app.mjs); it writes messages to DynamoDB.
-#
-# PREREQUISITE: your account is ALLOWLISTED for the self-managed Kafka ESM auth types.
+# The Amazon MSK cluster is registered with Lambda as a self-managed Kafka event
+# source pointed at its IAM bootstrap brokers (:9098). The event source mapping
+# signs each connection with the function's execution role (SASL/AWS_MSK_IAM), so
+# there is no secret to store. The function writes each record to Amazon DynamoDB.
 # =============================================================================
 set -euo pipefail
 export AWS_PAGER=""
@@ -138,6 +134,10 @@ else
     --environment "Variables={DYNAMODB_TABLE_NAME=$DDB_TABLE_NAME}" >/dev/null
 fi
 aws lambda wait function-active-v2 --region "$REGION" --function-name "$FUNCTION_NAME" 2>/dev/null || sleep 10
+
+# Keep the function's logs for 7 days rather than forever.
+aws logs create-log-group --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" 2>/dev/null || true
+aws logs put-retention-policy --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" --retention-in-days 7
 
 BS_JSON=$(node -e "console.log(JSON.stringify(process.argv[1].split(',').filter(Boolean)))" "$BOOTSTRAP_SERVERS")
 
