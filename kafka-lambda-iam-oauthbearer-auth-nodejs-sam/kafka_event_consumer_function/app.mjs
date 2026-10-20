@@ -91,9 +91,10 @@ async function writeToDynamoDb(message) {
 export const lambdaHandler = async (event) => {
   const messages = parseRecords(event);
   for (const message of messages) {
-    console.log(`Received this message from Kafka - ${JSON.stringify(message)}`);
+    // Log where the record came from, not its payload, which may hold personal data.
+    console.log(`Received this message from Kafka - topic=${message.topic}, `
+      + `partition=${message.partition}, offset=${message.offset}`);
     await writeToDynamoDb(message);
   }
-  console.log(`All messages in this batch = ${JSON.stringify(messages)}`);
   return "200 OK";
 };

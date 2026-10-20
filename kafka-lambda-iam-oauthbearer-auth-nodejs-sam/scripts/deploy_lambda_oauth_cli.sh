@@ -1,26 +1,17 @@
 #!/bin/bash
 # =============================================================================
-# Deploy the Java Kafka consumer as a Lambda function with a SELF-MANAGED KAFKA
-# event source using IAM Outbound Identity Federation (IAM_OAUTHBEARER_AUTH),
-# via the AWS CLI.
+# Deploy the Node.js Kafka consumer as an AWS Lambda function with a self-managed
+# Apache Kafka event source that uses IAM outbound identity federation
+# (IAM_OAUTHBEARER_AUTH), with the AWS CLI. This is the alternative to `sam deploy`.
 #
-# The Lambda poller mints an AWS web-identity (OIDC) token from its execution
-# role and presents it to the brokers over SASL/OAUTHBEARER. There is no external
-# identity provider and no OAuth client secret. AWS SAM does not support this
-# auth type, so this uses `aws lambda create-event-source-mapping` directly.
+# The event source mapping obtains an AWS web identity token for the function's
+# execution role and presents it to the brokers over SASL/OAUTHBEARER. There is no
+# external identity provider and no client secret. The brokers trust the account's
+# AWS STS issuer and authorize the role's ARN through Kafka ACLs. The function
+# writes each record to Amazon DynamoDB.
 #
-# Reuses the same Node.js consumer (app.lambdaHandler) and writes messages to DynamoDB.
-#
-# -----------------------------------------------------------------------------
-# PREREQUISITES:
-#   1. Your account is ALLOWLISTED for the self-managed Kafka ESM auth types.
-#   2. Outbound web identity federation is ENABLED for the account (this script
-#      calls enable-outbound-web-identity-federation; it is idempotent).
-#   3. The brokers expose a SASL_SSL / OAUTHBEARER listener validating the AWS STS
-#      OIDC issuer with audience == OUTBOUND_AUDIENCE (the CloudFormation stack
-#      configures this).
-# NOTE (under development): the sts:GetWebIdentityToken / outbound-federation APIs
-# are not finalized; adjust the CLI calls here and in the broker config if needed.
+# Outbound identity federation must be enabled in the account; the script runs
+# enable-outbound-web-identity-federation, which does nothing if it already is.
 # =============================================================================
 set -euo pipefail
 export AWS_PAGER=""
@@ -183,6 +174,10 @@ else
     --environment "Variables={DYNAMODB_TABLE_NAME=$DDB_TABLE_NAME}" >/dev/null
 fi
 aws lambda wait function-active-v2 --region "$REGION" --function-name "$FUNCTION_NAME" 2>/dev/null || sleep 10
+
+# Keep the function's logs for 7 days rather than forever.
+aws logs create-log-group --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" 2>/dev/null || true
+aws logs put-retention-policy --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" --retention-in-days 7
 
 BS_JSON=$(node -e "console.log(JSON.stringify(process.argv[1].split(',').filter(Boolean)))" "$BOOTSTRAP_SERVERS")
 
