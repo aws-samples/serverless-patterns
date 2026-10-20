@@ -1,0 +1,247 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Secure a Lambda Web Function behind Amazon CloudFront using Origin Access Control (OAC).
+
+Parameters:
+  CodeBucket:
+    Type: String
+    Description: >
+      Name of the Amazon S3 bucket that holds the Web Function .zip deployment package.
+      Web Functions can only be deployed from an S3 object (there is no inline code path).
+  CodeKey:
+    Type: String
+    Default: web-function/app.zip
+    Description: S3 object key for the Web Function .zip deployment package.
+  CodeVersionId:
+    Type: String
+    Default: ''
+    Description: >
+      S3 object version ID of the deployment package. Lambda requires the code bucket to
+      have versioning enabled; pin this to an object version so each revision maps to an
+      immutable artifact. Leave blank to use the latest version.
+
+Conditions:
+  HasCodeVersion: !Not [!Equals [!Ref CodeVersionId, '']]
+
+Resources:
+
+  # Bucket policy granting the Lambda Web service principal read access to the code
+  # object. When you create a revision, Lambda reads your .zip from S3 as the
+  # lambda.amazonaws.com service principal, so this grant is REQUIRED for the revision
+  # to be created. Scoped by account and to Web Function source ARNs to prevent a
+  # confused-deputy. The bucket itself is created by deploy.sh before the code upload.
+  CodeBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CodeBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaWebFunctionCodeAccess
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub "arn:aws:s3:::${CodeBucket}/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub "${AWS::AccountId}"
+              ArnLike:
+                # Scope to THIS stack's Web Function and its revisions only -- not every
+                # Web Function in the account/region -- so an unrelated function cannot
+                # satisfy the confused-deputy check and read this bucket's code object.
+                # Uses the computed function name (not !Ref) to avoid a dependency cycle.
+                aws:SourceArn: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-web-function/revision/*"
+
+  # Execution role the Web Function revision assumes at runtime.
+  WebFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Top-level Web Function container resource.
+  MyWebFunction:
+    Type: AWS::Lambda::WebFunction
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-web-function"
+      Tags:
+        - Key: pattern
+          Value: cloudfront-lambdawebfunction-oac-sam
+
+  # Immutable revision: code location (S3) + runtime/service configuration.
+  MyWebFunctionRevision:
+    Type: AWS::Lambda::WebFunctionRevision
+    # The bucket policy must exist before Lambda reads the code from S3 to create the
+    # revision; CloudFormation can't infer this ordering, so make it explicit.
+    DependsOn: CodeBucketPolicy
+    Properties:
+      FunctionName: !Ref MyWebFunction
+      Description: Initial revision deployed from the S3 .zip package.
+      BuildConfig:
+        CodeConfig:
+          S3Object:
+            Bucket: !Ref CodeBucket
+            Key: !Ref CodeKey
+            VersionId: !If [HasCodeVersion, !Ref CodeVersionId, !Ref "AWS::NoValue"]
+        RuntimeConfig:
+          Runtime: nodejs24.x
+      ServiceConfig:
+        ExecutionRoleArn: !GetAtt WebFunctionExecutionRole.Arn
+        TimeoutSeconds: 30
+        # A single execution environment serves many concurrent requests -- the
+        # headline Web Functions differentiator. Valid range 1-128 (default 64).
+        MaxConcurrencyPerEnvironment: 64
+        # Environment variables are available to your HTTP server at runtime.
+        EnvironmentVariables:
+          APP_NAME: cloudfront-lambdawebfunction-oac-sam
+          LOG_LEVEL: info
+
+  # HTTPS endpoint. AuthType IamAuth is REQUIRED for the CloudFront + OAC origin:
+  # CloudFront signs each origin request (SigV4) and Lambda authorizes it, so the
+  # endpoint is not publicly invocable on its own domain.
+  MyWebFunctionEndpoint:
+    Type: AWS::Lambda::WebFunctionEndpoint
+    Properties:
+      FunctionName: !Ref MyWebFunction
+      EndpointName: !Sub "${AWS::StackName}-endpoint"
+      EndpointType: HomeRegion
+      AuthType: IamAuth
+      RevisionWeights:
+        - RevisionId: !GetAtt MyWebFunctionRevision.RevisionId
+          Weight: 100
+      # Bounds this endpoint's capacity so it can't consume the account's entire
+      # regional quota (shared with every other endpoint in the account). Tune
+      # both from your expected peak RPS and concurrency.
+      ScalingConfig:
+        MaxEnvironments: 10
+      ThrottleConfig:
+        RateLimit: 100
+
+  # Origin Access Control for the Web Function endpoint. For Web Function origins
+  # CloudFront requires origin type 'lambda' with signing behavior 'always-amz-auth'.
+  MyCloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AWS::StackName}-oac-for-web-function"
+        OriginAccessControlOriginType: lambda
+        SigningBehavior: always-amz-auth
+        SigningProtocol: sigv4
+
+  # CloudFront distribution with the Web Function endpoint domain as a custom origin.
+  MyCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt MyWebFunctionEndpoint.DomainName
+            Id: MyWebFunctionOrigin
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+              OriginKeepaliveTimeout: 60
+            OriginAccessControlId: !Ref MyCloudFrontOriginAccessControl
+        Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: MyWebFunctionOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachePolicyId: !Ref MyCachingDisabledPolicy
+          OriginRequestPolicyId: !Ref MyOriginRequestPolicy
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+        HttpVersion: http2
+        PriceClass: PriceClass_All
+
+  # Resource-based policy granting the CloudFront service principal permission to invoke
+  # the Web Function endpoint, scoped to this distribution via aws:SourceArn.
+  # NOTE: Web Functions do NOT support AWS::Lambda::Permission (the AddPermission API).
+  # Their resource policy is managed via PutResourcePolicy, whose CloudFormation surface
+  # is AWS::Lambda::ResourcePolicy. The policy attaches to the Web Function ARN; the
+  # statement's Resource scopes to the specific endpoint.
+  MyEndpointInvokePolicyForCloudFront:
+    Type: AWS::Lambda::ResourcePolicy
+    Properties:
+      ResourceArn: !GetAtt MyWebFunction.FunctionArn
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOACAccess
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: lambda:InvokeWebFunctionEndpoint
+            Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-web-function/endpoint/${AWS::StackName}-endpoint"
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${MyCloudFrontDistribution}"
+
+  # Caching disabled: dynamic Web Function responses should not be cached by default.
+  MyCachingDisabledPolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub "${AWS::StackName}-cache-policy"
+        DefaultTTL: 0
+        MinTTL: 0
+        MaxTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingBrotli: false
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: none
+          CookiesConfig:
+            CookieBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
+  # Forward viewer query strings/cookies to the origin while OAC adds the signature.
+  # The Host header is intentionally NOT forwarded so CloudFront signs against the
+  # origin domain.
+  MyOriginRequestPolicy:
+    Type: AWS::CloudFront::OriginRequestPolicy
+    Properties:
+      OriginRequestPolicyConfig:
+        Name: !Sub "${AWS::StackName}-origin-request-policy"
+        HeadersConfig:
+          HeaderBehavior: allExcept
+          Headers:
+            - Host
+        CookiesConfig:
+          CookieBehavior: all
+        QueryStringsConfig:
+          QueryStringBehavior: all
+
+Outputs:
+  CloudFrontDistributionId:
+    Description: The CloudFront Distribution ID
+    Value: !Ref MyCloudFrontDistribution
+  CloudFrontDomainName:
+    Description: The CloudFront Distribution Domain Name (use this to reach the app)
+    Value: !GetAtt MyCloudFrontDistribution.DomainName
+  WebFunctionEndpointDomain:
+    Description: The Web Function endpoint domain (direct access is denied by IamAuth)
+    Value: !GetAtt MyWebFunctionEndpoint.DomainName
+  WebFunctionArn:
+    Description: The Web Function ARN
+    Value: !GetAtt MyWebFunction.FunctionArn
