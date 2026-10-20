@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to AWS Step Functions Express to Amazon Athena",
-  "description": "Run an Amazon Athena query and return its rows in one synchronous Amazon API Gateway call through an AWS Step Functions Express Workflow, with zero AWS Lambda functions.",
+  "description": "Run an Amazon Athena query via an AWS Step Functions Express Workflow and return the rows in one synchronous Amazon API Gateway call, with no AWS Lambda in the request path.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
@@ -20,15 +20,12 @@
       "This pattern deploys an Amazon API Gateway REST API that invokes an AWS Step Functions Express Workflow synchronously with StartSyncExecution.",
       "The Express Workflow uses native AWS Step Functions service integrations to call Amazon Athena. Because Express Workflows do not support the .sync (RUN_JOB) pattern, AthenaStartQueryExecution runs with the REQUEST_RESPONSE pattern, a Wait/Choice loop polls GetQueryExecution until the query succeeds, then AthenaGetQueryResults reads the rows. A final Pass state shapes the response.",
       "Amazon Athena queries an AWS Glue external table over a sample CSV dataset in Amazon S3 and writes results to a separate Amazon S3 prefix pinned by an Amazon Athena workgroup.",
-      "The result rows are returned to the caller in a single synchronous request/response. There are no AWS Lambda functions anywhere in the pattern."
+      "The result rows are returned to the caller in a single synchronous request/response. There are no AWS Lambda functions in the request path (the stack deploys two small AWS CDK helper functions at deploy time, to seed the sample data and to empty the bucket on stack deletion)."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-express-athena-cdk",
-      "templateURL": "serverless-patterns/apigw-sfn-express-athena-cdk",
-      "projectFolder": "apigw-sfn-express-athena-cdk",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-sfn-express-athena-cdk/README.md"
+      "templateFile": "cdk/lib/apigw-sfn-express-athena-stack.ts"
     }
   },
   "resources": {

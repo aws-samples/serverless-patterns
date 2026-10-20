@@ -1,7 +1,7 @@
 {
   "name": "apigw-sfn-express-athena-cdk",
   "version": "1.0.0",
-  "description": "Amazon API Gateway to AWS Step Functions Express to Amazon Athena synchronous query (zero AWS Lambda)",
+  "description": "Amazon API Gateway to AWS Step Functions Express to Amazon Athena synchronous query (no AWS Lambda in the request path)",
   "bin": {
     "app": "bin/app.js"
   },

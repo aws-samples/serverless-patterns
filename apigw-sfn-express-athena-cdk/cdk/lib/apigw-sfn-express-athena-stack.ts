@@ -24,7 +24,10 @@ import * as apigw from 'aws-cdk-lib/aws-apigateway';
  * Amazon API Gateway (REST) -> AWS Step Functions Express Workflow (synchronous
  * StartSyncExecution) -> Amazon Athena (StartQueryExecution + GetQueryResults via
  * native Step Functions service integrations) -> results returned to the caller in
- * a single request/response. ZERO AWS Lambda functions.
+ * a single request/response. There are no AWS Lambda functions in the request
+ * path. (The stack does deploy two small AWS CDK helper functions at deploy
+ * time: one behind the AwsCustomResource that seeds the sample CSV and one that
+ * empties the bucket on `cdk destroy`.)
  */
 export class ApigwSfnExpressAthenaStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -50,7 +53,7 @@ export class ApigwSfnExpressAthenaStack extends Stack {
 
     // Seed a tiny sample CSV dataset into the data/ prefix so the pattern is
     // queryable immediately after deploy with no manual data-loading step.
-    // Uses an AwsCustomResource calling s3:PutObject with the CSV inline —
+    // Uses an AwsCustomResource calling s3:PutObject with the CSV inline -
     // no asset bundling or bundled-CLI download (more robust than
     // BucketDeployment across build hosts).
     const seedData = new cr.AwsCustomResource(this, 'SampleDataDeployment', {
@@ -140,7 +143,7 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     // athena-results/ prefix and results encrypted with SSE-S3.
     // ---------------------------------------------------------------------
     const workgroupName = `apigw-sfn-express-athena-${Aws.ACCOUNT_ID}`;
-    const workgroup = new athena.CfnWorkGroup(this, 'AthenaWorkgroup', {
+    new athena.CfnWorkGroup(this, 'AthenaWorkgroup', {
       name: workgroupName,
       recursiveDeleteOption: true,
       workGroupConfiguration: {
@@ -166,7 +169,8 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     // Express workflows do NOT support the '.sync' (RUN_JOB) Athena
     // integration, so we start the query, then poll its status in a
     // Wait/Choice loop until it reaches SUCCEEDED before fetching results.
-    // All native Step Functions service integrations -> no AWS Lambda.
+    // All native Step Functions service integrations -> no AWS Lambda in the
+    // request path.
     // ---------------------------------------------------------------------
     const startQuery = new tasks.AthenaStartQueryExecution(this, 'StartAthenaQuery', {
       // REQUEST_RESPONSE returns immediately with a QueryExecutionId. Express
@@ -180,14 +184,25 @@ export class ApigwSfnExpressAthenaStack extends Stack {
       resultPath: '$.queryExecution',
     });
 
-    // Retry transient Athena throttling/service errors, then Catch any
-    // remaining failure and surface a clean error payload to the caller.
-    startQuery.addRetry({
+    // Retry transient Athena throttling/service errors (shared by the three
+    // Athena tasks). Any remaining failure is caught and routed to the
+    // TaskFailed state below, which fails the execution with the caught error.
+    const athenaRetry: sfn.RetryProps = {
       errors: ['Athena.AthenaException', 'States.TaskFailed'],
       interval: Duration.seconds(2),
       maxAttempts: 3,
       backoffRate: 2,
-    });
+    };
+    // A request that Amazon Athena rejects as invalid (for example a SQL syntax
+    // error) can never succeed on retry, so it is listed first with no retries.
+    // Retry entries are evaluated in order, and the catch-all entry above would
+    // otherwise spend about 14 seconds of backoff on it.
+    const athenaNoRetry: sfn.RetryProps = {
+      errors: ['Athena.InvalidRequestException'],
+      maxAttempts: 0,
+    };
+    startQuery.addRetry({ ...athenaNoRetry });
+    startQuery.addRetry({ ...athenaRetry });
 
     // Poll the query status: Wait -> GetQueryExecution -> Choice.
     const waitForQuery = new sfn.Wait(this, 'WaitForQuery', {
@@ -205,12 +220,7 @@ export class ApigwSfnExpressAthenaStack extends Stack {
       iamResources: [workgroupArn],
       resultPath: '$.queryStatus',
     });
-    getQueryExecution.addRetry({
-      errors: ['Athena.AthenaException', 'States.TaskFailed'],
-      interval: Duration.seconds(2),
-      maxAttempts: 3,
-      backoffRate: 2,
-    });
+    getQueryExecution.addRetry({ ...athenaRetry });
 
     const getResults = new tasks.AthenaGetQueryResults(this, 'GetAthenaResults', {
       queryExecutionId: sfn.JsonPath.stringAt(
@@ -218,18 +228,29 @@ export class ApigwSfnExpressAthenaStack extends Stack {
       ),
       resultPath: '$.queryResults',
     });
-    getResults.addRetry({
-      errors: ['Athena.AthenaException', 'States.TaskFailed'],
-      interval: Duration.seconds(2),
-      maxAttempts: 3,
-      backoffRate: 2,
-    });
+    getResults.addRetry({ ...athenaRetry });
 
-    const queryFailed = new sfn.Pass(this, 'QueryFailed', {
-      parameters: {
-        'error.$': '$.error',
-        message: 'Athena query failed',
-      },
+    // Failure states. An execution that ends in a Fail state has status FAILED,
+    // which the StepFunctionsRestApi response template maps to HTTP 500 with the
+    // "error" and "cause" values in the body.
+    //
+    // From CheckQueryState when Athena reports FAILED or CANCELLED. The Athena
+    // StateChangeReason is optional in the API, so it is only used as the cause
+    // when it is present in the GetQueryExecution output.
+    const stateChangeReasonPath =
+      '$.queryStatus.QueryExecution.Status.StateChangeReason';
+    const queryFailed = new sfn.Fail(this, 'QueryFailed', {
+      error: 'AthenaQueryFailed',
+      causePath: stateChangeReasonPath,
+    });
+    const queryFailedNoReason = new sfn.Fail(this, 'QueryFailedNoReason', {
+      error: 'AthenaQueryFailed',
+      cause: 'The Athena query failed or was cancelled without a reported reason.',
+    });
+    // From the addCatch handlers below, which put the caught error under $.error.
+    const taskFailed = new sfn.Fail(this, 'TaskFailed', {
+      errorPath: '$.error.Error',
+      causePath: '$.error.Cause',
     });
 
     // Shape the response: return only the Athena result rows to the caller.
@@ -247,17 +268,27 @@ export class ApigwSfnExpressAthenaStack extends Stack {
         getResults,
       )
       .when(
+        sfn.Condition.and(
+          sfn.Condition.or(
+            sfn.Condition.stringEquals(queryStatePath, 'FAILED'),
+            sfn.Condition.stringEquals(queryStatePath, 'CANCELLED'),
+          ),
+          sfn.Condition.isPresent(stateChangeReasonPath),
+        ),
+        queryFailed,
+      )
+      .when(
         sfn.Condition.or(
           sfn.Condition.stringEquals(queryStatePath, 'FAILED'),
           sfn.Condition.stringEquals(queryStatePath, 'CANCELLED'),
         ),
-        queryFailed,
+        queryFailedNoReason,
       )
       .otherwise(waitForQuery);
 
-    startQuery.addCatch(queryFailed, { errors: ['States.ALL'], resultPath: '$.error' });
-    getQueryExecution.addCatch(queryFailed, { errors: ['States.ALL'], resultPath: '$.error' });
-    getResults.addCatch(queryFailed, { errors: ['States.ALL'], resultPath: '$.error' });
+    startQuery.addCatch(taskFailed, { errors: ['States.ALL'], resultPath: '$.error' });
+    getQueryExecution.addCatch(taskFailed, { errors: ['States.ALL'], resultPath: '$.error' });
+    getResults.addCatch(taskFailed, { errors: ['States.ALL'], resultPath: '$.error' });
 
     // Amazon API Gateway's StepFunctionsRestApi integration wraps the request
     // body under a "body" key (input shape: {body, querystring, path}). Lift
@@ -283,11 +314,19 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     const stateMachine = new sfn.StateMachine(this, 'AthenaExpressStateMachine', {
       definitionBody: sfn.DefinitionBody.fromChainable(definition),
       stateMachineType: sfn.StateMachineType.EXPRESS,
+      // Note: the REST API below is edge-optimized, where the integration
+      // timeout is 29 seconds and cannot be raised. A query that takes longer
+      // than about 29 seconds gets a 504 at the caller while the execution keeps
+      // running (up to this timeout) and the Athena query is not stopped. See
+      // the README.
       timeout: Duration.seconds(60),
       tracingEnabled: true,
       logs: {
         destination: logGroup,
         level: sfn.LogLevel.ALL,
+        // includeExecutionData writes the caller's SQL and the full result rows
+        // to CloudWatch Logs on every request. Fine for a sample; set it to
+        // false (or lower the log level) if you copy this for sensitive data.
         includeExecutionData: true,
       },
     });
@@ -338,23 +377,31 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     // Amazon API Gateway (REST) -> StartSyncExecution on the Express state
     // machine. StepFunctionsRestApi wires the AWS service integration and
     // grants the API role sync-execution permission on THIS state machine.
+    // The request body is passed to Amazon Athena as SQL, so the method requires
+    // AWS IAM (SigV4) authorization and the stage caps the request rate.
     // ---------------------------------------------------------------------
     const api = new apigw.StepFunctionsRestApi(this, 'AthenaQueryApi', {
       stateMachine,
       // Express + StartSyncExecution: request/response in one HTTP call.
       useDefaultMethodResponses: true,
+      defaultMethodOptions: {
+        authorizationType: apigw.AuthorizationType.IAM,
+      },
       deployOptions: {
         stageName: 'prod',
         tracingEnabled: true,
+        // Stage-level throttling for all methods. Adjust for your workload.
+        throttlingRateLimit: 5,
+        throttlingBurstLimit: 10,
       },
     });
 
     new CfnOutput(this, 'ApiEndpoint', {
       value: api.url,
-      description: 'POST here with {"queryString":"..."} to run a synchronous Athena query',
+      description: 'POST here (SigV4-signed) with {"queryString":"..."} to run a synchronous Athena query',
     });
     new CfnOutput(this, 'DataBucketName', { value: dataBucket.bucketName });
-    new CfnOutput(this, 'AthenaWorkgroupName', { value: workgroup.name! });
+    new CfnOutput(this, 'AthenaWorkgroupName', { value: workgroupName });
     new CfnOutput(this, 'GlueDatabaseName', {
       value: `orders_db_${Aws.ACCOUNT_ID}`,
     });

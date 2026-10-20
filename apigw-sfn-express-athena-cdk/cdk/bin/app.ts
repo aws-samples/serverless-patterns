@@ -16,7 +16,7 @@ new ApigwSfnExpressAthenaStack(app, 'ApigwSfnExpressAthenaStack', {
     region: process.env.CDK_DEFAULT_REGION,
   },
   description:
-    'Amazon API Gateway -> AWS Step Functions Express -> Amazon Athena synchronous query, zero AWS Lambda (uksb-sfn-athena)',
+    'Amazon API Gateway -> AWS Step Functions Express -> Amazon Athena synchronous query, no AWS Lambda in the request path (uksb-sfn-athena)',
 });
 
 app.synth();
