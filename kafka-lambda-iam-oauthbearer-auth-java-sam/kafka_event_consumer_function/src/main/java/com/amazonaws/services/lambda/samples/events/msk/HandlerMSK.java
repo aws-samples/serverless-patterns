@@ -126,7 +126,7 @@ public class HandlerMSK implements RequestHandler<KafkaEvent, String>{
 				listOfMessages.add(thisMessage);
 				// Log where the record came from, not its payload, which may hold personal data.
 				logger.log("Received this message from Kafka - topic=" + thisMessage.getTopic()
-						+ ", partition=" + thisMessage.getPartition() + ", offset=" + thisMessage.getOffset());
+						+ ", partition=" + thisMessage.getPartition() + ", offset=" + thisMessage.getOffset() + "\n");
 				// Persist the Kafka metadata and the parsed JSON payload fields to DynamoDB
 				writeToDynamoDb(thisMessage, logger);
 			}
