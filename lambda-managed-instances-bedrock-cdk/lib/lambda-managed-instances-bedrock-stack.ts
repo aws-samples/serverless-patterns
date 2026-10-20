@@ -9,11 +9,11 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const modelId = new cdk.CfnParameter(this, "BedrockModelId", {
-      type: "String",
-      default: "us.anthropic.claude-sonnet-4-6",
-      description: "Bedrock inference profile model ID",
-    });
+    // The inference profile and the foundation-model ARNs in the IAM policy below
+    // are derived from this one model ID. The us. profile routes to us-east-1,
+    // us-east-2 and us-west-2 when called from one of those Regions, so deploy there.
+    const baseModelId = "anthropic.claude-sonnet-4-6";
+    const inferenceProfileId = `us.${baseModelId}`;
 
     const functionName = "managed-instances-bedrock-cdk";
 
@@ -34,17 +34,17 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
       description: "Bedrock invocation on Lambda Managed Instances (EC2-backed)",
       loggingFormat: lambda.LoggingFormat.JSON,
       logGroup,
-      environment: { MODEL_ID: modelId.valueAsString },
+      environment: { MODEL_ID: inferenceProfileId },
     });
 
     fn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ["bedrock:InvokeModel"],
         resources: [
-          `arn:${this.partition}:bedrock:${this.region}:${this.account}:inference-profile/${modelId.valueAsString}`,
-          `arn:${this.partition}:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-6`,
-          `arn:${this.partition}:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6`,
-          `arn:${this.partition}:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-6`,
+          `arn:${this.partition}:bedrock:${this.region}:${this.account}:inference-profile/${inferenceProfileId}`,
+          `arn:${this.partition}:bedrock:us-east-1::foundation-model/${baseModelId}`,
+          `arn:${this.partition}:bedrock:us-east-2::foundation-model/${baseModelId}`,
+          `arn:${this.partition}:bedrock:us-west-2::foundation-model/${baseModelId}`,
         ],
       })
     );

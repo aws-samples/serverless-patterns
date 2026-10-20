@@ -6,6 +6,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+Cost note: publishing the function version launches three Managed Instances (EC2) and keeps a minimum of three execution environments running, so charges accrue from deploy until you run `cdk destroy`, even with no traffic. See [Scaling Lambda Managed Instances](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances-scaling.html). Managed Instances are billed at EC2 instance pricing plus a management fee, and the Free Tier allowances published for default Lambda compute are not listed for them, so do not expect Free Tier coverage. The NAT Gateway also bills hourly.
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
@@ -41,7 +43,7 @@ This pattern adds Bedrock integration to demonstrate a real-world use case beyon
                    └─────────────────────────────────────────────┘
 ```
 
-**Note on networking:** This pattern uses a NAT Gateway for internet egress (including Bedrock API calls). For production workloads, consider adding a VPC interface endpoint for Bedrock (`com.amazonaws.{region}.bedrock-runtime`) to keep traffic on the AWS network and eliminate NAT costs.
+**Note on networking:** This pattern uses a NAT Gateway for internet egress (including Bedrock API calls). For production workloads, consider adding a VPC interface endpoint for Bedrock (`com.amazonaws.{region}.bedrock-runtime`) to keep Bedrock traffic on the AWS network and reduce NAT costs. Managed Instances also send logs to CloudWatch Logs, so removing the NAT Gateway entirely also needs a `com.amazonaws.{region}.logs` interface endpoint ([Networking for Lambda Managed Instances](https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances-networking.html)).
 
 ## Deployment Instructions
 
@@ -56,10 +58,12 @@ This pattern adds Bedrock integration to demonstrate a real-world use case beyon
     npm install
     ```
 
-3. Deploy the stack:
+3. Deploy the stack in `us-east-1`, `us-east-2` or `us-west-2`:
     ```bash
     cdk deploy
     ```
+
+    The IAM policy grants the foundation model in those three Regions, which is where the `us.anthropic.claude-sonnet-4-6` inference profile routes when called from one of them. From `us-west-1`, `ca-central-1` or `ca-west-1` the profile can also route to the local Region, which the policy does not cover ([Claude Sonnet 4.6](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-4-6.html)). Also confirm Lambda Managed Instances is available in the Region you choose (see the Region selector on the [Lambda pricing page](https://aws.amazon.com/lambda/pricing/)).
 
 ## Testing
 
