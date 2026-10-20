@@ -41,6 +41,9 @@ done
 echo "Deleting function $FUNCTION_NAME..."
 aws lambda delete-function --region "$REGION" --function-name "$FUNCTION_NAME" 2>/dev/null && echo "  deleted" || echo "  (not found)"
 
+echo "Deleting log group /aws/lambda/$FUNCTION_NAME..."
+aws logs delete-log-group --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" 2>/dev/null && echo "  deleted" || echo "  (not found)"
+
 echo "Deleting DynamoDB table $DDB_TABLE_NAME..."
 aws dynamodb delete-table --region "$REGION" --table-name "$DDB_TABLE_NAME" >/dev/null 2>&1 && echo "  deleted" || echo "  (not found)"
 

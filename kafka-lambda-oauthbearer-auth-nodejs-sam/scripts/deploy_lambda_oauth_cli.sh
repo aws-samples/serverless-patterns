@@ -1,29 +1,13 @@
 #!/bin/bash
 # =============================================================================
-# Deploy the Node.js Kafka consumer as a Lambda function with a SELF-MANAGED KAFKA
-# event source using SASL/OAUTHBEARER (OAuth 2.0 client-credentials) auth, via
-# the AWS CLI.
+# Deploy the Node.js Kafka consumer as an AWS Lambda function with a self-managed
+# Apache Kafka event source that uses SASL/OAUTHBEARER (OAUTHBEARER_AUTH), with
+# the AWS CLI. This is the alternative to `sam deploy`.
 #
-# AWS SAM does not yet support the OAUTHBEARER auth type for self-managed Kafka
-# event sources, so this script uses `aws lambda create-event-source-mapping`
-# directly (per the "Kafka OAuth & IAM Testing Manual").
-#
-# It reuses the same Node.js consumer as the SAM path (app.lambdaHandler).
-#
-# -----------------------------------------------------------------------------
-# PREREQUISITES (these are NOT created by this script and are assumed to exist):
-#   1. Your AWS account is ALLOWLISTED for the new self-managed Kafka ESM auth
-#      types (OAUTHBEARER_AUTH). Otherwise create-event-source-mapping fails.
-#   2. The brokers expose a SASL_SSL / OAUTHBEARER listener (e.g. :9093) with a
-#      TLS server certificate. The Lambda poller connects over TLS and validates
-#      the broker cert against SERVER_ROOT_CA_CERTIFICATE. (The pattern's default
-#      cluster listens SASL_PLAINTEXT on :9092 - add a TLS listener first.)
-#   3. A Cognito app client with the client_credentials grant, a user-pool
-#      domain, and a resource server + scope (e.g. kafka/consume). The broker's
-#      JWKS validator must accept these tokens (no audience is present).
-#
-# This script CAN create the two Secrets Manager secrets for you (see CREATE
-# secret sections) if you pass the raw values instead of pre-made ARNs.
+# The event source mapping obtains access tokens from the Amazon Cognito user pool
+# with the client credentials grant, using a client-credentials secret this script
+# creates, and trusts the brokers' self-signed certificate through a second secret
+# (SERVER_ROOT_CA_CERTIFICATE). The function writes each record to Amazon DynamoDB.
 # =============================================================================
 set -euo pipefail
 export AWS_PAGER=""   # don't pipe CLI output through a pager (less/vi)
@@ -202,6 +186,10 @@ else
     --environment "Variables={DYNAMODB_TABLE_NAME=$DDB_TABLE_NAME}" >/dev/null
 fi
 aws lambda wait function-active-v2 --region "$REGION" --function-name "$FUNCTION_NAME" 2>/dev/null || sleep 10
+
+# Keep the function's logs for 7 days rather than forever.
+aws logs create-log-group --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" 2>/dev/null || true
+aws logs put-retention-policy --region "$REGION" --log-group-name "/aws/lambda/$FUNCTION_NAME" --retention-in-days 7
 
 # --------- Build the bootstrap-servers JSON array from the CSV list ----------
 BS_JSON=$(node -e "process.stdout.write(JSON.stringify(process.argv[1].split(',').filter(Boolean)))" "$BOOTSTRAP_SERVERS")
