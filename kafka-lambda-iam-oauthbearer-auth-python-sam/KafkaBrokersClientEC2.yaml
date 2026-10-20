@@ -458,28 +458,28 @@ Resources:
                 Effect: Allow
                 Action: lambda:*
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+              # Creating a mapping is limited to this stack's functions. Lambda checks the
+              # other mapping actions against resource '*' when CloudFormation calls them
+              # (on update and delete there is no function ARN to match), so they can't be
+              # narrowed the same way.
               - Sid: CreateSampleEventSourceMappings
                 Effect: Allow
-                Action:
-                  - lambda:CreateEventSourceMapping
-                  - lambda:UpdateEventSourceMapping
-                  - lambda:DeleteEventSourceMapping
+                Action: lambda:CreateEventSourceMapping
                 Resource: '*'
                 Condition:
                   ArnLike:
                     lambda:FunctionArn: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
-              - Sid: ListEventSourceMappings
-                Effect: Allow
-                Action: lambda:ListEventSourceMappings
-                Resource: '*'
-              - Sid: ReadAndTagEventSourceMappings
+              - Sid: ManageEventSourceMappings
                 Effect: Allow
                 Action:
                   - lambda:GetEventSourceMapping
+                  - lambda:UpdateEventSourceMapping
+                  - lambda:DeleteEventSourceMapping
+                  - lambda:ListEventSourceMappings
                   - lambda:TagResource
                   - lambda:UntagResource
                   - lambda:ListTags
-                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:event-source-mapping:*'
+                Resource: '*'
               - Sid: DescribeNetworkForEventSource
                 Effect: Allow
                 Action:
