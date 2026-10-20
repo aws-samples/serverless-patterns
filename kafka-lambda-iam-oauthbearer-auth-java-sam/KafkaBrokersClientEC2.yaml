@@ -306,17 +306,43 @@ Resources:
       GroupName: !Sub "${AWS::StackName}-kafka-broker-sg"
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        # Kafka client (9092), controller (9093) and inter-broker (9094) traffic
-        # from anywhere inside the VPC (brokers, client instance and Lambda ENIs).
+        # Kafka clients (9092, SASL_SSL with OAUTHBEARER) from anywhere inside the VPC:
+        # the client instance and the AWS Lambda event source mapping's ENIs. The
+        # PLAINTEXT controller (9093) and internal (9094) listeners are opened
+        # below to the brokers and the client instance only.
         - IpProtocol: tcp
           FromPort: 9092
-          ToPort: 9094
+          ToPort: 9092
           CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
         # SSH from within the VPC (used by EC2 Instance Connect endpoint)
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
           CidrIp: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+  # The controller (9093) and internal (9094) listeners are PLAINTEXT, and the
+  # internal listener's anonymous principal is a Kafka super user. Only the brokers
+  # use them, plus the client instance, which creates the topic and ACLs through
+  # 9094 at boot. (A security group can't reference itself in its own inline rules,
+  # so these are separate resources.)
+  KafkaBrokerInternalIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref KafkaBrokerSecurityGroup
+      Description: Kafka controller and internal listeners, between brokers
+      IpProtocol: tcp
+      FromPort: 9093
+      ToPort: 9094
+      SourceSecurityGroupId: !Ref KafkaBrokerSecurityGroup
+  KafkaBrokerAdminIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref KafkaBrokerSecurityGroup
+      Description: Internal listener, for topic and ACL setup from the client instance
+      IpProtocol: tcp
+      FromPort: 9094
+      ToPort: 9094
+      SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
 
   KafkaClientInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -343,14 +369,166 @@ Resources:
             Action: 'sts:AssumeRole'
       Path: "/"
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess
-        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
-        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
       Policies:
+        # What runs on these instances needs: the boot scripts, `sam deploy` (AWS
+        # CloudFormation creates the SAM stack's resources with these credentials),
+        # and the AWS CLI deploy and teardown scripts. Everything the samples create
+        # is named with this stack's name as a prefix: the SAM stack (<stack>-sam)
+        # and its function, role, table and log group, and the CLI script's
+        # <stack>-consumer function and role. Deploy the SAM stack under a name that
+        # starts with this stack's name, as the README does.
+        - PolicyName: SampleDeployAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              # Boot: open SSH to the client from EC2 Instance Connect, and signal
+              # CloudFormation when setup is done.
+              - Sid: FindInstanceConnectPrefixList
+                Effect: Allow
+                Action: ec2:DescribeManagedPrefixLists
+                Resource: '*'
+              - Sid: AllowInstanceConnectToClient
+                Effect: Allow
+                Action: ec2:AuthorizeSecurityGroupIngress
+                Resource: !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:security-group/${KafkaClientInstanceSecurityGroup.GroupId}'
+              - Sid: ThisStack
+                Effect: Allow
+                Action:
+                  - cloudformation:SignalResource
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DescribeStackResources
+                Resource: !Sub 'arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*'
+              # The brokers cache the Kafka download and share their certificate here.
+              - Sid: KafkaCacheBucket
+                Effect: Allow
+                Action:
+                  - s3:CreateBucket
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::kafka-oauth-cache-${AWS::AccountId}-${AWS::Region}'
+              - Sid: KafkaCacheObjects
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::kafka-oauth-cache-${AWS::AccountId}-${AWS::Region}/*'
+              # sam deploy: the SAM stack, SAM's artifact bucket stack, and the transform.
+              - Sid: SampleStacks
+                Effect: Allow
+                Action: cloudformation:*
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}-*/*'
+                  - !Sub 'arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/aws-sam-cli-managed-default/*'
+              - Sid: ServerlessTransform
+                Effect: Allow
+                Action: cloudformation:CreateChangeSet
+                Resource: !Sub 'arn:${AWS::Partition}:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31'
+              - Sid: TemplateChecks
+                Effect: Allow
+                Action:
+                  - cloudformation:ValidateTemplate
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:ListStacks
+                Resource: '*'
+              - Sid: SamArtifactBucket
+                Effect: Allow
+                Action: s3:*
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:s3:::aws-sam-cli-managed-default-samclisourcebucket-*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::aws-sam-cli-managed-default-samclisourcebucket-*/*'
+              # The consumer function, its event source mapping, role, table and logs.
+              - Sid: SampleFunctions
+                Effect: Allow
+                Action: lambda:*
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+              - Sid: CreateSampleEventSourceMappings
+                Effect: Allow
+                Action:
+                  - lambda:CreateEventSourceMapping
+                  - lambda:UpdateEventSourceMapping
+                  - lambda:DeleteEventSourceMapping
+                Resource: '*'
+                Condition:
+                  ArnLike:
+                    lambda:FunctionArn: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+              - Sid: ListEventSourceMappings
+                Effect: Allow
+                Action: lambda:ListEventSourceMappings
+                Resource: '*'
+              - Sid: ReadAndTagEventSourceMappings
+                Effect: Allow
+                Action:
+                  - lambda:GetEventSourceMapping
+                  - lambda:TagResource
+                  - lambda:UntagResource
+                  - lambda:ListTags
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:event-source-mapping:*'
+              - Sid: DescribeNetworkForEventSource
+                Effect: Allow
+                Action:
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeNetworkInterfaces
+                Resource: '*'
+              - Sid: SampleRoles
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:UpdateRole
+                  - iam:UpdateRoleDescription
+                  - iam:UpdateAssumeRolePolicy
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:ListRoleTags
+                  - iam:PutRolePolicy
+                  - iam:GetRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:ListAttachedRolePolicies
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}-*'
+              # The only managed policy the sample roles use.
+              - Sid: AttachLambdaBasicExecution
+                Effect: Allow
+                Action:
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}-*'
+                Condition:
+                  ArnEquals:
+                    iam:PolicyARN: !Sub 'arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+              - Sid: PassSampleRolesToLambda
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}-*'
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: lambda.amazonaws.com
+              # Create the table, write to it from `sam local invoke`, and read it to
+              # check results. Covers <stack>-sam-messages and the CLI's <stack>-messages.
+              - Sid: SampleTables
+                Effect: Allow
+                Action: dynamodb:*
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${AWS::StackName}-*'
+                  - !Sub 'arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${AWS::StackName}-*/*'
+              - Sid: ListTables
+                Effect: Allow
+                Action: dynamodb:ListTables
+                Resource: '*'
+              - Sid: SampleLogGroups
+                Effect: Allow
+                Action: logs:*
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*'
+                  - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*:*'
+              - Sid: DescribeLogGroups
+                Effect: Allow
+                Action: logs:DescribeLogGroups
+                Resource: '*'
         - PolicyName: OutboundFederationAccess
           PolicyDocument:
             Version: 2012-10-17
@@ -375,36 +553,12 @@ Resources:
               - Effect: Allow
                 Action:
                   - 'secretsmanager:CreateSecret'
+                  - 'secretsmanager:DeleteSecret'
                   - 'secretsmanager:PutSecretValue'
                   - 'secretsmanager:TagResource'
                   - 'secretsmanager:GetSecretValue'
                   - 'secretsmanager:DescribeSecret'
                 Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AWS::StackName}-*'
-        - PolicyName: DynamoDBDeployAccess
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              # The CLI Lambda deploy script (run on the client) creates the
-              # DynamoDB table the consumer writes to.
-              - Effect: Allow
-                Action:
-                  - 'dynamodb:CreateTable'
-                  - 'dynamodb:DescribeTable'
-                  - 'dynamodb:DeleteTable'
-                  - 'dynamodb:TagResource'
-                  - 'dynamodb:ListTables'
-                Resource: '*'
-              # Read the consumer's table to check results, and let `sam local
-              # invoke` (which runs with these credentials) write to it. Covers both
-              # the SAM table (<stack>-sam-messages) and the CLI's (<stack>-messages).
-              - Effect: Allow
-                Action:
-                  - 'dynamodb:PutItem'
-                  - 'dynamodb:BatchWriteItem'
-                  - 'dynamodb:GetItem'
-                  - 'dynamodb:Query'
-                  - 'dynamodb:Scan'
-                Resource: !Sub 'arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${AWS::StackName}-*'
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -513,8 +667,6 @@ Resources:
 
               # Resolve the AWS IAM Outbound Identity Federation OIDC issuer. If not
               # supplied, enable federation and look up the account-specific issuer.
-              # NOTE: get-outbound-web-identity-federation-info is an under-development
-              # API; adjust the command/field name if it differs at GA.
               if [ -z "$OUTBOUND_ISSUER" ]; then
                 aws iam enable-outbound-web-identity-federation 2>/dev/null || true
                 OUTBOUND_ISSUER=$(aws iam get-outbound-web-identity-federation-info --query 'IssuerIdentifier' --output text 2>/dev/null || true)
@@ -715,8 +867,6 @@ Resources:
 
               # Resolve the AWS IAM Outbound Identity Federation OIDC issuer. If not
               # supplied, enable federation and look up the account-specific issuer.
-              # NOTE: get-outbound-web-identity-federation-info is an under-development
-              # API; adjust the command/field name if it differs at GA.
               if [ -z "$OUTBOUND_ISSUER" ]; then
                 aws iam enable-outbound-web-identity-federation 2>/dev/null || true
                 OUTBOUND_ISSUER=$(aws iam get-outbound-web-identity-federation-info --query 'IssuerIdentifier' --output text 2>/dev/null || true)
@@ -917,8 +1067,6 @@ Resources:
 
               # Resolve the AWS IAM Outbound Identity Federation OIDC issuer. If not
               # supplied, enable federation and look up the account-specific issuer.
-              # NOTE: get-outbound-web-identity-federation-info is an under-development
-              # API; adjust the command/field name if it differs at GA.
               if [ -z "$OUTBOUND_ISSUER" ]; then
                 aws iam enable-outbound-web-identity-federation 2>/dev/null || true
                 OUTBOUND_ISSUER=$(aws iam get-outbound-web-identity-federation-info --query 'IssuerIdentifier' --output text 2>/dev/null || true)
