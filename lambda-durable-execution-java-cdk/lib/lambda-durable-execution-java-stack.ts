@@ -1,6 +1,5 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 
 export class LambdaDurableExecutionJavaStack extends cdk.Stack {
@@ -20,12 +19,6 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
         retentionPeriod: cdk.Duration.days(7),
       },
     });
-
-    fn.role!.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName(
-        "service-role/AWSLambdaBasicDurableExecutionRolePolicy"
-      )
-    );
 
     const alias = new lambda.Alias(this, "ProdAlias", {
       aliasName: "prod",
