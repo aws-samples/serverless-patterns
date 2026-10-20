@@ -4,9 +4,6 @@
 #
 # Usage: refresh_token.sh <admin|producer|consumer> [output-file]
 # Prints the path of the written properties file on stdout.
-#
-# NOTE (under development): the exact `aws sts get-web-identity-token` CLI shape and
-# response field are not finalized. Adjust the command / --query below if they differ.
 set -eo pipefail
 source /home/ec2-user/kafka_oauth.env
 
@@ -42,4 +39,5 @@ ssl.truststore.type=PKCS12
 sasl.login.callback.handler.class=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
 sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.access.token="$TOKEN" ;
 EOF
+chmod 600 "$OUT"   # holds a live credential
 echo "$OUT"
