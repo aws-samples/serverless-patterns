@@ -424,16 +424,7 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              # Boot: open SSH to the client from EC2 Instance Connect, and signal
-              # CloudFormation when setup is done.
-              - Sid: FindInstanceConnectPrefixList
-                Effect: Allow
-                Action: ec2:DescribeManagedPrefixLists
-                Resource: '*'
-              - Sid: AllowInstanceConnectToClient
-                Effect: Allow
-                Action: ec2:AuthorizeSecurityGroupIngress
-                Resource: !Sub 'arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:security-group/${KafkaClientInstanceSecurityGroup.GroupId}'
+              # Boot: signal CloudFormation when setup is done.
               - Sid: ThisStack
                 Effect: Allow
                 Action:
@@ -1227,7 +1218,10 @@ Resources:
     Properties:
       InstanceType: m5.large
       IamInstanceProfile: !Ref EC2InstanceProfile
-      SubnetId: !Ref PublicSubnetOne
+      # Private subnet: the client reaches the internet through the NAT gateway, like
+      # the brokers, so it also works where VPC Block Public Access stops direct
+      # internet gateway traffic. Connect to it through the EC2 Instance Connect Endpoint.
+      SubnetId: !Ref PrivateSubnetOne
       SecurityGroupIds: [!GetAtt KafkaClientInstanceSecurityGroup.GroupId]
       ImageId: !Ref LatestAmiId
       Tags:
@@ -1328,16 +1322,6 @@ Resources:
               unzip -q aws-sam-cli-linux-x86_64.zip -d sam-installation
               ./sam-installation/install || ./sam-installation/install --update
 
-              # Allow the browser-based "EC2 Instance Connect" console option to SSH
-              # into this public client instance. Look up THIS region's EC2 Instance
-              # Connect service prefix list and authorize port 22 from it (region
-              # agnostic - no hardcoded IDs). The private brokers have no public IP,
-              # so use the EC2 Instance Connect Endpoint to reach them instead.
-              EIC_PL=$(aws ec2 describe-managed-prefix-lists --region "$AWS_REGION" --filters "Name=prefix-list-name,Values=com.amazonaws.$AWS_REGION.ec2-instance-connect" --query "PrefixLists[0].PrefixListId" --output text 2>/dev/null || true)
-              if [ -n "$EIC_PL" ] && [ "$EIC_PL" != "None" ]; then
-                aws ec2 authorize-security-group-ingress --region "$AWS_REGION" --group-id "$CLIENT_SG" --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,PrefixListIds=[{PrefixListId=$EIC_PL}]" 2>/dev/null || true
-                echo "Authorized SSH from EC2 Instance Connect prefix list $EIC_PL on $CLIENT_SG"
-              fi
 
               # Kafka CLI tools + Strimzi client OAuth libraries
               cd /home/ec2-user
