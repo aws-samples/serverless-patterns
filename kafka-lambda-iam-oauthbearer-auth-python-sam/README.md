@@ -23,6 +23,7 @@ Processing is at least once. If any record in a batch fails, for example because
 
 - An AWS account and an IAM principal with permissions to create the resources in `KafkaBrokersClientEC2.yaml`, including named IAM roles.
 - The [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), if you deploy the template from the command line. Everything else, including the AWS SAM CLI and the Python toolchain, is installed on the Amazon EC2 client instance.
+- IAM outbound identity federation enabled in the account, or permission to enable it (`iam:EnableOutboundWebIdentityFederation`). The stack enables it for you; see the note under [Deploy the AWS CloudFormation template](#deploy-the-aws-cloudformation-template).
 
 ## Files
 
@@ -62,7 +63,7 @@ The `Python3Version` parameter selects the AWS Lambda runtime (default `python3.
 
 `KafkaBrokersClientEC2.yaml` is larger than the 51,200-byte limit for inline templates, so the AWS CLI uploads it to the Amazon S3 bucket you name in `--s3-bucket`. The AWS CloudFormation console handles this for you.
 
-> **Note:** IAM outbound identity federation must be enabled in the account. If you leave the `OutboundIssuerUrl` parameter empty, the brokers enable it at boot with `aws iam enable-outbound-web-identity-federation`, an account-wide setting that lets IAM principals request web identity tokens subject to their own permissions.
+> **Note:** This pattern needs IAM outbound identity federation, which is off by default. If you leave the `OutboundIssuerUrl` parameter empty, the brokers turn it on at boot with `aws iam enable-outbound-web-identity-federation`. This is an account-wide setting: once on, any IAM principal in the account that has `sts:GetWebIdentityToken` permission can request web identity tokens. It stays on after you delete the stacks; see [Cleanup](#cleanup) to turn it off. If federation is already on, the setting is left as is.
 
 The stack reaches `CREATE_COMPLETE` only after the brokers and the client instance have finished setting up.
 
@@ -172,6 +173,12 @@ These resources bill continuously until you delete the stacks: the three Kafka b
 
    ```bash
    aws s3 rb "s3://kafka-oauth-cache-$(aws sts get-caller-identity --query Account --output text)-<region>" --force
+   ```
+
+4. Optionally, turn IAM outbound identity federation off again if this pattern turned it on and nothing else in the account uses it. Other workloads that call `sts:GetWebIdentityToken` stop working when it's off:
+
+   ```bash
+   aws iam disable-outbound-web-identity-federation
    ```
 
 ----
