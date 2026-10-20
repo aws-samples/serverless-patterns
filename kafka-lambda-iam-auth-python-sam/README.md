@@ -55,7 +55,7 @@ aws cloudformation deploy \
   --capabilities CAPABILITY_NAMED_IAM
 ```
 
-The `Python3Version` parameter selects the AWS Lambda runtime (default `python3.13`). To clone a fork or branch of this repository onto the client instance, set `ServerlessLandGithubLocation` and `ServerlessLandGithubBranch`. Pass parameters with `--parameter-overrides`, for example `--parameter-overrides Python3Version=python3.13`.
+The `Python3Version` parameter selects the AWS Lambda runtime (default `python3.13`). To clone a fork or branch of this repository onto the client instance, set `ServerlessLandGithubLocation` and `ServerlessLandGithubBranch`. `EC2InstanceType` sets the instance type for the client instance and `MSKBrokerInstanceType` for the Amazon MSK brokers (default `m5.large` and `kafka.m5.large`). If the stack fails with an insufficient-capacity error, delete it and deploy again with another allowed type, for example `--parameter-overrides EC2InstanceType=m6i.large`. Pass parameters with `--parameter-overrides`, for example `--parameter-overrides Python3Version=python3.13`.
 
 Creating the Amazon MSK cluster takes 20 to 30 minutes.
 

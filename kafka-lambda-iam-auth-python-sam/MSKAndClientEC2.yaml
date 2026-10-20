@@ -9,6 +9,32 @@ Description: >
   interactive clients distinct MSK-IAM principals for authorization.
 
 Parameters:
+  EC2InstanceType:
+    Type: String
+    Description: >
+      Instance type for the Amazon EC2 client instance. All choices are
+      2 vCPU / 8 GiB x86_64. If the stack fails with an insufficient-capacity error
+      for one type in an Availability Zone, delete it and deploy again with another.
+    Default: m5.large
+    AllowedValues:
+      - m5.large
+      - m5a.large
+      - m5n.large
+      - m6i.large
+      - m6a.large
+      - m7i.large
+      - m7a.large
+      - t3.large
+  MSKBrokerInstanceType:
+    Type: String
+    Description: >
+      Amazon MSK broker instance type. If the stack fails because MSK has no capacity
+      for one type, delete it and deploy again with another.
+    Default: kafka.m5.large
+    AllowedValues:
+      - kafka.m5.large
+      - kafka.m7g.large
+      - kafka.m5.xlarge
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
@@ -409,7 +435,7 @@ Resources:
       NumberOfBrokerNodes: 3
       BrokerNodeGroupInfo:
         ClientSubnets: [!Ref PrivateSubnetOne, !Ref PrivateSubnetTwo, !Ref PrivateSubnetThree]
-        InstanceType: kafka.m5.large
+        InstanceType: !Ref MSKBrokerInstanceType
         SecurityGroups: [!GetAtt MSKSecurityGroup.GroupId]
         StorageInfo:
           EBSStorageInfo: {VolumeSize: 100}
@@ -428,7 +454,7 @@ Resources:
         Timeout: PT60M
     DependsOn: [MSKCluster, PrivateRoute, KafkaAdminRole, KafkaProducerRole, KafkaConsumerRole]
     Properties:
-      InstanceType: m5.large
+      InstanceType: !Ref EC2InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfile
       # Private subnet: the client reaches the internet through the NAT gateway, like
       # the brokers, so it also works where VPC Block Public Access stops direct
