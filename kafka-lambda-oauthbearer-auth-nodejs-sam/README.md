@@ -57,7 +57,7 @@ aws cloudformation deploy \
   --s3-bucket <amzn-s3-bucket-in-the-same-region>
 ```
 
-The `NodeVersion` parameter selects the AWS Lambda runtime (default `nodejs22.x`). To clone a fork or branch of this repository onto the client instance, set `ServerlessLandGithubLocation` and `ServerlessLandGithubBranch`. Pass parameters with `--parameter-overrides`, for example `--parameter-overrides NodeVersion=nodejs22.x`.
+The `NodeVersion` parameter selects the AWS Lambda runtime (default `nodejs22.x`). To clone a fork or branch of this repository onto the client instance, set `ServerlessLandGithubLocation` and `ServerlessLandGithubBranch`. `EC2InstanceType` sets the instance type for the brokers and the client instance (default `m5.large`). If the stack fails with an insufficient-capacity error, delete it and deploy again with another allowed type, for example `--parameter-overrides EC2InstanceType=m6i.large`. Pass parameters with `--parameter-overrides`, for example `--parameter-overrides NodeVersion=nodejs22.x`.
 
 `KafkaBrokersCognitoClientEC2.yaml` is larger than the 51,200-byte limit for inline templates, so the AWS CLI uploads it to the Amazon S3 bucket you name in `--s3-bucket`. The AWS CloudFormation console handles this for you.
 
