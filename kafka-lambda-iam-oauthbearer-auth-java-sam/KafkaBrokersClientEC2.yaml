@@ -36,6 +36,22 @@ Parameters:
     Description: Name suffix for the IAM role the CONSUMER client assumes (authorized to READ only).
     Default: kafka-consumer
     MinLength: 1
+  EC2InstanceType:
+    Type: String
+    Description: >
+      Instance type for the Kafka brokers and the client instance. All choices are
+      2 vCPU / 8 GiB x86_64. If the stack fails with an insufficient-capacity error
+      for one type in an Availability Zone, delete it and deploy again with another.
+    Default: m5.large
+    AllowedValues:
+      - m5.large
+      - m5a.large
+      - m5n.large
+      - m6i.large
+      - m6a.large
+      - m7i.large
+      - m7a.large
+      - t3.large
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
@@ -563,7 +579,7 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: PrivateRoute
     Properties:
-      InstanceType: m5.large
+      InstanceType: !Ref EC2InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfile
       SubnetId: !Ref PrivateSubnetOne
       PrivateIpAddress: !FindInMap ['BrokerConfig', 'Broker1', 'PrivateIp']
@@ -763,7 +779,7 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: PrivateRoute
     Properties:
-      InstanceType: m5.large
+      InstanceType: !Ref EC2InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfile
       SubnetId: !Ref PrivateSubnetTwo
       PrivateIpAddress: !FindInMap ['BrokerConfig', 'Broker2', 'PrivateIp']
@@ -963,7 +979,7 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: PrivateRoute
     Properties:
-      InstanceType: m5.large
+      InstanceType: !Ref EC2InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfile
       SubnetId: !Ref PrivateSubnetThree
       PrivateIpAddress: !FindInMap ['BrokerConfig', 'Broker3', 'PrivateIp']
@@ -1173,7 +1189,7 @@ Resources:
       - KafkaProducerRole
       - KafkaConsumerRole
     Properties:
-      InstanceType: m5.large
+      InstanceType: !Ref EC2InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfile
       # Private subnet: the client reaches the internet through the NAT gateway, like
       # the brokers, so it also works where VPC Block Public Access stops direct
