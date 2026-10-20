@@ -1,7 +1,7 @@
 // Local test, no AWS needed: node --test lambda/hook.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { probe, parseHookDetails } = require('./hook.js');
+const { probe, parseHookDetails, parseHookDetailsChecked } = require('./hook.js');
 
 const reply = (status, body) => async () => ({ status, text: async () => body });
 
@@ -43,4 +43,10 @@ test('hookDetails is accepted as a JSON string or as an object', () => {
   assert.deepStrictEqual(parseHookDetails(details), details);
   assert.deepStrictEqual(parseHookDetails('not json'), {});
   assert.deepStrictEqual(parseHookDetails(undefined), {});
+});
+
+test('a malformed hookDetails string is distinguished from a missing one', () => {
+  assert.strictEqual(parseHookDetailsChecked('not json').malformed, true);
+  assert.strictEqual(parseHookDetailsChecked(undefined).malformed, false);
+  assert.strictEqual(parseHookDetailsChecked('{"url":"u"}').malformed, false);
 });

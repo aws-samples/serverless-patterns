@@ -1,6 +1,6 @@
 # Amazon ECS blue/green deployments with Amazon VPC Lattice
 
-This pattern deploys an Amazon ECS (AWS Fargate) service that uses the built-in blue/green deployment strategy with Amazon VPC Lattice as the traffic layer. An AWS Lambda lifecycle hook tests the new (green) revision through a VPC Lattice test listener rule before production traffic shifts, and Amazon CloudWatch alarms roll the deployment back automatically.
+This pattern deploys an Amazon ECS on AWS Fargate service that uses the built-in blue/green deployment strategy with Amazon VPC Lattice as the traffic layer. An AWS Lambda lifecycle hook tests the new (green) revision through a VPC Lattice test listener rule before production traffic shifts, and Amazon CloudWatch alarms roll the deployment back automatically.
 
 Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. Use a recent version, because the Amazon ECS service deployment commands used in Testing are new.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js](https://nodejs.org/en/download/) 20 or later and npm installed
+* [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
 
 ## Deployment Instructions
@@ -83,6 +83,8 @@ All commands run from the pattern directory. They assume the stack name `EcsVpcL
     out() { aws cloudformation describe-stacks --stack-name $STACK --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
     CLUSTER=$(out ClusterName); SERVICE=$(out ServiceName); FN=$(out HookFunctionName); LOGS=$(out HookLogGroupName)
     SVC=$(out LatticeServiceId); LISTENER=$(out LatticeListenerId); PROD_RULE=$(out ProductionRuleId); DNS=$(out LatticeServiceDnsName)
+    REGION=${AWS_REGION:-$(aws configure get region)}
+    PL=$(aws ec2 describe-managed-prefix-lists --region $REGION --filters "Name=prefix-list-name,Values=com.amazonaws.$REGION.vpc-lattice" --query "PrefixLists[0].PrefixListId" --output text)
     ```
 1. Check the first deployment. Expected: the service has one running task and one service deployment with status `SUCCESSFUL`.
     ```bash
@@ -135,6 +137,6 @@ All commands run from the pattern directory. They assume the stack name `EcsVpcL
 To run the hook logic locally without AWS: `npm test`.
 
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0

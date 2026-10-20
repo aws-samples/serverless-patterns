@@ -30,16 +30,23 @@ async function probe({ url, expectedVersion, doFetch = fetch, attempts = 5, dela
 }
 
 // hookDetails is configured as a JSON string in the service; accept an already parsed object as well.
-function parseHookDetails(hookDetails) {
+// Returns { details, malformed }: malformed is true when a string was given that is not valid JSON.
+function parseHookDetailsChecked(hookDetails) {
   if (typeof hookDetails === 'string') {
-    try { return JSON.parse(hookDetails) || {}; } catch (e) { return {}; }
+    try { return { details: JSON.parse(hookDetails) || {}, malformed: false }; } catch (e) { return { details: {}, malformed: true }; }
   }
-  return hookDetails || {};
+  return { details: hookDetails || {}, malformed: false };
+}
+
+function parseHookDetails(hookDetails) {
+  return parseHookDetailsChecked(hookDetails).details;
 }
 
 exports.handler = async (event) => {
-  const { url, expectedVersion } = parseHookDetails(event.hookDetails);
+  const { details, malformed } = parseHookDetailsChecked(event.hookDetails);
+  const { url, expectedVersion } = details;
   console.log(JSON.stringify({ msg: 'hook-invoked', stage: event.lifecycleStage, url, expectedVersion, eventKeys: Object.keys(event), hookDetailsType: typeof event.hookDetails }));
+  if (malformed) return { hookStatus: 'FAILED', reason: 'hookDetails is not valid JSON' };
   if (!url || !expectedVersion) return { hookStatus: 'FAILED', reason: 'hookDetails.url and hookDetails.expectedVersion are required' };
 
   const result = await probe({ url, expectedVersion });
@@ -49,7 +56,7 @@ exports.handler = async (event) => {
     try {
       const prod = await get(fetch, url, {});
       console.log(JSON.stringify({ msg: 'production-listener-observation', observedVersion: prod.version, status: prod.status }));
-    } catch (e) { /* ignore */ }
+    } catch (e) { console.log(JSON.stringify({ msg: 'production-listener-observation-error', error: String(e.message || e) })); }
   }
 
   if (result.ok) {
@@ -63,3 +70,4 @@ exports.handler = async (event) => {
 
 exports.probe = probe;
 exports.parseHookDetails = parseHookDetails;
+exports.parseHookDetailsChecked = parseHookDetailsChecked;
