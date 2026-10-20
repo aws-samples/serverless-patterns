@@ -2,7 +2,7 @@
 
 This pattern demonstrates multi-tenant authentication and tenant isolation for an [Amazon Bedrock AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime.html) agent using [Amazon Cognito](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html) as the OAuth 2.0 / JWT identity provider.
 
-AgentCore Identity validates inbound Cognito JWTs at the runtime edge via a [custom JWT authorizer](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html). The agent then derives the caller's tenant from the validated token claims and can only ever read that tenant's partition in Amazon DynamoDB. Because the tenant is fixed from the token and not from the prompt, a user cannot coax the agent into reading another tenant's data.
+Amazon Bedrock AgentCore Identity validates inbound Cognito JWTs at the runtime edge via a [custom JWT authorizer](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html). The agent then derives the caller's tenant from the validated token claims and can only ever read that tenant's partition in Amazon DynamoDB. Because the tenant is fixed from the token and not from the prompt, a user cannot coax the agent into reading another tenant's data.
 
 Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/agentcore-identity-cognito-multi-tenant-cdk).
 
@@ -15,8 +15,9 @@ Important: this application uses various AWS services and there are costs associ
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
 - [Docker](https://docs.docker.com/get-docker/) installed and running
-- [Python 3.12](https://www.python.org/downloads/) installed
+- [Python 3.14](https://www.python.org/downloads/) installed
 - Access to an Amazon Bedrock foundation model enabled in your region (the agent uses the default [Strands Agents](https://strandsagents.com/) model on Amazon Bedrock)
+- [jq](https://jqlang.org/download/) installed (used by `test/get_token.sh` to extract the access token)
 
 ## Deployment Instructions
 
@@ -47,6 +48,8 @@ Important: this application uses various AWS services and there are costs associ
     cdk bootstrap
     cdk deploy
     ```
+
+    `us-west-2` is just the example value - `app.py` requires `CDK_DEFAULT_REGION` to be set, but any [Region that supports Amazon Bedrock AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html) works. If you deploy to a different Region, also update the Region used in the test scripts below (they default to `us-west-2`).
 
 5. Note the CDK outputs: `UserPoolId`, `UserPoolClientId`, `AgentRuntimeArn`, `TenantTableName`, and `TenantGroups`.
 
@@ -150,6 +153,8 @@ Delete the stack:
 ```bash
 cdk destroy
 ```
+
+Note: `cdk destroy` does not remove the agent's container image. `DockerImageAsset` pushes it to the shared `cdk-hnb659fds-container-assets-*` ECR repository created by `cdk bootstrap`, not a repository owned by this stack, so the image remains and continues to incur ECR storage costs. Clean it up with [`cdk gc --unstable=gc --type=ecr`](https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-gc.html), or by manually deleting the image from the `cdk-hnb659fds-container-assets-*` repository.
 
 ---
 

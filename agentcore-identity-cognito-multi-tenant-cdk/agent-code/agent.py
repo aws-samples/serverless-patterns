@@ -104,10 +104,15 @@ async def invoke(payload, context):
     @tool
     def get_tenant_records() -> list:
         """Return the data records that belong to the caller's tenant."""
-        response = table.query(
-            KeyConditionExpression=Key("tenant_id").eq(tenant_id)
-        )
-        return response.get("Items", [])
+        items = []
+        query_kwargs = {"KeyConditionExpression": Key("tenant_id").eq(tenant_id)}
+        while True:
+            response = table.query(**query_kwargs)
+            items.extend(response.get("Items", []))
+            if "LastEvaluatedKey" not in response:
+                break
+            query_kwargs["ExclusiveStartKey"] = response["LastEvaluatedKey"]
+        return items
 
     agent = Agent(
         tools=[get_tenant_records],

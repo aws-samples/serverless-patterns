@@ -104,7 +104,7 @@ class AgentCoreIdentityStack(Stack):
                 conditions={
                     "StringEquals": {"aws:SourceAccount": self.account},
                     "ArnLike": {
-                        "aws:SourceArn": f"arn:aws:bedrock-agentcore:{self.region}:{self.account}:*"
+                        "aws:SourceArn": f"arn:{self.partition}:bedrock-agentcore:{self.region}:{self.account}:*"
                     },
                 },
             ),
@@ -132,19 +132,19 @@ class AgentCoreIdentityStack(Stack):
                                 "logs:CreateLogGroup",
                             ],
                             resources=[
-                                f"arn:aws:logs:{self.region}:{self.account}:log-group:/aws/bedrock-agentcore/runtimes/*"
+                                f"arn:{self.partition}:logs:{self.region}:{self.account}:log-group:/aws/bedrock-agentcore/runtimes/*"
                             ],
                         ),
                         iam.PolicyStatement(
                             actions=["logs:DescribeLogGroups"],
                             resources=[
-                                f"arn:aws:logs:{self.region}:{self.account}:log-group:*"
+                                f"arn:{self.partition}:logs:{self.region}:{self.account}:log-group:*"
                             ],
                         ),
                         iam.PolicyStatement(
                             actions=["logs:CreateLogStream", "logs:PutLogEvents"],
                             resources=[
-                                f"arn:aws:logs:{self.region}:{self.account}:log-group:/aws/bedrock-agentcore/runtimes/*:log-stream:*"
+                                f"arn:{self.partition}:logs:{self.region}:{self.account}:log-group:/aws/bedrock-agentcore/runtimes/*:log-stream:*"
                             ],
                         ),
                         iam.PolicyStatement(
@@ -174,8 +174,8 @@ class AgentCoreIdentityStack(Stack):
                                 "bedrock-agentcore:GetWorkloadAccessTokenForUserId",
                             ],
                             resources=[
-                                f"arn:aws:bedrock-agentcore:{self.region}:{self.account}:workload-identity-directory/default",
-                                f"arn:aws:bedrock-agentcore:{self.region}:{self.account}:workload-identity-directory/default/workload-identity/{agent_name}-*",
+                                f"arn:{self.partition}:bedrock-agentcore:{self.region}:{self.account}:workload-identity-directory/default",
+                                f"arn:{self.partition}:bedrock-agentcore:{self.region}:{self.account}:workload-identity-directory/default/workload-identity/{agent_name}-*",
                             ],
                         ),
                         iam.PolicyStatement(
@@ -186,7 +186,7 @@ class AgentCoreIdentityStack(Stack):
                             ],
                             resources=[
                                 "arn:aws:bedrock:*::foundation-model/*",
-                                f"arn:aws:bedrock:{self.region}:{self.account}:*",
+                                f"arn:{self.partition}:bedrock:{self.region}:{self.account}:inference-profile/*",
                             ],
                         ),
                         iam.PolicyStatement(

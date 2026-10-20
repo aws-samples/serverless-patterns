@@ -21,7 +21,7 @@ read -r -p "Pool ID [${POOL_ID:-}]: " input && POOL_ID=${input:-${POOL_ID:-}}
 read -r -p "Client ID [${CLIENT_ID:-}]: " input && CLIENT_ID=${input:-${CLIENT_ID:-}}
 read -r -p "Username [${USERNAME:-}]: " input && USERNAME=${input:-${USERNAME:-}}
 read -r -p "Tenant group (e.g. tenant-acme) [${TENANT_GROUP:-}]: " input && TENANT_GROUP=${input:-${TENANT_GROUP:-}}
-echo "Password requires: min 8 chars"
+echo "Password requires: min 8 chars, with uppercase, lowercase, a digit, and a symbol"
 read -r -sp "Password: " PASSWORD
 echo
 read -r -p "Region [${REGION:-us-west-2}]: " input && REGION=${input:-${REGION:-us-west-2}}
@@ -45,7 +45,7 @@ aws cognito-idp admin-set-user-password \
   --username "$USERNAME" \
   --password "$PASSWORD" \
   --region "$REGION" \
-  --permanent > /dev/null 2>&1 || true
+  --permanent
 
 aws cognito-idp admin-add-user-to-group \
   --user-pool-id "$POOL_ID" \

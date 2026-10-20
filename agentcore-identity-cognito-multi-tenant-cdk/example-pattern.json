@@ -1,9 +1,9 @@
 {
   "title": "Multi-tenant Amazon Bedrock AgentCore Runtime with Amazon Cognito",
-  "description": "Authenticate an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito and enforce per-tenant data isolation using AgentCore Identity inbound JWT authorization.",
+  "description": "Authenticate an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito and enforce per-tenant data isolation using Amazon Bedrock AgentCore Identity inbound JWT authorization.",
   "language": "Python",
   "level": "300",
-  "framework": "CDK",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/agentcore-identity-cognito-multi-tenant-cdk",
-      "templateURL": "serverless-patterns/agentcore-identity-cognito-multi-tenant-cdk",
-      "projectFolder": "agentcore-identity-cognito-multi-tenant-cdk",
       "templateFile": "app.py"
     }
   },
@@ -65,11 +62,10 @@
   },
   "authors": [
     {
-      "name": "Sudhanshu Saurav",
-      "image": "link-to-your-photo.jpg",
-      "bio": "Contributor to the Serverless Patterns Collection.",
-      "linkedin": "",
-      "twitter": ""
+      "name": "Sudhansu Mohapatra",
+      "bio": "Delivery Consultant at AWS",
+      "image": "https://drive.google.com/file/d/1uTQ3MbFvziRfBPWHsVsD5vbVyGuFO665/view?usp=sharing",
+      "linkedin": "sudhansu-mohapatra-83a51811a"
     }
   ]
 }
