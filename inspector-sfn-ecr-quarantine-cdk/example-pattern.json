@@ -1,6 +1,6 @@
 {
   "title": "Auto-quarantine vulnerable Amazon ECR images",
-  "description": "An Amazon Inspector finding on a vulnerable Amazon ECR image triggers an AWS Step Functions workflow via Amazon EventBridge that quarantines the image and sends Amazon SNS.",
+  "description": "An Amazon Inspector finding on a vulnerable Amazon ECR image triggers an AWS Step Functions workflow via Amazon EventBridge to quarantine the image and alert via Amazon SNS.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
@@ -9,16 +9,12 @@
     "headline": "How it works",
     "text": [
       "This pattern automatically quarantines a vulnerable container image the moment Amazon Inspector raises a HIGH or CRITICAL finding on it.",
-      "An Amazon Inspector finding on an Amazon ECR container image is routed by an Amazon EventBridge rule (source aws.inspector2, detail-type Inspector2 Finding, filtered to HIGH/CRITICAL severity and the AWS_ECR_CONTAINER_IMAGE resource type) to an AWS Step Functions STANDARD workflow.",
-      "The workflow reads the image manifest by digest with ecr:BatchGetImage and writes the same manifest back under a quarantine tag with ecr:PutImage - a pure control-plane re-tag that needs no AWS Lambda function - then publishes an Amazon SNS notification. Retry and Catch drive a failure-notification path.",
-      "It is the first Amazon Inspector serverless pattern that acts on a finding rather than only notifying."
+      "An Amazon Inspector finding on an Amazon ECR container image is routed by an Amazon EventBridge rule (source aws.inspector2, detail-type Inspector2 Finding, filtered to ACTIVE HIGH/CRITICAL findings on images in the demo repository) to an AWS Step Functions STANDARD workflow.",
+      "The workflow reads the image manifest by digest with ecr:BatchGetImage and writes the same manifest back under a per-image quarantine-<digest> tag with ecr:PutImage - a pure control-plane re-tag that needs no AWS Lambda function - then publishes an Amazon SNS notification. Retry and Catch drive a failure-notification path, and repeat findings for an already quarantined image end without another email."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/inspector-sfn-ecr-quarantine-cdk",
-      "templateURL": "serverless-patterns/inspector-sfn-ecr-quarantine-cdk",
-      "projectFolder": "inspector-sfn-ecr-quarantine-cdk",
       "templateFile": "cdk/lib/inspector-sfn-ecr-quarantine-stack.ts"
     }
   },
@@ -42,6 +38,7 @@
     "text": [
       "<code>cd inspector-sfn-ecr-quarantine-cdk/cdk</code>",
       "<code>npm install</code>",
+      "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once",
       "<code>npx cdk deploy</code>"
     ]
   },
@@ -59,7 +56,7 @@
   "authors": [
     {
       "name": "Nithin Chandran R",
-      "image": "https://avatars.githubusercontent.com/u/NithinChandranR-AWS",
+      "image": "https://github.com/NithinChandranR-AWS.png",
       "bio": "Solutions Architect at AWS.",
       "linkedin": "",
       "twitter": ""

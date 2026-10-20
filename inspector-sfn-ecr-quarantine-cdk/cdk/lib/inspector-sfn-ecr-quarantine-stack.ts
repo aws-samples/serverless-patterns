@@ -24,7 +24,7 @@ import * as kms from 'aws-cdk-lib/aws-kms';
  * When Amazon Inspector raises a HIGH or CRITICAL finding on an Amazon ECR
  * container image, Amazon EventBridge routes the finding to an AWS Step
  * Functions STANDARD workflow that QUARANTINES the offending image by applying
- * a `quarantine` tag to it, then sends an Amazon SNS notification.
+ * a per-image `quarantine-<digest>` tag to it, then sends an Amazon SNS notification.
  *
  * How the ECR "quarantine tag" is implemented (verified against the ECR API):
  *   An OCI/Docker image in Amazon ECR is identified by its content-addressable
@@ -33,19 +33,28 @@ import * as kms from 'aws-cdk-lib/aws-kms';
  *   image data you:
  *     1. ecr:BatchGetImage  - read the image manifest by its digest.
  *     2. ecr:PutImage       - write the SAME manifest bytes back under a new
- *                             imageTag ("quarantine"). This is a pure
- *                             control-plane call; no layers are moved.
+ *                             imageTag (`quarantine-<digest hex>`). This is a
+ *                             pure control-plane call; no layers are moved.
  *   Both calls are available as Step Functions optimized AWS SDK service
  *   integrations (arn:aws:states:::aws-sdk:ecr:batchGetImage / :putImage), so
  *   the whole quarantine action runs from the state machine with no AWS
  *   Lambda function.
  *
+ *   The tag is derived from the image digest (`quarantine-<sha256 hex>`), so
+ *   each quarantined image gets its own marker and a tag never moves from one
+ *   image to another. Because Amazon Inspector emits one event per finding (and
+ *   another on each state change), the same image can start several executions;
+ *   a repeat PutImage with the identical manifest and tag fails with
+ *   ImageAlreadyExistsException, which the workflow treats as "already
+ *   quarantined".
+ *
  *   Note on tag mutability: the demo repository is created with MUTABLE tags so
  *   the PutImage re-tag can succeed. PutImageTagMutability is a REPOSITORY-level
  *   setting (not per-image), so flipping the repo to IMMUTABLE mid-workflow
- *   would block the very re-tag we depend on. The `quarantine` tag is therefore
- *   the durable per-image marker; downstream lifecycle policies or admission
- *   controllers can key off it. See README "Design decisions".
+ *   would block the very re-tag we depend on. The `quarantine-<digest>` tag is
+ *   therefore the durable per-image marker; downstream lifecycle policies or
+ *   admission controllers can key off the `quarantine-` prefix. See README
+ *   "Design decisions".
  */
 export class InspectorSfnEcrQuarantineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -115,8 +124,19 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
       resultPath: '$.manifest',
     });
 
-    // 2) Re-tag the SAME manifest under the "quarantine" tag (PutImage).
-    //    ImageManifest is the manifest string returned by BatchGetImage above.
+    // 2) Re-tag the SAME manifest under a per-image quarantine tag (PutImage).
+    //    ImageManifest and ImageManifestMediaType are returned by BatchGetImage
+    //    above. The tag is derived from the digest (sha256:<hex> -> hex) so every
+    //    quarantined image keeps its own tag.
+    const digestHex = sfn.JsonPath.arrayGetItem(
+      sfn.JsonPath.stringSplit(
+        sfn.JsonPath.stringAt(
+          '$.detail.resources[0].details.awsEcrContainerImage.imageHash',
+        ),
+        ':',
+      ),
+      1,
+    );
     const applyQuarantineTag = new tasks.CallAwsService(
       this,
       'ApplyQuarantineTag',
@@ -130,16 +150,21 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
           ImageManifest: sfn.JsonPath.stringAt(
             '$.manifest.Images[0].ImageManifest',
           ),
-          ImageTag: 'quarantine',
+          ImageManifestMediaType: sfn.JsonPath.stringAt(
+            '$.manifest.Images[0].ImageManifestMediaType',
+          ),
+          ImageTag: sfn.JsonPath.format('quarantine-{}', digestHex),
         },
         iamResources: [repository.repositoryArn],
         resultPath: '$.putImage',
       },
     );
 
-    // Retry transient ECR/throttling errors on the two ECR calls.
+    // Retry only transient ECR errors (server-side faults and throttling) on
+    // the two ECR calls. Permanent errors such as Ecr.RepositoryNotFoundException
+    // or Ecr.ImageAlreadyExistsException go straight to the Catch.
     const retryProps: sfn.RetryProps = {
-      errors: ['States.ALL'],
+      errors: ['Ecr.ServerException', 'Ecr.ThrottlingException', 'States.Timeout'],
       interval: Duration.seconds(2),
       maxAttempts: 3,
       backoffRate: 2,
@@ -160,7 +185,7 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
           '$.detail.resources[0].details.awsEcrContainerImage.imageHash',
         ),
         severity: sfn.JsonPath.stringAt('$.detail.severity'),
-        quarantineTag: 'quarantine',
+        quarantineTag: sfn.JsonPath.format('quarantine-{}', digestHex),
         findingTitle: sfn.JsonPath.stringAt('$.detail.title'),
       }),
     });
@@ -195,13 +220,49 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
       resultPath: '$.rebuild',
     });
 
+    // BatchGetImage returns HTTP 200 with an empty `images` array (and the
+    // image under `failures`) when the image no longer exists, for example if
+    // it was deleted between the finding and this execution. Referencing
+    // $.manifest.Images[0] would then raise States.Runtime, which a
+    // States.ALL Catch does not catch, so check for the manifest first and
+    // route the missing case to the failure notification.
+    const manifestMissing = new sfn.Pass(this, 'ImageManifestMissing', {
+      comment: 'BatchGetImage returned no usable manifest (image deleted or no media type).',
+      result: sfn.Result.fromObject({
+        Error: 'ImageManifestMissing',
+        Cause: 'BatchGetImage returned no image manifest for the finding. The image may have been deleted.',
+      }),
+      resultPath: '$.error',
+    });
+    manifestMissing.next(notifyFailure);
+
+    const hasManifest = new sfn.Choice(this, 'HasImageManifest')
+      .when(
+        sfn.Condition.and(
+          sfn.Condition.isPresent('$.manifest.Images[0].ImageManifest'),
+          sfn.Condition.isPresent('$.manifest.Images[0].ImageManifestMediaType'),
+        ),
+        applyQuarantineTag,
+      )
+      .otherwise(manifestMissing);
+
     // Wire the quarantine happy path, attaching a Catch to the failure path.
-    const quarantineFlow = getManifest
-      .next(applyQuarantineTag)
-      .next(rebuildHint)
-      .next(notifyQuarantined);
+    const quarantineFlow = getManifest.next(hasManifest);
+    applyQuarantineTag.next(rebuildHint).next(notifyQuarantined);
 
     getManifest.addCatch(notifyFailure, { resultPath: '$.error' });
+
+    // Inspector emits one event per finding, so repeat executions for the same
+    // image call PutImage with an identical manifest and tag and get
+    // Ecr.ImageAlreadyExistsException. Treat that as success. This Catch is
+    // added BEFORE the States.ALL one so it is evaluated first.
+    const alreadyQuarantined = new sfn.Pass(this, 'AlreadyQuarantined', {
+      comment: 'Image already carries its quarantine tag; nothing to do.',
+    });
+    applyQuarantineTag.addCatch(alreadyQuarantined, {
+      errors: ['Ecr.ImageAlreadyExistsException'],
+      resultPath: '$.putImage',
+    });
     applyQuarantineTag.addCatch(notifyFailure, { resultPath: '$.error' });
 
     // Severity Choice: act only on HIGH/CRITICAL; otherwise skip.
@@ -244,18 +305,28 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     // publish scoped to the topic automatically. No wildcards are used.
 
     // ---------------------------------------------------------------------
-    // Amazon EventBridge rule: Inspector2 HIGH/CRITICAL findings on ECR images.
+    // Amazon EventBridge rule: ACTIVE Inspector2 HIGH/CRITICAL findings on images
+    // in the demo ECR repository.
     // ---------------------------------------------------------------------
     const rule = new events.Rule(this, 'InspectorEcrFindingRule', {
       description:
-        'Route HIGH/CRITICAL Amazon Inspector findings on Amazon ECR container images to the quarantine workflow',
+        'Route ACTIVE HIGH/CRITICAL Amazon Inspector findings on container images in the demo Amazon ECR repository to the quarantine workflow',
       eventPattern: {
         source: ['aws.inspector2'],
         detailType: ['Inspector2 Finding'],
         detail: {
           severity: ['HIGH', 'CRITICAL'],
+          // Skip events for findings that moved to CLOSED or SUPPRESSED.
+          status: ['ACTIVE'],
           resources: {
             type: ['AWS_ECR_CONTAINER_IMAGE'],
+            // Only the demo repository: the state machine role has ECR
+            // permissions on this repository alone.
+            details: {
+              awsEcrContainerImage: {
+                repositoryName: [repository.repositoryName],
+              },
+            },
           },
         },
       },
