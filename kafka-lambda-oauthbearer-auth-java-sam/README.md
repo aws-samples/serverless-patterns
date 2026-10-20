@@ -17,6 +17,8 @@ The function consumes records from a self-managed Apache Kafka cluster using SAS
 
 Each record the producer sends is delivered to the AWS Lambda function in batches. The function logs every record to Amazon CloudWatch Logs and stores its fields, together with the Kafka topic, partition, and offset, in Amazon DynamoDB.
 
+Processing is at least once. If any record in a batch fails, for example because a DynamoDB write fails, the event source mapping retries the whole batch rather than skipping it. The table's key is the topic partition plus the offset, so a retried record overwrites its earlier item instead of creating a duplicate.
+
 ## Requirements
 
 - An AWS account and an IAM principal with permissions to create the resources in `KafkaBrokersCognitoClientEC2.yaml`, including named IAM roles.
@@ -98,24 +100,20 @@ sh ./producer_send.sh $KAFKA_TOPIC 10
 
 ## Verify the AWS Lambda function received the messages
 
-Set `FN` to the name of the function you deployed:
+Each record appears in the function's Amazon CloudWatch Logs as a `Received this message from Kafka` entry with its topic, partition, and offset. Set `LOG_GROUP` for the option you deployed, then read the logs:
 
 ```bash
-# Option A (AWS SAM)
-FN=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME-sam" \
-  --query "Stacks[0].Outputs[?OutputKey=='LambdaKafkaConsumerJavaFunction'].OutputValue" --output text)
+# Option A (AWS SAM): the template's log group, which keeps logs for 7 days
+LOG_GROUP=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME-sam" \
+  --query "Stacks[0].Outputs[?OutputKey=='ConsumerLogGroupName'].OutputValue" --output text)
 
-# Option B (AWS CLI script)
-FN="$STACK_NAME-consumer"
+# Option B (AWS CLI script): the script also sets 7-day retention
+LOG_GROUP="/aws/lambda/$STACK_NAME-consumer"
+
+aws logs tail "$LOG_GROUP" --since 15m
 ```
 
-Then read the function's logs in Amazon CloudWatch Logs. Each record appears as a `Received this message from Kafka` entry:
-
-```bash
-aws logs tail "/aws/lambda/${FN##*:}" --since 15m
-```
-
-You can also open the `/aws/lambda/<function-name>` log group in the [Amazon CloudWatch console](https://console.aws.amazon.com/cloudwatch/).
+You can also open the log group in the [Amazon CloudWatch console](https://console.aws.amazon.com/cloudwatch/).
 
 ## Verify the records in Amazon DynamoDB
 
@@ -128,7 +126,21 @@ aws dynamodb scan --table-name "$STACK_NAME-messages" --select COUNT        # Op
 
 To browse the items, open the table in the [Amazon DynamoDB console](https://console.aws.amazon.com/dynamodbv2/) and choose **Explore table items**.
 
+## Run the negative tests
+
+The scripts in `scripts/` also show the cluster turning away clients that shouldn't get in:
+
+```bash
+cd ~/serverless-patterns/kafka-lambda-oauthbearer-auth-java-sam/scripts
+bash ./bad_invalid_credentials.sh
+bash ./bad_unauthorized_operations.sh $KAFKA_TOPIC
+```
+
+`bad_invalid_credentials.sh` shows Amazon Cognito refusing a bogus username and password, then the brokers rejecting an invalid token with a SASL/OAUTHBEARER authentication failure. `bad_unauthorized_operations.sh` uses valid tokens for operations the users' Kafka ACLs don't allow, such as the producer creating a topic or the consumer writing to one, and each attempt fails with `TopicAuthorizationException`. Each script prints an `>> expected:` line before every attempt, so you can compare the actual error with it.
+
 ## Cleanup
+
+These resources bill continuously until you delete the stacks: the three Kafka broker instances, the Amazon EC2 client instance, the NAT gateway, and the event source mapping's provisioned poller, which this sample runs in provisioned mode and which is charged for its minimum pollers whether or not messages arrive.
 
 1. Delete the AWS Lambda function with the tool you deployed it with. Each tool removes only the resources it created.
 

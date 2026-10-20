@@ -124,15 +124,13 @@ public class HandlerMSK implements RequestHandler<KafkaEvent, String>{
 				}
 				thisMessage.setHeaders(headersInThisMessage);
 				listOfMessages.add(thisMessage);
-				// Below we are logging the particular kafka message in string format using the toString method
-	            // as well as in Json format using gson.toJson function
-				logger.log("Received this message from Kafka - " + thisMessage.toString());
-				logger.log("Message in JSON format : " + gson.toJson(thisMessage));
+				// Log where the record came from, not its payload, which may hold personal data.
+				logger.log("Received this message from Kafka - topic=" + thisMessage.getTopic()
+						+ ", partition=" + thisMessage.getPartition() + ", offset=" + thisMessage.getOffset());
 				// Persist the Kafka metadata and the parsed JSON payload fields to DynamoDB
 				writeToDynamoDb(thisMessage, logger);
 			}
 		}
-		logger.log("All Messages in this batch = " + gson.toJson(listOfMessages));
 		return response;
 	}
 
