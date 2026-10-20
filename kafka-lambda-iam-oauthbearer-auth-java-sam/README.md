@@ -11,7 +11,7 @@ The function consumes records from a self-managed Apache Kafka cluster using SAS
 - A three-broker Apache Kafka cluster (KRaft mode) on Amazon EC2 in private subnets, accepting SASL/OAUTHBEARER over TLS and trusting the account's AWS STS token issuer.
 - IAM roles for the admin, producer, and consumer clients, and the execution role for the AWS Lambda function. The brokers authorize each role's ARN through Kafka ACLs.
 - An AWS Secrets Manager secret holding the brokers' CA certificate.
-- An Amazon EC2 client instance with the Kafka tools, the AWS SAM CLI, and this pattern's scripts preinstalled.
+- An Amazon EC2 client instance in a private subnet, with the Kafka tools, the AWS SAM CLI, and this pattern's scripts preinstalled. It reaches the internet through a NAT gateway, and you connect to it through an EC2 Instance Connect Endpoint.
 - An AWS Lambda function with a self-managed Apache Kafka event source (`IAM_OAUTHBEARER_AUTH`, `OAUTHBEARER_AUDIENCE`, `SERVER_ROOT_CA_CERTIFICATE`) in the VPC.
 - An Amazon DynamoDB table that receives one item per Kafka record.
 
@@ -67,7 +67,9 @@ The stack reaches `CREATE_COMPLETE` only after the brokers and the client instan
 
 ## Connect to the Amazon EC2 client instance
 
-When the stack reaches `CREATE_COMPLETE`, open the [Amazon EC2 console](https://console.aws.amazon.com/ec2/), select the instance named **KafkaClientInstance**, choose **Connect**, and connect with **EC2 Instance Connect**.
+When the stack reaches `CREATE_COMPLETE`, open the [Amazon EC2 console](https://console.aws.amazon.com/ec2/), select the instance named **KafkaClientInstance**, and choose **Connect**. On the **EC2 Instance Connect** tab, choose to connect using a private IP through an EC2 Instance Connect Endpoint, select the endpoint this stack created, and choose **Connect**. The instance has no public IP address.
+
+From your machine you can also open a shell with `aws ec2-instance-connect ssh --instance-id <instance-id> --connection-type eice`.
 
 The client instance has already created the Kafka topic and written `template.yaml` with this stack's values. Your shell loads the environment from `~/kafka_oauth.env`, including `STACK_NAME`, `KAFKA_TOPIC`, and `AWS_REGION`.
 
