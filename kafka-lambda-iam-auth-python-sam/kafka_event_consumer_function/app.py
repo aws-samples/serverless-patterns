@@ -107,7 +107,8 @@ def _write_to_dynamodb(message):
 def lambda_handler(event, context):
     messages = parse_records(event)
     for message in messages:
-        print(f"Received this message from Kafka - {message}")
+        # Log where the record came from, not its payload, which may hold personal data.
+        print(f"Received this message from Kafka - topic={message['topic']}, "
+              f"partition={message['partition']}, offset={message['offset']}")
         _write_to_dynamodb(message)
-    print(f"All messages in this batch = {json.dumps(messages)}")
     return "200 OK"

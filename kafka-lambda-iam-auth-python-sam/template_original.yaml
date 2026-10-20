@@ -20,6 +20,10 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      # Write to a log group with a retention period, so a forgotten deployment
+      # doesn't keep its logs forever.
+      LoggingConfig:
+        LogGroup: !Ref ConsumerLogGroup
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           # The consumer writes each message's fields + Kafka metadata to this table
@@ -80,6 +84,12 @@ Resources:
           - kafka-cluster:AlterGroup
           - kafka-cluster:DescribeGroup
           Resource: !Sub "arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:group/${MSKClusterName}/*"
+
+  ConsumerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-consumer"
+      RetentionInDays: 7
 
   MessagesTable:
     Type: AWS::DynamoDB::Table
@@ -147,6 +157,9 @@ Outputs:
   LambdaKafkaConsumerPythonFunction:
     Description: "Kafka consumer Lambda function ARN"
     Value: !GetAtt LambdaKafkaConsumerPythonFunction.Arn
+  ConsumerLogGroupName:
+    Description: "Amazon CloudWatch Logs log group the consumer writes to"
+    Value: !Ref ConsumerLogGroup
   MessagesTableName:
     Description: "DynamoDB table the consumer writes to"
     Value: !Ref MessagesTable

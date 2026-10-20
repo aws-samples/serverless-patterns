@@ -24,4 +24,5 @@ sasl.mechanism=AWS_MSK_IAM
 sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required awsRoleArn="$ROLE_ARN" awsStsRegion="$AWS_REGION";
 sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler
 EOF
+chmod 600 "$OUT"   # holds a live credential
 echo "$OUT"
