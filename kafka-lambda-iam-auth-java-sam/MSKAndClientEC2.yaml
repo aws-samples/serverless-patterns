@@ -40,7 +40,15 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   MSKKafkaVersion:
     Type: String
-    Default: 3.6.0
+    Description: >
+      Apache Kafka version for the Amazon MSK cluster. Standard broker types such as
+      kafka.m5.large need 3.8.x or later. The client instance installs the Kafka 3.9.0
+      command line tools (ApacheKafkaInstallerLocation), which work with all of these.
+    Default: 3.9.x
+    AllowedValues:
+      - 3.8.x
+      - 3.9.x
+      - 3.9.x.kraft
   JavaVersion:
     Type: String
     AllowedValues: [java11, java17, java21, java25]
