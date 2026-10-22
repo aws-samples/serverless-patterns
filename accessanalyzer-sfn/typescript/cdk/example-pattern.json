@@ -1,0 +1,69 @@
+{
+  "title": "Check IAM role policy changes with AWS IAM Access Analyzer and AWS Step Functions",
+  "description": "Amazon EventBridge starts an AWS Step Functions workflow when an inline IAM role policy changes. AWS IAM Access Analyzer checks the policy and Amazon SNS reports the result.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern checks every inline policy that is written to an IAM role whose name starts with a configured prefix. An Amazon EventBridge rule matches the IAM PutRolePolicy call recorded by AWS CloudTrail and starts an AWS Step Functions workflow. The workflow passes the policy document from the event straight to the IAM Access Analyzer CheckAccessNotGranted API with an AWS SDK service integration, so no AWS Lambda function is needed and no call to read the policy back is made.",
+      "If the result is PASS the execution ends. If the result is FAIL, or the policy cannot be checked, the workflow publishes an Amazon SNS notification. By default the pattern only notifies. Removing the inline policy is an opt-in setting that is limited to the same role-name prefix.",
+      "The pattern is detective and corrective, not preventive: the permission exists until the event is delivered and the workflow finishes. IAM events are delivered in us-east-1, so deploy the stack there."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/accessanalyzer-sfn-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Validate policies with IAM Access Analyzer custom policy checks",
+        "link": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-custom-policy-checks.html"
+      },
+      {
+        "text": "CheckAccessNotGranted API reference",
+        "link": "https://docs.aws.amazon.com/access-analyzer/latest/APIReference/API_CheckAccessNotGranted.html"
+      },
+      {
+        "text": "Call AWS SDK services from AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "AWS service events delivered via AWS CloudTrail",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event-cloudtrail.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd accessanalyzer-sfn/typescript/cdk",
+      "npm install",
+      "export AWS_REGION=us-east-1",
+      "npx cdk bootstrap",
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Subscribe an email address to the Amazon SNS topic from the stack output, create a role named guardrail-demo-test, then write the compliant and the blocked policy from the test folder with <code>aws iam put-role-policy</code>.",
+      "Read the executions with <code>aws stepfunctions list-executions</code>. The compliant policy ends in PolicyCompliant. The blocked policy ends in NotifyViolation and sends an email.",
+      "See the GitHub repo for the exact commands and expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the test role policies and the test role, then delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
