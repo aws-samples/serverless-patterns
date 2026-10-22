@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow4" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+    <marker id="arrow4orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#FF9900"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="480" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad4)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad4)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 4: Monitoring</text>
+  <text x="240" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="260" y="36" fill="#D5DBDB" font-size="14">Polling with exponential backoff and durable suspension</text>
+
+  <!-- Step 1: Acknowledge Job -->
+  <rect x="30" y="80" width="140" height="70" fill="url(#stepGrad4)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow4)"/>
+  <rect x="30" y="80" width="140" height="24" fill="#1B660F" rx="6"/>
+  <rect x="30" y="94" width="140" height="10" fill="#1B660F"/>
+  <text x="44" y="96" fill="#FFF" font-size="10" font-weight="bold">acknowledge-job</text>
+  <text x="43" y="116" fill="#16191F" font-size="9">Record job start time</text>
+  <text x="43" y="130" fill="#16191F" font-size="9">Initialize attempt = 0</text>
+
+  <!-- Arrow to poll loop -->
+  <line x1="170" y1="115" x2="200" y2="115" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow4)"/>
+
+  <!-- Poll Loop Container -->
+  <rect x="205" y="72" width="680" height="165" fill="#FFF" stroke="#FF9900" stroke-width="2" rx="8" filter="url(#shadow4)"/>
+  <rect x="205" y="72" width="680" height="28" fill="#FF9900" rx="8"/>
+  <rect x="205" y="88" width="680" height="12" fill="#FF9900"/>
+  <text x="225" y="91" fill="#FFF" font-size="11" font-weight="bold">waitForCondition() - Polling Loop with Exponential Backoff</text>
+
+  <!-- Poll attempt 1 -->
+  <rect x="225" y="112" width="90" height="50" fill="url(#stepGrad4)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="237" y="128" fill="#16191F" font-size="9" font-weight="bold">Poll #1</text>
+  <text x="237" y="142" fill="#687078" font-size="8">check status</text>
+  <text x="237" y="154" fill="#D13212" font-size="8">NOT READY</text>
+
+  <!-- Wait 5s -->
+  <line x1="315" y1="137" x2="335" y2="137" stroke="#FF9900" stroke-width="1" marker-end="url(#arrow4orange)"/>
+  <rect x="338" y="124" width="62" height="28" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="3"/>
+  <text x="346" y="136" fill="#FF9900" font-size="8" font-weight="bold">SUSPEND</text>
+  <text x="352" y="147" fill="#FF9900" font-size="7">wait 5s</text>
+
+  <!-- Poll attempt 2 -->
+  <line x1="400" y1="137" x2="415" y2="137" stroke="#FF9900" stroke-width="1" marker-end="url(#arrow4orange)"/>
+  <rect x="418" y="112" width="90" height="50" fill="url(#stepGrad4)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="430" y="128" fill="#16191F" font-size="9" font-weight="bold">Poll #2</text>
+  <text x="430" y="142" fill="#687078" font-size="8">check status</text>
+  <text x="430" y="154" fill="#D13212" font-size="8">NOT READY</text>
+
+  <!-- Wait 10s -->
+  <line x1="508" y1="137" x2="528" y2="137" stroke="#FF9900" stroke-width="1" marker-end="url(#arrow4orange)"/>
+  <rect x="531" y="124" width="62" height="28" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="3"/>
+  <text x="539" y="136" fill="#FF9900" font-size="8" font-weight="bold">SUSPEND</text>
+  <text x="543" y="147" fill="#FF9900" font-size="7">wait 10s</text>
+
+  <!-- Poll attempt 3 -->
+  <line x1="593" y1="137" x2="608" y2="137" stroke="#FF9900" stroke-width="1" marker-end="url(#arrow4orange)"/>
+  <rect x="611" y="112" width="90" height="50" fill="url(#stepGrad4)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="623" y="128" fill="#16191F" font-size="9" font-weight="bold">Poll #3</text>
+  <text x="623" y="142" fill="#687078" font-size="8">check status</text>
+  <text x="623" y="154" fill="#D13212" font-size="8">NOT READY</text>
+
+  <!-- Wait 20s -->
+  <line x1="701" y1="137" x2="721" y2="137" stroke="#FF9900" stroke-width="1" marker-end="url(#arrow4orange)"/>
+  <rect x="724" y="124" width="62" height="28" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="3"/>
+  <text x="732" y="136" fill="#FF9900" font-size="8" font-weight="bold">SUSPEND</text>
+  <text x="736" y="147" fill="#FF9900" font-size="7">wait 20s</text>
+
+  <!-- Dots indicating continuation -->
+  <text x="800" y="142" fill="#545B64" font-size="14">...</text>
+
+  <!-- Terminal condition -->
+  <rect x="820" y="112" width="50" height="50" fill="#E8F5E9" stroke="#1B660F" stroke-width="1.5" rx="4"/>
+  <text x="828" y="134" fill="#1B660F" font-size="8" font-weight="bold">Poll</text>
+  <text x="829" y="146" fill="#1B660F" font-size="8" font-weight="bold">#N</text>
+  <text x="828" y="158" fill="#1B660F" font-size="7">DONE!</text>
+
+  <!-- Backoff formula -->
+  <rect x="225" y="175" width="655" height="22" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="3"/>
+  <text x="240" y="190" fill="#2C3E50" font-size="9" font-weight="bold">Backoff Formula:</text>
+  <text x="345" y="190" fill="#545B64" font-size="9">delay = 5s &#xD7; 2^(attempt-1), capped at 60s | Sequence: 5s, 10s, 20s, 40s, 60s, 60s, ...</text>
+
+  <!-- Arrow from loop to terminal check -->
+  <line x1="545" y1="237" x2="545" y2="262" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow4)"/>
+
+  <!-- Terminal Condition Check -->
+  <rect x="430" y="267" width="230" height="60" fill="url(#stepGrad4)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow4)"/>
+  <rect x="430" y="267" width="230" height="24" fill="#232F3E" rx="6"/>
+  <rect x="430" y="281" width="230" height="10" fill="#232F3E"/>
+  <text x="460" y="283" fill="#FF9900" font-size="10" font-weight="bold">Condition Check (stopPolling)</text>
+  <text x="443" y="306" fill="#16191F" font-size="9">COMPLETED or FAILED &#x2192; exit loop</text>
+  <text x="443" y="318" fill="#687078" font-size="8">Max attempts or timeout &#x2192; FAILED</text>
+
+  <!-- Arrow to Process Result -->
+  <line x1="660" y1="297" x2="720" y2="297" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow4)"/>
+
+  <!-- Step: Process Result -->
+  <rect x="725" y="267" width="150" height="60" fill="url(#stepGrad4)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow4)"/>
+  <rect x="725" y="267" width="150" height="24" fill="#1B660F" rx="6"/>
+  <rect x="725" y="281" width="150" height="10" fill="#1B660F"/>
+  <text x="748" y="283" fill="#FFF" font-size="10" font-weight="bold">process-result</text>
+  <text x="738" y="306" fill="#16191F" font-size="9">Format final status</text>
+  <text x="738" y="318" fill="#16191F" font-size="9">Store job outcome</text>
+
+  <!-- Arrow to COMPLETED -->
+  <line x1="875" y1="297" x2="920" y2="297" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow4)"/>
+
+  <!-- COMPLETED badge -->
+  <rect x="925" y="284" width="100" height="28" fill="#E8F5E9" stroke="#1B660F" stroke-width="1.5" rx="14"/>
+  <text x="941" y="302" fill="#1B660F" font-size="11" font-weight="bold">COMPLETED</text>
+
+  <!-- Key Concept Box -->
+  <rect x="30" y="350" width="1040" height="110" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow4)"/>
+  <rect x="30" y="350" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="368" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="370" fill="#FF9900" font-size="12" font-weight="bold">Key Concept: Durable Polling vs. Busy Waiting</text>
+
+  <text x="50" y="400" fill="#16191F" font-size="11">Unlike traditional polling (Lambda running continuously), each wait() call suspends the execution entirely.</text>
+  <text x="50" y="418" fill="#16191F" font-size="11">The function resumes only when the timer fires. You pay only for the brief poll check (~50ms), not the wait time.</text>
+
+  <!-- Cost comparison -->
+  <rect x="50" y="432" width="300" height="18" fill="#FDECEA" stroke="#D13212" stroke-width="1" rx="3"/>
+  <text x="60" y="444" fill="#D13212" font-size="9">Traditional: 10 polls &#xD7; 15min timeout = 150min billed</text>
+  <rect x="370" y="432" width="300" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="3"/>
+  <text x="380" y="444" fill="#1B660F" font-size="9">Durable: 10 polls &#xD7; 50ms active = 500ms billed</text>
+</svg>

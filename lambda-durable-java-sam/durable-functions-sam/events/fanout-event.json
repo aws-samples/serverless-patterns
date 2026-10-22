@@ -1,0 +1,5 @@
+{
+  "dataId": "DATA-TEST-001",
+  "source": "s3://my-bucket/documents/report.pdf",
+  "analysisTypes": ["sentiment", "entities", "summary"]
+}

@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad7" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad7" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow7" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow7" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="520" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad7)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad7)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 7: Map Processing</text>
+  <text x="280" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="300" y="36" fill="#D5DBDB" font-size="14">Bounded-concurrency batch processing with failure tolerance</text>
+
+  <!-- Step 1: Prepare Batch -->
+  <rect x="30" y="80" width="150" height="70" fill="url(#stepGrad7)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow7)"/>
+  <rect x="30" y="80" width="150" height="24" fill="#1B660F" rx="6"/>
+  <rect x="30" y="94" width="150" height="10" fill="#1B660F"/>
+  <text x="55" y="96" fill="#FFF" font-size="10" font-weight="bold">prepare-batch</text>
+  <text x="43" y="117" fill="#16191F" font-size="9">Load 10 items from queue</text>
+  <text x="43" y="131" fill="#16191F" font-size="9">Partition into work units</text>
+
+  <!-- Arrow to map -->
+  <line x1="180" y1="115" x2="210" y2="115" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+  <!-- Map container -->
+  <rect x="215" y="68" width="650" height="280" fill="#FFF" stroke="#1F78B4" stroke-width="2" rx="8" filter="url(#shadow7)"/>
+  <rect x="215" y="68" width="650" height="28" fill="#1F78B4" rx="8"/>
+  <rect x="215" y="86" width="650" height="10" fill="#1F78B4"/>
+  <text x="235" y="87" fill="#FFF" font-size="11" font-weight="bold">map("process-items") - maxConcurrency=3, toleratedFailures=2</text>
+
+  <!-- Concurrency slots label -->
+  <text x="235" y="115" fill="#232F3E" font-size="10" font-weight="bold">3 Concurrent Slots:</text>
+
+  <!-- Slot 1 -->
+  <rect x="235" y="125" width="190" height="100" fill="url(#stepGrad7)" stroke="#D5DBDB" stroke-width="1" rx="5"/>
+  <rect x="235" y="125" width="190" height="20" fill="#232F3E" rx="5"/>
+  <rect x="235" y="139" width="190" height="6" fill="#232F3E"/>
+  <text x="295" y="139" fill="#FF9900" font-size="9" font-weight="bold">Slot 1</text>
+
+  <rect x="245" y="152" width="55" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="252" y="164" fill="#1B660F" font-size="7">validate</text>
+  <text x="303" y="164" fill="#545B64" font-size="9">&#x2192;</text>
+  <rect x="312" y="152" width="55" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="316" y="164" fill="#1B660F" font-size="7">transform</text>
+  <text x="370" y="164" fill="#545B64" font-size="9">&#x2192;</text>
+  <rect x="380" y="152" width="35" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="386" y="164" fill="#1B660F" font-size="7">store</text>
+
+  <text x="245" y="187" fill="#1B660F" font-size="8">Items 1, 4, 7, 10</text>
+  <text x="245" y="200" fill="#687078" font-size="8">item-5: &#x2717; fails validation</text>
+
+  <!-- Slot 2 -->
+  <rect x="440" y="125" width="190" height="100" fill="url(#stepGrad7)" stroke="#D5DBDB" stroke-width="1" rx="5"/>
+  <rect x="440" y="125" width="190" height="20" fill="#232F3E" rx="5"/>
+  <rect x="440" y="139" width="190" height="6" fill="#232F3E"/>
+  <text x="500" y="139" fill="#FF9900" font-size="9" font-weight="bold">Slot 2</text>
+
+  <rect x="450" y="152" width="55" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="457" y="164" fill="#1B660F" font-size="7">validate</text>
+  <text x="508" y="164" fill="#545B64" font-size="9">&#x2192;</text>
+  <rect x="517" y="152" width="55" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="521" y="164" fill="#1B660F" font-size="7">transform</text>
+  <text x="575" y="164" fill="#545B64" font-size="9">&#x2192;</text>
+  <rect x="585" y="152" width="35" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="591" y="164" fill="#1B660F" font-size="7">store</text>
+
+  <text x="450" y="187" fill="#1B660F" font-size="8">Items 2, 5, 8</text>
+  <text x="450" y="200" fill="#687078" font-size="8">item-10: &#x2717; fails validation</text>
+
+  <!-- Slot 3 -->
+  <rect x="645" y="125" width="190" height="100" fill="url(#stepGrad7)" stroke="#D5DBDB" stroke-width="1" rx="5"/>
+  <rect x="645" y="125" width="190" height="20" fill="#232F3E" rx="5"/>
+  <rect x="645" y="139" width="190" height="6" fill="#232F3E"/>
+  <text x="705" y="139" fill="#FF9900" font-size="9" font-weight="bold">Slot 3</text>
+
+  <rect x="655" y="152" width="55" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="662" y="164" fill="#1B660F" font-size="7">validate</text>
+  <text x="713" y="164" fill="#545B64" font-size="9">&#x2192;</text>
+  <rect x="722" y="152" width="55" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="726" y="164" fill="#1B660F" font-size="7">transform</text>
+  <text x="780" y="164" fill="#545B64" font-size="9">&#x2192;</text>
+  <rect x="790" y="152" width="35" height="18" fill="#E8F5E9" stroke="#1B660F" stroke-width="0.5" rx="2"/>
+  <text x="796" y="164" fill="#1B660F" font-size="7">store</text>
+
+  <text x="655" y="187" fill="#1B660F" font-size="8">Items 3, 6, 9</text>
+  <text x="655" y="200" fill="#687078" font-size="8">All succeed &#x2713;</text>
+
+  <!-- Failure tolerance note -->
+  <rect x="235" y="235" width="610" height="40" fill="#FFF3E0" stroke="#FF9900" stroke-width="1.5" rx="4"/>
+  <text x="255" y="253" fill="#FF9900" font-size="10" font-weight="bold">Failure Tolerance: 2 failures tolerated</text>
+  <text x="255" y="268" fill="#545B64" font-size="9">Every 5th item fails validation. 2 failures (items 5, 10) &#x2264; toleratedFailures=2 &#x2192; map() continues and completes</text>
+
+  <!-- Progress indicators -->
+  <rect x="235" y="283" width="610" height="25" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="3"/>
+  <text x="400" y="300" fill="#1B660F" font-size="9" font-weight="bold">Progress: 10/10 processed | 8 succeeded | 2 failed (within tolerance)</text>
+
+  <!-- Arrow to summarize -->
+  <line x1="865" y1="200" x2="895" y2="200" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow7)"/>
+
+  <!-- Summarize Results -->
+  <rect x="900" y="130" width="170" height="140" fill="url(#stepGrad7)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow7)"/>
+  <rect x="900" y="130" width="170" height="24" fill="#1B660F" rx="6"/>
+  <rect x="900" y="144" width="170" height="10" fill="#1B660F"/>
+  <text x="918" y="146" fill="#FFF" font-size="10" font-weight="bold">summarize-results</text>
+  <text x="913" y="170" fill="#16191F" font-size="9">Aggregate outcomes:</text>
+  <text x="913" y="186" fill="#1B660F" font-size="9" font-weight="bold">8 succeeded &#x2713;</text>
+  <text x="913" y="200" fill="#D13212" font-size="9" font-weight="bold">2 failed &#x2717;</text>
+  <text x="913" y="218" fill="#16191F" font-size="9">Success rate: 80%</text>
+  <text x="913" y="234" fill="#16191F" font-size="9">Store summary in DDB</text>
+  <text x="913" y="252" fill="#687078" font-size="8" font-style="italic">Total items: 10</text>
+
+  <!-- Key Concept Box -->
+  <rect x="30" y="370" width="1040" height="130" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow7)"/>
+  <rect x="30" y="370" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="388" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="390" fill="#FF9900" font-size="12" font-weight="bold">Key Concept: Bounded Concurrency &amp; Failure Tolerance</text>
+
+  <text x="50" y="420" fill="#16191F" font-size="11">map() processes items with bounded concurrency (maxConcurrency=3). Items are distributed across slots round-robin.</text>
+  <text x="50" y="438" fill="#16191F" font-size="11">If failures &#x2264; toleratedFailures, the map completes successfully. If exceeded, it throws MapBatchFailedException.</text>
+
+  <!-- Config summary -->
+  <rect x="50" y="455" width="480" height="32" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="3"/>
+  <text x="65" y="470" fill="#2C3E50" font-size="9" font-weight="bold">Configuration:</text>
+  <text x="145" y="470" fill="#545B64" font-size="9">maxConcurrency=3 | toleratedFailures=2 | each item: validate &#x2192; transform &#x2192; store</text>
+  <text x="65" y="483" fill="#687078" font-size="8">Items assigned to slots: Slot1=[1,4,7,10] Slot2=[2,5,8] Slot3=[3,6,9]</text>
+
+  <!-- vs Step Functions comparison -->
+  <rect x="560" y="455" width="480" height="32" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="3"/>
+  <text x="575" y="470" fill="#2C3E50" font-size="9" font-weight="bold">vs. Step Functions Map:</text>
+  <text x="690" y="470" fill="#545B64" font-size="9">Same bounded concurrency concept, but runs within a single Lambda</text>
+  <text x="575" y="483" fill="#687078" font-size="8">No state machine transitions overhead - sub-steps are checkpointed within the function</text>
+</svg>
