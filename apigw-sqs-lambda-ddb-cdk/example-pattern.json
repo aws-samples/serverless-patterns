@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to Amazon SQS to AWS Lambda to Amazon DynamoDB",
-  "description": "This pattern shows how to deploy a CDK application with API Gateway, SQS, Lambda, and DynamoDB.",
+  "description": "Background job processing with AWS CDK: API Gateway sends requests to Amazon SQS, a Lambda queue worker processes them, and results are stored in Amazon DynamoDB.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",

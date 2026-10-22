@@ -1,6 +1,6 @@
 {
   "title": "Amazon S3 bucket creation notifications",
-  "description": "Notify users via AWS Lambda and Amazon SNS when a new Amazon S3 Bucket is created.",
+  "description": "Event-driven notifications: notify users via AWS Lambda and Amazon SNS when a new Amazon S3 bucket is created.",
   "language": "Python",
   "level": "200",
   "framework": "Terraform",

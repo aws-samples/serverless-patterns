@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway HTTP API to Amazon SQS to AWS Lambda",
-  "description": "This sample project demonstrates how to crate an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+  "description": "Run background jobs in Python: an Amazon API Gateway HTTP API integrates with an Amazon SQS queue, and a Lambda worker processes the jobs asynchronously.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

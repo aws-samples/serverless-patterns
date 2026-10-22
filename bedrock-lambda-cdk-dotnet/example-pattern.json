@@ -1,6 +1,6 @@
 {
   "title": "Automatically extract text from images in Amazon S3 using Amazon Bedrock",
-  "description": "This pattern demonstrates how to use Amazon Bedrock to automatically extract text from images uploaded to Amazon S3.",
+  "description": "File and image processing: use Amazon Bedrock and AWS Lambda to automatically extract text from images uploaded to Amazon S3.",
   "language": ".NET",
   "level": "200",
   "framework": "AWS CDK",

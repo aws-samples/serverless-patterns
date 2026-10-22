@@ -1,6 +1,6 @@
 {
   "title": "Multi-Day Scheduled Task Orchestration with AWS Lambda durable functions",
-  "description": "Demonstrates a 7-day workflow with scheduled checkpoints using AWS Lambda durable functions.",
+  "description": "Multi-day scheduled tasks: a 7-day workflow with scheduled checkpoints using AWS Lambda durable functions.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",

@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to AWS Lambda to Amazon EventBridge",
-  "description": "Make a request to API Gateway that sends an event to EventBridge via Lambda.",
+  "description": "Event-driven API: a request to API Gateway sends an event to EventBridge via Lambda, which routes it to a second Lambda function.",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",

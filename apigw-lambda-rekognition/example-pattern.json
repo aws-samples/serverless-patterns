@@ -1,6 +1,6 @@
 {
   "title": "Content safety image moderation using Amazon S3 and AWS Lambda",
-  "description": "Securely upload images to Amazon S3 and detect inappropriate content with Amazon Rekognition",
+  "description": "Image processing and moderation: securely upload images to Amazon S3 and detect inappropriate content with Amazon Rekognition and AWS Lambda.",
   "language": "YAML",
   "level": "200",
   "framework": "Terraform",

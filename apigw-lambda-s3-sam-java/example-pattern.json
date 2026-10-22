@@ -1,6 +1,6 @@
 {
   "title": "Upload file up to 5GB to Amazon S3 bucket using presigned URL",
-  "description": "This project deploys Amazon API Gateway with AWS Lambda integration. The Java based Lambda function generates presigned S3 URL.",
+  "description": "File uploads for file processing: Amazon API Gateway with an AWS Lambda integration. The Java based Lambda function generates a presigned S3 URL for uploads up to 5 GB.",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",

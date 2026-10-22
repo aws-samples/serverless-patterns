@@ -1,6 +1,6 @@
 {
   "title": "AWS Lambda function with a function URL",
-  "description": "Create Lambda function with a URL",
+  "description": "Web app or API backend on AWS Lambda with CDK: create a Lambda function with a function URL.",
   "language": "TypeScript",
   "level": "100",
   "framework": "AWS CDK",
