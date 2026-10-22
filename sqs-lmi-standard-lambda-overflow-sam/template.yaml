@@ -1,0 +1,502 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Runs a steady SQS workload on Lambda Managed Instances and opens a Standard Lambda
+  burst tier on the same queue when queue depth shows that LMI cannot keep up.
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    Timeout: 30
+    MemorySize: 2048
+    LoggingConfig:
+      LogFormat: JSON
+
+Parameters:
+  # Declared as scalars rather than List<AWS::EC2::Subnet::Id>: the AWS SAM transform
+  # cannot resolve a Ref to a List parameter into a list, and rejects the template.
+  LmiSubnetIdAz1:
+    Type: AWS::EC2::Subnet::Id
+    Description: >
+      First private subnet for Lambda Managed Instances. Needs egress to SQS, DynamoDB,
+      CloudWatch, and CloudWatch Logs.
+
+  LmiSubnetIdAz2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Second private subnet, in a different Availability Zone.
+
+  LmiSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security group for Lambda Managed Instances. Requires outbound access.
+
+  LmiMaxVCpuCount:
+    Type: Number
+    Default: 64
+    MinValue: 2
+    MaxValue: 15000
+    Description: >
+      Ceiling on vCPUs the capacity provider may provision. With the defaults below each
+      execution environment gets 1 vCPU, so this is also the maximum number of execution
+      environments.
+
+  LmiBaselineExecutionEnvironments:
+    Type: Number
+    Default: 3
+    MinValue: 0
+    MaxValue: 15000
+    Description: >
+      Always-on execution environments (MinExecutionEnvironments). Set this to the
+      steady-state footprint you want covered by an EC2 Savings Plan or Reserved Instance.
+
+  LmiPerEnvironmentConcurrency:
+    Type: Number
+    Default: 10
+    MinValue: 1
+    Description: >
+      Concurrent invocations per execution environment. Baseline concurrency is
+      LmiBaselineExecutionEnvironments multiplied by this value.
+
+  LmiMaximumPollers:
+    Type: Number
+    Default: 64
+    MinValue: 1
+    MaxValue: 2000
+    Description: >
+      Maximum provisioned event pollers for the LMI event source mapping. Each poller
+      supplies about 10 concurrent invocations, so this must be at least
+      (LmiMaxVCpuCount * LmiPerEnvironmentConcurrency) / 10 or the pollers, not LMI,
+      become the throughput ceiling.
+
+  LmiMinimumPollers:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    MaxValue: 200
+    Description: Minimum provisioned event pollers. These are billed continuously.
+
+  SpillOpenDepth:
+    Type: Number
+    Default: 1800
+    MinValue: 1
+    Description: >
+      Visible queue depth at which the burst tier opens. Size this as the number of
+      messages the LMI baseline drains in about 60 seconds.
+
+  SpillCloseDepth:
+    Type: Number
+    Default: 450
+    MinValue: 0
+    Description: >
+      Visible queue depth at which the burst tier closes. Must be well below
+      SpillOpenDepth. The gap between the two is the dead band that prevents flapping.
+
+  SpillMinimumDwellSeconds:
+    Type: Number
+    Default: 300
+    MinValue: 0
+    Description: >
+      Minimum time the burst tier stays open before the controller is allowed to close
+      it. Gives LMI time to actually scale up before the relief valve is removed.
+
+  ControllerPollIntervalSeconds:
+    Type: Number
+    Default: 10
+    MinValue: 0
+    MaxValue: 60
+    Description: >
+      Seconds between GetQueueAttributes polls. This is the detection latency for opening
+      the burst tier. The controller is scheduled once a minute and polls in a loop for
+      most of that minute, so a lower value costs more Lambda duration and more SQS API
+      calls, not more invocations. Set to 0 for a single poll per minute: nearly free, but
+      detection becomes up to 60 seconds.
+
+  SpillCloseTrendWindowSeconds:
+    Type: Number
+    Default: 30
+    MinValue: 0
+    MaxValue: 45
+    Description: >
+      The controller will not close the burst tier until it has watched depth for this
+      long and seen it flat or falling. Prevents a close on a dip that is on its way back
+      up. Samples do not carry across invocations, so this must fit inside one poll loop
+      -- roughly 40 seconds at the default interval. Set to 0 to disable the check and
+      close on depth alone, which is required if ControllerPollIntervalSeconds is 0,
+      because a single poll cannot establish a slope. A window this loop cannot cover
+      logs a misconfigured-trend-window warning and leaves the tier unable to close.
+
+  BurstMaximumConcurrency:
+    Type: Number
+    Default: 540
+    MinValue: 2
+    MaxValue: 1000
+    Description: >
+      Maximum concurrent burst-worker invocations. Size as
+      (peak arrival rate - LMI baseline drain rate) * work seconds, plus headroom to
+      clear the backlog that accumulated before the valve opened.
+
+  WorkDurationMs:
+    Type: Number
+    Default: 1000
+    MinValue: 0
+    MaxValue: 25000
+    Description: >
+      Simulated per-message processing time. This is the knob that sets how much load a
+      given message rate applies, so it determines whether a burst can saturate LMI.
+
+  WorkMode:
+    Type: String
+    Default: cpu
+    AllowedValues:
+      - cpu
+      - sleep
+    Description: >
+      cpu burns real CPU for WorkDurationMs and drives both CPUThrottles and
+      ConcurrencyThrottles. sleep only occupies concurrency slots, so LMI scales on
+      concurrency saturation alone.
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # Data plane: one queue, two consumers.
+  # ---------------------------------------------------------------------------
+
+  WorkDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+
+  WorkQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      # Six times the function timeout, per SQS/Lambda guidance.
+      VisibilityTimeout: 180
+      SqsManagedSseEnabled: true
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt WorkDeadLetterQueue.Arn
+        # Poison messages leave the queue quickly instead of inflating the depth
+        # signal that drives the spill decision.
+        maxReceiveCount: 5
+
+  IdempotencyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: work_item_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: work_item_id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+
+  # ---------------------------------------------------------------------------
+  # Baseline tier: Lambda Managed Instances.
+  # ---------------------------------------------------------------------------
+
+  CapacityProvider:
+    Type: AWS::Serverless::CapacityProvider
+    Properties:
+      CapacityProviderName: !Sub '${AWS::StackName}-lmi'
+      VpcConfig:
+        SubnetIds:
+          - !Ref LmiSubnetIdAz1
+          - !Ref LmiSubnetIdAz2
+        SecurityGroupIds:
+          - !Ref LmiSecurityGroupId
+      InstanceRequirements:
+        Architectures:
+          - arm64
+      ScalingConfig:
+        MaxVCpuCount: !Ref LmiMaxVCpuCount
+        # AverageCPUUtilization is deliberately NOT set. Setting it makes AWS SAM
+        # emit ScalingMode: Manual with a target-tracking policy, which gives up the
+        # managed Auto scaler's roughly 2x-per-5-minutes headroom. This pattern
+        # depends on that headroom to recover from a burst.
+      Tags:
+        Pattern: sqs-lmi-standard-lambda-overflow
+
+  LmiWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: worker.lambda_handler
+      Description: Baseline SQS worker on Lambda Managed Instances.
+      # NOTE: CapacityProviderConfig must be set on the first deploy. It cannot be
+      # added to, or removed from, an existing function resource.
+      CapacityProviderConfig:
+        Arn: !GetAtt CapacityProvider.Arn
+        # 2048 MB of memory at 2 GiB per vCPU means 1 vCPU per execution environment.
+        ExecutionEnvironmentMemoryGiBPerVCpu: 2
+        PerExecutionEnvironmentMaxConcurrency: !Ref LmiPerEnvironmentConcurrency
+      FunctionScalingConfig:
+        MinExecutionEnvironments: !Ref LmiBaselineExecutionEnvironments
+      Environment:
+        Variables:
+          COMPUTE_TIER: lmi
+          IDEMPOTENCY_TABLE: !Ref IdempotencyTable
+          METRIC_NAMESPACE: !Sub 'LmiOverflow/${AWS::StackName}'
+          WORK_DURATION_MS: !Ref WorkDurationMs
+          WORK_MODE: !Ref WorkMode
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt WorkQueue.QueueName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref IdempotencyTable
+      Tags:
+        Pattern: sqs-lmi-standard-lambda-overflow
+
+  LmiEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !GetAtt LmiWorkerFunction.Arn
+      EventSourceArn: !GetAtt WorkQueue.Arn
+      # BatchSize 1 keeps per-message latency and the drain rate directly proportional
+      # to concurrency, which makes the load-test graphs readable. Raise it for
+      # production throughput once you no longer need that.
+      BatchSize: 1
+      FunctionResponseTypes:
+        - ReportBatchItemFailures
+      # ScalingConfig is NOT set here. It is mutually exclusive with
+      # ProvisionedPollerConfig.
+      ProvisionedPollerConfig:
+        MinimumPollers: !Ref LmiMinimumPollers
+        MaximumPollers: !Ref LmiMaximumPollers
+
+  # ---------------------------------------------------------------------------
+  # Burst tier: Standard Lambda on the same queue, disabled until needed.
+  # ---------------------------------------------------------------------------
+
+  BurstWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: worker.lambda_handler
+      Description: On-demand Standard Lambda worker that absorbs temporary overflow.
+      # MemorySize matches the LMI worker (Globals) so both tiers have the same
+      # per-invocation service rate. Different memory would distort the graphs.
+      Environment:
+        Variables:
+          COMPUTE_TIER: standard-lambda
+          IDEMPOTENCY_TABLE: !Ref IdempotencyTable
+          METRIC_NAMESPACE: !Sub 'LmiOverflow/${AWS::StackName}'
+          WORK_DURATION_MS: !Ref WorkDurationMs
+          WORK_MODE: !Ref WorkMode
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt WorkQueue.QueueName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref IdempotencyTable
+      Tags:
+        Pattern: sqs-lmi-standard-lambda-overflow
+
+  BurstEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !GetAtt BurstWorkerFunction.Arn
+      EventSourceArn: !GetAtt WorkQueue.Arn
+      BatchSize: 1
+      FunctionResponseTypes:
+        - ReportBatchItemFailures
+      # Disabled at deploy time: the burst tier costs nothing at steady state. The
+      # spill controller flips this to true. A later `sam deploy` resets it to false,
+      # which is safe -- LMI keeps draining and the controller's next poll reopens the
+      # valve within a minute if depth still warrants it.
+      Enabled: false
+      ScalingConfig:
+        MaximumConcurrency: !Ref BurstMaximumConcurrency
+
+  # ---------------------------------------------------------------------------
+  # Control plane: a controller that polls live queue depth and toggles the burst
+  # event source mapping. Nothing here sits in the data path.
+  #
+  # There are deliberately no CloudWatch alarms on queue depth. A load test of this
+  # pattern measured 2m 15s of metric-publish plus alarm-evaluation lag on
+  # ApproximateNumberOfMessagesVisible -- more than half the total time to engage the
+  # burst tier, and irreducible, because SQS publishes that metric on a one-minute
+  # grain. GetQueueAttributes reads live queue state for the same decision.
+  # ---------------------------------------------------------------------------
+
+  SpillControllerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: spill_controller.lambda_handler
+      Description: Polls live queue depth and enables or disables the burst mapping.
+      # 128 MB: this function sleeps, calls two APIs, and compares integers. Memory is
+      # the wrong dial here and duration is what it is billed for -- the poll loop runs
+      # for most of every minute, so an oversized MemorySize multiplies straight through
+      # to the monthly bill.
+      MemorySize: 128
+      # One minute of schedule, minus the loop's own reserve. The handler exits on its
+      # own once too little of the invocation is left for another poll.
+      Timeout: 60
+      Environment:
+        Variables:
+          BURST_EVENT_SOURCE_MAPPING_UUID: !Ref BurstEventSourceMapping
+          WORK_QUEUE_URL: !Ref WorkQueue
+          SPILL_OPEN_DEPTH: !Ref SpillOpenDepth
+          SPILL_CLOSE_DEPTH: !Ref SpillCloseDepth
+          POLL_INTERVAL_SECONDS: !Ref ControllerPollIntervalSeconds
+          CLOSE_TREND_WINDOW_SECONDS: !Ref SpillCloseTrendWindowSeconds
+          MINIMUM_DWELL_SECONDS: !Ref SpillMinimumDwellSeconds
+          METRIC_NAMESPACE: !Sub 'LmiOverflow/${AWS::StackName}'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:GetEventSourceMapping
+                - lambda:UpdateEventSourceMapping
+              Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:event-source-mapping:${BurstEventSourceMapping}'
+            # Read-only on the queue, and narrower than the SQSPollerPolicy template:
+            # the controller must never be able to receive or delete a workload message.
+            - Effect: Allow
+              Action: sqs:GetQueueAttributes
+              Resource: !GetAtt WorkQueue.Arn
+      Events:
+        Poll:
+          # One minute is EventBridge's floor, so the handler loops internally to reach
+          # ControllerPollIntervalSeconds. The schedule is also the recovery mechanism:
+          # every invocation reads current state and converges, so a stack redeploy or a
+          # dropped invocation costs at most a minute.
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+
+  # ---------------------------------------------------------------------------
+  # Dashboard: produces the traffic-curve graphs for the two load-test scenarios.
+  # ---------------------------------------------------------------------------
+
+  Dashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub '${AWS::StackName}-lmi-overflow'
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric", "x": 0, "y": 0, "width": 12, "height": 7,
+              "properties": {
+                "title": "Backlog and spill thresholds",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "stat": "Maximum", "period": 60,
+                "metrics": [
+                  [ "AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "${WorkQueue.QueueName}", { "label": "Visible depth" } ],
+                  [ ".", "ApproximateAgeOfOldestMessage", ".", ".", { "label": "Age of oldest (s)", "yAxis": "right" } ]
+                ],
+                "annotations": { "horizontal": [
+                  { "label": "open burst tier", "value": ${SpillOpenDepth}, "color": "#d62728" },
+                  { "label": "close burst tier", "value": ${SpillCloseDepth}, "color": "#2ca02c" }
+                ] }
+              }
+            },
+            {
+              "type": "metric", "x": 12, "y": 0, "width": 12, "height": 7,
+              "properties": {
+                "title": "Work completed per tier (the traffic curve)",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "stacked": true, "stat": "Sum", "period": 60,
+                "metrics": [
+                  [ "LmiOverflow/${AWS::StackName}", "MessagesProcessed", "Tier", "lmi", { "label": "LMI baseline", "color": "#1f77b4" } ],
+                  [ ".", ".", ".", "standard-lambda", { "label": "Standard Lambda burst", "color": "#ff7f0e" } ]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 0, "y": 7, "width": 12, "height": 7,
+              "properties": {
+                "title": "Concurrency per tier",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "stat": "Maximum", "period": 60,
+                "metrics": [
+                  [ "AWS/Lambda", "ConcurrentExecutions", "FunctionName", "${LmiWorkerFunction}", { "label": "LMI worker" } ],
+                  [ ".", ".", ".", "${BurstWorkerFunction}", { "label": "Burst worker" } ]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 12, "y": 7, "width": 12, "height": 7,
+              "properties": {
+                "title": "End-to-end queue wait per tier (p99)",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "stat": "p99", "period": 60,
+                "metrics": [
+                  [ "LmiOverflow/${AWS::StackName}", "QueueWaitMillis", "Tier", "lmi", { "label": "LMI" } ],
+                  [ ".", ".", ".", "standard-lambda", { "label": "Standard Lambda" } ]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 0, "y": 14, "width": 12, "height": 7,
+              "properties": {
+                "title": "Why LMI is scaling (throttle reasons, 5-min metrics)",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "stat": "Sum", "period": 300,
+                "metrics": [
+                  [ "AWS/Lambda", "ConcurrencyThrottles", "FunctionName", "${LmiWorkerFunction}", { "label": "Concurrency saturated" } ],
+                  [ ".", "CPUThrottles", ".", ".", { "label": "CPU exhausted" } ],
+                  [ ".", "MemoryThrottles", ".", ".", { "label": "Memory exhausted" } ]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 12, "y": 14, "width": 12, "height": 7,
+              "properties": {
+                "title": "LMI capacity provider (5-min metrics)",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "period": 300,
+                "metrics": [
+                  [ { "expression": "SEARCH('{AWS/Lambda,CapacityProviderName,InstanceType} MetricName=\"CPUUtilization\" CapacityProviderName=\"${AWS::StackName}-lmi\"', 'Average', 300)", "label": "CPU utilization %", "id": "cpu" } ],
+                  [ { "expression": "SEARCH('{AWS/Lambda,CapacityProviderName,InstanceType} MetricName=\"vCPUAllocated\" CapacityProviderName=\"${AWS::StackName}-lmi\"', 'Average', 300)", "label": "vCPU allocated", "id": "alloc", "yAxis": "right" } ],
+                  [ { "expression": "SEARCH('{AWS/Lambda,CapacityProviderName,FunctionName,Resource} MetricName=\"ExecutionEnvironmentConcurrency\" FunctionName=\"${LmiWorkerFunction}\"', 'Maximum', 300)", "label": "EE concurrency", "id": "ee", "yAxis": "right" } ]
+                ],
+                "annotations": { "horizontal": [
+                  { "label": "MaxVCpuCount", "value": ${LmiMaxVCpuCount}, "color": "#d62728" }
+                ] }
+              }
+            },
+            {
+              "type": "metric", "x": 0, "y": 21, "width": 24, "height": 5,
+              "properties": {
+                "title": "Errors and dead letters",
+                "region": "${AWS::Region}",
+                "view": "timeSeries", "stat": "Sum", "period": 60,
+                "metrics": [
+                  [ "AWS/Lambda", "Errors", "FunctionName", "${LmiWorkerFunction}", { "label": "LMI worker errors" } ],
+                  [ ".", ".", ".", "${BurstWorkerFunction}", { "label": "Burst worker errors" } ],
+                  [ ".", ".", ".", "${SpillControllerFunction}", { "label": "Spill controller errors" } ],
+                  [ "AWS/SQS", "ApproximateNumberOfMessagesVisible", "QueueName", "${WorkDeadLetterQueue.QueueName}", { "label": "Dead letters", "stat": "Maximum" } ]
+                ]
+              }
+            }
+          ]
+        }
+
+Outputs:
+  WorkQueueUrl:
+    Description: Send workload messages here. Both tiers consume from this one queue.
+    Value: !Ref WorkQueue
+  WorkQueueName:
+    Description: Queue name, for CloudWatch queries.
+    Value: !GetAtt WorkQueue.QueueName
+  DeadLetterQueueUrl:
+    Description: Messages that failed maxReceiveCount times on either tier.
+    Value: !Ref WorkDeadLetterQueue
+  LmiWorkerFunctionName:
+    Description: Baseline worker running on Lambda Managed Instances.
+    Value: !Ref LmiWorkerFunction
+  BurstWorkerFunctionName:
+    Description: Standard Lambda burst worker.
+    Value: !Ref BurstWorkerFunction
+  BurstEventSourceMappingUuid:
+    Description: The event source mapping the spill controller enables and disables.
+    Value: !Ref BurstEventSourceMapping
+  CapacityProviderName:
+    Description: LMI capacity provider name, for CloudWatch queries.
+    Value: !Sub '${AWS::StackName}-lmi'
+  DashboardUrl:
+    Description: Traffic-curve dashboard for the load-test scenarios.
+    Value: !Sub 'https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${AWS::StackName}-lmi-overflow'
