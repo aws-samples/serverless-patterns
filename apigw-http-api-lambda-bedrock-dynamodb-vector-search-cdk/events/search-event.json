@@ -1,0 +1,6 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /search",
+  "body": "{\"query\":\"How can I search embeddings without a separate vector database?\",\"tenantId\":\"tenant-1\",\"category\":\"aws\",\"topK\":5}",
+  "isBase64Encoded": false
+}
