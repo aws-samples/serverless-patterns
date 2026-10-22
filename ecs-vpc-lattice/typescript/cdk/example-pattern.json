@@ -1,0 +1,67 @@
+{
+  "title": "Amazon ECS blue/green deployments with Amazon VPC Lattice",
+  "description": "Amazon ECS on AWS Fargate blue/green with Amazon VPC Lattice test and production listener rules, an AWS Lambda test hook and an Amazon CloudWatch alarm for rollback.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon ECS on AWS Fargate service that uses the built-in blue/green deployment strategy with Amazon VPC Lattice. The VPC Lattice service has a listener with a test rule (header x-environment: test) and a production rule, and two IP target groups that ECS registers tasks into.",
+      "When you deploy a new version, ECS starts the green tasks and sends test traffic to them. An AWS Lambda lifecycle hook in the VPC calls the VPC Lattice test rule, compares the version it receives with the expected one and returns SUCCEEDED or FAILED. Only then does ECS shift production traffic. An Amazon CloudWatch alarm on VPC Lattice 5xx responses rolls the deployment back automatically.",
+      "ECS blue/green with a Lambda hook and a test listener is already shown with an Application Load Balancer. What is new here is the VPC Lattice wiring: listener rules, target groups, the ECS infrastructure role and in-VPC reachability for the hook."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/ecs-vpc-lattice-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon ECS blue/green deployments",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-blue-green.html"
+      },
+      {
+        "text": "VPC Lattice resources for Amazon ECS blue/green, linear, and canary deployments",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/vpc-lattice-resources-for-blue-green.html"
+      },
+      {
+        "text": "Lambda hooks for Amazon ECS service deployments",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/lambda-lifecycle-hooks.html"
+      },
+      {
+        "text": "Control traffic to your VPC Lattice services using security groups",
+        "link": "https://docs.aws.amazon.com/vpc-lattice/latest/ug/security-groups.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "REGION=${AWS_REGION:-$(aws configure get region)}",
+      "PL=$(aws ec2 describe-managed-prefix-lists --region $REGION --filters \"Name=prefix-list-name,Values=com.amazonaws.$REGION.vpc-lattice\" --query \"PrefixLists[0].PrefixListId\" --output text)",
+      "npx cdk deploy --parameters LatticePrefixListId=$PL"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Read the stack outputs, then deploy a second version with <code>npx cdk deploy --parameters LatticePrefixListId=$PL -c appVersion=v2</code>, with <code>PL</code> set as in the deployment steps (look it up again if you opened a new shell).",
+      "Watch the deployment with <code>aws ecs list-service-deployments</code> and <code>aws ecs describe-service-deployments</code>, the production listener rule weights with <code>aws vpc-lattice get-rule</code>, and the hook Lambda logs with <code>aws logs filter-log-events</code>. The hook log shows the test listener returning the new version before production traffic shifts.",
+      "See the GitHub repo for the exact commands and expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
