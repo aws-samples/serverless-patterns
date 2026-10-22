@@ -1,0 +1,24 @@
+{
+  "name": "sfn-entity-resolution-dynamodb-cdk",
+  "version": "1.0.0",
+  "description": "AWS Step Functions orchestrates AWS Entity Resolution matching jobs triggered by Amazon S3 uploads, storing results in Amazon DynamoDB",
+  "bin": {
+    "app": "bin/app.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy",
+    "destroy": "cdk destroy"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.185.0",
+    "constructs": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.4.0",
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "aws-cdk": "^2.185.0"
+  }
+}
