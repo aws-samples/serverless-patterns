@@ -1,0 +1,245 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Run a Lambda Web Function with private VPC egress via a Lambda network connector.
+
+Parameters:
+  CodeBucket:
+    Type: String
+    Description: >
+      Name of the Amazon S3 bucket that holds the Web Function .zip deployment package.
+      Web Functions can only be deployed from an S3 object (there is no inline code path).
+  CodeKey:
+    Type: String
+    Default: web-function/app.zip
+    Description: S3 object key for the Web Function .zip deployment package.
+  CodeVersionId:
+    Type: String
+    Default: ''
+    Description: >
+      S3 object version ID of the deployment package. Lambda requires the code bucket to
+      have versioning enabled; pin this to an object version so each revision maps to an
+      immutable artifact. Leave blank to use the latest version.
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: >
+      The VPC that the subnets belong to. Required so the stack can create a default
+      security group for the connector ENIs when you don't bring your own.
+  VpcSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: >
+      Private subnet IDs where Lambda provisions ENIs for VPC egress (1-16). Use two or
+      more subnets in different Availability Zones for resilience. Subnets must reach the
+      resources your app calls, and reach AWS service endpoints (via NAT gateway or VPC
+      interface/gateway endpoints) for anything outside the VPC such as Amazon S3.
+  VpcSecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: ''
+    Description: >
+      Optional. Security group IDs attached to the ENIs (up to 5), as a comma-separated
+      list. Leave blank to have the stack create an egress-only security group for you.
+      If you bring your own, all must be in the same VPC as the subnets.
+  NetworkProtocol:
+    Type: String
+    Default: IPv4
+    AllowedValues:
+      - IPv4
+      - DualStack
+    Description: Network protocol for the connector ENIs.
+  InternalTargetUrl:
+    Type: String
+    Default: ''
+    Description: >
+      Optional. A private HTTP endpoint inside your VPC (for example an internal ALB,
+      or a service on EC2/ECS) that the sample app probes to demonstrate VPC egress.
+      Leave blank to deploy without a probe target (the page shows "Not configured").
+
+Conditions:
+  HasCodeVersion: !Not [!Equals [!Ref CodeVersionId, '']]
+  # True when the user did not supply any security group IDs, so the stack creates one.
+  CreateSecurityGroup: !Equals [!Join ['', !Ref VpcSecurityGroupIds], '']
+  # True when a private probe target URL was provided, so we set it as an env var.
+  HasInternalTarget: !Not [!Equals [!Ref InternalTargetUrl, '']]
+
+Resources:
+
+  # Bucket policy granting the Lambda Web service principal read access to the code
+  # object. When you create a revision, Lambda reads your .zip from S3 as the
+  # lambda.amazonaws.com service principal, so this grant is REQUIRED for the revision
+  # to be created. Scoped by account and to Web Function source ARNs to prevent a
+  # confused-deputy. The bucket itself is created by deploy.sh before the code upload.
+  CodeBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CodeBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaWebFunctionCodeAccess
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub "arn:aws:s3:::${CodeBucket}/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub "${AWS::AccountId}"
+              ArnLike:
+                # Scope to THIS stack's Web Function and its revisions only -- not every
+                # Web Function in the account/region -- so an unrelated function cannot
+                # satisfy the confused-deputy check and read this bucket's code object.
+                # Uses the computed function name (not !Ref) to avoid a dependency cycle.
+                aws:SourceArn: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-web-function/revision/*"
+
+  # Execution role the Web Function revision assumes at runtime.
+  WebFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Operator role Lambda assumes to manage ENIs in your VPC on your behalf.
+  NetworkConnectorOperatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: manage-enis
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Create ENIs — scoped to the interface, subnet, and security-group
+              # resource types the connector needs (per the Lambda Developer Guide).
+              - Sid: CreateENI
+                Effect: Allow
+                Action: ec2:CreateNetworkInterface
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                  - !Sub "arn:${AWS::Partition}:ec2:*:*:subnet/*"
+                  - !Sub "arn:${AWS::Partition}:ec2:*:*:security-group/*"
+              # Tag ENIs at creation only — gated so the role can only tag interfaces
+              # the Lambda network-connector service manages, not arbitrary ENIs.
+              - Sid: TagENI
+                Effect: Allow
+                Action: ec2:CreateTags
+                Resource: !Sub "arn:${AWS::Partition}:ec2:*:*:network-interface/*"
+                Condition:
+                  StringEquals:
+                    ec2:ManagedResourceOperator: network-connectors.lambda.amazonaws.com
+
+  # Egress-only security group for the connector ENIs, created only when the user
+  # does not bring their own. Allows all outbound (so the function can reach your
+  # private resources and, via NAT/VPC endpoints, AWS services) and no inbound.
+  ConnectorSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateSecurityGroup
+    Properties:
+      GroupDescription: !Sub "Egress security group for ${AWS::StackName} Web Function connector ENIs"
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic
+
+  # Network connector providing a managed egress path from the Web Function into your VPC.
+  MyNetworkConnector:
+    Type: AWS::Lambda::NetworkConnector
+    Properties:
+      Name: !Sub "${AWS::StackName}-connector"
+      OperatorRole: !GetAtt NetworkConnectorOperatorRole.Arn
+      Configuration:
+        VpcEgressConfiguration:
+          AssociatedComputeResourceTypes:
+            - WebFunction
+          NetworkProtocol: !Ref NetworkProtocol
+          SubnetIds: !Ref VpcSubnetIds
+          SecurityGroupIds: !If
+            - CreateSecurityGroup
+            - [!Ref ConnectorSecurityGroup]
+            - !Ref VpcSecurityGroupIds
+
+  # Top-level Web Function container resource.
+  MyWebFunction:
+    Type: AWS::Lambda::WebFunction
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-web-function"
+      Tags:
+        - Key: pattern
+          Value: lambdawebfunction-vpc-sam
+
+  # Immutable revision. EgressNetworkConnectorArn pins to the connector's version-qualified
+  # ARN. NOTE: a revision with a network connector supports ONLY HomeRegion endpoints.
+  MyWebFunctionRevision:
+    Type: AWS::Lambda::WebFunctionRevision
+    # The bucket policy must exist before Lambda reads the code from S3 to create the
+    # revision; CloudFormation can't infer this ordering, so make it explicit.
+    DependsOn: CodeBucketPolicy
+    Properties:
+      FunctionName: !Ref MyWebFunction
+      Description: Initial revision with VPC egress via network connector.
+      BuildConfig:
+        CodeConfig:
+          S3Object:
+            Bucket: !Ref CodeBucket
+            Key: !Ref CodeKey
+            VersionId: !If [HasCodeVersion, !Ref CodeVersionId, !Ref "AWS::NoValue"]
+        RuntimeConfig:
+          Runtime: nodejs24.x
+      ServiceConfig:
+        ExecutionRoleArn: !GetAtt WebFunctionExecutionRole.Arn
+        TimeoutSeconds: 30
+        MaxConcurrencyPerEnvironment: 64
+        # Pass the private probe target to the app only when one was provided.
+        EnvironmentVariables: !If
+          - HasInternalTarget
+          - { INTERNAL_TARGET_URL: !Ref InternalTargetUrl }
+          - !Ref "AWS::NoValue"
+        # Version-qualified ARN of the network connector pins this revision to that version.
+        EgressNetworkConnectorArn: !GetAtt MyNetworkConnector.LatestVersionArn
+
+  # HTTPS endpoint. Must be HomeRegion because the revision uses a network connector.
+  MyWebFunctionEndpoint:
+    Type: AWS::Lambda::WebFunctionEndpoint
+    Properties:
+      FunctionName: !Ref MyWebFunction
+      EndpointName: !Sub "${AWS::StackName}-endpoint"
+      EndpointType: HomeRegion
+      AuthType: IamAuth
+      # Conservative endpoint caps so a spike or runaway client cannot consume
+      # account-wide capacity before this endpoint throttles. Tune for your workload.
+      ScalingConfig:
+        MaxEnvironments: 10
+      ThrottleConfig:
+        RateLimit: 100
+      RevisionWeights:
+        - RevisionId: !GetAtt MyWebFunctionRevision.RevisionId
+          Weight: 100
+
+Outputs:
+  WebFunctionArn:
+    Description: The Web Function ARN
+    Value: !GetAtt MyWebFunction.FunctionArn
+  WebFunctionEndpointDomain:
+    Description: The Web Function endpoint domain (IamAuth - requests must be SigV4-signed)
+    Value: !GetAtt MyWebFunctionEndpoint.DomainName
+  NetworkConnectorArn:
+    Description: The network connector ARN
+    Value: !GetAtt MyNetworkConnector.Arn
+  NetworkConnectorLatestVersionArn:
+    Description: The version-qualified network connector ARN referenced by the revision
+    Value: !GetAtt MyNetworkConnector.LatestVersionArn
