@@ -1,6 +1,6 @@
 {
   "title": "Amazon S3 to AWS Lambda",
-  "description": "Create a Lambda function that resizes images uploaded to S3.",
+  "description": "File processing on AWS Lambda: a Lambda function resizes images, such as thumbnails, when they are uploaded to Amazon S3.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS CDK",

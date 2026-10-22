@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to Amazon SQS to AWS Lambda",
-  "description": "Create an HTTP API that routes to SQS then Lambda",
+  "description": "Offload background jobs from an API: an HTTP API routes requests to Amazon SQS, then a Lambda worker processes them asynchronously.",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",

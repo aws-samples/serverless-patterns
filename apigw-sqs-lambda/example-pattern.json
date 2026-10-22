@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway HTTP API to Amazon SQS",
-  "description": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
+  "description": "Webhook ingestion and background jobs: an Amazon API Gateway HTTP API accepts requests into an Amazon SQS queue, and a Lambda worker processes them.",
   "language": "Node.js",
   "level": "100",
   "framework": "AWS SAM",

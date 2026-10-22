@@ -1,6 +1,6 @@
 {
   "title": "Amazon SQS to AWS Lambda",
-  "description": "Create a Lambda function that subscribes to an SQS queue",
+  "description": "Run background jobs on AWS Lambda: a Lambda function subscribes to an Amazon SQS queue as a queue worker, with no worker hosts or process supervisors to manage.",
   "language": "Node.js",
   "level": "100",
   "framework": "AWS SAM",

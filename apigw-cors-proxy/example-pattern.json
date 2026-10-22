@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway REST API with AWS Lambda proxy integration and CORS enabled",
-  "description": "API Gateway REST API with Lambda proxy integration",
+  "description": "API backend on AWS Lambda: an API Gateway REST API with Lambda proxy integration and CORS enabled.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

@@ -1,6 +1,6 @@
 {
   "title": "Saga Pattern with AWS Lambda Durable Functions in Python",
-  "description": "Multi-step order processing with automatic compensating transactions on failure using Lambda durable functions and Amazon DynamoDB.",
+  "description": "Durable workflow with compensation (saga): multi-step order processing with automatic compensating transactions on failure using Lambda durable functions and Amazon DynamoDB.",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",

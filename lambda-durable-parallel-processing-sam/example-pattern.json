@@ -1,6 +1,6 @@
 {
   "title": "Parallel Processing with AWS Lambda durable functions",
-  "description": "Parallel order processing using Lambda durable functions with concurrent inventory, payment, shipping, and tax validation",
+  "description": "Durable workflow with parallel branches: order processing using Lambda durable functions with concurrent inventory, payment, shipping, and tax validation.",
   "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",
