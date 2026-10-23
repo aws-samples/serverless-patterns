@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda function that consumes from self-managed Apache Kafka, SASL/OAUTHBEARER with an AWS STS web identity token (IAM_OAUTHBEARER_AUTH).
+  The client EC2 instance writes template.yaml from this file, filling the
+  placeholders with this environment's values.
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  LambdaKafkaConsumerJavaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: kafka_event_consumer_function
+      Handler: com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest
+      Runtime: JAVA_VERSION
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Role: !Ref LambdaRoleArn
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          # The consumer writes each message's fields + Kafka metadata to this table
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
+      Events:
+        SelfManagedKafkaEvent:
+          Type: SelfManagedKafka # More info about SelfManagedKafka Event https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html
+          Properties:
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 10
+            ConsumerGroupId: !Ref ConsumerGroupId
+            # Provisioned mode: one poller is plenty for this sample.
+            ProvisionedPollerConfig:
+              MinimumPollers: 1
+              MaximumPollers: 1
+            Topics:
+              - !Ref KafkaTopic
+            KafkaBootstrapServers:
+              - !Ref KafkaBootstrapServer1
+              - !Ref KafkaBootstrapServer2
+              - !Ref KafkaBootstrapServer3
+            SourceAccessConfigurations:
+              # The brokers live on private IPs inside the VPC, so the event source
+              # mapping attaches ENIs to these subnets to reach them.
+              - Type: VPC_SUBNET
+                URI: !Sub "subnet:${PrivateSubnetOne}"
+              - Type: VPC_SUBNET
+                URI: !Sub "subnet:${PrivateSubnetTwo}"
+              - Type: VPC_SUBNET
+                URI: !Sub "subnet:${PrivateSubnetThree}"
+              - Type: VPC_SECURITY_GROUP
+                URI: !Sub "security_group:${SecurityGroupId}"
+              # IAM outbound identity federation over SASL/OAUTHBEARER. No URI:
+              # the poller mints a web identity token for the execution role. With
+              # IAM_OAUTHBEARER_AUTH, OAUTHBEARER_AUDIENCE is the only OAuth
+              # metadata entry Lambda accepts.
+              - Type: IAM_OAUTHBEARER_AUTH
+              - Type: OAUTHBEARER_AUDIENCE
+                URI: !Ref OutboundAudience
+              # The brokers use a self-signed certificate; this secret's
+              # "certificate" field holds its PEM.
+              - Type: SERVER_ROOT_CA_CERTIFICATE
+                URI: !Ref BrokerCASecretArn
+
+  # The execution role comes from the main CloudFormation stack (its
+  # LambdaConsumerRole), which already grants the ENI, sts:GetWebIdentityToken and
+  # broker-CA permissions. The poller's token sub is that role's ARN, and the client
+  # granted it the Kafka ACLs at boot. Only the table permission is added here,
+  # because this stack creates the table.
+  ConsumerTableWritePolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Select [1, !Split ["role/", !Ref LambdaRoleArn]]
+      PolicyName: !Sub "${AWS::StackName}-dynamodb-write"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:BatchWriteItem
+            Resource: !GetAtt MessagesTable.Arn
+
+  MessagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: topicPartition
+          AttributeType: S
+        - AttributeName: offset
+          AttributeType: N
+      KeySchema:
+        - AttributeName: topicPartition
+          KeyType: HASH
+        - AttributeName: offset
+          KeyType: RANGE
+Parameters:
+  KafkaTopic:
+    Type: String
+    Description: Enter the name of the Kafka Topic the Lambda function will consume from
+    Default: KAFKA_TOPIC
+  KafkaBootstrapServer1:
+    Type: String
+    Description: First Kafka broker bootstrap endpoint (host:port)
+    Default: BOOTSTRAP_SERVER_1
+  KafkaBootstrapServer2:
+    Type: String
+    Description: Second Kafka broker bootstrap endpoint (host:port)
+    Default: BOOTSTRAP_SERVER_2
+  KafkaBootstrapServer3:
+    Type: String
+    Description: Third Kafka broker bootstrap endpoint (host:port)
+    Default: BOOTSTRAP_SERVER_3
+  PrivateSubnetOne:
+    Type: String
+    Description: First private subnet ID for the Lambda event source mapping ENIs
+    Default: SUBNET_1
+  PrivateSubnetTwo:
+    Type: String
+    Description: Second private subnet ID for the Lambda event source mapping ENIs
+    Default: SUBNET_2
+  PrivateSubnetThree:
+    Type: String
+    Description: Third private subnet ID for the Lambda event source mapping ENIs
+    Default: SUBNET_3
+  SecurityGroupId:
+    Type: String
+    Description: Security group ID for the Lambda event source mapping ENIs
+    Default: LAMBDA_SG
+  DynamoDBTableName:
+    Type: String
+    Description: >
+      DynamoDB table the consumer writes to. A parameter rather than a !Ref to the
+      table so that `sam local invoke` sees the real name too.
+    Default: MESSAGES_TABLE_NAME
+  ConsumerGroupId:
+    Type: String
+    Description: Kafka consumer group the event source mapping joins
+    Default: lambda-iam-oauth-consumer
+  OutboundAudience:
+    Type: String
+    Description: Audience of the poller's web identity token; must match what the brokers expect
+    Default: OUTBOUND_AUDIENCE
+  BrokerCASecretArn:
+    Type: String
+    Description: Secrets Manager ARN of the secret holding the brokers' CA certificate PEM
+    Default: BROKER_CA_SECRET_ARN
+  LambdaRoleArn:
+    Type: String
+    Description: Execution role ARN from the main stack; the brokers' ACLs name it
+    Default: LAMBDA_ROLE_ARN
+Outputs:
+  LambdaKafkaConsumerJavaFunction:
+    Description: "Kafka consumer Lambda function ARN"
+    Value: !GetAtt LambdaKafkaConsumerJavaFunction.Arn
+  MessagesTableName:
+    Description: "DynamoDB table the consumer writes to"
+    Value: !Ref MessagesTable
