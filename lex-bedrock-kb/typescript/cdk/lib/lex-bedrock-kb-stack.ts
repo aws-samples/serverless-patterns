@@ -1,3 +1,5 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: MIT-0
 import * as cdk from 'aws-cdk-lib';
 import * as bedrock from 'aws-cdk-lib/aws-bedrock';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -41,12 +43,12 @@ export class LexBedrockKbStack extends cdk.Stack {
       dataType: 'float32',
       dimension: EMBEDDING_DIMENSIONS,
       distanceMetric: 'cosine',
-      // Required for Bedrock Knowledge Bases: the chunk text and Bedrock metadata are not filterable.
+      // Required for Amazon Bedrock Knowledge Bases: the chunk text and Bedrock metadata are not filterable.
       metadataConfiguration: { nonFilterableMetadataKeys: ['AMAZON_BEDROCK_TEXT', 'AMAZON_BEDROCK_METADATA'] },
     });
     vectorIndex.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
-    // Role used by the Knowledge Base to read the documents, embed them and write to the vector index.
+    // Role used by the knowledge base to read the documents, embed them and write to the vector index.
     const kbRole = new iam.Role(this, 'KnowledgeBaseRole', {
       assumedBy: new iam.PrincipalWithConditions(new iam.ServicePrincipal('bedrock.amazonaws.com'), {
         StringEquals: { 'aws:SourceAccount': this.account },
@@ -108,7 +110,7 @@ export class LexBedrockKbStack extends cdk.Stack {
       },
     });
 
-    // Role used by Lex at runtime: call the generation model and retrieve from this one Knowledge Base.
+    // Role used by Lex at runtime: call the generation model and retrieve from this one knowledge base.
     const lexRole = new iam.Role(this, 'LexBotRole', {
       assumedBy: new iam.PrincipalWithConditions(new iam.ServicePrincipal('lexv2.amazonaws.com'), {
         StringEquals: { 'aws:SourceAccount': this.account },

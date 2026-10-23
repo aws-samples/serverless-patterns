@@ -9,7 +9,7 @@
     "text": [
       "This pattern creates an Amazon Lex V2 bot whose built-in AMAZON.QnAIntent answers questions with a foundation model, using passages retrieved from an Amazon Bedrock knowledge base. The knowledge base reads documents from an Amazon S3 bucket, embeds them with Amazon Titan Text Embeddings V2 and stores the vectors in an Amazon S3 Vectors index.",
       "There is no AWS Lambda function in the request path. You call the bot with the Lex runtime API (for example aws lexv2-runtime recognize-text). Lex asks the knowledge base for matching passages, sends them to the model with the question and returns the answer.",
-      "Ingestion is one explicit step: copy the sample documents to the bucket and start an ingestion job. Until the job completes, the knowledge base has nothing to retrieve. The model id and the Region are configurable, and the IAM roles are scoped to the one knowledge base, the one index and the two model ARNs."
+      "Ingestion is one explicit step: copy the sample documents to the bucket and start an ingestion job. Until the job completes, the knowledge base has nothing to retrieve. The model id and the Region are configurable, and the AWS IAM roles are scoped to the one knowledge base, the one index and the two model ARNs."
     ]
   },
   "gitHub": {
@@ -39,9 +39,9 @@
   },
   "deploy": {
     "text": [
-      "npm install",
-      "npx cdk bootstrap",
-      "npx cdk deploy"
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
     ]
   },
   "testing": {

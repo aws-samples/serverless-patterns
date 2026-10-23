@@ -9,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. Use a recent version, because the Amazon S3 Vectors and Amazon Lex V2 commands are new.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. Use version 2. Every command in this README exists in version 2.31.3 and later.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap`)
@@ -20,9 +20,9 @@ Important: this application uses various AWS services and there are costs associ
 
 The stack takes the Region from your AWS CLI profile or the `AWS_REGION` environment variable. Nothing in the template is hardcoded to a Region.
 
-* The default generation model is `amazon.nova-lite-v1:0` and the embedding model is `amazon.titan-embed-text-v2:0` (1024 dimensions). Both ids are constants at the top of `lib/lex-bedrock-kb-stack.ts` and can be overridden at deploy time with `-c generationModelId=<model-id>` and `-c embeddingModelId=<model-id>`. If you change the embedding model, also change `EMBEDDING_DIMENSIONS` so that it matches the model output size. The embedding settings of the knowledge base (`embeddingDataType` and `dimensions`) are written for Titan Text Embeddings V2, so another model can need more changes in `lib/lex-bedrock-kb-stack.ts`.
-* The pattern was deployed and tested in **us-east-1** and **us-west-2**. In both, the Lex locale built with `amazon.nova-lite-v1:0` as the QnA model and the bot answered from the knowledge base. I could not find a list of the models that `AMAZON.QnAIntent` accepts in the Amazon Lex documentation, so other Regions and other models are not covered by that result. If the bot fails to build with a model error, open any Lex bot in the console, add the `AMAZON.QnAIntent`, pick a model from its model list and pass that model with `-c generationModelId=<model-id>`.
-* The Amazon Lex V2 API documents the `ModelArn` of the QnA intent model as a foundation model ARN (`arn:aws:bedrock:<region>::foundation-model/<model-id>`), so the generation model is expected to be invocable in the deployment Region without a cross-Region inference profile. In eu-central-1, `aws bedrock list-foundation-models` lists Nova Lite with the inference type `INFERENCE_PROFILE` only (no on-demand), so in that Region choose another model that is invocable in-Region and offered for the Lex QnA intent. The pattern was not deployed in eu-central-1.
+* The default generation model is `amazon.nova-lite-v1:0` and the embedding model is `amazon.titan-embed-text-v2:0` (1024 dimensions). Both ids are constants at the top of `lib/lex-bedrock-kb-stack.ts` and can be overridden at deploy time with `-c generationModelId=<model-id>` and `-c embeddingModelId=<model-id>`. If you change the embedding model, also change `EMBEDDING_DIMENSIONS` so that it matches the model output size. The embedding settings of the knowledge base (`embeddingDataType` and `dimensions`) are written for Amazon Titan Text Embeddings V2, so another model can need more changes in `lib/lex-bedrock-kb-stack.ts`.
+* The pattern was deployed and tested in **us-east-1** and **us-west-2**. In both, the Lex locale built with `amazon.nova-lite-v1:0` as the QnA model and the bot answered from the knowledge base. The Amazon Lex documentation page for `AMAZON.QnAIntent` lists no supported models or Regions, so other Regions and other models are not covered by that result. If the bot fails to build with a model error, open any Lex bot in the console, add the `AMAZON.QnAIntent`, pick a model from its model list and pass that model with `-c generationModelId=<model-id>`.
+* The Amazon Lex V2 API documents the `ModelArn` of the QnA intent model as a foundation model ARN (`arn:aws:bedrock:<region>::foundation-model/<model-id>`), so the generation model is expected to be invocable in the deployment Region without a cross-Region inference profile. In eu-central-1, `aws bedrock list-foundation-models` lists Amazon Nova Lite with the inference type `INFERENCE_PROFILE` only (no on-demand), so in that Region choose another model that is invocable in-Region and offered for the Lex QnA intent. The pattern was not deployed in eu-central-1.
 * Before you deploy in another Region, check that Amazon Lex V2, Amazon Bedrock Knowledge Bases, Amazon S3 Vectors and both models are available there. Models are retired over time, so check the [Amazon Bedrock model lifecycle](https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html) page and the model list of the Lex QnA intent before you reuse an id.
 
 ## Architecture
@@ -61,11 +61,11 @@ The ingestion job is deliberately a documented CLI step and not a custom resourc
 
 ### Exposure
 
-The bot has no public endpoint. Callers need AWS credentials with `lex:RecognizeText` on the bot alias. The documents bucket blocks public access and denies requests without TLS. The vector bucket has no resource policy, so only IAM principals of the account can use it. The stack creates no API, load balancer or security group.
+The bot has no public endpoint. Callers need AWS credentials with `lex:RecognizeText` on the bot alias. The documents bucket blocks public access and denies requests without TLS. The vector bucket has no resource policy, so only IAM principals of the account can use it. The stack creates no API, load balancer or security group. No Amazon Bedrock guardrail is configured on the QnA intent: before you let untrusted callers use the bot, add one with the `BedrockGuardrailConfiguration` property of the intent's model specification.
 
 ### Cost and logs
 
-The stack has no resource that bills by the hour (no OpenSearch Serverless collection, no provisioned capacity and no NAT gateway). You pay for what you use: Amazon S3 storage and requests, Amazon S3 Vectors storage and queries, embedding tokens during ingestion, generation tokens and Lex text requests for each question. See the pricing pages of the services for current rates.
+The stack has no resource that bills by the hour (no Amazon OpenSearch Serverless collection, no provisioned capacity and no NAT gateway). You pay for what you use: Amazon S3 storage and requests, Amazon S3 Vectors storage and queries, embedding tokens during ingestion, generation tokens and Lex text requests for each question. See the pricing pages of the services for current rates.
 
 The stack defines no log groups and does not turn on Lex conversation logs. The CDK helper function that empties the documents bucket on delete writes to an Amazon CloudWatch Logs log group that AWS Lambda creates when the function first runs. CloudFormation does not manage that log group, so it has no retention setting and `cdk destroy` does not remove it. The Cleanup section shows how to delete it. Ingestion status is read with `aws bedrock-agent get-ingestion-job`. The stack outputs list the identifiers you need for testing.
 
@@ -155,7 +155,7 @@ If the bot cannot answer a question that the documents cover, work from the data
 
 ## Cleanup
 
-1. Delete the stack:
+1. Delete the stack. This also deletes the documents bucket with its content and the vector bucket with its vectors:
     ```bash
     npx cdk destroy
     ```
