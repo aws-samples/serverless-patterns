@@ -28,10 +28,25 @@ fi
 
 REGION="${AWS_REGION:-us-west-2}"
 STACK_NAME="${STACK_NAME:-kafka-iam}"
-# Lambda-side resource names are derived from the stack name, so two stacks in the
-# same account and region (for example the Java and Python versions of this
-# pattern) never overwrite each other's function, role, secrets, or table.
-FUNCTION_NAME="${FUNCTION_NAME:-${STACK_NAME}-consumer}"
+# Lambda-side names start with this sample's prefix (PATTERN_PREFIX, made from the
+# main stack's ID), which is what the client instance's IAM role allows. Two stacks
+# in the same account and region (for example the Java and Python versions of this
+# pattern) have different prefixes, so they never overwrite each other's resources.
+if [ -z "${PATTERN_PREFIX:-}" ]; then
+  PATTERN_PREFIX=$(aws cloudformation describe-stacks --region "$REGION" --stack-name "$STACK_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='SamplePrefix'].OutputValue" --output text 2>/dev/null || true)
+fi
+if [ -z "$PATTERN_PREFIX" ] || [ "$PATTERN_PREFIX" = "None" ]; then
+  echo "ERROR: could not read the SamplePrefix output of stack '$STACK_NAME' in $REGION."
+  echo "       Set STACK_NAME and AWS_REGION to match your stack, or set PATTERN_PREFIX."
+  exit 1
+fi
+# New execution roles need this permissions boundary (the client role requires it).
+if [ -z "${ROLE_BOUNDARY_ARN:-}" ]; then
+  ROLE_BOUNDARY_ARN=$(aws cloudformation describe-stacks --region "$REGION" --stack-name "$STACK_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='SampleRoleBoundaryArn'].OutputValue" --output text 2>/dev/null || true)
+fi
+FUNCTION_NAME="${FUNCTION_NAME:-${PATTERN_PREFIX}-cli-consumer}"
 RUNTIME="${RUNTIME:-java21}"
 HANDLER="com.amazonaws.services.lambda.samples.events.msk.HandlerMSK::handleRequest"
 JAR_PATH="${JAR_PATH:-$PATTERN_DIR/kafka_event_consumer_function/target/MSKConsumer-1.0.jar}"
@@ -39,7 +54,7 @@ TOPIC="${TOPIC:-${KAFKA_TOPIC:-KafkaIamLambdaTopic}}"
 CONSUMER_GROUP="${CONSUMER_GROUP:-lambda-iam-consumer}"
 POLLER_GROUP="${POLLER_GROUP:-${CONSUMER_GROUP}-cell1}"
 BATCH_SIZE="${BATCH_SIZE:-10}"
-DDB_TABLE_NAME="${DDB_TABLE_NAME:-${STACK_NAME}-messages}"
+DDB_TABLE_NAME="${DDB_TABLE_NAME:-${PATTERN_PREFIX}-cli-messages}"
 if [ ${#FUNCTION_NAME} -gt 59 ]; then
   echo "ERROR: FUNCTION_NAME '$FUNCTION_NAME' is longer than 59 characters (IAM role names, which"
   echo "       add '-role', max out at 64). Set FUNCTION_NAME to something shorter."
@@ -71,8 +86,8 @@ MSK_CLUSTER_ARN="${MSK_CLUSTER_ARN:-$(get_output MSKClusterArn)}"
 BOOTSTRAP_SERVERS="${BOOTSTRAP_SERVERS:-$(aws kafka get-bootstrap-brokers --region "$REGION" --cluster-arn "$MSK_CLUSTER_ARN" --query 'BootstrapBrokerStringSaslIam' --output text)}"
 [ -n "$BOOTSTRAP_SERVERS" ] || { echo "ERROR: could not resolve IAM bootstrap brokers"; exit 1; }
 
-# kafka-cluster:* resource ARNs (cluster name is <stack>-cluster)
-CLUSTER_RES="arn:aws:kafka:${REGION}:$(aws sts get-caller-identity --query Account --output text):cluster/${STACK_NAME}-cluster/*"
+# kafka-cluster:* resource ARNs: arn:...:cluster/<name>/<uuid> -> arn:...:cluster/<name>/*
+CLUSTER_RES="$(echo "$MSK_CLUSTER_ARN" | cut -d/ -f1-2)/*"
 TOPIC_RES="${CLUSTER_RES/:cluster\//:topic\/}"
 GROUP_RES="${CLUSTER_RES/:cluster\//:group\/}"
 
@@ -97,7 +112,8 @@ DDB_TABLE_ARN=$(aws dynamodb describe-table --region "$REGION" --table-name "$DD
 ROLE_NAME="${ROLE_NAME:-${FUNCTION_NAME}-role}"
 if ! aws iam get-role --role-name "$ROLE_NAME" >/dev/null 2>&1; then
   echo "Creating execution role $ROLE_NAME..."
-  aws iam create-role --role-name "$ROLE_NAME" \
+  aws iam create-role --role-name "$ROLE_NAME" --path "/${PATTERN_PREFIX}-lambda/" \
+    --permissions-boundary "$ROLE_BOUNDARY_ARN" \
     --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}' >/dev/null
   aws iam attach-role-policy --role-name "$ROLE_NAME" \
     --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

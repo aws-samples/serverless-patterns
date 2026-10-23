@@ -19,6 +19,11 @@ Resources:
       Runtime: JAVA_VERSION
       Architectures:
         - x86_64
+      FunctionName: !Sub "${SamplePrefix}-sam-consumer"
+      # SAM names the role after the SAM stack; the client instance's IAM role
+      # allows execution roles by path, with this permissions boundary.
+      RolePath: !Sub "/${SamplePrefix}-lambda/"
+      PermissionsBoundary: !Ref RoleBoundaryArn
       MemorySize: 512
       # Write to a log group with a retention period, so a forgotten deployment
       # doesn't keep its logs forever.
@@ -89,7 +94,7 @@ Resources:
   ConsumerLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-consumer"
+      LogGroupName: !Sub "/aws/lambda/${SamplePrefix}-sam-consumer"
       RetentionInDays: 7
 
   MessagesTable:
@@ -154,6 +159,16 @@ Parameters:
     Type: String
     Description: Name of the MSK cluster, used to scope the kafka-cluster IAM permissions
     Default: MSK_CLUSTER_NAME
+  SamplePrefix:
+    Type: String
+    Description: >
+      Name prefix from the main stack. The client instance's IAM role only allows
+      functions, log groups and execution role paths that start with it.
+    Default: SAMPLE_PREFIX
+  RoleBoundaryArn:
+    Type: String
+    Description: Permissions boundary the client instance's IAM role requires on the execution roles it creates
+    Default: ROLE_BOUNDARY_ARN
 Outputs:
   LambdaKafkaConsumerJavaFunction:
     Description: "Kafka consumer Lambda function ARN"
