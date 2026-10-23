@@ -28,7 +28,7 @@ PORT=8000
 IMAGE=public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:latest
 VOLUME=dynamodb-local-data
 # Same default the SAM template's DynamoDBTableName parameter gets
-TABLE="${DYNAMODB_TABLE_NAME:-$STACK_NAME-sam-messages}"
+TABLE="${DYNAMODB_TABLE_NAME:-$PATTERN_PREFIX-sam-messages}"
 LOCAL="--endpoint-url http://localhost:$PORT"
 
 # The pattern folder holds template.yaml and samconfig.toml. Usually that's the
@@ -94,26 +94,31 @@ else:
     s = s.rstrip("\n") + f"\n\n{hdr}\n" + "".join(f"{k} = {v}\n" for k, v in want.items())
 open(path, "w").write(s)
 PY
-# Also make "<this stack>-sam" the default stack name for `sam deploy --guided`
-# (SAM's own default is sam-app). The client instance's IAM role only allows SAM
-# stacks, and the functions, roles, tables and log groups they create, whose names
-# start with this stack's name. A stack name you already saved is left as is.
-python3 - "$PATTERN_DIR/samconfig.toml" "$STACK_NAME-sam" <<'PY'
+# Also give `sam deploy` the tag the client instance's IAM role looks for on SAM
+# stacks (kafka-sample=<prefix>), and a default stack name (SAM's own default is
+# sam-app). The stack name can be anything; the tag is what matters.
+python3 - "$PATTERN_DIR/samconfig.toml" "$STACK_NAME-sam" "kafka-sample=$PATTERN_PREFIX" <<'PY'
 import re, sys
-path, stack = sys.argv[1], sys.argv[2]
+path, stack, tag = sys.argv[1], sys.argv[2], sys.argv[3]
 s = open(path).read()
 hdr = "[default.deploy.parameters]"
 if hdr not in s:
-    s = s.rstrip("\n") + f"\n\n{hdr}\nstack_name = \"{stack}\"\n"
-else:
-    start = s.index(hdr) + len(hdr)
-    nxt = re.search(r"^\[", s[start:], re.M)
-    end = start + nxt.start() if nxt else len(s)
-    if not re.search(r"^stack_name\s*=", s[start:end], re.M):
-        s = s[:start] + f"\nstack_name = \"{stack}\"" + s[start:]
+    s = s.rstrip("\n") + f"\n\n{hdr}\n"
+start = s.index(hdr) + len(hdr)
+nxt = re.search(r"^\[", s[start:], re.M)
+end = start + nxt.start() if nxt else len(s)
+section = s[start:end]
+m = re.search(r'^tags\s*=\s*"(.*)"', section, re.M)
+if not m:
+    section = f"\ntags = \"{tag}\"" + section
+elif tag.split("=")[0] + "=" not in m.group(1):
+    section = section[:m.start(1)] + (m.group(1) + " " + tag).strip() + section[m.end(1):]
+if not re.search(r"^stack_name\s*=", section, re.M):
+    section = f"\nstack_name = \"{stack}\"" + section
+s = s[:start] + section + s[end:]
 open(path, "w").write(s)
 PY
-echo "Set docker_network and event for sam local invoke, and stack_name for sam deploy, in $PATTERN_DIR/samconfig.toml."
+echo "Set docker_network and event for sam local invoke, and the stack tag and name for sam deploy, in $PATTERN_DIR/samconfig.toml."
 
 cat <<EOF
 

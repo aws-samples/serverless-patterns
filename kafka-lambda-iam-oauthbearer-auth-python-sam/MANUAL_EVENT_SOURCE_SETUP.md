@@ -96,8 +96,8 @@ The poller uses your function's execution role, so the role needs:
 IAM says what the role can do in AWS. **Kafka ACLs** say what the authenticated principal can do on
 the cluster. You need both, and the Kafka half is easy to forget.
 
-The principal name is the token's `sub` claim, which for this pattern is **the execution role's ARN**.
-So the ACL looks like:
+The principal name is the token's `sub` claim, which for this pattern is **the execution role's ARN**,
+including its IAM path if it has one (`role/<path>/<name>`). So the ACL looks like:
 
 ```bash
 kafka-acls.sh --bootstrap-server <internal-listener> --add \
