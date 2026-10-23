@@ -24,6 +24,7 @@ Resources:
       # doesn't keep its logs forever.
       LoggingConfig:
         LogGroup: !Ref ConsumerLogGroup
+      FunctionName: !Sub "${SamplePrefix}-sam-consumer"
       Role: !Ref LambdaRoleArn
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
@@ -78,7 +79,7 @@ Resources:
   ConsumerTableWritePolicy:
     Type: AWS::IAM::RolePolicy
     Properties:
-      RoleName: !Select [1, !Split ["role/", !Ref LambdaRoleArn]]
+      RoleName: !Ref LambdaRoleName
       PolicyName: !Sub "${AWS::StackName}-dynamodb-write"
       PolicyDocument:
         Version: '2012-10-17'
@@ -92,7 +93,7 @@ Resources:
   ConsumerLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}-consumer"
+      LogGroupName: !Sub "/aws/lambda/${SamplePrefix}-sam-consumer"
       RetentionInDays: 7
 
   MessagesTable:
@@ -165,6 +166,16 @@ Parameters:
     Type: String
     Description: Execution role ARN from the main stack; the brokers' ACLs name it
     Default: LAMBDA_ROLE_ARN
+  LambdaRoleName:
+    Type: String
+    Description: Name of the execution role in LambdaRoleArn
+    Default: LAMBDA_ROLE_NAME
+  SamplePrefix:
+    Type: String
+    Description: >
+      Name prefix from the main stack. The client instance's IAM role only allows
+      functions, log groups and execution role paths that start with it.
+    Default: SAMPLE_PREFIX
 Outputs:
   LambdaKafkaConsumerJavaFunction:
     Description: "Kafka consumer Lambda function ARN"
