@@ -2,17 +2,9 @@
 
 This pattern deploys an AWS Backup restore testing plan for an Amazon DynamoDB table and an AWS Step Functions workflow that validates each restored copy. When a restore test job completes, Amazon EventBridge starts the workflow. The workflow counts the items in the restored table and writes a `SUCCESSFUL` or `FAILED` validation result back to AWS Backup with the `PutRestoreValidationResult` API, so the result appears on the restore job.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/backup-sfn-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
-
-## Why this pattern
-
-AWS Backup restore testing restores a recovery point on a schedule and deletes the restored resource afterwards. Validating the restored data is optional and is something you supply: the [documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html) says that validation can be run programmatically but not from the AWS Backup console. The [validation example in the AWS Backup documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing-validation.html) uses an AWS Lambda function and notes that `PutRestoreValidationResult` is not available through the Lambda SDK, so a Lambda layer with a newer SDK is needed.
-
-This pattern takes a different route. The workflow calls Amazon DynamoDB and AWS Backup directly through [AWS SDK service integrations](https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html), so the synthesized template contains no Lambda function and no custom resources. The check (the item count of the restored table) decides the verdict that is written back to the originating service.
-
-The closest pattern in this repository is [securityhub-finding-sfn-remediation-cdk](../../../securityhub-finding-sfn-remediation-cdk), which also starts a Step Functions workflow from an EventBridge event but remediates Security Hub findings with Lambda functions. This pattern reports a validation verdict to AWS Backup and has no Lambda function.
 
 ## Requirements
 
@@ -22,35 +14,26 @@ The closest pattern in this repository is [securityhub-finding-sfn-remediation-c
 * [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed, and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap` once per account and Region)
 
-### Regions
+## Supported Regions
 
 The stack contains no Region-specific values or hardcoded account IDs, and its ARNs use the partition, Region and account of the stack. It was tested in us-west-2. Deploy it to a Region where AWS Backup restore testing, Amazon DynamoDB and AWS Step Functions are available (see the [AWS Backup feature availability](https://docs.aws.amazon.com/aws-backup/latest/devguide/backup-feature-availability.html) page).
 
-## Deployment Instructions
+## Architecture
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/backup-sfn/typescript/cdk
-    ```
-1. Install the dependencies:
-    ```
-    npm install
-    ```
-1. Choose when the restore test runs. A restore testing plan has no "run now" call: it runs on a cron schedule (UTC unless you set a time zone), and AWS Backup starts the restore at a random time within the plan's start window, which this stack sets to 1 hour. The command below builds a schedule 30 minutes from now. That leaves time to seed the table and take a backup first (see Testing).
-    ```
-    CRON=$(node -e 'const d=new Date(Date.now()+30*60000);console.log(`cron(${d.getUTCMinutes()} ${d.getUTCHours()} * * ? *)`)')
-    echo $CRON
-    ```
-1. Deploy the stack:
-    ```
-    npx cdk deploy -c restoreTestCron="$CRON"
-    ```
-    Without `-c restoreTestCron` the plan uses `cron(0 5 ? * * *)`, which is 05:00 UTC every day.
-1. Note the outputs from the deployment: the table name and ARN, the backup vault name, the ARN of the IAM role for the on-demand backup, the restore testing plan ARN, and the state machine ARN and log group name. They are used for testing.
+```
+AWS Backup restore testing plan (runs on a schedule)
+   |  restores the latest recovery point of the Amazon DynamoDB table
+   v
+Restore job COMPLETED ---- "Restore Job State Change" event ----> Amazon EventBridge rule
+                                                                        |
+                                                                        v
+                                                       AWS Step Functions workflow (no AWS Lambda function)
+                                                          1. dynamodb:Scan on the restored table (Select COUNT, Limit 3)
+                                                          2. backup:PutRestoreValidationResult: SUCCESSFUL or FAILED
+                                                                        |
+                                                                        v
+                                      the validation result shows up on the restore job in AWS Backup
+```
 
 ## How it works
 
@@ -77,6 +60,16 @@ The fields that the workflow and the rule use in the `Restore Job State Change` 
 
 The item count check is deliberately simple. It shows the wiring; replace it with your own checks (for example a read of a known key). A count over a table larger than one Scan page is only a lower bound, which is enough for a minimum-size check.
 
+## Why this pattern
+
+AWS Backup restore testing restores a recovery point on a schedule and deletes the restored resource afterwards. Validating the restored data is optional and is something you supply: the [documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html) says that validation can be run programmatically but not from the AWS Backup console. The [validation example in the AWS Backup documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing-validation.html) uses an AWS Lambda function and notes that `PutRestoreValidationResult` is not available through the Lambda SDK, so a Lambda layer with a newer SDK is needed.
+
+This pattern takes a different route. The workflow calls Amazon DynamoDB and AWS Backup directly through [AWS SDK service integrations](https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html), so the synthesized template contains no Lambda function and no custom resources. The check (the item count of the restored table) decides the verdict that is written back to the originating service.
+
+The closest pattern in this repository is [securityhub-finding-sfn-remediation-cdk](../../../securityhub-finding-sfn-remediation-cdk), which also starts a Step Functions workflow from an EventBridge event but remediates Security Hub findings with Lambda functions. This pattern reports a validation verdict to AWS Backup and has no Lambda function.
+
+## Important Notes
+
 ### IAM
 
 * The state machine role can call `dynamodb:Scan` only on tables whose names start with `awsbackup-restore-test-`, the name prefix that AWS Backup [infers for restored DynamoDB tables](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing-inferred-metadata.html). Its trust policy has `aws:SourceAccount` and `aws:SourceArn` conditions.
@@ -95,6 +88,29 @@ The item count check is deliberately simple. It shows the wiring; replace it wit
 ### Cost
 
 Nothing in this pattern bills by the hour. AWS Backup charges for each restore test, for backup storage and for the restored data, DynamoDB charges for the table, and Step Functions charges per state transition. See [AWS Backup pricing](https://aws.amazon.com/backup/pricing/). The restore test runs at every schedule match (daily with the cron used in Deployment Instructions) for as long as the stack exists and an eligible recovery point is in the vault. The on-demand recovery point in Testing expires after one day, so later runs have nothing to restore. Run the cleanup steps when you are done.
+
+## Deployment Instructions
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd serverless-patterns/backup-sfn/typescript/cdk
+    ```
+2. Install the dependencies:
+    ```
+    npm install
+    ```
+3. Choose when the restore test runs. A restore testing plan has no "run now" call: it runs on a cron schedule (UTC unless you set a time zone), and AWS Backup starts the restore at a random time within the plan's start window, which this stack sets to 1 hour. The command below builds a schedule 30 minutes from now. That leaves time to seed the table and take a backup first (see Testing).
+    ```
+    CRON=$(node -e 'const d=new Date(Date.now()+30*60000);console.log(`cron(${d.getUTCMinutes()} ${d.getUTCHours()} * * ? *)`)')
+    echo $CRON
+    ```
+4. Deploy the stack:
+    ```
+    npx cdk deploy -c restoreTestCron="$CRON"
+    ```
+    Without `-c restoreTestCron` the plan uses `cron(0 5 ? * * *)`, which is 05:00 UTC every day.
+5. Note the outputs from the deployment: the table name and ARN, the backup vault name, the ARN of the IAM role for the on-demand backup, the restore testing plan ARN, and the state machine ARN and log group name. They are used for testing.
 
 ## Testing
 
