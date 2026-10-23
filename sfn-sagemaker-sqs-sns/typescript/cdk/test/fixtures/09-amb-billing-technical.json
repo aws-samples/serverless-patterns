@@ -1,0 +1,77 @@
+{
+ "id": "amb-billing-technical",
+ "note": "ambiguous billing vs technical (canonical ticket b)",
+ "request": {
+  "state": "I was charged twice for last month's invoice right after your update broke the checkout page.",
+  "questions": {
+   "department": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+     "billing": "charges, invoices, refunds, payment failures",
+     "technical": "bugs, outages, errors, performance",
+     "account_access": "login, password, MFA, locked accounts",
+     "sales": "pricing, plans, upgrades, quotes"
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this ticket for the customer?",
+    "criteria": [
+     "Low",
+     "Medium",
+     "High",
+     "Critical"
+    ]
+   },
+   "security_incident": {
+    "type": "noul",
+    "instructions": "Does this ticket report an active security incident such as a compromised account or data being exfiltrated?"
+   }
+  }
+ },
+ "response": {
+  "model": "strands-decider-2B-hobson-v19",
+  "answers": {
+   "department": {
+    "type": "choice",
+    "choice": "billing",
+    "probabilities": {
+     "billing": 0.7554,
+     "technical": 0.2216,
+     "account_access": 0.0075,
+     "sales": 0.0155
+    },
+    "confidence": 0.6738
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.8467,
+    "legend": {
+     "0": "Low",
+     "1": "Medium",
+     "2": "High",
+     "3": "Critical"
+    },
+    "probabilities": {
+     "0": 0.1461,
+     "1": 0.1968,
+     "2": 0.3215,
+     "3": 0.3356
+    },
+    "confidence": 0.3839
+   },
+   "security_incident": {
+    "type": "noul",
+    "noul": 0.1575
+   }
+  },
+  "usage": {
+   "input_tokens": 270,
+   "output_tokens": 3
+  },
+  "latency_ms": 1935.25
+ },
+ "http_status": 200,
+ "wall_ms": 1942.3
+}

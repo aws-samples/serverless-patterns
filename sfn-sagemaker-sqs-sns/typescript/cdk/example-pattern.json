@@ -1,0 +1,62 @@
+{
+  "title": "AWS Step Functions to Amazon SageMaker AI confidence gate",
+  "description": "A Step Functions Choice state acts on the answers of an open-weight Strands Decider model on SageMaker AI only when it is confident, and sends the rest to Amazon SQS.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS Step Functions Express workflow that calls an Amazon SageMaker AI endpoint serving the open-weight Strands Decider decision model, directly through the AWS SDK integration. The model answers three typed questions about a support ticket in one call: a choice for the owning department, a score for urgency, and a yes/no question about an active security incident.",
+      "A Choice state is the confidence gate. A confident department answer is auto-routed. A suspected security incident is published to an Amazon SNS topic and still goes to a person. Everything else, including any ticket for which the model call failed or returned something unusable, goes to an Amazon SQS human-review queue with a dead-letter queue behind it.",
+      "The model decides what, and its confidence decides whether to act. The pattern includes the model container, unit tests that evaluate the synthesized state machine with recorded model responses, and notes on how the default thresholds were chosen."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/strands-decider-confidence-gated-triage-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Strands Decider",
+        "link": "https://github.com/strands-labs/strands-decider"
+      },
+      {
+        "text": "AWS Step Functions Choice state",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/state-choice.html"
+      },
+      {
+        "text": "Call AWS services with Step Functions AWS SDK integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      },
+      {
+        "text": "Custom inference containers for Amazon SageMaker AI",
+        "link": "https://docs.aws.amazon.com/sagemaker/latest/dg/your-algorithms-inference-code.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}

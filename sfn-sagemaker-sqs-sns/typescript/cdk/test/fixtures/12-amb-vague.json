@@ -1,0 +1,77 @@
+{
+ "id": "amb-vague",
+ "note": "vague",
+ "request": {
+  "state": "Hi, something is wrong with my account, please help.",
+  "questions": {
+   "department": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+     "billing": "charges, invoices, refunds, payment failures",
+     "technical": "bugs, outages, errors, performance",
+     "account_access": "login, password, MFA, locked accounts",
+     "sales": "pricing, plans, upgrades, quotes"
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this ticket for the customer?",
+    "criteria": [
+     "Low",
+     "Medium",
+     "High",
+     "Critical"
+    ]
+   },
+   "security_incident": {
+    "type": "noul",
+    "instructions": "Does this ticket report an active security incident such as a compromised account or data being exfiltrated?"
+   }
+  }
+ },
+ "response": {
+  "model": "strands-decider-2B-hobson-v19",
+  "answers": {
+   "department": {
+    "type": "choice",
+    "choice": "account_access",
+    "probabilities": {
+     "billing": 0.0328,
+     "technical": 0.0641,
+     "account_access": 0.8976,
+     "sales": 0.0056
+    },
+    "confidence": 0.8634
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.7694,
+    "legend": {
+     "0": "Low",
+     "1": "Medium",
+     "2": "High",
+     "3": "Critical"
+    },
+    "probabilities": {
+     "0": 0.1568,
+     "1": 0.2187,
+     "2": 0.3227,
+     "3": 0.3018
+    },
+    "confidence": 0.3833
+   },
+   "security_incident": {
+    "type": "noul",
+    "noul": 0.4
+   }
+  },
+  "usage": {
+   "input_tokens": 264,
+   "output_tokens": 3
+  },
+  "latency_ms": 2051.51
+ },
+ "http_status": 200,
+ "wall_ms": 2057.5
+}
