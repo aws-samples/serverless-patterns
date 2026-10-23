@@ -78,7 +78,7 @@ sam build
 sam deploy --guided --stack-name "$STACK_NAME-sam"
 ```
 
-Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets.
+Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets. Keep the stack name `<stack-name>-sam`, or any name that starts with the AWS CloudFormation stack's name: the client instance's IAM role only lets AWS SAM create stacks, functions, roles, and tables named that way, so another name fails with an `AccessDenied` error.
 
 To test the function locally before you deploy, run `sam local invoke --event ./events/event.json` after `sam build`. The client instance runs DynamoDB Local at boot, and the function writes to it whenever it runs under `sam local`, so a local test never touches the deployed table.
 
