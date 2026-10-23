@@ -87,7 +87,7 @@ sam build
 sam deploy --guided --stack-name "$STACK_NAME-sam"
 ```
 
-Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets. You can give the SAM stack any name. The client instance's IAM role recognizes SAM stacks by the `kafka-sample` tag, which `samconfig.toml` already sets, so keep that tag if you edit the file.
+Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets. You can give the SAM stack any name. Keep the `kafka-sample` tag that `samconfig.toml` sets: the client instance's IAM role only creates stacks with that tag, and only updates or deletes stacks that have it. AWS CloudFormation tags a new stack only when its change set runs, so the role can run change sets on any stack in the account and Region. Deploy this sample in a test account without other workloads.
 
 To test the function locally before you deploy, run `sam local invoke --event ./events/event.json` after `sam build`. The client instance runs DynamoDB Local at boot, and the function writes to it whenever it runs under `sam local`, so a local test never touches the deployed table.
 
