@@ -228,11 +228,16 @@ class TemplateTest(unittest.TestCase):
         self.assertEqual(self.states["ReasonDecisionUnavailable"]["Next"], "SendToHumanReview")
 
     # --- the queue and the page ---------------------------------------------------------------------------
-    def test_queue_and_topic_calls_are_retried_and_a_failed_page_still_reaches_review(self):
-        for name in ("SendToHumanReview", "PageSecurityOnCall"):
-            (retrier,) = self.states[name]["Retry"]
-            self.assertEqual(retrier["ErrorEquals"], ["States.TaskFailed"], name)
-            self.assertEqual(retrier["MaxAttempts"], 3, name)
+    def test_queue_and_topic_calls_retry_except_permanent_errors_and_a_failed_page_still_reaches_review(self):
+        # The first retrier matches the errors that a retry cannot fix and allows no attempts. States.TaskFailed
+        # in the second matches every known error except States.Timeout, so everything else is retried.
+        missing = {"SendToHumanReview": "SQS.QueueDoesNotExistException", "PageSecurityOnCall": "SNS.NotFoundException"}
+        for name, error in missing.items():
+            permanent, others = self.states[name]["Retry"]
+            self.assertEqual(sorted(permanent["ErrorEquals"]), sorted(["States.Permissions", error]), name)
+            self.assertEqual(permanent["MaxAttempts"], 0, name)
+            self.assertEqual(others["ErrorEquals"], ["States.TaskFailed"], name)
+            self.assertEqual(others["MaxAttempts"], 3, name)
         (catcher,) = self.states["PageSecurityOnCall"]["Catch"]
         self.assertEqual((catcher["ErrorEquals"], catcher["Next"]), (["States.ALL"], "ReasonPageFailed"))
         self.assertEqual(self.states["ReasonPageFailed"]["Next"], "SendToHumanReview")

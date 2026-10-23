@@ -187,11 +187,16 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
       resultPath: "$.page",
     });
 
-    // A transient SQS or SNS error is retried. If the review queue stays unreachable the execution
-    // fails, which the caller sees, rather than the ticket silently going nowhere.
-    const retryTransient = { errors: ["States.TaskFailed"], interval: Duration.seconds(1), maxAttempts: 3, backoffRate: 2 };
-    sendToHumanReview.addRetry(retryTransient);
-    pageOnCall.addRetry(retryTransient);
+    // The error names of the SQS and SNS integrations do not separate transient from permanent causes (an
+    // invalid parameter raises the generic SQS.AmazonSQSException), so the first retrier lists the errors that
+    // a retry cannot fix (no permission, queue or topic missing) with no attempts, and everything else is
+    // retried. States.TaskFailed matches every known error except States.Timeout. If the review queue stays
+    // unreachable the execution fails, which the caller sees, rather than the ticket silently going nowhere.
+    const retryOthers = { errors: ["States.TaskFailed"], interval: Duration.seconds(1), maxAttempts: 3, backoffRate: 2 };
+    sendToHumanReview.addRetry({ errors: ["States.Permissions", "SQS.QueueDoesNotExistException"], maxAttempts: 0 });
+    sendToHumanReview.addRetry(retryOthers);
+    pageOnCall.addRetry({ errors: ["States.Permissions", "SNS.NotFoundException"], maxAttempts: 0 });
+    pageOnCall.addRetry(retryOthers);
 
     const reviewUnavailable = tag("ReasonDecisionUnavailable", "review", "decision_unavailable").next(sendToHumanReview);
     // If the page cannot be published the ticket still goes to a person, and says why.

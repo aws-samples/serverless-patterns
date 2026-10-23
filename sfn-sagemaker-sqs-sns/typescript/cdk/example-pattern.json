@@ -1,6 +1,6 @@
 {
   "title": "AWS Step Functions to Amazon SageMaker AI confidence gate",
-  "description": "A Step Functions Choice state acts on the answers of an open-weight Strands Decider model on SageMaker AI only when it is confident, and sends the rest to Amazon SQS.",
+  "description": "An AWS Step Functions Choice state acts on the answers of an open-weight Strands Decider model on Amazon SageMaker AI only when it is confident; the rest go to Amazon SQS.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
@@ -39,7 +39,9 @@
   },
   "deploy": {
     "text": [
-      "npx cdk deploy"
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>",
+      "The stack builds the model container image, so a container builder must be available (Docker, or Finch with <code>CDK_DOCKER=finch</code>), and the account and Region must be bootstrapped (<code>npx cdk bootstrap</code>)."
     ]
   },
   "testing": {
@@ -55,7 +57,8 @@
   "authors": [
     {
       "name": "Nithin Chandran R",
-      "bio": "Technical Account Manager at AWS",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
       "linkedin": "nithin-chandran-r"
     }
   ]

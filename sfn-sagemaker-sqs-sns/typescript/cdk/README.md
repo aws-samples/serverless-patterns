@@ -19,6 +19,10 @@ Important: this application uses various AWS services and there are costs associ
 * Amazon SageMaker AI quota for one endpoint instance of the instance type you choose (default `ml.m5.2xlarge`; check Service Quotas, "ml.m5.2xlarge for endpoint usage")
 * Python 3.9 or later, only to run the tests (tested with Python 3.13)
 
+## Supported Regions
+
+The stack has no Region-specific values: it deploys to the Region of your AWS CLI profile or `AWS_REGION`, and its ARNs use the partition, Region and account of the stack. It was deployed and tested in us-west-2 only. In another Region, check that you have endpoint quota for the instance type there. The endpoint also needs outbound internet access to download the model (see Important Notes).
+
 ## Architecture
 
 ```
@@ -43,7 +47,7 @@ AWS Step Functions Express workflow
 1. `ValidateInput` fails the execution with `InvalidTicket` unless the input is `{"id": "<string>", "text": "<string>"}`.
 2. `AskDecider` calls `InvokeEndpoint` on the Amazon SageMaker AI endpoint through the AWS SDK integration (`arn:aws:states:::aws-sdk:sagemakerruntime:invokeEndpoint`). Throttling and the transient service errors `ServiceUnavailable` and `InternalFailure` are retried twice. An error returned by the container itself (`SageMakerRuntime.ModelErrorException`) is not retried. Any other failure, including the 60-second timeout, is caught and the ticket goes to review as `decision_unavailable`.
 3. `ConfidenceGate` is the Choice state (see [The gate](#the-gate)).
-4. The outcome states tag the execution with `gate.outcome` and `gate.reason`. Tickets that need a person are sent to the Amazon SQS queue, and a suspected security incident is first published to the Amazon SNS topic. Both calls are retried up to three times. If the page still fails, the ticket goes to the queue with the reason `security_incident_page_failed`. If the queue itself stays unreachable, the execution fails, so the caller knows the ticket was not queued.
+4. The outcome states tag the execution with `gate.outcome` and `gate.reason`. Tickets that need a person are sent to the Amazon SQS queue, and a suspected security incident is first published to the Amazon SNS topic. Both calls are retried up to three times, except for errors that a retry cannot fix (a missing queue or topic, or missing permission), which fail at once. If the page still fails, the ticket goes to the queue with the reason `security_incident_page_failed`. If the queue itself stays unreachable, the execution fails, so the caller knows the ticket was not queued.
 
 Step Functions serialises the request `Body` to JSON and returns the response body as a string. The container is asked for JSON, and `AskDecider` parses the body with the JSONata `$parse` function. This one state uses the JSONata query language (the other states use JSONPath, and a state machine may mix them). A body that is not valid JSON raises `States.QueryEvaluationError`, which is caught and treated as "no usable answer". The equivalent JSONPath intrinsic function `States.StringToJson` raises `States.Runtime` for such a body, an error that no `Catch` can handle, so the whole execution would fail and the ticket would never reach the review queue (seen in a check with the Step Functions TestState API).
 
@@ -114,8 +118,8 @@ The upstream project reports 0.723 accuracy (167 of 231 tasks) and an expected c
 * **Not production-ready.** Strands Decider's own server has no authentication, and its behaviour under concurrent requests is not verified; the [upstream documentation](https://github.com/strands-labs/strands-decider/blob/main/docs/inference.md) says to use it "for local experiments only". This pattern puts it behind an Amazon SageMaker AI endpoint, which authenticates callers with IAM, and serialises requests inside the container. That does not make the model production-ready. Measure accuracy and thresholds on your own tickets before you rely on the gate.
 * **Treat ticket text as hostile.** The model reads it as part of its input. Do not let the model's answer be the only control on an irreversible action.
 * **Access to the model is IAM-only.** The endpoint is reachable only through the Amazon SageMaker AI runtime API, and the workflow role can invoke only this endpoint. There is no public entry point in this pattern; put your own authenticated front door (for example Amazon API Gateway with an authorizer) in front of `StartSyncExecution` if you need one.
-* **The container downloads weights from Hugging Face at startup,** about 4.6 GB each time the endpoint starts (the base model file is 4.55 GB and the adapter 0.07 GB). The checkpoint and its base model are pinned to the commits in the `revision` and `baseRevision` context values; the base model commit is the one the checkpoint's `provenance.json` records, which it marks as inferred because the training hosts did not pin a revision. Python packages are pinned in `model/requirements.txt`. To remove the runtime dependency, bake the weights into the image or stage them in Amazon S3.
-* **The container runs as root,** because Amazon SageMaker AI expects inference containers to. Its only entry point is the SageMaker runtime API.
+* **The container downloads weights from Hugging Face at startup,** about 4.6 GB each time the endpoint starts (the base model file is 4.55 GB and the adapter 0.07 GB). The checkpoint and its base model are pinned to the commits in the `revision` and `baseRevision` context values; the base model commit is the one the checkpoint's `provenance.json` records, which it marks as inferred because the training hosts did not pin a revision. Python packages are pinned in `model/requirements.txt`. To remove the runtime dependency, bake the weights into the image or stage them in Amazon S3. While the container downloads at startup, the endpoint needs outbound internet access and cannot run with network isolation.
+* **The container runs as root,** because Amazon SageMaker AI [expects inference containers to run as root](https://docs.aws.amazon.com/sagemaker/latest/dg/your-algorithms-inference-code.html). Its only entry point is the SageMaker runtime API.
 * **Logs:** the state machine logs errors only and turns execution data off. An error message written by Step Functions can still quote part of the state, so treat the log group as sensitive. The page leaves the ticket text out. The review queue and the execution output contain the ticket; treat them accordingly.
 * **Least privilege:** the workflow role is scoped to `sagemaker:InvokeEndpoint` on the one endpoint, `sqs:SendMessage` on the one queue and `sns:Publish` on the one topic. The workflow role also holds the Amazon CloudWatch Logs delivery actions that Step Functions needs for logging, which AWS documents with resource `*`. The SageMaker AI execution role can pull images from the AWS CDK bootstrap repository and write logs under `/aws/sagemaker/Endpoints/*`, plus `ecr:GetAuthorizationToken`, which supports only resource `*`.
 * **One endpoint instance, one model worker, no autoscaling.** Requests are answered one at a time.
@@ -123,7 +127,7 @@ The upstream project reports 0.723 accuracy (167 of 231 tasks) and an expected c
 * **The model is an experiment.** It has 1.9 billion parameters (according to the [upstream README](https://github.com/strands-labs/strands-decider)) and its authors describe it as the first model of the family. Upstream's [data/sources.md](https://github.com/strands-labs/strands-decider/blob/main/data/sources.md) lists its training sources: public classification datasets, examples written by other models, and targets distilled from a larger model. It does not record the licence of several of them, so read it and the model card before you use the model commercially. Measure the model on your tickets.
 * **Cap the ticket size at the caller.** Step Functions limits the data of a state to 256 KiB (a larger input fails the execution), and the model reads about 4,096 tokens whatever you send, so the rest of a long ticket is ignored. A long ticket also takes longer to answer. A call that passes 60 seconds is cut off and the ticket goes to review, but the container keeps computing it, so later tickets wait behind it.
 * **Updates need spare quota.** Changing the model revisions or the instance type updates the endpoint: SageMaker AI starts the new instance before it deletes the old one, so you need quota for two instances while the update runs.
-* **No de-duplication.** The workflow does not de-duplicate tickets; start one execution per ticket.
+* **No de-duplication.** The workflow does not de-duplicate tickets; start one execution per ticket. Start it with `StartSyncExecution`, which runs at most once. An Express workflow that is started asynchronously runs at least once ([workflow types](https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html)), so a ticket can be paged twice.
 
 ## Deployment Instructions
 
@@ -148,11 +152,22 @@ The upstream project reports 0.723 accuracy (167 of 231 tasks) and an expected c
 
 ## Testing
 
-1. Start an execution with each sample ticket in `events/` and read the result:
+1. Read the stack outputs into variables:
     ```bash
-    aws stepfunctions start-sync-execution --cli-read-timeout 0 --state-machine-arn <StateMachineArn> --input file://events/clear-ticket.json --query output --output text
-    aws stepfunctions start-sync-execution --cli-read-timeout 0 --state-machine-arn <StateMachineArn> --input file://events/ambiguous-ticket.json --query output --output text
-    aws stepfunctions start-sync-execution --cli-read-timeout 0 --state-machine-arn <StateMachineArn> --input file://events/security-ticket.json --query output --output text
+    out() { aws cloudformation describe-stacks --stack-name StrandsDeciderConfidenceGatedTriageStack --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
+    SM=$(out StateMachineArn); QUEUE=$(out HumanReviewQueueUrl); TOPIC=$(out SecurityPagingTopicArn)
+    ```
+
+2. Subscribe to the paging topic before you send the security sample, for example by email (click the confirmation link in the message that Amazon SNS sends first, or no page arrives):
+    ```bash
+    aws sns subscribe --topic-arn $TOPIC --protocol email --notification-endpoint you@example.com
+    ```
+
+3. Start an execution with each sample ticket in `events/` and read the result:
+    ```bash
+    aws stepfunctions start-sync-execution --cli-read-timeout 0 --state-machine-arn $SM --input file://events/clear-ticket.json --query output --output text
+    aws stepfunctions start-sync-execution --cli-read-timeout 0 --state-machine-arn $SM --input file://events/ambiguous-ticket.json --query output --output text
+    aws stepfunctions start-sync-execution --cli-read-timeout 0 --state-machine-arn $SM --input file://events/security-ticket.json --query output --output text
     ```
     `--cli-read-timeout 0` stops the AWS CLI from giving up after its default 60 seconds and sending the request again, which would start a second execution. The output is the final state. `gate.outcome` and `gate.reason` tell you what the gate did, and `model.response.answers` holds the model's answers. If every ticket is `review` / `decision_unavailable`, read `error.Error` and `error.Cause` in the output: they hold the reason the model call failed. The values below were recorded from a local run of the same model (see [What the recorded tickets show](#what-the-recorded-tickets-show)); yours can differ slightly. On the deployed endpoint (`ml.m5.2xlarge`, us-west-2) the three samples gave the `gate.outcome` and `gate.reason` values in the table, and each took about 5 seconds from the CLI call to the result, about 3 seconds of that in the model:
 
@@ -162,23 +177,18 @@ The upstream project reports 0.723 accuracy (167 of 231 tasks) and an expected c
     | `ambiguous-ticket.json` | `review` / `low_confidence` | department `billing` (0.67), urgency score 1.85, P(security incident) 0.16 |
     | `security-ticket.json` | `paged_and_review` / `security_incident_suspected` | department `account_access` (0.80), urgency score 2.31, P(security incident) 0.91 |
 
-2. Read the review queue. The ambiguous and security samples are there, with the full answers:
+4. Read the review queue. The ambiguous and security samples are there, with the full answers:
     ```bash
-    aws sqs receive-message --queue-url <HumanReviewQueueUrl> --max-number-of-messages 10
+    aws sqs receive-message --queue-url $QUEUE --max-number-of-messages 10 --wait-time-seconds 10
     ```
-    A message that you receive is hidden from further receives for 60 seconds (the visibility timeout), so wait a minute before you read the queue again. Every receive without a delete counts toward the queue's `maxReceiveCount` of 3, after which the message moves to the dead-letter queue.
+    `--wait-time-seconds 10` turns on long polling. Without it a call can return only some of the messages: in a test it returned one of the two. A message that you receive is hidden from further receives for 60 seconds (the visibility timeout), so wait a minute before you read the queue again. Every receive without a delete counts toward the queue's `maxReceiveCount` of 3, after which the message moves to the dead-letter queue.
 
-3. Subscribe to the paging topic before the security sample to receive the page, for example by email (click the confirmation link in the message that Amazon SNS sends first, or no page arrives):
+5. Send an invalid input to see the workflow refuse it. Expected: status `FAILED` and the error `InvalidTicket`:
     ```bash
-    aws sns subscribe --topic-arn <SecurityPagingTopicArn> --protocol email --notification-endpoint you@example.com
-    ```
-
-4. Send an invalid input to see the workflow refuse it. Expected: status `FAILED` and the error `InvalidTicket`:
-    ```bash
-    aws stepfunctions start-sync-execution --state-machine-arn <StateMachineArn> --input '{"text": "no id"}' --query '[status,error]' --output text
+    aws stepfunctions start-sync-execution --state-machine-arn $SM --input '{"text": "no id"}' --query '[status,error]' --output text
     ```
 
-5. Run the unit tests. They need no AWS account. `npm test` synthesizes the stack first because the tests read the synthesized state machine:
+6. Run the unit tests. They need no AWS account. `npm test` synthesizes the stack first because the tests read the synthesized state machine:
     ```bash
     npm test
     ```
@@ -186,19 +196,24 @@ The upstream project reports 0.723 accuracy (167 of 231 tasks) and an expected c
 
 ## Cleanup
 
-1. Delete the stack. This removes the endpoint, so the hourly charge stops. It also deletes the review and dead-letter queues and any tickets still in them, so read or move those first:
+1. Read the endpoint name before you delete the stack, because the stack outputs are gone afterwards:
+    ```bash
+    ENDPOINT=$(aws cloudformation describe-stacks --stack-name StrandsDeciderConfidenceGatedTriageStack --query "Stacks[0].Outputs[?OutputKey=='DeciderEndpointName'].OutputValue" --output text)
+    ```
+
+2. Delete the stack. This removes the endpoint, so the hourly charge stops. It also deletes the review and dead-letter queues and any tickets still in them, so read or move those first:
     ```bash
     npx cdk destroy
     ```
 
-2. Amazon SageMaker AI creates the endpoint's log group itself, and the stack does not delete it. Delete it with the `DeciderEndpointName` value you noted at deployment:
+3. Amazon SageMaker AI creates the endpoint's log group itself, and the stack does not delete it. Delete it:
     ```bash
-    aws logs delete-log-group --log-group-name /aws/sagemaker/Endpoints/<DeciderEndpointName>
+    aws logs delete-log-group --log-group-name /aws/sagemaker/Endpoints/$ENDPOINT
     ```
 
-3. The container image stays in the AWS CDK bootstrap repository in Amazon ECR. Delete it there if you no longer need it.
+4. The container image stays in the AWS CDK bootstrap repository in Amazon ECR. Delete it there if you no longer need it.
 
-4. Confirm the stack has been deleted:
+5. Confirm the stack has been deleted:
     ```bash
     aws cloudformation describe-stacks --stack-name StrandsDeciderConfidenceGatedTriageStack
     ```
