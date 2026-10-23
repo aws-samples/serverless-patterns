@@ -94,7 +94,26 @@ else:
     s = s.rstrip("\n") + f"\n\n{hdr}\n" + "".join(f"{k} = {v}\n" for k, v in want.items())
 open(path, "w").write(s)
 PY
-echo "Set docker_network and event for sam local invoke in $PATTERN_DIR/samconfig.toml."
+# Also make "<this stack>-sam" the default stack name for `sam deploy --guided`
+# (SAM's own default is sam-app). The client instance's IAM role only allows SAM
+# stacks, and the functions, roles, tables and log groups they create, whose names
+# start with this stack's name. A stack name you already saved is left as is.
+python3 - "$PATTERN_DIR/samconfig.toml" "$STACK_NAME-sam" <<'PY'
+import re, sys
+path, stack = sys.argv[1], sys.argv[2]
+s = open(path).read()
+hdr = "[default.deploy.parameters]"
+if hdr not in s:
+    s = s.rstrip("\n") + f"\n\n{hdr}\nstack_name = \"{stack}\"\n"
+else:
+    start = s.index(hdr) + len(hdr)
+    nxt = re.search(r"^\[", s[start:], re.M)
+    end = start + nxt.start() if nxt else len(s)
+    if not re.search(r"^stack_name\s*=", s[start:end], re.M):
+        s = s[:start] + f"\nstack_name = \"{stack}\"" + s[start:]
+open(path, "w").write(s)
+PY
+echo "Set docker_network and event for sam local invoke, and stack_name for sam deploy, in $PATTERN_DIR/samconfig.toml."
 
 cat <<EOF
 
