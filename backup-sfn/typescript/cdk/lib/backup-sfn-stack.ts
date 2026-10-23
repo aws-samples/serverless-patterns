@@ -53,7 +53,8 @@ export class BackupSfnStack extends Stack {
 
     // ---- AWS Backup restore testing (L1 only: there is no L2 construct yet) -----------------
     const plan = new backup.CfnRestoreTestingPlan(this, 'RestoreTestingPlan', {
-      restoreTestingPlanName: 'sfn_validated_restore_test', // letters, digits and underscores only
+      // Must be unique in the account and Region: letters, digits and underscores only, at most 50 characters.
+      restoreTestingPlanName: `${this.stackName}_restore_test`.replace(/[^A-Za-z0-9_]/g, '_'),
       scheduleExpression: restoreTestCron,
       startWindowHours: START_WINDOW_HOURS,
       recoveryPointSelection: {

@@ -40,7 +40,7 @@ Restore job COMPLETED ---- "Restore Job State Change" event ----> Amazon EventBr
 The stack creates the following resources:
 
 * **Amazon DynamoDB**: a small on-demand table (`pk` partition key) that is the protected resource.
-* **AWS Backup**: a backup vault, an IAM role for backup jobs, an IAM role for restores (each with the matching AWS managed policy), a restore testing plan and a restore testing selection that picks the DynamoDB table. The plan restores the latest snapshot recovery point in the vault from the last day. The selection keeps the restored table for 2 hours (`ValidationWindowHours`) so that the workflow can read it. The plan and the selection have fixed names (`sfn_validated_restore_test` and `source_table`), and a restore testing plan name must be unique in an account and Region, so a second copy of this stack in the same account and Region fails with a name conflict. Change the plan name in `lib/backup-sfn-stack.ts` if you need two copies. The window for eligible recovery points (`selectionWindowDays`) is 1 day, which suits the one-off backup in Testing. With a real backup plan, set it to more than the backup interval plus the start window, as the [AWS Backup documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html) recommends. Restore testing in the AWS CDK is available only as L1 constructs (`CfnRestoreTestingPlan` and `CfnRestoreTestingSelection`).
+* **AWS Backup**: a backup vault, an IAM role for backup jobs, an IAM role for restores (each with the matching AWS managed policy), a restore testing plan and a restore testing selection that picks the DynamoDB table. The plan restores the latest snapshot recovery point in the vault from the last day. The selection keeps the restored table for 2 hours (`ValidationWindowHours`) so that the workflow can read it. The plan name is built from the stack name (`BackupSfnRestoreValidationStack_restore_test`) and must be unique in an account and Region, so a second copy of this stack in the same account and Region needs a different stack name in `bin/app.ts`. The selection is named `source_table`. The window for eligible recovery points (`selectionWindowDays`) is 1 day, which suits the one-off backup in Testing. With a real backup plan, set it to more than the backup interval plus the start window, as the [AWS Backup documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html) recommends. Restore testing in the AWS CDK is available only as L1 constructs (`CfnRestoreTestingPlan` and `CfnRestoreTestingSelection`).
 * **Amazon EventBridge**: a rule for `Restore Job State Change` events from `aws.backup` with status `COMPLETED`, a resource type that starts with `DynamoDB` and this plan's ARN. AWS Backup reports the resource type of a DynamoDB restore job as `DynamoDB.FullyManaged` in this event, not as `DynamoDB`, so a rule that matches `DynamoDB` exactly never fires. The target is the state machine, with retries and an encrypted Amazon SQS dead-letter queue for events that cannot be delivered.
 * **AWS Step Functions**: a Standard state machine with execution logging to an Amazon CloudWatch Logs log group (1 week retention).
 
@@ -66,7 +66,7 @@ AWS Backup restore testing restores a recovery point on a schedule and deletes t
 
 This pattern takes a different route. The workflow calls Amazon DynamoDB and AWS Backup directly through [AWS SDK service integrations](https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html), so the synthesized template contains no Lambda function and no custom resources. The check (the item count of the restored table) decides the verdict that is written back to the originating service.
 
-The closest pattern in this repository is [securityhub-finding-sfn-remediation-cdk](../../../securityhub-finding-sfn-remediation-cdk), which also starts a Step Functions workflow from an EventBridge event but remediates Security Hub findings with Lambda functions. This pattern reports a validation verdict to AWS Backup and has no Lambda function.
+The closest pattern in this repository is [securityhub-finding-sfn-remediation-cdk](../../../securityhub-finding-sfn-remediation-cdk), which also starts a Step Functions workflow from an EventBridge event but remediates AWS Security Hub findings with AWS Lambda functions. This pattern reports a validation verdict to AWS Backup and has no Lambda function.
 
 ## Important Notes
 
@@ -122,7 +122,7 @@ Plan for up to two hours of wall-clock time for the first real result: the 30 mi
     ```bash
     out() { aws cloudformation describe-stacks --stack-name BackupSfnRestoreValidationStack --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
     TABLE=$(out TableName); TABLE_ARN=$(out TableArn); VAULT=$(out VaultName); ROLE=$(out BackupRoleArn)
-    PLAN_ARN=$(out RestoreTestingPlanArn); SM=$(out StateMachineArn); LOGS=$(out StateMachineLogGroup)
+    PLAN_ARN=$(out RestoreTestingPlanArn); SM=$(out StateMachineArn)
     ```
 1. Put five items into the table. Expected: the count is `5`.
     ```bash
@@ -165,10 +165,19 @@ Plan for up to two hours of wall-clock time for the first real result: the 30 mi
     ```bash
     aws stepfunctions list-executions --state-machine-arn $SM --query "executions[].{name:name,status:status}"
     ```
-1. To see a `FAILED` verdict, delete three or more of the five items, take another backup, and let the next scheduled restore test run (redeploy with a new `restoreTestCron` to avoid waiting a day). Expected: `ValidationStatus` is `FAILED` and the message reads `Restored table awsbackup-restore-test-... holds fewer than 3 items.`
+1. To see a `FAILED` verdict, delete three of the five items, then repeat step 3 to take another backup and deploy again with a new `CRON` value (Deployment steps 3 and 4) so that you do not wait a day:
+    ```bash
+    for i in 1 2 3; do aws dynamodb delete-item --table-name $TABLE --key "{\"pk\":{\"S\":\"item-$i\"}}"; done
+    ```
+    When that restore test has run, repeat step 7. Expected: `ValidationStatus` is `FAILED` and the message reads `Restored table awsbackup-restore-test-... holds fewer than 3 items.`
 
 ## Cleanup
 
+1. Read the values that the next steps use. Skip this if you are still in the shell from Testing. In a new shell, do it before `cdk destroy`, because the stack outputs are gone afterwards:
+    ```bash
+    out() { aws cloudformation describe-stacks --stack-name BackupSfnRestoreValidationStack --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
+    VAULT=$(out VaultName); PLAN_ARN=$(out RestoreTestingPlanArn)
+    ```
 1. Make sure no restore job is still running, and that the restored table has been deleted by AWS Backup (`DeletionStatus` is `SUCCESSFUL` in `describe-restore-job`). The restored table is deleted once a result is recorded or after the 2-hour validation window:
     ```bash
     aws backup list-restore-jobs --by-restore-testing-plan-arn $PLAN_ARN --query "RestoreJobs[].{id:RestoreJobId,status:Status,deletion:DeletionStatus}"

@@ -39,10 +39,10 @@
   },
   "deploy": {
     "text": [
-      "npm install",
+      "<code>npm install</code>",
       "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once.",
-      "CRON=$(node -e 'const d=new Date(Date.now()+30*60000);console.log(`cron(${d.getUTCMinutes()} ${d.getUTCHours()} * * ? *)`)')",
-      "npx cdk deploy -c restoreTestCron=\"$CRON\""
+      "<code>CRON=$(node -e 'const d=new Date(Date.now()+30*60000);console.log(`cron(${d.getUTCMinutes()} ${d.getUTCHours()} * * ? *)`)')</code>",
+      "<code>npx cdk deploy -c restoreTestCron=\"$CRON\"</code>"
     ]
   },
   "testing": {
