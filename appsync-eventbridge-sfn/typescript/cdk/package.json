@@ -1,0 +1,24 @@
+{
+  "name": "appsync-eventbridge-sfn-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-service workflow catalog: a GraphQL front door for Step Functions workflows, built with AppSync, EventBridge, Lambda, and DynamoDB",
+  "main": "dist/lib/workflow-catalog.js",
+  "types": "dist/lib/workflow-catalog.d.ts",
+  "scripts": {
+    "build": "tsc && rm -rf dist/lambda dist/graphql && mkdir -p dist/lambda && cp lambda/*.py dist/lambda/ && cp -R graphql dist/ && python3 -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --requirement lambda/requirements.txt --target dist/lambda",
+    "clean": "rm -rf dist cdk.out",
+    "synth": "npm run build && cdk synth",
+    "diff": "npm run build && cdk diff",
+    "deploy": "npm run build && cdk deploy"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.3",
+    "aws-cdk": "2.1141.0",
+    "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.269.0",
+    "constructs": "10.8.1"
+  }
+}
