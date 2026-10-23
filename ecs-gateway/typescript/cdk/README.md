@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon ECS Gateway and connects two AWS Fargate services to it. The gateway owns the ingress: ECS provisions one internet-facing Application Load Balancer, its listener, the certificates and a generated HTTPS hostname per service, and the template contains none of them. Each service opts in with a single `GatewayConnectors` entry. The platform-level settings (an AWS WAF web ACL, Amazon S3 access logs, the inbound security group and the load balancer limit) are set once on the gateway and apply to every service behind it.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ecs-gateway-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -15,43 +15,19 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) with `npx cdk bootstrap`
 * A Region where Amazon ECS Gateway is available. The [documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/gateway-overview.html) lists all commercial AWS Regions. The template contains no Region-specific values; it was tested in us-west-2.
 
-## Who can reach what
+## Architecture
 
-The gateway creates an **internet-facing** Application Load Balancer. That is what the feature does by default, so the pattern makes the client range an explicit input instead of a default:
-
-* The stack refuses to synthesize until you pass `-c allowedCidr=<IPv4 CIDR>`. Use your own address as a `/32`. The value becomes the only inbound rule (HTTPS, port 443) of the gateway's security group. The stack checks that it is a valid IPv4 CIDR (octets 0 to 255, prefix 0 to 32) and rejects any range with a prefix shorter than `/8`, which includes every `/0` such as `0.0.0.0/0` or `1.2.3.4/0`, unless you also pass `-c allowAnyone=true`.
-* The load balancer listens on HTTPS port 443 only. The generated hostnames (`https://ec-<id>.ecs.<region>.on.aws`) are random, but they are not secrets, so do not rely on them for access control.
-* The Fargate tasks run in private subnets and accept port 8080 only from the gateway's security group.
-* The sample containers are static pages with no authentication. For a real workload, add authentication in the application or in front of it.
-* The AWS WAF web ACL adds a per-IP rate limit. It is a safeguard, not access control.
-
-**Private alternative:** deploy with `-c scheme=internal`. The gateway then uses an internal load balancer in the private subnets, and the services filter on `PRIVATE`, so they never connect to an internet-facing gateway. Set `allowedCidr` to the range of the clients inside the VPC (for example the VPC CIDR `10.0.0.0/16`) and test from a host in that VPC. The scheme and the subnets cannot be changed on an existing gateway, so choose the scheme at the first deployment and run `cdk destroy` before you switch to the other one. In a test of this variant, both service connections had access type `PRIVATE`, the load balancer scheme was `internal`, and the generated hostnames resolved to private addresses (`10.0.x.x`). A one-off Fargate task in the VPC's private subnets got `hello from orders` and `hello from catalog` with HTTP 200 from both URLs and no answer on plain HTTP (port 80), and the same URL from outside the VPC did not answer.
-
-## Deployment Instructions
-
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/ecs-gateway/typescript/cdk
-    ```
-1. Install the dependencies:
-    ```
-    npm install
-    ```
-1. Find the public IP address that your requests come from and keep it in a variable:
-    ```
-    MY_CIDR=$(curl -s https://checkip.amazonaws.com)/32
-    echo $MY_CIDR
-    ```
-1. Deploy the stack:
-    ```
-    npx cdk deploy -c allowedCidr=$MY_CIDR
-    ```
-    The first deployment takes several minutes, because ECS creates the load balancer and certificates when the first service connects (6 to 7 minutes in test runs in us-west-2). IAM roles can take a short time to become usable. If the stack fails with a message that the `infrastructureRoleArn` could not be assumed, run the same command again.
-1. Note the outputs from the deployment (gateway, cluster, service, web ACL and bucket names, and the allowed range). They are used for testing.
+```
+Client (the range you allow, HTTPS 443)
+   |
+   v
+AWS WAF web ACL (per-IP rate limit)
+   |
+   v
+Application Load Balancer, created and shared by the Amazon ECS Gateway ----> access logs ----> Amazon S3
+   |-- host rule: https://ec-<id>.ecs.<region>.on.aws ----> AWS Fargate service "orders"
+   '-- host rule: https://ec-<id>.ecs.<region>.on.aws ----> AWS Fargate service "catalog"
+```
 
 ## How it works
 
@@ -72,6 +48,20 @@ What happens at deployment:
 
 On `cdk destroy`, CloudFormation deletes the services first, then the association and the gateway. According to the Amazon ECS documentation, a route is removed when its service is deleted, an association stays in `DISASSOCIATING` until every route is gone, and a gateway can be deleted only when it has no association in `ACTIVE` or `DISASSOCIATING` state. These removals are asynchronous, so a deletion can report `DELETE_FAILED` while a managed resource is still being removed (see Cleanup).
 
+## Important Notes
+
+### Who can reach what
+
+The gateway creates an **internet-facing** Application Load Balancer. That is what the feature does by default, so the pattern makes the client range an explicit input instead of a default:
+
+* The stack refuses to synthesize until you pass `-c allowedCidr=<IPv4 CIDR>`. Use your own address as a `/32`. The value becomes the only inbound rule (HTTPS, port 443) of the gateway's security group. The stack checks that it is a valid IPv4 CIDR (octets 0 to 255, prefix 0 to 32) and rejects any range with a prefix shorter than `/8`, which includes every `/0` such as `0.0.0.0/0` or `1.2.3.4/0`, unless you also pass `-c allowAnyone=true`.
+* The load balancer listens on HTTPS port 443 only. The generated hostnames (`https://ec-<id>.ecs.<region>.on.aws`) are random, but they are not secrets, so do not rely on them for access control.
+* The Fargate tasks run in private subnets and accept port 8080 only from the gateway's security group.
+* The sample containers are static pages with no authentication. For a real workload, add authentication in the application or in front of it.
+* The AWS WAF web ACL adds a per-IP rate limit. It is a safeguard, not access control.
+
+**Private alternative:** deploy with `-c scheme=internal`. The gateway then uses an internal load balancer in the private subnets, and the services filter on `PRIVATE`, so they never connect to an internet-facing gateway. Set `allowedCidr` to the range of the clients inside the VPC (for example the VPC CIDR `10.0.0.0/16`) and test from a host in that VPC. The scheme and the subnets cannot be changed on an existing gateway, so choose the scheme at the first deployment and run `cdk destroy` before you switch to the other one. In a test of this variant, both service connections had access type `PRIVATE`, the load balancer scheme was `internal`, and the generated hostnames resolved to private addresses (`10.0.x.x`). A one-off Fargate task in the VPC's private subnets got `hello from orders` and `hello from catalog` with HTTP 200 from both URLs and no answer on plain HTTP (port 80), and the same URL from outside the VPC did not answer.
+
 ### CDK notes
 
 * `aws-cdk-lib` has no construct for the gateway yet, so the stack uses `cdk.CfnResource` for `AWS::ECS::Gateway` and `AWS::ECS::GatewayClusterAssociations`, and `addPropertyOverride('GatewayConnectors', ...)` on the L1 service. CloudFormation accepted the properties on deployment (the CDK validator does not know the new resource types yet). When `aws-cdk-lib` adds typed constructs for them, replace the escape hatches with those.
@@ -84,6 +74,33 @@ On `cdk destroy`, CloudFormation deletes the services first, then the associatio
 ### How this differs from the existing ALB patterns
 
 [fargate-cdk](../../../fargate-cdk) and [apigw-fargate-cdk](../../../apigw-fargate-cdk) put an Application Load Balancer in front of Fargate with `ApplicationLoadBalancedFargateService`, and [route53-alb-fargate-cdk-dotnet](../../../route53-alb-fargate-cdk-dotnet) adds a custom domain and certificate. Here the load balancer, listener, target groups, certificates and hostnames are not in the template: the gateway resource owns them and shares one load balancer across the services.
+
+### Cost
+
+The gateway has no additional charge. You pay for the resources it creates and for the rest of the stack: the Application Load Balancer (hourly and per LCU, shared by both services), the NAT gateway (hourly plus data), the AWS WAF web ACL and rule, the two Fargate tasks, public IPv4 addresses, CloudWatch Logs and the S3 bucket. Several of these bill by the hour, so delete the stack when you finish.
+
+## Deployment Instructions
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd serverless-patterns/ecs-gateway/typescript/cdk
+    ```
+2. Install the dependencies:
+    ```
+    npm install
+    ```
+3. Find the public IP address that your requests come from and keep it in a variable:
+    ```
+    MY_CIDR=$(curl -s https://checkip.amazonaws.com)/32
+    echo $MY_CIDR
+    ```
+4. Deploy the stack:
+    ```
+    npx cdk deploy -c allowedCidr=$MY_CIDR
+    ```
+    The first deployment takes several minutes, because ECS creates the load balancer and certificates when the first service connects (6 to 7 minutes in test runs in us-west-2). IAM roles can take a short time to become usable. If the stack fails with a message that the `infrastructureRoleArn` could not be assumed, run the same command again.
+5. Note the outputs from the deployment (gateway, cluster, service, web ACL and bucket names, and the allowed range). They are used for testing.
 
 ## Testing
 
@@ -162,10 +179,6 @@ Logs and metrics: the containers write to two Amazon CloudWatch Logs log groups 
     aws cloudformation describe-stacks --stack-name EcsGatewayStack
     ```
     Expected: an error that the stack does not exist.
-
-## Cost
-
-The gateway has no additional charge. You pay for the resources it creates and for the rest of the stack: the Application Load Balancer (hourly and per LCU, shared by both services), the NAT gateway (hourly plus data), the AWS WAF web ACL and rule, the two Fargate tasks, public IPv4 addresses, CloudWatch Logs and the S3 bucket. Several of these bill by the hour, so delete the stack when you finish.
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
