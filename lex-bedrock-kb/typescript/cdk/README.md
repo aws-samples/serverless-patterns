@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon Lex V2 bot whose built-in `AMAZON.QnAIntent` answers questions from an Amazon Bedrock knowledge base. The knowledge base reads documents from an Amazon S3 bucket and keeps its vectors in an Amazon S3 Vectors index. You talk to the bot with the Lex runtime API. There is no AWS Lambda function in the request path.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lex-bedrock-kb-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -13,10 +13,10 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap`)
-* Access in the target Region to the two Amazon Bedrock models used by the stack (see [Models and Regions](#models-and-regions)).
+* Access in the target Region to the two Amazon Bedrock models used by the stack (see [Models and Regions](#supported-regions)).
 * Permission for the identity that calls the bot to run `lex:RecognizeText` on the bot alias.
 
-## Models and Regions
+## Supported Regions
 
 The stack takes the Region from your AWS CLI profile or the `AWS_REGION` environment variable. Nothing in the template is hardcoded to a Region.
 
@@ -25,30 +25,17 @@ The stack takes the Region from your AWS CLI profile or the `AWS_REGION` environ
 * The Amazon Lex V2 API documents the `ModelArn` of the QnA intent model as a foundation model ARN (`arn:aws:bedrock:<region>::foundation-model/<model-id>`), so the generation model is expected to be invocable in the deployment Region without a cross-Region inference profile. In eu-central-1, `aws bedrock list-foundation-models` lists Nova Lite with the inference type `INFERENCE_PROFILE` only (no on-demand), so in that Region choose another model that is invocable in-Region and offered for the Lex QnA intent. The pattern was not deployed in eu-central-1.
 * Before you deploy in another Region, check that Amazon Lex V2, Amazon Bedrock Knowledge Bases, Amazon S3 Vectors and both models are available there. Models are retired over time, so check the [Amazon Bedrock model lifecycle](https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html) page and the model list of the Lex QnA intent before you reuse an id.
 
-## Deployment Instructions
+## Architecture
 
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/lex-bedrock-kb/typescript/cdk
-    ```
-1. Install the dependencies:
-    ```
-    npm install
-    ```
-1. Bootstrap the account and Region if you have not done so before:
-    ```
-    npx cdk bootstrap
-    ```
-1. Deploy the stack:
-    ```
-    npx cdk deploy
-    ```
-    To use another generation model, add `-c generationModelId=<model-id>`.
-1. Note the outputs from the deployment: the documents bucket name, the knowledge base ID, the data source ID, the bot ID, the locale ID and the generation model ID. They are used for testing.
+```
+Documents (Amazon S3, docs/ prefix)
+   |  start-ingestion-job: chunk, embed (Amazon Titan Text Embeddings V2), store
+   v
+Amazon Bedrock knowledge base ----> Amazon S3 Vectors index
+   ^
+   |  Retrieve
+User ----> Amazon Lex V2 bot (QnAIntent) ----> generation model on Amazon Bedrock (Amazon Nova Lite) ----> answer
+```
 
 ## How it works
 
@@ -70,6 +57,8 @@ If you remove the knowledge base, `QnAIntent` has no knowledge store to answer f
 
 The ingestion job is deliberately a documented CLI step and not a custom resource. A knowledge base without an ingestion job returns no passages, so run the job before you test the bot.
 
+## Important Notes
+
 ### Exposure
 
 The bot has no public endpoint. Callers need AWS credentials with `lex:RecognizeText` on the bot alias. The documents bucket blocks public access and denies requests without TLS. The vector bucket has no resource policy, so only IAM principals of the account can use it. The stack creates no API, load balancer or security group.
@@ -79,6 +68,28 @@ The bot has no public endpoint. Callers need AWS credentials with `lex:Recognize
 The stack has no resource that bills by the hour (no OpenSearch Serverless collection, no provisioned capacity and no NAT gateway). You pay for what you use: Amazon S3 storage and requests, Amazon S3 Vectors storage and queries, embedding tokens during ingestion, generation tokens and Lex text requests for each question. See the pricing pages of the services for current rates.
 
 The stack defines no log groups and does not turn on Lex conversation logs. The CDK helper function that empties the documents bucket on delete writes to an Amazon CloudWatch Logs log group that AWS Lambda creates when the function first runs. CloudFormation does not manage that log group, so it has no retention setting and `cdk destroy` does not remove it. The Cleanup section shows how to delete it. Ingestion status is read with `aws bedrock-agent get-ingestion-job`. The stack outputs list the identifiers you need for testing.
+
+## Deployment Instructions
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd serverless-patterns/lex-bedrock-kb/typescript/cdk
+    ```
+2. Install the dependencies:
+    ```
+    npm install
+    ```
+3. Bootstrap the account and Region if you have not done so before:
+    ```
+    npx cdk bootstrap
+    ```
+4. Deploy the stack:
+    ```
+    npx cdk deploy
+    ```
+    To use another generation model, add `-c generationModelId=<model-id>`.
+5. Note the outputs from the deployment: the documents bucket name, the knowledge base ID, the data source ID, the bot ID, the locale ID and the generation model ID. They are used for testing.
 
 ## Testing
 
@@ -139,7 +150,7 @@ All commands run from the pattern directory. They assume the stack name `LexBedr
 If the bot cannot answer a question that the documents cover, work from the data to the model:
 
 1. Run the `retrieve` command above. An empty list points at ingestion, so check that the ingestion job is `COMPLETE` and that `numberOfDocumentsFailed` is 0.
-1. If `retrieve` returns the passage but Lex does not answer, check that the locale status is `Built`, that the locale is enabled on `TSTALIASID` (see the alias step above) and that the generation model is invocable in your Region (see [Models and Regions](#models-and-regions)).
+1. If `retrieve` returns the passage but Lex does not answer, check that the locale status is `Built`, that the locale is enabled on `TSTALIASID` (see the alias step above) and that the generation model is invocable in your Region (see [Models and Regions](#supported-regions)).
 1. If a call returns an access error, read the denied action in AWS CloudTrail.
 
 ## Cleanup
