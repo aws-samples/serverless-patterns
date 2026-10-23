@@ -8,7 +8,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources. CloudFormation passes the infrastructure role to Amazon ECS, so the deploying identity needs `iam:PassRole` on that role (the AWS CDK deployment role has it).
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources. AWS CloudFormation passes the infrastructure role to Amazon ECS, so the deploying identity needs `iam:PassRole` on that role (the AWS CDK deployment role has it).
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. Use AWS CLI v2 version 2.38.3 or later: that is the first release whose changelog lists Amazon ECS Gateway. In a test, version 2.31.3 failed with `Found invalid choice` on `describe-gateway-resources` and printed `null` for the gateway connections of a service. The commands in Testing were run with version 2.38.5. Check yours with `aws --version`.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
@@ -77,7 +77,7 @@ The gateway creates an **internet-facing** Application Load Balancer. That is wh
 
 ### Cost
 
-The gateway has no additional charge. You pay for the resources it creates and for the rest of the stack: the Application Load Balancer (hourly and per LCU, shared by both services), the NAT gateway (hourly plus data), the AWS WAF web ACL and rule, the two Fargate tasks, public IPv4 addresses, CloudWatch Logs and the S3 bucket. Several of these bill by the hour, so delete the stack when you finish.
+The gateway has no additional charge. You pay for the resources it creates and for the rest of the stack: the Application Load Balancer (hourly and per LCU, shared by both services), the NAT gateway (hourly plus data), the AWS WAF web ACL and rule, the two Fargate tasks, public IPv4 addresses, Amazon CloudWatch Logs and the S3 bucket. Several of these bill by the hour, so delete the stack when you finish.
 
 ## Deployment Instructions
 
@@ -169,7 +169,7 @@ Logs and metrics: the containers write to two Amazon CloudWatch Logs log groups 
 
 ## Cleanup
 
-1. Delete the stack. The app refuses to synthesize without `allowedCidr`, so the command needs a value even though destroy does not use it: any valid CIDR with a prefix of /8 or longer works, and the variable from the deployment step is not needed (it is empty in a new shell). Confirm the prompt, or add `--force`:
+1. Delete the stack. This also deletes the access log bucket with the logs in it. The app refuses to synthesize without `allowedCidr`, so the command needs a value even though destroy does not use it: any valid CIDR with a prefix of /8 or longer works, and the variable from the deployment step is not needed (it is empty in a new shell). Confirm the prompt, or add `--force`:
     ```bash
     npx cdk destroy -c allowedCidr=203.0.113.7/32
     ```

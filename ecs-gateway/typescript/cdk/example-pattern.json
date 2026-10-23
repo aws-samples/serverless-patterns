@@ -1,6 +1,6 @@
 {
   "title": "Amazon ECS Gateway with a shared Application Load Balancer, AWS WAF and Amazon S3 access logs",
-  "description": "Two AWS Fargate services join an Amazon ECS Gateway with one connector each and get HTTPS hostnames on a shared Application Load Balancer, with AWS WAF and S3 access logs.",
+  "description": "Two AWS Fargate services join an Amazon ECS Gateway, one connector each, and get HTTPS hostnames on a shared Application Load Balancer with AWS WAF and Amazon S3 access logs.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
