@@ -1,7 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 import {
-  Annotations,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -22,7 +21,6 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 // IAM management events are delivered in this Region (see the README).
 const IAM_EVENTS_REGION = 'us-east-1';
-const RESOURCE_NAME = 'accessanalyzer-policy-guardrail';
 
 // Access that an inline role policy must not grant. The list is explicit
 // because the API documentation does not say whether wildcards are allowed in
@@ -56,16 +54,21 @@ export class AccessAnalyzerSfnStack extends Stack {
     super(scope, id, props);
 
     if (!Token.isUnresolved(this.region) && this.region !== IAM_EVENTS_REGION) {
-      Annotations.of(this).addWarning(
-        `IAM events are delivered in ${IAM_EVENTS_REGION}. In ${this.region} the rule never matches. Deploy this stack in ${IAM_EVENTS_REGION}.`,
+      throw new Error(
+        `IAM events are delivered in ${IAM_EVENTS_REGION} only, so the rule never matches in ${this.region}. Deploy this stack there: export AWS_REGION=${IAM_EVENTS_REGION}`,
       );
     }
+
+    // The state machine and the rule get fixed names, built from the stack name, so that the trust policies
+    // can name their ARNs without a circular dependency and a second stack does not collide with this one.
+    const resourceName = `${this.stackName}-policy-guardrail`;
 
     const prefix = String(this.node.tryGetContext('roleNamePrefix') ?? 'guardrail-demo-');
     if (!/^[A-Za-z0-9_+=,.@-]{4,40}$/.test(prefix)) {
       throw new Error('roleNamePrefix must be 4 to 40 IAM role name characters and contain no wildcard');
     }
-    const remediate = String(this.node.tryGetContext('enableRemediation')).toLowerCase() === 'true';
+    // Only the exact value "true" turns removal on (a boolean true in cdk.json also works).
+    const remediate = String(this.node.tryGetContext('enableRemediation')) === 'true';
 
     // Amazon SNS topic, encrypted with the AWS managed key, TLS only.
     const topic = new sns.Topic(this, 'Topic', {
@@ -154,8 +157,8 @@ export class AccessAnalyzerSfnStack extends Stack {
     });
     let onFail: sfn.IChainable = notifyViolation;
     if (remediate) {
-      // A States.ALL Catch does not catch States.Runtime, so the next two
-      // states only reference fields the rule pattern guarantees.
+      // A States.ALL Catch does not catch States.Runtime, so the next two states only read fields that every
+      // successful PutRolePolicy event carries: the rule matches roleName and policyName is a required parameter.
       const removePolicy = new tasks.CallAwsService(this, 'RemoveInlinePolicy', {
         service: 'iam',
         action: 'deleteRolePolicy',
@@ -209,9 +212,9 @@ export class AccessAnalyzerSfnStack extends Stack {
       retention: logs.RetentionDays.ONE_WEEK,
       removalPolicy: RemovalPolicy.DESTROY,
     });
-    const stateMachineArn = `arn:${this.partition}:states:${this.region}:${this.account}:stateMachine:${RESOURCE_NAME}`;
+    const stateMachineArn = `arn:${this.partition}:states:${this.region}:${this.account}:stateMachine:${resourceName}`;
     const stateMachine = new sfn.StateMachine(this, 'StateMachine', {
-      stateMachineName: RESOURCE_NAME,
+      stateMachineName: resourceName,
       stateMachineType: sfn.StateMachineType.STANDARD,
       definitionBody: sfn.DefinitionBody.fromChainable(definition),
       role: new iam.Role(this, 'StateMachineRole', {
@@ -225,7 +228,7 @@ export class AccessAnalyzerSfnStack extends Stack {
     });
 
     // 5) The rule: successful PutRolePolicy calls on roles with the prefix.
-    const ruleArn = `arn:${this.partition}:events:${this.region}:${this.account}:rule/${RESOURCE_NAME}`;
+    const ruleArn = `arn:${this.partition}:events:${this.region}:${this.account}:rule/${resourceName}`;
     const invokeRole = new iam.Role(this, 'RuleInvokeRole', {
       assumedBy: new iam.ServicePrincipal('events.amazonaws.com').withConditions({
         StringEquals: { 'aws:SourceAccount': this.account },
@@ -233,7 +236,7 @@ export class AccessAnalyzerSfnStack extends Stack {
       }),
     });
     const rule = new events.Rule(this, 'PutRolePolicyRule', {
-      ruleName: RESOURCE_NAME,
+      ruleName: resourceName,
       description: 'Successful IAM PutRolePolicy calls on roles whose name starts with the configured prefix',
       eventPattern: {
         source: ['aws.iam'],

@@ -39,11 +39,11 @@
   },
   "deploy": {
     "text": [
-      "cd accessanalyzer-sfn/typescript/cdk",
-      "npm install",
-      "export AWS_REGION=us-east-1",
-      "npx cdk bootstrap",
-      "npx cdk deploy"
+      "<code>cd accessanalyzer-sfn/typescript/cdk</code>",
+      "<code>npm install</code>",
+      "<code>export AWS_REGION=us-east-1</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
     ]
   },
   "testing": {
