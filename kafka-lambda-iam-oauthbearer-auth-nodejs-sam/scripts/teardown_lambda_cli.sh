@@ -18,11 +18,21 @@ fi
 
 REGION="${AWS_REGION:-us-west-2}"
 STACK_NAME="${STACK_NAME:-kafka-iam-oauth}"
-# Lambda-side resource names are derived from the stack name, so two stacks in the
-# same account and region (for example the Java and Python versions of this
-# pattern) never delete each other's function, role, secrets, or table.
-FUNCTION_NAME="${FUNCTION_NAME:-${STACK_NAME}-consumer}"
-DDB_TABLE_NAME="${DDB_TABLE_NAME:-${STACK_NAME}-messages}"
+# Lambda-side names start with this sample's prefix (PATTERN_PREFIX, made from the
+# main stack's ID), which is what the client instance's IAM role allows. Two stacks
+# in the same account and region (for example the Java and Python versions of this
+# pattern) have different prefixes, so they never delete each other's resources.
+if [ -z "${PATTERN_PREFIX:-}" ]; then
+  PATTERN_PREFIX=$(aws cloudformation describe-stacks --region "$REGION" --stack-name "$STACK_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='SamplePrefix'].OutputValue" --output text 2>/dev/null || true)
+fi
+if [ -z "$PATTERN_PREFIX" ] || [ "$PATTERN_PREFIX" = "None" ]; then
+  echo "ERROR: could not read the SamplePrefix output of stack '$STACK_NAME' in $REGION."
+  echo "       Set STACK_NAME and AWS_REGION to match your stack, or set PATTERN_PREFIX."
+  exit 1
+fi
+FUNCTION_NAME="${FUNCTION_NAME:-${PATTERN_PREFIX}-cli-consumer}"
+DDB_TABLE_NAME="${DDB_TABLE_NAME:-${PATTERN_PREFIX}-cli-messages}"
 ROLE_NAME="${ROLE_NAME:-${FUNCTION_NAME}-role}"
 SECRET_NAMES=("${FUNCTION_NAME}-broker-ca")
 
