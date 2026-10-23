@@ -336,9 +336,11 @@ Resources:
         # CloudFormation creates the SAM stack's resources with these credentials),
         # and the AWS CLI deploy and teardown scripts. None of it depends on what
         # you name this stack or the SAM stack:
-        #   - SAM stacks: any stack created with the tag kafka-sample=<SamplePrefix>,
-        #     which the client instance puts in samconfig.toml. Only stacks that
-        #     already carry the tag can be changed or deleted.
+        #   - SAM stacks: any name. They're created with the tag
+        #     kafka-sample=<SamplePrefix>, which the client instance puts in
+        #     samconfig.toml, and only stacks with the tag can be updated or deleted
+        #     directly. Change sets can run on any stack in this account and Region,
+        #     so deploy this sample in an account without other workloads.
         #   - Functions, tables, log groups and secrets: names that start with
         #     SamplePrefix, which the SAM template and the CLI script use.
         #   - Lambda execution roles: under the IAM path /<SamplePrefix>-lambda/,
@@ -363,10 +365,9 @@ Resources:
                   - kafka:DescribeCluster
                   - kafka:DescribeClusterV2
                 Resource: !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${SamplePrefix.Value}-cluster/*'
-              # sam deploy: SAM stacks are recognized by their kafka-sample tag, not
-              # their name. A stack can only be created with the tag, and only a stack
-              # that already has it can be changed, executed or deleted, so this role
-              # can't take over other stacks by tagging them.
+              # sam deploy: the SAM stack can have any name. A stack has to be created
+              # with the kafka-sample tag, and only a stack that has it can be updated
+              # or deleted directly.
               - Sid: CreateSampleStacks
                 Effect: Allow
                 Action:
@@ -376,6 +377,22 @@ Resources:
                 Condition:
                   StringEquals:
                     aws:RequestTag/kafka-sample: !GetAtt SamplePrefix.Value
+              # sam deploy creates and updates a stack through a change set, and
+              # CloudFormation tags a new stack only when its change set runs. So the
+              # change set steps can't be limited by tag, and are allowed on any stack.
+              - Sid: RunChangeSets
+                Effect: Allow
+                Action:
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:ListChangeSets
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeStackResource
+                  - cloudformation:DescribeStackResources
+                  - cloudformation:ListStackResources
+                  - cloudformation:GetTemplate
+                Resource: !Sub 'arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*/*'
               - Sid: ManageSampleStacks
                 Effect: Allow
                 Action: cloudformation:*
