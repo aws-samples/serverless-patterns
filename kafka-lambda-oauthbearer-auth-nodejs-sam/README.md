@@ -47,13 +47,13 @@ Processing is at least once. If any record in a batch fails, for example because
 
 ## Deploy the AWS CloudFormation template
 
-Deploy `KafkaBrokersCognitoClientEC2.yaml` from the [AWS CloudFormation console](https://console.aws.amazon.com/cloudformation/) (**Create stack** > **With new resources** > **Upload a template file**, then acknowledge the creation of named IAM resources), or from the AWS CLI on your machine:
+Deploy `KafkaBrokersCognitoClientEC2.yaml` from the [AWS CloudFormation console](https://console.aws.amazon.com/cloudformation/) (**Create stack** > **With new resources** > **Upload a template file**, then acknowledge the creation of IAM resources), or from the AWS CLI on your machine:
 
 ```bash
 aws cloudformation deploy \
   --template-file KafkaBrokersCognitoClientEC2.yaml \
   --stack-name kafka-oauth-nodejs \
-  --capabilities CAPABILITY_NAMED_IAM \
+  --capabilities CAPABILITY_IAM \
   --s3-bucket <amzn-s3-bucket-in-the-same-region>
 ```
 
@@ -69,7 +69,7 @@ When the stack reaches `CREATE_COMPLETE`, open the [Amazon EC2 console](https://
 
 From your machine you can also open a shell with `aws ec2-instance-connect ssh --instance-id <instance-id> --connection-type eice`.
 
-The client instance has already created the Kafka topic and written `template.yaml` with this stack's values. Your shell loads the environment from `~/kafka_oauth.env`, including `STACK_NAME`, `KAFKA_TOPIC`, and `AWS_REGION`.
+The client instance has already created the Kafka topic and written `template.yaml` with this stack's values. Your shell loads the environment from `~/kafka_oauth.env`, including `STACK_NAME`, `PATTERN_PREFIX`, `KAFKA_TOPIC`, and `AWS_REGION`. `PATTERN_PREFIX` (`kafka-` and 8 characters from the stack ID) starts the names of the functions, tables, and log groups you create from the client instance; its IAM role is scoped to that prefix rather than to any stack name.
 
 ## Deploy the AWS Lambda function
 
@@ -83,7 +83,7 @@ sam build
 sam deploy --guided --stack-name "$STACK_NAME-sam"
 ```
 
-Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets. Keep the stack name `<stack-name>-sam`, or any name that starts with the AWS CloudFormation stack's name: the client instance's IAM role only lets AWS SAM create stacks, functions, roles, and tables named that way, so another name fails with an `AccessDenied` error.
+Accept the default for every prompt. The parameter defaults already contain this environment's broker endpoints, subnets, security group, and secrets. You can give the SAM stack any name. The client instance's IAM role recognizes SAM stacks by the `kafka-sample` tag, which `samconfig.toml` already sets, so keep that tag if you edit the file.
 
 To test the function locally before you deploy, run `sam local invoke --event ./events/event.json` after `sam build`. The client instance runs DynamoDB Local at boot, and the function writes to it whenever it runs under `sam local`, so a local test never touches the deployed table.
 
@@ -111,7 +111,7 @@ LOG_GROUP=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME-sam" \
   --query "Stacks[0].Outputs[?OutputKey=='ConsumerLogGroupName'].OutputValue" --output text)
 
 # Option B (AWS CLI script): the script also sets 7-day retention
-LOG_GROUP="/aws/lambda/$STACK_NAME-consumer"
+LOG_GROUP="/aws/lambda/$PATTERN_PREFIX-cli-consumer"
 
 aws logs tail "$LOG_GROUP" --since 15m
 ```
@@ -120,11 +120,11 @@ You can also open the log group in the [Amazon CloudWatch console](https://conso
 
 ## Verify the records in Amazon DynamoDB
 
-The function writes one item per record to the table `<stack-name>-sam-messages` (Option A) or `<stack-name>-messages` (Option B). After sending 10 messages, the table holds 10 new items:
+The function writes one item per record to the table `<prefix>-sam-messages` (Option A) or `<prefix>-cli-messages` (Option B). After sending 10 messages, the table holds 10 new items:
 
 ```bash
-aws dynamodb scan --table-name "$STACK_NAME-sam-messages" --select COUNT    # Option A
-aws dynamodb scan --table-name "$STACK_NAME-messages" --select COUNT        # Option B
+aws dynamodb scan --table-name "$PATTERN_PREFIX-sam-messages" --select COUNT    # Option A
+aws dynamodb scan --table-name "$PATTERN_PREFIX-cli-messages" --select COUNT    # Option B
 ```
 
 To browse the items, open the table in the [Amazon DynamoDB console](https://console.aws.amazon.com/dynamodbv2/) and choose **Explore table items**.
