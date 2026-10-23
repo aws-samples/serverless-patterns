@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sticky Notes Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <!-- ===== Connect screen ===== -->
+  <section id="connect-screen" class="connect-screen">
+    <div class="connect-card">
+      <div class="brand">
+        <div class="brand-mark">◆</div>
+        <div>
+          <h1>Sticky Notes Board</h1>
+          <p class="muted">Lambda MicroVM · session-persistent workspace</p>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>Middleware URL</span>
+        <input id="middleware-url" type="url" placeholder="https://xxxx.lambda-url.us-west-1.on.aws/" autocomplete="off" />
+        <small class="muted">Function URL printed by <code>middleware/deploy.sh</code></small>
+      </label>
+
+      <label class="field">
+        <span>Client ID</span>
+        <input id="client-id" type="text" placeholder="demo-user-ricardo" autocomplete="off" />
+        <small class="muted">Your workspace key. Same ID → same notes &amp; files restored.</small>
+      </label>
+
+      <button id="connect-btn" class="btn btn-primary btn-block">Open my workspace</button>
+      <div id="connect-status" class="connect-status" hidden></div>
+    </div>
+  </section>
+
+  <!-- ===== Workspace ===== -->
+  <section id="workspace" class="workspace" hidden>
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="brand-mark small">◆</span>
+        <strong>Sticky Notes Board</strong>
+        <span id="session-pill" class="pill"></span>
+      </div>
+      <div class="topbar-right">
+        <span class="meta-item">
+          <span class="meta-label">client</span>
+          <span id="client-label" class="meta-value"></span>
+        </span>
+        <span class="meta-item" id="microvm-item" hidden>
+          <span class="meta-label">microVM</span>
+          <span id="microvm-label" class="meta-value mono"></span>
+        </span>
+        <button id="refresh-btn" class="btn btn-ghost" title="Reload notes and files">↻ Refresh</button>
+        <button id="disconnect-btn" class="btn btn-ghost">Switch workspace</button>
+      </div>
+    </header>
+
+    <div class="split">
+      <!-- ---- Notes frame ---- -->
+      <section class="frame" id="frame-notes">
+        <div class="panel-head">
+          <h2>Notes <span id="note-count" class="count">0</span></h2>
+          <button id="new-note-btn" class="btn btn-primary">+ New note</button>
+        </div>
+        <div class="frame-body">
+          <div id="notes-grid" class="notes-grid"></div>
+          <div id="notes-empty" class="empty" hidden>No notes yet. Create your first one.</div>
+        </div>
+      </section>
+
+      <!-- ---- Files frame ---- -->
+      <section class="frame" id="frame-files">
+        <div class="panel-head">
+          <h2>Files <span id="file-count" class="count">0</span></h2>
+          <div class="file-actions">
+            <input id="file-input" type="file" hidden />
+            <button id="upload-btn" class="btn btn-primary">⤒ Upload file</button>
+          </div>
+        </div>
+        <div class="frame-body">
+          <div id="dropzone" class="dropzone">Drop any file here, or click “Upload file”.</div>
+          <ul id="files-list" class="files-list"></ul>
+          <div id="files-empty" class="empty" hidden>No files uploaded yet.</div>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<!-- ===== Note editor modal ===== -->
+<div id="note-modal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="note-modal-title">Edit note</h3>
+      <button class="icon-btn" data-close="note-modal">✕</button>
+    </div>
+    <label class="field">
+      <span>Content</span>
+      <textarea id="note-content" rows="4" placeholder="Write something..."></textarea>
+    </label>
+    <div class="field-row">
+      <label class="field">
+        <span>Color</span>
+        <div id="color-swatches" class="swatches"></div>
+      </label>
+      <label class="field">
+        <span>Position X</span>
+        <input id="note-x" type="number" value="0" />
+      </label>
+      <label class="field">
+        <span>Position Y</span>
+        <input id="note-y" type="number" value="0" />
+      </label>
+    </div>
+    <div class="modal-foot">
+      <button id="note-delete-btn" class="btn btn-danger" hidden>Delete</button>
+      <div class="grow"></div>
+      <button class="btn btn-ghost" data-close="note-modal">Cancel</button>
+      <button id="note-save-btn" class="btn btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Text file editor modal ===== -->
+<div id="text-modal" class="modal" hidden>
+  <div class="modal-card modal-wide">
+    <div class="modal-head">
+      <h3 id="text-modal-title">Edit file</h3>
+      <button class="icon-btn" data-close="text-modal">✕</button>
+    </div>
+    <textarea id="text-editor" class="code" spellcheck="false"></textarea>
+    <div class="modal-foot">
+      <div id="text-status" class="muted"></div>
+      <div class="grow"></div>
+      <button class="btn btn-ghost" data-close="text-modal">Close</button>
+      <button id="text-save-btn" class="btn btn-primary">Save file</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
