@@ -61,10 +61,10 @@
   },
   "authors": [
     {
-      "name": "REPLACE_ME",
+      "name": ["Mia Alarcon Chong", "Meghana Srinivas"],
       "image": "",
-      "bio": "REPLACE_ME",
-      "linkedin": "",
+      "bio": "ProServe Delivery Consultants at Amazon Web Services",
+      "linkedin": ["mialarcon", "meghana-srinivas-2837b918b"],
       "twitter": ""
     }
   ]
