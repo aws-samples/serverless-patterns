@@ -641,6 +641,12 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
+              # Boot: write the brokers' certificate into this stack's CA secret.
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:PutSecretValue'
+                  - 'secretsmanager:DescribeSecret'
+                Resource: !Ref BrokerCASecret
               # The CLI Lambda deploy script (run on the client) creates the
               # broker-CA trust-anchor secret it wires into the event source mapping.
               - Effect: Allow
