@@ -2,7 +2,7 @@
 
 This pattern checks the inline policy that is written to an IAM role the moment it is written. An Amazon EventBridge rule matches the IAM `PutRolePolicy` call and starts an AWS Step Functions workflow. The workflow sends the policy document from the event to the AWS IAM Access Analyzer `CheckAccessNotGranted` API through an AWS SDK service integration and publishes an Amazon SNS notification when the policy might allow any of a list of actions. The pattern only notifies by default. Removing the inline policy is an opt-in setting.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/accessanalyzer-sfn-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -16,46 +16,11 @@ Important: this application uses various AWS services and there are costs associ
 * An AWS CloudTrail trail that logs management events. The EventBridge documentation states that events with the `AWS API Call via CloudTrail` detail type require a trail with logging enabled ([AWS service events delivered via AWS CloudTrail](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event-cloudtrail.html)). This pattern does not create a trail. Check whether your account already has one before you create another.
 * A sandbox account. The workflow reads every matching policy change in the account, and the optional removal step deletes IAM policies.
 
-## Region
+## Supported Regions
 
 Deploy this stack in us-east-1 (US East (N. Virginia)). IAM is a global service, and CloudTrail records its events in us-east-1 ([CloudTrail global service events](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html#cloudtrail-concepts-global-service-events)). EventBridge also states that events from API calls to global services such as IAM are only available in that Region ([troubleshooting](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-troubleshooting.html#eb-rule-did-not-trigger-iam)). A rule deployed in another Region deploys without error and never matches. The stack prints a synthesis warning when the Region is not us-east-1. The stack builds its ARNs with the partition of the deployment, but it was only designed for the standard `aws` partition in us-east-1.
 
-## Deployment Instructions
-
-1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
-    ```
-    git clone https://github.com/aws-samples/serverless-patterns
-    ```
-1. Change directory to the pattern directory:
-    ```
-    cd serverless-patterns/accessanalyzer-sfn/typescript/cdk
-    ```
-1. Install the dependencies:
-    ```
-    npm install
-    ```
-1. Use us-east-1 for the AWS CDK commands:
-    ```
-    export AWS_REGION=us-east-1
-    ```
-1. If this account and Region have never been used with the AWS CDK, bootstrap them once. The stack needs the bootstrap resources:
-    ```
-    npx cdk bootstrap
-    ```
-1. Deploy the stack. It runs in notify-only mode:
-    ```
-    npx cdk deploy
-    ```
-1. Note the stack outputs: `StateMachineArn`, `TopicArn`, `LogGroupName`, `RoleNamePrefix` and `Mode`.
-
-Settings are AWS CDK context values, set with `-c name=value` on `cdk deploy` or in `cdk.json`:
-
-| Context value | Default | Meaning |
-| --- | --- | --- |
-| `roleNamePrefix` | `guardrail-demo-` | Only roles whose name starts with this prefix are checked. The rule matches the prefix regardless of case, because IAM role names are not distinguished by case. The `Choice` state that guards removal compares case sensitively. It must be 4 to 40 IAM role name characters and cannot contain a wildcard. |
-| `enableRemediation` | `false` | When `true`, a policy that fails the check is deleted with `iam:DeleteRolePolicy`. Only the exact value `true` turns it on; anything else means notify-only, and the `Mode` output shows which mode is deployed. |
-
-## How it works
+## Architecture
 
 ```
 IAM PutRolePolicy on a role named <prefix>*
@@ -74,6 +39,15 @@ AWS Step Functions (Standard)
   API error (Catch)  ->  NotifyNotEvaluated -> PolicyNotEvaluated (Fail)
   RemoveInlinePolicy error (Catch)  ->  NotifyRemovalFailed -> RemovalFailed (Fail)
 ```
+
+## How it works
+
+1. A `PutRolePolicy` call on an IAM role whose name starts with the configured prefix is recorded by AWS CloudTrail and delivered to the default event bus in us-east-1.
+2. An Amazon EventBridge rule starts an AWS Step Functions Standard workflow. Failed deliveries go to an Amazon SQS dead-letter queue.
+3. The workflow passes the policy document from the event to the IAM Access Analyzer `CheckAccessNotGranted` API through an AWS SDK service integration (no AWS Lambda function, no `GetRolePolicy`).
+4. `PASS` ends the workflow. `FAIL`, or a policy that cannot be checked, is published to Amazon SNS. With `enableRemediation=true`, a failing inline policy on a role inside the prefix is also deleted.
+
+## Important Notes
 
 * **The decision comes from IAM Access Analyzer.** The `PolicyDocument` parameter of `CheckAccessNotGranted` is the string at `$.detail.requestParameters.policyDocument` of the CloudTrail event. The workflow does not call `GetRolePolicy` and has no AWS Lambda function. The synthesized template contains no Lambda function. The access object is an explicit list of 11 actions in `lib/accessanalyzer-sfn-stack.ts`, such as `iam:CreateAccessKey`, `iam:PassRole` and `iam:PutRolePolicy`. The API documentation describes a `FAIL` result as the policy "might allow some or all" of the actions, so the check errs toward reporting. The API accepts at most one access object. Edit the list for your own standards.
 * **Policies that cannot be checked are reported.** A `Choice` state tests that the policy document is present and is a string before the API call, so a missing field cannot cause a `States.Runtime` error, which a `States.ALL` catch does not handle. If the Access Analyzer call fails, or it returns neither `PASS` nor `FAIL`, the execution sends a `POLICY_NOT_EVALUATED` notification and ends in a `Fail` state with an error and a cause. When the API call failed, the notification carries the error name and cause that Step Functions caught from the API. In the other cases it carries a fixed `PolicyNotEvaluated` cause. Validation errors from the API are not retried. Throttling and server errors are retried three times.
@@ -102,6 +76,38 @@ Only `PutRolePolicy` on roles with the prefix is matched. These calls are not: `
 ### Cost
 
 No resource in this stack bills by the hour. The documented custom policy check price is based on the number of API calls, and the [pricing page](https://aws.amazon.com/iam/access-analyzer/pricing/) example uses $0.0020 per call. Confirm the current price there. One matching policy change makes one check. Step Functions Standard workflows are billed per state transition, and Amazon SNS, Amazon SQS, Amazon EventBridge and CloudWatch Logs are billed by use. A CloudTrail trail is a separate resource with its own charges.
+
+## Deployment Instructions
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd serverless-patterns/accessanalyzer-sfn/typescript/cdk
+    ```
+2. Install the dependencies:
+    ```
+    npm install
+    ```
+3. Use us-east-1 for the AWS CDK commands:
+    ```
+    export AWS_REGION=us-east-1
+    ```
+4. If this account and Region have never been used with the AWS CDK, bootstrap them once. The stack needs the bootstrap resources:
+    ```
+    npx cdk bootstrap
+    ```
+5. Deploy the stack. It runs in notify-only mode:
+    ```
+    npx cdk deploy
+    ```
+6. Note the stack outputs: `StateMachineArn`, `TopicArn`, `LogGroupName`, `RoleNamePrefix` and `Mode`.
+
+Settings are AWS CDK context values, set with `-c name=value` on `cdk deploy` or in `cdk.json`:
+
+| Context value | Default | Meaning |
+| --- | --- | --- |
+| `roleNamePrefix` | `guardrail-demo-` | Only roles whose name starts with this prefix are checked. The rule matches the prefix regardless of case, because IAM role names are not distinguished by case. The `Choice` state that guards removal compares case sensitively. It must be 4 to 40 IAM role name characters and cannot contain a wildcard. |
+| `enableRemediation` | `false` | When `true`, a policy that fails the check is deleted with `iam:DeleteRolePolicy`. Only the exact value `true` turns it on; anything else means notify-only, and the `Mode` output shows which mode is deployed. |
 
 ## Testing
 
