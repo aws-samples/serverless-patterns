@@ -4,6 +4,7 @@
   "language": "Python",
   "level": "200",
   "framework": "AWS CloudFormation",
+  "patternGroup": "lambda-microvms-codex-agent",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -15,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvms-codex-agent",
-      "templateURL": "serverless-patterns/lambda-microvms-codex-agent",
-      "projectFolder": "lambda-microvms-codex-agent",
       "templateFile": "template.yaml"
     }
   },

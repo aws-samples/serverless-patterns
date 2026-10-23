@@ -4,8 +4,6 @@ This pattern deploys an AWS Lambda MicroVM with the [Codex CLI](https://develope
 
 Codex is also wired to the [AWS MCP Server](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/mcp-server.html) from the [Agent Toolkit for AWS](https://github.com/aws/agent-toolkit-for-aws), so it can make live AWS API calls from inside the VM (for example "list my S3 buckets"), search AWS documentation, and retrieve AWS skills. The image installs the [MCP Proxy for AWS](https://github.com/aws/mcp-proxy-for-aws), which signs each request with AWS Signature Version 4 (SigV4) using the same execution-role credentials. Access is read-only, enforced by AWS Identity and Access Management (IAM).
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-microvms-codex-agent
-
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage. Please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 Important: the MicroVM execution role uses the AWS-managed `ReadOnlyAccess` policy, which can read data across the whole account (for example Amazon S3 object contents and Amazon DynamoDB items) and is extended automatically when AWS launches new services. Anyone with shell access to the MicroVM, and the agent itself, can read that data. Deploy into a sandbox or non-production account that holds no sensitive data, or narrow the role first; see [Things to check for your own account](#things-to-check-for-your-own-account).
@@ -43,7 +41,7 @@ Pick a Region where both [AWS Lambda MicroVMs](https://docs.aws.amazon.com/lambd
 2. Change directory to the pattern directory:
 
    ```bash
-   cd serverless-patterns/lambda-microvms-codex-agent
+   cd serverless-patterns/lambda-microvms-codex-agent/python/cloudformation
    ```
 
 3. Deploy. `deploy.sh` creates the Amazon S3 artifact bucket, uploads the source, deploys [template.yaml](template.yaml) (IAM roles, log group, MicroVM image), and runs a MicroVM:
