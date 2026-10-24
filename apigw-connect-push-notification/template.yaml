@@ -81,10 +81,93 @@ Resources:
               ,"Tags": $input.json('$.tags')
               #end
             }
+        # Each Connect error status is passed through as-is. SelectionPattern is matched
+        # against the backend HTTP status code. More info:
+        # https://docs.aws.amazon.com/connect/latest/APIReference/API_CreateNotification.html#API_CreateNotification_Errors
         IntegrationResponses:
+          # Connect returns HTTP 200 even when recipients fail, with the per-recipient
+          # error in FailedRecipientList. If every recipient failed, return the first
+          # recipient's ErrorCode; if only some failed, return 207 Multi-Status.
           - StatusCode: '200'
+            ResponseTemplates:
+              application/json: |
+                #set($failed = $input.path('$.FailedRecipientList'))
+                #set($succeeded = $input.path('$.SuccessfulRecipientList'))
+                #if($failed && $failed.size() > 0)
+                  #if(!$succeeded || $succeeded.size() == 0)
+                    #set($code = "$failed[0].ErrorCode")
+                    #if($code == "400")
+                      #set($context.responseOverride.status = 400)
+                    #elseif($code == "403")
+                      #set($context.responseOverride.status = 403)
+                    #elseif($code == "404")
+                      #set($context.responseOverride.status = 404)
+                    #elseif($code == "409")
+                      #set($context.responseOverride.status = 409)
+                    #elseif($code == "429")
+                      #set($context.responseOverride.status = 429)
+                    #elseif($code == "503")
+                      #set($context.responseOverride.status = 503)
+                    #else
+                      #set($context.responseOverride.status = 500)
+                    #end
+                  #else
+                    #set($context.responseOverride.status = 207)
+                  #end
+                #end
+                $input.json('$')
+          - StatusCode: '400'
+            SelectionPattern: '400'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
+          - StatusCode: '403'
+            SelectionPattern: '403'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
+          - StatusCode: '404'
+            SelectionPattern: '404'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
+          - StatusCode: '409'
+            SelectionPattern: '409'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
+          - StatusCode: '429'
+            SelectionPattern: '429'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
+          - StatusCode: '500'
+            SelectionPattern: '500'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
+          - StatusCode: '503'
+            SelectionPattern: '503'
+            ResponseParameters:
+              method.response.header.x-amzn-ErrorType: integration.response.header.x-amzn-ErrorType
       MethodResponses:
         - StatusCode: '200'
+        - StatusCode: '207'
+        - StatusCode: '400'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
+        - StatusCode: '403'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
+        - StatusCode: '404'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
+        - StatusCode: '409'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
+        - StatusCode: '429'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
+        - StatusCode: '500'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
+        - StatusCode: '503'
+          ResponseParameters:
+            method.response.header.x-amzn-ErrorType: false
 
   ApiDeployment:
     Type: 'AWS::ApiGateway::Deployment'

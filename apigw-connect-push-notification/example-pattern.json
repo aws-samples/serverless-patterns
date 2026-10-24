@@ -1,24 +1,21 @@
 {
-  "title": "Amazon API Gateway REST API to Amazon Connect Push Notification",
+  "title": "Amazon API Gateway REST API to Amazon Connect in-app notifications",
   "description": "Create an API Gateway REST API that sends in-app push notifications to Amazon Connect users via direct AWS service integration",
-  "language": "",
+  "language": "YAML",
   "level": "300",
-  "framework": "SAM",
+  "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
       "This pattern creates an Amazon API Gateway REST API with a direct AWS service integration to Amazon Connect.",
       "A POST request is transformed via VTL mapping templates and forwarded directly to the Connect CreateNotification API.",
-      "Using this Customers can send In-app notifications such as System notifications or custom organizational messages to Connnect Agents and Admins.",
+      "Customers can use this to send in-app notifications, such as system alerts or custom organizational messages, to Connect agents and admins.",
       "Notifications appear in the Amazon Connect workspace header for targeted users.",
       "Supports localized content (11 locales), priority levels, TTL expiration, and tag-based access control."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-connect-notification",
-      "templateURL": "serverless-patterns/apigw-connect-notification",
-      "projectFolder": "apigw-connect-notification",
       "templateFile": "template.yaml"
     }
   },
@@ -62,7 +59,7 @@
     {
       "name": "Vaidehi Patel",
       "bio": "Solutions Architect at Amazon Web Services",
-      "linkedin": "https://www.linkedin.com/in/vaidehi-patel08/"
+      "linkedin": "vaidehi-patel08"
     }
   ]
 }
