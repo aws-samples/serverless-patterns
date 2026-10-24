@@ -1,0 +1,60 @@
+{
+  "title": "Ordered processing with a synchronous AWS Lambda target on Amazon EventBridge",
+  "description": "Processes events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge custom event bus",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how an Amazon EventBridge custom event bus (the eventsv2 API) processes events in order by invoking an AWS Lambda function synchronously (InvocationType REQUEST_RESPONSE) from a FIFO subscriber.",
+      "The publisher sends a sequence of OrderPlaced events that share one EventGroupId, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer AWS Lambda function synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the Amazon CloudWatch log shows the sequence handled in order, one at a time. Synchronous confirmation provides the reliability and back-pressure teams used to add an Amazon SQS queue between the bus and AWS Lambda to get, so no Amazon SQS buffer sits in the path.",
+      "This deploys one Amazon EventBridge custom event bus, one FIFO subscriber configured for synchronous invocation, one Node.js 24 (TypeScript) AWS Lambda function, an Amazon SQS dead-letter queue (safety net), and the AWS Identity and Access Management (IAM) delivery role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-lambda-sync/typescript/sam",
+      "templateURL": "serverless-patterns/eventbridge-custom-lambda-sync/typescript/sam",
+      "projectFolder": "eventbridge-custom-lambda-sync-sam-typescript",
+      "templateFile": "infra/template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge event buses",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      },
+      {
+        "text": "Invoking AWS Lambda functions with Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}

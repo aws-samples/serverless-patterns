@@ -55,7 +55,7 @@ Resources:
       Handler: handler.handler
       Runtime: nodejs24.x
       CodeUri: ../consumer/
-      Timeout: 30
+      Timeout: 25 
       MemorySize: 256
       Description: Logs OrderPlaced events in processing order (ordered FIFO demo).
 
@@ -118,6 +118,14 @@ Resources:
         RoleArn: !GetAtt DeliveryRole.Arn
         LambdaParameters:
           InvocationType: REQUEST_RESPONSE
+      # On a FIFO subscriber, an event that cannot be delivered holds up later
+      # events in its EventGroupId until it succeeds or exhausts retries and is
+      # dead-lettered. Bounding retries caps that head-of-line blocking: a
+      # failing event drains to the DLQ promptly and unblocks its group.
+      # Delivery stops at whichever limit is reached first.
+      RetryPolicy:
+        MaxRetryAttempts: 10
+        MaxEventAgeInSeconds: 3600
       OnFailureConfiguration:
         Arn: !GetAtt DeadLetterQueue.Arn
 
