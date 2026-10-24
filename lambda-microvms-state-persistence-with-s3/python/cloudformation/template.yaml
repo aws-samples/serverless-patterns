@@ -1,0 +1,412 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Lambda MicroVMs state persistence with S3 — MicroVM image + session middleware
+  (DynamoDB, Lambda, API Gateway). The S3 state/staging bucket is created by
+  deploy.sh before this stack (the MicroVM artifact must be staged first), and
+  passed in as a parameter.
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PARAMETERS
+# ──────────────────────────────────────────────────────────────────────────────
+
+Parameters:
+  StackLabel:
+    Type: String
+    Default: state-persistence-demo
+    Description: Label used to name the MicroVM image and tag resources.
+    AllowedPattern: "^[a-z0-9][a-z0-9\\-]{1,40}[a-z0-9]$"
+    ConstraintDescription: 3-42 chars, lowercase alphanumeric and hyphens, no leading/trailing hyphen.
+
+  StateBucket:
+    Type: String
+    Description: >
+      S3 bucket (created by deploy.sh) that stages the MicroVM artifact and
+      holds per-client notes/files state at runtime.
+
+  ArtifactKey:
+    Type: String
+    Default: microvm-app/artifact.zip
+    Description: S3 key of the staged MicroVM artifact zip.
+
+  MiddlewareKey:
+    Type: String
+    Default: middleware/middleware.zip
+    Description: S3 key of the staged middleware Lambda deployment zip.
+
+  ApiStageName:
+    Type: String
+    Default: prod
+    Description: API Gateway stage name.
+
+  TokenTtlMinutes:
+    Type: String
+    Default: "30"
+    Description: Auth-token lifetime the middleware requests (minutes).
+
+  AllowedOrigins:
+    Type: String
+    Default: "*"
+    Description: >
+      CORS allowed origin for the HTTP API. Defaults to "*" so the demo UI works
+      from any localhost port. For anything beyond a personal demo, set this to
+      your UI's exact origin (e.g. https://notes.example.com) — a wildcard lets
+      any web page call this API from a victim's browser.
+
+  MaxLiveMicrovms:
+    Type: String
+    Default: "10"
+    Description: >
+      Hard cap on concurrently running MicroVMs. The middleware refuses to launch
+      a new MicroVM once this many sessions are "running", bounding billable
+      MicroVMs if the endpoint is abused. Raise it deliberately for real load.
+
+  ApiBurstLimit:
+    Type: Number
+    Default: 10
+    Description: API Gateway stage burst limit (concurrent requests).
+
+  ApiRateLimit:
+    Type: Number
+    Default: 5
+    Description: API Gateway stage steady-state request rate (requests/second).
+
+  MiddlewareReservedConcurrency:
+    Type: Number
+    Default: 10
+    Description: >
+      Reserved concurrency for the middleware Lambda. Caps how many requests can
+      run session/launch logic at once, a second brake on runaway MicroVM launches.
+
+# ──────────────────────────────────────────────────────────────────────────────
+# RESOURCES
+# ──────────────────────────────────────────────────────────────────────────────
+
+Resources:
+
+  # ── CloudWatch log group for the MicroVM ────────────────────────────────────
+  MicroVMLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda-microvms/${StackLabel}"
+      RetentionInDays: 7
+
+  # ── CloudWatch log group for the middleware Lambda ──────────────────────────
+  # Owned by the stack with explicit retention. Without this, CloudWatch would
+  # auto-create /aws/lambda/<generated-name> on first invoke with never-expire
+  # retention and the stack wouldn't manage it. No LogGroupName is set, so
+  # CloudFormation generates one — avoiding a circular dependency with the
+  # auto-generated FunctionName. The function is pointed at it via LoggingConfig.
+  MiddlewareLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  # ── IAM: MicroVM build role (used while the image is built) ──────────────────
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: [ sts:AssumeRole, sts:TagSession ]
+            Condition:
+              StringEquals: { "aws:SourceAccount": !Ref AWS::AccountId }
+      Policies:
+        - PolicyName: MicroVMBuildPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [ s3:GetObject ]
+                Resource: !Sub "arn:${AWS::Partition}:s3:::${StateBucket}/*"
+              - Effect: Allow
+                Action: [ logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents ]
+                Resource: !Sub "arn:${AWS::Partition}:logs:*:${AWS::AccountId}:*"
+
+  # ── IAM: MicroVM execution role (assumed at runtime by the MicroVM) ──────────
+  # Scoped to the notes (microvm-state/*) and files (microvm-files/*) prefixes.
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: [ sts:AssumeRole, sts:TagSession ]
+            Condition:
+              StringEquals: { "aws:SourceAccount": !Ref AWS::AccountId }
+      Policies:
+        - PolicyName: ScopedLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Scoped to this stack's MicroVM log group only — not account-wide
+              # CloudWatchLogsFullAccess.
+              - Sid: WriteOwnLogs
+                Effect: Allow
+                Action: [ logs:CreateLogStream, logs:PutLogEvents ]
+                Resource:
+                  - !GetAtt MicroVMLogGroup.Arn
+                  - !Sub "${MicroVMLogGroup.Arn}:*"
+        - PolicyName: StateAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: StateAndFileObjects
+                Effect: Allow
+                Action: [ s3:GetObject, s3:PutObject, s3:DeleteObject ]
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:s3:::${StateBucket}/microvm-state/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::${StateBucket}/microvm-files/*"
+              - Sid: ListForFileSync
+                Effect: Allow
+                Action: [ s3:ListBucket ]
+                Resource: !Sub "arn:${AWS::Partition}:s3:::${StateBucket}"
+                Condition:
+                  StringLike:
+                    "s3:prefix": [ "microvm-state/*", "microvm-files/*" ]
+
+  # ── MicroVM image ────────────────────────────────────────────────────────────
+  MicroVMImage:
+    Type: AWS::Lambda::MicrovmImage
+    # Build role and log group are already enforced as dependencies via the
+    # GetAtt/Ref in Properties below, so no explicit DependsOn is needed.
+    Properties:
+      Name: !Ref StackLabel
+      Description: State-persistence demo MicroVM (notes + files, S3-persisted)
+      BaseImageArn: !Sub "arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
+      BaseImageVersion: "0"
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub "s3://${StateBucket}/${ArtifactKey}"
+      CpuConfigurations:
+        - Architecture: ARM_64
+      AdditionalOsCapabilities: []
+      EgressNetworkConnectors: []
+      EnvironmentVariables:
+        - Key: APP_PORT
+          Value: "8080"
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref MicroVMLogGroup
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 300
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 60
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 60
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 60
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 60
+      Resources:
+        - MinimumMemoryInMiB: 2048
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+
+  # ── DynamoDB: session records (one item per clientId) ────────────────────────
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      # No explicit TableName — let CloudFormation generate a unique, stack-scoped
+      # name so the stack fully owns it (avoids NAME_CONFLICT with any pre-existing
+      # table). The middleware reads the real name from the SESSIONS_TABLE env var.
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: clientId
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      KeySchema:
+        - AttributeName: clientId
+          KeyType: HASH
+      # Lets the middleware count "running" sessions cheaply to enforce the
+      # MaxLiveMicrovms cap without scanning the whole table.
+      GlobalSecondaryIndexes:
+        - IndexName: status-index
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+      SSESpecification:
+        SSEEnabled: true
+
+  # ── IAM: middleware Lambda role ──────────────────────────────────────────────
+  MiddlewareRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SessionMiddlewarePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Scoped to the stack-owned log group. Replaces the
+              # AWSLambdaBasicExecutionRole managed policy, whose /aws/lambda/*
+              # scope would not cover this group's CloudFormation-generated name.
+              - Sid: WriteOwnLogs
+                Effect: Allow
+                Action: [ logs:CreateLogStream, logs:PutLogEvents ]
+                Resource:
+                  - !GetAtt MiddlewareLogGroup.Arn
+                  - !Sub "${MiddlewareLogGroup.Arn}:*"
+              - Sid: SessionTable
+                Effect: Allow
+                Action: [ dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:Query ]
+                Resource:
+                  - !GetAtt SessionsTable.Arn
+                  - !Sub "${SessionsTable.Arn}/index/status-index"
+              # Scoped to THIS stack's MicroVM image (named by StackLabel), not
+              # every MicroVM in the account. Per the Lambda MicroVMs IAM
+              # reference, these run/token/lifecycle actions authorize against
+              # the microvm-image ARN, so this binds the grant to MicroVMs
+              # launched from this pattern's image only.
+              - Sid: MicroVMControlPlane
+                Effect: Allow
+                Action:
+                  - lambda:RunMicrovm
+                  - lambda:GetMicrovm
+                  - lambda:CreateMicrovmAuthToken
+                  - lambda:TerminateMicrovm
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:${StackLabel}"
+              # PassNetworkConnector scoped to the two AWS-managed connectors the
+              # middleware actually launches MicroVMs with (HTTP ingress +
+              # internet egress), not any connector.
+              - Sid: PassMicroVMConnectors
+                Effect: Allow
+                Action: lambda:PassNetworkConnector
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:HTTP_INGRESS"
+                  - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS"
+              - Sid: PassExecutionRoleToMicroVM
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt MicroVMExecutionRole.Arn
+                Condition:
+                  StringEquals: { "iam:PassedToService": lambda.amazonaws.com }
+
+  # ── Middleware Lambda (code staged in S3 by deploy.sh) ───────────────────────
+  MiddlewareFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      # No explicit FunctionName — CloudFormation generates a unique one, so the
+      # stack owns it and re-deploys never collide with a leftover function.
+      Runtime: python3.12
+      Handler: middleware.handler.lambda_handler
+      Role: !GetAtt MiddlewareRole.Arn
+      # Must stay under the HTTP API's 30s integration limit. Otherwise API
+      # Gateway 504s at 30s while the function keeps running (and billing).
+      Timeout: 29
+      MemorySize: 256
+      # Caps concurrent executions, bounding how fast session/launch logic
+      # (and therefore MicroVM launches) can run if the endpoint is hammered.
+      ReservedConcurrentExecutions: !Ref MiddlewareReservedConcurrency
+      # Send logs to the stack-owned group (explicit retention) instead of an
+      # auto-created, never-expiring /aws/lambda/<generated-name> group.
+      LoggingConfig:
+        LogGroup: !Ref MiddlewareLogGroup
+      Code:
+        S3Bucket: !Ref StateBucket
+        S3Key: !Ref MiddlewareKey
+      Environment:
+        Variables:
+          SESSIONS_TABLE: !Ref SessionsTable
+          SESSIONS_STATUS_INDEX: status-index
+          MAX_LIVE_MICROVMS: !Ref MaxLiveMicrovms
+          IMAGE_ARN: !GetAtt MicroVMImage.ImageArn
+          IMAGE_VERSION: "1.0"
+          EXECUTION_ROLE_ARN: !GetAtt MicroVMExecutionRole.Arn
+          STATE_BUCKET: !Ref StateBucket
+          TOKEN_TTL_MINUTES: !Ref TokenTtlMinutes
+          APP_PORT: "8080"
+          MICROVM_LOG_GROUP: !Ref MicroVMLogGroup
+          AWS_DATA_PATH: /var/task/middleware/botocore_models
+
+  # ── API Gateway HTTP API fronting the Lambda ─────────────────────────────────
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: microvm-session-api
+      ProtocolType: HTTP
+      CorsConfiguration:
+        # Defaults to "*" for the demo; override AllowedOrigins with your UI's
+        # exact origin for anything beyond a personal demo.
+        AllowOrigins: !Split [ ",", !Ref AllowedOrigins ]
+        AllowMethods: [ GET, POST, PUT, DELETE, OPTIONS ]
+        AllowHeaders: [ Content-Type, X-Client-Id, X-File-Name ]
+
+  HttpApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt MiddlewareFunction.Arn
+      PayloadFormatVersion: "2.0"
+      # HTTP API integrations cap at 30s; make it explicit. The middleware
+      # function Timeout (29s) stays just under this.
+      TimeoutInMillis: 30000
+
+  HttpApiDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: "$default"
+      Target: !Sub "integrations/${HttpApiIntegration}"
+
+  HttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: !Ref ApiStageName
+      AutoDeploy: true
+      # Stage-level throttling bounds request volume so a loop over fabricated
+      # clientIds can't drive unbounded MicroVM launches. Tune for real load.
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: !Ref ApiBurstLimit
+        ThrottlingRateLimit: !Ref ApiRateLimit
+
+  MiddlewareInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MiddlewareFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# OUTPUTS
+# ──────────────────────────────────────────────────────────────────────────────
+
+Outputs:
+  MiddlewareUrl:
+    Description: Base URL for the web UI's "Middleware URL" field.
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${ApiStageName}"
+
+  MicroVMImageArn:
+    Description: ARN of the built MicroVM image.
+    Value: !GetAtt MicroVMImage.ImageArn
+
+  MicroVMExecutionRoleArn:
+    Description: Execution role assumed by running MicroVMs.
+    Value: !GetAtt MicroVMExecutionRole.Arn
+
+  SessionsTableName:
+    Description: DynamoDB session table.
+    Value: !Ref SessionsTable

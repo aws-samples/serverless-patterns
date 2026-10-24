@@ -16,6 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * A custom domain name (e.g., awsuser.myinstance.com). You can register domain using AWS Route 53 - https://aws.amazon.com/getting-started/hands-on/get-a-domain/
 * A valid SSL certificate (e.g., Amazon Certificate Manager) for the custom domain name. You can use a wildcard certificate for *.awsuser.myinstance.com - https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains-prerequisites.html
 * A PrettyTable Lambda Layer for your Lambda function. Download zip file from here - https://github.com/jainam1992/aws-lambda-code-samples/blob/main/prettyTable.zip . Once you have downloaded the Layer .zip file, you can add the layer and upload the .zip file using these steps - https://docs.aws.amazon.com/lambda/latest/dg/invocation-layers.html#invocation-layers-using. Note the ARN of the created layer.
+* The layer code runs with the Lambda function's IAM role. The role allows only `ec2:DescribeRegions`, `lambda:GetAccountSettings` and writing to the function's own log group. Only use a layer you've built or reviewed yourself.
 
 ## Deployment Instructions
 
@@ -55,7 +56,13 @@ This template deploys a full-stack application where Application Load Balancer w
 
 ## Testing
 
-Once the SAM deploymeny is successful, you will get a custom LoadBalancerDNSNAme as output. Eg: alb.awsuser.myinstance.com. Navigate to this domain name and you will see a Cognito authentication page. Click on Sign Up and create a user. Once the Sign Up is successful, you will be directed to a page which will show regional metrics related to Lambda functions present in your account.
+Once the SAM deployment is successful, you get the `LoadBalancerDNSNAme` and `UserPoolId` outputs. The user pool doesn't allow self sign-up, so create a user first. Cognito emails a temporary password to the address you give:
+
+```
+aws cognito-idp admin-create-user --user-pool-id <UserPoolId> --username you@example.com --user-attributes Name=email,Value=you@example.com Name=email_verified,Value=true
+```
+
+Navigate to the `LoadBalancerDNSNAme` domain, for example `alb.awsuser.myinstance.com`, and sign in with the temporary password. Cognito asks you to set a new password of at least 12 characters with upper and lower case letters, a number and a symbol. You're then directed to a page that shows regional metrics for the Lambda functions in your account.
 
 ## Cleanup
  
