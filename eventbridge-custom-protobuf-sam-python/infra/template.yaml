@@ -1,0 +1,179 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Protobuf on EventBridge custom event bus (eventsv2). This template provisions
+  the whole sample: the event bus, a subscriber that delivers to the consumer
+  Lambda, the Glue Schema Registry + Protobuf schema for OrderPlaced, the consumer
+  Lambda, a dead-letter queue, and the delivery role.
+
+  Account- and region-agnostic: no account id or region is hardcoded; resources
+  are named from the AppName parameter.
+
+Parameters:
+  AppName:
+    Type: String
+    Default: proto-orders
+    Description: Prefix used for resource names.
+  RetentionInDays:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 365
+    Description: Days events are retained on the bus (the replay window).
+
+Resources:
+
+  # --- Event bus -----------------------------------------------------------
+  # The new custom event bus. Ref returns the bus ARN.
+  OrdersBus:
+    Type: AWS::EventsV2::EventBus
+    Properties:
+      Name: !Sub "${AppName}-bus"
+      StorageConfiguration:
+        RetentionPeriodInDays: !Ref RetentionInDays
+
+  # --- Glue Schema Registry + Protobuf schema ------------------------------
+  # Protobuf is an open format: EventBridge decodes the payload against this
+  # registry when the publisher names it on the PutRawEvents request. The
+  # registry is read with the PUBLISHER's own credentials, so the publisher's
+  # IAM must allow Glue reads on it (see README).
+  SchemaRegistry:
+    Type: AWS::Glue::Registry
+    Properties:
+      Name: !Sub "${AppName}-registry"
+      Description: Schema registry for OrderPlaced Protobuf events.
+
+  OrderPlacedSchema:
+    Type: AWS::Glue::Schema
+    Properties:
+      Name: OrderPlaced
+      Description: OrderPlaced domain event.
+      DataFormat: PROTOBUF
+      Compatibility: BACKWARD
+      Registry:
+        Arn: !GetAtt SchemaRegistry.Arn
+      # NOTE: this is the SAME schema as proto/order_placed.proto, inlined here.
+      # There is no build step that syncs them, so if you edit one you MUST
+      # hand-edit the other. If they drift, the publisher encodes against one
+      # schema while Glue is registered with the other, and publishes fail to
+      # decode. Glue supports proto2/proto3 but NOT `extensions` or `groups`.
+      SchemaDefinition: |
+        syntax = "proto3";
+        package com.example.orders;
+        message OrderItem {
+          string sku = 1;
+          int32 qty = 2;
+        }
+        message OrderPlaced {
+          string order_id = 1;
+          string customer_id = 2;
+          double amount = 3;
+          string currency = 4;
+          repeated OrderItem items = 5;
+          int64 placed_at = 6;
+        }
+
+  # --- Consumer Lambda -----------------------------------------------------
+  # Logs the delivered event. EventBridge decodes the Protobuf against the Glue
+  # registry server-side, so Data arrives as JSON. SAM creates the log group and
+  # a basic execution role (CloudWatch Logs) automatically.
+  ConsumerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AppName}-consumer"
+      Handler: handler.handler
+      Runtime: python3.14
+      CodeUri: ../consumer/
+      Timeout: 30
+      MemorySize: 256
+      Description: Logs delivered OrderPlaced events (decoded to JSON server-side).
+
+  # --- Dead-letter queue ---------------------------------------------------
+  # A subscriber MUST have a DLQ before you test: a failed delivery with nowhere
+  # to record it disappears with no signal. The delivery role is granted
+  # sqs:SendMessage on this queue below.
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AppName}-subscriber-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  # --- Delivery role -------------------------------------------------------
+  # The role EventBridge assumes to invoke the target. It MUST trust the
+  # events.amazonaws.com service principal and carry both the target action
+  # (lambda:InvokeFunction) and sqs:SendMessage on the DLQ.
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AppName}-delivery-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: deliver-to-lambda-and-dlq
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt ConsumerFunction.Arn
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+
+  # --- Subscriber ----------------------------------------------------------
+  # Filters on METADATA (Protobuf binary is opaque to a DATA filter) and uses a
+  # WITH_METADATA transformer so the Lambda receives the
+  # Data + Metadata + SystemMetadata envelope.
+  OrdersSubscriber:
+    Type: AWS::EventsV2::Subscriber
+    Properties:
+      Name: !Sub "${AppName}-to-lambda"
+      EventBusArn: !Ref OrdersBus
+      FilterConfiguration:
+        Filters:
+          - Scope: METADATA
+            Pattern: '{"eventType":["OrderPlaced"]}'
+      Transformer:
+        Type: WITH_METADATA
+      InvokeConfiguration:
+        TargetArn: !GetAtt ConsumerFunction.Arn
+        RoleArn: !GetAtt DeliveryRole.Arn
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+
+Outputs:
+  AppName:
+    Description: Resource-name prefix.
+    Value: !Ref AppName
+  EventBusArn:
+    Description: ARN of the custom event bus. Pass to the publisher.
+    Value: !Ref OrdersBus
+  SubscriberArn:
+    Description: ARN of the subscriber.
+    Value: !Ref OrdersSubscriber
+  SchemaRegistryArn:
+    Description: Glue Schema Registry ARN. Pass to the publisher as RegistryUri.
+    Value: !GetAtt SchemaRegistry.Arn
+  ConsumerFunctionArn:
+    Description: Consumer Lambda ARN. The subscriber's target.
+    Value: !GetAtt ConsumerFunction.Arn
+  ConsumerFunctionName:
+    Description: Consumer Lambda name (its log group is /aws/lambda/<name>).
+    Value: !Ref ConsumerFunction
+  DeliveryRoleArn:
+    Description: Role EventBridge assumes to invoke the Lambda and write the DLQ.
+    Value: !GetAtt DeliveryRole.Arn
+  DeadLetterQueueArn:
+    Description: DLQ ARN. The subscriber's OnFailureConfiguration target.
+    Value: !GetAtt DeadLetterQueue.Arn
+  ConsumerLogGroup:
+    Description: CloudWatch log group where delivered events are logged.
+    Value: !Sub "/aws/lambda/${AppName}-consumer"
+  DeadLetterQueueUrl:
+    Description: DLQ URL. Should stay empty on a healthy run.
+    Value: !Ref DeadLetterQueue

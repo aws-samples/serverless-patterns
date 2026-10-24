@@ -1,0 +1,14 @@
+# buf codegen config for the sample.
+#
+# scripts/generate.sh runs `buf generate` from the sample root using this file.
+# It reads proto/*.proto and writes the protobuf-py bindings into common/gen/.
+#
+# The protoc-gen-py plugin is provided by the `protoc-gen-py` pip package
+# (installed into the sample's .venv); `buf` comes from the `buf-bin` pip
+# package. See the README prerequisites.
+version: v2
+inputs:
+  - directory: proto
+plugins:
+  - local: protoc-gen-py
+    out: common/gen
