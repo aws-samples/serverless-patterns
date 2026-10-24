@@ -714,10 +714,12 @@ Resources:
                   - !Ref AdminUserSecret
                   - !Ref ProducerUserSecret
                   - !Ref ConsumerUserSecret
-              # Boot: write the brokers' certificate into this stack's CA secret.
+              # Boot: write the brokers' certificate into this stack's CA secret
+              # (and read it back when troubleshooting the event source mapping).
               - Effect: Allow
                 Action:
                   - 'secretsmanager:PutSecretValue'
+                  - 'secretsmanager:GetSecretValue'
                   - 'secretsmanager:DescribeSecret'
                 Resource: !Ref BrokerCASecret
               # Let the CLI Lambda deploy script (run on the client) create the
