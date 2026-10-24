@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lambda Web SSE Dashboard</title>
+  <!-- inline favicon: avoids a 404 in the console during the demo -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'><rect width='80' height='80' rx='10' fill='%23FF9900'/><path fill='%23fff' d='M28,66 L15.6,66 L29.3,37.3 L35.5,50.1 Z M65,66 L52.7,66 L32.9,24.6 L23.9,24.6 L23.9,14 L39.7,14 L59.4,55.4 L65,55.4 Z'/></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── Theme variables ── */
+    :root[data-theme="dark"] {
+      --bg: #0b1220;        /* darker page bg so cards pop more */
+      --panel: #1e293b;
+      --border: #3b4a5f;    /* slightly brighter border for definition */
+      --text: #f8fafc;      /* primary text: near-white */
+      --text-muted: #cbd5e1;/* brighter muted text (was #94a3b8) — higher contrast */
+      --label: #a9b6c8;     /* labels distinct but readable */
+    }
+    :root[data-theme="light"] {
+      --bg: #eef2f7;        /* slightly deeper page bg so white cards pop */
+      --panel: #ffffff;
+      --border: #c3ccd8;
+      --text: #0b1220;      /* primary text: near-black */
+      --text-muted: #334155;/* darker muted text — higher contrast (was #475569) */
+      --label: #475569;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* header shares the same max-width + padding as the cards so it lines up */
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 0 2.5rem; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 0 1.25rem;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.6rem; }
+    header h1 .logo { width: 30px; height: 30px; flex: none; }
+    .runtime { font-size: 1rem; color: var(--text-muted); }
+    .runtime span { color: var(--text); font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .header-right { display: flex; align-items: center; gap: 1.25rem; }
+    .status {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 1rem; color: var(--text-muted);
+    }
+    .status-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #ef4444; transition: background 0.3s;
+    }
+    .status-dot.connected { background: #22c55e; }
+    .theme-toggle {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .cards-secondary {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    @media (max-width: 820px) {
+      .cards, .cards-secondary { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem 2rem;
+    }
+    .card-label {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--label); margin-bottom: 0.4rem;
+    }
+    .card-value {
+      font-size: 3.5rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em;
+    }
+    .card-sub { font-size: 0.95rem; color: var(--text-muted); margin-top: 0.4rem; }
+    .card-sub .strong { color: var(--text); font-weight: 600; }
+
+    /* accent colors stay identical in both themes */
+    .card-value.green  { color: #16a34a; }
+    .card-value.blue   { color: #2563eb; }
+    .card-value.purple { color: #9333ea; }
+    .card-value.amber  { color: #d97706; }
+
+    #instanceId { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.5rem; color: var(--text); }
+
+    .spark { margin-top: 1rem; height: 70px; }
+    .spark.small { height: 48px; }
+    canvas { width: 100% !important; }
+
+    .load-btn {
+      margin-top: 1rem;
+      background: #16a34a; color: #ffffff;
+      border: none; border-radius: 0.6rem;
+      padding: 0.65rem 1.1rem; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: filter 0.15s, transform 0.05s;
+    }
+    .load-btn:hover { filter: brightness(1.08); }
+    .load-btn:active { transform: scale(0.98); }
+    .load-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .info-bar {
+      margin: 2rem 0;
+      padding: 1rem 1.5rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      display: flex; gap: 2rem; flex-wrap: wrap;
+    }
+    .info-bar span { color: var(--text); font-weight: 600; }
+
+    /* Instance-change flash + badge */
+    .moved-badge {
+      display: none;
+      margin-left: 0.5rem;
+      background: #e11d48; color: #fff;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.03em;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+      vertical-align: middle;
+    }
+    .moved-badge.show { display: inline-block; }
+    @keyframes instanceFlash {
+      0%   { box-shadow: 0 0 0 0 rgba(225,29,72,0.0);  border-color: var(--border); }
+      15%  { box-shadow: 0 0 0 4px rgba(225,29,72,0.45); border-color: #e11d48; }
+      100% { box-shadow: 0 0 0 0 rgba(225,29,72,0.0);  border-color: var(--border); }
+    }
+    .card.flash { animation: instanceFlash 1.2s ease-out; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1><svg class="logo" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AWS Lambda"><defs><linearGradient x1="0%" y1="100%" x2="100%" y2="0%" id="lambdaGrad"><stop stop-color="#C8511B" offset="0%"/><stop stop-color="#FF9900" offset="100%"/></linearGradient></defs><rect width="80" height="80" rx="8" fill="url(#lambdaGrad)"/><path fill="#FFFFFF" d="M28.0075352,66 L15.5907274,66 L29.3235885,37.296 L35.5460249,50.106 L28.0075352,66 Z M30.2196674,34.553 C30.0512768,34.208 29.7004629,33.989 29.3175745,33.989 L29.3145676,33.989 C28.9286723,33.99 28.5778583,34.211 28.4124746,34.558 L13.097944,66.569 C12.9495999,66.879 12.9706487,67.243 13.1550766,67.534 C13.3374998,67.824 13.6582439,68 14.0020416,68 L28.6420072,68 C29.0299071,68 29.3817234,67.777 29.5481094,67.428 L37.563706,50.528 C37.693006,50.254 37.6920037,49.937 37.5586944,49.665 L30.2196674,34.553 Z M64.9953491,66 L52.6587274,66 L32.866809,24.57 C32.7014253,24.222 32.3486067,24 31.9617091,24 L23.8899822,24 L23.8990031,14 L39.7197081,14 L59.4204149,55.429 C59.5857986,55.777 59.9386172,56 60.3255148,56 L64.9953491,56 L64.9953491,66 Z M65.9976745,54 L60.9599868,54 L41.25928,12.571 C41.0938963,12.223 40.7410777,12 40.3531778,12 L22.89768,12 C22.3453987,12 21.8963569,12.447 21.8953545,12.999 L21.884329,24.999 C21.884329,25.265 21.9885708,25.519 22.1780103,25.707 C22.3654452,25.895 22.6200358,26 22.8866544,26 L31.3292417,26 L51.1221625,67.43 C51.2885485,67.778 51.6393624,68 52.02626,68 L65.9976745,68 C66.5519605,68 67,67.552 67,67 L67,55 C67,54.448 66.5519605,54 65.9976745,54 L65.9976745,54 Z"/></svg>AWS Lambda Web Functions Dashboard</h1>
+      <div class="runtime">Runtime: <span>nodejs24.x</span></div>
+      <div class="header-right">
+        <div class="status">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Connecting...</span>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle light/dark">🌙 Dark</button>
+      </div>
+    </header>
+
+    <!-- Hero row: the contrast that IS the story -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Environment Uptime</div>
+        <div class="card-value blue" id="uptime">-</div>
+        <div class="card-sub">Wall-clock this environment has stayed alive</div>
+        <div class="spark"><canvas id="sparkUptime"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-label">CPU Time Consumed</div>
+        <div class="card-value green" id="cpuTotal">-</div>
+        <div class="card-sub"><span class="strong" id="cpuPctOfUptime">-</span> of that time doing actual work
+          &nbsp;·&nbsp; now: <span class="strong" id="cpuMs">-</span> ms/2s</div>
+        <div class="spark small"><canvas id="sparkCpu"></canvas></div>
+        <button id="loadBtn" class="load-btn">⚡ Generate CPU load</button>
+      </div>
+    </div>
+
+    <!-- Secondary row -->
+    <div class="cards-secondary">
+      <div class="card">
+        <div class="card-label">Active SSE Connections</div>
+        <div class="card-value purple" id="connections">-</div>
+        <div class="card-sub">Peak this instance: <span class="strong" id="peakConnections">-</span></div>
+        <div class="spark small"><canvas id="sparkConn"></canvas></div>
+      </div>
+      <div class="card" id="servedCard">
+        <div class="card-label">Served From <span id="movedBadge" class="moved-badge">↻ moved instance</span></div>
+        <div class="card-value amber" id="region">-</div>
+        <div class="card-sub">Location: <span class="strong" id="regionCity">–</span></div>
+        <div class="card-sub">Instance: <span id="instanceId">-</span></div>
+        <div class="card-sub">Latency to you: <span class="strong" id="latency">–</span></div>
+        <div class="card-sub">Environments seen: <span class="strong" id="instancesSeen">0</span></div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <script>
+    const MAX_POINTS = 60;
+
+    // ── Theme toggle ──
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    function applyTheme(t) {
+      root.setAttribute('data-theme', t);
+      themeBtn.textContent = t === 'dark' ? '🌙 Dark' : '☀️ Light';
+      try { localStorage.setItem('theme', t); } catch {}
+    }
+    applyTheme((() => { try { return localStorage.getItem('theme') || 'dark'; } catch { return 'dark'; } })());
+    themeBtn.addEventListener('click', () => {
+      applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    // AWS region code -> friendly city name. Full list so testers can deploy to
+    // any region and still see a name; unknown codes fall back to the raw code.
+    const REGION_NAMES = {
+      'us-east-1': 'N. Virginia', 'us-east-2': 'Ohio',
+      'us-west-1': 'N. California', 'us-west-2': 'Oregon',
+      'af-south-1': 'Cape Town',
+      'ap-east-1': 'Hong Kong', 'ap-south-1': 'Mumbai', 'ap-south-2': 'Hyderabad',
+      'ap-southeast-1': 'Singapore', 'ap-southeast-2': 'Sydney',
+      'ap-southeast-3': 'Jakarta', 'ap-southeast-4': 'Melbourne',
+      'ap-southeast-5': 'Malaysia', 'ap-southeast-7': 'Thailand',
+      'ap-northeast-1': 'Tokyo', 'ap-northeast-2': 'Seoul', 'ap-northeast-3': 'Osaka',
+      'ca-central-1': 'Canada Central', 'ca-west-1': 'Calgary',
+      'eu-central-1': 'Frankfurt', 'eu-central-2': 'Zurich',
+      'eu-west-1': 'Ireland', 'eu-west-2': 'London', 'eu-west-3': 'Paris',
+      'eu-north-1': 'Stockholm', 'eu-south-1': 'Milan', 'eu-south-2': 'Spain',
+      'il-central-1': 'Tel Aviv',
+      'me-central-1': 'UAE', 'me-south-1': 'Bahrain',
+      'mx-central-1': 'Mexico',
+      'sa-east-1': 'São Paulo',
+    };
+    function regionLabel(code) {
+      const city = REGION_NAMES[code];
+      return city ? `${code} · ${city}` : (code || '-');
+    }
+
+    // A minimal sparkline: filled line, no axes, no legend — just motion + shape.
+    function makeSpark(id, color, fillColor) {
+      return new Chart(document.getElementById(id), {
+        type: 'line',
+        data: { labels: [], datasets: [{
+          data: [], borderColor: color, backgroundColor: fillColor,
+          borderWidth: 2.5, pointRadius: 0, tension: 0.35, fill: 'origin'
+        }]},
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 300 },
+          scales: { x: { display: false }, y: { display: false, beginAtZero: true } },
+          plugins: { legend: { display: false }, tooltip: { enabled: false } }
+        }
+      });
+    }
+
+    const sparkUptime = makeSpark('sparkUptime', '#2563eb', 'rgba(37,99,235,0.15)');
+    const sparkCpu    = makeSpark('sparkCpu',    '#16a34a', 'rgba(22,163,74,0.18)');
+    const sparkConn   = makeSpark('sparkConn',   '#9333ea', 'rgba(147,51,234,0.15)');
+
+    function pushSpark(chart, value) {
+      const ds = chart.data.datasets[0];
+      chart.data.labels.push('');
+      ds.data.push(value);
+      if (ds.data.length > MAX_POINTS) { chart.data.labels.shift(); ds.data.shift(); }
+      chart.update();
+    }
+
+    function formatUptime(secs) {
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+      return h > 0 ? `${h}h ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+    }
+
+    // Track which execution environment(s) we've been served by this session.
+    let lastInstance = null;
+    const instancesSeen = new Set();
+    let badgeTimer = null;
+
+    function onInstanceChange(newId) {
+      // New environment: flash the card, show a badge briefly, reset the
+      // per-instance sparklines (uptime/connections are per-process, so a fresh
+      // instance legitimately starts them over).
+      const card = document.getElementById('servedCard');
+      card.classList.remove('flash'); void card.offsetWidth; // restart animation
+      card.classList.add('flash');
+      const badge = document.getElementById('movedBadge');
+      badge.classList.add('show');
+      clearTimeout(badgeTimer);
+      badgeTimer = setTimeout(() => badge.classList.remove('show'), 4000);
+
+      // reset per-instance sparklines
+      [sparkUptime, sparkConn].forEach(c => { c.data.labels = []; c.data.datasets[0].data = []; c.update(); });
+    }
+
+    function updateDashboard(d) {
+      document.getElementById('uptime').textContent = formatUptime(d.uptime);
+      document.getElementById('cpuTotal').textContent = d.cpuSecondsTotal.toFixed(2) + 's';
+
+      const pct = d.uptime > 0 ? (d.cpuSecondsTotal / d.uptime) * 100 : 0;
+      const pctText = pct > 0 && pct < 0.1 ? '<0.1%' : pct.toFixed(1) + '%';
+      document.getElementById('cpuPctOfUptime').textContent = pctText;
+
+      document.getElementById('connections').textContent = d.activeConnections;
+      document.getElementById('peakConnections').textContent = d.peakConnections;
+      document.getElementById('region').textContent = d.region;
+      document.getElementById('regionCity').textContent = REGION_NAMES[d.region] || '—';
+      document.getElementById('instanceId').textContent = d.instanceId;
+      document.getElementById('cpuMs').textContent = d.cpuMsInterval.toFixed(0);
+
+      // Instance-change detection
+      if (d.instanceId && d.instanceId !== lastInstance) {
+        if (lastInstance !== null) onInstanceChange(d.instanceId); // skip flash on first ever message
+        lastInstance = d.instanceId;
+        instancesSeen.add(d.instanceId);
+        document.getElementById('instancesSeen').textContent = instancesSeen.size;
+      }
+
+      pushSpark(sparkUptime, d.uptime);
+      pushSpark(sparkCpu, d.cpuMsInterval);   // spikes for real when work runs
+      pushSpark(sparkConn, d.activeConnections);
+    }
+
+    // "Generate CPU load" — calls /api/work, which does genuine SHA-256 hashing
+    // on the server. The CPU sparkline spikes because real work ran.
+    const loadBtn = document.getElementById('loadBtn');
+    loadBtn.addEventListener('click', async () => {
+      loadBtn.disabled = true;
+      loadBtn.textContent = '⚙️ Working…';
+      try { await fetch('/api/work?ms=1500'); } catch {}
+      loadBtn.disabled = false;
+      loadBtn.textContent = '⚡ Generate CPU load';
+    });
+
+    // Client-measured round-trip latency to the serving region. Uses a rolling
+    // best-of-recent (min) to smooth out jitter — a stable "network distance"
+    // number that will drop when a nearer region serves you (MultiRegion later).
+    const latEl = document.getElementById('latency');
+    const recentLat = [];
+    async function measureLatency() {
+      const t0 = performance.now();
+      try {
+        await fetch('/api/ping?t=' + Date.now(), { cache: 'no-store' });
+        const rtt = Math.round(performance.now() - t0);
+        recentLat.push(rtt);
+        if (recentLat.length > 5) recentLat.shift();
+        latEl.textContent = Math.min(...recentLat) + ' ms';
+      } catch { latEl.textContent = '–'; }
+    }
+    measureLatency();
+    setInterval(measureLatency, 3000);
+
+    function connect() {
+      const es = new EventSource('/api/events');
+      es.onopen = () => {
+        document.getElementById('statusDot').classList.add('connected');
+        document.getElementById('statusText').textContent = 'Connected (Server-Sent Events)';
+      };
+      es.onmessage = (e) => { try { updateDashboard(JSON.parse(e.data)); } catch {} };
+      es.onerror = () => {
+        document.getElementById('statusDot').classList.remove('connected');
+        document.getElementById('statusText').textContent = 'Reconnecting...';
+        es.close();
+        setTimeout(connect, 3000);
+      };
+    }
+    connect();
+  </script>
+</body>
+</html>

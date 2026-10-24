@@ -89,6 +89,8 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
     node _scripts/validate.js {family}/{language}/{framework}/example-pattern.json
     ```
 
+    The same command scans your pattern folder for admin-equivalent IAM grants and fails if it finds `AdministratorAccess`, `IAMFullAccess`, `PowerUserAccess`, `iam:*`, or every action on every resource. Name the actions and resources each role uses instead. If a role has to create other roles, require a [permissions boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html).
+
 - **Check the template builds**, e.g. `sam validate --lint`, `cdk synth` or `terraform validate`, and deploy and test it in your own account before you open the pull request.
 - **Leave out:** account IDs, secrets, build output such as `.aws-sam/`, `cdk.out/` and `node_modules/`, and architecture diagrams. The Serverless Land team creates the diagrams.
 

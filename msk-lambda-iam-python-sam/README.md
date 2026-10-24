@@ -44,7 +44,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 ins
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/msk-Lambda-iam-python-sam
+    cd serverless-patterns/msk-lambda-iam-python-sam
     ```
 ## Use the SAM CLI to build and test locally
 
@@ -147,7 +147,7 @@ REPORT RequestId: 5c10310a-abf9-416e-b017-697d2c3ba097	Init Duration: 6.68 ms	Du
 To deploy your application for the first time, run the following in your shell:
 
 ```bash
-sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-Lambda-iam-python-sam --guided
+sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name msk-lambda-iam-python-sam --guided
 ```
 
 The sam deploy command will package and deploy your application to AWS, with a series of prompts. You can accept all the defaults by hitting Enter:
@@ -158,7 +158,8 @@ The sam deploy command will package and deploy your application to AWS, with a s
 * **Parameter MSKClusterId**: The unique ID of the MSKCluster
 * **Parameter MSKTopic**: The Kafka topic on which the Lambda function will listen on
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
+* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. In this example, each Lambda function role allows only the actions that function uses, and also carries the permissions boundary `SamFunctionPermissionsBoundary` that the EC2 stack creates. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
+* **Note on IAM permissions**: The EC2 instance role can create IAM roles only under a role path named after the EC2 stack, and only with the permissions boundary attached. It can't grant itself or other roles more access than the boundary allows. The instance role still has broad access to AWS Lambda, AWS CloudFormation and Amazon S3 so that it can run `sam deploy`. Deploy this example in a test account, limit who can connect to the instance, and delete both stacks when you finish testing.
 * **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails
 * **Save arguments to configuration file**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
 * **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally
@@ -217,7 +218,7 @@ The code in this example prints out the fields in the Kafka message and also dec
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/msk-Lambda-iam-python-sam
+cd /home/ec2-user/serverless-patterns/msk-lambda-iam-python-sam
 sam delete
 
 ```
