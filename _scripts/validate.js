@@ -10,9 +10,12 @@
 // script also comments on and labels the pull request (needs TOKEN, PR_NUMBER,
 // ACTOR and GITHUB_REPOSITORY).
 //
-// Exits non-zero if any file fails validation.
+// It also scans each pattern folder for admin-equivalent IAM grants (see check-iam.js).
+//
+// Exits non-zero if any file fails validation or any pattern has a broad IAM grant.
 const fs = require('fs');
 const path = require('path');
+const { checkPatternIam } = require('./check-iam');
 
 const PATTERN_FILE = 'example-pattern.json';
 const repoRoot = path.join(__dirname, '..');
@@ -110,6 +113,21 @@ const reportErrors = async (failures) => {
   console.info('Errors found: Added comments back to the pull request requesting changes');
 };
 
+const reportIamFindings = async (iamFailures) => {
+  if (!githubAutomation) return;
+  const sections = iamFailures.map(({ dir, findings }) => {
+    const list = findings.map((finding, index) => `${index + 1}. ${finding}`).join('\n');
+    return `**${path.relative(repoRoot, dir)}**\n\n${list}`;
+  });
+  await comment(
+    `@${process.env.ACTOR} this pattern grants admin-equivalent IAM permissions. Please replace them with the specific actions and resources the pattern uses \n\n` +
+      `${sections.join('\n\n')} \n\n` +
+      `_Use [SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html) or name each action and resource. If a role has to create other roles, require a [permissions boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html)._ \n\n`
+  );
+  await addLabels(['broad-iam-permissions', 'requested-changes']);
+  console.info('Broad IAM found: Added comments back to the pull request requesting changes');
+};
+
 const reportSuccess = async (parsedPatterns) => {
   if (!githubAutomation) return;
   try {
@@ -161,8 +179,23 @@ const main = async () => {
     }
   }
 
-  if (failures.length) {
-    await reportErrors(failures);
+  const iamFailures = [];
+  for (const dir of [...new Set(patternFiles.map((file) => path.dirname(file)))]) {
+    if (!fs.existsSync(dir)) continue;
+    const findings = checkPatternIam(dir, repoRoot);
+    const name = path.relative(process.cwd(), dir) || '.';
+    if (findings.length) {
+      iamFailures.push({ dir, findings });
+      console.error(`✘ ${name}: broad IAM permissions`);
+      findings.forEach((finding, index) => console.error(`  ${index + 1}. ${finding.replace(/`/g, '')}`));
+    } else {
+      console.info(`✔ ${name}: no admin-equivalent IAM grants`);
+    }
+  }
+
+  if (failures.length) await reportErrors(failures);
+  if (iamFailures.length) await reportIamFindings(iamFailures);
+  if (failures.length || iamFailures.length) {
     process.exitCode = 1;
     return;
   }

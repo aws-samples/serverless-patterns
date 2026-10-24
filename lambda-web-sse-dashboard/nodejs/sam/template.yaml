@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - Server-Sent Events dashboard on AWS Lambda Web
+  Functions (SAM). Zero-dependency Node.js app that streams measured
+  uptime, CPU time and connection counts to the browser every 2 seconds.
+
+Parameters:
+  CodeBucket:
+    Type: String
+    Description: >
+      Name of an existing, versioning-enabled S3 bucket in this Region that
+      holds function.zip. Its bucket policy must grant lambda.amazonaws.com
+      s3:GetObject and s3:GetObjectVersion. See the README for the setup.
+  CodeKey:
+    Type: String
+    Default: lambda-web-sse-dashboard-sam/function.zip
+    Description: S3 key of the uploaded function.zip.
+
+Resources:
+  # One AWS::Serverless::WebFunction expands into three CloudFormation
+  # resources: AWS::Lambda::WebFunction (the function), an immutable
+  # AWS::Lambda::WebFunctionRevision (code + configuration) and an
+  # AWS::Lambda::WebFunctionEndpoint (the HTTPS endpoint, routed 100% to
+  # that revision). SAM also creates the execution role with CloudWatch
+  # Logs permissions because ExecutionRoleArn is not set.
+  WebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      CodeUri:
+        Bucket: !Ref CodeBucket
+        Key: !Ref CodeKey
+      # SSE connections stay open for the whole request timeout. 900 s is the
+      # maximum; the browser EventSource reconnects automatically afterwards.
+      Timeout: 900
+      # ApplicationManaged = the endpoint is PUBLIC and the app owns
+      # authentication. Use IamAuth to require SigV4-signed requests.
+      AuthType: ApplicationManaged
+      # HomeRegion = a single regional endpoint. MultiRegion replicates the
+      # function to extra Regions behind one global domain served from the
+      # nearest Region; PerRegion publishes one regional domain per Region and
+      # you route between them. Both need AutoDeploymentMode: Disabled plus
+      # RevisionWeights, and the type cannot be changed after creation.
+      EndpointType: HomeRegion
+      # New revisions created outside this stack receive traffic
+      # automatically. Set Disabled + RevisionWeights for manual routing.
+      AutoDeploymentMode: LatestRevision
+      LoggingConfig:
+        LogGroup: !Sub /aws/lambda/web/${AWS::StackName}
+
+Outputs:
+  EndpointDomainName:
+    Description: HTTPS domain of the Lambda Web Function endpoint
+    Value: !GetAtt WebFunctionEndpoint.DomainName
+  FunctionArn:
+    Description: ARN of the Lambda Web Function
+    Value: !GetAtt WebFunction.FunctionArn
+  LogGroupName:
+    Description: CloudWatch Logs group the web function writes to
+    Value: !Sub /aws/lambda/web/${AWS::StackName}

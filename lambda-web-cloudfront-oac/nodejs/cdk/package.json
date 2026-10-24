@@ -1,0 +1,24 @@
+{
+  "name": "lambda-web-cloudfront-oac-cdk",
+  "version": "1.0.0",
+  "description": "CDK app: Lambda Web Function reachable only through a CloudFront distribution (Origin Access Control)",
+  "private": true,
+  "bin": {
+    "lambda-web-cloudfront-oac-cdk": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "aws-cdk": "^2.1145.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.273.0",
+    "constructs": "^10.4.0"
+  },
+  "license": "MIT-0"
+}
