@@ -69,13 +69,13 @@ Resources:
               "Content": $input.json('$.content'),
               "Recipients": $input.json('$.recipients')
               #if($input.path('$.priority') != "")
-              ,"Priority": "$input.path('$.priority')"
+              ,"Priority": $input.json('$.priority')
               #end
               #if($input.path('$.expiresAt') != "")
-              ,"ExpiresAt": $input.path('$.expiresAt')
+              ,"ExpiresAt": $input.json('$.expiresAt')
               #end
               #if($input.path('$.clientToken') != "")
-              ,"ClientToken": "$input.path('$.clientToken')"
+              ,"ClientToken": $input.json('$.clientToken')
               #end
               #if($input.path('$.tags') != "")
               ,"Tags": $input.json('$.tags')
