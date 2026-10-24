@@ -42,12 +42,12 @@ namespace Net6BundlingZipFileLambdaCdk
                 "zip-lambda-function",
                 new FunctionProps
             {
-                Runtime = Runtime.DOTNET_6,
+                Runtime = Runtime.DOTNET_10,
                 Code = Code.FromAsset("../Lambda", new AssetOptions
                 {
                     Bundling = new BundlingOptions
                     {
-                      Image  = Runtime.DOTNET_6.BundlingImage,
+                      Image  = Runtime.DOTNET_10.BundlingImage,
                       Command = new []
                       {
                           "bash", "-c", string.Join(" && ", commands)

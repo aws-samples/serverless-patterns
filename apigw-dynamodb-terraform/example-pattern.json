@@ -1,0 +1,65 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon DynamoDB",
+  "description": "Create an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table",
+  "language": "Integration",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Build an API Gateway REST API with AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "How do I use API Gateway as a proxy for another AWS service?",
+        "link": "https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-proxy-integrate-service/"
+      },
+      {
+        "text": "Using Amazon API Gateway as a proxy for DynamoDB",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/"
+      },
+      {
+        "text": "Setting up data transformations for REST APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-data-transformations.html"
+      },
+      {
+        "text": "Amazon API Gateway API request and response data mapping reference",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy</code>.",
+      "2. Confirm all created resources has been deleted: <code>terraform show</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/ahmad-aboushady.json"
+  ]
+}

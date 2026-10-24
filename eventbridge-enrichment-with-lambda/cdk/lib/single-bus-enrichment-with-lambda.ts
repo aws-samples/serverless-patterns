@@ -11,7 +11,7 @@ import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
 const lambdaDefaults = {
   memorySize: 1024,
   timeout: Duration.seconds(5),
-  runtime: lambda.Runtime.NODEJS_16_X,
+  runtime: lambda.Runtime.NODEJS_24_X,
   handler: 'handler',
 };
 

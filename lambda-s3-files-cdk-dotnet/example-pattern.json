@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-s3-files-cdk-dotnet",
-      "templateURL": "serverless-patterns/lambda-s3-files-cdk-dotnet",
-      "projectFolder": "lambda-s3-files-cdk-dotnet",
       "templateFile": "src/Cdk/LambdaS3FilesStack.cs"
     }
   },
@@ -54,8 +51,8 @@
   "authors": [
     {
       "name": "Pankaj Rawat",
-      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
       "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
       "linkedin": "pankaj-rawat-14568765",
       "twitter": "pankajrawat333"
     }

@@ -1,21 +1,18 @@
 {
-  "title": "Find list of Inactive lambda functions and publish it to SNS topic using Step Functions.",
-  "description": "Simple pattern that runs daily using eventbridge scheduler and invokes a state machine to find Inactive functions and publish it to SNS topic.",
+  "title": "Publish daily list of inactive AWS Lambda functions to Amazon SNS",
+  "description": "Daily running Amazon EventBridge scheduler invokes a state machine to find inactive Lambda functions and publish the list to a SNS topic.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Creates a one time schedule in eventBridge scheduler with state machine as target and uses SDK integration to find the lambda function status and returns the list of Inactive functions and which is then published to the SNS Topic."
+      "Creates a one time schedule in EventBridge scheduler with a StepFunctions state machine as target. Uses the SDK integration to find the Lambda function status, returns the list of inactive functions and publishes the list to a SNS Topic."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-stepfunction-lambda-getfunctionstatus",
-      "templateURL": "serverless-patterns/eventbridge-stepfunction-lambda-getfunctionstatus",
-      "projectFolder": "eventbridge-stepfunction-lambda-getfunctionstatus",
-      "templateFile": "eventbridge-stepfunction-lambda-getfunctionstatus/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -64,10 +61,9 @@
   "authors": [
     {
       "name": "Sahil Kapoor",
-      "image": "https://media.licdn.com/dms/image/v2/D5603AQHTVptga3RxcA/profile-displayphoto-shrink_800_800/B56ZO3ZfseHoAc-/0/1733948735068?e=1739404800&v=beta&t=FX6MFZ2JFH17KQc89u4gY6tQXGoMJLiLkB2qT3MtV2g",
       "bio": "AWS Cloud Support Engineer",
-      "linkedin": "sahil-kapoor-503391a7",
-      "twitter": ""
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQHTVptga3RxcA/profile-displayphoto-shrink_800_800/B56ZO3ZfseHoAc-/0/1733948735068?e=1739404800&v=beta&t=FX6MFZ2JFH17KQc89u4gY6tQXGoMJLiLkB2qT3MtV2g",
+      "linkedin": "sahil-kapoor-503391a7"
     }
   ]
 }

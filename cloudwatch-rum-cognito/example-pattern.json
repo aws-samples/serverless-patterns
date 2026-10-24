@@ -1,0 +1,53 @@
+{
+  "title": "Amazon CloudWatch RUM with Amazon Cognito Identity Pool",
+  "description": "Create a CloudWatch RUM application monitor and an associated Cognito Identity Pool.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a CloudWatch RUM application monitor and an associated Cognito Identity Pool.",
+      "The Cognito Identity Pool is configured to allow unauthenticated access to the CloudWatch RUM web client in order to publish generated events.",
+      "The stack creates a single IAM role used by the Cognito IdentityPool to allow the rum:PutRumEvents action to send events to CloudWatch RUM application monitor."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Use CloudWatch RUM",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-RUM.html"
+      },
+      {
+        "text": "Real-User Monitoring for Amazon CloudWatch",
+        "link": "https://aws.amazon.com/blogs/aws/cloudwatch-rum/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/paul-mowat.json"
+  ]
+}

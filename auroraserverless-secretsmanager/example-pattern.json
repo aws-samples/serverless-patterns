@@ -1,0 +1,54 @@
+{
+  "title": "Amazon Aurora Serverless with Secrets Manager",
+  "description": "Create an Aurora Serverless cluster with Secrets Manager.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an Aurora Serverless database cluster, a secret in Secrets Manager, and required VPC with subnets."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "CDK/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Secrets Manager",
+        "link": "https://aws.amazon.com/secrets-manager/"
+      },
+      {
+        "text": "Amazon Aurora Serverless",
+        "link": "https://aws.amazon.com/rds/aurora/serverless/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing in the README.md file in the repo"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/leonardo-wildt.json"
+  ]
+}

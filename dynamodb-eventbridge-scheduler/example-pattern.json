@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dynamodb-eventbridge-scheduler",
-      "templateURL": "serverless-patterns/dynamodb-eventbridge-scheduler",
-      "projectFolder": "dynamodb-eventbridge-scheduler",
       "templateFile": "template.yaml"
     }
   },
@@ -61,49 +58,7 @@
   "authors": [
     {
       "name": "Luigi Napoleone Capasso",
-      "bio": "Technical Account Manager @ AWS",
-      "linkedin": ""
+      "bio": "Technical Account Manager @ AWS"
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 20,
-      "y": 50,
-      "service": "dynamodb",
-      "label": "DynamoDB Table with Streams"
-    },
-    "icon2": {
-      "x": 50,
-      "y": 50,
-      "service": "lambda",
-      "label": "Stream Processor Lambda"
-    },
-    "icon3": {
-      "x": 80,
-      "y": 30,
-      "service": "eventbridge",
-      "label": "EventBridge Scheduler"
-    },
-    "icon4": {
-      "x": 80,
-      "y": 70,
-      "service": "lambda",
-      "label": "Target Lambda"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2",
-      "label": "Stream triggers"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3",
-      "label": "Manages schedules"
-    },
-    "line3": {
-      "from": "icon3",
-      "to": "icon4",
-      "label": "Invokes at scheduled time"
-    }
-  }
+  ]
 }

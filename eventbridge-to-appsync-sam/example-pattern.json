@@ -1,22 +1,19 @@
 {
-  "title": "EventBridge to AppSync (real-time)",
+  "title": "Realtime subscriptions with Amazon EventBridge and AWS AppSync",
   "description": "Create real time subscriptions from EventBridge to AppSync",
-  "language": "",
+  "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern configures AppSync as an EventBridge target allowing consumers subscribe to real-time updates using AppSync",
+      "This pattern configures AppSync as an EventBridge target allowing consumers subscribe to real-time updates using GraphQL subscriptions.",
       "Events published on the event bus are forwared to the Mutation on the AppSync GraphQL schema. Consumers of the API can subscribe in real time.",
-      "Using the GraphQL subscriptions you can listen for changes based on account, region, detail-type or source"
+      "Using this example GraphQL subscription you can listen for events based on account, region, detail-type or source."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-to-appsync-sam",
-      "templateURL": "serverless-patterns/eventbridge-to-appsync-sam",
-      "projectFolder": "eventbridge-to-appsync-sam",
       "templateFile": "template.yaml"
     }
   },

@@ -30,7 +30,7 @@ class ApigwHttpApiSqsLambdaStack(Stack):
         self._sqs_event_source = SqsEventSource(self._queue)
 
         self._fn = _lambda.Function(self, 'SqsMessageHandler',
-            runtime=_lambda.Runtime.PYTHON_3_8,
+            runtime=_lambda.Runtime.PYTHON_3_14,
             handler='app.handler',
             code=_lambda.Code.from_asset(
                 path='src'

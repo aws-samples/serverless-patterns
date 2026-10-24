@@ -1,18 +1,20 @@
 {
-  "title": "Change data capture events from DynamoDB to EventBridge Bus using filters",
-  "description": "This pattern uses CDC events from DynamoDB stream into EventBridge using filters and multiple EventBridge pipes",
-  "language": "",
+  "title": "Change data capture events into multiple Amazon EventBridge pipes",
+  "description": "Change data capture events from DynamoDB stream into EventBridge using multiple EventBridge pipes and filters",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
-    "text": ["Three EventBridge pipes are connected to the same DynamoDB stream. Each pipe filters out changes and raises CDC events into EventBridge"]
+    "text": [
+      "Two EventBridge pipes are connected to the same DynamoDB stream. Each pipe filters out changes and raises CDC events into EventBridge, creating OrderCreated, OrderUpdated events.",
+      "<h5>How this pattern works?</h5>",
+      "Two EventBridge pipes are connected to the same DDB stream. Each pipe filters by `eventName`, and filters when items are added or modified",
+      "When an item is added the <strong>`OrderCreated`</strong> event is raised, when item is modified the <strong>`OrderUpdated`</strong> event is raised."
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/eventbridge-pipes-ddbstream-with-filters-to-eventbridge",
-      "templateURL": "serverless-patterns/eventbridge-pipes-ddbstream-with-filters-to-eventbridge",
-      "projectFolder": "eventbridge-pipes-ddbstream-with-filters-to-eventbridge",
       "templateFile": "template.yaml"
     }
   },
@@ -23,7 +25,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -37,19 +39,25 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

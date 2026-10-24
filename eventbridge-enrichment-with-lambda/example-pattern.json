@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge event enrichment with AWS Lambda",
+  "title": "Amazon EventBridge event enrichment with AWS Lambda",
   "description": "Enrich events with Lambda and put them back onto the event bus for downstream consumers",
   "language": "TypeScript",
   "level": "200",
@@ -7,28 +7,44 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern will produce events with enrichment flag. Enricher (Lambda function) picks up the event, enriches then puts the event back onto the bus. Downstream consumers get the enriched event"
+      "This pattern will produce events with enrichment flag. Enricher (Lambda function) picks up the event, enriches then puts the event back onto the bus. Downstream consumers get the enriched event",
+      "<h5>How the enrichment works</h5>",
+      "<ul style=\"list-style-type: none;\"><li>1. Producer raise event and stores enrich:true into the metadata of the event.</li><li>2. Event bus consumes event</li><li>3. Rule is setup to listen to all events that need enriching (using the metadata field and EventBridge filters)</li><li>4. Enricher takes event, strips of the enrichment flag, and continues to enrich event using the detailType as the key. The enricher is opinionated and knows how to enrich based on the event and schema of the event.</li><li>5. Every downstream consumer acts as usual, but now they have to add a filter onto the rule that makes sure enrich:true is not set onto the event (downside of the pattern).</li></ul>",
+      "<a target=\"_blank\" href=\"https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-enrichment-with-lambda/cdk\">Read more about this pattern</a>",
+      "<hr />",
+      "<h5>Things to know</h5>",
+      "This pattern is an opinionated way to enrich data. Using event metadata with enrichment flags allows the rules to filter and process the events. The producer will need to add enrich onto the event and consumers will need to create rules ignoring this field."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-enrichment-with-lambda",
-      "templateURL": "serverless-patterns/eventbridge-enrichment-with-lambda",
-      "projectFolder": "eventbridge-enrichment-with-lambda",
-      "templateFile": "lib/single-bus-enrichment-with-lambda.ts"
+      "templateFile": "cdk/lib/single-bus-enrichment-with-lambda.ts"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Content rnricher messaging pattern",
+        "text": "Enriching Amazon EventBridge events with AWS Lambda",
+        "link": "https://www.boyney.io/blog/2022-11-01-eventbridge-enrichment-with-lambda"
+      },
+      {
+        "text": "Content enricher messaging pattern",
         "link": "https://www.enterpriseintegrationpatterns.com/DataEnricher.html"
+      },
+      {
+        "text": "Understanding event payload standards with EventBridge",
+        "link": "https://www.boyney.io/blog/2022-02-11-event-payload-patterns"
       }
     ]
   },
   "deploy": {
     "text": [
       "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
@@ -39,8 +55,8 @@
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.jpg",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.jpg"
     }
   ]
 }

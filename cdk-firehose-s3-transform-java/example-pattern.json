@@ -1,21 +1,19 @@
 {
-  "title": "KinesisDataFirehose with AWS Lambda for Transformation",
-  "description": "Create a Kinesis DataFirehose and Java Lambda function to transform the stream of data",
+  "title": "Amazon Data Firehose Data Transformation with AWS Lambda",
+  "description": "Transform incoming source data and deliver the transformed data to S3.",
   "language": "Java",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This sample project demonstrates how to use AWS Lambda (Java runtime) to transform the stream of data from a Kinesis DataFirehose with error handling and retries using Java",
-      "This example uses AWS CDK constructs"
+      "The purpose of this pattern is to deploy the infrastructure necessary to enable Amazon Data Firehose data transformation.",
+      "Amazon Data Firehose can invoke a Lambda function to transform incoming source data and deliver the transformed data to destinations. In this architecture, Amazon Data Firehose then invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode.",
+      "The transformed data is sent from Lambda to Amazon Data Firehose. Amazon Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-firehose-s3-transform-java",
-      "templateURL": "serverless-patterns/cdk-firehose-s3-transform-java",
-      "projectFolder": "cdk-firehose-s3-transform-java",
       "templateFile": "infrastructure/src/main/java/com/myorg/CdkFirehoseLambdaS3JavaStack.java"
     }
   },
@@ -24,6 +22,14 @@
       {
         "text": "AWS CDK Construct for KinesisDataFirehose Data Transformation using Lambda",
         "link": "https://constructs.dev/packages/@aws-cdk/aws-kinesisfirehose-alpha/v/2.101.1-alpha.0?lang=java"
+      },
+      {
+        "text": "Amazon Data Firehose Data Transformation",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
+      },
+      {
+        "text": "Redact sensitive data from streaming data in near-real time using Amazon Comprehend and Amazon Data Firehose",
+        "link": "https://aws.amazon.com/blogs/machine-learning/redact-sensitive-data-from-streaming-data-in-near-real-time-using-amazon-comprehend-and-amazon-kinesis-data-firehose/"
       }
     ]
   },
@@ -45,10 +51,8 @@
   "authors": [
     {
       "name": "Shiva Mahalingam",
-      "image": "",
       "bio": "Solutions Architect @ AWS",
-      "linkedin": "shivamahalingam",
-      "twitter": ""
+      "linkedin": "shivamahalingam"
     }
   ]
 }

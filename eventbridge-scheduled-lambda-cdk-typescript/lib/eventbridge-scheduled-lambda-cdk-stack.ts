@@ -25,7 +25,7 @@ export class EventbridgeScheduledLambdaCdkStack extends Stack {
 
     //Lambda function to run the scheduled task
     const myFunction = new lambda.Function(this, 'function-name', {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       memorySize: 128,
       timeout: Duration.seconds(30),
       handler: 'index.handler',

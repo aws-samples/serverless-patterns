@@ -1,11 +1,12 @@
-import * as codebuild from '@aws-cdk/aws-codebuild';
-import * as codecommit from '@aws-cdk/aws-codecommit';
-import * as events from "@aws-cdk/aws-events";
-import * as targets from "@aws-cdk/aws-events-targets";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as nodeJSlambda from "@aws-cdk/aws-lambda-nodejs";
-import * as iam from "@aws-cdk/aws-iam";
-import * as cdk from "@aws-cdk/core";
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import * as codecommit from 'aws-cdk-lib/aws-codecommit';
+import * as events from "aws-cdk-lib/aws-events";
+import * as targets from "aws-cdk-lib/aws-events-targets";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as nodeJSlambda from "aws-cdk-lib/aws-lambda-nodejs";
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as cdk from "aws-cdk-lib";
+import { Construct } from "constructs";
 import * as path from "path";
 
 export interface PipelineProps extends cdk.StackProps {
@@ -18,7 +19,7 @@ export interface PipelineProps extends cdk.StackProps {
  *  Then a comment will be added the the PullRequest with a link to the logs.
  */
 export class PipelineStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, name: string, props: PipelineProps) {
+    constructor(scope: Construct, name: string, props: PipelineProps) {
         super(scope, name, props);
         const {repositoryName} = props
 
@@ -72,10 +73,10 @@ export class PipelineStack extends cdk.Stack {
 
         // Lambda That will post the comment.
         const commentLambda = new nodeJSlambda.NodejsFunction(this, 'commentOnPRWithBuildStatus', {
-            runtime: lambda.Runtime.NODEJS_14_X,
+            runtime: lambda.Runtime.NODEJS_24_X,
             handler: 'handler',
             bundling: {
-                externalModules: ['aws-sdk', '@aws-sdk/client-codecommit']
+                externalModules: ['@aws-sdk/client-codecommit']
             },
             entry: path.join(__dirname, `/../src/commentLambda.ts`),
             initialPolicy: [ new iam.PolicyStatement({

@@ -8,8 +8,8 @@ from aws_cdk import (
     aws_lambda as _lambda
 )
 from constructs import Construct
-import aws_cdk.aws_apigatewayv2_alpha as api_gateway
-import aws_cdk.aws_apigatewayv2_integrations_alpha as integrations
+import aws_cdk.aws_apigatewayv2 as api_gateway
+import aws_cdk.aws_apigatewayv2_integrations as integrations
 
 
 class LambdaEfsCdkStack(Stack):
@@ -28,7 +28,7 @@ class LambdaEfsCdkStack(Stack):
                                             posix_user=efs.PosixUser(gid="1001",uid="1001"))
 
         _efs_lambda = _lambda.Function(self, 'lambdaEfsHandler',
-                                    runtime = _lambda.Runtime.PYTHON_3_8,
+                                    runtime = _lambda.Runtime.PYTHON_3_14,
                                     code = _lambda.Code.from_asset('lambda_function'),
                                     handler='lambda_function.lambda_handler',
                                     vpc = _vpc,

@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-lambda-terraform-python",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-lambda-terraform-python",
-      "projectFolder": "eventbridge-schedule-to-lambda-terraform-python",
-      "templateFile": "eventbridge-schedule-to-lambda-terraform-python/main.tf"
+      "templateFile": "main.tf"
     }
   },
   "resources": {

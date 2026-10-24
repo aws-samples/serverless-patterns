@@ -1,8 +1,8 @@
 {
-  "title": "Lambda Function URL",
-  "description": "Create a Lambda Function URL.",
+  "title": "AWS Lambda function with a function URL",
+  "description": "Create Lambda function with a URL",
   "language": "Node.js",
-  "level": "200",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
@@ -12,13 +12,11 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-athena-cdk-python",
-      "templateURL": "serverless-patterns/sfn-athena-cdk-python",
-      "projectFolder": "sfn-athena-cdk-python",
-      "templateFile": "sfn_athena_cdk_python/sfn_athena_cdk_python_stack.py"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
+    "headline": "Additional resources",
     "bullets": [
       {
         "text": "Creating and managing Lambda function URLs",
@@ -32,26 +30,29 @@
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Rohan Mehta",
-      "image": "https://internal-cdn.amazon.com/badgephotos.amazon.com/?uid=merohan",
       "bio": "Associated Cloud Application Architect at AWS Professional Services",
-      "linkedin": "https://www.linkedin.com/in/rohan-mehta-1052b570/",
-      "twitter": "https://twitter.com/rohanmehta_dev"
+      "image": "https://internal-cdn.amazon.com/badgephotos.amazon.com/?uid=merohan",
+      "linkedin": "rohan-mehta-1052b570",
+      "twitter": "rohanmehta_dev"
     }
   ]
 }

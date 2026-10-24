@@ -9,7 +9,7 @@ Globals:
   Function:
     Tracing: PassThrough
     Timeout: 10
-    Runtime: dotnet6
+    Runtime: dotnet10
 
 Parameters:
   SourceBucketName:

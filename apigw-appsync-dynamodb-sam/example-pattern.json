@@ -1,7 +1,7 @@
 {
   "title": "Amazon API Gateway to AWS AppSync to Amazon DynamoDB ",
   "description": "Create an Amazon API Gateway HTTP API as a proxy to AWS AppSync GraphQL API with Amazon DynamoDB as the API data source",
-  "language": "Yaml",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-appsync-dynamodb-sam",
-      "templateURL": "serverless-patterns/apigw-appsync-dynamodb-sam",
-      "projectFolder": "apigw-appsync-dynamodb-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -54,11 +51,10 @@
   "authors": [
     {
       "name": "Ozioma Uzoegwu",
-      "image": "./Ouzoegwu.jpeg",
       "bio": "I am a Principal Solutions Architect working at AWS",
+      "image": "./Ouzoegwu.jpeg",
       "linkedin": "ouzoegwu",
       "twitter": "iam_tessot"
     }
   ]
 }
-

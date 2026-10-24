@@ -1,0 +1,53 @@
+{
+  "title": "AWS Lambda to Amazon Data Firehose to Amazon S3",
+  "description": "Create a Lambda function that writes to Amazon Data Firehose, then an S3 bucket.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys a Lambda function, a Amazon Data Firehose and an S3 bucket.",
+      "This is a Java 25 implementation of this pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Using serverless backends to iterate quickly on web apps – part 1",
+        "link": "https://serverlessland.com/blog/using-serverless-backends-to-iterate-quickly-on-web-apps--part-1"
+      },
+      {
+        "text": "S3-to-Lambda application patterns",
+        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/razvan-minciuna.json"
+  ]
+}

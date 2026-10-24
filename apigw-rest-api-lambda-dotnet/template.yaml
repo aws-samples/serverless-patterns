@@ -17,7 +17,7 @@ Resources:
     Properties:
       CodeUri: ./src/HelloWorld/
       Handler: HelloWorld::HelloWorld.Function::FunctionHandler
-      Runtime: dotnet8
+      Runtime: dotnet10
       Architectures:
         - x86_64
       MemorySize: 512

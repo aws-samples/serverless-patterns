@@ -1,0 +1,49 @@
+{
+  "title": "Amazon S3 to Amazon SNS",
+  "description": "Send a notifications from S3 to SNS when an object is created",
+  "language": "Integration",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template creates an S3 bucket, allows you to upload objects to that bucket, and will send you notifications from S3 to SNS when an object is created in that bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": []
+  },
+  "deploy": {
+    "text": [
+      "terraform apply --auto-approve",
+      "terraform init"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>terraform destroy --auto-approve</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joahna Abelgas",
+      "bio": "Cloud Engineer",
+      "image": "https://avatars.githubusercontent.com/u/86153724?v=4",
+      "linkedin": "joahna",
+      "twitter": "heyjoahna"
+    }
+  ]
+}

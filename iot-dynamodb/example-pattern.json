@@ -1,6 +1,7 @@
 {
-  "title": "AWS IoT to DynamoDB",
+  "title": "AWS IoT to Amazon DynamoDB",
   "description": "Create IoT Topic Rules to put event data to DynamoDB table",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
@@ -11,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/iot-dynamodb",
-      "templateURL": "serverless-patterns/iot-dynamodb",
-      "projectFolder": "iot-dynamodb",
-      "templateFile": "iot-dynamodb/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -59,9 +57,9 @@
   "authors": [
     {
       "name": "Udit Parikh",
-      "image": "https://1drv.ms/u/s!AufpCThJxKa2g50banMoavhl7i5EUg",
       "bio": "Udit is a AWS 6x Certified Cloud Enthusiast who love building solutions.",
-      "linkedin": "https://www.linkedin.com/in/parikhudit"
+      "image": "https://1drv.ms/u/s!AufpCThJxKa2g50banMoavhl7i5EUg",
+      "linkedin": "parikhudit"
     }
   ]
 }

@@ -1,12 +1,9 @@
 {
-  "title": "Lambda Function URL",
+  "title": "AWS Lambda Function URL",
   "description": "Create a Lambda Function URL.",
   "language": "TypeScript",
   "level": "100",
   "framework": "Serverless Framework",
-    "services": {
-        "from": "lambda"
-    },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -15,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-function-url-sls",
-      "templateURL": "serverless-patterns/lambda-function-url-sls",
-      "projectFolder": "lambda-function-url-sls",
-      "templateFile": "lambda-function-url-sls/serverless.yml"
+      "templateFile": "serverless.yml"
     }
   },
   "resources": {
@@ -55,11 +49,7 @@
   "authors": [
     {
       "name": "Wayne Greeley",
-      "image": "",
-      "bio": "AWS Community Builder",
-      "linkedin": "",
-      "twitter": ""
+      "bio": "AWS Community Builder"
     }
   ]
 }
-

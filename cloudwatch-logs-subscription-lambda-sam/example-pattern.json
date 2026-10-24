@@ -1,6 +1,6 @@
 {
-  "title": "Cloudwatch Logs Subscription to Lambda with SAM",
-  "description": "Create a Cloudwatch Logs Subscription Filter to Lambda function with SAM",
+  "title": "Amazon CloudWatch Logs Subscription to AWS Lambda with AWS SAM",
+  "description": "Create a CloudWatch Logs Subscription Filter to Lambda function with SAM",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",
@@ -13,16 +13,13 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cloudwatch-logs-subscription-lambda-sam",
-      "templateURL": "serverless-patterns/cloudwatch-logs-subscription-lambda-sam",
-      "projectFolder": "cloudwatch-logs-subscription-lambda-sam",
-      "templateFile": "cloudwatch-logs-subscription-lambda-sam/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Cloudwatch Logs Subscription Filters",
+        "text": "CloudWatch Logs Subscription Filters",
         "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"
       }
     ]
@@ -45,10 +42,10 @@
   "authors": [
     {
       "name": "Omar Rosadio",
-      "image": "https://avatars.githubusercontent.com/u/10565035",
       "bio": "Cloud Engineer / AWS Community Builder in Serverless category.",
+      "image": "https://avatars.githubusercontent.com/u/10565035",
       "linkedin": "omaralonsorosadioportilla",
-      "twitter": "@omarrosadio"
+      "twitter": "omarrosadio"
     }
   ]
 }

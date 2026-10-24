@@ -1,0 +1,55 @@
+{
+  "title": "Amazon API Gateway to AWS Fargate",
+  "description": "Create an API Gateway endpoint to access an AWS Fargate service",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS Fargate service running on an Amazon Elastic Container Service (ECS) cluster with a private Application Load Balancer in-front. The Application Load Balanced Fargate Service is integrated with Amazon API Gateway HTTP API to expose the endpoint.",
+      "This template uses a custom image without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built ecs.ContainerImage.fromAsset method. The custom image has a base route / to output a message."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Fargate",
+        "link": "https://aws.amazon.com/fargate/"
+      },
+      {
+        "text": "Building Happy Little APIs - Episode 1",
+        "link": "https://www.youtube.com/watch?v=CEHC9crd2VU"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/glenn-chia-jin-wee.json"
+  ]
+}

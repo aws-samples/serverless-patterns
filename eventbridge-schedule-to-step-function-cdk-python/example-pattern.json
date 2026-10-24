@@ -1,0 +1,52 @@
+{
+  "title": "Amazon EventBridge schedule to trigger a Step Functionsworkflow",
+  "description": "Simple pattern that triggers Step Functionsexecution every 5 minutes using EventBridge Scheduler with CDK and Python. ",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge Scheduler triggers a new Step Functionsexecution every 5 minutes."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "eventbridge_schedule_to_step_function_cdk_python/eventbridge_schedule_to_step_function_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "Scheduler Documentation for CDK v2 Python",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_scheduler/CfnSchedule.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/pubudu-jayawardana.json"
+  ]
+}

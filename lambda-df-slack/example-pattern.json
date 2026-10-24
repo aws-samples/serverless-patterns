@@ -1,6 +1,6 @@
 {
-  "title": "AWS Lambda Durable Functions to Slack via Bedrock AgentCore",
-  "description": "A Slack chatbot using AWS Lambda Durable Functions for stateful, multi-turn conversations with human-in-the-loop interactions, generating travel itineraries via Amazon Bedrock through AgentCore.",
+  "title": "AWS Lambda durable functions to Slack via Amazon Bedrock AgentCore",
+  "description": "Slack chatbot using AWS Lambda Durable Functions for stateful, multi-turn conversations with HITL interactions, generating travel itineraries via Amazon Bedrock AgentCore.",
   "language": "Python",
   "level": "400",
   "framework": "Terraform",
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-df-slack",
-      "templateURL": "serverless-patterns/lambda-df-slack",
-      "projectFolder": "lambda-df-slack",
       "templateFile": "terraform/main.tf"
     }
   },
@@ -62,8 +59,8 @@
   "authors": [
     {
       "name": "Rajil Paloth",
-      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
       "bio": "ProServ Delivery Consultant at AWS",
+      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
       "linkedin": "paloth"
     }
   ]

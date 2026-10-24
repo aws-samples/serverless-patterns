@@ -1,4 +1,4 @@
-import cdk = require("@aws-cdk/core");
+import cdk = require("aws-cdk-lib");
 import { PipelineStack } from "../lib/pipeline";
 
 const app = new cdk.App();

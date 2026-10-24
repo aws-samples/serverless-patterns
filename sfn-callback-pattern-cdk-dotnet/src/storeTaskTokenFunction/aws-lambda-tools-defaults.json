@@ -8,7 +8,7 @@
   "profile": "default",
   "region": "us-east-1",
   "configuration": "Release",
-  "function-runtime": "dotnet6",
+  "function-runtime": "dotnet10",
   "function-memory-size": 256,
   "function-timeout": 30,
   "function-handler": "storeTaskTokenFunction::storeTaskTokenFunction.Function::FunctionHandler"

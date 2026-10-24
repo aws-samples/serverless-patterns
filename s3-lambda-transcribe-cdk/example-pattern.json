@@ -1,6 +1,6 @@
 {
-  "title": "S3 to Lambda to Transcribe",
-  "description": "Create a Lambda with an S3 object created trigger that starts an Amazon Transcibe job and puts the results in anoter S3 Bucket",
+  "title": "Amazon S3 to AWS Lambda to Amazon Transcribe",
+  "description": "Trigger a Transcribe job from an S3 upload.",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",
@@ -8,15 +8,12 @@
     "headline": "How it works",
     "text": [
       "This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template that deploys a Lambda Function with an S3 object created trigger to start an Amazon Transcribe job and place the results in another S3 bucket.",
-      "This pattern deploys one Lambda Function and two S3 Buckets."
+      "This pattern deploys one Lambda Function and two S3 buckets."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-transcribe-cdk",
-      "templateURL": "serverless-patterns/s3-lambda-transcribe-cdk",
-      "projectFolder": "s3-lambda-transcribe-cdk",
-      "templateFile": "s3-lambda-transcribe-cdk/s3_lambda_transcribe_cdk.py"
+      "templateFile": "s3_lambda_transcribe_cdk.py"
     }
   },
   "resources": {
@@ -43,15 +40,17 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
     ]
   },
   "authors": [
     {
       "name": "Davonte Blakely",
-      "image": "https://media-exp1.licdn.com/dms/image/C4D03AQGLZ2P84tYXvg/profile-displayphoto-shrink_800_800/0/1611861641822?e=1666224000&v=beta&t=h1OihmKSYq4sCP3fCaSvbyTVqdMPiJfVq_Bmxd8Hsss",
       "bio": "Davonte is an Associate Cloud Developer with Amazon Web Services",
-      "linkedin": "https://www.linkedin.com/in/davonte-blakely-ab3028171/"
+      "image": "https://media-exp1.licdn.com/dms/image/C4D03AQGLZ2P84tYXvg/profile-displayphoto-shrink_800_800/0/1611861641822?e=1666224000&v=beta&t=h1OihmKSYq4sCP3fCaSvbyTVqdMPiJfVq_Bmxd8Hsss",
+      "linkedin": "davonte-blakely-ab3028171"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "title": "Function chaining with AWS Lambda durable functions in Terraform",
-  "description": "A durable orchestrator that chains three Lambda functions in sequence to demonstrate AWS Lambda's durable function",
+  "description": "A durable orchestrator that chains three Lambda functions in sequence to demonstrate AWS Lambda durable functions",
   "language": "Python",
   "level": "300",
   "framework": "Terraform",
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-function-chaining-terraform",
-      "templateURL": "serverless-patterns/lambda-durable-function-chaining-terraform",
-      "projectFolder": "lambda-durable-function-chaining-terraform",
       "templateFile": "main.tf"
     }
   },
@@ -50,8 +47,8 @@
   "authors": [
     {
       "name": "Archana V",
-      "image": "ttps://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_200_200/B56ZZH3LL6H0AY-/0/1744962369852?e=1772668800&v=beta&t=y0t7bsQKJwy5McO395hDmW7QPu_K-a1WKXeTA0-ecno",
       "bio": "Solutions Architect at AWS",
+      "image": "ttps://media.licdn.com/dms/image/v2/D5603AQGhkVtEhllFEw/profile-displayphoto-shrink_200_200/B56ZZH3LL6H0AY-/0/1744962369852?e=1772668800&v=beta&t=y0t7bsQKJwy5McO395hDmW7QPu_K-a1WKXeTA0-ecno",
       "linkedin": "archanavenkat"
     }
   ]

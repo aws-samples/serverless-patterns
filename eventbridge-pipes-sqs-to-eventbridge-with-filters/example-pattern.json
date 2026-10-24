@@ -1,18 +1,20 @@
 {
-  "title": "SQS to EventBridge Bus using EventBridge Pipes",
-  "description": "This pattern uses SQS and triggers EventBridge events directly with optional filtering supported.",
-  "language": "",
+  "title": "Amazon SQS to Amazon EventBridge",
+  "description": "This pattern uses EventBridge pipes to connect SQS to EventBridge.",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
-    "text": ["SQS queue is polled and messages are sent to EventBridge. SQS messages are filtered before reaching EventBridge, and custom events in EventBridge are raised."]
+    "text": [
+      "SQS queue is polled and messages are sent to EventBridge. SQS messages are filtered before reaching EventBridge, and custom events in EventBridge are raised.",
+      "<h5>How the pattern works</h5>",
+      "SQS messages are filtered using EventBridge Pipes filter and before sending the events to EventBridge the messages are transformed using input transformers picking out order information for the event",
+      "Pipes TargetParams are used to specify the detail and source of the event to raise, in this example we raise `OrderCreated` events on the `myapp.orders` source"
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-to-eventbridge-with-filters",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-eventbridge-with-filters",
-      "projectFolder": "eventbridge-pipes-sqs-to-eventbridge-with-filters",
       "templateFile": "template.yaml"
     }
   },
@@ -23,7 +25,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -37,19 +39,25 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

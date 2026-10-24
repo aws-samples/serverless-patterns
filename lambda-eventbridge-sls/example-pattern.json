@@ -1,9 +1,9 @@
 {
-  "title": "Lambda to EventBridge",
+  "title": "AWS Lambda to Amazon EventBridge",
   "description": "Publish events to EventBridge.",
   "language": "Python",
   "level": "200",
-  "framework": "Serverless",
+  "framework": "Serverless Framework",
   "introBox": {
     "headline": "Create a Lambda function that sends events to EventBridge.",
     "text": [
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-eventbridge-sls",
-      "templateURL": "serverless-patterns/lambda-eventbridge-sls",
-      "projectFolder": "lambda-eventbridge-sls",
       "templateFile": "serverless.yml"
     }
   },
@@ -31,15 +28,19 @@
     ]
   },
   "deploy": {
-    "text": ["serverless deploy --verbose"]
+    "text": [
+      "serverless deploy --verbose"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
     "text": [
       "Delete the stack: <code>serverless remove --verbose</code>.",
-      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\""
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [

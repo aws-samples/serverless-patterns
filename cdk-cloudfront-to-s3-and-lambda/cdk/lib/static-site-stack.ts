@@ -17,9 +17,10 @@ export class StaticSiteStack extends Stack {
       this,
       "apiDefaultHandler",
       {
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: "get",
         entry: path.join(__dirname, "../../api/default/index.ts"),
+        projectRoot: path.join(__dirname, "../.."),
         memorySize: 1024,
       }
     );
@@ -27,9 +28,10 @@ export class StaticSiteStack extends Stack {
       this,
       "apiHelloGetHandler",
       {
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: "get",
         entry: path.join(__dirname, "../../api/hello/index.ts"),
+        projectRoot: path.join(__dirname, "../.."),
         memorySize: 1024,
       }
     );
@@ -37,9 +39,10 @@ export class StaticSiteStack extends Stack {
       this,
       "apiWorldGetHandler",
       {
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: "get",
         entry: path.join(__dirname, "../../api/world/index.ts"),
+        projectRoot: path.join(__dirname, "../.."),
         memorySize: 1024,
       }
     );
@@ -116,7 +119,7 @@ export class StaticSiteStack extends Stack {
       {
         code: lambda.Code.fromAsset(path.join(__dirname, "./cloudfront")),
         handler: "cors.onOriginResponse",
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
       }
     );
 
@@ -127,7 +130,7 @@ export class StaticSiteStack extends Stack {
       {
         code: lambda.Code.fromAsset(path.join(__dirname, "./cloudfront")),
         handler: "rewrite.onViewerRequest",
-        runtime: lambda.Runtime.NODEJS_12_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
       }
     );
 

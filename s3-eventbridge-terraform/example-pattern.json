@@ -1,0 +1,59 @@
+{
+  "title": "Amazon S3 to Amazon EventBridge to Amazon SNS",
+  "description": "Publish events directly from S3 to EventBridge and send notifications to SNS when an object is created.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template creates an S3 bucket that publishes events to Amazon EventBridge. When an object is uploaded to the bucket, the EventBridge is triggered and a SNS notification is sent."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      },
+      {
+        "text": "New – Use Amazon S3 Event Notifications with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/new-use-amazon-s3-event-notifications-with-amazon-eventbridge/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete all files from the S3 bucket",
+      "2. Delete all created resources by terraform <code>terraform destroy</code>",
+      "3. During the prompts, enter yes",
+      "4. Confirm all created resources has been deleted <code>terraform show</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/joahna-abelgas.json"
+  ]
+}

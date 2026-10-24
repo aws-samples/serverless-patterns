@@ -9,14 +9,11 @@
     "text": [
       "This code demonstrates how an Amazon SQS queue can be used to buffer records for an Amazon DynamoDB table and mitigate the risk for a client of being throttled.",
       "The CDK code deploys Ingress and Dead-Letter SQS queues, AWS Lambda functions, destination DynamoDB tables and CloudWatch alarms.",
-      "AWS Lambda function uses NodeJS 20 runtime."
+      "AWS Lambda function uses Node.js 24 runtime."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
-      "templateURL": "serverless-patterns/sqs-lambda-dynamodb-cloudwatch-cdk-ts",
-      "projectFolder": "sqs-lambda-dynamodb-cloudwatch-cdk-ts",
       "templateFile": "lib/sqs-lambda-dynamo-stack.ts"
     }
   },
@@ -33,13 +30,19 @@
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"]
+    "text": [
+      "cdk deploy"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["<code>cdk destroy</code>"]
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {

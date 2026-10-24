@@ -1,5 +1,5 @@
 {
-  "title": "Implementing the claim check pattern using EventBridge Pipes.",
+  "title": "Implementing the claim check pattern using Amazon EventBridge Pipes.",
   "description": "To reduce the size of the events in your event-driven application, you can temporarily remove attributes. This approach is known as the claim check pattern.",
   "language": "TypeScript",
   "level": "300",
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/claim-check-pattern-cdk",
-      "templateURL": "serverless-patterns/claim-check-pattern-cdk",
-      "projectFolder": "claim-check-pattern-cdk",
       "templateFile": "src/lib/claim-check-stack.ts"
     }
   },
@@ -47,8 +44,8 @@
   "authors": [
     {
       "name": "Dominik Richter",
-      "image": "https://avatars.githubusercontent.com/u/29404931",
       "bio": "Solutions Architect at AWS, passionate about event-driven architectures and Serverless.",
+      "image": "https://avatars.githubusercontent.com/u/29404931",
       "linkedin": "do-richter"
     }
   ]

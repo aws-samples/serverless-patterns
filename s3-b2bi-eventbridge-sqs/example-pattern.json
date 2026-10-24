@@ -1,6 +1,6 @@
 {
-  "title": "Event-Driven EDI to JSON Transformation using AWS B2B Data Interchange Status Updates",
-  "description": "This project shows how to use AWS B2B Data Interchange to transform EDI files into JSON format. It also demonstrates tracking transformation completion via Amazon EventBridge rules that integrate with Amazon SQS queues.",
+  "title": "Event-Driven EDI Transformation using AWS B2B Data Interchange",
+  "description": "Integrate AWS B2B Data Interchange transformations with Amazon EventBridge and Amazon SQS.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
@@ -16,9 +16,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-b2bi-eventbridge-sqs",
-      "templateURL": "serverless-patterns/s3-b2bi-eventbridge-sqs",
-      "projectFolder": "s3-b2bi-eventbridge-sqs",
       "templateFile": "template.yaml"
     }
   },
@@ -59,8 +56,8 @@
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "linkedin": "biswanathmukherjee"
     }
   ]

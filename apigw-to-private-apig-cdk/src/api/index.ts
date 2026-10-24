@@ -1,11 +1,11 @@
-import * as apigateway from "@aws-cdk/aws-apigateway";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as cdk from "@aws-cdk/core";
-import * as elb from '@aws-cdk/aws-elasticloadbalancingv2'
-import * as elbTarget from '@aws-cdk/aws-elasticloadbalancingv2-targets'
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as iam from '@aws-cdk/aws-iam';
-import * as customResource from '@aws-cdk/custom-resources'
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as cdk from "aws-cdk-lib";
+import * as elb from 'aws-cdk-lib/aws-elasticloadbalancingv2'
+import * as elbTarget from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets'
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as customResource from 'aws-cdk-lib/custom-resources'
 import path from "path";
 import config from "./config.json";
 
@@ -25,7 +25,7 @@ export class ApiStack extends cdk.Stack {
       service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY,
       vpc: vpc,
       subnets: vpc.selectSubnets({
-        subnetType: ec2.SubnetType.PRIVATE
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
       }),
       privateDnsEnabled: true,
       securityGroups: [apiGatewayEndpointSG]
@@ -34,10 +34,10 @@ export class ApiStack extends cdk.Stack {
     const handler = new lambda.Function(this, "handler", {
       code: new lambda.AssetCode(path.resolve(__dirname, "dist")),
       handler: `index.${config.api.handler}`,
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       vpc: vpc,
       vpcSubnets: vpc.selectSubnets({
-        subnetType: ec2.SubnetType.PRIVATE
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS
       })
     });
 
@@ -85,7 +85,7 @@ export class ApiStack extends cdk.Stack {
         onUpdate: {
           service: 'EC2',
           action: 'describeNetworkInterfaces',
-          outputPath: `NetworkInterfaces.${counter}.PrivateIpAddress`,
+          outputPaths: [`NetworkInterfaces.${counter}.PrivateIpAddress`],
           parameters: { NetworkInterfaceIds: endpointAPIGateway.vpcEndpointNetworkInterfaceIds },
           physicalResourceId: customResource.PhysicalResourceId.of(`NetworkInterfaces.${counter}.PrivateIpAddress`)
         },

@@ -1,0 +1,49 @@
+{
+  "title": "Amazon API Gateway integration with AWS WAF",
+  "description": "Create an Amazon API Gateway integration with AWS WAF",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern in SAM provides a means to generate a WebACL and associate it with an existing REST or Websocket API (HTTP APIs are not currently supported)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Web Application Firewall",
+        "link": "https://aws.amazon.com/waf/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Invoke the API with the appropriate stage. To view the WebACL rules, visit the Management Console and navigate to the WAF & Shield service page."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/jj-johnson.json"
+  ]
+}

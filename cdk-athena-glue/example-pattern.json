@@ -1,0 +1,57 @@
+{
+  "title": "Amazon Athena to AWS Glue to Amazon S3",
+  "description": "Create AWS Glue tables from Athena and integrate with S3.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK pattern shows an example to generate AWS Glue Tables and connect to Amazon Athena to execute queries. It creates CSV and TSV-type tables using CFNTable."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "What Is AWS Glue?",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+      },
+      {
+        "text": "Service Integration Patterns",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-sync"
+      },
+      {
+        "text": "CDK documentation for Glue",
+        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-glue-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/feroz-kumar.json",
+    "content/contributors/jayesh-a-shinde.json",
+    "content/contributors/atul-sharma.json"
+  ]
+}

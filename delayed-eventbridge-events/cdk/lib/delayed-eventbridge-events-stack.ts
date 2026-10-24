@@ -38,7 +38,7 @@ export class DelayedEventbridgeEventsStack extends cdk.Stack {
     const processUserCreatedFunction: NodejsFunction = new NodejsFunction(this, 'process-user-created', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/process-user-created/index.ts'),
       environment: {
@@ -68,7 +68,7 @@ export class DelayedEventbridgeEventsStack extends cdk.Stack {
     const emailCustomer: NodejsFunction = new NodejsFunction(this, 'email-customer', {
       memorySize: 1024,
       timeout: Duration.seconds(5),
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, '../src/email-customer/index.ts'),
     });

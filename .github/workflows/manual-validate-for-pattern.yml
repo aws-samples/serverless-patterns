@@ -44,10 +44,10 @@ jobs:
         with:
           ref: ${{ steps.extract_PR_details.outputs.headSHA }}
 
-      - run: cd scripts && npm i
+      - run: cd _scripts && npm i
 
       - name: Validate
-        run: node scripts/validate.js
+        run: node _scripts/validate.js
         env: # Or as an environment variable
           MODIFIED_FILES: ${{ steps.extract_PR_details.outputs.files }}
           ADDED_FILES: "${{ steps.changed-files.outputs.added_files }}"

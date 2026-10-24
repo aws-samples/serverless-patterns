@@ -34,7 +34,7 @@ class ApigwLambdaComprehendServerless(Stack):
         lambda_function = lambda_.Function(
             self,
             "DetectSentimentLambda",
-            runtime=lambda_.Runtime.PYTHON_3_10,
+            runtime=lambda_.Runtime.PYTHON_3_14,
             handler="lambda_function.lambda_handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
             timeout=Duration.minutes(10),

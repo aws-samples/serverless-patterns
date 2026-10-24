@@ -1,0 +1,59 @@
+{
+  "title": "AWS Lambda to AWS AppSync",
+  "description": "Create a Lambda function that triggers an AppSync GraphQL API.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, AWS AppSync provides a a schema that allows you to manage and read todos. A Lambda function is implemented that can interact with the GraphQL API.",
+      "This function can create todos by using the codegen generated from the schema by the Amplify CLI codegen. The codegen provides the operations and the variable types, which makes it simple to interact with the AppSync GraphQL API from the Typescript function.",
+      "This pattern is useful in event driven design that trigger your AppSync function from the backend. Those changes can they easily be reflected on front-end clients in real time by using AppSync subscriptions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/main.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Exporting AppSync operations to a Lambda layer for easy reuse",
+        "link": "https://docs.amplify.aws/guides/functions/appsync-operations-to-lambda-layer/q/platform/js/"
+      },
+      {
+        "text": "Simplify access to multiple microservices with AWS AppSync and AWS Amplify",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-microservices/"
+      },
+      {
+        "text": "Tutorial: HTTP Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/brice-pelle.json"
+  ]
+}

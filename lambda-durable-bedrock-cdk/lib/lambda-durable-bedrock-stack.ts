@@ -9,13 +9,13 @@ export class LambdaDurableBedrockStack extends cdk.Stack {
 
     const modelId = new cdk.CfnParameter(this, "BedrockModelId", {
       type: "String",
-      default: "us.anthropic.claude-sonnet-4-20250514-v1:0",
+      default: "us.anthropic.claude-sonnet-4-6",
       description: "Bedrock model ID (inference profile) to use",
     });
 
     // Lambda function with durable execution enabled
     const fn = new lambda.Function(this, "DurableBedrockFn", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("src"),
       timeout: cdk.Duration.minutes(15),

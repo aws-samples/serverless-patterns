@@ -99,7 +99,7 @@ export class CdkStack extends cdk.Stack {
       this,
       "BedrockInvokeLambdaHandler",
       {
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         handler: "handler",
         entry: path.join(__dirname, "../src/lambda/invokeBedrock/index.ts"),
         memorySize: 512, // Increased memory for potentially larger SDK and payloads

@@ -2,10 +2,11 @@
  *  SPDX-License-Identifier: MIT-0
 */
 
-const AWS = require('aws-sdk');
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 const moment = require('moment');
 
-const documentClient = new AWS.DynamoDB.DocumentClient();
+const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 export async function main( event: any ) {
   let params = {
@@ -17,7 +18,7 @@ export async function main( event: any ) {
     }
   }
   try {
-    let data = await documentClient.put(params).promise();
+    let data = await documentClient.send(new PutCommand(params));
   }
   catch (err) {
     console.log(err);

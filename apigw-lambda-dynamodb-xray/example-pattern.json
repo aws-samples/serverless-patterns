@@ -1,0 +1,54 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon DynamoDB with X-Ray",
+  "description": "Create an API Gateway endpoint integrated with Lambda and DynamoDB with X-Ray enabled.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "AWS X-Ray records and visualizes requests made by applications, making it a great tool to analyze and debug applications built using a microservices and serverless architecture.",
+      "This CDK application demonstrates how to integrate X-Ray SDK in Lambda functions to observe into downstream API calls. This example creates an Amazon API Gateway REST API that uses a Lambda function as the backend to scan a DynamoDB table. The REST API and Lambda function both have X-Ray tracing enabled. X-Ray SDK is also integrated in the Lambda function to observe into the API call to the downstream DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/apigw-lambda-dynamodb-cdk-ts-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS Docs: Writing Data to a Table",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SQLtoNoSQL.WriteData.html"
+      },
+      {
+        "text": "Lambda CDK docs",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2//docs/aws-cdk-lib.aws_lambda-readme.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/guyu-ye.json"
+  ]
+}

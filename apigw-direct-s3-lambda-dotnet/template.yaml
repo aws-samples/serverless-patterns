@@ -32,7 +32,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: LambdaFileProcessor::LambdaFileProcessor.S3Function::FunctionHandler
-      Runtime: dotnet8
+      Runtime: dotnet10
       CodeUri: 'LambdaFileProcessor'
       Description: Default function
       MemorySize: 1024
@@ -69,7 +69,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: LambdaAuthorizer::LambdaAuthorizer.AuthorizerFunction::FunctionHandler
-      Runtime: dotnet8
+      Runtime: dotnet10
       CodeUri: 'LambdaAuthorizer'
       Description: Lambda Authorizer
       MemorySize: 1024

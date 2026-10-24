@@ -62,8 +62,7 @@ class LambdaLayerXRayStackStack(Stack):
                 code=lambda_.Code.from_asset(os.path.join(os.getcwd(), "lambda_layer_x_ray_stack/layers/xray")),
                 description="Lambda Layer containing Xray SDK Python Library",
                 compatible_runtimes=[
-                    lambda_.Runtime.PYTHON_3_7,
-                    lambda_.Runtime.PYTHON_3_8,
+                    lambda_.Runtime.PYTHON_3_14,
                 ],
                 removal_policy=RemovalPolicy.DESTROY,
                 )
@@ -76,7 +75,7 @@ class LambdaLayerXRayStackStack(Stack):
                 id = 'xray-sample-app',
                 function_name='xray-handler',
                 code=lambda_.Code.from_asset(os.path.join(os.getcwd(), "lambda_code")),
-                runtime= lambda_.Runtime.PYTHON_3_8,
+                runtime= lambda_.Runtime.PYTHON_3_14,
                 handler="lambda-handler.lambda_handler",
                 layers=[layerxray, layerpillow],
                 role=Role,

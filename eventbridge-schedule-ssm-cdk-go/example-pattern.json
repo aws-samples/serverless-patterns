@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge Scheduler to Start State Manager Association Once",
+  "title": "Amazon EventBridge Scheduler to start State Manager Association",
   "description": "This pattern will create an EventBridge Scheduler to start State Manager Association once in AWS Systems Manager every 5 minutes.",
   "language": "Go",
   "level": "200",
@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-ssm-cdk-go",
-        "templateURL": "serverless-patterns/eventbridge-schedule-ssm-cdk-go",
-        "projectFolder": "eventbridge-schedule-ssm-cdk-go",
-        "templateFile": "eventbridge-schedule-ssm-cdk-go.go"
+      "templateFile": "eventbridge-schedule-ssm-cdk-go.go"
     }
   },
   "resources": {
@@ -59,7 +56,7 @@
     {
       "name": "Hoi Wing Chan",
       "bio": "Hoi Wing is a Technical Account Manager at Amazon Web Services with a background of software development and architecture.",
-      "linkedin": "https://www.linkedin.com/in/wing-chan-0943a344"
+      "linkedin": "wing-chan-0943a344"
     }
   ]
 }

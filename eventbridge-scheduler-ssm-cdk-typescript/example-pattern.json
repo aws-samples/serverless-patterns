@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-scheduler-ssm-cdk-typescript",
-      "templateURL": "serverless-patterns/eventbridge-scheduler-ssm-cdk-typescript",
-      "projectFolder": "eventbridge-scheduler-ssm-cdk-typescript",
-      "templateFile": "eventbridge-scheduler-ssm-cdk-typescript/lib/eventbridge-scheduler-ssm-cdk-typescript-stack.ts"
+      "templateFile": "lib/eventbridge-scheduler-ssm-cdk-typescript-stack.ts"
     }
   },
   "resources": {

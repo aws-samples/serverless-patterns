@@ -1,0 +1,49 @@
+{
+  "title": "AWS AppSync to Amazon DynamoDB - SingleTable",
+  "description": "Create an AWS AppSync API endpoint with a custom resolver to Amazon DynamoDB using a single table design",
+  "language": "YAML",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template deploys an AppSync API, a DynamoDB table, a GraphQL schema and a custom resolver that demonstrates a Single Table design on Amazon DynamoDB that is formatted for AppSync."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "DynamoDB Office Hours - Building a Single Table Design SAM template for AWS AppSync",
+        "link": "https://youtu.be/I-L89SpoDxI"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Once the application is deployed, open the AppSync console at https://us-west-2.console.aws.amazon.com/appsync/home ensuring you are in the same region that the API was deployed to.",
+      "2. See the repo for additional testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/eric-johnson.json"
+  ]
+}

@@ -1,10 +1,10 @@
 # Manage a Batch Job
 
-This workflow use Step Functions, AWS Batch and AWS SNS Topics to start an batch job and send a notification with the status of the job execution via SNS. This sample project creates the following:
+This workflow use Step Functions, AWS Batch and Amazon SNS Topics to start an batch job and send a notification with the status of the job execution via SNS. This sample project creates the following:
 
 * An AWS Batch job
 * An Amazon SNS topic
-* AWS Step Function
+* AWS Step Functions
 * Related AWS Identity and Access Management (IAM) roles
 
 Learn more about this workflow at Step Functions workflows collection: https://docs.aws.amazon.com/step-functions/latest/dg/batch-job-notification.html
@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) with version 1.x installed (this pattern has been tested with version 1.15)
 
 ## Deployment Instructions
 

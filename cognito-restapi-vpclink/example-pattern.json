@@ -1,0 +1,57 @@
+{
+  "title": "Amazon Cognito to Amazon API Gateway private REST API",
+  "description": "Create an API Gateway private REST API with private integration.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template implements an Amazon API Gateway private REST API with private integration. It can be used if you have a private API inside a VPC which is currently open to unauthenticated clients and you want to protect it by adding an authentication and authorization layer without having to modify the API itself.",
+      "The template creates a private REST API in Amazon API Gateway which sits in front of the original backend API. Requests will go through the API Gateway endpoint and will be authorized using a Cognito authorizer. The integration with the backend resource is done via a VPC link to connect to private resources inside the VPC. The API Gateway API is configured with a greedy proxy (\"{proxy+}\") which means that everything in the URL path will be passed to the backend without any modification. The API has an \"ANY\" method to accept all methods such as GET or POST. Finally, the OPTIONS method is configured so that the API can process preflight requests from browsers making cross-origin requests (CORS)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "Understanding VPC links in Amazon API Gateway private integrations",
+        "link": "https://aws.amazon.com/blogs/compute/understanding-vpc-links-in-amazon-api-gateway-private-integrations/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/jose-e-montilla-l.json"
+  ]
+}

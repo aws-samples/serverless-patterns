@@ -18,14 +18,14 @@ data "archive_file" "lambda_code_in_zip_format" {
 
 # Define a Lambda function.
 #
-# The handler is the name of the executable for go1.x runtime.
+# The provided.al2023 runtime runs the executable named bootstrap.
 resource "aws_lambda_function" "kinesis_stream_lambda" {
   depends_on = [ data.archive_file.lambda_code_in_zip_format ]
   function_name    = "error_handling_function"
   filename         = "${path.module}/src/kinesis-stream.zip"
-  handler          = "kinesis_stream"
+  handler          = "bootstrap"
   role             = aws_iam_role.iam_role_for_lambda.arn
-  runtime          = "go1.x"
+  runtime          = "provided.al2023"
   memory_size      = 128
   timeout          = 10
 }

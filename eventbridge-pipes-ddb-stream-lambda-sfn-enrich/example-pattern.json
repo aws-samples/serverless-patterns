@@ -1,5 +1,5 @@
 {
-  "title": "DynamoDB Stream to AWS Lambda with Step Function Event Enrichment",
+  "title": "Amazon DynamoDB Stream to AWS Lambda with Step FunctionsEvent Enrichment",
   "description": "This pattern triggers a Lambda function from a DynamoDB Stream with Step functions enrichment in between them using EventBridge Pipes.",
   "language": "Python",
   "level": "200",
@@ -7,21 +7,18 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "DynamoDB Streams events are sent to Step Function workflow, the workflow enriches the event and forwards them onto the Lambda function"
+      "DynamoDB Streams events are sent to Step Functionsworkflow, the workflow enriches the event and forwards them onto the Lambda function"
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-ddb-stream-lambda-sfn-enrich",
-      "templateURL": "serverless-patterns/eventbridge-pipes-ddb-stream-lambda-sfn-enrich",
-      "projectFolder": "eventbridge-pipes-ddb-stream-lambda-sfn-enrich",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -32,10 +29,13 @@
   },
   "deploy": {
     "text": [
-        "sam deploy --guided"    ]
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
     "text": [
@@ -43,11 +43,11 @@
     ]
   },
   "authors": [
-      {
-        "name": "Sayan Moitra",
-        "image": "./smoitra.png",
-        "bio": "Sayan is a Solutions Architect at Amazon Web Services based in India.",
-        "linkedin": "sayanmoitra"
-      }
+    {
+      "name": "Sayan Moitra",
+      "bio": "Sayan is a Solutions Architect at Amazon Web Services based in India.",
+      "image": "./smoitra.png",
+      "linkedin": "sayanmoitra"
+    }
   ]
 }

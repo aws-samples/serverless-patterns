@@ -1,5 +1,5 @@
 {
-  "title": "EventBridge Scheduler to send messages to Amazon SQS",
+  "title": "Amazon EventBridge Scheduler to send messages to Amazon SQS",
   "description": "Simple pattern that publishes a message to an SQS queue every 5 minutes",
   "language": "Python",
   "level": "200",
@@ -12,9 +12,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-schedule-to-sqs-cdk-python",
-      "templateURL": "serverless-patterns/eventbridge-schedule-to-sqs-cdk-python",
-      "projectFolder": "eventbridge-schedule-to-sqs-cdk-python",
       "templateFile": "eventbridge_schedule_to_sqs_cdk_python/eventbridge_schedule_to_sqs_cdk_python_stack.py"
     }
   },

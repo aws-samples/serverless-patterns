@@ -1,8 +1,8 @@
 {
   "title": "AWS Lambda function using JBang",
-  "description": "Create a Java Lambda function using JBang",
+  "description": "Create a Java Lambda function using JBang.",
   "language": "Java",
-  "level": "200",
+  "level": "100",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
@@ -12,10 +12,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-jbang",
-      "templateURL": "serverless-patterns/lambda-jbang",
-      "projectFolder": "lambda-jbang",
-      "templateFile": "template.yaml"
+      "templateFile": "template.yml"
     }
   },
   "resources": {
@@ -32,26 +29,28 @@
   },
   "deploy": {
     "text": [
-      "<code>sam deploy --guided --stack-name lambda-jbang</code>"
+      "sam deploy --guided"
     ]
   },
   "testing": {
+    "headline": "Testing",
     "text": [
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
+    "headline": "Cleanup",
     "text": [
-      "Delete the stack: <code>sam delete --stack-name lambda-jbang</code>.",
-      "Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'lambda-jbang')].StackStatus\"</code>"
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },
   "authors": [
     {
       "name": "Marcin Szałomski",
       "bio": "Software Architect at Hapag-Lloyd AG",
-      "twitter": "baldram",
-      "linkedin": "https://www.linkedin.com/in/marcin-szalomski/"
+      "linkedin": "marcin-szalomski",
+      "twitter": "baldram"
     }
   ]
 }

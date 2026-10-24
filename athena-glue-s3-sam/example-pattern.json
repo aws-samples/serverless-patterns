@@ -1,22 +1,19 @@
 {
-  "title": "Querying Amazon S3 Express One Zone directory bucket using Amazon Athena",
-  "description": "This sample project demonstrates how to query Amazon S3 Express One Zone directory bucket using Amazon Athena.",
+  "title": "Amazon Athena to Amazon S3 Express One Zone",
+  "description": "How to query Amazon S3 Express One Zone directory bucket using Amazon Athena.",
   "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "Catalog the Amzon S3 Express One Zone directory bucket using AWS Glue Data Catalog.",
+      "Catalog the Amazon S3 Express One Zone directory bucket using AWS Glue Data Catalog.",
       "Upload your data to Amzon S3 Express One Zone storage.",
       "Query the data using Amazon Athena."
     ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/athena-glue-s3-sam",
-      "templateURL": "serverless-patterns/athena-glue-s3-sam",
-      "projectFolder": "athena-glue-s3-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -44,16 +41,16 @@
   },
   "cleanup": {
     "text": [
-      "Delete the Amazon S3 Input Express One Zone bucket content: <code>aws s3 rm s3://{MyInputBucketExpressOneZone} --recursive</code> --region {my-region}",
-      "Delete the Amazon S3 Output Express One Zone bucket content: <code>aws s3 rm s3://{MyOutputBucketExpressOneZone} --recursive</code> --region {my-region}",
+      "Delete the Amazon S3 Input Express One Zone bucket content: <code>aws s3 rm s3://{MyInputBucketExpressOneZone} --recursive --region {my-region}</code>",
+      "Delete the Amazon S3 Output Express One Zone bucket content: <code>aws s3 rm s3://{MyOutputBucketExpressOneZone} --recursive --region {my-region}</code>",
       "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
     {
       "name": "Biswanath Mukherjee",
-      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
       "linkedin": "biswanathmukherjee"
     }
   ]

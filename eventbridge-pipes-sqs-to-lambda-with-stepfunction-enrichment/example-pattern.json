@@ -1,18 +1,23 @@
 {
-  "title": "SQS to Lambda with Step Functions event enrichment",
-  "description": "This pattern triggers a Lambda function from an SQS queue with Step functions enrichment inbetween them using EventBridge Pipes",
-  "language": "",
+  "title": "Amazon SQS to AWS Lambda with AWS Step Functions enrichment",
+  "description": "SQS to Lambda with Step functions enrichment using EventBridge Pipes",
+  "language": "YAML",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
-    "text": ["SQS queue is polled and messages are sent to Step Function workflow, the workflow enriches the event and forwards them onto the Lambda function"]
+    "text": [
+      "SQS queue is polled and messages are sent to Step Functionsworkflow, the workflow enriches the event and forwards them onto the Lambda function",
+      "<h5>How the pattern works</h5>",
+      "EventBridge pipe polls SQS messages and delivers them to the Lambda function with enriched information from a Step Functionsworkflow.",
+      "This example uses DynamoDB to enrich the message flowing through the pipe. The `order_id` is read from the SQS message and used to look up order information for the downstream Lambda function.",
+      "<h5>Important enrichment facts to know</h5>",
+      "1. If you don't want targets to get hit from enrichment you need to return an empty value <a href='https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html#pipes-enrichment'>(more info in docs)</a>",
+      "2. Make sure you return an array from your enrichment so pipes knows how to trigger your target. Data flowing from enrichment to target must be an array"
+    ]
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment",
-      "templateURL": "serverless-patterns/eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment",
-      "projectFolder": "eventbridge-pipes-sqs-to-lambda-with-stepfunction-enrichment",
       "templateFile": "template.yaml"
     }
   },
@@ -23,7 +28,7 @@
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
       },
       {
-        "text": "Cloudformation API for Pipes",
+        "text": "CloudFormation API for Pipes",
         "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
       },
       {
@@ -37,19 +42,25 @@
     ]
   },
   "deploy": {
-    "text": ["sam deploy --guided"]
+    "text": [
+      "sam deploy --guided"
+    ]
   },
   "testing": {
-    "text": ["See the README in the GitHub repo for detailed testing instructions."]
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>sam delete</code>."]
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
   },
   "authors": [
     {
       "name": "David Boyne",
-      "image": "../assets/images/resources/dboyne.png",
-      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless."
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
     }
   ]
 }

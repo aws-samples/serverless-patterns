@@ -1,0 +1,54 @@
+{
+  "title": "AWS Step Functions to AWS Step Functions",
+  "description": "Creates a Step Functions workflow to launch another state machine execution",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an AWS Step Functions state machine to build a modular system.",
+      "An outer Step Functionsis used to orchestrate several inner Step Functions. Each inner Step Functionsproduces an output identical with the input and each one can be used to do a specific job (a synchronous or asynchronous job).",
+      "Having the output identical with the output makes it a interlocking block and allows to assemble multiple blocks together, in any order, to produce the required output.",
+      "The outer Step Functionswill trigger the inner Step Functions, one by one, and waits for each one to finish before continuing. A sample inner Step Functionsis provided which has a single task of type Pass. Replace it with your own Step Function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "sfn_inside_sfn_cdk/sfn_inside_sfn_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/corneliu-croitoru.json"
+  ]
+}
