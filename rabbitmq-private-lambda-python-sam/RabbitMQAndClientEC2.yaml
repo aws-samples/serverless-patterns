@@ -586,6 +586,8 @@ Resources:
             sed -i "s/RABBITMQ_SUBNET_THREE/$RABBITMQ_SUBNET_THREE/g" template.yaml
             sed -i "s/SECURITY_GROUP/$SECURITY_GROUP/g" template.yaml
             sed -i "s/PYTHON3_VERSION/$PYTHON3_VERSION/g" template.yaml
+            sed -i "s|PERMISSIONS_BOUNDARY_ARN|${SamFunctionPermissionsBoundary}|g" template.yaml
+            sed -i "s|ROLE_PATH|/${AWS::StackName}/|g" template.yaml
 
             #Update Shell script for sending RabbitMQ messages to Lambda function
             cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-python-sam/rabbitmq_message_sender_json
@@ -713,21 +715,40 @@ Resources:
                   - lambda:GetEventSourceMapping
                   - lambda:UpdateEventSourceMapping
                 Resource: '*'
-              - Sid: IAMRoleManagement
+              - Sid: ManageSamFunctionRolesWithBoundary
                 Effect: Allow
                 Action:
                   - iam:CreateRole
-                  - iam:DeleteRole
-                  - iam:GetRole
-                  - iam:PassRole
-                  - iam:AttachRolePolicy
-                  - iam:DetachRolePolicy
                   - iam:PutRolePolicy
                   - iam:DeleteRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PermissionsBoundary': !Ref SamFunctionPermissionsBoundary
+              - Sid: ReadAndDeleteSamFunctionRoles
+                Effect: Allow
+                Action:
+                  - iam:GetRole
                   - iam:GetRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:ListAttachedRolePolicies
                   - iam:TagRole
                   - iam:UntagRole
-                Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+                  - iam:DeleteRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+              - Sid: PassSamFunctionRolesToLambda
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PassedToService': lambda.amazonaws.com
+              - Sid: DenyPassingOtherRoles
+                Effect: Deny
+                Action: iam:PassRole
+                NotResource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
               - Sid: S3ArtifactAccess
                 Effect: Allow
                 Action:
@@ -816,6 +837,41 @@ Resources:
                 }
             ]
         }'
+
+  SamFunctionPermissionsBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions boundary for the Lambda function roles that sam deploy creates from the client instance
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - mq:DescribeBroker
+              - secretsmanager:GetSecretValue
+              - dynamodb:GetItem
+              - dynamodb:DeleteItem
+              - dynamodb:PutItem
+              - dynamodb:Scan
+              - dynamodb:Query
+              - dynamodb:UpdateItem
+              - dynamodb:BatchWriteItem
+              - dynamodb:BatchGetItem
+              - dynamodb:DescribeTable
+              - dynamodb:ConditionCheckItem
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - ec2:CreateNetworkInterface
+              - ec2:DescribeNetworkInterfaces
+              - ec2:DeleteNetworkInterface
+              - ec2:DetachNetworkInterface
+              - ec2:AssignPrivateIpAddresses
+              - ec2:UnassignPrivateIpAddresses
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: '*'
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile

@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - AWS Lambda Web Function behind Amazon CloudFront with
+  Origin Access Control (SAM). The endpoint accepts only SigV4-signed requests,
+  CloudFront signs every origin request through an OAC of type lambda, and a
+  resource policy lets exactly one distribution invoke the endpoint.
+
+Parameters:
+  CodeBucket:
+    Type: String
+    Description: >
+      Name of an existing, versioning-enabled S3 bucket in this Region that
+      holds function.zip. Its bucket policy must grant lambda.amazonaws.com
+      s3:GetObject and s3:GetObjectVersion. See the README for the setup.
+  CodeKey:
+    Type: String
+    Default: lambda-web-cloudfront-oac-sam/function.zip
+    Description: S3 key of the uploaded function.zip.
+
+Resources:
+  # One AWS::Serverless::WebFunction expands into AWS::Lambda::WebFunction,
+  # an immutable AWS::Lambda::WebFunctionRevision (code + configuration) and
+  # an AWS::Lambda::WebFunctionEndpoint routed 100% to that revision, plus a
+  # logs-only execution role because ExecutionRoleArn is not set. The
+  # generated logical IDs are WebFunctionRevision and WebFunctionEndpoint.
+  WebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      # Function names are unique per account across Regions. The stack name
+      # is also used for the OAC, the distribution comment and the log group.
+      FunctionName: !Ref AWS::StackName
+      Runtime: nodejs24.x
+      CodeUri:
+        Bucket: !Ref CodeBucket
+        Key: !Ref CodeKey
+      Timeout: 30
+      # IamAuth from creation: Lambda returns 403 to any request that is not
+      # SigV4-signed, before the application code runs. The endpoint is never
+      # public. (ApplicationManaged would make it open to anyone with the URL.)
+      AuthType: IamAuth
+      EndpointName: dev
+      EndpointType: HomeRegion
+      AutoDeploymentMode: LatestRevision
+      LoggingConfig:
+        LogGroup: !Sub /aws/lambda/web/${AWS::StackName}
+
+  # CloudFront signs each origin request with its own credentials. For Web
+  # Function origins the type must be `lambda` and the behavior must be
+  # `always-amz-auth`; CloudFront rejects `always` for this origin type.
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Ref AWS::StackName
+        Description: !Sub Signs CloudFront requests to the ${AWS::StackName} web function
+        OriginAccessControlOriginType: lambda
+        SigningProtocol: sigv4
+        SigningBehavior: always-amz-auth
+
+  # Cache key = path + query string + the viewer's Authorization header. The
+  # managed CachingOptimized policy leaves query strings and Authorization out
+  # of the key, and CloudFront forwards Authorization to the origin only when
+  # the cache policy includes it. This policy keeps CachingOptimized's TTLs and
+  # compression and adds both, so each signed-in viewer gets their own entries.
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Ref AWS::StackName
+        Comment: Path, query string and Authorization header in the cache key
+        MinTTL: 1
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Authorization
+          CookiesConfig:
+            CookieBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: all
+
+  # CloudFront is a global service; the distribution is created from this
+  # stack's Region like any other resource. Origin = the endpoint domain.
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Ref AWS::StackName
+        Enabled: true
+        HttpVersion: http2and3
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: web-function
+            DomainName: !GetAtt WebFunctionEndpoint.DomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+        DefaultCacheBehavior:
+          TargetOriginId: web-function
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          CachePolicyId: !Ref CachePolicy
+          # Managed AllViewerExceptHostHeader: forward viewer headers and query
+          # string, but keep the origin's Host header. Lambda routes on Host.
+          OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+
+  # The SigV4 signature proves the caller is CloudFront; this policy decides
+  # which distribution. Another distribution, even with the same OAC and
+  # origin, gets 403. The policy is attached to the function and scoped to
+  # the `dev` endpoint. ResourceArn is the web-function ARN (the template
+  # reference documents it as FunctionResourceArn, which does not exist).
+  EndpointResourcePolicy:
+    Type: AWS::Lambda::ResourcePolicy
+    Properties:
+      ResourceArn: !GetAtt WebFunction.FunctionArn
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: lambda:InvokeWebFunctionEndpoint
+            Resource: !GetAtt WebFunctionEndpoint.EndpointArn
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+
+Outputs:
+  CloudFrontUrl:
+    Description: Public URL. Requests reach the function only through here.
+    Value: !Sub https://${Distribution.DomainName}
+  OriginUrl:
+    Description: The function's own endpoint. Unsigned requests get 403.
+    Value: !Sub https://${WebFunctionEndpoint.DomainName}
+  DistributionId:
+    Description: CloudFront distribution id (the only one allowed by the resource policy)
+    Value: !Ref Distribution
+  FunctionArn:
+    Description: ARN of the Lambda Web Function
+    Value: !GetAtt WebFunction.FunctionArn
+  LogGroupName:
+    Description: CloudWatch Logs group the web function writes to
+    Value: !Sub /aws/lambda/web/${AWS::StackName}

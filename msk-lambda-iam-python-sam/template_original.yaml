@@ -9,6 +9,8 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
+    PermissionsBoundary: PERMISSIONS_BOUNDARY_ARN
+    RolePath: ROLE_PATH
     Timeout: 15
 
 Resources:
