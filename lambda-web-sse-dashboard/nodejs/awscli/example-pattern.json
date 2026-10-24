@@ -1,0 +1,60 @@
+{
+  "title": "Real-time metrics dashboard with Server-Sent Events on AWS Lambda Web Functions",
+  "description": "Stream live metrics to the browser over server-sent events (SSE) from a zero-dependency Node.js HTTP server running as an AWS Lambda Web Function.",
+  "language": "Node.js",
+  "level": "200",
+  "highlight": "true",
+  "framework": "AWS CLI",
+  "patternGroup": "lambda-web-sse-dashboard",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a plain Node.js HTTP server as an AWS Lambda Web Function. It has no framework, no dependencies, and no build step. The server streams a metrics snapshot to the browser every 2 seconds over a single SSE connection that stays open.",
+      "A web function runs a real server process. The runtime passes the listen address in the <code>AWS_LAMBDA_HTTP_ENDPOINT</code> environment variable, and the server listens on it as it would anywhere else. Because the process stays alive between requests, it can hold long-lived connections open and push data to the client, which the Lambda event model cannot do.",
+      "The dashboard reports values the process measures about itself: execution environment uptime, CPU time consumed, open SSE connections, and the serving Region. Select Generate CPU load to run about 1.5 seconds of SHA-256 hashing and watch CPU time climb and fall back. The environment stays up for minutes while using a fraction of a second of CPU, because you pay for active CPU time, not time spent waiting.",
+      "Each execution environment handles many concurrent requests (64 by default, up to 128). As environments near that limit, Lambda adds more and scales back to zero when traffic falls. Optionally, deploy a second <code>MultiRegion</code> endpoint to get one global URL that uses Amazon Route 53 latency-based routing to serve each request from the nearest Region."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "patternPath": "lambda-web-sse-dashboard/nodejs/awscli",
+      "templateFile": "index.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html"
+      },
+      {
+        "text": "Using Server-Sent Events (MDN)",
+        "link": "https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events"
+      },
+      {
+        "text": "AWS Lambda pricing",
+        "link": "https://aws.amazon.com/lambda/pricing/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "aws lambda-web deploy --name lambda-web-sse-dashboard --code . --timeout-seconds 900"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the function and its endpoints: <code>aws lambda-web delete-web-function --function-name lambda-web-sse-dashboard</code>.",
+      "See the GitHub repo for removing the execution role and log groups."
+    ]
+  },
+  "contributors": [
+    "content/contributors/julian-wood.json"
+  ]
+}
