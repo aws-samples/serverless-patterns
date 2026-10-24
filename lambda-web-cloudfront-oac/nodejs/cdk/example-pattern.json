@@ -1,0 +1,61 @@
+{
+  "title": "AWS Lambda Web Function behind Amazon CloudFront with Origin Access Control",
+  "description": "Serve a Lambda Web Function only through a CloudFront distribution: an IamAuth endpoint, an OAC that signs origin requests, and a resource policy that trusts one distribution.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "patternGroup": "lambda-web-cloudfront-oac",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a plain Node.js HTTP server as an AWS Lambda Web Function and puts an Amazon CloudFront distribution in front of it. The function's endpoint uses the <code>IamAuth</code> authentication type, so Lambda accepts only requests signed with AWS Signature Version 4 and returns 403 to everything else before your code runs.",
+      "CloudFront signs each origin request through an Origin Access Control of type <code>lambda</code> with <code>SigningBehavior: always-amz-auth</code>. A resource policy on the function allows <code>lambda:InvokeWebFunctionEndpoint</code> for the CloudFront service principal only when <code>AWS:SourceArn</code> matches your distribution, so a different distribution using the same origin is also denied.",
+      "After validating the signature, Lambda removes the Authorization header it used and forwards the viewer's own headers, so the application has no authentication code of its own and existing sign-in flows keep working. The app returns <code>Cache-Control</code> headers that CloudFront honours, which the pattern uses to show edge caching.",
+      "With CloudFront in front you can add a custom domain, AWS WAF, compression and caching to a Web Function without changing the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/lambda-web-cloudfront-oac-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Web Functions networking",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-networking.html"
+      },
+      {
+        "text": "Lambda Web Function endpoint access control",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-endpoint-access-control.html"
+      },
+      {
+        "text": "Restricting access to an origin with CloudFront Origin Access Control",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-origin.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Run <code>npm install</code>, then <code>cdk deploy</code> in the pattern directory (bootstrap the account and Region first if needed).",
+      "The stack creates the versioned code bucket, uploads the application, and defines the Web Function, its revision and <code>IamAuth</code> endpoint, the OAC, a cache policy that forwards the viewer's Authorization header, the CloudFront distribution and the resource policy."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Run <code>cdk destroy</code>. The stack disables and deletes the distribution and the cache policy, empties and deletes the code bucket and removes the log group."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jon Loinaz Anton",
+      "bio": "Enterprise Solutions Architect at AWS based in Spain, helping large organizations adopt serverless and generative AI.",
+      "linkedin": "jonloinaz"
+    }
+  ]
+}
