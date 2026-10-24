@@ -4,9 +4,9 @@ This pattern is an example of a Lambda function written in Java that consumes me
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- rabbitmq_consumer_dynamo_sam/rabbit_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (RabbitMQ) messages and write them to an Amazon DynamoDB table
-- rabbit_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (RabbitMQ cluster)
-- rabbit_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
+- rabbitmq_consumer_dynamo_sam/rabbitmq_event_consumer_function/src/main/java - Code for the application's Lambda function that will listen for Amazon MQ (RabbitMQ) messages and write them to an Amazon DynamoDB table
+- rabbitmq_message_sender_json/src/main/java - Code for publishing messages with JSON payload into an Amazon MQ (RabbitMQ cluster)
+- rabbitmq_consumer_dynamo_sam/template_original.yaml - A template that defines the application's Lambda function to be used by SAM to deploy the lambda function
 - RabbitMQAndClientEC2.yaml - An AWS CloudFormation template file that can be used to deploy an Amazon MQ (RabbitMQ) cluster and also deploy an EC2 instance with all pre-requisities already installed, so you can directly build and deploy the lambda function and test it out.
 - create_rabbit_queue.sh - A shell script that can be used to connect to the Amazon MQ (RabbitMQ) brokers to create virtualhosts, exchanges and queues, required for the lambda functions event listener
 
@@ -39,7 +39,7 @@ We cloned the serverless-patterns Github repository on the EC2 instance already 
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/rabbit-private-lambda-java-sam
+    cd serverless-patterns/rabbitmq-private-lambda-java-sam
     ```
 
 ## Use the SAM CLI to build and deploy the lambda function
@@ -47,11 +47,11 @@ Change directory to the pattern directory:
 Build your application with the `sam build` command.
 
 ```bash
-cd rabbit_consumer_dynamo_sam
+cd rabbitmq_consumer_dynamo_sam
 sam build
 ```
 
-The SAM CLI installs dependencies defined in `rabbitmq_consumer_dynamo_sam/rabbit_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
+The SAM CLI installs dependencies defined in `rabbitmq_consumer_dynamo_sam/rabbitmq_event_consumer_function/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 ## Test the build locally
 
@@ -272,7 +272,8 @@ The sam deploy command will package and deploy your application to AWS, with a s
 * **Parameter Subnet3**: The third of the three private subnets where the Amazon MQ (RabbitMQ) cluster is deployed
 * **Parameter SecurityGroup**: The security group of the lambda function. This can be the same as the security group of the EC2 instance that was created by the AWS CloudFormation template
 * **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
+* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. In this example, each Lambda function role allows only the actions that function uses, and also carries the permissions boundary `SamFunctionPermissionsBoundary` that the EC2 stack creates. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
+* **Note on IAM permissions**: The EC2 instance role can create IAM roles only under a role path named after the EC2 stack, and only with the permissions boundary attached. It can't grant itself or other roles more access than the boundary allows. The instance role still has broad access to AWS Lambda, AWS CloudFormation and Amazon S3 so that it can run `sam deploy`. Deploy this example in a test account, limit who can connect to the instance, and delete both stacks when you finish testing.
 * **Disable rollback**: Defaults to No and it preserves the state of previously provisioned resources when an operation fails
 * **Save arguments to configuration file**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
 * **SAM configuration file [samconfig.toml]**: Name of the configuration file to store configuration information locally
@@ -289,7 +290,7 @@ Once the lambda function is deployed, send some messages to the Amazon MQ (Rabbi
 
 For your convenience, a Java program and a shell script has been created on the EC2 instance that was provisioned using AWS CloudFormation.
 ```
-cd /home/ec2-user/serverless-patterns/rabbit-private-lambda-java-sam/rabbit_message_sender_json
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_message_sender_json
 chmod +x commands.sh
 ```
 
@@ -337,7 +338,7 @@ aws dynamodb scan --table-name RabbitMQDynamoDBTableJava --select "COUNT"
 You can first clean-up the Lambda function by running the `sam delete` command
 
 ```
-cd /home/ec2-user/serverless-patterns/rabbit-private-lambda-java-sam/rabbit_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/rabbitmq-private-lambda-java-sam/rabbitmq_consumer_dynamo_sam
 sam delete
 
 ```
