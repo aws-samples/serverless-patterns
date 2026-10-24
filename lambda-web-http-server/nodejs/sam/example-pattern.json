@@ -1,0 +1,62 @@
+{
+  "title": "Node.js HTTP server on AWS Lambda Web Functions",
+  "description": "Run a zero-dependency Node.js http.createServer app as a Lambda Web Function with a public HTTPS endpoint, using AWS SAM.",
+  "language": "Node.js",
+  "level": "100",
+  "highlight": "true",
+  "framework": "AWS SAM",
+  "patternGroup": "lambda-web-http-server",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys the smallest possible Lambda Web Function: a Node.js server built with the standard <code>http</code> module and no dependencies. Lambda Web Functions run a long-lived HTTP server in an execution environment and forward requests to it directly, so the code has no Lambda handler, no event object and no response mapping. The same <code>index.js</code> runs locally with <code>node index.js</code> and on AWS without changes.",
+      "The application reads the address it must listen on from the <code>AWS_LAMBDA_HTTP_ENDPOINT</code> environment variable, which the runtime sets to <code>0.0.0.0:3000</code>, and falls back to that value when the variable is absent (local development). Each execution environment serves many requests concurrently on one process, so the app keeps in-memory counters (active requests, peak concurrency, total requests) and returns them in every JSON response. Sending parallel requests makes the concurrency model visible: the counters grow per execution environment, and a second execution environment starts from zero. On <code>SIGTERM</code> the server closes gracefully.",
+      "A single <code>AWS::Serverless::WebFunction</code> resource in the SAM template expands into three CloudFormation resources: <code>AWS::Lambda::WebFunction</code> (the function), <code>AWS::Lambda::WebFunctionRevision</code> (an immutable snapshot of code plus configuration, referencing a zip in a versioning-enabled S3 bucket) and <code>AWS::Lambda::WebFunctionEndpoint</code> (the HTTPS endpoint, routed 100% to that revision). SAM also generates the execution role with CloudWatch Logs permissions and writes logs to the log group named in <code>LoggingConfig</code>.",
+      "The endpoint uses <code>AuthType</code> <code>ApplicationManaged</code>, which makes it publicly reachable: the application owns authentication, input validation and rate limiting. Switch to <code>IamAuth</code> to accept only SigV4-signed requests. <code>EndpointType</code> <code>HomeRegion</code> creates a single regional endpoint; <code>MultiRegion</code> and <code>PerRegion</code> replicate it to other Regions.",
+      "Deploying a change means uploading a new zip under a new S3 key and deploying again: CloudFormation creates a new immutable revision only when the revision's properties change, so re-deploying with an unchanged key reports no changes. Because the endpoint uses <code>AutoDeploymentMode</code> <code>LatestRevision</code>, traffic moves to the new revision as soon as it is active; for weighted canaries between two revisions, set <code>AutoDeploymentMode</code> <code>Disabled</code> and <code>RevisionWeights</code> instead."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Serverless Application Model (SAM) documentation",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
+      },
+      {
+        "text": "Node.js http module",
+        "link": "https://nodejs.org/api/http.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name lambda-web-http-server-sam</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jon Loinaz Anton",
+      "bio": "Enterprise Solutions Architect at AWS based in Spain, helping large organizations adopt serverless and generative AI.",
+      "linkedin": "jonloinaz"
+    }
+  ]
+}

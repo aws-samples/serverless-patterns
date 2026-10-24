@@ -12,7 +12,7 @@ export class SfnBedrockInvokemodelStack extends cdk.Stack {
 
     const modelId = new cdk.CfnParameter(this, "BedrockModelId", {
       type: "String",
-      default: "us.anthropic.claude-sonnet-4-20250514-v1:0",
+      default: "us.anthropic.claude-sonnet-4-6",
       description: "Bedrock inference profile model ID",
     });
 

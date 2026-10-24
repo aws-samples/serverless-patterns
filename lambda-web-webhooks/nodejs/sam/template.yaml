@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - Webhook ingestion on AWS Lambda Web Functions (SAM).
+  Express app that verifies HMAC-SHA256 signatures (Stripe, GitHub, generic)
+  and stores each event once in Amazon DynamoDB.
+
+Parameters:
+  CodeBucket:
+    Type: String
+    Description: >
+      Name of an existing, versioning-enabled S3 bucket in this Region that
+      holds function.zip. Its bucket policy must grant lambda.amazonaws.com
+      s3:GetObject and s3:GetObjectVersion. See the README for the setup.
+  CodeKey:
+    Type: String
+    Default: lambda-web-webhooks-sam/function.zip
+    Description: S3 key of the uploaded function.zip.
+  StripeWebhookSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    Description: Signing secret shown by Stripe for the webhook endpoint. No default; at least 16 characters.
+  GitHubWebhookSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    Description: Secret configured on the GitHub webhook. No default; at least 16 characters.
+  GenericWebhookSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    Description: Shared secret for the generic x-webhook-signature provider. No default; at least 16 characters.
+  EnableTestEndpoint:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    Description: >
+      Expose POST /test/fire, which signs a sample payload with the real
+      secret. Set 'true' only for the test walkthrough; keep 'false' wherever
+      real providers call the endpoint.
+
+Resources:
+  # Events table keyed by "<provider>:<event id>". TTL expires old events.
+  EventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: eventId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: eventId
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      SSESpecification:
+        SSEEnabled: true
+
+  # Execution role: CloudWatch Logs plus the three DynamoDB actions used,
+  # scoped to the table ARN.
+  WebFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: EventsTableAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Scan
+                Resource: !GetAtt EventsTable.Arn
+
+  # One AWS::Serverless::WebFunction expands into AWS::Lambda::WebFunction,
+  # AWS::Lambda::WebFunctionRevision (immutable code + config) and
+  # AWS::Lambda::WebFunctionEndpoint (HTTPS endpoint, 100% to that revision).
+  WebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      CodeUri:
+        Bucket: !Ref CodeBucket
+        Key: !Ref CodeKey
+      Timeout: 30
+      # Webhook providers call this URL directly, so the endpoint must be
+      # public. Authentication is the HMAC signature verified by the app.
+      AuthType: ApplicationManaged
+      EndpointType: HomeRegion
+      AutoDeploymentMode: LatestRevision
+      ExecutionRoleArn: !GetAtt WebFunctionRole.Arn
+      EnvironmentVariables:
+        TABLE_NAME: !Ref EventsTable
+        EVENT_TTL_DAYS: '30'
+        ENABLE_TEST_ENDPOINT: !Ref EnableTestEndpoint
+        STRIPE_WEBHOOK_SECRET: !Ref StripeWebhookSecret
+        GITHUB_WEBHOOK_SECRET: !Ref GitHubWebhookSecret
+        GENERIC_WEBHOOK_SECRET: !Ref GenericWebhookSecret
+      LoggingConfig:
+        LogGroup: !Sub /aws/lambda/web/${AWS::StackName}
+
+Outputs:
+  EndpointDomainName:
+    Description: HTTPS domain of the Lambda Web Function endpoint (webhook URL base)
+    Value: !GetAtt WebFunctionEndpoint.DomainName
+  FunctionArn:
+    Description: ARN of the Lambda Web Function
+    Value: !GetAtt WebFunction.FunctionArn
+  TableName:
+    Description: DynamoDB table holding the received events
+    Value: !Ref EventsTable
+  LogGroupName:
+    Description: CloudWatch Logs group the web function writes to
+    Value: !Sub /aws/lambda/web/${AWS::StackName}

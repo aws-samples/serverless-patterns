@@ -1,0 +1,12 @@
+{
+  "name": "lambda-web-sse-dashboard-sam",
+  "version": "1.0.0",
+  "description": "Real-time metrics dashboard using Server-Sent Events on AWS Lambda Web Functions (zero dependencies)",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "license": "MIT-0"
+}
