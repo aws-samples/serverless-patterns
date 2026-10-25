@@ -1,0 +1,66 @@
+{
+  "title": "Amazon EventBridge Scheduler schedule groups with tagging to Amazon SQS",
+  "description": "Organize EventBridge Scheduler schedules into a tagged schedule group targeting an SQS queue, showing tagging and naming best practices.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates best practices for organizing and governing Amazon EventBridge Scheduler schedules using schedule groups and tags, deployed with the AWS Cloud Development Kit (AWS CDK) for TypeScript. Instead of placing every schedule in the account's built-in default group, it creates a dedicated, purpose-named schedule group and applies a consistent set of tags to that group at creation time.",
+      "A schedule group is the EventBridge Scheduler resource used to organize schedules, and every account can hold up to 500 of them. Tags are applied to the group rather than to individual schedules, so every schedule in the group shares the group's organizational context. This pattern tags the group with environment, owner, cost-center, and application keys, so the schedules can be governed and cost-allocated as a unit. Tagging at creation time avoids any window where the group exists untagged.",
+      "Tags are paired with an intentional schedule naming convention. Tag search across AWS is exact-match only and cannot match a prefix or substring, but the ListSchedules and ListScheduleGroups APIs accept a NamePrefix parameter. By naming schedules with a consistent, sliceable prefix such as payments-production-invoice-sweep, operators can list a whole domain or environment directly from the Scheduler API or CLI, while the group's tags carry governance and cost-allocation metadata. The naming convention and the tags are complementary, not redundant.",
+      "The pattern creates one schedule group, two schedules inside that group, and one Amazon SQS queue as a benign target. Each schedule assumes a least-privilege IAM role scoped to sqs:SendMessage on the single queue it targets, with a trust policy that allows only the EventBridge Scheduler service to assume it. Flexible time windows are explicitly disabled for deterministic behavior.",
+      "Because deleting a schedule group cascades to the schedules it contains, the group is the natural unit for lifecycle management: deleting the group removes all schedules in it. Tags must never contain personally identifiable information or other sensitive data, because tags are visible to many AWS services, including billing.",
+      "This pattern deploys one EventBridge Scheduler schedule group, two schedules, one SQS queue, and one IAM role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/eventbridge-schedule-group-tagging-cdk-typescript-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Managing a schedule group in EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule-group.html"
+      },
+      {
+        "text": "CreateScheduleGroup API reference (tag on create)",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/APIReference/API_CreateScheduleGroup.html"
+      },
+      {
+        "text": "Tagging your AWS resources",
+        "link": "https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html"
+      },
+      {
+        "text": "ListSchedules API reference (NamePrefix filtering)",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/APIReference/API_ListSchedules.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>. Deleting the schedule group cascades to all schedules in it."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Doug Scott",
+      "bio": "Douglas Scott is a Greater Boston-based Builder and Enterprise Support Lead at AWS with 20+ years of industry experience and has used AWS since 2009.",
+      "linkedin": "douglasdpscott",
+      "twitter": "sapintegrated"
+    }
+  ]
+}
