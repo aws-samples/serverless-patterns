@@ -1,5 +1,5 @@
 {
-  "name": "eventbridge-firehose-opensearch-cdk",
+  "name": "eventbridge-firehose-opensearch",
   "version": "1.0.0",
   "description": "Stream all EventBridge events to OpenSearch via Amazon Data Firehose for near real-time monitoring",
   "bin": {
