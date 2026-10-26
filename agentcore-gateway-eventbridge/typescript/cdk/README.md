@@ -59,7 +59,7 @@ The tradeoff is added network latency per emission, which is generally negligibl
 
 ```bash
 git clone https://github.com/aws-samples/serverless-patterns
-cd serverless-patterns/agentcore-gateway-eventbridge-cdk/cdk
+cd serverless-patterns/agentcore-gateway-eventbridge/typescript/cdk
 npm install
 cdk deploy
 ```

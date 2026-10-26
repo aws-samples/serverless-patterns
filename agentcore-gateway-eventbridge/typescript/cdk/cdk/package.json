@@ -1,5 +1,5 @@
 {
-  "name": "agentcore-gateway-eventbridge-cdk",
+  "name": "agentcore-gateway-eventbridge",
   "version": "1.0.0",
   "description": "AgentCore Runtime agent emits events to EventBridge via AgentCore Gateway MCP tool",
   "bin": {
