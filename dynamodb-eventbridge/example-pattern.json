@@ -1,6 +1,6 @@
 {
   "title": "Amazon DynamoDB to AWS Lambda to Amazon EventBridge",
-  "description": "Event-driven change data capture: send DynamoDB table changes to EventBridge via Lambda.",
+  "description": "Send DynamoDB table changes to EventBridge via Lambda.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",

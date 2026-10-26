@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway HTTP API to Amazon EventBridge",
-  "description": "Webhook and event ingestion: an HTTP API endpoint integrates directly with Amazon EventBridge, which routes events to AWS Lambda.",
+  "description": "Create an HTTP API endpoint that directly integrates with Amazon EventBridge",
   "language": "TypeScript",
   "level": "300",
   "framework": "Serverless Framework",

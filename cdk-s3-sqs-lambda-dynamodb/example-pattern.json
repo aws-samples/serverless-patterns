@@ -1,6 +1,6 @@
 {
   "title": "Process files uploaded to Amazon S3 with Amazon SQS, AWS Lambda and Amazon DynamoDB",
-  "description": "File processing for CSV uploads: store and process CSV files using Amazon S3, Amazon SQS, AWS Lambda and Amazon DynamoDB.",
+  "description": "Stores and process CSV data using Amazon S3, Amazon SQS, AWS Lambda and Amazon DynamoDB.",
   "language": "Python",
   "level": "200",
   "framework": "AWS CDK",

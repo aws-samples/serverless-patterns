@@ -1,6 +1,6 @@
 {
   "title": "Deploy AWS Lambda functions with container image",
-  "description": "File processing with a container image: an AWS Lambda function deployed from a container image runs when a new file is uploaded to an Amazon S3 bucket.",
+  "description": "This sample project demonstrates how to deploy an AWS Lambda function with a container image that gets triggered when a new object is created in an Amazon S3 bucket",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

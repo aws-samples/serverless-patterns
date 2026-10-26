@@ -1,6 +1,6 @@
 {
   "title": "Webhook ingestion on AWS Lambda Web Functions with Amazon DynamoDB",
-  "description": "Receive Stripe, GitHub and generic webhooks on a Lambda Web Function, verify HMAC-SHA256 signatures and store each event once in DynamoDB.",
+  "description": "Webhook receiver: receive Stripe, GitHub and generic webhooks on a Lambda Web Function, verify HMAC-SHA256 signatures and store each event once in DynamoDB.",
   "language": "Node.js",
   "level": "200",
   "highlight": "true",

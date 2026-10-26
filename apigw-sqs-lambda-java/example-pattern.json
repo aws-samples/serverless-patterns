@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway HTTP API to Amazon SQS to AWS Lambda",
-  "description": "Run background jobs in Java: an Amazon API Gateway HTTP API integrates with an Amazon SQS queue, and a Lambda worker processes the jobs asynchronously.",
+  "description": "Create an Amazon API Gateway HTTP API that integrates with an Amazon SQS queue.",
   "language": "Java",
   "level": "100",
   "framework": "AWS SAM",

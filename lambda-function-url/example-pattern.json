@@ -1,6 +1,6 @@
 {
   "title": "AWS Lambda function with a function URL",
-  "description": "Web app or API backend on AWS Lambda: create a Lambda function with a function URL, no API gateway needed.",
+  "description": "Create Lambda function with a URL",
   "language": "Node.js",
   "level": "100",
   "framework": "AWS SAM",

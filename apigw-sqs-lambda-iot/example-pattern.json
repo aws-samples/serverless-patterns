@@ -1,6 +1,6 @@
 {
   "title": "Asynchronous message processing with AWS Lambda and IoT Core",
-  "description": "Asynchronous background processing: API Gateway REST API integration with SQS, a Lambda worker, and IoT.",
+  "description": "API Gateway REST API integration with SQS, Lambda, and IoT",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

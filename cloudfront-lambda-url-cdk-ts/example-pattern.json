@@ -1,6 +1,6 @@
 {
   "title": "Amazon CloudFront to AWS Lambda URLs",
-  "description": "Web app hosting on AWS Lambda: front Lambda function URLs with Amazon CloudFront.",
+  "description": "Front AWS Lambda Function URLs with Amazon CloudFront",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",

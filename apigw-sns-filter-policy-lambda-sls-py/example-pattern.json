@@ -1,6 +1,6 @@
 {
   "title": "REST API via Amazon API Gateway, acting as Amazon SNS proxy with Amazon SNS Filter Policy",
-  "description": "Event filtering and routing: a REST API via API Gateway acts as an SNS proxy, and an SNS filter policy invokes Lambda functions only for matching messages.",
+  "description": "REST API via API Gateway as an SNS proxy, triggering Lambda functions with MessageBody filtering.",
   "language": "Python",
   "level": "200",
   "framework": "Serverless Framework",
