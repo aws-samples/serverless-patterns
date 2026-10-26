@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-# create-esm.sh — Create a Kafka Queue mode ESM via direct API call
-#
-# ConsumptionMode: Queue is a pre-release field not yet in the CloudFormation
-# or SAM schema. This script creates the ESM by calling the Lambda REST API
-# directly using curl with AWS SigV4 signing, bypassing client-side validation.
+# create-esm.sh — Create a Kafka Queue mode ESM via the AWS CLI
 #
 # Prerequisites:
 #   - aws CLI configured with appropriate credentials
-#   - curl >= 7.75 (for --aws-sigv4 support)
 #   - Stacks kafka-queue-network, kafka-queue-broker, kafka-queue-app must be deployed
 #
 # Usage:
@@ -68,60 +63,29 @@ echo "  Bootstrap:     $BOOTSTRAP"
 echo "  DLQ ARN:       $DLQ_ARN"
 echo ""
 
-# ── Export credentials for curl --aws-sigv4 ──────────────────
-echo "Exporting credentials for SigV4 signing..."
-unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
-eval "$(aws configure export-credentials --format env --profile "$PROFILE")"
-
-# ── Create ESM via Lambda REST API ───────────────────────────
-# Security note: --user exposes credentials in the process argument list.
-# This script is intended for temporary use until ConsumptionMode: Queue
-# is available in the AWS CLI, at which point standard aws lambda
-# create-event-source-mapping can replace this script entirely.
+# ── Create ESM via AWS CLI ───────────────────────────────────
 echo "Creating ESM..."
-RESPONSE=$(curl -sS -X POST \
-  "https://lambda.$REGION.amazonaws.com/2015-03-31/event-source-mappings/" \
-  --aws-sigv4 "aws:amz:$REGION:lambda" \
-  --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY" \
-  -H "x-amz-security-token: $AWS_SESSION_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"FunctionName\": \"$WORKER_ARN\",
-    \"SelfManagedEventSource\": {
-      \"Endpoints\": {\"KAFKA_BOOTSTRAP_SERVERS\": [\"$BOOTSTRAP\"]}
-    },
-    \"SelfManagedKafkaEventSourceConfig\": {
-      \"ConsumerGroupId\": \"$CONSUMER_GROUP_ID\",
-      \"ConsumptionMode\": \"Queue\"
-    },
-    \"Topics\": [\"$TOPIC\"],
-    \"BatchSize\": 10,
-    \"MaximumRetryAttempts\": $MAX_RETRY_ATTEMPTS,
-    \"FunctionResponseTypes\": [\"ReportBatchItemFailures\"],
-    \"DestinationConfig\": {
-      \"OnFailure\": {\"Destination\": \"$DLQ_ARN\"}
-    },
-    \"ProvisionedPollerConfig\": {
-      \"MinimumPollers\": $MIN_POLLERS,
-      \"MaximumPollers\": $MAX_POLLERS
-    },
-    \"MetricsConfig\": {
-      \"Metrics\": [\"EventCount\", \"ErrorCount\", \"KafkaMetrics\"]
-    },
-    \"SourceAccessConfigurations\": [
-      {\"Type\": \"VPC_SUBNET\", \"URI\": \"subnet:$SUBNET_A\"},
-      {\"Type\": \"VPC_SUBNET\", \"URI\": \"subnet:$SUBNET_B\"},
-      {\"Type\": \"VPC_SUBNET\", \"URI\": \"subnet:$SUBNET_C\"},
-      {\"Type\": \"VPC_SECURITY_GROUP\", \"URI\": \"security_group:$LAMBDA_SG\"}
-    ]
-  }")
+RESPONSE=$(aws lambda create-event-source-mapping \
+  --profile "$PROFILE" --region "$REGION" \
+  --function-name "$WORKER_ARN" \
+  --self-managed-event-source "Endpoints={KAFKA_BOOTSTRAP_SERVERS=[$BOOTSTRAP]}" \
+  --self-managed-kafka-event-source-config "ConsumerGroupId=$CONSUMER_GROUP_ID,ConsumptionMode=Queue" \
+  --topics "$TOPIC" \
+  --batch-size 10 \
+  --maximum-retry-attempts "$MAX_RETRY_ATTEMPTS" \
+  --function-response-types '["ReportBatchItemFailures"]' \
+  --destination-config "OnFailure={Destination=$DLQ_ARN}" \
+  --provisioned-poller-config "MinimumPollers=$MIN_POLLERS,MaximumPollers=$MAX_POLLERS" \
+  --metrics-config "Metrics=EventCount,ErrorCount,KafkaMetrics" \
+  --source-access-configurations \
+    "Type=VPC_SUBNET,URI=subnet:$SUBNET_A" \
+    "Type=VPC_SUBNET,URI=subnet:$SUBNET_B" \
+    "Type=VPC_SUBNET,URI=subnet:$SUBNET_C" \
+    "Type=VPC_SECURITY_GROUP,URI=security_group:$LAMBDA_SG")
 
 echo "$RESPONSE" | python3 -c "
 import sys, json
 r = json.load(sys.stdin)
-if 'Type' in r and r.get('Type') == 'User':
-    print('ERROR:', r.get('message'))
-    sys.exit(1)
 print('ESM created!')
 print('  UUID:            ', r.get('UUID'))
 print('  State:           ', r.get('State'))
@@ -134,7 +98,7 @@ print('  aws lambda invoke \\\\')
 print('    --function-name kafka-queue-app-producer \\\\')
 print('    --region $REGION --profile $PROFILE \\\\')
 print('    --cli-binary-format raw-in-base64-out \\\\')
-print('    --payload \'{"count": 20}\' /dev/stdout')
+print('    --payload \\'{\"count\": 20}\\' /dev/stdout')
 print()
 print('Watch logs:')
 print('  aws logs tail /aws/lambda/kafka-queue-app-worker --follow \\\\')
