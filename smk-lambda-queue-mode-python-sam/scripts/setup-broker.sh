@@ -97,12 +97,35 @@ run_ssm() {
         --profile "$PROFILE" --region "$REGION" \
         --query 'StandardErrorContent' --output text 2>/dev/null)
       echo "  ERROR: $ERR"
-      exit 1
+      return 1
     fi
     echo "  [$((i * 10))s] $STATUS..."
   done
   echo "  ERROR: Timed out after ${TIMEOUT}s"
-  exit 1
+  return 1
+}
+
+# Probe whether the Kafka broker is actually serving on 9092 via a
+# fresh SSM invocation. Returns 0 if broker is reachable, non-zero otherwise.
+probe_broker() {
+  local CMD_ID
+  CMD_ID=$(aws ssm send-command \
+    --instance-ids "$INSTANCE_ID" \
+    --document-name AWS-RunShellScript \
+    --parameters 'commands=["timeout 10 /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1 && echo broker_alive"]' \
+    --profile "$PROFILE" --region "$REGION" \
+    --query 'Command.CommandId' --output text)
+  for _ in $(seq 1 6); do
+    sleep 5
+    local STATUS
+    STATUS=$(aws ssm get-command-invocation \
+      --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" \
+      --profile "$PROFILE" --region "$REGION" \
+      --query 'Status' --output text 2>/dev/null || echo Pending)
+    if [ "$STATUS" = "Success" ]; then return 0; fi
+    if [ "$STATUS" = "Failed" ] || [ "$STATUS" = "TimedOut" ]; then return 1; fi
+  done
+  return 1
 }
 
 # ── Step 1: Install Java ──────────────────────────────────────
@@ -126,9 +149,24 @@ run_ssm "4/6 Configure and format storage" \
   60
 
 # ── Step 5: Start Kafka and wait for ready ────────────────────
-run_ssm "5/6 Start Kafka broker" \
-  "export KAFKA_HEAP_OPTS='-Xmx512m -Xms256m' && nohup /opt/kafka/bin/kafka-server-start.sh /tmp/kraft-server.properties > /var/log/kafka.log 2>&1 & sleep 20 && for i in \$(seq 1 12); do /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1 && echo broker_ready && break || sleep 5; done" \
-  180
+# The nohup-backgrounded JVM can leave the SSM shell holding file descriptors,
+# which may trip the SSM agent into reporting TimedOut even though Kafka is up.
+# If run_ssm reports a failure here, probe the broker directly before giving up.
+echo "NOTE: Step 5 may print 'ERROR: Timed out after 180s'. This is expected on"
+echo "      many SSM agent versions because the Kafka JVM is launched in the"
+echo "      background and SSM waits on its inherited file descriptors. The"
+echo "      script will probe the broker directly and continue if it is up."
+if ! run_ssm "5/6 Start Kafka broker" \
+       "export KAFKA_HEAP_OPTS='-Xmx512m -Xms256m' && nohup /opt/kafka/bin/kafka-server-start.sh /tmp/kraft-server.properties > /var/log/kafka.log 2>&1 & sleep 20 && for i in \$(seq 1 12); do /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1 && echo broker_ready && break || sleep 5; done" \
+       180; then
+  echo "  SSM reported failure for step 5. Probing broker directly..."
+  if probe_broker; then
+    echo "  Broker is reachable on localhost:9092 - continuing despite SSM failure."
+  else
+    echo "  Broker is NOT reachable. Fatal."
+    exit 1
+  fi
+fi
 
 # ── Step 6: Enable share groups ──────────────────────────────
 run_ssm "6/6 Enable KIP-932 share groups" \
