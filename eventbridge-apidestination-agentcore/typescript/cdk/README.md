@@ -105,7 +105,7 @@ These are deliberate omissions to keep the pattern minimal. For production:
 
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns
-   cd serverless-patterns/eventbridge-apidestination-agentcore-cdk/cdk
+   cd serverless-patterns/eventbridge-apidestination-agentcore/typescript/cdk
    npm install
    ```
 

@@ -1,5 +1,5 @@
 {
-  "name": "eventbridge-apidestination-agentcore-cdk",
+  "name": "eventbridge-apidestination-agentcore",
   "version": "1.0.0",
   "description": "EventBridge API Destination to Amazon Bedrock AgentCore Runtime - Lambda-less event-driven agent invocation",
   "bin": {
