@@ -1,0 +1,13 @@
+[project]
+name = "FraudDetectionAgent"
+version = "1.0.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.121.2",
+    "httpx>=0.28.1",
+    "pydantic>=2.12.4",
+    "strands-agents>=1.16.0",
+    "uvicorn[standard]>=0.38.0",
+]
