@@ -13,6 +13,7 @@ keeps draining old rows until they are gone.
 """
 
 import json
+import logging
 import os
 import time
 import uuid
@@ -37,6 +38,10 @@ STATUS_MAP = {
 }
 
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+
 def _response(status_code: int, body: dict) -> dict:
     return {
         "statusCode": status_code,
@@ -46,7 +51,10 @@ def _response(status_code: int, body: dict) -> dict:
 
 
 def create_job(event: dict) -> dict:
-    payload = json.loads(event.get("body") or "{}")
+    try:
+        payload = json.loads(event.get("body") or "{}")
+    except json.JSONDecodeError:
+        return _response(400, {"error": "body must be JSON"})
     job_id = payload.get("job_id") or str(uuid.uuid4())
 
     # DurableExecutionName makes the start idempotent: a retry with the same
@@ -88,7 +96,7 @@ def get_job(event: dict) -> dict:
         # Legacy row from the status-table version: still in flight on the old poller.
         body = {
             "job_id": job_id,
-            "status": item["status"],
+            "status": item.get("status", "UNKNOWN"),
             "step": item.get("step"),
             "legacy": True,
         }
@@ -115,7 +123,15 @@ def get_job(event: dict) -> dict:
 def lambda_handler(event: dict, context) -> dict:
     method = event.get("httpMethod")
     if method == "POST":
-        return create_job(event)
-    if method == "GET":
-        return get_job(event)
-    return _response(405, {"error": "method not allowed"})
+        response = create_job(event)
+    elif method == "GET":
+        response = get_job(event)
+    else:
+        response = _response(405, {"error": "method not allowed"})
+    logger.info(
+        "%s %s -> %s",
+        method,
+        event.get("path"),
+        response["statusCode"],
+    )
+    return response

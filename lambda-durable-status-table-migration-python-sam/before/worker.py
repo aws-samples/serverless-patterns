@@ -9,6 +9,7 @@ Everything in this file is the "where was I?" bookkeeping that durable
 functions do for you. Compare with after/job.py.
 """
 
+import logging
 import os
 import time
 from decimal import Decimal
@@ -23,6 +24,10 @@ table = dynamodb.Table(os.environ["JOBS_TABLE"])
 # A RUNNING row older than this is assumed crashed and is picked up again.
 STALE_AFTER_SECONDS = 120
 MAX_ATTEMPTS = 3
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def _now() -> int:
@@ -101,16 +106,22 @@ def _run_job(job: dict) -> None:
             _checkpoint(job_id, "publish_result", outputs)
 
         _finish(job_id, "DONE", result=outputs["publish_result"])
+        logger.info("job %s DONE", job_id)
 
     except TransientError as exc:
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
+            logger.error("job %s FAILED after %d attempts: %s", job_id, attempts, exc)
             _finish(job_id, "FAILED", error=str(exc), attempts=attempts)
         else:
             # Put it back for the next poll. No backoff, no jitter: you would add those by hand.
+            logger.warning(
+                "job %s attempt %d failed, requeued: %s", job_id, attempts, exc
+            )
             _finish(job_id, "PENDING", error=str(exc), attempts=attempts)
 
     except Exception as exc:
+        logger.exception("job %s FAILED: %s", job_id, exc)
         _finish(job_id, "FAILED", error=str(exc))
 
 

@@ -44,3 +44,19 @@ def test_flaky_step_is_retried_by_the_runtime():
     # The steps around it ran exactly once -- no re-execution of finished work.
     assert result.get_step("fetch_source").attempt == 1
     assert result.get_step("publish_result").attempt == 1
+
+
+def test_replay_is_deterministic():
+    # Same input, same execution name, run twice: a durable function must produce
+    # the same checkpoints and the same result on replay, and every operation is
+    # a named step (tests fetch operations by name, never by index).
+    first = _run("job-replay", "hello")
+    second = _run("job-replay", "hello")
+    assert first.execution_status.name == "SUCCEEDED", first.error
+    assert second.execution_status.name == "SUCCEEDED", second.error
+    assert json.loads(first.result) == json.loads(second.result)
+    expected = {"fetch_source", "transform", "publish_result"}
+    for result in (first, second):
+        assert {op.name for op in result.get_all_operations()} == expected
+        for name in expected:
+            assert result.get_step(name).status.name == "SUCCEEDED"

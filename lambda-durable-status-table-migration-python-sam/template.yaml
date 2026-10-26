@@ -28,6 +28,7 @@ Globals:
     - arm64
     MemorySize: 256
     Timeout: 30
+    Tracing: Active
     Environment:
       Variables:
         JOBS_TABLE:
@@ -54,6 +55,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
+      TracingEnabled: true
     Metadata:
       SamResourceId: JobsApi
   LegacyJobApiFunctionLogGroup:
@@ -72,13 +74,20 @@ Resources:
       Description: BEFORE - creates a job row and reads its status from the table
       CodeUri: before/
       Handler: api.lambda_handler
+      Timeout: 10
       LoggingConfig:
         LogGroup:
           Ref: LegacyJobApiFunctionLogGroup
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: JobsTable
+      - Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          Resource:
+            Fn::GetAtt:
+            - JobsTable
+            - Arn
       Events:
         CreateJob:
           Type: Api
@@ -142,6 +151,7 @@ Resources:
       Description: AFTER - starts a durable execution per job and reads its status
       CodeUri: after/
       Handler: api.lambda_handler
+      Timeout: 10
       LoggingConfig:
         LogGroup:
           Ref: JobApiFunctionLogGroup
@@ -150,9 +160,15 @@ Resources:
           JOB_FUNCTION:
             Ref: JobFunction.Alias
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: JobsTable
+      - Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          Resource:
+            Fn::GetAtt:
+            - JobsTable
+            - Arn
       - Statement:
         - Effect: Allow
           Action: lambda:InvokeFunction

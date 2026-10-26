@@ -2,7 +2,7 @@
 
 You have a job that is too long or too fragile for one Lambda invocation, so you built the usual workaround: write a row to a "jobs" table, have a poller pick it up, run the steps, and update the row after each one so a crash can be resumed. Clients poll `GET /jobs/{id}` to see where it is.
 
-This pattern shows the same job twice. `before/` is that status-table version. `after/` is the same job as a Lambda durable function: each step is checkpointed by the runtime, retries use a built-in policy, and the public `job_id` is the durable execution name, so the API and its clients do not change. Both halves deploy side by side (`/v1` and `/v2`) so you can cut over without downtime, then remove the old half with one parameter.
+This pattern shows the same job twice. `before/` is that status-table version. `after/` is the same job as a Lambda durable function: each step is checkpointed by the runtime, retries use a built-in policy, and the public `job_id` is the durable execution name, so the API and its clients do not change. Both halves deploy side by side (`/v1` and `/v2`) so you can cut over without downtime, then remove the old half with one parameter. The front door is an API Gateway REST API so one stage can host both versions with the same proxy event shape; an HTTP API would work the same way with the v1.0 payload format.
 
 ### What is a durable function?
 

@@ -9,6 +9,7 @@ A separate poller (worker.py) moves rows through PENDING -> RUNNING -> DONE.
 """
 
 import json
+import logging
 import os
 import time
 import uuid
@@ -21,6 +22,10 @@ table = dynamodb.Table(os.environ["JOBS_TABLE"])
 TTL_SECONDS = 3 * 24 * 60 * 60
 
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+
 def _response(status_code: int, body: dict) -> dict:
     return {
         "statusCode": status_code,
@@ -30,7 +35,10 @@ def _response(status_code: int, body: dict) -> dict:
 
 
 def create_job(event: dict) -> dict:
-    payload = json.loads(event.get("body") or "{}")
+    try:
+        payload = json.loads(event.get("body") or "{}")
+    except json.JSONDecodeError:
+        return _response(400, {"error": "body must be JSON"})
     job_id = payload.get("job_id") or str(uuid.uuid4())
     now = int(time.time())
 
@@ -85,7 +93,15 @@ def get_job(event: dict) -> dict:
 def lambda_handler(event: dict, context) -> dict:
     method = event.get("httpMethod")
     if method == "POST":
-        return create_job(event)
-    if method == "GET":
-        return get_job(event)
-    return _response(405, {"error": "method not allowed"})
+        response = create_job(event)
+    elif method == "GET":
+        response = get_job(event)
+    else:
+        response = _response(405, {"error": "method not allowed"})
+    logger.info(
+        "%s %s -> %s",
+        method,
+        event.get("path"),
+        response["statusCode"],
+    )
+    return response
