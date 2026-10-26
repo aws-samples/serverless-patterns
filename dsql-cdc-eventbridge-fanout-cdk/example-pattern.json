@@ -1,6 +1,6 @@
 {
   "title": "Amazon Aurora DSQL CDC to Amazon EventBridge",
-  "description": "Stream real-time database changes from Amazon Aurora DSQL via CDC through Amazon Kinesis and AWS Lambda to Amazon EventBridge",
+  "description": "Stream changes from Amazon Aurora DSQL through Amazon Kinesis Data Streams and AWS Lambda to Amazon EventBridge events.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
@@ -34,7 +34,9 @@
   },
   "deploy": {
     "text": [
-      "<code>cd dsql-cdc-eventbridge-fanout-cdk/cdk</code>",
+      "<code>git clone https://github.com/aws-samples/serverless-patterns</code>",
+      "<code>cd serverless-patterns/dsql-cdc-eventbridge-fanout-cdk/cdk</code>",
+      "Create an Amazon Aurora DSQL cluster in the Region you deploy to and wait until it is ACTIVE; Docker or Finch must be running. See the GitHub repo for the commands.",
       "<code>npm install</code>",
       "<code>npm run build</code>",
       "<code>npx cdk deploy --parameters DsqlClusterId=your-cluster-id</code>"
@@ -42,13 +44,16 @@
   },
   "testing": {
     "text": [
-      "Insert data into your Amazon Aurora DSQL cluster to generate CDC events.",
-      "Add an Amazon EventBridge rule on the dsql-cdc-events bus to verify events arrive."
+      "Connect to your Amazon Aurora DSQL cluster with psql and insert, update and delete a row to generate CDC events.",
+      "Add a temporary Amazon EventBridge rule with an Amazon SQS queue target on the dsql-cdc-events bus and read the events. See the GitHub repo for the exact commands."
     ]
   },
   "cleanup": {
     "text": [
-      "<code>npx cdk destroy</code>"
+      "Delete the temporary Amazon EventBridge rule, its target and the Amazon SQS queue from the testing step first: the event bus cannot be deleted while it has rules.",
+      "<code>npx cdk destroy</code>",
+      "<code>aws dsql update-cluster --identifier your-cluster-id --no-deletion-protection-enabled</code>",
+      "<code>aws dsql delete-cluster --identifier your-cluster-id</code>"
     ]
   },
   "authors": [
@@ -57,43 +62,5 @@
       "bio": "Technical Account Manager at AWS",
       "linkedin": "nithin-chandran-r"
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 15,
-      "y": 50,
-      "service": "dsql",
-      "label": "Amazon Aurora DSQL"
-    },
-    "icon2": {
-      "x": 38,
-      "y": 50,
-      "service": "kinesis",
-      "label": "Amazon Kinesis"
-    },
-    "icon3": {
-      "x": 62,
-      "y": 50,
-      "service": "lambda",
-      "label": "AWS Lambda"
-    },
-    "icon4": {
-      "x": 85,
-      "y": 50,
-      "service": "eventbridge",
-      "label": "Amazon EventBridge"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3"
-    },
-    "line3": {
-      "from": "icon3",
-      "to": "icon4"
-    }
-  }
+  ]
 }

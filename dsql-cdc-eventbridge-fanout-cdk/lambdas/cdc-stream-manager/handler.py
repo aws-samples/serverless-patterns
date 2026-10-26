@@ -1,5 +1,5 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: MIT-0 (2026)
+# SPDX-License-Identifier: MIT-0
 """Custom Resource: Create and delete Amazon Aurora DSQL CDC streams."""
 
 import json
@@ -23,7 +23,7 @@ def on_event(event, context):
     if request_type == 'Create':
         return create_stream(cluster_id, kinesis_arn, role_arn)
     elif request_type == 'Update':
-        # CDC streams are immutable — delete old, create new
+        # CDC streams are immutable - delete old, create new
         old_stream_id = event.get('PhysicalResourceId', '')
         if old_stream_id:
             delete_stream(cluster_id, old_stream_id)
@@ -36,7 +36,7 @@ def on_event(event, context):
 
 
 def create_stream(cluster_id: str, kinesis_arn: str, role_arn: str) -> dict:
-    """Create a DSQL CDC stream targeting Amazon Kinesis."""
+    """Create a DSQL CDC stream targeting Amazon Kinesis Data Streams."""
     try:
         response = DSQL_CLIENT.create_stream(
             clusterIdentifier=cluster_id,

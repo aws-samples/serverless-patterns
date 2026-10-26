@@ -1,6 +1,6 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: MIT-0 (2026)
-"""CDC Processor: Parse Amazon Aurora DSQL CDC events from Amazon Kinesis
+# SPDX-License-Identifier: MIT-0
+"""CDC Processor: Parse Amazon Aurora DSQL CDC events from Amazon Kinesis Data Streams
 and fan out to Amazon EventBridge with typed detail-type routing."""
 
 import base64
@@ -16,7 +16,7 @@ SOURCE = 'dsql.cdc'
 
 
 def lambda_handler(event, context):
-    """Process Amazon Kinesis records containing Amazon Aurora DSQL CDC events."""
+    """Process records from Amazon Kinesis Data Streams that contain Amazon Aurora DSQL CDC events."""
     records = event.get('Records', [])
     if not records:
         return {'statusCode': 200, 'processed': 0}
@@ -31,10 +31,18 @@ def lambda_handler(event, context):
             payload = base64.b64decode(record['kinesis']['data'])
             cdc_event = json.loads(payload)
 
+            # Records over 9 MiB arrive as chunked and fragment records; this pattern forwards full records only
+            if cdc_event.get('type', 'full') != 'full':
+                print(f"Skipping {cdc_event.get('type')} CDC record (oversized rows are not reassembled here)")
+                continue
+
+            source = cdc_event.get('source', {})
+            transaction = cdc_event.get('transaction', {})
+
             # Map DSQL CDC op codes to human-readable operation types
             raw_op = cdc_event.get('op', '').lower()
             operation = OP_MAP.get(raw_op, 'UNKNOWN')
-            table_name = cdc_event.get('source', {}).get('table', 'unknown')
+            table_name = source.get('table', 'unknown')
 
             # Use operation as EventBridge detail-type for content-based routing
             detail_type = operation
@@ -47,8 +55,10 @@ def lambda_handler(event, context):
                     'operation': operation,
                     'newImage': cdc_event.get('after'),
                     'oldImage': cdc_event.get('before'),
-                    'timestamp': cdc_event.get('source', {}).get('ts_ms',
-                                               datetime.now(timezone.utc).isoformat()),
+                    'txId': source.get('txId'),
+                    'recordId': transaction.get('record_id'),
+                    'timestamp': source.get('ts_ms', datetime.now(timezone.utc).isoformat()),
+                    'commitTimestampNs': str(source['ts_ns']) if 'ts_ns' in source else None,
                     'sequenceNumber': record['kinesis'].get('sequenceNumber'),
                 }),
                 'EventBusName': EVENT_BUS_NAME,
