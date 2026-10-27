@@ -1,0 +1,29 @@
+{
+  "name": "lambda-sqs-fastapi-typescript-sam",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Move a FastAPI/Express in-process job runner to Amazon SQS + an AWS Lambda consumer (TypeScript, SAM)",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "5.3.0",
+    "serverless-http": "4.0.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "3.1157.0",
+    "@aws-sdk/client-sqs": "3.1157.0",
+    "@aws-sdk/lib-dynamodb": "3.1157.0",
+    "@types/aws-lambda": "8.10.164",
+    "@types/express": "5.0.6",
+    "@types/jest": "29.5.14",
+    "@types/node": "22.20.5",
+    "aws-sdk-client-mock": "4.1.0",
+    "esbuild": "0.28.2",
+    "jest": "29.7.0",
+    "ts-jest": "29.4.15",
+    "typescript": "5.9.3"
+  }
+}
