@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -185,12 +184,5 @@ public final class AvroIo {
         order.put("items", java.util.List.of(item1, item2));
         order.put("placedAt", System.currentTimeMillis());
         return order;
-    }
-
-    /** Read a string field from a decoded record (Avro returns Utf8 for strings). */
-    static String stringField(GenericRecord record, String field) {
-        Object value = record.get(field);
-        return value == null ? null : new String(value.toString().getBytes(StandardCharsets.UTF_8),
-            StandardCharsets.UTF_8);
     }
 }
