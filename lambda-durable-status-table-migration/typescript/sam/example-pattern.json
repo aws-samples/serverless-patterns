@@ -1,6 +1,6 @@
 {
-  "title": "Migrate a long-running job from a status table and poller to Lambda durable functions",
-  "description": "Same job twice: before as a DynamoDB status table with a scheduled poller, after as a Lambda durable function with checkpointed steps and built-in retries. Same public job id, same GET /jobs/{id} API, side-by-side cutover.",
+  "title": "Migrate a long-running job from a status table and poller to AWS Lambda durable functions",
+  "description": "Same job twice: a DynamoDB status table with a scheduled poller, then an AWS Lambda durable function with checkpointed steps and built-in retries. Same job id and GET API.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS SAM",

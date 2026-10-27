@@ -56,37 +56,6 @@ Both halves run the same three business steps from `steps.py`: `fetch_source`, `
 
 `before/worker.py` is about 150 lines, almost all of it bookkeeping. `after/job.py` is about 65, almost all of it the steps.
 
-### Architecture
-
-```
-                    +------------------------+
-   client --------> |  API Gateway  /prod    |
-                    |  /v1/jobs   /v2/jobs   |
-                    +-----+-------------+----+
-                          |             |
-            BEFORE        v             v        AFTER
-     +--------------------+--+     +----+-----------------------+
-     | LegacyJobApiFunction  |     | JobApiFunction             |
-     | put PENDING / get row |     | Invoke(DurableExecution-   |
-     +-----------+-----------+     |   Name=job_id) / GetDurable|
-                 |                 |   Execution(arn)           |
-   rate(1 min)   v                 +----+------------------+----+
-  +--------------+--------+             |                  |
-  | LegacyJobWorkerFunction|            v                  |
-  | scan, claim, run steps,|   +--------+----------+       |
-  | checkpoint each step   |   | JobFunction (durable) |   |
-  +-----------+------------+   | step fetch_source     |   |
-              |                | step transform  (retry)|  |
-              |                | step publish_result   |   |
-              |                +--------+--------------+   |
-              v                         |  checkpoints held |
-     +--------+-------------------------v-------------------v-+
-     | JobsTable (DynamoDB, TTL 3d)                            |
-     | BEFORE row: status, step, outputs, attempts, result     |
-     | AFTER  row: execution_arn only                          |
-     +---------------------------------------------------------+
-```
-
 What replay looks like against this code: if the execution is interrupted right after `transform` finishes, the runtime re-invokes the function. `context.step(..., name="fetch_source")` and `name="transform"` return their checkpoints without running; only `publish_result` executes. The `before/` equivalent is the three `if "x" not in outputs` guards in `worker.py`. The durable runtime is doing that bookkeeping for you.
 
 Two things the runtime does not do for you:
