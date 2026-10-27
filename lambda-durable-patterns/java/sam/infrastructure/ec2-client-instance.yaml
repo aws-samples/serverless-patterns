@@ -247,9 +247,9 @@ Resources:
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone -n --depth=1 --filter=tree:0 $SERVERLESS_LAND_GITHUB_LOCATION
             cd ./serverless-patterns
-            git sparse-checkout set --no-cone /lambda-durable-java-sam
+            git sparse-checkout set --no-cone /lambda-durable-patterns/java/sam
             git checkout
-            cd lambda-durable-java-sam
+            cd lambda-durable-patterns/java/sam
             sudo chown -R ec2-user .
 
             # Get IP CIDR range for EC2 Instance Connect

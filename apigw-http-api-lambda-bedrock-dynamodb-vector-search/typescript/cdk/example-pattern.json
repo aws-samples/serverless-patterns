@@ -4,6 +4,7 @@
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
+  "patternGroup": "apigw-http-api-lambda-bedrock-dynamodb-vector-search",
   "introBox": {
     "headline": "How it works",
     "text": [
