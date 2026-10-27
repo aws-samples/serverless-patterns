@@ -1,0 +1,286 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Migrate a long-running job from a hand-rolled status table and poller
+  to Lambda durable functions while keeping the same public job id. Deploys both halves
+  side by side: /v1 (status table + poller) and /v2 (durable). (uksb-1tthgi812) (tag:lambda-durable-status-table-migration-typescript-sam)
+
+  '
+Parameters:
+  EnableLegacy:
+    Type: String
+    Default: 'true'
+    AllowedValues:
+    - 'true'
+    - 'false'
+    Description: 'Deploy the BEFORE half (/v1 API + one-minute poller). Set to "false"
+      once the table has no rows without an execution_arn to finish the cutover.
+
+      '
+Conditions:
+  LegacyEnabled:
+    Fn::Equals:
+    - Ref: EnableLegacy
+    - 'true'
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures:
+    - arm64
+    MemorySize: 256
+    Timeout: 30
+    Tracing: Active
+    Environment:
+      Variables:
+        JOBS_TABLE:
+          Ref: JobsTable
+Resources:
+  JobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName:
+        Fn::Sub: ${AWS::StackName}-jobs
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+      - AttributeName: job_id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: job_id
+        KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+  JobsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      TracingEnabled: true
+  LegacyJobApiFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: LegacyEnabled
+    Properties:
+      LogGroupName:
+        Fn::Sub: /aws/lambda/${AWS::StackName}-legacy-api
+      RetentionInDays: 14
+  LegacyJobApiFunction:
+    Type: AWS::Serverless::Function
+    Condition: LegacyEnabled
+    Properties:
+      Description: BEFORE - creates a job row and reads its status from the table
+      CodeUri: before/
+      Handler: api.handler
+      Timeout: 10
+      LoggingConfig:
+        LogGroup:
+          Ref: LegacyJobApiFunctionLogGroup
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          Resource:
+            Fn::GetAtt:
+            - JobsTable
+            - Arn
+      Events:
+        CreateJob:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: JobsApi
+            Path: /v1/jobs
+            Method: POST
+        GetJob:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: JobsApi
+            Path: /v1/jobs/{job_id}
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+        - .js=.mjs
+        External:
+        - '@aws-sdk/*'
+        EntryPoints:
+        - api.ts
+  LegacyJobWorkerFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: LegacyEnabled
+    Properties:
+      LogGroupName:
+        Fn::Sub: /aws/lambda/${AWS::StackName}-legacy-worker
+      RetentionInDays: 14
+  LegacyJobWorkerFunction:
+    Type: AWS::Serverless::Function
+    Condition: LegacyEnabled
+    Properties:
+      Description: BEFORE - polls the table for PENDING jobs every minute and runs
+        the steps
+      CodeUri: before/
+      Handler: worker.handler
+      Timeout: 60
+      LoggingConfig:
+        LogGroup:
+          Ref: LegacyJobWorkerFunctionLogGroup
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: JobsTable
+      Events:
+        Poll:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+        - .js=.mjs
+        External:
+        - '@aws-sdk/*'
+        EntryPoints:
+        - worker.ts
+  JobApiFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: /aws/lambda/${AWS::StackName}-job-api
+      RetentionInDays: 14
+  JobApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: AFTER - starts a durable execution per job and reads its status
+      CodeUri: after/
+      Handler: api.handler
+      Timeout: 10
+      LoggingConfig:
+        LogGroup:
+          Ref: JobApiFunctionLogGroup
+      Environment:
+        Variables:
+          JOB_FUNCTION:
+            Ref: JobFunction.Alias
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          Resource:
+            Fn::GetAtt:
+            - JobsTable
+            - Arn
+      - Statement:
+        - Effect: Allow
+          Action: lambda:InvokeFunction
+          Resource:
+          - Fn::GetAtt:
+            - JobFunction
+            - Arn
+          - Fn::Sub: ${JobFunction.Arn}:*
+        - Effect: Allow
+          Action: lambda:GetDurableExecution
+          Resource:
+            Fn::Sub: ${JobFunction.Arn}:*/durable-execution/*
+      Events:
+        CreateJob:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: JobsApi
+            Path: /v2/jobs
+            Method: POST
+        GetJob:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: JobsApi
+            Path: /v2/jobs/{job_id}
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+        - .js=.mjs
+        External:
+        - '@aws-sdk/*'
+        EntryPoints:
+        - api.ts
+  JobDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+  JobFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: AFTER - the job itself, each step checkpointed by the durable runtime
+      CodeUri: after/
+      Handler: job.handler
+      Timeout: 60
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: 3600
+        RetentionPeriodInDays: 3
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn:
+          Fn::GetAtt:
+          - JobDeadLetterQueue
+          - Arn
+      LoggingConfig:
+        LogGroup:
+          Ref: JobFunctionLogGroup
+      Policies:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicDurableExecutionRolePolicy
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+        - .js=.mjs
+        External:
+        - '@aws-sdk/*'
+        EntryPoints:
+        - job.ts
+  JobFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: /aws/lambda/${AWS::StackName}-job
+      RetentionInDays: 14
+Outputs:
+  ApiUrl:
+    Description: Base URL. BEFORE is /v1/jobs (when EnableLegacy=true), AFTER is /v2/jobs
+    Value:
+      Fn::Sub: https://${JobsApi}.execute-api.${AWS::Region}.amazonaws.com/prod
+  JobsTableName:
+    Description: Shared jobs table
+    Value:
+      Ref: JobsTable
+  JobFunctionAlias:
+    Description: Qualified ARN of the durable job function
+    Value:
+      Ref: JobFunction.Alias
+  JobDeadLetterQueueUrl:
+    Description: Receives the triggering event of any job whose execution ends FAILED,
+      TIMED_OUT or STOPPED
+    Value:
+      Ref: JobDeadLetterQueue

@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.1157.0",
+    "@aws-sdk/lib-dynamodb": "3.1157.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
