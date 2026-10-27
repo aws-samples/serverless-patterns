@@ -1,0 +1,69 @@
+{
+    "title": "AWS Lambda consumer for self-managed Apache Kafka with OAuth through AWS IAM (Node.js)",
+    "description": "Node.js AWS Lambda function that consumes from self-managed Apache Kafka with SASL/OAUTHBEARER, using web identity tokens issued by AWS IAM.",
+    "language": "Node.js",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "Self-managed Apache Kafka with SASL/OAUTHBEARER using tokens issued by AWS IAM: through IAM outbound identity federation, the event source mapping obtains a web identity token for the function's execution role (IAM_OAUTHBEARER_AUTH), with no identity provider or secret.",
+            "The AWS CloudFormation template KafkaBrokersClientEC2.yaml creates the Kafka cluster and an Amazon EC2 client instance; the AWS Lambda function and its event source are deployed with AWS SAM or the AWS CLI.",
+            "The function decodes each Kafka record, logs it to Amazon CloudWatch Logs, and writes its fields to Amazon DynamoDB.",
+            "For detailed deployment instructions, see the README.md."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/kafka-lambda-iam-oauthbearer-auth-nodejs-sam",
+            "templateURL": "serverless-patterns/kafka-lambda-iam-oauthbearer-auth-nodejs-sam",
+            "projectFolder": "kafka-lambda-iam-oauthbearer-auth-nodejs-sam",
+            "templateFile": "template_original.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Using AWS Lambda with self-managed Apache Kafka",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html"
+            },
+            {
+                "text": "Configuring cluster authentication methods in AWS Lambda",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/kafka-cluster-auth.html"
+            },
+            {
+                "text": "AWS SAM SelfManagedKafka event source",
+                "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html"
+            },
+            {
+                "text": "Apache Kafka SASL/OAUTHBEARER authentication",
+                "link": "https://kafka.apache.org/documentation/#security_sasl_oauthbearer"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the AWS Lambda function: <code>sam delete</code>, or <code>scripts/teardown_lambda_cli.sh</code> if you deployed it with the AWS CLI.",
+            "Delete the AWS CloudFormation stack created from KafkaBrokersClientEC2.yaml."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Indranil Banerjee",
+            "image": "https://avatars.githubusercontent.com/u/185852475?s=400&u=c97fce2705b99fadad8b66d3f7acbc2eeee730b6&v=4",
+            "bio": "AWS - Senior Solutions Architect",
+            "linkedin": "indranil-banerjee-b00a261"
+        }
+    ]
+}
