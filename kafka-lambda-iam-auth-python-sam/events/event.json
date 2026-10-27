@@ -1,0 +1,108 @@
+{
+  "eventSource": "aws:SelfManagedKafka",
+  "bootstrapServers": "b-1.msk-cluster.abc123.c2.kafka.us-west-2.amazonaws.com:9098,b-2.msk-cluster.abc123.c2.kafka.us-west-2.amazonaws.com:9098,b-3.msk-cluster.abc123.c2.kafka.us-west-2.amazonaws.com:9098",
+  "records": {
+    "KafkaIamLambdaTopic-1": [
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 208,
+        "timestamp": 1790996330920,
+        "timestampType": "CREATE_TIME",
+        "key": "anRob21hc0BleGFtcGxlLm9yZw==",
+        "value": "eyJmaXJzdE5hbWUiOiAiR2VvcmdlIiwgImxhc3ROYW1lIjogIllhbmciLCAic3RyZWV0QWRkcmVzcyI6ICIyNTYxIE1hcnRpbiBJc2xhbmQiLCAiYXBhcnRtZW50TnVtYmVyIjogIlN1aXRlIDAyNyIsICJjaXR5IjogIkRhbGV0b3duIiwgInN0YXRlIjogIklEIiwgInppcCI6ICI3MTI4OCIsICJwaG9uZU51bWJlciI6ICIyMzk5NzcyODQ4IiwgImVtYWlsIjogImp0aG9tYXNAZXhhbXBsZS5vcmcifQ==",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 209,
+        "timestamp": 1790996330943,
+        "timestampType": "CREATE_TIME",
+        "key": "cm9iZXJ0OTZAZXhhbXBsZS5vcmc=",
+        "value": "eyJmaXJzdE5hbWUiOiAiTWljaGFlbCIsICJsYXN0TmFtZSI6ICJUYXlsb3IiLCAic3RyZWV0QWRkcmVzcyI6ICIwMDAgS2F5bGEgUmFuY2giLCAiYXBhcnRtZW50TnVtYmVyIjogIkFwdC4gMTc5IiwgImNpdHkiOiAiSmVubmlmZXJiZXJnIiwgInN0YXRlIjogIklMIiwgInppcCI6ICI3MzE3NyIsICJwaG9uZU51bWJlciI6ICIyNDY0NzY2MDUxIiwgImVtYWlsIjogInJvYmVydDk2QGV4YW1wbGUub3JnIn0=",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 210,
+        "timestamp": 1790996330951,
+        "timestampType": "CREATE_TIME",
+        "key": "bmFuY3lqb25lc0BleGFtcGxlLm9yZw==",
+        "value": "eyJmaXJzdE5hbWUiOiAiS3Jpc3RhIiwgImxhc3ROYW1lIjogIldpbGxpYW1zIiwgInN0cmVldEFkZHJlc3MiOiAiMzg5OCBMb3JpIFNwcmluZyIsICJhcGFydG1lbnROdW1iZXIiOiAiQXB0LiA1MzciLCAiY2l0eSI6ICJMaXNhdmlsbGUiLCAic3RhdGUiOiAiTkoiLCAiemlwIjogIjcwOTU3IiwgInBob25lTnVtYmVyIjogIjkzNi4yNTUuNTE4OSIsICJlbWFpbCI6ICJuYW5jeWpvbmVzQGV4YW1wbGUub3JnIn0=",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 211,
+        "timestamp": 1790996330960,
+        "timestampType": "CREATE_TIME",
+        "key": "Y3NtaXRoQGV4YW1wbGUubmV0",
+        "value": "eyJmaXJzdE5hbWUiOiAiQ29yeSIsICJsYXN0TmFtZSI6ICJNb29yZSIsICJzdHJlZXRBZGRyZXNzIjogIjgxNjQ4IEV2YW5zIEZvcmRzIiwgImFwYXJ0bWVudE51bWJlciI6ICJBcHQuIDk4MSIsICJjaXR5IjogIldlc3QgTHlubiIsICJzdGF0ZSI6ICJBSyIsICJ6aXAiOiAiNzI5OTQiLCAicGhvbmVOdW1iZXIiOiAiOTk5MzQ5NzU2MyIsICJlbWFpbCI6ICJjc21pdGhAZXhhbXBsZS5uZXQifQ==",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 212,
+        "timestamp": 1790996330965,
+        "timestampType": "CREATE_TIME",
+        "key": "aGVhdGhlcjQyQGV4YW1wbGUuY29t",
+        "value": "eyJmaXJzdE5hbWUiOiAiS2F5bGEiLCAibGFzdE5hbWUiOiAiU2V4dG9uIiwgInN0cmVldEFkZHJlc3MiOiAiOTc1IEpvZWwgTWlzc2lvbiBBcHQuIDQwNyIsICJhcGFydG1lbnROdW1iZXIiOiAiU3VpdGUgNTQyIiwgImNpdHkiOiAiTm9ydGggS2VsbHlzdGFkIiwgInN0YXRlIjogIlBSIiwgInppcCI6ICI5MTc3OSIsICJwaG9uZU51bWJlciI6ICIrMS00MzEtODY2LTgzNTR4ODY1IiwgImVtYWlsIjogImhlYXRoZXI0MkBleGFtcGxlLmNvbSJ9",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 213,
+        "timestamp": 1790996330982,
+        "timestampType": "CREATE_TIME",
+        "key": "bGlzYWJhbmtzQGV4YW1wbGUuY29t",
+        "value": "eyJmaXJzdE5hbWUiOiAiUGF1bCIsICJsYXN0TmFtZSI6ICJCcm93biIsICJzdHJlZXRBZGRyZXNzIjogIjkwOTQgU3VsbGl2YW4gRm9ydCBBcHQuIDg5NiIsICJhcGFydG1lbnROdW1iZXIiOiAiQXB0LiA5MzciLCAiY2l0eSI6ICJMYWtlIEphY29iIiwgInN0YXRlIjogIkFaIiwgInppcCI6ICIyMTI1MCIsICJwaG9uZU51bWJlciI6ICIrMS05ODctNjkwLTY0ODN4MTY5NiIsICJlbWFpbCI6ICJsaXNhYmFua3NAZXhhbXBsZS5jb20ifQ==",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 214,
+        "timestamp": 1790996330987,
+        "timestampType": "CREATE_TIME",
+        "key": "Z3RheWxvckBleGFtcGxlLm9yZw==",
+        "value": "eyJmaXJzdE5hbWUiOiAiQ2hyaXN0b3BoZXIiLCAibGFzdE5hbWUiOiAiTWFydGluIiwgInN0cmVldEFkZHJlc3MiOiAiMTk4NyBNb29yZSBNYW5vciIsICJhcGFydG1lbnROdW1iZXIiOiAiU3VpdGUgMDQxIiwgImNpdHkiOiAiS2ltYmVybHloYXZlbiIsICJzdGF0ZSI6ICJDVCIsICJ6aXAiOiAiMjU1NzUiLCAicGhvbmVOdW1iZXIiOiAiKzEtNTcxLTQzNy04MjcyeDQzMiIsICJlbWFpbCI6ICJndGF5bG9yQGV4YW1wbGUub3JnIn0=",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 215,
+        "timestamp": 1790996330993,
+        "timestampType": "CREATE_TIME",
+        "key": "YnJvY2tjcnlzdGFsQGV4YW1wbGUubmV0",
+        "value": "eyJmaXJzdE5hbWUiOiAiQ2hhcmxlcyIsICJsYXN0TmFtZSI6ICJUdXJuZXIiLCAic3RyZWV0QWRkcmVzcyI6ICIzOTEgVGhvbXBzb24gTWV3cyBBcHQuIDY2MiIsICJhcGFydG1lbnROdW1iZXIiOiAiU3VpdGUgOTk5IiwgImNpdHkiOiAiQ2hyaXN0aW5hbW91dGgiLCAic3RhdGUiOiAiTUUiLCAiemlwIjogIjI1MDY2IiwgInBob25lTnVtYmVyIjogIjIzNi0zNDYtMjg5NXg0ODMiLCAiZW1haWwiOiAiYnJvY2tjcnlzdGFsQGV4YW1wbGUubmV0In0=",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 216,
+        "timestamp": 1790996330999,
+        "timestampType": "CREATE_TIME",
+        "key": "Y29oZW5lcmljYUBleGFtcGxlLmNvbQ==",
+        "value": "eyJmaXJzdE5hbWUiOiAiVG9uaSIsICJsYXN0TmFtZSI6ICJNYWRkb3giLCAic3RyZWV0QWRkcmVzcyI6ICI4MDUgQ29sdG9uIFJvdXRlIEFwdC4gNzMyIiwgImFwYXJ0bWVudE51bWJlciI6ICJBcHQuIDE4NiIsICJjaXR5IjogIk5ldyBKZW5uaWZlciIsICJzdGF0ZSI6ICJEQyIsICJ6aXAiOiAiMDc3MTQiLCAicGhvbmVOdW1iZXIiOiAiMDAxLTY3OS0yNDctMjMzNiIsICJlbWFpbCI6ICJjb2hlbmVyaWNhQGV4YW1wbGUuY29tIn0=",
+        "headers": []
+      },
+      {
+        "topic": "KafkaIamLambdaTopic",
+        "partition": 1,
+        "offset": 217,
+        "timestamp": 1790996331018,
+        "timestampType": "CREATE_TIME",
+        "key": "YWxleGFuZGVyaGVycmVyYUBleGFtcGxlLm9yZw==",
+        "value": "eyJmaXJzdE5hbWUiOiAiQW50aG9ueSIsICJsYXN0TmFtZSI6ICJQZXRlcnNlbiIsICJzdHJlZXRBZGRyZXNzIjogIjg4MiBLYXRobGVlbiBHcm92ZXMiLCAiYXBhcnRtZW50TnVtYmVyIjogIlN1aXRlIDYyOSIsICJjaXR5IjogIkxha2UgU2FicmluYWxhbmQiLCAic3RhdGUiOiAiTkMiLCAiemlwIjogIjczNzUxIiwgInBob25lTnVtYmVyIjogIjAwMS02MzEtNDY0LTM4NTF4OTE0IiwgImVtYWlsIjogImFsZXhhbmRlcmhlcnJlcmFAZXhhbXBsZS5vcmcifQ==",
+        "headers": []
+      }
+    ]
+  }
+}
