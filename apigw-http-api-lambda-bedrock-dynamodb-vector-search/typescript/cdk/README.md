@@ -2,7 +2,7 @@
 
 This pattern deploys a serverless semantic-search API. Clients ingest text documents and run natural-language searches through Amazon API Gateway. AWS Lambda generates embeddings with Amazon Bedrock and stores or searches those embeddings in a native Amazon DynamoDB vector index. The source content, metadata, and embedding remain together in one DynamoDB item.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-http-api-lambda-bedrock-dynamodb-vector-search-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage. See the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -54,7 +54,7 @@ The HTTP API is intentionally unauthenticated to keep the integration focused. A
 
     ```bash
     git clone https://github.com/aws-samples/serverless-patterns.git
-    cd serverless-patterns/apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk
+    cd serverless-patterns/apigw-http-api-lambda-bedrock-dynamodb-vector-search/typescript/cdk
     ```
 
 2. Install dependencies:
