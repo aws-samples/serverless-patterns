@@ -1,5 +1,5 @@
 {
-  "title": "API Gateway to Bedrock and DynamoDB vector search",
+  "title": "Amazon API Gateway to Amazon Bedrock and Amazon DynamoDB vector search",
   "description": "Build a semantic search API with API Gateway, Lambda, Bedrock embeddings, and a native DynamoDB vector index.",
   "language": "TypeScript",
   "level": "300",
