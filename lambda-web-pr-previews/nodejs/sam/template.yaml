@@ -1,0 +1,283 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - A preview URL for every pull request with AWS Lambda Web Functions (SAM).
+  Creates the code bucket, execution roles, log groups and GitHub Actions deploy roles. The deploy
+  script creates the Web Function, its production endpoint and one pr-<number> endpoint per pull request.
+
+Parameters:
+  GitHubSubjectPrefix:
+    Type: String
+    Default: ''
+    AllowedPattern: '^$|^repo:[^:*?]+$'
+    Description: >
+      Subject prefix of the GitHub OIDC tokens for the repository that may deploy, for example
+      repo:my-org@123456/my-repo@456789 or repo:my-org/my-repo. Get it with the gh command in the
+      README. Leave empty to skip the GitHub Actions roles and deploy from your terminal only.
+  GitHubOidcProviderArn:
+    Type: String
+    Default: ''
+    Description: >
+      ARN of an existing token.actions.githubusercontent.com OIDC provider in this account. An
+      account can have only one, so leave empty only if the account does not have one yet.
+  LogRetentionDays:
+    Type: Number
+    Default: 7
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365]
+    Description: Days to keep the Web Function logs.
+
+Conditions:
+  HasRepository: !Not [!Equals [!Ref GitHubSubjectPrefix, '']]
+  CreateOidcProvider: !And
+    - !Condition HasRepository
+    - !Equals [!Ref GitHubOidcProviderArn, '']
+
+Resources:
+  # Web Functions deploy code from a specific object version, so versioning is required.
+  CodeBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # Lambda reads the code package as the service principal, not as the execution role.
+  CodeBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CodeBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub '${CodeBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
+  # The stack owns the log groups, so they get a retention period and are deleted with the stack.
+  # Lambda writes to the .local group and copies the events into the main group.
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/web/${AWS::StackName}-${AWS::Region}
+      RetentionInDays: !Ref LogRetentionDays
+
+  LocalLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/web/${AWS::StackName}-${AWS::Region}.local
+      RetentionInDays: !Ref LogRetentionDays
+
+  # Each revision names its own execution role. Production revisions use this role. Add the
+  # permissions that your production code needs, for example to production data.
+  ProductionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub '${LogGroup.Arn}'
+                  - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/web/${AWS::StackName}-${AWS::Region}.local:*'
+
+  # Preview revisions run code from pull requests that nobody has merged yet, so they get their own
+  # role. Keep it free of production permissions.
+  PreviewExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub '${LogGroup.Arn}'
+                  - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/web/${AWS::StackName}-${AWS::Region}.local:*'
+
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOidcProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+
+  # Assumed by the workflow that runs for pull requests. GitHub does not give OIDC tokens to pull
+  # requests from forks, so only branches in your repository can deploy previews. The role can
+  # change only pr-* endpoints, so a pull request cannot touch the production endpoint.
+  PreviewDeployRole:
+    Type: AWS::IAM::Role
+    Condition: HasRepository
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If [CreateOidcProvider, !Ref GitHubOidcProvider, !Ref GitHubOidcProviderArn]
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub '${GitHubSubjectPrefix}:pull_request'
+      Policies:
+        - PolicyName: deploy-previews
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ReadStackOutputs
+                Effect: Allow
+                Action: cloudformation:DescribeStacks
+                Resource: !Ref AWS::StackId
+              - Sid: UploadPreviewCode
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: !Sub '${CodeBucket.Arn}/previews/*'
+              - Sid: CreatePreviewRevisionsAndEndpoints
+                Effect: Allow
+                Action:
+                  - lambda:GetWebFunction
+                  - lambda:CreateWebFunctionRevision
+                  - lambda:CreateWebFunctionEndpoint
+                  - lambda:ListWebFunctionEndpoints
+                  - lambda:ListWebFunctionRevisions
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}'
+              - Sid: ManagePreviewEndpointsOnly
+                Effect: Allow
+                Action:
+                  - lambda:GetWebFunctionEndpoint
+                  - lambda:UpdateWebFunctionEndpoint
+                  - lambda:DeleteWebFunctionEndpoint
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/endpoint/pr-*'
+              - Sid: ManageRevisions
+                Effect: Allow
+                Action:
+                  - lambda:GetWebFunctionRevision
+                  - lambda:DeleteWebFunctionRevision
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/revision/*'
+              - Sid: PassPreviewRoleOnly
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt PreviewExecutionRole.Arn
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: lambda.amazonaws.com
+
+  # Assumed by the workflow that runs on pushes to main. It deploys the production endpoint.
+  ProductionDeployRole:
+    Type: AWS::IAM::Role
+    Condition: HasRepository
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If [CreateOidcProvider, !Ref GitHubOidcProvider, !Ref GitHubOidcProviderArn]
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub '${GitHubSubjectPrefix}:ref:refs/heads/main'
+      Policies:
+        - PolicyName: deploy-production
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ReadStackOutputs
+                Effect: Allow
+                Action: cloudformation:DescribeStacks
+                Resource: !Ref AWS::StackId
+              - Sid: UploadProductionCode
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: !Sub '${CodeBucket.Arn}/production/*'
+              - Sid: CreateFunctionAndRevisions
+                Effect: Allow
+                Action:
+                  - lambda:GetWebFunction
+                  - lambda:CreateWebFunction
+                  - lambda:CreateWebFunctionRevision
+                  - lambda:ListWebFunctionEndpoints
+                  - lambda:ListWebFunctionRevisions
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}'
+              - Sid: ManageProductionEndpoint
+                Effect: Allow
+                Action:
+                  - lambda:GetWebFunctionEndpoint
+                  - lambda:UpdateWebFunctionEndpoint
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/endpoint/prod'
+              - Sid: ReadRevisions
+                Effect: Allow
+                Action: lambda:GetWebFunctionRevision
+                Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/revision/*'
+              - Sid: PassProductionRoleOnly
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt ProductionExecutionRole.Arn
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: lambda.amazonaws.com
+
+Outputs:
+  FunctionName:
+    # Web Function names must be unique across all Regions of an account, so the name includes the Region.
+    Description: Name of the Lambda Web Function that the deploy script creates
+    Value: !Sub '${AWS::StackName}-${AWS::Region}'
+  CodeBucketName:
+    Description: Versioned S3 bucket for the code packages
+    Value: !Ref CodeBucket
+  ProductionExecutionRoleArn:
+    Description: Execution role for production revisions
+    Value: !GetAtt ProductionExecutionRole.Arn
+  PreviewExecutionRoleArn:
+    Description: Execution role for preview revisions
+    Value: !GetAtt PreviewExecutionRole.Arn
+  PreviewDeployRoleArn:
+    Condition: HasRepository
+    Description: Role for the pull request workflow. Store it as the AWS_PREVIEW_ROLE_ARN repository variable
+    Value: !GetAtt PreviewDeployRole.Arn
+  ProductionDeployRoleArn:
+    Condition: HasRepository
+    Description: Role for the production workflow. Store it as the AWS_PRODUCTION_ROLE_ARN repository variable
+    Value: !GetAtt ProductionDeployRole.Arn
