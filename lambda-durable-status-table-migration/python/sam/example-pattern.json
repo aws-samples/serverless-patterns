@@ -1,13 +1,13 @@
 {
   "title": "Migrate a long-running job from a status table and poller to AWS Lambda durable functions",
-  "description": "Same job twice: a DynamoDB status table with a scheduled poller, then an AWS Lambda durable function with checkpointed steps and built-in retries. Same job id and GET API.",
+  "description": "Same job twice: a FastAPI app with a DynamoDB status table and poller, then the same app on an AWS Lambda durable function with checkpointed steps and retries.",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "A job too long or too fragile for one Lambda invocation is usually run through a hand-rolled status table: write a PENDING row, have a poller claim it, run the steps, update the row after each one, detect stale RUNNING rows, count attempts. This pattern deploys that version (before/) and the same job as a Lambda durable function (after/) side by side.",
+      "A job too long or too fragile for one Lambda invocation is usually run through a hand-rolled status table behind a FastAPI app: write a PENDING row, have a poller claim it, run the steps, update the row after each one, detect stale RUNNING rows, count attempts. This pattern deploys that version (before/) and the same job as a Lambda durable function (after/) side by side.",
       "In the durable version each step is a context.step() call. The runtime checkpoints results, replays past completed steps after a crash, and retries the flaky step with RetryPresets.transient() instead of a hand-written attempt counter.",
       "The public job id becomes the DurableExecutionName, so starting a job is idempotent and GET /jobs/{id} resolves job_id to an execution ARN and reads status with GetDurableExecution. Durable statuses are mapped back to the old API's words so clients do not change.",
       "Cutover: point POST at /v2, keep GET polling as is. The /v2 GET still answers for old rows while the legacy poller drains them; delete the legacy functions once no rows lack an execution ARN.",

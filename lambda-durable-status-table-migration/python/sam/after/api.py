@@ -1,11 +1,13 @@
 """
-AFTER - job API backed by durable executions.
+AFTER - the same FastAPI job API, backed by durable executions.
 
 POST /v2/jobs       -> start a durable execution named by job_id, store its ARN
 GET  /v2/jobs/{id}  -> job_id -> execution ARN -> GetDurableExecution
 
-The table shrinks to one job: map a public job_id to an execution ARN.
-Status, step progress, retries and results now live in the durable runtime.
+The web app is unchanged in shape: same framework, same routes, same public
+job_id. What changed is behind it. The table shrinks to one job: map a public
+job_id to an execution ARN. Status, step progress, retries and results now
+live in the durable runtime.
 
 Cutover: a GET for a job created by the OLD API (a row with no execution
 ARN) still answers from the row. Point clients at /v2 and the old poller
@@ -19,6 +21,9 @@ import time
 import uuid
 
 import boto3
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from mangum import Mangum
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["JOBS_TABLE"])
@@ -37,24 +42,27 @@ STATUS_MAP = {
     "STOPPED": "FAILED",
 }
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
-def _response(status_code: int, body: dict) -> dict:
-    return {
-        "statusCode": status_code,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(body),
-    }
+app = FastAPI(title="jobs (durable)", docs_url=None, redoc_url=None)
 
 
-def create_job(event: dict) -> dict:
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    response = await call_next(request)
+    logger.info("%s %s -> %s", request.method, request.url.path, response.status_code)
+    return response
+
+
+@app.post("/v2/jobs")
+async def create_job(request: Request) -> JSONResponse:
     try:
-        payload = json.loads(event.get("body") or "{}")
-    except json.JSONDecodeError:
-        return _response(400, {"error": "body must be JSON"})
+        payload = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "body must be JSON"}, status_code=400)
+    if not isinstance(payload, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
     job_id = payload.get("job_id") or str(uuid.uuid4())
 
     # DurableExecutionName makes the start idempotent: a retry with the same
@@ -69,8 +77,9 @@ def create_job(event: dict) -> dict:
     if not execution_arn:
         # Only a durable function returns this. A missing ARN means JOB_FUNCTION
         # points at a function without DurableConfig.
-        return _response(
-            500, {"error": "target is not a durable function", "job_id": job_id}
+        return JSONResponse(
+            {"error": "target is not a durable function", "job_id": job_id},
+            status_code=500,
         )
 
     now = int(time.time())
@@ -82,14 +91,16 @@ def create_job(event: dict) -> dict:
             "expires_at": now + TTL_SECONDS,
         }
     )
-    return _response(202, {"job_id": job_id, "status": "RUNNING"})
+    return JSONResponse({"job_id": job_id, "status": "RUNNING"}, status_code=202)
 
 
-def get_job(event: dict) -> dict:
-    job_id = (event.get("pathParameters") or {}).get("job_id")
+@app.get("/v2/jobs/{job_id}")
+async def get_job(job_id: str) -> JSONResponse:
     item = table.get_item(Key={"job_id": job_id}).get("Item")
     if not item:
-        return _response(404, {"error": "job not found", "job_id": job_id})
+        return JSONResponse(
+            {"error": "job not found", "job_id": job_id}, status_code=404
+        )
 
     execution_arn = item.get("execution_arn")
     if not execution_arn:
@@ -100,11 +111,10 @@ def get_job(event: dict) -> dict:
             "step": item.get("step"),
             "legacy": True,
         }
-        if "result" in item:
-            body["result"] = item["result"]
-        if "error" in item:
-            body["error"] = item["error"]
-        return _response(200, body)
+        for k in ("result", "error"):
+            if k in item:
+                body[k] = item[k]
+        return JSONResponse(body, status_code=200)
 
     execution = lambda_client.get_durable_execution(DurableExecutionArn=execution_arn)
     body = {
@@ -117,21 +127,8 @@ def get_job(event: dict) -> dict:
         body["error"] = execution["Error"].get("ErrorMessage") or str(
             execution["Error"]
         )
-    return _response(200, body)
+    return JSONResponse(body, status_code=200)
 
 
-def lambda_handler(event: dict, context) -> dict:
-    method = event.get("httpMethod")
-    if method == "POST":
-        response = create_job(event)
-    elif method == "GET":
-        response = get_job(event)
-    else:
-        response = _response(405, {"error": "method not allowed"})
-    logger.info(
-        "%s %s -> %s",
-        method,
-        event.get("path"),
-        response["statusCode"],
-    )
-    return response
+# Lambda entry point. Lifespan is off because there is no startup work to run.
+lambda_handler = Mangum(app, lifespan="off")

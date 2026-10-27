@@ -108,6 +108,11 @@ Resources:
         - .js=.mjs
         External:
         - '@aws-sdk/*'
+        # Express is CommonJS. In an ESM bundle its require() calls for Node
+        # built-ins need a real require, or the function fails at load with
+        # "Dynamic require of 'tty' is not supported".
+        Banner:
+        - js=import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);
         EntryPoints:
         - api.ts
   LegacyJobWorkerFunctionLogGroup:
@@ -219,6 +224,11 @@ Resources:
         - .js=.mjs
         External:
         - '@aws-sdk/*'
+        # Express is CommonJS. In an ESM bundle its require() calls for Node
+        # built-ins need a real require, or the function fails at load with
+        # "Dynamic require of 'tty' is not supported".
+        Banner:
+        - js=import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);
         EntryPoints:
         - api.ts
   JobDeadLetterQueue:

@@ -1,6 +1,6 @@
 # Migrate a long-running job from a status table and poller to Lambda durable functions (TypeScript)
 
-This pattern demonstrates how to migrate a long-running job that outlives one Lambda invocation from a DynamoDB status table with a scheduled poller to an AWS Lambda durable function. The legacy version writes a row to a jobs table, has a poller pick it up, run the steps, and update the row after each one so a crash can be resumed; clients poll `GET /jobs/{id}` for status. The durable version checkpoints each step, retries with a built-in policy, and uses the public `job_id` as the execution name, so the API and its clients do not change. Both halves deploy side by side (`/v1` and `/v2`) for a no-downtime cutover, then the legacy half is removed with one parameter. The front door is an API Gateway REST API so one stage can host both versions with the same proxy event shape; an HTTP API would work the same way with the v1.0 payload format.
+This pattern demonstrates how to migrate a long-running job that outlives one Lambda invocation from a DynamoDB status table with a scheduled poller to an AWS Lambda durable function. The legacy version is a Express app that writes a row to a jobs table, has a poller pick it up, run the steps, and update the row after each one so a crash can be resumed; clients poll `GET /jobs/{id}` for status. The durable version checkpoints each step, retries with a built-in policy, and uses the public `job_id` as the execution name, so the API and its clients do not change. Both halves deploy side by side (`/v1` and `/v2`) for a no-downtime cutover, then the legacy half is removed with one parameter. The front door is an API Gateway REST API so one stage can host both versions with the same proxy event shape; an HTTP API would work the same way with the v1.0 payload format.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-status-table-migration-typescript-sam](https://serverlessland.com/patterns/lambda-durable-status-table-migration-typescript-sam)
 
@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-Both halves run the same three business steps from `steps.ts`: `fetch_source`, `transform`, and `publish_result`. Only the orchestration around them changes.
+Both halves expose the same Express app (`api.ts`, served on Lambda through serverless-http) and run the same three business steps from `steps.ts`: `fetch_source`, `transform`, and `publish_result`. The web app keeps its framework, routes and public `job_id`; only the orchestration behind it changes, from the poller in `worker.ts` to a durable function.
 
 `transform` raises a `TransientError` on attempt 1 for any input containing the word `flaky`, then succeeds on attempt 2. It stands in for a throttle or timeout from a dependency. It is keyed off the attempt number the caller passes in (the hand-kept `attempts` counter in `before/`, `step.attempt` from the runtime in `after/`), so it behaves the same whether the retry lands in a warm or a cold execution environment.
 

@@ -1,44 +1,59 @@
 """
-BEFORE - job API backed by a status table.
+BEFORE - FastAPI job API backed by a status table.
 
 POST /v1/jobs       -> write {job_id, status=PENDING, payload} to the table
 GET  /v1/jobs/{id}  -> read the row and return its status
 
-The table is the only source of truth about where a job is.
-A separate poller (worker.py) moves rows through PENDING -> RUNNING -> DONE.
+This is the web app a team already has: a FastAPI service whose only record
+of a job is a row in a "jobs" table. A separate poller (worker.py) moves rows
+through PENDING -> RUNNING -> DONE. Mangum adapts the ASGI app to the API
+Gateway proxy event, so the same app runs on Lambda unchanged.
 """
 
-import json
 import logging
 import os
 import time
 import uuid
 
 import boto3
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from mangum import Mangum
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["JOBS_TABLE"])
 
 TTL_SECONDS = 3 * 24 * 60 * 60
 
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
-def _response(status_code: int, body: dict) -> dict:
-    return {
-        "statusCode": status_code,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(body),
-    }
+app = FastAPI(title="jobs (status table)", docs_url=None, redoc_url=None)
 
 
-def create_job(event: dict) -> dict:
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    response = await call_next(request)
+    logger.info("%s %s -> %s", request.method, request.url.path, response.status_code)
+    return response
+
+
+def _row_to_body(job_id: str, item: dict) -> dict:
+    body = {"job_id": job_id, "status": item["status"], "step": item.get("step")}
+    for k in ("result", "error"):
+        if k in item:
+            body[k] = item[k]
+    return body
+
+
+@app.post("/v1/jobs")
+async def create_job(request: Request) -> JSONResponse:
     try:
-        payload = json.loads(event.get("body") or "{}")
-    except json.JSONDecodeError:
-        return _response(400, {"error": "body must be JSON"})
+        payload = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "body must be JSON"}, status_code=400)
+    if not isinstance(payload, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
     job_id = payload.get("job_id") or str(uuid.uuid4())
     now = int(time.time())
 
@@ -59,49 +74,20 @@ def create_job(event: dict) -> dict:
     except table.meta.client.exceptions.ConditionalCheckFailedException:
         # Already exists: report where it really is, not a fresh PENDING.
         existing = table.get_item(Key={"job_id": job_id})["Item"]
-        body = {
-            "job_id": job_id,
-            "status": existing["status"],
-            "step": existing.get("step"),
-        }
-        for k in ("result", "error"):
-            if k in existing:
-                body[k] = existing[k]
-        return _response(200, body)
+        return JSONResponse(_row_to_body(job_id, existing), status_code=200)
 
-    return _response(202, {"job_id": job_id, "status": "PENDING"})
+    return JSONResponse({"job_id": job_id, "status": "PENDING"}, status_code=202)
 
 
-def get_job(event: dict) -> dict:
-    job_id = (event.get("pathParameters") or {}).get("job_id")
+@app.get("/v1/jobs/{job_id}")
+async def get_job(job_id: str) -> JSONResponse:
     item = table.get_item(Key={"job_id": job_id}).get("Item")
     if not item:
-        return _response(404, {"error": "job not found", "job_id": job_id})
-
-    body = {
-        "job_id": job_id,
-        "status": item["status"],
-        "step": item.get("step"),
-    }
-    if "result" in item:
-        body["result"] = item["result"]
-    if "error" in item:
-        body["error"] = item["error"]
-    return _response(200, body)
+        return JSONResponse(
+            {"error": "job not found", "job_id": job_id}, status_code=404
+        )
+    return JSONResponse(_row_to_body(job_id, item), status_code=200)
 
 
-def lambda_handler(event: dict, context) -> dict:
-    method = event.get("httpMethod")
-    if method == "POST":
-        response = create_job(event)
-    elif method == "GET":
-        response = get_job(event)
-    else:
-        response = _response(405, {"error": "method not allowed"})
-    logger.info(
-        "%s %s -> %s",
-        method,
-        event.get("path"),
-        response["statusCode"],
-    )
-    return response
+# Lambda entry point. Lifespan is off because there is no startup work to run.
+lambda_handler = Mangum(app, lifespan="off")

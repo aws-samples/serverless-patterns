@@ -1,11 +1,13 @@
 /**
- * AFTER - job API backed by durable executions.
+ * AFTER - the same Express job API, backed by durable executions.
  *
  * POST /v2/jobs       -> start a durable execution named by job_id, store its ARN
  * GET  /v2/jobs/{id}  -> job_id -> execution ARN -> GetDurableExecution
  *
- * The table shrinks to one job: map a public job_id to an execution ARN.
- * Status, step progress, retries and results now live in the durable runtime.
+ * The web app is unchanged in shape: same framework, same routes, same public
+ * job_id. What changed is behind it. The table shrinks to one job: map a
+ * public job_id to an execution ARN. Status, step progress, retries and
+ * results now live in the durable runtime.
  *
  * Cutover: a GET for a job created by the OLD API (a row with no execution
  * ARN) still answers from the row. Point clients at /v2 and the old poller
@@ -15,8 +17,9 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { GetDurableExecutionCommand, InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'node:crypto';
+import serverless from 'serverless-http';
 
 const table = process.env.JOBS_TABLE!;
 const JOB_FUNCTION = process.env.JOB_FUNCTION!; // qualified alias ARN
@@ -37,25 +40,17 @@ const STATUS_MAP: Record<string, string> = {
 
 type Body = Record<string, unknown>;
 
-function response(statusCode: number, body: Body): APIGatewayProxyResult {
-  return {
-    statusCode,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  };
-}
+const app = express();
+app.use(express.json());
 
-function parseBody(event: APIGatewayProxyEvent): Body | undefined {
-  try {
-    return JSON.parse(event.body || '{}');
-  } catch {
-    return undefined;
-  }
-}
+// Log every request the way the old handler did.
+app.use((req, res, next) => {
+  res.on('finish', () => console.info(`${req.method} ${req.path} -> ${res.statusCode}`));
+  next();
+});
 
-async function createJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const payload = parseBody(event);
-  if (!payload) return response(400, { error: 'body must be JSON' });
+app.post('/v2/jobs', async (req: Request, res: Response) => {
+  const payload = req.body as Body;
   const jobId = (payload.job_id as string | undefined) || randomUUID();
 
   // DurableExecutionName makes the start idempotent: a retry with the same
@@ -72,7 +67,8 @@ async function createJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyRe
   if (!executionArn) {
     // Only a durable function returns this. A missing ARN means JOB_FUNCTION
     // points at a function without DurableConfig.
-    return response(500, { error: 'target is not a durable function', job_id: jobId });
+    res.status(500).json({ error: 'target is not a durable function', job_id: jobId });
+    return;
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -82,13 +78,16 @@ async function createJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyRe
       Item: { job_id: jobId, execution_arn: executionArn, created_at: now, expires_at: now + TTL_SECONDS },
     }),
   );
-  return response(202, { job_id: jobId, status: 'RUNNING' });
-}
+  res.status(202).json({ job_id: jobId, status: 'RUNNING' });
+});
 
-async function getJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const jobId = event.pathParameters?.job_id;
+app.get('/v2/jobs/:job_id', async (req: Request, res: Response) => {
+  const jobId = String(req.params.job_id);
   const item = (await ddb.send(new GetCommand({ TableName: table, Key: { job_id: jobId } }))).Item;
-  if (!item) return response(404, { error: 'job not found', job_id: jobId });
+  if (!item) {
+    res.status(404).json({ error: 'job not found', job_id: jobId });
+    return;
+  }
 
   const executionArn = item.execution_arn as string | undefined;
   if (!executionArn) {
@@ -96,7 +95,8 @@ async function getJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     const body: Body = { job_id: jobId, status: item.status ?? 'UNKNOWN', step: item.step ?? null, legacy: true };
     if ('result' in item) body.result = item.result;
     if ('error' in item) body.error = item.error;
-    return response(200, body);
+    res.status(200).json(body);
+    return;
   }
 
   const execution = await lambda.send(new GetDurableExecutionCommand({ DurableExecutionArn: executionArn }));
@@ -104,14 +104,17 @@ async function getJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
   const body: Body = { job_id: jobId, status: STATUS_MAP[status] ?? status };
   if (execution.Result) body.result = JSON.parse(execution.Result);
   if (execution.Error) body.error = execution.Error.ErrorMessage ?? JSON.stringify(execution.Error);
-  return response(200, body);
-}
+  res.status(200).json(body);
+});
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  let result: APIGatewayProxyResult;
-  if (event.httpMethod === 'POST') result = await createJob(event);
-  else if (event.httpMethod === 'GET') result = await getJob(event);
-  else result = response(405, { error: 'method not allowed' });
-  console.info(`${event.httpMethod} ${event.path} -> ${result.statusCode}`);
-  return result;
-};
+// express.json() rejects a malformed body with a 400 that is HTML by default.
+app.use((err: Error & { type?: string }, _req: Request, res: Response, next: express.NextFunction) => {
+  if (err.type === 'entity.parse.failed') {
+    res.status(400).json({ error: 'body must be JSON' });
+    return;
+  }
+  next(err);
+});
+
+// Lambda entry point.
+export const handler = serverless(app);

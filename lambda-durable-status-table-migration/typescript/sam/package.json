@@ -8,6 +8,10 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "express": "5.3.0",
+    "serverless-http": "4.0.0"
+  },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "3.1157.0",
     "@aws-sdk/client-lambda": "3.1157.0",
@@ -20,6 +24,7 @@
     "esbuild": "0.28.2",
     "jest": "29.7.0",
     "ts-jest": "29.4.15",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@types/express": "5.0.6"
   }
 }
