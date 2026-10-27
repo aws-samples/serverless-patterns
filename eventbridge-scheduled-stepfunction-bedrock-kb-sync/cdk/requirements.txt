@@ -20,7 +20,7 @@ aws-lambda-powertools==3.29.0
     # via -r requirements.in
 bandit==1.9.4
     # via -r requirements.in
-black==26.3.1
+black==26.10.1
     # via -r requirements.in
 boto3==1.43.6
     # via
@@ -134,7 +134,7 @@ pygments==2.20.0
     # via
     #   pytest
     #   rich
-pylint==4.0.5
+pylint==4.0.9
     # via -r requirements.in
 pytest==9.0.3
     # via
