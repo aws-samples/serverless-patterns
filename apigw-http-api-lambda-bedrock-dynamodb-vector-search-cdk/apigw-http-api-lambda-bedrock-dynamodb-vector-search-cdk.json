@@ -9,7 +9,7 @@
       "x": 20,
       "y": 50,
       "service": "apigw",
-      "label": "API Gateway HTTP API"
+      "label": "Amazon API Gateway HTTP API"
     },
     "icon2": {
       "x": 50,
