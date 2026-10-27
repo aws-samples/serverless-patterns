@@ -80,7 +80,7 @@ sam --version
 Clone the project:
 ```bash
 git clone https://github.com/aws-samples/serverless-patterns.git
-cd serverless-patterns/lambda-durable-java-sam
+cd serverless-patterns/lambda-durable-patterns/java/sam
 ```
 
 ---

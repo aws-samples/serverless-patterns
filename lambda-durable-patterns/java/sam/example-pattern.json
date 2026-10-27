@@ -4,6 +4,7 @@
   "language": "Java",
   "level": "300",
   "framework": "AWS SAM",
+  "patternGroup": "lambda-durable-patterns",
   "introBox": {
     "headline": "How it works",
     "text": [

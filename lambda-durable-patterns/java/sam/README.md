@@ -64,7 +64,7 @@ The CloudFormation template deploys a VPC with a public subnet and an EC2 instan
 **3. Navigate to the project directory:**
 
 ```bash
-cd /home/ec2-user/serverless-patterns/lambda-durable-java-sam
+cd /home/ec2-user/serverless-patterns/lambda-durable-patterns/java/sam
 ```
 
 Then continue from [Build and Deploy](#build-and-deploy) below.
@@ -139,8 +139,8 @@ set AWS_REGION=us-east-1
 git clone --depth 1 --filter=blob:none --sparse \
   https://github.com/aws-samples/serverless-patterns.git
 cd serverless-patterns
-git sparse-checkout set lambda-durable-java-sam
-cd lambda-durable-java-sam
+git sparse-checkout set lambda-durable-patterns/java/sam
+cd lambda-durable-patterns/java/sam
 ```
 
 Then continue from [Build and Deploy](#build-and-deploy) below.
@@ -216,7 +216,7 @@ Navigate to the SAM template directory:
 
 **From EC2:**
 ```bash
-cd /home/ec2-user/serverless-patterns/lambda-durable-java-sam/durable-functions-sam
+cd /home/ec2-user/serverless-patterns/lambda-durable-patterns/java/sam/durable-functions-sam
 ```
 
 **From local machine:**
@@ -465,7 +465,7 @@ aws lambda get-durable-execution --function-name durable-chaining-example:1 --ex
 ## Project Structure
 
 ```
-lambda-durable-java-sam/
+lambda-durable-patterns/java/sam/
 ├── README.md
 ├── USER_GUIDE.md
 ├── DEVELOPER_GUIDE.md
