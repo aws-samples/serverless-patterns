@@ -62,7 +62,7 @@ Both halves run the same three business steps from `steps.py`: `fetch_source`, `
 | Current step | `step` field in the row | Not in the status response; read it from `get-durable-execution-history` |
 | What the table holds | Status, current step, every step's output, attempts, error, result | `job_id -> execution_arn` only |
 
-`before/worker.py` is about 120 lines, almost all of it bookkeeping. `after/job.py` is about 65, almost all of it the steps.
+`before/worker.py` is about 150 lines, almost all of it bookkeeping. `after/job.py` is about 65, almost all of it the steps.
 
 ```
                     +------------------------+

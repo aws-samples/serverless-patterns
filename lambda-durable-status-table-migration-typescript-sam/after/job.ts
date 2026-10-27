@@ -24,8 +24,8 @@ interface JobEvent {
 }
 
 // Step 2 is the flaky one. Give it a bounded exponential backoff with jitter
-// instead of a hand-rolled attempt counter. (retryPresets.default allows six
-// attempts over ~2.5 minutes; three is enough for a transient blip.)
+// instead of a hand-rolled attempt counter. The SDK's default preset allows
+// six attempts; three is enough for a transient blip.
 const RETRY_TRANSIENT = createRetryStrategy({
   maxAttempts: 3,
   initialDelay: { seconds: 1 },
