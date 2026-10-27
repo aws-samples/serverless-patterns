@@ -1,0 +1,8 @@
+node_modules/
+cdk.out/
+cdk-outputs.json
+*.js
+*.d.ts
+*.js.map
+!jest.config.js
+.DS_Store
