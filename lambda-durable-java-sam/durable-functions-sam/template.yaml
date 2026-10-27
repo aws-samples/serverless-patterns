@@ -10,6 +10,17 @@ Parameters:
     Type: String
     Description: Name of the SNS Topic used to trigger durable functions
     Default: DurableFunctionsSNSTopic
+  PermissionsBoundaryArn:
+    Type: String
+    Description: Optional permissions boundary for the function role. The EC2 dev environment sets this ($SAM_PERMISSIONS_BOUNDARY_ARN); leave it empty when deploying from your own machine.
+    Default: ''
+  RolePath:
+    Type: String
+    Description: Path for the function role. The EC2 dev environment sets this ($SAM_ROLE_PATH); keep / when deploying from your own machine.
+    Default: /
+
+Conditions:
+  HasPermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundaryArn, '']]
 
 Resources:
   # SNS Topic for triggering the durable functions
@@ -23,6 +34,8 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub "${AWS::StackName}-durable-function-role"
+      Path: !Ref RolePath
+      PermissionsBoundary: !If [HasPermissionsBoundary, !Ref PermissionsBoundaryArn, !Ref AWS::NoValue]
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

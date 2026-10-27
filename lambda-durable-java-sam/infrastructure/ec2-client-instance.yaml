@@ -237,6 +237,10 @@ Resources:
             # Set environment variables
             AWS_REGION=${aws_region}
             echo "export AWS_REGION=$AWS_REGION" >> /home/ec2-user/.bash_profile
+            # The instance can only create the function role under this path
+            # and with this permissions boundary; pass both to sam deploy.
+            echo "export SAM_PERMISSIONS_BOUNDARY_ARN=${permissions_boundary_arn}" >> /home/ec2-user/.bash_profile
+            echo "export SAM_ROLE_PATH=${role_path}" >> /home/ec2-user/.bash_profile
 
             # Clone the durable functions project from serverless-patterns
             cd /home/ec2-user
@@ -264,6 +268,8 @@ Resources:
             aws_region: !Ref 'AWS::Region'
             java_version: !Ref JavaVersion
             security_group_id: !GetAtt ClientInstanceSecurityGroup.GroupId
+            permissions_boundary_arn: !Ref SamFunctionPermissionsBoundary
+            role_path: !Sub '/${AWS::StackName}/'
 
   EC2InstanceEndpoint:
     Type: AWS::EC2::InstanceConnectEndpoint
@@ -290,12 +296,49 @@ Resources:
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/IAMFullAccess
         - arn:aws:iam::aws:policy/AWSLambda_FullAccess
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess_v2
         - arn:aws:iam::aws:policy/AmazonSNSFullAccess
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
       Policies:
+        - PolicyName: SamDeployIamAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ManageSamFunctionRolesWithBoundary
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PermissionsBoundary': !Ref SamFunctionPermissionsBoundary
+              - Sid: ReadAndDeleteSamFunctionRoles
+                Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:GetRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:ListAttachedRolePolicies
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:DeleteRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+              - Sid: PassSamFunctionRolesToLambda
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
+                Condition:
+                  StringEquals:
+                    'iam:PassedToService': lambda.amazonaws.com
+              - Sid: DenyPassingOtherRoles
+                Effect: Deny
+                Action: iam:PassRole
+                NotResource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AWS::StackName}/*'
         - PolicyName: SecurityGroupsPolicy
           PolicyDocument: !Sub '{
             "Version": "2012-10-17",
@@ -335,6 +378,28 @@ Resources:
                 }
             ]
           }'
+
+  SamFunctionPermissionsBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions boundary for the Lambda function role that sam deploy creates from the client instance
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - lambda:CheckpointDurableExecution
+              - lambda:GetDurableExecutionState
+              - lambda:InvokeFunction
+              - lambda:SendDurableExecutionCallbackSuccess
+              - lambda:SendDurableExecutionCallbackFailure
+              - lambda:SendDurableExecutionCallbackHeartbeat
+              - sns:Publish
+              - sns:Subscribe
+            Resource: '*'
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile

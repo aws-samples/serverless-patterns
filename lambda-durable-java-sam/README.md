@@ -51,6 +51,8 @@ The CloudFormation template deploys a VPC with a public subnet and an EC2 instan
 5. Click **Next** through the options, check **I acknowledge that AWS CloudFormation might create IAM resources with custom names**, then click **Submit**
 6. Wait for the stack status to reach **CREATE_COMPLETE** (~5 minutes)
 
+> **Note on IAM permissions:** The EC2 instance role can create IAM roles only under a role path named after the EC2 stack, and only with the permissions boundary attached. It can't grant itself or other roles more access than the boundary allows. The instance role still has broad access to AWS Lambda, AWS CloudFormation and Amazon S3 so that it can run `sam deploy`. Deploy this example in a test account, limit who can connect to the instance, and delete both stacks when you finish testing.
+
 **2. Connect to the instance via EC2 Instance Connect:**
 
 1. Open the [AWS EC2 console](https://console.aws.amazon.com/ec2/)
@@ -229,15 +231,22 @@ aws cloudformation delete-stack --stack-name <your-stack-name>
 aws cloudformation wait stack-delete-complete --stack-name <your-stack-name>
 ```
 
-Deploy:
+Deploy from your local machine:
 ```bash
 sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
+```
+
+Deploy from EC2 (the instance can only create the function role with the permissions boundary and role path it was set up with, so pass both):
+```bash
+sam deploy --guided --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides PermissionsBoundaryArn=$SAM_PERMISSIONS_BOUNDARY_ARN RolePath=$SAM_ROLE_PATH
 ```
 
 When prompted:
 - **Stack Name**: choose a name (e.g., `lambda-durable-java-sam`)
 - **AWS Region**: enter your region (must match where you pushed the ECR image)
 - **Parameter SNSTopicName**: press Enter to accept default
+- **Parameter PermissionsBoundaryArn** and **Parameter RolePath**: press Enter (on EC2 they're already filled in; locally keep the empty boundary and `/`)
 - **Confirm changes before deploy**: `N`
 - **Allow SAM CLI IAM role creation**: `Y`
 - **Disable rollback**: `N`
