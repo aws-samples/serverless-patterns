@@ -4,12 +4,6 @@ You have a job that is too long or too fragile for one Lambda invocation, so you
 
 This pattern shows the same job twice. `before/` is that status-table version. `after/` is the same job as a Lambda durable function: each step is checkpointed by the runtime, retries use a built-in policy, and the public `job_id` is the durable execution name, so the API and its clients do not change. Both halves deploy side by side (`/v1` and `/v2`) so you can cut over without downtime, then remove the old half with one parameter. The front door is an API Gateway REST API so one stage can host both versions with the same proxy event shape; an HTTP API would work the same way with the v1.0 payload format.
 
-### What is a durable function?
-
-A normal Lambda invocation is all or nothing: crash at minute eight and it restarts from line one. A *durable execution* is one logical run of a Lambda function that the runtime can pause, resume and retry across many invocations. You wrap each unit of work in `context.step(...)`. When a step returns, the runtime writes a *checkpoint* (the step's result). If the execution is interrupted, the runtime *replays* your function from the top; each `context.step()` whose checkpoint exists returns the saved result without running the body, so execution picks up at the first unfinished step.
-
-Every execution has a *name*, unique per function. Invoking again with a name that already exists returns the existing execution instead of starting a second one. This pattern uses the public `job_id` as that name, which is the idempotency the `before/` code gets only from its `attribute_not_exists(job_id)` conditional put.
-
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-status-table-migration-typescript-sam](https://serverlessland.com/patterns/lambda-durable-status-table-migration-typescript-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -63,6 +57,8 @@ Both halves run the same three business steps from `steps.ts`: `fetch_source`, `
 | What the table holds | Status, current step, every step's output, attempts, error, result | `job_id -> execution_arn` only |
 
 `before/worker.ts` is about 150 lines, almost all of it bookkeeping. `after/job.ts` is about 70, almost all of it the steps.
+
+### Architecture
 
 ```
                     +------------------------+
