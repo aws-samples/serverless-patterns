@@ -44,16 +44,55 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
 
   JobsQueue:
     Type: AWS::SQS::Queue
     Properties:
-      # Give the worker room to run all three steps before the message
-      # becomes visible again. AWS recommends >= 6x the function timeout.
-      VisibilityTimeout: 360
+      # Give the worker room to run all three steps before the message becomes
+      # visible again. AWS recommends >= 6x the function timeout; the worker is
+      # 60s, so 6x is 360 - 420 keeps a margin above the floor for cold start
+      # and receive-to-invoke latency.
+      VisibilityTimeout: 420
+      SqsManagedSseEnabled: true
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt JobsDeadLetterQueue.Arn
         maxReceiveCount: 3
+
+  # Deny any non-TLS access to either queue (the enforceSSL posture).
+  JobsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref JobsQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: sqs:*
+            Resource: !GetAtt JobsQueue.Arn
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+
+  JobsDeadLetterQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref JobsDeadLetterQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: sqs:*
+            Resource: !GetAtt JobsDeadLetterQueue.Arn
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
 
   JobApiFunctionLogGroup:
     Type: AWS::Logs::LogGroup

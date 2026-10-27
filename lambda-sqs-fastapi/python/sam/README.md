@@ -45,6 +45,8 @@ The queue is what the in-process thread could not give you: an unacknowledged me
 
 The `before/` folder is the starting point to compare against - the same FastAPI app running the steps on a background thread. It is included as reference and is not deployed by this template.
 
+Note: SQS delivers at least once, so a redelivered message runs the steps again from the top. The demo steps have no external effect, so that is safe; a real `publish_result` writing to a non-idempotent sink needs an idempotency key or a per-step checkpoint. The `POST` writes the row and sends the message as two calls, not one transaction: if the send fails after the row is written, the job stays `PENDING` and must be re-driven (sweep `PENDING` rows, or make the client retry a new id).
+
 ### Architecture
 
 ```
@@ -90,10 +92,10 @@ curl -s -H 'Content-Type: application/json' -X POST $API/v1/jobs -d "{\"job_id\"
 curl -s $API/v1/jobs/flaky-$RUN
 ```
 
-A duplicate `POST` with the same `job_id` returns the existing job and does not enqueue it again. Run the handler tests locally with no AWS account:
+A duplicate `POST` with the same `job_id` returns the existing job and does not enqueue it again. Run the handler tests locally with no AWS account (Python 3.10 or newer):
 
 ```bash
-python -m venv .venv && . .venv/bin/activate
+python3 -m venv .venv && . .venv/bin/activate
 pip install -r tests/requirements.txt
 pytest tests/
 ```

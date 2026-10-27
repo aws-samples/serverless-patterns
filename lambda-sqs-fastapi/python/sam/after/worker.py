@@ -74,19 +74,32 @@ def lambda_handler(event: dict, context) -> dict:
     failures: list[dict] = []
     for record in event.get("Records", []):
         message_id = record["messageId"]
-        attempt = int(record.get("attributes", {}).get("ApproximateReceiveCount", "1"))
-        body = json.loads(record["body"])
-        job_id = body["job_id"]
-        payload = body.get("payload", {})
+        # Parse INSIDE the try: a single malformed message must not raise out of
+        # the handler, which would fail - and redeliver - the WHOLE batch and
+        # re-run its already-done batch-mates. A message we cannot parse is
+        # reported as a failure so SQS redelivers it and, after maxReceiveCount,
+        # moves it to the DLQ.
         try:
+            attempt = int(
+                record.get("attributes", {}).get("ApproximateReceiveCount", "1")
+            )
+            body = json.loads(record["body"])
+            job_id = body["job_id"]
+            payload = body.get("payload", {})
             _run_one(job_id, payload, attempt)
         except TransientError as exc:
             # Let SQS redeliver: do NOT mark FAILED yet. After maxReceiveCount
-            # deliveries the message goes to the DLQ instead.
+            # deliveries the message goes to the DLQ instead. The row stays
+            # RUNNING; the error is recorded only when the job ends FAILED, so a
+            # GET during the redelivery window never shows RUNNING-with-error.
             logger.warning("job %s attempt %d transient failure, will redeliver: %s",
                            job_id, attempt, exc)
-            _update(job_id, {"status": "RUNNING", "error": str(exc),
-                             "updated_at": int(time.time())})
+            failures.append({"itemIdentifier": message_id})
+        except (ValueError, KeyError) as exc:
+            # Malformed message body: cannot even identify the job. Redeliver and
+            # let the DLQ catch it; never fail the batch over one bad message.
+            logger.error("message %s is malformed, will redeliver to DLQ: %s",
+                         message_id, exc)
             failures.append({"itemIdentifier": message_id})
         except Exception as exc:  # a permanent error fails this job only
             logger.exception("job %s FAILED (permanent)", job_id)

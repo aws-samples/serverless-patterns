@@ -153,19 +153,38 @@ def test_worker_runs_job_to_done(mods):
     assert "error" not in row  # nothing to clear, stays absent
 
 
-def test_flaky_job_redelivers_then_clears_error(mods):
+def test_flaky_job_redelivers_then_completes(mods):
     api, worker, table, _sqs = mods
     _call(api, _proxy("POST", "/v1/jobs", {"job_id": "w2", "input": "flaky thing"}))
-    # First delivery: transient failure -> reported for redelivery, error stamped.
+    # First delivery: transient failure -> reported for redelivery. The row
+    # stays RUNNING and NO error is stamped, so a GET in the redelivery window
+    # never shows RUNNING-with-a-stale-error.
     out1 = worker.lambda_handler(_sqs_event("w2", {"input": "flaky thing"}, receive=1), None)
     assert out1["batchItemFailures"] == [{"itemIdentifier": "m-w2"}]
     assert table.items["w2"]["status"] == "RUNNING"
-    assert "error" in table.items["w2"]
-    # Redelivery (receive count 2): transform succeeds, DONE, stale error cleared.
+    assert "error" not in table.items["w2"]
+    # Redelivery (receive count 2): transform succeeds, job is DONE, no error.
     out2 = worker.lambda_handler(_sqs_event("w2", {"input": "flaky thing"}, receive=2), None)
     assert out2["batchItemFailures"] == []
     assert table.items["w2"]["status"] == "DONE"
     assert "error" not in table.items["w2"]
+
+
+def test_malformed_message_redelivers_without_failing_the_batch(mods):
+    _api, worker, table, _sqs = mods
+    # A good message and a non-JSON message in one batch: the good one must run
+    # to DONE, and only the bad one is reported for redelivery.
+    event = {
+        "Records": [
+            {"messageId": "good", "attributes": {"ApproximateReceiveCount": "1"},
+             "body": json.dumps({"job_id": "ok", "payload": {"input": "hi"}})},
+            {"messageId": "bad", "attributes": {"ApproximateReceiveCount": "1"},
+             "body": "{not json"},
+        ]
+    }
+    out = worker.lambda_handler(event, None)
+    assert out["batchItemFailures"] == [{"itemIdentifier": "bad"}]
+    assert table.items["ok"]["status"] == "DONE"
 
 
 def _sqs_event(job_id, payload, receive):
