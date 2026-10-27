@@ -121,7 +121,7 @@ def _run_job(job: dict) -> None:
             _finish(job_id, "PENDING", error=str(exc), attempts=attempts)
 
     except Exception as exc:
-        logger.exception("job %s FAILED: %s", job_id, exc)
+        logger.exception("job %s FAILED", job_id)
         _finish(job_id, "FAILED", error=str(exc))
 
 
