@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Move a FastAPI job runner's work out of the web process into SQS + a Lambda
+  consumer, keeping the same /v1 routes, job ids and status endpoint. The API
+  Lambda enqueues to SQS and returns; the worker Lambda runs the same step code
+  and writes status back to the shared jobs table. (uksb-1tthgi812) (tag:lambda-sqs-fastapi-python-sam)
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    MemorySize: 256
+    Timeout: 30
+    Tracing: Active
+    Environment:
+      Variables:
+        JOBS_TABLE: !Ref JobsTable
+
+Resources:
+  JobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-jobs
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: job_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: job_id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+
+  JobsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      TracingEnabled: true
+
+  JobsDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+
+  JobsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      # Give the worker room to run all three steps before the message
+      # becomes visible again. AWS recommends >= 6x the function timeout.
+      VisibilityTimeout: 360
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt JobsDeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  JobApiFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-job-api
+      RetentionInDays: 14
+
+  JobApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: The FastAPI API - enqueues a job to SQS and reads its status
+      CodeUri: after/
+      Handler: api.lambda_handler
+      Timeout: 10
+      LoggingConfig:
+        LogGroup: !Ref JobApiFunctionLogGroup
+      Environment:
+        Variables:
+          JOBS_QUEUE_URL: !Ref JobsQueue
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+              Resource: !GetAtt JobsTable.Arn
+        - Statement:
+            - Effect: Allow
+              Action: sqs:SendMessage
+              Resource: !GetAtt JobsQueue.Arn
+      Events:
+        CreateJob:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JobsApi
+            Path: /v1/jobs
+            Method: POST
+        GetJob:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JobsApi
+            Path: /v1/jobs/{job_id}
+            Method: GET
+
+  JobWorkerFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-job-worker
+      RetentionInDays: 14
+
+  JobWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: The SQS consumer - runs the same step code the API process used to run
+      CodeUri: after/
+      Handler: worker.lambda_handler
+      Timeout: 60
+      LoggingConfig:
+        LogGroup: !Ref JobWorkerFunctionLogGroup
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: dynamodb:UpdateItem
+              Resource: !GetAtt JobsTable.Arn
+      Events:
+        JobMessages:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt JobsQueue.Arn
+            BatchSize: 5
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+Outputs:
+  ApiUrl:
+    Description: Base URL - POST /v1/jobs, GET /v1/jobs/{job_id}
+    Value: !Sub https://${JobsApi}.execute-api.${AWS::Region}.amazonaws.com/prod
+  JobsTableName:
+    Description: Shared jobs table
+    Value: !Ref JobsTable
+  JobsQueueUrl:
+    Description: Queue the API enqueues jobs to
+    Value: !Ref JobsQueue
+  JobsDeadLetterQueueUrl:
+    Description: Receives any job message that fails maxReceiveCount deliveries
+    Value: !Ref JobsDeadLetterQueue

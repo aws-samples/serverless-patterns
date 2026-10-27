@@ -1,0 +1,64 @@
+{
+  "title": "Move a FastAPI in-process job runner to Amazon SQS and AWS Lambda",
+  "description": "A FastAPI app that runs jobs on an in-process thread, then the same app enqueuing to Amazon SQS and running the steps in an AWS Lambda consumer. No API change.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A FastAPI service that runs background jobs on a thread inside the request process is tied to that process: a deploy, scale-in or crash strands every in-flight job, and the box is sized for the work rather than the traffic. This pattern shows that app (before/) and the same app with the work moved to Amazon SQS and an AWS Lambda consumer (after/).",
+      "In the after/ version the API keeps the same /v1 routes, job ids and status endpoint, but POST /v1/jobs writes a PENDING row to a DynamoDB jobs table, sends one SQS message, and returns. A separate Lambda is triggered by the queue and runs the identical step code, updating the same row to DONE or FAILED.",
+      "SQS gives you what the in-process thread could not: redelivery of unacknowledged messages after the visibility timeout, a dead-letter queue for poison messages, partial batch failure so only failed messages retry, and independent scaling of the API and the worker.",
+      "The API contract does not change, so clients are untouched. The after/ half reuses the same table and routes, and the before/ folder is included only for comparison and is not deployed.",
+      "The handlers have local tests that invoke them with API Gateway proxy events and an SQS event against a fake table and queue, so the idempotent enqueue, reserved-word aliasing and stale-error clearing can be verified without deploying."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      },
+      {
+        "text": "Amazon SQS dead-letter queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      },
+      {
+        "text": "Lambda SQS partial batch responses (ReportBatchItemFailures)",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html"
+      },
+      {
+        "text": "Mangum - ASGI adapter for AWS Lambda",
+        "link": "https://github.com/jordaneremieff/mangum"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions, including local handler tests that need no AWS account."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Patlut",
+      "bio": "Developer Experience Engineer"
+    }
+  ]
+}
