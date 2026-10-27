@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
-      "templateURL": "serverless-patterns/apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
-      "projectFolder": "apigw-http-api-lambda-bedrock-dynamodb-vector-search-cdk",
       "templateFile": "lib/vector-search-stack.ts"
     }
   },
