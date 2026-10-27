@@ -79,14 +79,14 @@ Durable execution status is mapped back to the old API's words (`SUCCEEDED -> DO
 
 ### Locally, without deploying
 
-The durable half runs in the SDK's in-memory test runner. This proves the step wiring and the retry without an AWS account:
+Two test files run without an AWS account. `tests/test_job.py` runs the durable half in the SDK's in-memory test runner and proves the step wiring, the retry and replay. `tests/test_api.py` drives both FastAPI apps through the Lambda handler with fake AWS clients and covers the status codes, the idempotent start, the legacy-row branch and the duplicate-start-after-redeploy case:
 
 ```
 pip install -r tests/requirements.txt
 pytest tests/
 ```
 
-The second test submits a `flaky` input and asserts the `transform` step reports `attempt == 2` while its neighbours ran once.
+The flaky-input test asserts the `transform` step reports `attempt == 2` while its neighbours ran once.
 
 ### Deployed
 
@@ -94,34 +94,35 @@ Set the base URL from the stack output:
 
 ```
 API=$(aws cloudformation describe-stacks --stack-name <stack-name> --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" --output text)
+RUN=$(date +%s)   # fresh job ids each run; a reused id returns the existing job
 ```
 
 1. Start a job on each half with the same input:
    ```
-   curl -s -X POST $API/v1/jobs -d '{"job_id":"old-1","input":"this one is flaky"}'
-   curl -s -X POST $API/v2/jobs -d '{"job_id":"new-1","input":"this one is flaky"}'
+   curl -s -X POST $API/v1/jobs -H 'Content-Type: application/json' -d "{\"job_id\":\"old-$RUN\",\"input\":\"this one is flaky\"}"
+   curl -s -X POST $API/v2/jobs -H 'Content-Type: application/json' -d "{\"job_id\":\"new-$RUN\",\"input\":\"this one is flaky\"}"
    ```
 1. Poll both. The `/v1` job waits for the next one-minute poll, fails once on `transform`, goes back to `PENDING`, and finishes on the following poll (two to three minutes). The `/v2` job retries within seconds:
    ```
-   curl -s $API/v1/jobs/old-1
-   curl -s $API/v2/jobs/new-1
+   curl -s $API/v1/jobs/old-$RUN
+   curl -s $API/v2/jobs/new-$RUN
    ```
-1. Retry the `/v2` start with the same `job_id`. It is idempotent: no second execution is created.
+1. Retry the `/v2` start with the same `job_id`. It is idempotent: the response reports the existing job and no second execution is created.
    ```
-   curl -s -X POST $API/v2/jobs -d '{"job_id":"new-1","input":"this one is flaky"}'
+   curl -s -X POST $API/v2/jobs -H 'Content-Type: application/json' -d "{\"job_id\":\"new-$RUN\",\"input\":\"this one is flaky\"}"
    FN=$(aws cloudformation describe-stacks --stack-name <stack-name> --query "Stacks[0].Outputs[?OutputKey=='JobFunctionAlias'].OutputValue" --output text)
-   aws lambda list-durable-executions-by-function --function-name ${FN%:live} --durable-execution-name new-1 --query 'length(DurableExecutions)'
+   aws lambda list-durable-executions-by-function --function-name ${FN%:live} --durable-execution-name new-$RUN --query 'length(DurableExecutions)'
    ```
    Prints `1`.
 1. Confirm the cutover path: read the `/v1` job through the `/v2` endpoint.
    ```
-   curl -s $API/v2/jobs/old-1
+   curl -s $API/v2/jobs/old-$RUN
    ```
    The response carries `"legacy": true` and is served from the row.
 1. Inspect the durable execution's step history. This is where the current step lives now. Look for `StepFailed` then `StepSucceeded` on `transform`:
    ```
    TABLE=$(aws cloudformation describe-stacks --stack-name <stack-name> --query "Stacks[0].Outputs[?OutputKey=='JobsTableName'].OutputValue" --output text)
-   ARN=$(aws dynamodb get-item --table-name $TABLE --key '{"job_id":{"S":"new-1"}}' --query 'Item.execution_arn.S' --output text)
+   ARN=$(aws dynamodb get-item --table-name $TABLE --key "{\"job_id\":{\"S\":\"new-$RUN\"}}" --query 'Item.execution_arn.S' --output text)
    aws lambda get-durable-execution-history --durable-execution-arn $ARN --query 'Events[].EventType'
    ```
 1. Finish the cutover: remove the `/v1` half.

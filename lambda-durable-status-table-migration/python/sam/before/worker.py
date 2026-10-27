@@ -39,12 +39,17 @@ def _update(
     fields: dict,
     condition: str | None = None,
     cond_values: dict | None = None,
+    remove: list[str] | None = None,
 ) -> None:
-    """SET the given fields. Every name is aliased: status, error and result
-    are DynamoDB reserved words, and a bare name in an UpdateExpression fails."""
+    """SET the given fields (and REMOVE the named ones). Every name is aliased:
+    status, error and result are DynamoDB reserved words, and a bare name in an
+    UpdateExpression fails."""
     names = {f"#f{i}": k for i, k in enumerate(fields)}
     values = {f":v{i}": v for i, v in enumerate(fields.values())}
     expr = "SET " + ", ".join(f"#f{i} = :v{i}" for i in range(len(fields)))
+    if remove:
+        names.update({f"#r{i}": k for i, k in enumerate(remove)})
+        expr += " REMOVE " + ", ".join(f"#r{i}" for i in range(len(remove)))
     kwargs = {
         "Key": {"job_id": job_id},
         "UpdateExpression": expr,
@@ -80,7 +85,10 @@ def _checkpoint(job_id: str, step: str, outputs: dict) -> None:
 
 
 def _finish(job_id: str, status: str, **fields) -> None:
-    _update(job_id, {"status": status, "updated_at": _now(), **fields})
+    # A job that failed once and then succeeded still carries the old error;
+    # clear it so DONE never reads as DONE-with-error.
+    remove = ["error"] if status == "DONE" and "error" not in fields else None
+    _update(job_id, {"status": status, "updated_at": _now(), **fields}, remove=remove)
 
 
 def _run_job(job: dict) -> None:

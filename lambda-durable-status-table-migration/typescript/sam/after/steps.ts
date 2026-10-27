@@ -20,7 +20,7 @@ export const FLAKY_MARKER = 'flaky';
 
 /** A failure that is safe to retry. */
 export class TransientError extends Error {
-  constructor(message: string) {
+  constructor(message = 'transient failure') {
     super(message);
     this.name = 'TransientError';
   }

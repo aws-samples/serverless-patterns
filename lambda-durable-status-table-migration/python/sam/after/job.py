@@ -17,12 +17,27 @@ from aws_durable_execution_sdk_python import (
     durable_step,
 )
 from aws_durable_execution_sdk_python.config import StepConfig
-from aws_durable_execution_sdk_python.retries import RetryPresets
-from steps import fetch_source, publish_result, transform
+from aws_durable_execution_sdk_python.retries import (
+    JitterStrategy,
+    RetryStrategyConfig,
+    create_retry_strategy,
+)
+from steps import TransientError, fetch_source, publish_result, transform
 
-# Step 2 is the flaky one. Give it the SDK's transient-failure retry policy
-# (bounded exponential backoff with jitter) instead of a hand-rolled attempt counter.
-RETRY_TRANSIENT = StepConfig(retry_strategy=RetryPresets.transient())
+# Step 2 is the flaky one. Give it an SDK retry policy (bounded exponential
+# backoff with jitter) instead of a hand-rolled attempt counter, and retry only
+# the transient failure class: a permanent error fails the execution at once
+# instead of burning three attempts. Same shape as the TypeScript twin.
+RETRY_TRANSIENT = StepConfig(
+    retry_strategy=create_retry_strategy(
+        RetryStrategyConfig(
+            max_attempts=3,
+            backoff_rate=2,
+            jitter_strategy=JitterStrategy.HALF,
+            retryable_error_types=[TransientError],
+        )
+    )
+)
 
 
 @durable_step

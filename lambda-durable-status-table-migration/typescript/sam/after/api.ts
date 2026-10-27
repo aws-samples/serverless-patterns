@@ -14,7 +14,7 @@
  * keeps draining old rows until they are gone.
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { ConditionalCheckFailedException, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { GetDurableExecutionCommand, InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import express, { type Request, type Response } from 'express';
@@ -41,7 +41,9 @@ const STATUS_MAP: Record<string, string> = {
 type Body = Record<string, unknown>;
 
 const app = express();
-app.use(express.json());
+// Parse the body as JSON whatever the Content-Type says (curl -d sends a form
+// type), and bound it: API Gateway caps payloads anyway, but say so here.
+app.use(express.json({ type: () => true, limit: '1mb' }));
 
 // Log every request the way the old handler did.
 app.use((req, res, next) => {
@@ -71,18 +73,32 @@ app.post('/v2/jobs', async (req: Request, res: Response) => {
     return;
   }
 
+  // Conditional put: never overwrite the row. A duplicate POST after a redeploy
+  // gets back an ARN stamped with the alias's CURRENT version, but the execution
+  // keeps the version it was created under, so overwriting would break later GETs.
   const now = Math.floor(Date.now() / 1000);
-  await ddb.send(
-    new PutCommand({
-      TableName: table,
-      Item: { job_id: jobId, execution_arn: executionArn, created_at: now, expires_at: now + TTL_SECONDS },
-    }),
-  );
+  try {
+    await ddb.send(
+      new PutCommand({
+        TableName: table,
+        Item: { job_id: jobId, execution_arn: executionArn, created_at: now, expires_at: now + TTL_SECONDS },
+        ConditionExpression: 'attribute_not_exists(job_id)',
+      }),
+    );
+  } catch (err) {
+    if (!(err instanceof ConditionalCheckFailedException)) throw err;
+    // Already started: report where it really is, same as the legacy API does.
+    await getJob(jobId, res);
+    return;
+  }
   res.status(202).json({ job_id: jobId, status: 'RUNNING' });
 });
 
 app.get('/v2/jobs/:job_id', async (req: Request, res: Response) => {
-  const jobId = String(req.params.job_id);
+  await getJob(String(req.params.job_id), res);
+});
+
+async function getJob(jobId: string, res: Response): Promise<void> {
   const item = (await ddb.send(new GetCommand({ TableName: table, Key: { job_id: jobId } }))).Item;
   if (!item) {
     res.status(404).json({ error: 'job not found', job_id: jobId });
@@ -105,7 +121,7 @@ app.get('/v2/jobs/:job_id', async (req: Request, res: Response) => {
   if (execution.Result) body.result = JSON.parse(execution.Result);
   if (execution.Error) body.error = execution.Error.ErrorMessage ?? JSON.stringify(execution.Error);
   res.status(200).json(body);
-});
+}
 
 // express.json() rejects a malformed body with a 400 that is HTML by default.
 app.use((err: Error & { type?: string }, _req: Request, res: Response, next: express.NextFunction) => {

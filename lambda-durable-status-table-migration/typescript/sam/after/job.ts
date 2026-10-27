@@ -16,7 +16,7 @@ import {
   JitterStrategy,
   withDurableExecution,
 } from '@aws/durable-execution-sdk-js';
-import { fetchSource, JobPayload, publishResult, Published, transform } from './steps';
+import { fetchSource, JobPayload, publishResult, Published, transform, TransientError } from './steps';
 
 interface JobEvent {
   job_id: string;
@@ -32,6 +32,8 @@ const RETRY_TRANSIENT = createRetryStrategy({
   maxDelay: { seconds: 10 },
   backoffRate: 2,
   jitter: JitterStrategy.HALF,
+  // Retry only the transient failure class; a permanent error fails at once.
+  retryableErrorTypes: [TransientError],
 });
 
 export const handler = withDurableExecution(

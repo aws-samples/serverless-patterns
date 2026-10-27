@@ -33,7 +33,9 @@ function rowToBody(jobId: string, item: Body): Body {
 }
 
 const app = express();
-app.use(express.json());
+// Parse the body as JSON whatever the Content-Type says (curl -d sends a form
+// type), and bound it: API Gateway caps payloads anyway, but say so here.
+app.use(express.json({ type: () => true, limit: '1mb' }));
 
 // Log every request the way the old handler did.
 app.use((req, res, next) => {

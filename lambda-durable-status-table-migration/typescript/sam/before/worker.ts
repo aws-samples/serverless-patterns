@@ -36,15 +36,21 @@ async function update(
   fields: Row,
   condition?: string,
   condValues: Row = {},
+  remove: string[] = [],
 ): Promise<void> {
   const keys = Object.keys(fields);
   const names = Object.fromEntries(keys.map((k, i) => [`#f${i}`, k]));
   const values = Object.fromEntries(keys.map((k, i) => [`:v${i}`, fields[k]]));
+  let expression = 'SET ' + keys.map((_, i) => `#f${i} = :v${i}`).join(', ');
+  if (remove.length) {
+    remove.forEach((k, i) => (names[`#r${i}`] = k));
+    expression += ' REMOVE ' + remove.map((_, i) => `#r${i}`).join(', ');
+  }
   await ddb.send(
     new UpdateCommand({
       TableName: table,
       Key: { job_id: jobId },
-      UpdateExpression: 'SET ' + keys.map((_, i) => `#f${i} = :v${i}`).join(', '),
+      UpdateExpression: expression,
       ExpressionAttributeNames: names,
       ExpressionAttributeValues: { ...values, ...condValues },
       ...(condition ? { ConditionExpression: condition } : {}),
@@ -73,7 +79,9 @@ const checkpoint = (jobId: string, step: string, outputs: Row) =>
   update(jobId, { step, outputs, updated_at: now() });
 
 const finish = (jobId: string, status: string, fields: Row = {}) =>
-  update(jobId, { status, updated_at: now(), ...fields });
+  // A job that failed once and then succeeded still carries the old error;
+  // clear it so DONE never reads as DONE-with-error.
+  update(jobId, { status, updated_at: now(), ...fields }, undefined, {}, status === 'DONE' && !('error' in fields) ? ['error'] : []);
 
 async function runJob(job: Row): Promise<void> {
   const jobId: string = job.job_id;

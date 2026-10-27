@@ -82,15 +82,24 @@ async def create_job(request: Request) -> JSONResponse:
             status_code=500,
         )
 
+    # Conditional put: never overwrite the row. A duplicate POST after a redeploy
+    # gets back an ARN stamped with the alias's CURRENT version, but the execution
+    # keeps the version it was created under, so overwriting would break later GETs.
     now = int(time.time())
-    table.put_item(
-        Item={
-            "job_id": job_id,
-            "execution_arn": execution_arn,
-            "created_at": now,
-            "expires_at": now + TTL_SECONDS,
-        }
-    )
+    try:
+        table.put_item(
+            Item={
+                "job_id": job_id,
+                "execution_arn": execution_arn,
+                "created_at": now,
+                "expires_at": now + TTL_SECONDS,
+            },
+            ConditionExpression="attribute_not_exists(job_id)",
+        )
+    except table.meta.client.exceptions.ConditionalCheckFailedException:
+        # Already started: report where it really is, same as the legacy API does.
+        return await get_job(job_id)
+
     return JSONResponse({"job_id": job_id, "status": "RUNNING"}, status_code=202)
 
 
