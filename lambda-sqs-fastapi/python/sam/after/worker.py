@@ -74,6 +74,10 @@ def lambda_handler(event: dict, context) -> dict:
     failures: list[dict] = []
     for record in event.get("Records", []):
         message_id = record["messageId"]
+        # Bind these before the try so the except branches never reference an
+        # unbound name when parsing itself fails.
+        job_id: str | None = None
+        attempt = 1
         # Parse INSIDE the try: a single malformed message must not raise out of
         # the handler, which would fail - and redeliver - the WHOLE batch and
         # re-run its already-done batch-mates. A message we cannot parse is
@@ -84,8 +88,10 @@ def lambda_handler(event: dict, context) -> dict:
                 record.get("attributes", {}).get("ApproximateReceiveCount", "1")
             )
             body = json.loads(record["body"])
+            if not isinstance(body, dict) or not body.get("job_id"):
+                raise ValueError("message is not a job object with a job_id")
             job_id = body["job_id"]
-            payload = body.get("payload", {})
+            payload = body.get("payload") or {}
             _run_one(job_id, payload, attempt)
         except TransientError as exc:
             # Let SQS redeliver: do NOT mark FAILED yet. After maxReceiveCount
@@ -95,7 +101,7 @@ def lambda_handler(event: dict, context) -> dict:
             logger.warning("job %s attempt %d transient failure, will redeliver: %s",
                            job_id, attempt, exc)
             failures.append({"itemIdentifier": message_id})
-        except (ValueError, KeyError) as exc:
+        except (ValueError, KeyError, TypeError) as exc:
             # Malformed message body: cannot even identify the job. Redeliver and
             # let the DLQ catch it; never fail the batch over one bad message.
             logger.error("message %s is malformed, will redeliver to DLQ: %s",

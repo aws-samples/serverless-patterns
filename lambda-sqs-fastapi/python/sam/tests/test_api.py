@@ -135,6 +135,30 @@ def test_bad_json_returns_400(mods):
     assert "JSON" in body["error"]
 
 
+def test_non_object_body_returns_400(mods):
+    api, _worker, _table, sqs = mods
+    for raw in ("[1, 2]", '"a string"', "null", "{}"):
+        event = _proxy("POST", "/v1/jobs")
+        event["body"] = raw
+        code, _body = _call(api, event)
+        assert code == 400, raw
+    assert len(sqs.sent) == 0
+
+
+def test_worker_treats_a_non_object_message_as_malformed(mods):
+    _api, worker, _table, _sqs = mods
+    # A JSON body that parses but is not a job object must be reported for
+    # redelivery (-> DLQ), never crash the batch with an unbound job id.
+    event = {
+        "Records": [
+            {"messageId": "m1", "attributes": {"ApproximateReceiveCount": "1"}, "body": "null"},
+            {"messageId": "m2", "attributes": {"ApproximateReceiveCount": "1"}, "body": "[1, 2]"},
+        ]
+    }
+    out = worker.lambda_handler(event, None)
+    assert out["batchItemFailures"] == [{"itemIdentifier": "m1"}, {"itemIdentifier": "m2"}]
+
+
 def test_get_unknown_job_returns_404(mods):
     api, _worker, _table, _sqs = mods
     code, _body = _call(api, _proxy("GET", "/v1/jobs/missing",

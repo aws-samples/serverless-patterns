@@ -113,6 +113,10 @@ app.use((req, res, next) => {
 
 app.post('/v1/jobs', async (req: Request, res: Response) => {
   const payload = req.body as Body;
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload) || Object.keys(payload).length === 0) {
+    res.status(400).json({ error: 'body must be a non-empty JSON object' });
+    return;
+  }
   const jobId = (payload.job_id as string | undefined) || randomUUID();
   const ts = now();
 

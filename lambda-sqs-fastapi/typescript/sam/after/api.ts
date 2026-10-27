@@ -56,6 +56,13 @@ app.use((req, res, next) => {
 
 app.post('/v1/jobs', async (req: Request, res: Response) => {
   const payload = req.body as Body;
+  // express.json() yields {} for an empty body and an array for a JSON array.
+  // Require a non-empty JSON object so an empty POST is not silently enqueued
+  // under a random id.
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload) || Object.keys(payload).length === 0) {
+    res.status(400).json({ error: 'body must be a non-empty JSON object' });
+    return;
+  }
   const jobId = (payload.job_id as string | undefined) || randomUUID();
   const now = Math.floor(Date.now() / 1000);
 

@@ -86,8 +86,10 @@ export const handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
     let jobId = '(unparsed)';
     try {
       const attempt = Number(record.attributes?.ApproximateReceiveCount ?? '1');
-      const body = JSON.parse(record.body) as { job_id: string; payload?: JobPayload };
-      if (!body.job_id) throw new Error('message has no job_id');
+      const body = JSON.parse(record.body) as { job_id?: string; payload?: JobPayload };
+      if (typeof body !== 'object' || body === null || Array.isArray(body) || !body.job_id) {
+        throw new Error('message is not a job object with a job_id');
+      }
       jobId = body.job_id;
       await runOne(jobId, body.payload ?? {}, attempt);
     } catch (err) {

@@ -67,8 +67,8 @@ async def create_job(request: Request) -> JSONResponse:
         payload = await request.json()
     except ValueError:
         return JSONResponse({"error": "body must be JSON"}, status_code=400)
-    if not isinstance(payload, dict):
-        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
+    if not isinstance(payload, dict) or not payload:
+        return JSONResponse({"error": "body must be a non-empty JSON object"}, status_code=400)
     job_id = payload.get("job_id") or str(uuid.uuid4())
     now = int(time.time())
 

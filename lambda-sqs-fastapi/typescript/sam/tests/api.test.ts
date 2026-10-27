@@ -128,6 +128,17 @@ describe('after: Express + SQS enqueue', () => {
     expect((await call(after, 'GET', '/v1/jobs/missing'))[0]).toBe(404);
   });
 
+  it('returns 400 for a body that is not a JSON object', async () => {
+    // express.json() yields {} for an empty body and an array for a JSON array;
+    // both must be rejected so a job POST is always a JSON object (parity with
+    // the Python half, and no job is silently enqueued under a random id).
+    const [emptyStatus] = await call(after, 'POST', '/v1/jobs', '');
+    expect(emptyStatus).toBe(400);
+    expect((await call(after, 'POST', '/v1/jobs', '[1,2]'))[0]).toBe(400);
+    expect((await call(after, 'POST', '/v1/jobs', '"a string"'))[0]).toBe(400);
+    expect(sent).toHaveLength(0);
+  });
+
   it('parses JSON even when the client forgets the Content-Type header', async () => {
     const [status, body] = await call(after, 'POST', '/v1/jobs', '{"job_id":"j9"}', 'application/x-www-form-urlencoded');
     expect([status, body.job_id]).toEqual([202, 'j9']);
