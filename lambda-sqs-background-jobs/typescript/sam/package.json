@@ -1,8 +1,8 @@
 {
-  "name": "lambda-sqs-fastapi-typescript-sam",
+  "name": "lambda-sqs-background-jobs-typescript-sam",
   "version": "1.0.0",
   "private": true,
-  "description": "Move a FastAPI/Express in-process job runner to Amazon SQS + an AWS Lambda consumer (TypeScript, SAM)",
+  "description": "Move an Express in-process job runner to Amazon SQS + an AWS Lambda consumer (TypeScript, SAM)",
   "type": "module",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",

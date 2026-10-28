@@ -2,7 +2,7 @@
 
 This pattern demonstrates moving a FastAPI service's background work out of the web process and onto Amazon SQS with an AWS Lambda consumer, without changing the API's public contract. The `before/` folder is a FastAPI app that runs each job on a thread inside the request process and records progress in an Amazon DynamoDB jobs table. The `after/` folder keeps the same routes, job ids and status endpoint, but the API now enqueues each job to an SQS queue and a separate Lambda runs the identical step code, so the work survives deploys, scales independently, and dead-letters poison messages instead of looping forever.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-fastapi-python-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-background-jobs-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd lambda-sqs-fastapi/python/sam
+    cd lambda-sqs-background-jobs/python/sam
     ```
 1. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```

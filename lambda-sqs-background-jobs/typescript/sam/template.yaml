@@ -4,7 +4,7 @@ Description: >
   Move an Express job runner's work out of the web process into Amazon SQS + a
   Lambda consumer, keeping the same /v1 routes, job ids and status endpoint. The
   API Lambda enqueues to SQS and returns; the worker Lambda runs the same step
-  code and writes status back to the shared jobs table. (uksb-1tthgi812) (tag:lambda-sqs-fastapi-typescript-sam)
+  code and writes status back to the shared jobs table. (uksb-1tthgi812) (tag:lambda-sqs-background-jobs-typescript-sam)
 
 Globals:
   Function:
