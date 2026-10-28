@@ -1,0 +1,5 @@
+{
+  "workItemId": "order-123",
+  "operation": "process",
+  "amount": 99.99
+}

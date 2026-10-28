@@ -1,0 +1,68 @@
+{
+  "title": "Amazon SQS overflow from AWS Lambda Managed Instances to Standard AWS Lambda",
+  "description": "Run a steady SQS workload on Lambda Managed Instances and open a Standard Lambda burst tier on the same queue when a temporary traffic burst outpaces it.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A single SQS queue is polled by two event source mappings: one always-on mapping to a worker running on Lambda Managed Instances (LMI), which provides a cost-optimized and reservable compute baseline, and one mapping to a Standard Lambda worker that is disabled at deploy time and therefore costs nothing at steady state.",
+      "LMI does not scale on queue depth; its managed scaler reacts to the CPU utilization and multi-concurrency saturation of its own execution environments. Keeping both tiers on one queue is what preserves that signal. A router that rate-limited LMI's input would cap its CPU, silence its scaler, and leave the burst tier carrying the load indefinitely.",
+      "A controller invoked once a minute polls the queue's live depth with GetQueueAttributes every 10 seconds, and toggles the burst mapping with UpdateEventSourceMapping. Two thresholds form a dead band: above the open threshold the burst tier opens immediately, and it closes only once depth is below the close threshold, flat or falling over a 30-second window, and a minimum dwell time has elapsed. Polling replaces the CloudWatch depth alarms this pattern originally used, because a load test measured 2m 15s of metric-publish and alarm-evaluation lag — more than half the total time to engage the burst tier, and irreducible on a metric SQS publishes once a minute. The controller is on the control plane and never touches a workload message.",
+      "Both tiers run the same handler and share a DynamoDB idempotency table that records a claim before processing and a completion after it, so a retryable failure is redelivered rather than mistaken for a duplicate. A CloudWatch dashboard charts work completed per tier, so you can see the burst tier absorb a spike and then hand the workload back as LMI scales up."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lmi-standard-lambda-overflow-sam",
+      "templateURL": "serverless-patterns/sqs-lmi-standard-lambda-overflow-sam",
+      "projectFolder": "sqs-lmi-standard-lambda-overflow-sam",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Managed Instances",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances.html"
+      },
+      {
+        "text": "Scaling Lambda Managed Instances",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances-scaling.html"
+      },
+      {
+        "text": "CloudWatch metrics for Lambda Managed Instances",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-managed-instances-monitoring-metrics.html"
+      },
+      {
+        "text": "Using Lambda with Amazon SQS",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam validate --lint",
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for the two load-test scenarios. A handful of messages will not demonstrate this pattern: the backlog must reach the open threshold before the burst tier can engage, and LMI needs roughly 17 minutes to scale through a 10x burst."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mitesh Purohit",
+      "bio": "Sr Solution Architect, AWS",
+      "linkedin": "mitup"
+    }
+  ]
+}
