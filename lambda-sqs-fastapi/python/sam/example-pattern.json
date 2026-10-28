@@ -4,6 +4,7 @@
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
+  "patternGroup": "lambda-sqs-fastapi",
   "introBox": {
     "headline": "How it works",
     "text": [

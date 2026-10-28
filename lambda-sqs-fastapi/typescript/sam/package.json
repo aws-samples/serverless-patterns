@@ -13,6 +13,10 @@
     "serverless-http": "4.0.0"
   },
   "devDependencies": {
+    "@aws-lambda-powertools/batch": "^2",
+    "@aws-lambda-powertools/logger": "^2",
+    "@aws-lambda-powertools/metrics": "^2",
+    "@aws-lambda-powertools/tracer": "^2",
     "@aws-sdk/client-dynamodb": "3.1157.0",
     "@aws-sdk/client-sqs": "3.1157.0",
     "@aws-sdk/lib-dynamodb": "3.1157.0",

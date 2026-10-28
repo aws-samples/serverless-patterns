@@ -2,7 +2,7 @@
 
 This pattern demonstrates moving a FastAPI service's background work out of the web process and onto Amazon SQS with an AWS Lambda consumer, without changing the API's public contract. The `before/` folder is a FastAPI app that runs each job on a thread inside the request process and records progress in an Amazon DynamoDB jobs table. The `after/` folder keeps the same routes, job ids and status endpoint, but the API now enqueues each job to an SQS queue and a separate Lambda runs the identical step code, so the work survives deploys, scales independently, and dead-letters poison messages instead of looping forever.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-fastapi
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-fastapi-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -12,6 +12,8 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [awscurl](https://github.com/okigan/awscurl) installed (`pip install awscurl`) to call the IAM-protected API
+* [Python 3.14](https://www.python.org/downloads/) on your PATH (so `sam build` can install `after/requirements.txt`), or run `sam build --use-container`
 
 ## Deployment Instructions
 
@@ -43,32 +45,15 @@ The API Lambda runs the FastAPI app behind Amazon API Gateway (Mangum adapts the
 
 The queue is what the in-process thread could not give you: an unacknowledged message is redelivered after the visibility timeout, so a crash mid-job retries instead of stranding the row; a message that fails `maxReceiveCount` times is parked in a dead-letter queue; and the worker returns partial batch failures so only failed messages are redelivered. The API and the worker scale on their own.
 
+The functions use Powertools for AWS Lambda (Python): the Logger writes structured JSON with the request id as correlation id, the Tracer adds an X-Ray subsegment for every DynamoDB and SQS call, the worker's BatchProcessor builds the partial batch response, and the Metrics utility publishes `JobsEnqueued`, `JobsDone` and `JobsFailed` under a namespace named after the stack. API Gateway writes an access log per request to its own log group and throttles the stage at 50 requests per second (burst 100); the access log needs the Region-wide `AWS::ApiGateway::Account` CloudWatch role, which this template creates and a second stack in the same Region would overwrite with its own. The template also creates alarms (no actions attached) on dead-letter queue depth and on each function's `Errors` and `Throttles`, and caps the worker at 10 concurrent invocations with `ScalingConfig`; setting `ReservedConcurrentExecutions: 0` on `JobWorkerFunction` is the emergency stop (messages wait in the queue; remove it to resume).
+
 The `before/` folder is the starting point to compare against - the same FastAPI app running the steps on a background thread. It is included as reference and is not deployed by this template.
 
-Note: SQS delivers at least once, so a redelivered message runs the steps again from the top. The demo steps have no external effect, so that is safe; a real `publish_result` writing to a non-idempotent sink needs an idempotency key or a per-step checkpoint. The `POST` writes the row and sends the message as two calls, not one transaction: if the send fails after the row is written, the job stays `PENDING` and must be re-driven (sweep `PENDING` rows, or make the client retry a new id).
-
-### Architecture
-
-```
-POST /v1/jobs                          GET /v1/jobs/{id}
-      |                                        |
-      v                                        v
-  API Gateway  ---->  API Lambda (FastAPI)  <----
-                          |        ^
-              SendMessage |        | GetItem
-                          v        |
-                       SQS queue   DynamoDB jobs table
-                          |              ^
-                          v              | UpdateItem
-                    Worker Lambda  -------
-                          |
-                          v (after maxReceiveCount failures)
-                    Dead-letter queue
-```
+Note: SQS delivers at least once, so a redelivered message runs the steps again from the top. The demo steps have no external effect, so that is safe; a real `publish_result` writing to a non-idempotent sink needs an idempotency key or a per-step checkpoint. The `POST` writes the row and sends the message as two calls, not one transaction: if the send fails after the row is written, the API deletes the `PENDING` row it just wrote and returns `503`, so a client retry with the same `job_id` creates the row and enqueues again instead of reading a `PENDING` job that no worker will ever pick up. The worker only updates rows that still exist (`attribute_exists`), so a message redelivered after the row's TTL removed it is consumed without re-creating the row.
 
 ## Testing
 
-After deploying, note the `ApiUrl` output, then set it in your shell:
+The API uses the `AWS_IAM` authorizer, so every call must be signed with SigV4. The examples use [awscurl](https://github.com/okigan/awscurl), which signs with the same AWS credentials you deployed with; an unsigned `curl` gets `403`. After deploying, note the `ApiUrl` output, then set it in your shell:
 
 ```bash
 API=<ApiUrl output>
@@ -78,9 +63,9 @@ Submit a job and poll its status (use a fresh id each run):
 
 ```bash
 RUN=$(date +%s)
-curl -s -H 'Content-Type: application/json' -X POST $API/v1/jobs -d "{\"job_id\":\"ok-$RUN\",\"input\":\"hello\"}"
+awscurl --service execute-api -X POST $API/v1/jobs -d "{\"job_id\":\"ok-$RUN\",\"input\":\"hello\"}"
 # wait a few seconds, then:
-curl -s $API/v1/jobs/ok-$RUN
+awscurl --service execute-api $API/v1/jobs/ok-$RUN
 ```
 
 The status moves from `PENDING` to `DONE` with a `result`.
@@ -88,11 +73,11 @@ The status moves from `PENDING` to `DONE` with a `result`.
 Submit a flaky job - the `transform` step fails on its first delivery and SQS redelivers it after the visibility timeout, so it completes on the second attempt with the stale error cleared:
 
 ```bash
-curl -s -H 'Content-Type: application/json' -X POST $API/v1/jobs -d "{\"job_id\":\"flaky-$RUN\",\"input\":\"this is flaky\"}"
-curl -s $API/v1/jobs/flaky-$RUN
+awscurl --service execute-api -X POST $API/v1/jobs -d "{\"job_id\":\"flaky-$RUN\",\"input\":\"this is flaky\"}"
+awscurl --service execute-api $API/v1/jobs/flaky-$RUN
 ```
 
-A duplicate `POST` with the same `job_id` returns the existing job and does not enqueue it again. Run the handler tests locally with no AWS account (Python 3.10 or newer):
+A duplicate `POST` with the same `job_id` returns the existing job and does not enqueue it again. Run the handler tests locally with no AWS account (Python 3.14, matching the runtime):
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
@@ -104,7 +89,7 @@ pytest tests/
 
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```bash

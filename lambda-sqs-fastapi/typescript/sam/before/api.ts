@@ -44,9 +44,11 @@ function rowToBody(jobId: string, item: Body): Body {
 }
 
 /**
- * SET the given fields (and REMOVE the named ones). Every name is aliased:
- * status, step, error and result are DynamoDB reserved words, and a bare name
- * in an UpdateExpression fails.
+ * SET the given fields (and REMOVE the named ones) on an EXISTING row. Every
+ * name is aliased: status, step, error and result are DynamoDB reserved words,
+ * and a bare name in an UpdateExpression fails. attribute_exists(job_id) stops
+ * an update from phantom-creating a row (with no expires_at) after the row's
+ * TTL has removed it.
  */
 async function update(jobId: string, fields: Body, remove: string[] = []): Promise<void> {
   const keys = Object.keys(fields);
@@ -62,6 +64,7 @@ async function update(jobId: string, fields: Body, remove: string[] = []): Promi
       TableName: table,
       Key: { job_id: jobId },
       UpdateExpression: expression,
+      ConditionExpression: 'attribute_exists(job_id)',
       ExpressionAttributeNames: names,
       ExpressionAttributeValues: values,
     }),
@@ -88,6 +91,11 @@ async function runJob(jobId: string, payload: JobPayload): Promise<void> {
       return;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      if (err instanceof ConditionalCheckFailedException) {
+        // The row is gone (TTL expired); there is nothing to update.
+        console.error(`job ${jobId} has no row, dropping`);
+        return;
+      }
       // Retry only the transient class, by hand, in this process.
       if (err instanceof TransientError && attempt < MAX_ATTEMPTS) {
         console.warn(`job ${jobId} attempt ${attempt} failed, retrying: ${message}`);

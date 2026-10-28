@@ -1,3 +1,4 @@
 boto3>=1.26.0
 fastapi==0.162.0
 mangum==0.22.0
+aws-lambda-powertools[tracer]>=3,<4

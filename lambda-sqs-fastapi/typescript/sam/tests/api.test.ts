@@ -7,13 +7,18 @@
  */
 
 import { ConditionalCheckFailedException } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { mockClient } from 'aws-sdk-client-mock';
-import type { SQSEvent } from 'aws-lambda';
+import type { Context, SQSEvent } from 'aws-lambda';
 
 process.env.JOBS_TABLE = 'jobs';
 process.env.JOBS_QUEUE_URL = 'https://sqs.local/jobs';
+// Powertools: no X-Ray daemon here, and keep the test output free of JSON log
+// lines and EMF blobs.
+process.env.POWERTOOLS_TRACE_ENABLED = 'false';
+process.env.POWERTOOLS_METRICS_DISABLED = 'true';
+process.env.POWERTOOLS_LOG_LEVEL = 'SILENT';
 
 const { handler: before } = await import('../before/api');
 const { handler: after } = await import('../after/api');
@@ -42,7 +47,9 @@ function event(method: string, path: string, body?: string, contentType = 'appli
   };
 }
 
-async function call(fn: typeof before, method: string, path: string, body?: string, contentType?: string) {
+type ApiHandler = (event: never, context: never) => Promise<unknown>;
+
+async function call(fn: ApiHandler, method: string, path: string, body?: string, contentType?: string) {
   const res = (await fn(event(method, path, body, contentType) as never, {} as never)) as { statusCode: number; body: string };
   return [res.statusCode, res.body ? JSON.parse(res.body) : undefined] as const;
 }
@@ -64,6 +71,7 @@ function sqsEvent(records: { messageId: string; body: string; receive?: number }
 }
 
 const flush = () => new Promise((r) => setTimeout(r, 50));
+const ctx = {} as Context;
 
 beforeEach(() => {
   rows = {};
@@ -78,7 +86,12 @@ beforeEach(() => {
     return {};
   });
   ddb.on(GetCommand).callsFake(({ Key }) => ({ Item: rows[Key.job_id] }));
-  ddb.on(UpdateCommand).callsFake(({ Key, UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues }) => {
+  ddb.on(UpdateCommand).callsFake(({ Key, UpdateExpression, ConditionExpression, ExpressionAttributeNames, ExpressionAttributeValues }) => {
+    // attribute_exists(job_id): an update to a missing row is a condition
+    // failure, as in DynamoDB, instead of creating the row.
+    if (ConditionExpression && !(Key.job_id in rows)) {
+      throw new ConditionalCheckFailedException({ message: 'missing', $metadata: {} });
+    }
     const row = (rows[Key.job_id] ??= { job_id: Key.job_id });
     const [setPart, removePart] = String(UpdateExpression).split(' REMOVE ');
     for (const assign of setPart.replace('SET ', '').split(',')) {
@@ -86,6 +99,18 @@ beforeEach(() => {
       row[ExpressionAttributeNames![nameAlias]] = ExpressionAttributeValues![valAlias];
     }
     if (removePart) for (const alias of removePart.split(',')) delete row[ExpressionAttributeNames![alias.trim()]];
+    return {};
+  });
+  ddb.on(DeleteCommand).callsFake(({ Key, ConditionExpression, ExpressionAttributeNames, ExpressionAttributeValues }) => {
+    const row = rows[Key.job_id];
+    if (ConditionExpression) {
+      // Only the "#s = :p" shape the API uses.
+      const [nameAlias, valAlias] = String(ConditionExpression).split(' = ');
+      if (!row || row[ExpressionAttributeNames![nameAlias]] !== ExpressionAttributeValues![valAlias]) {
+        throw new ConditionalCheckFailedException({ message: 'condition', $metadata: {} });
+      }
+    }
+    delete rows[Key.job_id];
     return {};
   });
   sqs.on(SendMessageCommand).callsFake((input) => {
@@ -143,12 +168,30 @@ describe('after: Express + SQS enqueue', () => {
     const [status, body] = await call(after, 'POST', '/v1/jobs', '{"job_id":"j9"}', 'application/x-www-form-urlencoded');
     expect([status, body.job_id]).toEqual([202, 'j9']);
   });
+
+  it('rolls the PENDING row back and returns 503 when the enqueue fails', async () => {
+    sqs.on(SendMessageCommand).rejects(new Error('sqs is down'));
+    const [status, body] = await call(after, 'POST', '/v1/jobs', '{"job_id":"j503","input":"x"}');
+    expect(status).toBe(503);
+    expect(body).toEqual({ error: 'could not enqueue job, retry', job_id: 'j503' });
+    // The row is gone, so the client's retry creates and enqueues it afresh
+    // instead of landing in the duplicate branch with a job no worker has.
+    expect('j503' in rows).toBe(false);
+    expect((await call(after, 'GET', '/v1/jobs/j503'))[0]).toBe(404);
+  });
+
+  it('turns an unhandled SDK error into a JSON 500', async () => {
+    ddb.on(GetCommand).rejects(new Error('table unavailable'));
+    const [status, body] = await call(after, 'GET', '/v1/jobs/any');
+    expect(status).toBe(500);
+    expect(body).toEqual({ error: 'internal error' });
+  });
 });
 
 describe('after: SQS worker', () => {
   it('runs a job to DONE with no error key', async () => {
     rows.w1 = { job_id: 'w1', status: 'PENDING' };
-    const out = await worker(sqsEvent([{ messageId: 'm-w1', body: JSON.stringify({ job_id: 'w1', payload: { input: 'hello' } }) }]));
+    const out = await worker(sqsEvent([{ messageId: 'm-w1', body: JSON.stringify({ job_id: 'w1', payload: { input: 'hello' } }) }]), ctx);
     expect(out).toEqual({ batchItemFailures: [] });
     expect(rows.w1.status).toBe('DONE');
     expect('error' in rows.w1).toBe(false);
@@ -157,11 +200,11 @@ describe('after: SQS worker', () => {
   it('redelivers a flaky job without leaking a stale error, then completes', async () => {
     rows.w2 = { job_id: 'w2', status: 'PENDING' };
     const body = JSON.stringify({ job_id: 'w2', payload: { input: 'flaky thing' } });
-    const out1 = await worker(sqsEvent([{ messageId: 'm-w2', body, receive: 1 }]));
+    const out1 = await worker(sqsEvent([{ messageId: 'm-w2', body, receive: 1 }]), ctx);
     expect(out1).toEqual({ batchItemFailures: [{ itemIdentifier: 'm-w2' }] });
     expect(rows.w2.status).toBe('RUNNING');
     expect('error' in rows.w2).toBe(false);
-    const out2 = await worker(sqsEvent([{ messageId: 'm-w2', body, receive: 2 }]));
+    const out2 = await worker(sqsEvent([{ messageId: 'm-w2', body, receive: 2 }]), ctx);
     expect(out2).toEqual({ batchItemFailures: [] });
     expect(rows.w2.status).toBe('DONE');
     expect('error' in rows.w2).toBe(false);
@@ -174,9 +217,18 @@ describe('after: SQS worker', () => {
         { messageId: 'good', body: JSON.stringify({ job_id: 'ok', payload: { input: 'hi' } }) },
         { messageId: 'bad', body: '{not json' },
       ]),
+      ctx,
     );
     expect(out).toEqual({ batchItemFailures: [{ itemIdentifier: 'bad' }] });
     expect(rows.ok.status).toBe('DONE');
+  });
+
+  it('consumes a message for an unknown job without creating a row', async () => {
+    // A message redelivered after the row's TTL removed it: attribute_exists
+    // fails, the message is dropped (not redelivered), and no row appears.
+    const out = await worker(sqsEvent([{ messageId: 'm-gone', body: JSON.stringify({ job_id: 'gone', payload: { input: 'x' } }) }]), ctx);
+    expect(out).toEqual({ batchItemFailures: [] });
+    expect('gone' in rows).toBe(false);
   });
 });
 

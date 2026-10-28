@@ -23,25 +23,32 @@ table is empty.
 """
 
 import json
-import logging
 import os
 import time
 import uuid
 
 import boto3
+from aws_lambda_powertools import Logger, Metrics, Tracer
+from aws_lambda_powertools.logging import correlation_paths
+from aws_lambda_powertools.metrics import MetricUnit
+from botocore.config import Config
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 
-dynamodb = boto3.resource("dynamodb")
+logger = Logger()
+tracer = Tracer()  # patches boto3 so DynamoDB and SQS calls become X-Ray subsegments
+metrics = Metrics()
+
+# Keep SDK calls well inside the 10s function timeout: a hung dependency
+# surfaces as a logged error, not a Task timed out.
+_SDK = Config(connect_timeout=2, read_timeout=5, retries={"mode": "standard", "max_attempts": 2})
+dynamodb = boto3.resource("dynamodb", config=_SDK)
 table = dynamodb.Table(os.environ["JOBS_TABLE"])
-sqs = boto3.client("sqs")
+sqs = boto3.client("sqs", config=_SDK)
 
 QUEUE_URL = os.environ["JOBS_QUEUE_URL"]
 TTL_SECONDS = 3 * 24 * 60 * 60
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 app = FastAPI(title="jobs (sqs + lambda)", docs_url=None, redoc_url=None)
 
@@ -49,8 +56,17 @@ app = FastAPI(title="jobs (sqs + lambda)", docs_url=None, redoc_url=None)
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     response = await call_next(request)
-    logger.info("%s %s -> %s", request.method, request.url.path, response.status_code)
+    logger.info("request", method=request.method, path=request.url.path,
+                status=response.status_code)
     return response
+
+
+@app.exception_handler(Exception)
+async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
+    # An SDK error (throttle, timeout) must come back as JSON, not the
+    # framework's text 500.
+    logger.exception("unhandled error", method=request.method, path=request.url.path)
+    return JSONResponse({"error": "internal error"}, status_code=500)
 
 
 def _row_to_body(job_id: str, item: dict) -> dict:
@@ -92,11 +108,25 @@ async def create_job(request: Request) -> JSONResponse:
         return JSONResponse(_row_to_body(job_id, existing), status_code=200)
 
     # Hand the job off. The row is already PENDING, so a GET works immediately
-    # even if the worker has not picked the message up yet.
-    sqs.send_message(
-        QueueUrl=QUEUE_URL,
-        MessageBody=json.dumps({"job_id": job_id, "payload": payload}),
-    )
+    # even if the worker has not picked the message up yet. If the send fails,
+    # roll the row back so a client retry with the same job_id enqueues again
+    # instead of hitting the conditional put and reading a PENDING row forever.
+    try:
+        sqs.send_message(
+            QueueUrl=QUEUE_URL,
+            MessageBody=json.dumps({"job_id": job_id, "payload": payload}),
+        )
+    except Exception:
+        logger.exception("enqueue failed; rolling back row", job_id=job_id)
+        table.delete_item(
+            Key={"job_id": job_id},
+            ConditionExpression="#s = :p",
+            ExpressionAttributeNames={"#s": "status"},
+            ExpressionAttributeValues={":p": "PENDING"},
+        )
+        return JSONResponse({"error": "could not enqueue job, retry", "job_id": job_id},
+                            status_code=503)
+    metrics.add_metric(name="JobsEnqueued", unit=MetricUnit.Count, value=1)
     return JSONResponse({"job_id": job_id, "status": "PENDING"}, status_code=202)
 
 
@@ -109,4 +139,11 @@ async def get_job(job_id: str) -> JSONResponse:
 
 
 # Lambda entry point. Lifespan is off because there is no startup work to run.
-lambda_handler = Mangum(app, lifespan="off")
+_asgi = Mangum(app, lifespan="off")
+
+
+@logger.inject_lambda_context(correlation_id_path=correlation_paths.API_GATEWAY_REST)
+@tracer.capture_lambda_handler
+@metrics.log_metrics(capture_cold_start_metric=True)
+def lambda_handler(event: dict, context) -> dict:
+    return _asgi(event, context)

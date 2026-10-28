@@ -50,7 +50,8 @@ async def log_requests(request: Request, call_next):
 def _update(job_id: str, fields: dict, remove: list[str] | None = None) -> None:
     """SET the given fields (and REMOVE the named ones). Every name is aliased:
     status, step, error and result are DynamoDB reserved words, and a bare name
-    in an UpdateExpression fails."""
+    in an UpdateExpression fails. attribute_exists stops a late update from
+    phantom-creating a row (with no expires_at) after the TTL removed it."""
     names = {f"#f{i}": k for i, k in enumerate(fields)}
     values = {f":v{i}": v for i, v in enumerate(fields.values())}
     expr = "SET " + ", ".join(f"#f{i} = :v{i}" for i in range(len(fields)))
@@ -60,6 +61,7 @@ def _update(job_id: str, fields: dict, remove: list[str] | None = None) -> None:
     table.update_item(
         Key={"job_id": job_id},
         UpdateExpression=expr,
+        ConditionExpression="attribute_exists(job_id)",
         ExpressionAttributeNames=names,
         ExpressionAttributeValues=values,
     )
@@ -98,6 +100,10 @@ def _run_job(job_id: str, payload: dict) -> None:
                 return
             logger.warning("job %s attempt %d failed, retrying: %s", job_id, attempt, exc)
             time.sleep(0.5 * attempt)
+        except table.meta.client.exceptions.ConditionalCheckFailedException:
+            # The row is gone (TTL expired mid-run); nothing left to update.
+            logger.error("job %s has no row (expired or never created); dropping", job_id)
+            return
         except Exception as exc:  # a bad job must not kill the thread
             _update(job_id, {"status": "FAILED", "error": str(exc),
                              "updated_at": int(time.time())})

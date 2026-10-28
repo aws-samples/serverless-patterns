@@ -20,19 +20,34 @@
  * on the old box until the table is empty.
  */
 
+import { Logger } from '@aws-lambda-powertools/logger';
+import { Metrics, MetricUnit } from '@aws-lambda-powertools/metrics';
+import { Tracer } from '@aws-lambda-powertools/tracer';
 import { ConditionalCheckFailedException, DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
+import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import serverless from 'serverless-http';
 
+// Powertools: JSON logs with the Lambda context, X-Ray subsegments for every
+// SDK call, and EMF metrics. Service name and namespace come from the
+// POWERTOOLS_* env vars in template.yaml.
+const logger = new Logger();
+const tracer = new Tracer();
+const metrics = new Metrics();
+
 const table = process.env.JOBS_TABLE!;
 const queueUrl = process.env.JOBS_QUEUE_URL!;
-const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}), {
+// SDK timeouts well inside the 10s function timeout, so a slow dependency
+// surfaces as an SDK error (and a JSON 500) rather than a Lambda timeout.
+// Two attempts at (2s connect + 5s request) worst case still fits.
+const sdk = { maxAttempts: 2, requestHandler: { connectionTimeout: 2_000, requestTimeout: 5_000 } };
+const ddb = DynamoDBDocumentClient.from(tracer.captureAWSv3Client(new DynamoDBClient(sdk)), {
   marshallOptions: { removeUndefinedValues: true },
 });
-const sqs = new SQSClient({});
+const sqs = tracer.captureAWSv3Client(new SQSClient(sdk));
 
 const TTL_SECONDS = 3 * 24 * 60 * 60;
 
@@ -50,7 +65,7 @@ const app = express();
 app.use(express.json({ type: () => true, limit: '1mb' }));
 
 app.use((req, res, next) => {
-  res.on('finish', () => console.info(`${req.method} ${req.path} -> ${res.statusCode}`));
+  res.on('finish', () => logger.info('request', { method: req.method, path: req.path, status: res.statusCode }));
   next();
 });
 
@@ -93,7 +108,28 @@ app.post('/v1/jobs', async (req: Request, res: Response) => {
 
   // Hand the job off. The row is already PENDING, so a GET works immediately
   // even if the worker has not picked the message up yet.
-  await sqs.send(new SendMessageCommand({ QueueUrl: queueUrl, MessageBody: JSON.stringify({ job_id: jobId, payload }) }));
+  try {
+    await sqs.send(new SendMessageCommand({ QueueUrl: queueUrl, MessageBody: JSON.stringify({ job_id: jobId, payload }) }));
+  } catch (err) {
+    // The row and the message are two writes, not one transaction. If the
+    // send fails, remove the PENDING row we just wrote (only if it is still
+    // the row we wrote) so the client's retry can create and enqueue it again
+    // instead of hitting the duplicate branch above with a job no worker will
+    // ever see.
+    logger.error('enqueue failed, rolling back row', { jobId, error: err instanceof Error ? err.message : String(err) });
+    await ddb.send(
+      new DeleteCommand({
+        TableName: table,
+        Key: { job_id: jobId },
+        ConditionExpression: '#s = :p',
+        ExpressionAttributeNames: { '#s': 'status' },
+        ExpressionAttributeValues: { ':p': 'PENDING' },
+      }),
+    );
+    res.status(503).json({ error: 'could not enqueue job, retry', job_id: jobId });
+    return;
+  }
+  metrics.addMetric('JobsEnqueued', MetricUnit.Count, 1);
   res.status(202).json({ job_id: jobId, status: 'PENDING' });
 });
 
@@ -116,5 +152,22 @@ app.use((err: Error & { type?: string }, _req: Request, res: Response, next: exp
   next(err);
 });
 
-// Lambda entry point.
-export const handler = serverless(app);
+// Anything else (an SDK error, a bug) becomes a logged JSON 500 instead of
+// Express's default HTML page. Express 5 routes a rejected async handler here.
+app.use((err: Error, req: Request, res: Response, _next: express.NextFunction) => {
+  logger.error('unhandled error', { method: req.method, path: req.path, error: err.message });
+  res.status(500).json({ error: 'internal error' });
+});
+
+// Lambda entry point: attach the invocation context to every log line, run the
+// request through Express, then flush any metrics the request recorded.
+const serverlessHandler = serverless(app);
+export const handler = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.addContext(context);
+  metrics.captureColdStartMetric();
+  try {
+    return await serverlessHandler(event, context);
+  } finally {
+    if (metrics.hasStoredMetrics()) metrics.publishStoredMetrics();
+  }
+};

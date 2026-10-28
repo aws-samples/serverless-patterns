@@ -2,7 +2,7 @@
 
 This pattern demonstrates moving an Express service's background work out of the web process and onto Amazon SQS with an AWS Lambda consumer, without changing the API's public contract. The `before/` folder is an Express app that runs each job in the request process and records progress in an Amazon DynamoDB jobs table. The `after/` folder keeps the same routes, job ids and status endpoint, but the API now enqueues each job to an SQS queue and a separate Lambda runs the identical step code, so the work survives deploys, scales independently, and dead-letters poison messages instead of looping forever.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-fastapi
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-fastapi-typescript-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -12,7 +12,8 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Node.js 20 or newer](https://nodejs.org/en/download/) installed
+* [awscurl](https://github.com/okigan/awscurl) installed (`pip install awscurl`) to call the IAM-protected API
+* [Node.js 24](https://nodejs.org/en/download/) installed (matches the nodejs24.x runtime; the tests and sam build use it)
 
 ## Deployment Instructions
 
@@ -50,30 +51,13 @@ The queue is what the in-process worker could not give you: an unacknowledged me
 
 The `before/` folder is the starting point to compare against - the same Express app running the steps on the request process. It is included as reference and is not deployed by this template.
 
-Note: SQS delivers at least once, so a redelivered message runs the steps again from the top. The demo steps have no external effect, so that is safe; a real `publishResult` writing to a non-idempotent sink needs an idempotency key or a per-step checkpoint. The `POST` writes the row and sends the message as two calls, not one transaction: if the send fails after the row is written, the job stays `PENDING` and must be re-driven.
+Note: SQS delivers at least once, so a redelivered message runs the steps again from the top. The demo steps have no external effect, so that is safe; a real `publishResult` writing to a non-idempotent sink needs an idempotency key or a per-step checkpoint. The `POST` writes the row and sends the message as two calls, not one transaction: if the send fails after the row is written, the API deletes the `PENDING` row it just wrote and returns `503`, so the client's retry creates and enqueues the job afresh instead of finding a job no worker will ever see. Every worker update is conditional on the row still existing, so a message redelivered after the row's TTL is dropped rather than recreating the row.
 
-### Architecture
-
-```
-POST /v1/jobs                          GET /v1/jobs/{id}
-      |                                        |
-      v                                        v
-  API Gateway  ---->  API Lambda (Express)  <----
-                          |        ^
-              SendMessage |        | GetItem
-                          v        |
-                       SQS queue   DynamoDB jobs table
-                          |              ^
-                          v              | UpdateItem
-                    Worker Lambda  -------
-                          |
-                          v (after maxReceiveCount failures)
-                    Dead-letter queue
-```
+Both functions use [Powertools for AWS Lambda (TypeScript)](https://docs.powertools.aws.dev/lambda/typescript/latest/): structured JSON logs with the invocation context, X-Ray subsegments for each DynamoDB and SQS call, `JobsEnqueued` / `JobsDone` / `JobsFailed` metrics in a namespace named after the stack, and the SQS batch processor for the partial batch response. API Gateway writes access logs to a log group with 14-day retention and throttles the stage at 50 requests per second (burst 100); access logging uses the one account-level API Gateway CloudWatch role per Region, which this template sets via `AWS::ApiGateway::Account`. The event source mapping caps the worker at 10 concurrent invocations; set `ReservedConcurrentExecutions: 0` on `JobWorkerFunction` to pause consumption entirely (messages wait in the queue) and raise it to resume. CloudWatch alarms on dead-letter queue depth and on each function's errors and throttles are created without actions - add your own `AlarmActions` to be notified.
 
 ## Testing
 
-After deploying, note the `ApiUrl` output, then set it in your shell:
+The API uses the `AWS_IAM` authorizer, so every call must be signed with SigV4. The examples use [awscurl](https://github.com/okigan/awscurl), which signs with the same AWS credentials you deployed with; an unsigned `curl` gets `403`. After deploying, note the `ApiUrl` output, then set it in your shell:
 
 ```bash
 API=<ApiUrl output>
@@ -83,9 +67,9 @@ Submit a job and poll its status (use a fresh id each run):
 
 ```bash
 RUN=$(date +%s)
-curl -s -H 'Content-Type: application/json' -X POST $API/v1/jobs -d "{\"job_id\":\"ok-$RUN\",\"input\":\"hello\"}"
+awscurl --service execute-api -X POST $API/v1/jobs -d "{\"job_id\":\"ok-$RUN\",\"input\":\"hello\"}"
 # wait a few seconds, then:
-curl -s $API/v1/jobs/ok-$RUN
+awscurl --service execute-api $API/v1/jobs/ok-$RUN
 ```
 
 The status moves from `PENDING` to `DONE` with a `result`. A duplicate `POST` with the same `job_id` returns the existing job and does not enqueue it again.
@@ -100,7 +84,7 @@ npm test
 
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    sam delete --stack-name STACK_NAME
     ```
 1. Confirm the stack has been deleted
     ```bash

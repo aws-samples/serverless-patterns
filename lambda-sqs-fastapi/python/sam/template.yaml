@@ -8,7 +8,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: python3.13
+    Runtime: python3.14
     Architectures:
       - arm64
     MemorySize: 256
@@ -17,6 +17,11 @@ Globals:
     Environment:
       Variables:
         JOBS_TABLE: !Ref JobsTable
+        # Powertools for AWS Lambda: structured JSON logs, X-Ray subsegments
+        # for every SDK call, and EMF metrics under the stack's namespace.
+        POWERTOOLS_SERVICE_NAME: !Sub ${AWS::StackName}-jobs
+        POWERTOOLS_LOG_LEVEL: INFO
+        POWERTOOLS_METRICS_NAMESPACE: !Ref AWS::StackName
 
 Resources:
   JobsTable:
@@ -34,11 +39,53 @@ Resources:
         AttributeName: expires_at
         Enabled: true
 
+  JobsApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/apigateway/${AWS::StackName}-jobs-api-access
+      RetentionInDays: 14
+
+  # API Gateway writes access logs through ONE account-level role per Region.
+  # AWS::ApiGateway::Account sets that Region-wide value; a second stack in the
+  # same Region that also declares it overwrites this one (same role is fine).
+  ApiGatewayCloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: apigateway.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+  ApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !GetAtt ApiGatewayCloudWatchRole.Arn
+
   JobsApi:
     Type: AWS::Serverless::Api
+    DependsOn: ApiGatewayAccount
     Properties:
       StageName: prod
       TracingEnabled: true
+      # Callers must sign requests with SigV4 (IAM). Swap for a Cognito or
+      # Lambda authorizer if your clients are not AWS principals.
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+      AccessLogSetting:
+        DestinationArn: !GetAtt JobsApiAccessLogGroup.Arn
+        Format: '{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength","integrationLatency":"$context.integrationLatency"}'
+      # Execution logs (LoggingLevel / DataTraceEnabled) are deliberately off:
+      # they can carry request bodies.
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          MetricsEnabled: true
+          ThrottlingRateLimit: 50     # steady-state req/s
+          ThrottlingBurstLimit: 100   # burst
 
   JobsDeadLetterQueue:
     Type: AWS::SQS::Queue
@@ -118,11 +165,11 @@ Resources:
               Action:
                 - dynamodb:GetItem
                 - dynamodb:PutItem
+                # DeleteItem rolls the PENDING row back when SendMessage fails.
+                - dynamodb:DeleteItem
               Resource: !GetAtt JobsTable.Arn
-        - Statement:
-            - Effect: Allow
-              Action: sqs:SendMessage
-              Resource: !GetAtt JobsQueue.Arn
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt JobsQueue.QueueName
       Events:
         CreateJob:
           Type: Api
@@ -162,9 +209,86 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt JobsQueue.Arn
+            # 5, not the usual 10: each message runs three ~0.5s steps, and the
+            # batch must fit the 60s worker timeout with room for redelivery.
             BatchSize: 5
             FunctionResponseTypes:
               - ReportBatchItemFailures
+            # Cap concurrent worker invocations so a burst of jobs cannot
+            # overwhelm the table or a downstream the steps call.
+            ScalingConfig:
+              MaximumConcurrency: 10
+
+  # Alarms have no AlarmActions on purpose: wire them to your SNS topic.
+  JobsDlqDepthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: A job message exhausted maxReceiveCount
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Dimensions: [{ Name: QueueName, Value: !GetAtt JobsDeadLetterQueue.QueueName }]
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  JobWorkerErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: The worker Lambda reported invocation errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions: [{ Name: FunctionName, Value: !Ref JobWorkerFunction }]
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  JobWorkerThrottlesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: The worker Lambda was throttled
+      Namespace: AWS/Lambda
+      MetricName: Throttles
+      Dimensions: [{ Name: FunctionName, Value: !Ref JobWorkerFunction }]
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  JobApiErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: The API Lambda reported invocation errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions: [{ Name: FunctionName, Value: !Ref JobApiFunction }]
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  JobApiThrottlesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: The API Lambda was throttled
+      Namespace: AWS/Lambda
+      MetricName: Throttles
+      Dimensions: [{ Name: FunctionName, Value: !Ref JobApiFunction }]
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
 
 Outputs:
   ApiUrl:
@@ -179,3 +303,9 @@ Outputs:
   JobsDeadLetterQueueUrl:
     Description: Receives any job message that fails maxReceiveCount deliveries
     Value: !Ref JobsDeadLetterQueue
+  JobApiFunctionName:
+    Description: API Lambda
+    Value: !Ref JobApiFunction
+  JobWorkerFunctionName:
+    Description: Worker Lambda (tail with sam logs)
+    Value: !Ref JobWorkerFunction
