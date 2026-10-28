@@ -49,7 +49,7 @@ Choose the path that matches your setup:
 
 ```bash
 git clone https://github.com/aws-samples/serverless-patterns
-cd serverless-patterns/smk-lambda-queue-mode-python-sam
+cd serverless-patterns/smk-lambda-queue-mode/python/sam
 ```
 
 ---
@@ -363,5 +363,5 @@ aws cloudformation delete-stack --stack-name kafka-queue-network --region <regio
 ```
 
 ---
-Copyright 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 SPDX-License-Identifier: MIT-0
