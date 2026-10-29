@@ -1,6 +1,6 @@
 {
   "title": "AWS Lambda durable functions Human-in-the-Loop Approval Workflow",
-  "description": "Approval workflow that pauses execution while waiting for human decisions, with automatic timeout handling and callback-based resumption",
+  "description": "Durable workflow with human approval: pauses execution while waiting for human decisions, with automatic timeout handling and callback-based resumption, using Lambda durable functions.",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",

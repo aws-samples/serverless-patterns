@@ -1,6 +1,6 @@
 {
   "title": "Order Processing with AWS Lambda durable functions",
-  "description": "Order processing workflow using Lambda durable functions with automatic checkpointing, long-running waits, and state persistence",
+  "description": "Long-running durable workflow: order processing using Lambda durable functions with automatic checkpointing, long-running waits, and state persistence.",
   "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",

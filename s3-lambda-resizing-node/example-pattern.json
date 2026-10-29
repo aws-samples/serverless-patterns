@@ -1,6 +1,6 @@
 {
   "title": "Resizing images uploaded to Amazon S3 with AWS Lambda (Node.js)",
-  "description": "Create a Lambda function that resizes images uploaded to S3.",
+  "description": "File and image processing in Node.js: create an AWS Lambda function that resizes images uploaded to Amazon S3.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",

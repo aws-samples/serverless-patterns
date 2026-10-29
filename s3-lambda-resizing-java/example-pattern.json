@@ -1,6 +1,6 @@
 {
   "title": "Resizing images uploaded to Amazon S3 with AWS Lambda (Java)",
-  "description": "Create an AWS Lambda function that resizes images uploaded to Amazon S3.",
+  "description": "File and image processing in Java: create an AWS Lambda function that resizes images uploaded to Amazon S3.",
   "language": "Java",
   "level": "200",
   "framework": "AWS SAM",

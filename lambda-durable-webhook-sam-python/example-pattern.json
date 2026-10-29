@@ -1,6 +1,6 @@
 {
   "title": "Webhook Receiver with AWS Lambda durable functions",
-  "description": "Receive and process webhooks durably with automatic checkpointing using Lambda durable functions and Python",
+  "description": "Webhook receiver: receive and process webhooks durably with automatic checkpointing using Lambda durable functions and Python.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

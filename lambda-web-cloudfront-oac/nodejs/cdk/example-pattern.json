@@ -1,6 +1,6 @@
 {
   "title": "AWS Lambda Web Function behind Amazon CloudFront with Origin Access Control",
-  "description": "Serve a Lambda Web Function only through a CloudFront distribution: an IamAuth endpoint, an OAC that signs origin requests, and a resource policy that trusts one distribution.",
+  "description": "Web app hosting on AWS Lambda: serve a Lambda Web Function only through a CloudFront distribution: an IamAuth endpoint, an OAC that signs origin requests, and a resource policy that trusts one distribution.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS CDK",

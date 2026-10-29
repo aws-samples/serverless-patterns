@@ -1,6 +1,6 @@
 {
   "title": "Resizing images uploaded to Amazon S3 with AWS Lambda (.NET)",
-  "description": "Automate the creation of thumbnail images from new images on Amazon S3 leveraging Lambda and .NET",
+  "description": "File and image processing in .NET: automate the creation of thumbnail images from new images on Amazon S3 leveraging AWS Lambda.",
   "language": ".NET",
   "level": "200",
   "framework": "AWS SAM",

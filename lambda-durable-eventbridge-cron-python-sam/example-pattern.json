@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge Scheduler to AWS Lambda durable function",
-  "description": "Create a Lambda durable function triggered by EventBridge Scheduler on a cron schedule using AWS SAM.",
+  "description": "Cron jobs as durable workflows: a Lambda durable function triggered by EventBridge Scheduler on a cron schedule using AWS SAM.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
