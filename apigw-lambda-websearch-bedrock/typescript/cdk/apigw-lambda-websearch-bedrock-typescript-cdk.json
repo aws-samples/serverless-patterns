@@ -15,8 +15,8 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-websearch-bedrock-cdk",
-            "templateURL": "serverless-patterns/apigw-lambda-websearch-bedrock-cdk",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-websearch-bedrock/typescript/cdk",
+            "templateURL": "serverless-patterns/apigw-lambda-websearch-bedrock/typescript/cdk",
             "projectFolder": "apigw-lambda-websearch-bedrock-cdk",
             "templateFile": "lib/apigw-lambda-websearch-bedrock-stack.ts"
         }

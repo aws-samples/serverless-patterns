@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon API Gateway REST API backed by an AWS Lambda function that searches the live web via the Web Search Tool on Amazon Bedrock AgentCore Gateway, then uses Amazon Bedrock to synthesize accurate, cited answers grounded in current facts.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-websearch-bedrock-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-websearch-bedrock-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Clone the repository:
     ```bash
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/apigw-lambda-websearch-bedrock-cdk
+    cd serverless-patterns/apigw-lambda-websearch-bedrock/typescript/cdk
     ```
 
 2. Install dependencies:
