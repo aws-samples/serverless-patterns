@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!--
+Design plan: a routing schematic on cool "fog" paper. Fog #EEF1F4 background, Ink #111A2B text
+and outlines, Cobalt #1946C8 for the request (the only thing that moves), Amber #B8640A for the
+control plane, Moss #1E7A4C for a 2xx from the MicroVM. Bricolage Grotesque for headings,
+IBM Plex Sans for body (max 70ch), monospace only for paths. Flat 1px panels, no shadows.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One CloudFront URL, one Lambda MicroVM per session</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fog: #EEF1F4; --paper: #F8FAFB; --ink: #111A2B; --slate: #5B6676; --line: #C9D1DA;
+  --cobalt: #1946C8; --cobalt-soft: #E3E9FA; --amber: #B8640A; --amber-soft: #FBEEDC; --moss: #1E7A4C; --brick: #B4231B;
+  --head: "Bricolage Grotesque", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fog); color: var(--ink); font-family: var(--body); font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+main { max-width: 1040px; margin: 0 auto; padding: 2.5rem clamp(1rem, 3vw, 2.5rem) 4rem; }
+h1, h2 { font-family: var(--head); font-weight: 700; letter-spacing: -0.015em; line-height: 1.1; margin: 0; }
+h1 { font-size: clamp(2rem, 4.5vw, 3rem); max-width: 22ch; }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.75rem; }
+p, ul { max-width: 70ch; margin: 0 0 1rem; }
+ul { padding-left: 1.2rem; }
+li { margin-bottom: 0.4rem; }
+code { font-family: var(--mono); font-size: 0.9em; background: var(--paper); border: 1px solid var(--line); padding: 0 0.3em; border-radius: 3px; }
+a { color: var(--cobalt); }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; border-radius: 2px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.lead { font-size: 1.2rem; margin-top: 1rem; }
+section { padding: 2.5rem 0 0; }
+section + section { margin-top: 1.5rem; border-top: 1px solid var(--line); }
+
+.scenarios { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1rem; }
+.scenarios button { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.95rem; }
+.scenarios button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.diagram-wrap { border: 1px solid var(--line); background: var(--paper); border-radius: 6px; overflow-x: auto; }
+.diagram-wrap svg { display: block; min-width: 700px; width: 100%; height: auto; }
+.node rect { fill: #fff; stroke: var(--ink); stroke-width: 1.25; }
+.node text { font-family: var(--body); font-size: 13px; fill: var(--ink); }
+.node .title { font-weight: 600; font-size: 14px; }
+.node .sub { fill: var(--slate); font-size: 11.5px; }
+.node.vm rect.frame-r { stroke-dasharray: 4 3; stroke: var(--slate); fill: none; }
+.node.active rect.main { stroke: var(--cobalt); stroke-width: 2.5; fill: var(--cobalt-soft); }
+.node.active-control rect.main { stroke: var(--amber); stroke-width: 2.5; fill: var(--amber-soft); }
+.link { stroke: var(--line); stroke-width: 1.5; }
+.link.active { stroke: var(--cobalt); stroke-width: 2.5; }
+.link.active-control { stroke: var(--amber); stroke-width: 2.5; }
+#token { transition: transform 550ms cubic-bezier(.4,0,.2,1); }
+#token circle { fill: var(--cobalt); stroke: #fff; stroke-width: 2; }
+#token.control circle { fill: var(--amber); }
+#token.ok circle { fill: var(--moss); }
+@media (prefers-reduced-motion: reduce) { #token { transition: none; } }
+.player { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin: 1rem 0 0.75rem; }
+.player button { background: #fff; border: 1.5px solid var(--ink); border-radius: 4px; padding: 0.45rem 0.9rem; font-weight: 600; }
+.player button:hover { background: var(--ink); color: #fff; }
+.player button:disabled { opacity: 0.35; cursor: default; }
+.player button:disabled:hover { background: #fff; color: var(--ink); }
+.player .counter { font-family: var(--head); font-weight: 700; font-size: 1.15rem; min-width: 5ch; }
+.player .hint { color: var(--slate); font-size: 0.9rem; }
+.step { border: 1px solid var(--line); border-left: 4px solid var(--cobalt); border-radius: 6px; background: #fff; padding: 1rem 1.1rem; max-width: 70ch; }
+.step.control { border-left-color: var(--amber); }
+.step.ok { border-left-color: var(--moss); }
+.step h3 { font-family: var(--head); font-weight: 700; font-size: 1.25rem; margin: 0 0 0.4rem; }
+.step p { margin: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+.ideas { list-style: none; padding: 0; max-width: 70ch; }
+.ideas li { padding: 0.8rem 0; border-top: 1px solid var(--line); }
+.ideas li:last-child { border-bottom: 1px solid var(--line); }
+.ideas strong { font-weight: 600; }
+.fit { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media (min-width: 760px) { .fit { grid-template-columns: 1fr 1fr; } }
+.fit h3 { font-family: var(--head); font-weight: 700; font-size: 1.2rem; margin: 0 0 0.5rem; }
+.fit .good h3 { color: var(--moss); }
+.fit .bad h3 { color: var(--brick); }
+.prod { border-left: 3px solid var(--amber); padding-left: 0.9rem; max-width: 70ch; margin-top: 1rem; }
+footer { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--slate); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>One CloudFront URL, one Lambda MicroVM per session</h1>
+    <p class="lead">Every session gets its own AWS Lambda MicroVM behind a single Amazon CloudFront URL. The session id in the path (<code>/s/{id}/…</code>) or query string (<code>?session={id}</code>) picks the VM; a Lambda@Edge function routes to it, and a control-plane Lambda launches it the first time.</p>
+  </header>
+
+  <section aria-labelledby="walk-h">
+    <h2 id="walk-h">How a request flows</h2>
+    <div class="scenarios" role="group" aria-label="Scenarios" id="tabs"></div>
+    <div class="diagram-wrap">
+      <svg id="diagram" viewBox="0 0 1000 330" role="img" aria-label="Viewer, CloudFront, Lambda@Edge router, control-plane Lambda, DynamoDB, and the session's MicroVM. The highlighted node shows the current step.">
+        <g id="links"></g><g id="nodes"></g>
+        <g id="token"><circle r="8"></circle></g>
+      </svg>
+    </div>
+    <div class="player">
+      <button type="button" id="prev">← Previous</button>
+      <button type="button" id="next">Next →</button>
+      <div class="counter" id="counter" aria-hidden="true"></div>
+      <div class="hint">Keys: ← and →</div>
+    </div>
+    <div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+    <div class="step" id="step"><h3 id="step-title"></h3><p id="step-text"></p></div>
+  </section>
+
+  <section aria-labelledby="ideas-h">
+    <h2 id="ideas-h">Core ideas</h2>
+    <ul class="ideas">
+      <li><strong>DynamoDB maps session id to MicroVM.</strong> One table, one record per session: <code>microvmId</code>, <code>endpoint</code>, <code>token</code> and when the token expires. Records expire after 24 hours.</li>
+      <li><strong>The edge function routes.</strong> On every request it reads the record. A valid token means proxy to the VM (origin, Host header, auth token, port 8080). Anything else means a 307 to <code>/_control</code>, or a 503 if the control plane already ran once. Session ids must match <code>^[A-Za-z0-9_-]{1,64}$</code> or get a 400.</li>
+      <li><strong>The control plane launches on demand.</strong> It attaches to a live VM or starts one, mints a 30-minute token, stores it, and redirects back. A conditional write claims the launch, so two simultaneous first requests start one VM, not two; the loser gets a 503 and succeeds on retry.</li>
+      <li><strong>Idle VMs suspend, resume, then terminate.</strong> After 15 idle minutes a VM is suspended; the next proxied request resumes it. After 30 more suspended minutes it is terminated, and the next request launches a fresh one.</li>
+      <li><strong>Lambda@Edge has no environment variables,</strong> so the table name and Region ride as custom headers on the CloudFront origin.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="fit-h">
+    <h2 id="fit-h">Is it a fit?</h2>
+    <div class="fit">
+      <div class="good">
+        <h3>Good fit</h3>
+        <ul>
+          <li>Each user or session needs its own isolated process, filesystem and memory.</li>
+          <li>Sessions are stateful and live for minutes to hours.</li>
+          <li>The first request can tolerate a redirect and a cold launch of up to ~20 seconds.</li>
+          <li>Your app uses relative asset paths, so stripping <code>/s/{id}</code> is harmless.</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Not a fit</h3>
+        <ul>
+          <li>Stateless request handling: a plain Lambda function or container is simpler.</li>
+          <li>You can't deploy in <code>us-east-1</code>; Lambda@Edge requires it, and far-away viewers pay a round trip to the single-Region table.</li>
+          <li>Your app references assets by absolute path (<code>/assets/…</code>); route by subdomain instead.</li>
+          <li>Untrusted users without adding authentication first.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="prod"><strong>For production</strong>, add authentication first: as shipped, anyone who knows a session id reaches that VM. Then consider a DynamoDB global table for lookup latency and subdomain routing if your paths are absolute.</p>
+  </section>
+
+  <footer>Deploy and test: see <code>README.md</code> in this folder.</footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  const NODES = {
+    viewer:  { x: 85,  y: 165, w: 110, h: 60, title: "Viewer",              sub: "browser / curl" },
+    cf:      { x: 275, y: 165, w: 140, h: 60, title: "CloudFront",          sub: "one URL" },
+    edge:    { x: 500, y: 55,  w: 170, h: 60, title: "Lambda@Edge router",  sub: "origin-request" },
+    control: { x: 500, y: 275, w: 170, h: 60, title: "Control-plane Lambda", sub: "Function URL + OAC" },
+    ddb:     { x: 500, y: 165, w: 150, h: 60, title: "DynamoDB",            sub: "session → MicroVM" },
+    vm:      { x: 810, y: 165, w: 170, h: 60, title: "MicroVM: alice",      sub: "app on :8080", vm: true }
+  };
+  const LINKS = [["viewer","cf"],["cf","edge"],["cf","control"],["edge","ddb"],["control","ddb"],["edge","vm"],["control","vm"]];
+  const lk = (a, b) => "lk-" + [a, b].sort().join("-");
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p.appendChild(e); return e; };
+  const edgePt = (f, t) => { const dx = t.x - f.x, dy = t.y - f.y; const s = Math.min((f.w / 2 + 4) / Math.abs(dx || 1e-9), (f.h / 2 + 4) / Math.abs(dy || 1e-9)); return { x: f.x + dx * s, y: f.y + dy * s }; };
+  const gl = document.getElementById("links"), gn = document.getElementById("nodes");
+  for (const [a, b] of LINKS) { const p = edgePt(NODES[a], NODES[b]), q = edgePt(NODES[b], NODES[a]); el("line", { id: lk(a, b), class: "link", x1: p.x, y1: p.y, x2: q.x, y2: q.y }, gl); }
+  for (const id in NODES) {
+    const n = NODES[id], g = el("g", { id: "n-" + id, class: "node" + (n.vm ? " vm" : "") }, gn);
+    if (n.vm) el("rect", { class: "frame-r", x: n.x - n.w / 2 - 5, y: n.y - n.h / 2 - 5, width: n.w + 10, height: n.h + 10, rx: 8 }, g);
+    el("rect", { class: "main", x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: 5 }, g);
+    el("text", { class: "title", x: n.x, y: n.y - 4, "text-anchor": "middle" }, g).textContent = n.title;
+    el("text", { class: "sub", x: n.x, y: n.y + 14, "text-anchor": "middle" }, g).textContent = n.sub;
+  }
+
+  const SCENARIOS = [
+    { id: "first", label: "First request", steps: [
+      { at: "viewer", kind: "data", title: "The viewer opens /s/alice/", text: "The session id, alice, is in the path." },
+      { at: "cf", from: "viewer", kind: "data", title: "CloudFront receives the request", text: "Before contacting any origin, it runs the Lambda@Edge router." },
+      { at: "edge", from: "cf", kind: "data", title: "The router checks the session id", text: "alice is a valid id, so the router looks it up." },
+      { at: "ddb", from: "edge", kind: "data", title: "DynamoDB has no record for alice", text: "This is the first visit, so there is no MicroVM to send the request to." },
+      { at: "edge", from: "ddb", kind: "data", title: "The router answers with a redirect", text: "It returns a 307 to /_control?session=alice&return=/s/alice/ instead of forwarding the request." },
+      { at: "cf", from: "edge", kind: "data", title: "CloudFront passes the redirect back", text: "The response goes to the viewer unchanged." },
+      { at: "viewer", from: "cf", kind: "data", title: "The viewer follows the redirect", text: "It requests /_control?session=alice&return=/s/alice/." },
+      { at: "cf", from: "viewer", kind: "control", title: "CloudFront routes /_control to the control plane", text: "Paths starting with /_control go to a different origin: the control-plane Lambda." },
+      { at: "control", from: "cf", kind: "control", title: "The control plane receives the request", text: "CloudFront signs it (Origin Access Control), and the Function URL accepts only signed requests from this distribution." },
+      { at: "ddb", from: "control", kind: "control", title: "It claims the launch", text: "A conditional write marks alice as launching. If two requests arrive together, only one wins and starts a MicroVM." },
+      { at: "vm", from: "control", kind: "control", title: "It launches alice's MicroVM", text: "RunMicrovm starts a VM from the image and passes it the session id. The control plane waits until it's running." },
+      { at: "control", from: "vm", kind: "control", title: "It mints an access token", text: "The token lets requests reach the VM's app on port 8080 for 30 minutes." },
+      { at: "ddb", from: "control", kind: "control", title: "It stores the endpoint and token", text: "The alice record now says where the VM is and how to get in." },
+      { at: "cf", from: "control", kind: "control", title: "It redirects the viewer back", text: "A 307 to /s/alice/, with a marker that stops the router from redirecting again if something is still wrong." },
+      { at: "viewer", from: "cf", kind: "data", title: "The viewer retries /s/alice/", text: "Same URL as the first request." },
+      { at: "cf", from: "viewer", kind: "data", title: "CloudFront runs the router again", text: "Same path as before." },
+      { at: "edge", from: "cf", kind: "data", title: "The router checks the session id", text: "Still alice, still valid." },
+      { at: "ddb", from: "edge", kind: "data", title: "This time there is a valid token", text: "The record has a token with more than 60 seconds left." },
+      { at: "edge", from: "ddb", kind: "data", title: "The router points the request at the VM", text: "It swaps the origin and Host for the VM's endpoint and adds the token." },
+      { at: "vm", from: "edge", kind: "ok", title: "The MicroVM answers", text: "The app replies with its session id, through CloudFront to the viewer. Later requests skip the control plane entirely." }
+    ] },
+    { id: "next", label: "Next request", steps: [
+      { at: "viewer", kind: "data", title: "The viewer opens /s/alice/ again", text: "Same session id in the path." },
+      { at: "cf", from: "viewer", kind: "data", title: "CloudFront receives the request", text: "It runs the Lambda@Edge router, as before." },
+      { at: "edge", from: "cf", kind: "data", title: "The router checks the session id", text: "alice is valid, so the router looks it up." },
+      { at: "ddb", from: "edge", kind: "data", title: "DynamoDB has a valid token", text: "One read. The token has more than 60 seconds left, so the session is usable." },
+      { at: "edge", from: "ddb", kind: "data", title: "The router points the request at the VM", text: "It sets the origin and the Host header to the VM's endpoint (Host doesn't follow the origin on its own), adds the token and port 8080, and strips the /s/alice prefix." },
+      { at: "vm", from: "edge", kind: "ok", title: "The MicroVM answers", text: "The VM checks the token and the app replies, through CloudFront to the viewer. No redirect, no control plane, no writes." }
+    ] },
+    { id: "expired", label: "Expired token", steps: [
+      { at: "viewer", kind: "data", title: "The viewer comes back after a while", text: "It opens /s/alice/ again, about 30 minutes after the token was minted." },
+      { at: "cf", from: "viewer", kind: "data", title: "CloudFront receives the request", text: "It runs the Lambda@Edge router, as always." },
+      { at: "edge", from: "cf", kind: "data", title: "The router checks the session id", text: "alice is valid, so the router looks it up." },
+      { at: "ddb", from: "edge", kind: "data", title: "The token has expired", text: "The record still names alice's MicroVM, but the token has less than 60 seconds left, so the router treats it as a miss." },
+      { at: "edge", from: "ddb", kind: "data", title: "The router answers with a redirect", text: "A 307 to /_control, exactly like a first request." },
+      { at: "cf", from: "edge", kind: "data", title: "CloudFront passes the redirect back", text: "The response goes to the viewer unchanged." },
+      { at: "viewer", from: "cf", kind: "data", title: "The viewer follows the redirect", text: "It requests /_control?session=alice&return=/s/alice/." },
+      { at: "cf", from: "viewer", kind: "control", title: "CloudFront routes /_control to the control plane", text: "Signed with Origin Access Control, as before." },
+      { at: "control", from: "cf", kind: "control", title: "The control plane receives the request", text: "Its job is the same: make the session usable." },
+      { at: "ddb", from: "control", kind: "control", title: "The record already names a MicroVM", text: "So the control plane doesn't claim a launch. It checks that VM first." },
+      { at: "control", from: "ddb", kind: "control", title: "It asks whether the VM is still alive", text: "One GetMicrovm call with the recorded id." },
+      { at: "vm", from: "control", kind: "control", title: "The VM is still there", text: "After 15 idle minutes it was suspended, not terminated, so there's nothing to relaunch." },
+      { at: "control", from: "vm", kind: "control", title: "It mints a new token", text: "A fresh 30-minute token for the same VM." },
+      { at: "ddb", from: "control", kind: "control", title: "It stores the new token", text: "Same VM, same endpoint, new token." },
+      { at: "cf", from: "control", kind: "control", title: "It redirects the viewer back", text: "A 307 to /s/alice/." },
+      { at: "viewer", from: "cf", kind: "data", title: "The viewer retries /s/alice/", text: "Same URL as before." },
+      { at: "cf", from: "viewer", kind: "data", title: "CloudFront runs the router again", text: "Same path as before." },
+      { at: "edge", from: "cf", kind: "data", title: "The router checks the session id", text: "Still alice, still valid." },
+      { at: "ddb", from: "edge", kind: "data", title: "Now the token is valid", text: "It has the full 30 minutes ahead of it." },
+      { at: "edge", from: "ddb", kind: "data", title: "The router points the request at the VM", text: "Origin, Host and token, as on any normal request." },
+      { at: "vm", from: "edge", kind: "ok", title: "The MicroVM resumes and answers", text: "The incoming request wakes the suspended VM, with its memory intact, and the app replies. If the VM had been terminated instead (45 idle minutes), the control plane would have launched a new one." }
+    ] }
+  ];
+
+  let si = 0, st = 0;
+  const $ = (id) => document.getElementById(id);
+  function render() {
+    const scn = SCENARIOS[si], s = scn.steps[st], ctl = s.kind === "control";
+    document.querySelectorAll("#tabs button").forEach((b, i) => b.setAttribute("aria-pressed", i === si ? "true" : "false"));
+    document.querySelectorAll(".node, .link").forEach((n) => n.classList.remove("active", "active-control"));
+    $("n-" + s.at).classList.add(ctl ? "active-control" : "active");
+    if (s.from) { const l = $(lk(s.from, s.at)); if (l) l.classList.add(ctl ? "active-control" : "active"); }
+    const n = NODES[s.at]; const tok = $("token"); tok.setAttribute("class", s.kind);
+    tok.style.transform = "translate(" + n.x + "px, " + (n.y - n.h / 2 - 14) + "px)";
+    $("step").className = "step " + (s.kind === "data" ? "" : s.kind);
+    $("step-title").textContent = s.title; $("step-text").textContent = s.text;
+    $("counter").textContent = (st + 1) + " / " + scn.steps.length;
+    $("prev").disabled = st === 0; $("next").disabled = st === scn.steps.length - 1;
+    $("live").textContent = scn.label + ", step " + (st + 1) + " of " + scn.steps.length + ": " + s.title;
+  }
+  SCENARIOS.forEach((s, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = s.label; b.addEventListener("click", () => { si = i; st = 0; render(); }); $("tabs").appendChild(b); });
+  const go = (d) => { const max = SCENARIOS[si].steps.length - 1; const n = st + d; if (n >= 0 && n <= max) { st = n; render(); } };
+  $("prev").addEventListener("click", () => go(-1)); $("next").addEventListener("click", () => go(1));
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); go(1); } if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+  });
+  render();
+})();
+</script>
+</body>
+</html>
