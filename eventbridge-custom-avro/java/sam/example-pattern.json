@@ -14,9 +14,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-avro/java/sam",
-      "templateURL": "serverless-patterns/eventbridge-custom-avro/java/sam",
-      "projectFolder": "eventbridge-custom-avro/java/sam",
       "templateFile": "template.yaml"
     }
   },
