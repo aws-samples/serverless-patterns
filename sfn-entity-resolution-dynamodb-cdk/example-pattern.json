@@ -1,0 +1,108 @@
+{
+  "title": "AWS Step Functions to AWS Entity Resolution to Amazon DynamoDB",
+  "description": "Orchestrate AWS Entity Resolution matching jobs with AWS Step Functions, triggered by Amazon S3 uploads, storing results in Amazon DynamoDB",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an automated entity matching pipeline using AWS Step Functions.",
+      "Customer records uploaded to Amazon S3 trigger an Amazon EventBridge rule.",
+      "AWS Step Functions orchestrates the AWS Entity Resolution matching job using native SDK integration.",
+      "The state machine polls for job completion and stores match metadata in Amazon DynamoDB.",
+      "No AWS Lambda functions are needed for orchestration thanks to direct SDK service integrations."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-entity-resolution-dynamodb-cdk",
+      "templateURL": "serverless-patterns/sfn-entity-resolution-dynamodb-cdk",
+      "projectFolder": "sfn-entity-resolution-dynamodb-cdk",
+      "templateFile": "cdk/lib/sfn-entity-resolution-dynamodb-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Entity Resolution - ML-powered entity matching",
+        "link": "https://docs.aws.amazon.com/entityresolution/latest/userguide/what-is-service.html"
+      },
+      {
+        "text": "AWS Step Functions - Serverless workflow orchestration",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon EventBridge - Serverless event bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd sfn-entity-resolution-dynamodb-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": {
+      "x": 15,
+      "y": 50,
+      "service": "s3",
+      "label": "Amazon S3"
+    },
+    "icon2": {
+      "x": 35,
+      "y": 50,
+      "service": "eventbridge",
+      "label": "Amazon EventBridge"
+    },
+    "icon3": {
+      "x": 55,
+      "y": 50,
+      "service": "sfn",
+      "label": "AWS Step Functions"
+    },
+    "icon4": {
+      "x": 75,
+      "y": 50,
+      "service": "entity-resolution",
+      "label": "AWS Entity Resolution"
+    },
+    "icon5": {
+      "x": 90,
+      "y": 50,
+      "service": "dynamodb",
+      "label": "Amazon DynamoDB"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon2",
+      "to": "icon3"
+    },
+    "line3": {
+      "from": "icon3",
+      "to": "icon4"
+    },
+    "line4": {
+      "from": "icon3",
+      "to": "icon5"
+    }
+  }
+}
