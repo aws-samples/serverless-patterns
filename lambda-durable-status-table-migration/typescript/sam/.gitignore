@@ -1,0 +1,9 @@
+node_modules/
+.aws-sam/
+samconfig.toml
+package-lock.json
+coverage/
+dist/
+*.log
+.env
+.DS_Store
