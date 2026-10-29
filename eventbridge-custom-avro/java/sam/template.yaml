@@ -7,7 +7,7 @@ Description: >
   the consumer Lambda, a dead-letter queue, and the delivery role.
 
   Account- and region-agnostic: no account id or region is hardcoded; resources
-  are named from the AppName parameter.
+  are named from the AppName parameter. (uksb-1tthgi812) (tag:eventbridge-custom-avro-sam-java)
 
 Parameters:
   AppName:
