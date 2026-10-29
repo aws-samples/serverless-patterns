@@ -74,7 +74,7 @@
         "icon2": {
             "x": 80,
             "y": 50,
-            "service": "lambda",
+            "service": "lambda-event-functions",
             "label": "AWS Lambda"
         },
         "line1": {
