@@ -1,0 +1,19 @@
+{
+  "name": "lambda-recursion-sfn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.274.0",
+    "constructs": "^10.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "aws-cdk": "^2.1146.1",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.6.0"
+  }
+}
