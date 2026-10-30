@@ -4,7 +4,9 @@
 package com.example.orders;
 
 import com.example.orders.proto.OrderPlaced;
+import software.amazon.awssdk.awscore.retry.AwsRetryStrategy;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.eventbridgev2.EventBridgeV2Client;
 import software.amazon.awssdk.services.eventbridgev2.model.PutRawEventsRequest;
@@ -44,6 +46,9 @@ public final class Publisher {
 
     static final String CONTENT_TYPE_PROTOBUF = "application/protobuf";
 
+    /** Total attempts (first call + retries) for the SDK's standard retry strategy. */
+    static final int MAX_ATTEMPTS = 5;
+
     private Publisher() {
     }
 
@@ -53,7 +58,10 @@ public final class Publisher {
      * <p>{@code Data} is Protobuf bytes wrapped in the Glue Schema Registry wire
      * format (header, schema-version UUID, message index, then the Protobuf
      * bytes). {@code Metadata} carries the custom keys a METADATA-scoped
-     * subscriber filter can route on.
+     * subscriber filter can route on. Because the content type is
+     * application/protobuf and the request names a Glue registry, EventBridge
+     * decodes {@code Data} before filtering, so DATA-scoped filters on the
+     * decoded fields work too.
      */
     static PutRawEventsRequestEntry buildEntry(OrderPlaced order, String schemaVersionId) {
         byte[] framed = ProtoIo.encodeFramed(order, schemaVersionId);
@@ -94,51 +102,32 @@ public final class Publisher {
         return failures;
     }
 
-    /** Call PutRawEvents, retrying ThrottlingException with backoff + jitter. */
-    static PutRawEventsResponse putRawWithBackoff(
-            EventBridgeV2Client client, String busArn, String registryArn,
-            List<PutRawEventsRequestEntry> entries, int attempts) {
-        long delayMs = 200;
-        for (int attempt = 0; attempt < attempts; attempt++) {
-            try {
-                return client.putRawEvents(PutRawEventsRequest.builder()
-                    .eventBusArn(busArn)
-                    .entries(entries)
-                    .schemaRegistryConfiguration(SchemaRegistryConfiguration.builder()
-                        .registryUri(registryArn)
-                        .build())
-                    .build());
-            } catch (RuntimeException error) {
-                if (!isThrottling(error) || attempt == attempts - 1) {
-                    throw error;
-                }
-                sleep(delayMs + (long) (Math.random() * delayMs));
-                delayMs *= 2;
-            }
-        }
-        throw new IllegalStateException("exhausted retry attempts without a response");
-    }
-
-    private static boolean isThrottling(RuntimeException error) {
-        String name = error.getClass().getSimpleName();
-        return name.contains("Throttling")
-            || (error.getMessage() != null && error.getMessage().contains("ThrottlingException"));
-    }
-
-    private static void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    /**
+     * Client configuration shared by the EventBridge and Glue clients.
+     *
+     * <p>Throttling is handled by the SDK's built-in standard retry strategy
+     * (exponential backoff with jitter on ThrottlingException and other
+     * retryable errors), so the publisher has no retry loop of its own.
+     */
+    static ClientOverrideConfiguration clientOverrideConfiguration() {
+        return ClientOverrideConfiguration.builder()
+            .retryStrategy(AwsRetryStrategy.standardRetryStrategy().toBuilder()
+                .maxAttempts(MAX_ATTEMPTS)
+                .build())
+            .build();
     }
 
     /** Encode one domain message and publish it to the bus; throw on any failure. */
     static PutRawEventsResponse publish(
             EventBridgeV2Client client, String busArn, String registryArn,
             OrderPlaced order, String schemaVersionId) {
-        List<PutRawEventsRequestEntry> entries = List.of(buildEntry(order, schemaVersionId));
-        PutRawEventsResponse response = putRawWithBackoff(client, busArn, registryArn, entries, 5);
+        PutRawEventsResponse response = client.putRawEvents(PutRawEventsRequest.builder()
+            .eventBusArn(busArn)
+            .entries(buildEntry(order, schemaVersionId))
+            .schemaRegistryConfiguration(SchemaRegistryConfiguration.builder()
+                .registryUri(registryArn)
+                .build())
+            .build());
         Integer failedCount = response.failedEntryCount();
         if (!findFailures(response).isEmpty() || (failedCount != null && failedCount > 0)) {
             throw new RuntimeException("publish had failed entries: " + response.entries());
@@ -179,8 +168,9 @@ public final class Publisher {
         Region region = (args.region != null && !args.region.isBlank())
             ? Region.of(args.region) : null;
 
-        var ebBuilder = EventBridgeV2Client.builder();
-        var glueBuilder = GlueClient.builder();
+        ClientOverrideConfiguration overrides = clientOverrideConfiguration();
+        var ebBuilder = EventBridgeV2Client.builder().overrideConfiguration(overrides);
+        var glueBuilder = GlueClient.builder().overrideConfiguration(overrides);
         if (region != null) {
             ebBuilder.region(region);
             glueBuilder.region(region);
@@ -193,7 +183,7 @@ public final class Publisher {
             PutRawEventsResponse response =
                 publish(client, args.busArn, args.registryArn, order, schemaVersionId);
             PutRawEventsResultEntry entry = response.entries().get(0);
-            System.out.printf("Published orderId=%s -> SuccessCode=%s EventId=%s%n",
+            System.out.printf("Published order_id=%s -> SuccessCode=%s EventId=%s%n",
                 args.orderId, entry.successCodeAsString(), entry.eventId());
         }
     }

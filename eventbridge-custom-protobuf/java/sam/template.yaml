@@ -4,7 +4,8 @@ Description: >
   Protobuf on an EventBridge custom event bus (eventsv2), Java consumer. This
   template provisions the whole sample: the event bus, a subscriber that delivers
   to the consumer Lambda, the Glue Schema Registry + Protobuf schema for
-  OrderPlaced, the consumer Lambda, a dead-letter queue, and the delivery role.
+  OrderPlaced, the consumer Lambda and its log group, a dead-letter queue, and
+  the delivery role.
 
   Account- and region-agnostic: no account id or region is hardcoded; resources
   are named from the AppName parameter.
@@ -84,10 +85,21 @@ Resources:
       FunctionName: !Sub "${AppName}-consumer"
       Handler: com.example.orders.Consumer::handleRequest
       Runtime: java21
-      CodeUri: ../
+      CodeUri: ./
       Timeout: 30
       MemorySize: 512
       Description: Logs delivered OrderPlaced events (decoded to JSON server-side).
+      LoggingConfig:
+        LogGroup: !Ref ConsumerFunctionLogGroup
+
+  # Explicit log group so the consumer's logs have a retention period and are
+  # removed with the stack (an implicitly created /aws/lambda/<fn> group never
+  # expires and outlives the stack).
+  ConsumerFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AppName}-consumer"
+      RetentionInDays: 7
 
   # --- Dead-letter queue ---------------------------------------------------
   # A subscriber MUST have a DLQ before you test: a failed delivery with nowhere
@@ -127,8 +139,13 @@ Resources:
                 Resource: !GetAtt DeadLetterQueue.Arn
 
   # --- Subscriber ----------------------------------------------------------
-  # Filters on METADATA (Protobuf binary is opaque to a DATA filter) and uses a
-  # WITH_METADATA transformer so the Lambda receives the
+  # Filters on METADATA (the publisher's custom eventType key). DATA filters
+  # would also work: because events are sent as application/protobuf with a
+  # Glue registry on the request, EventBridge decodes the payload before it
+  # filters, so a DATA pattern matches the decoded fields by their .proto
+  # names, e.g. {"Scope": "DATA", "Pattern": "{\"currency\":[\"USD\"]}"}.
+  # Only application/octet-stream payloads are opaque to DATA filters.
+  # Uses a WITH_METADATA transformer so the Lambda receives the
   # Data + Metadata + SystemMetadata envelope.
   OrdersSubscriber:
     Type: AWS::EventsV2::Subscriber
@@ -148,33 +165,12 @@ Resources:
         Arn: !GetAtt DeadLetterQueue.Arn
 
 Outputs:
-  AppName:
-    Description: Resource-name prefix.
-    Value: !Ref AppName
   EventBusArn:
     Description: ARN of the custom event bus. Pass to the publisher.
     Value: !Ref OrdersBus
-  SubscriberArn:
-    Description: ARN of the subscriber.
-    Value: !Ref OrdersSubscriber
   SchemaRegistryArn:
     Description: Glue Schema Registry ARN. Pass to the publisher as RegistryUri.
     Value: !GetAtt SchemaRegistry.Arn
-  ConsumerFunctionArn:
-    Description: Consumer Lambda ARN. The subscriber's target.
-    Value: !GetAtt ConsumerFunction.Arn
-  ConsumerFunctionName:
-    Description: Consumer Lambda name (its log group is /aws/lambda/<name>).
-    Value: !Ref ConsumerFunction
-  DeliveryRoleArn:
-    Description: Role EventBridge assumes to invoke the Lambda and write the DLQ.
-    Value: !GetAtt DeliveryRole.Arn
-  DeadLetterQueueArn:
-    Description: DLQ ARN. The subscriber's OnFailureConfiguration target.
-    Value: !GetAtt DeadLetterQueue.Arn
   ConsumerLogGroup:
     Description: CloudWatch log group where delivered events are logged.
-    Value: !Sub "/aws/lambda/${AppName}-consumer"
-  DeadLetterQueueUrl:
-    Description: DLQ URL. Should stay empty on a healthy run.
-    Value: !Ref DeadLetterQueue
+    Value: !Ref ConsumerFunctionLogGroup

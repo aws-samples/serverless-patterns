@@ -83,6 +83,14 @@
       <artifactId>jackson-databind</artifactId>
     </dependency>
 
+    <!-- No-op SLF4J binding for the slf4j-api 1.7.36 the AWS SDK pulls in.
+         Silences the "Failed to load class StaticLoggerBinder" warning. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+
     <!-- Tests: JUnit 5 + Mockito. -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -93,13 +101,13 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.14.2</version>
+      <version>5.24.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <version>5.14.2</version>
+      <version>5.24.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

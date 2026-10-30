@@ -4,7 +4,11 @@
 package com.example.orders;
 
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.retries.StandardRetryStrategy;
+import software.amazon.awssdk.retries.api.RetryStrategy;
 import software.amazon.awssdk.services.eventbridgev2.EventBridgeV2Client;
+import software.amazon.awssdk.services.eventbridgev2.model.EventBridgeV2Exception;
 import software.amazon.awssdk.services.eventbridgev2.model.PutRawEventsRequest;
 import software.amazon.awssdk.services.eventbridgev2.model.PutRawEventsRequestEntry;
 import software.amazon.awssdk.services.eventbridgev2.model.PutRawEventsResponse;
@@ -14,10 +18,13 @@ import software.amazon.awssdk.services.glue.model.GetSchemaVersionRequest;
 import software.amazon.awssdk.services.glue.model.GetSchemaVersionResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -106,5 +113,25 @@ class PublisherTest {
         RuntimeException ex = assertThrows(RuntimeException.class, () -> Publisher.publish(
             client, BUS_ARN, REGISTRY_ARN, ProtoIo.buildOrder("order-abc"), SCHEMA_VERSION_ID));
         assertTrue(ex.getMessage().contains("failed entries"));
+    }
+
+    @Test
+    void clientsUseSdkStandardRetryStrategy() {
+        ClientOverrideConfiguration config = Publisher.clientOverrideConfiguration();
+        RetryStrategy strategy = config.retryStrategy().orElseThrow();
+        assertInstanceOf(StandardRetryStrategy.class, strategy);
+        assertEquals(Publisher.MAX_ATTEMPTS, strategy.maxAttempts());
+    }
+
+    @Test
+    void publishLeavesRetriesToTheSdk() {
+        // Retries (including throttling) happen inside the SDK client, so an
+        // exception that reaches the publisher is surfaced after a single call.
+        EventBridgeV2Client client = mock(EventBridgeV2Client.class);
+        when(client.putRawEvents(any(PutRawEventsRequest.class))).thenThrow(
+            EventBridgeV2Exception.builder().message("Rate exceeded").statusCode(400).build());
+        assertThrows(EventBridgeV2Exception.class, () -> Publisher.publish(
+            client, BUS_ARN, REGISTRY_ARN, ProtoIo.buildOrder("order-abc"), SCHEMA_VERSION_ID));
+        verify(client, times(1)).putRawEvents(any(PutRawEventsRequest.class));
     }
 }
