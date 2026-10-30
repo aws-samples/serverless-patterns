@@ -1,0 +1,67 @@
+{
+  "title": "Amazon Lex bot answering from an Amazon Bedrock knowledge base on Amazon S3 Vectors",
+  "description": "An Amazon Lex V2 bot uses AMAZON.QnAIntent to answer questions from documents indexed by an Amazon Bedrock knowledge base that stores its vectors in Amazon S3 Vectors.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon Lex V2 bot whose built-in AMAZON.QnAIntent answers questions with a foundation model, using passages retrieved from an Amazon Bedrock knowledge base. The knowledge base reads documents from an Amazon S3 bucket, embeds them with Amazon Titan Text Embeddings V2 and stores the vectors in an Amazon S3 Vectors index.",
+      "There is no AWS Lambda function in the request path. You call the bot with the Lex runtime API (for example aws lexv2-runtime recognize-text). Lex asks the knowledge base for matching passages, sends them to the model with the question and returns the answer.",
+      "Ingestion is one explicit step: copy the sample documents to the bucket and start an ingestion job. Until the job completes, the knowledge base has nothing to retrieve. The model id and the Region are configurable, and the AWS IAM roles are scoped to the one knowledge base, the one index and the two model ARNs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/lex-bedrock-kb-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AMAZON.QnAIntent in Amazon Lex V2",
+        "link": "https://docs.aws.amazon.com/lexv2/latest/dg/built-in-intent-qna.html"
+      },
+      {
+        "text": "Permissions for the AMAZON.QnAIntent",
+        "link": "https://docs.aws.amazon.com/lexv2/latest/dg/qna-permissions.html"
+      },
+      {
+        "text": "Prerequisites for using a vector store you created for a knowledge base (Amazon S3 Vectors)",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-setup.html"
+      },
+      {
+        "text": "Using S3 Vectors with Amazon Bedrock Knowledge Bases",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-bedrock-kb.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Copy the files in <code>sample-docs</code> to the <code>docs/</code> prefix of the bucket from the stack outputs, start a knowledge base ingestion job with <code>aws bedrock-agent start-ingestion-job</code> and wait until its status is COMPLETE.",
+      "Check that the knowledge base returns passages with <code>aws bedrock-agent-runtime retrieve</code>, then ask the bot a question that the documents answer with <code>aws lexv2-runtime recognize-text</code>, using the bot alias TSTALIASID and the locale en_US.",
+      "See the GitHub repo for the exact commands and the expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
