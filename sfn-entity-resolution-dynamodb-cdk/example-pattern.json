@@ -45,6 +45,11 @@
       "<code>npx cdk deploy</code>"
     ]
   },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
   "cleanup": {
     "text": [
       "<code>npx cdk destroy</code>"
