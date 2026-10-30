@@ -1,0 +1,23 @@
+{
+  "name": "strands-decider-confidence-gated-triage-cdk",
+  "version": "1.0.0",
+  "bin": {
+    "app": "bin/app.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk",
+    "test": "cdk synth --quiet && python3 -m unittest discover -s test -v"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.274.0",
+    "constructs": "^10.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "aws-cdk": "^2.1146.1",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.0",
+    "typescript": "~5.7.0"
+  }
+}

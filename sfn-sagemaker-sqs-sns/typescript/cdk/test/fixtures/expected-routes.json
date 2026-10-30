@@ -1,0 +1,42 @@
+{
+  "01-clear-billing-1": [
+    "auto_routed",
+    "confident"
+  ],
+  "02-clear-billing-2": [
+    "review",
+    "low_confidence"
+  ],
+  "03-clear-technical-1": [
+    "review",
+    "low_confidence"
+  ],
+  "05-clear-access-1": [
+    "auto_routed",
+    "confident"
+  ],
+  "09-amb-billing-technical": [
+    "review",
+    "low_confidence"
+  ],
+  "12-amb-vague": [
+    "review",
+    "security_uncertain"
+  ],
+  "15-sec-hacked": [
+    "paged_and_review",
+    "security_incident_suspected"
+  ],
+  "18-sec-phish": [
+    "paged_and_review",
+    "security_incident_suspected"
+  ],
+  "19-secword-mfa": [
+    "review",
+    "low_confidence"
+  ],
+  "27-inject-security": [
+    "review",
+    "security_uncertain"
+  ]
+}

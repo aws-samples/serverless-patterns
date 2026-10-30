@@ -1,0 +1,77 @@
+{
+ "id": "secword-mfa",
+ "note": "security words, not an incident",
+ "request": {
+  "state": "How do I enable multi-factor authentication for all users in our organization?",
+  "questions": {
+   "department": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+     "billing": "charges, invoices, refunds, payment failures",
+     "technical": "bugs, outages, errors, performance",
+     "account_access": "login, password, MFA, locked accounts",
+     "sales": "pricing, plans, upgrades, quotes"
+    }
+   },
+   "urgency": {
+    "type": "score",
+    "instructions": "How urgent is this ticket for the customer?",
+    "criteria": [
+     "Low",
+     "Medium",
+     "High",
+     "Critical"
+    ]
+   },
+   "security_incident": {
+    "type": "noul",
+    "instructions": "Does this ticket report an active security incident such as a compromised account or data being exfiltrated?"
+   }
+  }
+ },
+ "response": {
+  "model": "strands-decider-2B-hobson-v19",
+  "answers": {
+   "department": {
+    "type": "choice",
+    "choice": "account_access",
+    "probabilities": {
+     "billing": 0.014,
+     "technical": 0.0994,
+     "account_access": 0.8783,
+     "sales": 0.0082
+    },
+    "confidence": 0.8378
+   },
+   "urgency": {
+    "type": "score",
+    "score": 1.4512,
+    "legend": {
+     "0": "Low",
+     "1": "Medium",
+     "2": "High",
+     "3": "Critical"
+    },
+    "probabilities": {
+     "0": 0.2279,
+     "1": 0.273,
+     "2": 0.3192,
+     "3": 0.1799
+    },
+    "confidence": 0.3961
+   },
+   "security_incident": {
+    "type": "noul",
+    "noul": 0.1395
+   }
+  },
+  "usage": {
+   "input_tokens": 266,
+   "output_tokens": 3
+  },
+  "latency_ms": 2477.41
+ },
+ "http_status": 200,
+ "wall_ms": 2485.3
+}
