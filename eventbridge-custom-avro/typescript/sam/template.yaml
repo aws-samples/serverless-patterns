@@ -1,0 +1,212 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Avro on an Amazon EventBridge custom event bus (eventsv2), TypeScript consumer. This
+  template provisions the whole sample: the event bus, a subscriber that delivers
+  to the consumer Lambda, the AWS Glue Schema Registry + Avro schema for OrderPlaced,
+  the consumer Lambda, a dead-letter queue, and the delivery role.
+
+  Account- and region-agnostic: no account id or region is hardcoded; resources
+  are named from the AppName parameter.
+
+Parameters:
+  AppName:
+    Type: String
+    Default: avro-orders
+    Description: Prefix used for resource names.
+  RetentionInDays:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 365
+    Description: Days events are retained on the bus (the replay window).
+  LogRetentionInDays:
+    Type: Number
+    Default: 7
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365]
+    Description: Days the consumer Lambda's CloudWatch logs are kept.
+
+Resources:
+
+  # --- Event bus -----------------------------------------------------------
+  OrdersBus:
+    Type: AWS::EventsV2::EventBus
+    # cfn-lint's bundled resource spec may not include the AWS::EventsV2::*
+    # types yet, so it reports E3006 ("resource type does not exist"). The type
+    # deploys fine; suppress that one check for this resource only.
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3006
+    Properties:
+      Name: !Sub "${AppName}-bus"
+      StorageConfiguration:
+        RetentionPeriodInDays: !Ref RetentionInDays
+
+  # --- Glue Schema Registry + Avro schema ----------------------------------
+  # Avro is an open format: EventBridge decodes the payload against this registry
+  # when the publisher names it on the PutRawEvents request. The registry is read
+  # with the PUBLISHER's own credentials, so the publisher's IAM must allow Glue
+  # reads on it (see README).
+  SchemaRegistry:
+    Type: AWS::Glue::Registry
+    Properties:
+      Name: !Sub "${AppName}-registry"
+      Description: Schema registry for OrderPlaced Avro events.
+
+  OrderPlacedSchema:
+    Type: AWS::Glue::Schema
+    Properties:
+      Name: OrderPlaced
+      Description: OrderPlaced domain event.
+      DataFormat: AVRO
+      Compatibility: BACKWARD
+      Registry:
+        Arn: !GetAtt SchemaRegistry.Arn
+      # NOTE: this is the SAME schema as schema/order_placed.avsc, inlined here in
+      # compact single-line form. There is no build step that syncs them, so if you
+      # edit one you MUST hand-edit the other. If they drift, the publisher encodes
+      # against one schema while Glue is registered with the other, and publishes
+      # fail to decode.
+      SchemaDefinition: >-
+        {"type":"record","name":"OrderPlaced","namespace":"com.example.orders","fields":[{"name":"orderId","type":"string"},{"name":"customerId","type":"string"},{"name":"amount","type":"double"},{"name":"currency","type":"string"},{"name":"items","type":{"type":"array","items":{"type":"record","name":"OrderItem","fields":[{"name":"sku","type":"string"},{"name":"qty","type":"int"}]}}},{"name":"placedAt","type":{"type":"long","logicalType":"timestamp-millis"}}]}
+
+  # --- Consumer Lambda -----------------------------------------------------
+  # Logs the delivered event. EventBridge decodes the Avro against the Glue
+  # registry server-side, so Data arrives as JSON. BuildMethod: esbuild bundles
+  # the TypeScript handler to a single JS file.
+  # Explicit log group so the consumer's logs expire instead of being kept
+  # forever (the default when Lambda creates the group on first invoke).
+  ConsumerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AppName}-consumer"
+      RetentionInDays: !Ref LogRetentionInDays
+
+  ConsumerFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Target: node24
+        Minify: false
+        Sourcemap: true
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - handler.ts
+    Properties:
+      FunctionName: !Sub "${AppName}-consumer"
+      Handler: handler.handler
+      Runtime: nodejs24.x
+      CodeUri: consumer/
+      Timeout: 30
+      MemorySize: 256
+      Description: Logs delivered OrderPlaced events (decoded to JSON server-side).
+      LoggingConfig:
+        LogGroup: !Ref ConsumerLogGroup
+
+  # --- Dead-letter queue ---------------------------------------------------
+  # A subscriber MUST have a DLQ before you test: a failed delivery with nowhere
+  # to record it disappears with no signal. The delivery role is granted
+  # sqs:SendMessage on this queue below.
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AppName}-subscriber-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  # --- Delivery role -------------------------------------------------------
+  # The role EventBridge assumes to invoke the target. It MUST trust the
+  # events.amazonaws.com service principal and carry both the target action
+  # (lambda:InvokeFunction) and sqs:SendMessage on the DLQ.
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AppName}-delivery-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: deliver-to-lambda-and-dlq
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt ConsumerFunction.Arn
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+
+  # --- Subscriber ----------------------------------------------------------
+  # Filters on the publisher's METADATA keys (eventType), so routing stays
+  # independent of the record's fields. A DATA filter would also work: with
+  # ContentType application/avro and a registry on the request, EventBridge
+  # deserializes the payload to JSON before evaluating filters, so a DATA
+  # pattern matches the decoded fields by their schema names (for example
+  # {"currency":["USD"]}). Only application/octet-stream payloads are opaque.
+  # Uses a WITH_METADATA transformer so the Lambda receives the
+  # Data + Metadata + SystemMetadata envelope.
+  OrdersSubscriber:
+    Type: AWS::EventsV2::Subscriber
+    # cfn-lint's bundled resource spec may not include the AWS::EventsV2::*
+    # types yet, so it reports E3006 ("resource type does not exist"). The type
+    # deploys fine; suppress that one check for this resource only.
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3006
+    Properties:
+      Name: !Sub "${AppName}-to-lambda"
+      EventBusArn: !Ref OrdersBus
+      FilterConfiguration:
+        Filters:
+          - Scope: METADATA
+            Pattern: '{"eventType":["OrderPlaced"]}'
+      Transformer:
+        Type: WITH_METADATA
+      InvokeConfiguration:
+        TargetArn: !GetAtt ConsumerFunction.Arn
+        RoleArn: !GetAtt DeliveryRole.Arn
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+
+Outputs:
+  AppName:
+    Description: Resource-name prefix.
+    Value: !Ref AppName
+  EventBusArn:
+    Description: ARN of the custom event bus. Pass to the publisher.
+    Value: !Ref OrdersBus
+  SubscriberArn:
+    Description: ARN of the subscriber.
+    Value: !Ref OrdersSubscriber
+  SchemaRegistryArn:
+    Description: Glue Schema Registry ARN. Pass to the publisher as RegistryUri.
+    Value: !GetAtt SchemaRegistry.Arn
+  ConsumerFunctionArn:
+    Description: Consumer Lambda ARN. The subscriber's target.
+    Value: !GetAtt ConsumerFunction.Arn
+  ConsumerFunctionName:
+    Description: Consumer Lambda name (its log group is /aws/lambda/<name>).
+    Value: !Ref ConsumerFunction
+  DeliveryRoleArn:
+    Description: Role EventBridge assumes to invoke the Lambda and write the DLQ.
+    Value: !GetAtt DeliveryRole.Arn
+  DeadLetterQueueArn:
+    Description: DLQ ARN. The subscriber's OnFailureConfiguration target.
+    Value: !GetAtt DeadLetterQueue.Arn
+  ConsumerLogGroup:
+    Description: CloudWatch log group where delivered events are logged.
+    Value: !Ref ConsumerLogGroup
+  DeadLetterQueueUrl:
+    Description: DLQ URL. Should stay empty on a healthy run.
+    Value: !Ref DeadLetterQueue
