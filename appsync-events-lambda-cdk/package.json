@@ -1,0 +1,15 @@
+{
+  "name": "appsync-events-lambda-cdk",
+  "version": "1.0.0",
+  "bin": { "app": "bin/app.js" },
+  "scripts": { "build": "tsc", "cdk": "cdk" },
+  "dependencies": {
+    "aws-cdk-lib": "^2.193.0",
+    "constructs": "^10.5.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}
