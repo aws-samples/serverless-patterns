@@ -1,0 +1,39 @@
+// The OrderPlaced domain event, as a Protocol Buffers schema.
+//
+// This is the SOURCE OF TRUTH for the sample. The Java classes are GENERATED
+// from this file by the protobuf-maven-plugin (which downloads protoc) into
+// target/generated-sources — regenerate them, don't hand-edit.
+//
+// The same schema is registered in the AWS Glue Schema Registry (DataFormat
+// PROTOBUF) so EventBridge can decode the payload server-side. Keep this file
+// and the Glue-registered schema in sync.
+//
+// The java_* options below only affect the generated Java code layout; they do
+// NOT change the protobuf wire format or the message full names
+// (com.example.orders.OrderItem / com.example.orders.OrderPlaced) that Glue uses
+// to assign the message index, so the registered schema stays identical to the
+// Python and TypeScript versions of this sample.
+//
+// Note: AWS Glue Schema Registry supports proto2 and proto3, but NOT protobuf
+// `extensions` or `groups`. This schema stays within that subset.
+syntax = "proto3";
+
+package com.example.orders;
+
+option java_package = "com.example.orders.proto";
+option java_multiple_files = true;
+
+message OrderItem {
+  string sku = 1;
+  int32 qty = 2;
+}
+
+message OrderPlaced {
+  string order_id = 1;
+  string customer_id = 2;
+  double amount = 3;
+  string currency = 4;
+  repeated OrderItem items = 5;
+  // Milliseconds since the Unix epoch (UTC).
+  int64 placed_at = 6;
+}
