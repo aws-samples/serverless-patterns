@@ -1,0 +1,66 @@
+{
+  "title": "Amazon Bedrock AgentCore Gateway with Cedar policies and Amazon Cognito scopes",
+  "description": "Per-tool authorization on an Amazon Bedrock AgentCore Gateway: Cedar policies allow each Amazon Cognito scope one AWS Lambda tool and deny the other.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon Bedrock AgentCore Gateway with an AWS Lambda target that exposes two tools. A policy engine from Policy in Amazon Bedrock AgentCore is attached to the gateway in ENFORCE mode, and Cedar denies every tool call unless a policy permits it.",
+      "Amazon Cognito has one app client per scope (OAuth 2.0 client credentials). The gateway JWT authorizer accepts tokens from these clients, and each Cedar policy permits one tool when the scope claim of the access token contains the matching scope.",
+      "With the same gateway, one token is allowed lookup_order and denied cancel_order, and the other token is the reverse. The decision is taken inside the gateway, so the denied call does not invoke the function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/agentcore-gateway-cedar-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Policy in Amazon Bedrock AgentCore",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html"
+      },
+      {
+        "text": "Principal-scoped Cedar policy examples",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/example-policies-principal.html"
+      },
+      {
+        "text": "IAM permissions for Gateway with Policy",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-permissions.html"
+      },
+      {
+        "text": "Set up inbound authorization for your gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-inbound-auth.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once.",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Get an access token for each Amazon Cognito app client, then call lookup_order and cancel_order through the gateway MCP endpoint with each token. Expected: each token is allowed one tool and denied the other.",
+      "See the GitHub repo for the exact commands, the check that denied calls do not invoke the function, and the expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
