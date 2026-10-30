@@ -1,5 +1,5 @@
 {
-  "name": "eventbridge-custom-avro-sam-typescript",
+  "name": "eventbridge-custom-avro-typescript-sam",
   "version": "1.0.0",
   "private": true,
   "description": "Avro on an EventBridge custom event bus with a Glue Schema Registry (TypeScript).",

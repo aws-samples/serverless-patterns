@@ -24,6 +24,14 @@ if [ -z "${REGION}" ]; then
   exit 1
 fi
 
+# Arguments are positional, so a misplaced order id ends up as the region.
+# Catch that before it turns into an unreachable-endpoint error.
+if ! [[ "${REGION}" =~ ^[a-z]{2}(-[a-z]+)+-[0-9]+$ ]]; then
+  echo "error: '${REGION}' is not an AWS region." >&2
+  echo "usage: scripts/run_publish.sh [stack-name] [region] [order-id]" >&2
+  exit 1
+fi
+
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 get_output() {

@@ -24,7 +24,7 @@ import {
   publish,
   resolveSchemaVersionId,
 } from "../publisher/publish.js";
-import { glueUnframe } from "../common/avroio.js";
+import { glueUnframe } from "./glue-decode.js";
 
 const TEST_REGION = "aws-region-1";
 const BUS_ARN = `arn:aws:events:${TEST_REGION}:111122223333:event-busv2/avro-orders-bus/abc123`;

@@ -5,14 +5,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import {
-  decode,
-  decodeFramed,
-  encode,
-  encodeFramed,
-  glueUnframe,
-  type Order,
-} from "../common/avroio.js";
+import { encode, encodeFramed, type Order } from "../common/avroio.js";
+import { decode, decodeFramed, glueUnframe } from "./glue-decode.js";
 
 function sampleRecord(): Order {
   return {
