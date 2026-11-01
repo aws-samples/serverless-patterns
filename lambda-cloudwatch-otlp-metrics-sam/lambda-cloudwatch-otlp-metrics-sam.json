@@ -68,7 +68,6 @@
     },
     "deploy": {
         "text": [
-            "sam build",
             "sam deploy --guided",
             "Deploy in one of the Regions listed in the README Requirements, and leave AdotLayerArn blank to use the ADOT Python layer in that Region."
         ]
@@ -82,7 +81,7 @@
     "cleanup": {
         "headline": "Cleanup",
         "text": [
-            "Delete the stack with <code>sam delete --stack-name STACK_NAME --region $REGION</code> and enter <code>y</code> at each confirmation prompt, confirm it with <code>aws cloudformation list-stacks</code>, then delete the local out.json response file and the .aws-sam build directory. The shared AWS SAM CLI managed artifacts bucket and the optional account and Region wide enrichment settings are not created by the stack and are left in place. Metric data points that were already ingested cannot be deleted and age out under the included retention."
+            "Delete the stack with <code>sam delete --stack-name STACK_NAME --region $REGION</code> and enter <code>y</code> at each confirmation prompt, confirm it with <code>aws cloudformation list-stacks</code>, then delete the local out.json response file. The shared AWS SAM CLI managed artifacts bucket and the optional account and Region wide enrichment settings are not created by the stack and are left in place. Metric data points that were already ingested cannot be deleted and age out under the included retention."
         ]
     },
     "authors": [

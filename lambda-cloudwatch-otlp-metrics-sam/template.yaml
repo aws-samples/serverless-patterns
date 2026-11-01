@@ -65,6 +65,8 @@ Resources:
         # so the stack works unchanged in every Region the ADOT layer is published in.
         - !If
           - UseDefaultAdotLayer
+          # 901920570463 is the AWS account that publishes the public ADOT Lambda layers in
+          # every supported Region, not an account you need to own or replace.
           - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:901920570463:layer:aws-otel-python-amd64-ver-1-32-0:7"
           - !Ref AdotLayerArn
       Environment:

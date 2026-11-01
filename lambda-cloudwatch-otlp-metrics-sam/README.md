@@ -23,7 +23,6 @@ The AWS SAM template deploys these resources, and the data flow between them is:
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* A way for `sam build` to build the function: either [Python](https://www.python.org/downloads/) 3.13 on your PATH, matching the function's `python3.13` runtime, or `sam build --use-container`, which builds the function inside a Lambda-like container image and "requires Docker to be installed" (AWS SAM Developer Guide, [Introduction to building with AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-build.html)).
 * Python 3 (`python3`) with the `botocore` library, used by the `promql_query.py` script in the Testing section to sign requests to the CloudWatch Prometheus-compatible HTTP API. The AWS CLI v2 installer bundles `botocore` for its own interpreter but does not expose it to your `python3`, so install it with `python3 -m pip install botocore` if `python3 -c "import botocore"` fails.
 * A Region that supports both OTLP metrics ingestion and the ADOT Python Lambda layer. OTLP metrics ingestion, PromQL querying and Query Studio are available in the Regions listed under "Supported AWS Regions" in [Query metrics with PromQL](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-PromQL.html). The ADOT Python Lambda layer is published in a smaller set: `ap-northeast-1`, `ap-northeast-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ca-central-1`, `eu-central-1`, `eu-north-1`, `eu-west-1`, `eu-west-2`, `eu-west-3`, `sa-east-1`, `us-east-1`, `us-east-2`, `us-west-1` and `us-west-2`, per [AWS Distro for OpenTelemetry Lambda Support For Python](https://aws-otel.github.io/docs/getting-started/lambda/lambda-python). Deploy in one of those 16 Regions, or copy the layer into your own Region first.
 * No account level enablement is needed for the OTLP metrics endpoint itself. Beyond basic Lambda logging permissions, the only permission the function needs is `cloudwatch:PutMetricData`, which the template grants. See [Publish custom metrics with OpenTelemetry](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/metrics-otel-send.html).
@@ -38,9 +37,8 @@ The AWS SAM template deploys these resources, and the data flow between them is:
     ```
     cd serverless-patterns/lambda-cloudwatch-otlp-metrics-sam
     ```
-1. From the command line, build the function and use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file. No `sam build` step is needed: `src/requirements.txt` is intentionally empty because the ADOT layer provides the OpenTelemetry API at runtime, so `sam deploy` packages `src/` as it is:
     ```
-    sam build
     sam deploy --guided
     ```
 1. During the prompts:
@@ -218,7 +216,6 @@ Each call documents its own permissions on its own page: [Enable resource tags o
 1. Delete the local files created while testing:
     ```bash
     rm -f out.json
-    rm -rf .aws-sam
     ```
 1. The AWS SAM CLI managed artifacts bucket that `sam deploy --guided` creates is shared by every stack you deploy with AWS SAM in that Region, so it is deliberately not removed here.
 1. The two enrichment settings in the optional section above are account and Region wide, were not created by this stack, and affect other workloads, so leave them alone unless you enabled them only for this walkthrough.

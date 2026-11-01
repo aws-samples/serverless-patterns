@@ -5,7 +5,7 @@
     "level": "300",
     "framework": "AWS SAM",
     "patternArch": {
-        "icon1": { "x": 30, "y": 50, "service": "lambda", "label": "AWS Lambda with ADOT layer" },
+        "icon1": { "x": 30, "y": 50, "service": "lambda-event-functions", "label": "AWS Lambda with ADOT layer" },
         "icon2": { "x": 70, "y": 50, "service": "cloudwatch", "label": "Amazon CloudWatch OTLP endpoint" },
         "line1": { "from": "icon1", "to": "icon2", "label": "OTLP over HTTP, SigV4 signed" }
     },
@@ -37,14 +37,14 @@
             { "text": "OpenTelemetry metrics API for Python", "link": "https://opentelemetry.io/docs/languages/python/instrumentation/" }
         ]
     },
-    "deploy": { "text": [ "sam build", "sam deploy --guided", "Deploy in one of the Regions listed in the README Requirements, and leave AdotLayerArn blank to use the ADOT Python layer in that Region." ] },
+    "deploy": { "text": [ "sam deploy --guided", "Deploy in one of the Regions listed in the README Requirements, and leave AdotLayerArn blank to use the ADOT Python layer in that Region." ] },
     "testing": {
         "headline": "Testing",
         "text": [ "Invoke the function a few times with the test event in events/order.json, wait one to two minutes, then query the counter with PromQL using the signed request script in the pattern folder, or in Query Studio in the CloudWatch console. See the README for detailed instructions." ]
     },
     "cleanup": {
         "headline": "Cleanup",
-        "text": [ "Delete the stack with <code>sam delete --stack-name STACK_NAME --region $REGION</code> and enter <code>y</code> at each confirmation prompt, confirm it with <code>aws cloudformation list-stacks</code>, then delete the local out.json response file and the .aws-sam build directory. The shared AWS SAM CLI managed artifacts bucket and the optional account and Region wide enrichment settings are not created by the stack and are left in place. Metric data points that were already ingested cannot be deleted and age out under the included retention." ]
+        "text": [ "Delete the stack with <code>sam delete --stack-name STACK_NAME --region $REGION</code> and enter <code>y</code> at each confirmation prompt, confirm it with <code>aws cloudformation list-stacks</code>, then delete the local out.json response file. The shared AWS SAM CLI managed artifacts bucket and the optional account and Region wide enrichment settings are not created by the stack and are left in place. Metric data points that were already ingested cannot be deleted and age out under the included retention." ]
     },
     "authors": [ { "name": "Manish S", "image": "", "bio": "AWS Support Engineer, trying to build things", "linkedin": "manish-s-84199221b", "twitter": "" } ]
 }
