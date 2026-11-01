@@ -20,7 +20,7 @@ if [ -z "${REGION}" ]; then
 fi
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TEMPLATE="${HERE}/infra/template.yaml"
+TEMPLATE="${HERE}/template.yaml"
 
 echo "Building the consumer Lambda (esbuild)..."
 sam build --template "${TEMPLATE}" --region "${REGION}"

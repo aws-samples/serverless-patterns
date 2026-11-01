@@ -1,5 +1,5 @@
 {
-  "title": "Protobuf on an Amazon EventBridge custom event bus",
+  "title": "Amazon EventBridge custom event bus to AWS Lambda with Protobuf and AWS Glue Schema Registry",
   "description": "Publishes a Protobuf-encoded event to an EventBridge custom event bus with a Glue Schema Registry and delivers the decoded JSON to a Lambda",
   "language": "TypeScript",
   "level": "200",
@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-protobuf-sam-typescript",
-      "templateURL": "serverless-patterns/eventbridge-custom-protobuf-sam-typescript",
-      "projectFolder": "eventbridge-custom-protobuf-sam-typescript",
-      "templateFile": "infra/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -45,7 +42,8 @@
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Publish one Protobuf OrderPlaced event: scripts/run_publish.sh <stack-name> <region>",
+      "Check the delivered (decoded JSON) event in CloudWatch: aws logs tail /aws/lambda/proto-orders-consumer --since 5m --format short"
     ]
   },
   "cleanup": {
