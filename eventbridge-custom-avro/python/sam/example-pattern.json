@@ -1,6 +1,6 @@
 {
-  "title": "Avro on an Amazon EventBridge custom event bus",
-  "description": "Publishes an Avro-encoded event to an EventBridge custom event bus with a Glue Schema Registry and delivers the decoded JSON to a Lambda",
+  "title": "Amazon EventBridge custom event bus to AWS Lambda with AWS Glue Schema Registry Avro",
+  "description": "Publish an Avro event to an Amazon EventBridge custom event bus, decoded against an AWS Glue Schema Registry, and deliver it as JSON to AWS Lambda",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-avro-sam-python",
-      "templateURL": "serverless-patterns/eventbridge-custom-avro-sam-python",
-      "projectFolder": "eventbridge-custom-avro-sam-python",
-      "templateFile": "infra/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
@@ -44,6 +41,9 @@
   },
   "testing": {
     "text": [
+      "Install the publisher dependencies: python3 -m venv .venv && ./.venv/bin/pip install -r publisher/requirements.txt",
+      "Publish one Avro OrderPlaced event: scripts/run_publish.sh <stack-name> <region>",
+      "View the delivered event: aws logs tail /aws/lambda/avro-orders-consumer --since 5m --format short",
       "See the GitHub repo for detailed testing instructions."
     ]
   },
@@ -55,7 +55,7 @@
   "authors": [
     {
       "name": "Kurt Tometich",
-      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "image": "https://avatars.githubusercontent.com/boomtown15",
       "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
       "linkedin": "kurt-tometich",
       "twitter": ""

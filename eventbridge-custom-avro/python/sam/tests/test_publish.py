@@ -4,7 +4,7 @@
 """Unit tests for the publisher's entry-building and result-checking logic.
 
 These use botocore's Stubber, which validates request parameters against the
-real eventsv2 service model — so a wrong field name or shape fails the test
+real eventbridgev2 service model — so a wrong field name or shape fails the test
 without any live AWS call.
 """
 
@@ -24,7 +24,7 @@ SCHEMA_VERSION_ID = "e424651b-7a41-405d-bf05-2cae8cdf5aea"
 
 def _client():
     return boto3.client(
-        "eventsv2",
+        "eventbridgev2",
         region_name=TEST_REGION,
         aws_access_key_id="test",
         aws_secret_access_key="test",

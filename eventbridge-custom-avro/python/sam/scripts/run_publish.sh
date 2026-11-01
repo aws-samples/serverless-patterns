@@ -45,26 +45,19 @@ echo "Bus:      ${BUS_ARN}"
 echo "Registry: ${REGISTRY_ARN}"
 echo "Publishing orderId=${ORDER_ID}..."
 
-# Pick a Python interpreter: prefer the sample's virtualenv, then python3, then
-# python. $PYTHON can override. Whichever is used must have boto3 + fastavro.
+# Use $PYTHON if set, else the sample's virtualenv, else python3.
+# Whichever is used must have boto3 + fastavro (publisher/requirements.txt).
 if [ -n "${PYTHON:-}" ]; then
   PYBIN="${PYTHON}"
 elif [ -x "${HERE}/.venv/bin/python" ]; then
   PYBIN="${HERE}/.venv/bin/python"
-elif command -v python3 >/dev/null 2>&1; then
-  PYBIN="python3"
-elif command -v python >/dev/null 2>&1; then
-  PYBIN="python"
 else
-  echo "error: no Python interpreter found. Install Python 3 and the publisher deps:" >&2
-  echo "  python3 -m venv .venv && ./.venv/bin/pip install -r publisher/requirements.txt" >&2
-  exit 1
+  PYBIN="python3"
 fi
 
 if ! "${PYBIN}" -c "import boto3, fastavro" >/dev/null 2>&1; then
   echo "error: ${PYBIN} is missing boto3 and/or fastavro. Install them with:" >&2
-  echo "  ${PYBIN} -m pip install -r publisher/requirements.txt" >&2
-  echo "(or create the venv: python3 -m venv .venv && ./.venv/bin/pip install -r publisher/requirements.txt)" >&2
+  echo "  python3 -m venv .venv && ./.venv/bin/pip install -r publisher/requirements.txt" >&2
   exit 1
 fi
 

@@ -27,6 +27,13 @@ Resources:
   # The new custom event bus. Ref returns the bus ARN.
   OrdersBus:
     Type: AWS::EventsV2::EventBus
+    # cfn-lint's bundled resource spec may not include AWS::EventsV2::* yet, so
+    # it reports E3006 ("resource type does not exist"). The type deploys fine.
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3006
     Properties:
       Name: !Sub "${AppName}-bus"
       StorageConfiguration:
@@ -70,7 +77,7 @@ Resources:
       FunctionName: !Sub "${AppName}-consumer"
       Handler: handler.handler
       Runtime: python3.14
-      CodeUri: ../consumer/
+      CodeUri: consumer/
       Timeout: 30
       MemorySize: 256
       Description: Logs delivered OrderPlaced events (decoded to JSON server-side).
@@ -113,11 +120,19 @@ Resources:
                 Resource: !GetAtt DeadLetterQueue.Arn
 
   # --- Subscriber ----------------------------------------------------------
-  # Filters on METADATA (Avro binary is opaque to a DATA filter) and uses a
+  # Filters on a publisher-set METADATA key. EventBridge decodes the Avro
+  # against the Glue registry before filtering, so a DATA filter on a record
+  # field (e.g. {"orderId":["1001"]}) would also work. Uses a
   # WITH_METADATA transformer so the Lambda receives the
   # Data + Metadata + SystemMetadata envelope.
   OrdersSubscriber:
     Type: AWS::EventsV2::Subscriber
+    # See OrdersBus: suppress the stale-spec E3006 false positive.
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3006
     Properties:
       Name: !Sub "${AppName}-to-lambda"
       EventBusArn: !Ref OrdersBus

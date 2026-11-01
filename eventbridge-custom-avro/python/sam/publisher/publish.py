@@ -13,25 +13,8 @@ Usage:
 Both ARNs can also be supplied via the BUS_ARN and REGISTRY_ARN environment
 variables (see scripts/run_publish.sh, which reads them from stack outputs).
 
-How Avro decoding is wired:
-  * Avro is an open format, so the service decodes it against a schema registry
-    named **on the publish request itself** via
-    `SchemaRegistryConfiguration.RegistryUri`. It is not configured on the bus.
-  * The registry is read with THIS caller's credentials, so the publishing IAM
-    identity must be allowed to read the Glue registry (see README).
-
-Other rules this script follows:
-  * PutRawEvents carries the payload in `Data` as RAW BYTES. Do not base64-encode
-    before handing to boto3 — the SDK does the wire encoding itself.
-  * `ContentType` goes inside each entry's `SystemMetadata`; for Avro it is
-    `application/avro`.
-  * Custom keys go in a per-entry `Metadata` map (up to 100 keys); a METADATA
-    subscriber filter routes on these, since a DATA filter cannot see inside
-    Avro binary.
-  * The response is a single `Entries` list aligned by index, each carrying a
-    `SuccessCode` (PUBLISHED or DEDUPLICATED) or an `ErrorCode`; also check
-    `FailedEntryCount`. `DEDUPLICATED` is a success, not an error.
-  * The IAM namespace is `events:`, never `eventsv2:`.
+The Glue registry is named on each request and read with THIS caller's
+credentials. See "Key considerations" in the README for the wire-format rules.
 """
 
 from __future__ import annotations
@@ -183,7 +166,9 @@ def main(argv: List[str]) -> int:
         )
         return 2
 
-    client = boto3.client("eventsv2", region_name=args.region)
+    # boto3 names this service "eventbridgev2" (botocore >= 1.43.102); only the
+    # AWS CLI calls it "eventsv2". boto3.client("eventsv2") raises UnknownServiceError.
+    client = boto3.client("eventbridgev2", region_name=args.region)
     schema_version_id = resolve_schema_version_id(args.registry_arn, args.region)
     record = build_order(args.order_id)
     response = publish(
