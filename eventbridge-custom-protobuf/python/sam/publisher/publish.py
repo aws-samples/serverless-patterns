@@ -172,7 +172,9 @@ def main(argv: List[str]) -> int:
         )
         return 2
 
-    client = boto3.client("eventsv2", region_name=args.region)
+    # The AWS CLI calls this service `eventsv2`, but boto3 names it
+    # `eventbridgev2`; boto3.client("eventsv2") raises UnknownServiceError.
+    client = boto3.client("eventbridgev2", region_name=args.region)
     schema_version_id = resolve_schema_version_id(args.registry_arn, args.region)
     message = protoio.build_order(args.order_id)
     response = publish(

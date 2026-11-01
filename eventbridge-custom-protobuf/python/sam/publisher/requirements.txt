@@ -1,4 +1,5 @@
-boto3>=1.34
+# boto3 1.43.102 is the first release with the `eventbridgev2` client.
+boto3>=1.43.102
 # bufbuild protobuf-py: the runtime the generated bindings import (Message,
 # to_binary/from_binary). Also needed to USE the generated module, not just to
 # generate it.

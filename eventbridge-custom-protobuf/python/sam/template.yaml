@@ -83,7 +83,7 @@ Resources:
       FunctionName: !Sub "${AppName}-consumer"
       Handler: handler.handler
       Runtime: python3.14
-      CodeUri: ../consumer/
+      CodeUri: consumer/
       Timeout: 30
       MemorySize: 256
       Description: Logs delivered OrderPlaced events (decoded to JSON server-side).

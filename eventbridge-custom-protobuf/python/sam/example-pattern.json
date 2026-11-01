@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-protobuf-sam-python",
-      "templateURL": "serverless-patterns/eventbridge-custom-protobuf-sam-python",
-      "projectFolder": "eventbridge-custom-protobuf-sam-python",
-      "templateFile": "infra/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {

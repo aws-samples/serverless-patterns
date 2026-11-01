@@ -23,7 +23,7 @@ if [ -z "${REGION}" ]; then
 fi
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TEMPLATE="${HERE}/infra/template.yaml"
+TEMPLATE="${HERE}/template.yaml"
 
 # The publisher imports the generated Protobuf bindings; the Glue schema in the
 # template is independent of them, but publishing later needs them, so warn early
