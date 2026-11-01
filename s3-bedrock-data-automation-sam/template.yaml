@@ -104,6 +104,16 @@ Resources:
       MemorySize: 128
       LoggingConfig:
         LogGroup: !Ref StartBdaFunctionLogGroup
+      # Amazon S3 invokes the function asynchronously. When a record fails and Lambda
+      # has used up its two retries, Lambda sends an invocation record, which carries the
+      # original Amazon S3 event as requestPayload, to this on-failure destination
+      # instead of discarding the event. With Type SQS and no Destination, AWS SAM
+      # creates the Amazon SQS queue and grants the execution role sqs:SendMessage on it.
+      # See https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html
+      EventInvokeConfig:
+        DestinationConfig:
+          OnFailure:
+            Type: SQS
       # Inline statements rather than a named AWS SAM policy template: the templates
       # that come closest (S3ReadPolicy, S3CrudPolicy) grant more actions on a wider
       # resource than this pattern needs, and none of them covers Bedrock Data
@@ -174,5 +184,8 @@ Outputs:
     Description: AWS Lambda function that starts Bedrock Data Automation jobs on upload.
     Value: !Ref StartBdaFunction
   LogGroupName:
-    Description: CloudWatch Logs log group for the AWS Lambda function.
+    Description: Amazon CloudWatch Logs log group for the AWS Lambda function.
     Value: !Ref StartBdaFunctionLogGroup
+  FailedUploadsQueueUrl:
+    Description: Amazon SQS queue that keeps the event of any upload the function could not start a job for, after the retries.
+    Value: !Ref StartBdaFunction.DestinationQueue

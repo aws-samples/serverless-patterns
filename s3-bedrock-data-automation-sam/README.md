@@ -10,22 +10,23 @@ Important: this application uses various AWS services and there are costs associ
 
 ![Architecture diagram: a file uploaded to the input prefix of an Amazon S3 bucket invokes an AWS Lambda function that starts an Amazon Bedrock Data Automation job, which writes structured JSON back to the output prefix](images/architecture.png)
 
-The AWS SAM template deploys these resources, and the data flow between them is:
+The AWS Serverless Application Model (AWS SAM) template deploys these resources, and the data flow between them is:
 
 1. You upload a file to the `input/` prefix of the Amazon S3 bucket that the stack creates.
 2. The Amazon S3 `ObjectCreated` event invokes the AWS Lambda function.
 3. The function calls `InvokeDataAutomationAsync` with the Bedrock Data Automation project (`AWS::Bedrock::DataAutomationProject`) and the inference profile for your Region's geography, then returns. It does not wait for the result.
 4. Bedrock Data Automation reads the file and writes the structured JSON result to the `output/` prefix of the same bucket.
-5. The function's AWS IAM execution role can only read `input/`, write `output/` and start jobs on this one project and profile. The function writes its logs to an Amazon CloudWatch Logs log group that the stack owns.
+5. The function's AWS Identity and Access Management (IAM) execution role can only read `input/`, write `output/` and start jobs on this one project and profile. The function writes its logs to an Amazon CloudWatch Logs log group that the stack owns.
+6. If the function cannot start a job for an upload, AWS Lambda retries the event twice and then sends it to an Amazon Simple Queue Service (Amazon SQS) queue, the function's on-failure destination, so the event is kept instead of discarded.
 
 ## Requirements
 
-* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS Identity and Access Management (AWS IAM) user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * A way for `sam build` to build the function: either [Python](https://www.python.org/downloads/) 3.13 on your PATH, matching the function's `python3.13` runtime, or `sam build --use-container`, which builds the function inside a Lambda-like container image and "requires Docker to be installed" (AWS SAM Developer Guide, [Introduction to building with AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-build.html)).
-* Permissions in the deployment account for Amazon S3, AWS Lambda, Amazon CloudWatch Logs, AWS IAM and Amazon Bedrock Data Automation
+* Permissions in the deployment account for Amazon S3, AWS Lambda, Amazon SQS, Amazon CloudWatch Logs, IAM and Amazon Bedrock Data Automation
 * Bedrock Data Automation is called through the cross-Region inference profile for your Region's geography, which the template picks for you: `us.data-automation-v1`, `eu.data-automation-v1` or `apac.data-automation-v1`. Deploy in a source Region that offers one of those profiles: `us-east-1`, `us-east-2`, `us-west-2`, `eu-central-1`, `eu-west-1`, `eu-west-2`, `ap-south-1`, `ap-southeast-2` or `ap-northeast-1`, per [Cross Region support required for Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html). The template contains an AWS CloudFormation `Rules` assertion that stops the deployment in any other Region.
 * This pattern was tested in `us-east-1` and `eu-central-1`.
 
@@ -57,7 +58,7 @@ The AWS SAM template deploys these resources, and the data flow between them is:
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing. This pattern uses `DataBucketName` and `LogGroupName`.
+1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing. This pattern uses `DataBucketName`, `LogGroupName` and `FailedUploadsQueueUrl`.
 
 ## How it works
 
@@ -65,6 +66,7 @@ The AWS SAM template deploys these resources, and the data flow between them is:
 * The function calls the Bedrock Data Automation runtime `InvokeDataAutomationAsync` API with the input file, an output location, and the Bedrock Data Automation project. It is fire-and-forget, so it only starts the job. The function skips folder markers and empty objects, and logs an error line for any record Bedrock Data Automation rejects.
 * Bedrock Data Automation reads the file, runs the managed extraction defined by the project, and writes structured JSON to the `output/` prefix.
 * The project (`AWS::Bedrock::DataAutomationProject`) is a native AWS CloudFormation resource, so the whole pipeline is infrastructure as code. The included standard output configuration returns each document as Markdown text (including tables) plus a generative summary.
+* The function has an on-failure destination: an Amazon SQS queue that AWS SAM creates from the `EventInvokeConfig` property in `template.yaml`. An upload that still fails after the AWS Lambda retries lands there, and the queue keeps it for the Amazon SQS default retention period of 4 days.
 * The stack owns the function log group and keeps its logs for 7 days. To keep them for longer, change `RetentionInDays` on the `StartBdaFunctionLogGroup` resource in `template.yaml`.
 * Bedrock Data Automation requires a cross-Region inference profile. The template uses the profile for the deployment Region's geography, so a job started in, for example, `eu-central-1` can be processed in any Region of the EU geography that [Cross Region support required for Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-cris.html) lists for that source Region. The function execution role allows `bedrock:InvokeDataAutomationAsync` on that one profile in any Region of your account, plus the one project the stack creates.
 
@@ -129,7 +131,13 @@ If no job starts, or `output/` stays empty, the function log group holds the rea
 aws logs tail LOG_GROUP_NAME --since 10m --region $REGION
 ```
 
-A record that fails makes the function raise, so AWS Lambda runs the invocation two more times by default before discarding the event (see [How Lambda handles errors and retries with asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html)), and the failure also shows in the function `Errors` metric in Amazon CloudWatch. The most common cause is an unsupported file format (see [Prerequisites for using Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-limits.html)).
+A record that fails makes the function raise, so AWS Lambda runs the invocation two more times by default (see [How Lambda handles errors and retries with asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html)), and the failure also shows in the function `Errors` metric in Amazon CloudWatch. The most common cause is an unsupported file format (see [Prerequisites for using Bedrock Data Automation](https://docs.aws.amazon.com/bedrock/latest/userguide/bda-limits.html)). When the retries are used up, Lambda sends an invocation record to the on-failure Amazon SQS queue instead of discarding the event. The record carries the original Amazon S3 event as `requestPayload` and the reason as `requestContext.condition`, for example `RetriesExhausted` (see [Capturing records of Lambda asynchronous invocations](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html)). Read it with the `FailedUploadsQueueUrl` output:
+
+```
+aws sqs receive-message --queue-url QUEUE_URL --region $REGION
+```
+
+After you fix the cause, upload the object to `input/` again to start a new job.
 
 If you deploy in a Region the inference profile does not cover, the stack does not get that far: the `Rules` assertion in the template fails the stack operation with `Parameter validation failed: assertion error: This pattern uses the Amazon Bedrock Data Automation inference profile for the US, EU or APAC geography ...` and no resources are created.
 
