@@ -2,7 +2,7 @@
 
 This pattern runs a job on an AWS Lambda MicroVM from an AWS Step Functions workflow, using the Step Functions AWS SDK integration for Lambda MicroVMs. The workflow starts the MicroVM, waits for the job inside it to report its result through a task token, and always terminates the MicroVM afterwards, whether the job succeeds, fails, stops sending heartbeats or runs out of time. No AWS Lambda function sits in between.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-lambda-microvms-callback-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-lambda-microvms-callback-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -36,9 +36,9 @@ The AWS SAM template deploys these resources, and the flow between them is:
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/sfn-lambda-microvms-callback-sam
+    cd serverless-patterns/sfn-lambda-microvms-callback/python/sam
     ```
-1. Set your Region and a name for a new S3 bucket that holds the worker code. The MicroVM image is built from this zip, so it must exist before you deploy:
+1. Set your Region and a name for a new Amazon S3 bucket that holds the worker code. The MicroVM image is built from this zip, so it must exist before you deploy:
     ```
     export AWS_REGION=us-east-1
     export ARTIFACT_BUCKET=sfn-microvms-callback-artifacts-$(aws sts get-caller-identity --query Account --output text)
@@ -89,7 +89,9 @@ To run your own workload, replace `run_job()` in `src/worker/app.py`, upload the
     ```
     export STATE_MACHINE_ARN=$(aws cloudformation describe-stacks --stack-name STACK_NAME --region $AWS_REGION --query "Stacks[0].Outputs[?OutputKey=='StateMachineArn'].OutputValue" --output text)
     ```
-1. **Successful job.** Count the primes below ten million, then keep the MicroVM busy for 90 seconds. That is longer than the 60-second heartbeat timeout, so the execution only keeps waiting because the worker sends heartbeats:
+1. Run three distinct job executions, one for each way a job can end. Each execution starts its own MicroVM:
+
+    a. **Successful job.** Count the primes below ten million, then keep the MicroVM busy for 90 seconds. That is longer than the 60-second heartbeat timeout, so the execution only keeps waiting because the worker sends heartbeats:
     ```
     aws stepfunctions start-execution --state-machine-arn $STATE_MACHINE_ARN --region $AWS_REGION --name success-1 --input '{"limit": 10000000, "durationSeconds": 90}'
     ```
@@ -98,17 +100,19 @@ To run your own workload, replace `run_job()` in `src/worker/app.py`, upload the
     aws stepfunctions describe-execution --execution-arn EXECUTION_ARN --region $AWS_REGION --query "{status:status,output:output}"
     ```
     The status is `SUCCEEDED` and the output is the job result, for example `{"microvmId":"microvm-...","limit":10000000,"primeCount":664579,"elapsedSeconds":90.1}`.
-1. **Failing job.** The worker raises an error and reports it with `SendTaskFailure`:
+
+    b. **Failing job.** The worker raises an error and reports it with `SendTaskFailure`:
     ```
     aws stepfunctions start-execution --state-machine-arn $STATE_MACHINE_ARN --region $AWS_REGION --name failure-1 --input '{"simulate": "failure"}'
     ```
     The execution ends `FAILED` with error `JobFailed` and cause `Simulated failure requested in the job input`.
-1. **Hung job.** The worker stops sending heartbeats and never answers, as a crashed or wedged process would:
+
+    c. **Hung job.** The worker stops sending heartbeats and never answers, as a crashed or wedged process would:
     ```
     aws stepfunctions start-execution --state-machine-arn $STATE_MACHINE_ARN --region $AWS_REGION --name hang-1 --input '{"simulate": "hang"}'
     ```
     After `HeartbeatSeconds` (60 seconds by default) the execution ends `FAILED` with error `States.Timeout` and cause `The job stopped sending heartbeats or ran longer than the maximum duration.`
-1. In every case, confirm the MicroVM was terminated. The MicroVM ID is in the `Start MicroVM` step output in the Step Functions console, or in the success output:
+1. For each of the three executions, confirm the MicroVM was terminated. The MicroVM ID is in the `Start MicroVM` step output in the Step Functions console, or in the success output:
     ```
     aws lambda-microvms get-microvm --microvm-identifier MICROVM_ID --region $AWS_REGION --query state
     ```

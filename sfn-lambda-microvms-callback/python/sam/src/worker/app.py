@@ -9,8 +9,10 @@ the MicroVM ID, and waits. This worker then:
   4. returns the result with SendTaskSuccess, or the error with SendTaskFailure
 
 Lifecycle hooks are served on port 9000:
-  POST /aws/lambda-microvms/runtime/v1/ready  image build, 200 = ready to snapshot
-  POST /aws/lambda-microvms/runtime/v1/run    once per RunMicrovm, starts the job
+  POST /aws/lambda-microvms/runtime/v1/ready     image build, 200 = ready to snapshot
+  POST /aws/lambda-microvms/runtime/v1/validate  image build, on a MicroVM started from the
+                                                 new image, 200 = the worker runs a job
+  POST /aws/lambda-microvms/runtime/v1/run       once per RunMicrovm, starts the job
 
 AWS clients are created after /run, never at build time, so no credentials or open
 connections are captured in the snapshot.
@@ -146,6 +148,20 @@ def process(raw_run_hook_body):
         log("job_failed", microvmId=microvm_id, error=str(err))
 
 
+def validate_worker():
+    """Run a small mock job through the same code path as a real job, without AWS calls.
+
+    Lambda calls /validate on a MicroVM started from the new image before it marks the
+    build successful. Running a mock payload also lets Lambda record which snapshot
+    regions the job touches and prefetch them when later MicroVMs start.
+    """
+    _, job = parse_run_hook(json.dumps({"microvmId": "validate", "runHookPayload": json.dumps({"job": {"limit": 100_000}})}))
+    result = run_job(job, threading.Event())
+    if result["primeCount"] != 9592:  # there are 9,592 primes below 100,000
+        raise RuntimeError(f"unexpected validation result {result}")
+    return result
+
+
 class HookHandler(BaseHTTPRequestHandler):
     def _reply(self, status, body):
         data = json.dumps(body).encode()
@@ -161,6 +177,14 @@ class HookHandler(BaseHTTPRequestHandler):
 
         if self.path == f"{HOOK_PATH}/ready":
             self._reply(200, {"status": "ready"})
+        elif self.path == f"{HOOK_PATH}/validate":
+            try:
+                result = validate_worker()
+                log("validate_passed", result=result)
+                self._reply(200, {"status": "valid"})
+            except Exception as err:  # noqa: BLE001  any error fails the image build
+                log("validate_failed", error=str(err))
+                self._reply(500, {"error": str(err)})
         elif self.path == f"{HOOK_PATH}/run":
             # The run hook must answer within its timeout, so the job runs on a thread.
             if not _started.is_set():

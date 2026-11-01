@@ -172,7 +172,10 @@ Resources:
         MicrovmImageHooks:
           Ready: ENABLED
           ReadyTimeoutInSeconds: 60
-          Validate: DISABLED
+          # Called on a new MicroVM started from the built image. The worker runs a small
+          # mock job, which also lets Lambda learn which snapshot regions to prefetch.
+          Validate: ENABLED
+          ValidateTimeoutInSeconds: 10
         MicrovmHooks:
           Run: ENABLED
           RunTimeoutInSeconds: 10

@@ -4,6 +4,7 @@
     "language": "Python",
     "level": "300",
     "framework": "AWS SAM",
+    "patternGroup": "sfn-lambda-microvms-callback",
     "introBox": {
         "headline": "How it works",
         "text": [
@@ -16,19 +17,28 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sfn-lambda-microvms-callback-sam",
-            "templateURL": "serverless-patterns/sfn-lambda-microvms-callback-sam",
-            "projectFolder": "sfn-lambda-microvms-callback-sam",
             "templateFile": "template.yaml"
         }
     },
     "resources": {
         "headline": "Additional resources",
         "bullets": [
-            { "text": "AWS SDK service integrations in Step Functions", "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html" },
-            { "text": "Wait for a callback with a task token", "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token" },
-            { "text": "AWS::Lambda::MicrovmImage CloudFormation resource", "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html" },
-            { "text": "AWS CLI reference for Lambda MicroVMs RunMicrovm", "link": "https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda-microvms/run-microvm.html" }
+            {
+                "text": "AWS SDK service integrations in Step Functions",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+            },
+            {
+                "text": "Wait for a callback with a task token",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+            },
+            {
+                "text": "AWS::Lambda::MicrovmImage CloudFormation resource",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html"
+            },
+            {
+                "text": "AWS CLI reference for Lambda MicroVMs RunMicrovm",
+                "link": "https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda-microvms/run-microvm.html"
+            }
         ]
     },
     "deploy": {
