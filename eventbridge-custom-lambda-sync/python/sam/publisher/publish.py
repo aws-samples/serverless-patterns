@@ -25,6 +25,8 @@ Notes:
   * This publishes JSON with `PutEvents`; no schema registry is involved.
   * The response is a single `Entries` list; check `FailedEntryCount` and each
     entry's `SuccessCode`/`ErrorCode`. `DEDUPLICATED` is a success.
+  * The AWS CLI calls the service `aws eventsv2`, but boto3 calls it
+    `eventbridgev2` (boto3 >= 1.43.102).
   * The IAM namespace is `events:`, never `eventsv2:`.
 """
 
@@ -138,7 +140,7 @@ def main(argv: List[str]) -> int:
         return 2
 
     group = args.group or f"order-group-{int(time.time())}"
-    client = boto3.client("eventsv2", region_name=args.region)
+    client = boto3.client("eventbridgev2", region_name=args.region)
 
     print(f"Publishing {args.count} ordered events in group '{group}'...")
     publish_sequence(client, args.bus_arn, group, args.count)

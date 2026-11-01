@@ -4,8 +4,8 @@
 """Unit tests for the publisher's entry-building, grouping, and result-checking.
 
 Uses botocore's Stubber, which validates request parameters against the real
-eventsv2 service model — so a wrong field name or shape (e.g. the EventGroupId
-nesting) fails without a live call.
+eventbridgev2 (EventsV2) service model — so a wrong field name or shape (e.g.
+the EventGroupId nesting) fails without a live call.
 """
 
 import json
@@ -24,7 +24,7 @@ BUS_ARN = f"arn:aws:events:{TEST_REGION}:111122223333:event-busv2/sync-orders-bu
 
 def _client():
     return boto3.client(
-        "eventsv2",
+        "eventbridgev2",
         region_name=TEST_REGION,
         aws_access_key_id="test",
         aws_secret_access_key="test",

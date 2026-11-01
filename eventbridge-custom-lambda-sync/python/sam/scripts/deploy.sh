@@ -11,7 +11,7 @@
 #   scripts/deploy.sh [stack-name] [region]
 set -euo pipefail
 
-STACK_NAME="${1:-lambda-sync-eventbridge-sample}"
+STACK_NAME="${1:-eventbridge-custom-lambda-sync}"
 # Region resolution order: positional arg, then $AWS_REGION / $AWS_DEFAULT_REGION,
 # then the region configured in your AWS CLI profile. Nothing is hardcoded.
 REGION="${2:-${AWS_REGION:-${AWS_DEFAULT_REGION:-$(aws configure get region 2>/dev/null || true)}}}"
@@ -22,7 +22,7 @@ if [ -z "${REGION}" ]; then
 fi
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TEMPLATE="${HERE}/infra/template.yaml"
+TEMPLATE="${HERE}/template.yaml"
 
 echo "Building the consumer Lambda..."
 sam build --template "${TEMPLATE}" --region "${REGION}"

@@ -1,6 +1,6 @@
 {
-  "title": "Ordered processing with a synchronous Lambda target on Amazon EventBridge",
-  "description": "Processes events in order by invoking a Lambda synchronously from a FIFO subscriber on an EventBridge custom event bus",
+  "title": "Ordered processing with a synchronous AWS Lambda target on Amazon EventBridge",
+  "description": "Process events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge custom event bus",
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
@@ -14,10 +14,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-custom-lambda-sync-sam-python",
-      "templateURL": "serverless-patterns/eventbridge-custom-lambda-sync-sam-python",
-      "projectFolder": "eventbridge-custom-lambda-sync-sam-python",
-      "templateFile": "infra/template.yaml"
+      "templateFile": "template.yaml"
     }
   },
   "resources": {
