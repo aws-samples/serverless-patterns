@@ -4,12 +4,34 @@
   "language": "Python",
   "level": "300",
   "framework": "AWS SAM",
+  "patternGroup": "bedrock-semantic-cache-s3vectors",
   "patternArch": {
-    "icon1": { "x": 20, "y": 50, "service": "lambda", "label": "AWS Lambda (semantic cache)" },
-    "icon2": { "x": 55, "y": 30, "service": "bedrock", "label": "Amazon Bedrock (embeddings and text model)" },
-    "icon3": { "x": 55, "y": 70, "service": "s3", "label": "Amazon S3 Vectors (cache store)" },
-    "line1": { "from": "icon1", "to": "icon2" },
-    "line2": { "from": "icon1", "to": "icon3" }
+    "icon1": {
+      "x": 20,
+      "y": 50,
+      "service": "lambda",
+      "label": "AWS Lambda (semantic cache)"
+    },
+    "icon2": {
+      "x": 55,
+      "y": 30,
+      "service": "bedrock",
+      "label": "Amazon Bedrock (embeddings and text model)"
+    },
+    "icon3": {
+      "x": 55,
+      "y": 70,
+      "service": "s3",
+      "label": "Amazon S3 Vectors (cache store)"
+    },
+    "line1": {
+      "from": "icon1",
+      "to": "icon2"
+    },
+    "line2": {
+      "from": "icon1",
+      "to": "icon3"
+    }
   },
   "introBox": {
     "headline": "How it works",
@@ -25,19 +47,31 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/bedrock-semantic-cache-s3vectors-sam",
-      "templateURL": "serverless-patterns/bedrock-semantic-cache-s3vectors-sam",
-      "projectFolder": "bedrock-semantic-cache-s3vectors-sam",
       "templateFile": "template.yaml"
     }
   },
   "resources": {
     "bullets": [
-      { "text": "Working with S3 Vectors and vector buckets", "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html" },
-      { "text": "Amazon S3 Vectors limitations and restrictions", "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html" },
-      { "text": "Amazon Titan Text Embeddings models", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html" },
-      { "text": "Amazon Bedrock prompt caching (native, prefix based), which complements this pattern", "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html" },
-      { "text": "Control access to Lambda function URLs", "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html" }
+      {
+        "text": "Working with S3 Vectors and vector buckets",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html"
+      },
+      {
+        "text": "Amazon S3 Vectors limitations and restrictions",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html"
+      },
+      {
+        "text": "Amazon Titan Text Embeddings models",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html"
+      },
+      {
+        "text": "Amazon Bedrock prompt caching (native, prefix based), which complements this pattern",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html"
+      },
+      {
+        "text": "Control access to Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html"
+      }
     ]
   },
   "deploy": {

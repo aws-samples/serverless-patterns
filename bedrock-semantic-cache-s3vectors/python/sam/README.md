@@ -4,7 +4,7 @@ This pattern puts an AWS Lambda function in front of Amazon Bedrock and returns 
 
 This is different from the prompt caching that Amazon Bedrock offers natively. Native prompt caching reuses an exact prompt prefix, so a single changed character is a miss (see [Prompt caching for faster model inference](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)). This pattern matches on meaning instead, so "What is the capital of France?" and "Which city is the capital of France?" hit the same cache entry. The two features complement each other.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-semantic-cache-s3vectors-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/bedrock-semantic-cache-s3vectors-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -38,7 +38,7 @@ The AWS SAM template deploys these resources, and the request flow between them 
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/bedrock-semantic-cache-s3vectors-sam
+    cd serverless-patterns/bedrock-semantic-cache-s3vectors/python/sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file. The function has no dependencies to install, so no build step is needed:
     ```
