@@ -18,6 +18,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <aws.sdk.version>2.55.6</aws.sdk.version>
     <jackson.version>2.22.3</jackson.version>
+    <mockito.version>5.24.0</mockito.version>
+    <!-- Pinned above Mockito's transitive Byte Buddy so the tests also run when
+         Maven itself runs on a JDK newer than 21 (e.g. sam build on JDK 25+). -->
+    <bytebuddy.version>1.18.16</bytebuddy.version>
   </properties>
 
   <dependencyManagement>
@@ -37,6 +41,16 @@
         <version>${jackson.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>${bytebuddy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy-agent</artifactId>
+        <version>${bytebuddy.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -73,13 +87,13 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.14.2</version>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <version>5.14.2</version>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -95,6 +109,25 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.5.2</version>
+        <configuration>
+          <!-- Load Mockito as a Java agent instead of letting it self-attach,
+               which newer JDKs warn about and will eventually block. -->
+          <argLine>-javaagent:${org.mockito:mockito-core:jar}</argLine>
+        </configuration>
+      </plugin>
+      <!-- Exposes each dependency's jar path as a property, e.g.
+           ${org.mockito:mockito-core:jar}, for the Surefire argLine above. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.8.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <!-- Shade builds a fat jar so the Lambda has the SDK on its classpath and
            the publisher CLI can run with `java -jar`. -->

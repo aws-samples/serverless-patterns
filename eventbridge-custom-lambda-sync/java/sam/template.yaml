@@ -44,20 +44,22 @@ Resources:
       FunctionName: !Sub "${AppName}-consumer"
       Handler: com.example.orders.Consumer::handleRequest
       Runtime: java21
-      CodeUri: ../
+      CodeUri: ./
       Timeout: 30
       MemorySize: 512
       Description: Logs OrderPlaced events in processing order (ordered FIFO demo).
 
   # --- Dead-letter queue ---------------------------------------------------
   # Best practice: a subscriber should have a DLQ so a delivery that ultimately
-  # fails has somewhere to go. This sample focuses on ordered processing, so the
-  # DLQ is just a safety net.
+  # fails has somewhere to go. A dead-letter record identifies the failed event
+  # by id and timestamp but does not carry the payload, so reprocessing it needs
+  # the event to still be inside the bus retention window (RetentionInDays).
   DeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Sub "${AppName}-subscriber-dlq"
       MessageRetentionPeriod: 1209600  # 14 days
+      SqsManagedSseEnabled: true
 
   # --- Delivery role -------------------------------------------------------
   # The role EventBridge assumes to invoke the target. It trusts the
