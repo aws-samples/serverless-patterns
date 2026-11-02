@@ -1,0 +1,9 @@
+{
+  "name": "lambda-web-pr-previews",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "engines": { "node": ">=24" },
+  "scripts": { "start": "node index.js" }
+}

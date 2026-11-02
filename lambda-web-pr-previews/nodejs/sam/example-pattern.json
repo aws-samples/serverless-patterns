@@ -1,0 +1,69 @@
+{
+  "title": "A preview URL for every pull request with AWS Lambda Web Functions",
+  "description": "Give every GitHub pull request its own live preview URL on a Lambda Web Function endpoint, updated on each push and deleted on close.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "patternGroup": "lambda-web-pr-previews",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern gives every pull request in a GitHub repository its own live preview URL, the way hosting platforms such as Vercel and Netlify do, using one AWS Lambda Web Function. A GitHub Actions workflow deploys each pull request to an endpoint named <code>pr-&lt;number&gt;</code>, comments the URL on the pull request, updates the same URL on every push and deletes the endpoint when the pull request closes. Merging to <code>main</code> deploys the <code>prod</code> endpoint.",
+      "A Web Function can have up to 10 endpoints, each with its own HTTPS domain, and an endpoint with <code>Disabled</code> auto-deployment keeps serving the revision that you point it at. Every endpoint in this pattern uses <code>Disabled</code>: with the default <code>LatestRevision</code>, production would serve the code of the last pull request that was pushed.",
+      "The workflows assume AWS IAM roles with GitHub OpenID Connect, so the repository stores no AWS keys. Because each endpoint has its own ARN, the preview role can change only <code>pr-*</code> endpoints and can pass only a separate preview execution role, so pull request code cannot touch the production endpoint or run with production permissions.",
+      "Idle previews scale to zero, and each preview endpoint is capped at 2 execution environments and 100 requests per second."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Deployment patterns for Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-deployment.html"
+      },
+      {
+        "text": "Lambda Web Function endpoints",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-endpoints.html"
+      },
+      {
+        "text": "Configuring OpenID Connect in Amazon Web Services for GitHub Actions",
+        "link": "https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws"
+      },
+      {
+        "text": "GitHub OIDC immutable subject claims",
+        "link": "https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Get your repository's OIDC subject prefix with <code>gh api repos/my-org/my-repo/actions/oidc/customization/sub --jq .sub_claim_prefix</code>.",
+      "Deploy the stack: <code>sam deploy --stack-name lambda-web-pr-previews --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides GitHubSubjectPrefix=&lt;prefix&gt;</code>.",
+      "Deploy production: <code>AWS_REGION=us-east-1 scripts/deploy.sh production</code>. Then copy <code>src</code>, <code>scripts</code> and <code>.github</code> into your repository and set the repository variables described in the GitHub repo."
+    ]
+  },
+  "testing": {
+    "text": [
+      "Create a preview from your terminal with <code>AWS_REGION=us-east-1 scripts/deploy.sh preview 1</code>, or open a pull request in your repository. See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Web Function and empty the code bucket: <code>AWS_REGION=us-east-1 scripts/deploy.sh destroy</code>.",
+      "Delete the stack: <code>sam delete --stack-name lambda-web-pr-previews --region us-east-1 --no-prompts</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manish S",
+      "image": "",
+      "bio": "AWS Support Engineer, trying to build things",
+      "linkedin": "manish-s-84199221b",
+      "twitter": ""
+    }
+  ]
+}
