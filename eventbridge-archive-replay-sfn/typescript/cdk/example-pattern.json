@@ -1,0 +1,62 @@
+{
+  "title": "Amazon EventBridge archive replay started by AWS Step Functions",
+  "description": "Replay lost Amazon EventBridge events after an outage: an Amazon CloudWatch alarm returning to OK starts an AWS Step Functions workflow that calls StartReplay for one rule.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A custom Amazon EventBridge bus archives its events. A rule on the bus has a target that fails, and an Amazon CloudWatch alarm watches the FailedInvocations metric of that rule.",
+      "When the alarm goes from ALARM to OK, a rule on the default bus starts an AWS Step Functions workflow. It reads the alarm history for the outage start, waits for the archive, calls StartReplay with the failing rule as the only destination filter, and polls DescribeReplay.",
+      "The workflow publishes the replay result to Amazon Simple Notification Service. It uses AWS SDK integrations only, so the template contains no AWS Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/eventbridge-archive-replay-sfn-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Archiving and replaying events in Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-archive.html"
+      },
+      {
+        "text": "Amazon EventBridge StartReplay API reference",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_StartReplay.html"
+      },
+      {
+        "text": "AWS SDK service integrations in AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk bootstrap</code> (once per account and Region)",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
