@@ -1,0 +1,4 @@
+aws-durable-execution-sdk-python>=1.0.0
+# The Lambda runtime's bundled boto3 may predate the lambda-microvms service model.
+boto3>=1.43.0
+botocore>=1.43.0

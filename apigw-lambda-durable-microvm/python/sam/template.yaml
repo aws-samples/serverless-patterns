@@ -1,0 +1,255 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Amazon API Gateway to AWS Lambda durable function to AWS Lambda MicroVM.
+  POST /jobs starts a durable execution that boots one ephemeral MicroVM from a
+  snapshot, hands it a command, suspends at zero cost until the VM posts the
+  result back through API Gateway, then terminates the VM.
+
+Parameters:
+  CodeArtifactBucket:
+    Type: String
+    Description: S3 bucket holding the MicroVM image zip (Dockerfile + app.py at the zip root).
+  CodeArtifactKey:
+    Type: String
+    Default: microvm-jobs/vm.zip
+    Description: >
+      S3 key of the zip. AWS::Lambda::MicrovmImage builds a new version only when a
+      property changes, so upload each new zip under a new key (for example with a
+      timestamp) and pass it here to rebuild the image.
+  JobTimeoutSeconds:
+    Type: Number
+    Default: 900
+    MinValue: 60
+    MaxValue: 28800
+    Description: >
+      Upper bound on one job. It is both the durable callback timeout and the
+      MicroVM's maximumDurationInSeconds, so a hung VM is always torn down.
+  VmMemoryMiB:
+    Type: Number
+    Default: 512
+    AllowedValues: [512, 1024, 2048, 4096, 8192]
+    Description: Baseline memory of the MicroVM (vCPU, peak memory and disk scale with it).
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures: [arm64]
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # API: POST /jobs starts a job, GET /jobs/{jobId} reads its state, and
+  # POST /callback is where the MicroVM reports the result.
+  # ---------------------------------------------------------------------------
+  JobsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration: REGIONAL
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/
+      Handler: app.handler
+      Environment:
+        Variables:
+          ORCHESTRATOR_FUNCTION_NAME: !Ref OrchestratorFunction
+          ORCHESTRATOR_ALIAS: live
+      Policies:
+        - Statement:
+            - Sid: StartAndReadExecutions
+              Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+                - lambda:ListDurableExecutionsByFunction
+                - lambda:GetDurableExecution
+              Resource:
+                - !GetAtt OrchestratorFunction.Arn
+                - !Sub ${OrchestratorFunction.Arn}:*
+            - Sid: ResumeExecutions
+              Effect: Allow
+              Action:
+                - lambda:SendDurableExecutionCallbackSuccess
+                - lambda:SendDurableExecutionCallbackFailure
+              # The callback's resource is the version-qualified function ARN plus a
+              # /durable-execution/... suffix, so the plain function ARN is not enough.
+              Resource:
+                - !GetAtt OrchestratorFunction.Arn
+                - !Sub ${OrchestratorFunction.Arn}:*
+                - !Sub ${OrchestratorFunction.Arn}:*/durable-execution/*
+      Events:
+        StartJob:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JobsApi
+            Path: /jobs
+            Method: POST
+        GetJob:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JobsApi
+            Path: /jobs/{jobId}
+            Method: GET
+        Callback:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JobsApi
+            Path: /callback
+            Method: POST
+
+  # ---------------------------------------------------------------------------
+  # Durable orchestrator. Invoked asynchronously through its alias. Three steps:
+  # run-microvm, wait for the callback (suspended, no compute billed), then
+  # terminate-microvm. AutoPublishAlias publishes a new version on every code
+  # change so the alias always points at the deployed code.
+  # ---------------------------------------------------------------------------
+  OrchestratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/orchestrator/
+      Handler: app.handler
+      Timeout: 60
+      AutoPublishAlias: live
+      DurableConfig:
+        ExecutionTimeout: !Ref JobTimeoutSeconds
+        RetentionPeriodInDays: 7
+      Environment:
+        Variables:
+          IMAGE_ARN: !Ref JobImage
+          IMAGE_VERSION: !GetAtt JobImage.LatestActiveImageVersion
+          EXECUTION_ROLE_ARN: !GetAtt MicrovmExecutionRole.Arn
+          JOB_TIMEOUT_SECONDS: !Ref JobTimeoutSeconds
+      # SAM attaches AWSLambdaBasicDurableExecutionRolePolicy itself for a function
+      # with DurableConfig; listing it here again fails validation (duplicate ARN).
+      Policies:
+        - Statement:
+            - Sid: RunMicrovms
+              Effect: Allow
+              Action:
+                - lambda:RunMicrovm
+                - lambda:GetMicrovm
+                - lambda:TerminateMicrovm
+              # A MicroVM's ARN does not exist until RunMicrovm returns it, so the
+              # action list is the scope here; the image and role it may use are
+              # pinned by the environment variables and the PassRole statement.
+              Resource: '*'
+            - Sid: PassNetworkConnectors
+              Effect: Allow
+              # RunMicrovm passes the default connectors even when none are named.
+              Action: lambda:PassNetworkConnector
+              Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:*
+            - Sid: PassExecutionRole
+              Effect: Allow
+              Action: iam:PassRole
+              Resource: !GetAtt MicrovmExecutionRole.Arn
+              Condition:
+                StringEquals:
+                  iam:PassedToService: lambda.amazonaws.com
+
+  # ---------------------------------------------------------------------------
+  # The MicroVM image, built by CloudFormation from the zip in S3. The stack
+  # reaches CREATE_COMPLETE only once a version is ACTIVE (a few minutes).
+  # ---------------------------------------------------------------------------
+  MicrovmBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: read-artifact-and-log
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${CodeArtifactBucket}/${CodeArtifactKey}
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/${AWS::StackName}*
+
+  MicrovmExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: runtime-logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/${AWS::StackName}*
+
+  JobImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Sub ${AWS::StackName}-job
+      Description: Runs one shell command and posts the result to the callback URL
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1
+      BaseImageVersion: '1'
+      BuildRoleArn: !GetAtt MicrovmBuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${CodeArtifactBucket}/${CodeArtifactKey}
+      Logging:
+        CloudWatch:
+          LogGroup: !Sub /aws/lambda-microvms/${AWS::StackName}-job
+      # The VM must reach API Gateway to post its result.
+      EgressNetworkConnectors:
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: !Ref VmMemoryMiB
+      AdditionalOsCapabilities: []
+      EnvironmentVariables: []
+      Hooks:
+        Port: 8080
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 60
+          Validate: ENABLED
+          ValidateTimeoutInSeconds: 60
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 10
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 10
+
+Outputs:
+  JobsEndpoint:
+    Description: POST a JSON body with a "command" key here to start a job
+    Value: !Sub https://${JobsApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/jobs
+  CallbackEndpoint:
+    Description: Where the MicroVM posts its result (passed to it in runHookPayload)
+    Value: !Sub https://${JobsApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/callback
+  OrchestratorAliasArn:
+    Description: The durable function alias the API invokes
+    Value: !Ref OrchestratorFunction.Alias
+  JobImageArn:
+    Description: The MicroVM image each job boots from
+    Value: !Ref JobImage
