@@ -1,0 +1,4 @@
+.aws-sam/
+samconfig.toml
+*.zip
+__pycache__/
