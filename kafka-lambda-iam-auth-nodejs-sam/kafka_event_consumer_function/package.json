@@ -1,0 +1,10 @@
+{
+  "name": "kafka-event-consumer",
+  "version": "1.0.0",
+  "description": "Lambda consumer for self-managed Kafka / MSK; writes messages to DynamoDB",
+  "type": "module",
+  "main": "app.mjs",
+  "scripts": {
+    "test": "node --test"
+  }
+}
