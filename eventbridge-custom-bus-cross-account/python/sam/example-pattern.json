@@ -1,0 +1,60 @@
+{
+  "title": "Amazon EventBridge custom event bus cross-account sharing with AWS Resource Access Manager",
+  "description": "Share one Amazon EventBridge custom event bus across accounts with AWS RAM. A consumer account subscribes and delivers events to an AWS Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An owner account creates an Amazon EventBridge custom event bus, sets its retention period, and shares it with other accounts in the organization using AWS Resource Access Manager (AWS RAM) with the SubscribeOnly managed permission.",
+      "A consumer account creates its own subscriber on the shared bus, together with the AWS Lambda function the subscriber invokes, an IAM delivery role, and an Amazon SQS dead-letter queue for failed deliveries. Each consumer owns its subscribers; the bus owner configures no routing on their behalf.",
+      "Deploy the single template once per account with the Role parameter set to Owner or Consumer. Publish events with the AWS CLI and confirm delivery in the consumer Lambda's Amazon CloudWatch logs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "What is the EventBridge custom event bus?",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-what-is.html"
+      },
+      {
+        "text": "Sharing a custom event bus with other accounts",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-sharing.html"
+      },
+      {
+        "text": "Subscribing to events on a custom event bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-subscribers.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Owner account: sam deploy --parameter-overrides Role=Owner SharePrincipal=<OU_OR_ACCOUNT_ID>",
+      "Consumer account: sam deploy --capabilities CAPABILITY_IAM --parameter-overrides Role=Consumer SharedBusArn=<BUS_ARN>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the consumer stack first, then the owner stack: <code>sam delete</code> in each account."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anusha Ganapuram",
+      "bio": "Technical Account Manager at AWS with deep expertise in serverless and event-driven solutions. Passionate about building scalable, secure and distributed applications that help organizations modernize their infrastructure and accelerate innovation.",
+      "image": "https://avatars.githubusercontent.com/u/58950933",
+      "linkedin": "anushaganapuram"
+    }
+  ]
+}
