@@ -1,0 +1,76 @@
+{
+    "title": "Amazon EventBridge custom event bus to AWS Lambda with ordered, synchronous delivery",
+    "description": "Process events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge custom event bus.",
+    "language": "Java",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern shows how an Amazon EventBridge custom event bus (the eventsv2 API) processes events in order by invoking an AWS Lambda function synchronously (InvocationType REQUEST_RESPONSE) from a FIFO subscriber.",
+            "The publisher sends a sequence of OrderPlaced events that share one EventGroupId, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer Lambda function synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the Amazon CloudWatch log shows the sequence handled in order, one at a time. Synchronous confirmation provides the reliability and back-pressure teams used to add an Amazon SQS queue between the bus and Lambda to get, so no SQS buffer sits in the path.",
+            "This deploys one EventBridge custom event bus, one FIFO subscriber configured for synchronous invocation, one Java 21 Lambda function, an SQS dead-letter queue, and the delivery role."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "Amazon EventBridge event buses",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+            },
+            {
+                "text": "Amazon EventBridge targets",
+                "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "sam build",
+            "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "sam delete"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Kurt Tometich",
+            "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+            "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+            "linkedin": "kurt-tometich",
+            "twitter": ""
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 30,
+            "y": 50,
+            "service": "eventbridge",
+            "label": "Amazon EventBridge (custom event bus)"
+        },
+        "icon2": {
+            "x": 80,
+            "y": 50,
+            "service": "sqs",
+            "label": "Amazon SQS (FIFO Queue)"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2",
+            "label": "Messages"
+        }
+    }
+}
