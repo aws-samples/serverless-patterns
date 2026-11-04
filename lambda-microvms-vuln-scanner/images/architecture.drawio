@@ -1,0 +1,52 @@
+<mxfile host="drawio.corp.amazon.com" modified="2026-10-12T14:50:21.259Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0" version="21.7.4" etag="VHedUVkSg_sL6nb7buPV" type="device">
+  <diagram name="Page-1" id="diagram-1">
+    <mxGraphModel dx="1242" dy="799" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1180" pageHeight="260" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="79e5BAUR26rl3OqxNA-y-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="141" y="58" width="786" height="168" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-s3" value="Amazon S3&#xa;&lt;i&gt;staged app artifact&lt;/i&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fontFamily=Helvetica;" parent="1" vertex="1">
+          <mxGeometry x="191" y="100" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-image" value="MicroVM Image&#xa;&lt;i&gt;AWS::Lambda::MicrovmImage&lt;/i&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fontFamily=Helvetica;" parent="1" vertex="1">
+          <mxGeometry x="400" y="100" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-microvm" value="Scanner MicroVM (Trivy)&#xa;&lt;i&gt;Firecracker-isolated · :8080 / :9000&lt;/i&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fontFamily=Helvetica;" parent="1" vertex="1">
+          <mxGeometry x="598" y="100" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="caller" value="Any caller&#xa;(CLI / CI / API / queue)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#232F3D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.users;fontFamily=Helvetica;" parent="1" vertex="1">
+          <mxGeometry x="818" y="100" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-s3-image" style="edgeStyle=none;rounded=0;html=1;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#232F3E;strokeWidth=1.6;fontFamily=Helvetica;fontSize=11;" parent="1" source="svc-s3" target="svc-image" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-s3-image-label" value="CloudFormation build" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;labelBackgroundColor=#ffffff;" parent="1" vertex="1">
+          <mxGeometry x="243" y="106" width="150" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-image-microvm" style="edgeStyle=none;rounded=0;html=1;endArrow=block;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#232F3E;strokeWidth=1.6;fontFamily=Helvetica;fontSize=11;" parent="1" source="svc-image" target="svc-microvm" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-image-microvm-label" value="run-microvm&#xa;(launch on demand)" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;labelBackgroundColor=#ffffff;" parent="1" vertex="1">
+          <mxGeometry x="452" y="94" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-caller-microvm" style="edgeStyle=none;rounded=0;html=1;endArrow=block;exitX=0;exitY=0.5;entryX=1;entryY=0.5;strokeColor=#232F3E;strokeWidth=1.6;fontFamily=Helvetica;fontSize=11;" parent="1" source="caller" target="svc-microvm" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-caller-microvm-label" value="scan request over HTTPS&#xa;(JWE token, :8080)" style="text;html=1;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;labelBackgroundColor=#ffffff;" parent="1" vertex="1">
+          <mxGeometry x="661" y="94" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="step-build" value="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#007CBD;strokeColor=default;fontColor=#FFFFFF;fontStyle=1;fontSize=14;fontFamily=Helvetica;strokeWidth=2;align=center;verticalAlign=middle;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="305" y="134" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="step-run" value="3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#007CBD;strokeColor=default;fontColor=#FFFFFF;fontStyle=1;fontSize=14;fontFamily=Helvetica;strokeWidth=2;align=center;verticalAlign=middle;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="514" y="134" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="step-scan" value="2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#007CBD;strokeColor=default;fontColor=#FFFFFF;fontStyle=1;fontSize=14;fontFamily=Helvetica;strokeWidth=2;align=center;verticalAlign=middle;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="728" y="134" width="26" height="26" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

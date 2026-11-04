@@ -1,0 +1,255 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Vulnerability and security scanning tool on AWS Lambda MicroVMs.
+
+  This pattern builds a MicroVM image that runs a vulnerability scanner (Trivy)
+  inside a Firecracker-isolated, single-tenant sandbox. The image is created
+  declaratively with the native AWS::Lambda::MicrovmImage resource. Launching a
+  MicroVM from the image is a runtime operation: a caller runs a fresh MicroVM
+  per untrusted artifact, submits the artifact to the scanner over the MicroVM's
+  authenticated HTTPS endpoint, collects the report, and terminates the MicroVM.
+  The pattern provisions only the reusable building blocks (the image, the IAM
+  build and execution roles, and a log group) so it can be plugged into any
+  trigger: an S3 event, an API, a CI/CD stage, or a queue consumer.
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PARAMETERS
+# ──────────────────────────────────────────────────────────────────────────────
+
+Parameters:
+  StackLabel:
+    Type: String
+    Default: vuln-scanner
+    AllowedPattern: "^[a-z0-9][a-z0-9\\-]{1,40}[a-z0-9]$"
+    ConstraintDescription: "Must be 3-42 characters, lowercase alphanumeric and hyphens only, cannot start/end with a hyphen."
+    Description: A label used to name the MicroVM image and related resources.
+  StagingBucket:
+    Type: String
+    Description: S3 bucket holding the pre-staged MicroVM app artifact (uploaded by deploy.sh).
+  ArtifactKey:
+    Type: String
+    Default: microvm-app/artifact.zip
+    Description: S3 key of the zipped MicroVM app artifact (Dockerfile + app, Trivy baked in).
+
+# ──────────────────────────────────────────────────────────────────────────────
+# RESOURCES
+# ──────────────────────────────────────────────────────────────────────────────
+
+Resources:
+
+  # ── KMS key for CloudWatch log encryption ───────────────────────────────────
+  # Encrypts the build + runtime log group at rest with a customer-managed key.
+  # The key policy grants the account root administrative access and lets the
+  # regional CloudWatch Logs service encrypt/decrypt log data.
+  LogsKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub "CMK for ${StackLabel} MicroVM CloudWatch logs"
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          # Least-privilege key administration for the account root: explicit
+          # management actions rather than kms:*. This keeps the key manageable
+          # via IAM and prevents lockout without granting a blanket wildcard.
+          - Sid: EnableRootAccountAdmin
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+            Action:
+              - kms:Create*
+              - kms:Describe*
+              - kms:Enable*
+              - kms:List*
+              - kms:Put*
+              - kms:Update*
+              - kms:Revoke*
+              - kms:Disable*
+              - kms:Get*
+              - kms:Delete*
+              - kms:TagResource
+              - kms:UntagResource
+              - kms:ScheduleKeyDeletion
+              - kms:CancelKeyDeletion
+            Resource: "*"
+          - Sid: AllowCloudWatchLogs
+            Effect: Allow
+            Principal:
+              Service: !Sub "logs.${AWS::Region}.amazonaws.com"
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: "*"
+            Condition:
+              ArnLike:
+                "kms:EncryptionContext:aws:logs:arn": !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/${StackLabel}"
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+
+  # ── CloudWatch log group (image build + MicroVM runtime) ────────────────────
+  MicroVMLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda-microvms/${StackLabel}"
+      RetentionInDays: 7
+      KmsKeyId: !GetAtt LogsKmsKey.Arn
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+
+  # ── IAM: managed policy for the build role ──────────────────────────────────
+  # Scoped to reading the staging artifact and writing build logs.
+  MicroVMBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: !Sub "Image-build permissions for ${StackLabel} (S3 read + build logs)"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: s3:GetObject
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${StagingBucket}/*"
+          # logs:CreateLogGroup requires Resource:* by API design.
+          - Effect: Allow
+            Action: logs:CreateLogGroup
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*"
+          # Writing is scoped to this stack's log group only.
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/${StackLabel}:*"
+
+  # ── IAM: MicroVM build role (assumed by the MicroVMs service at image build) ─
+  MicroVMBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - !Ref MicroVMBuildPolicy
+
+  # ── IAM: managed policy for the execution role ──────────────────────────────
+  # The scanner needs no AWS APIs of its own; it only writes runtime logs.
+  MicroVMExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: !Sub "Runtime permissions for ${StackLabel} MicroVMs (runtime logs only)"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # logs:CreateLogGroup requires Resource:* by API design.
+          - Effect: Allow
+            Action: logs:CreateLogGroup
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*"
+          # Writing is scoped to this stack's log group only.
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda-microvms/${StackLabel}:*"
+
+  # ── IAM: MicroVM execution role (assumed by the running MicroVM) ─────────────
+  MicroVMExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+      ManagedPolicyArns:
+        - !Ref MicroVMExecutionPolicy
+
+  # ── MicroVM image: the scanner, built declaratively ─────────────────────────
+  MicroVMImage:
+    Type: AWS::Lambda::MicrovmImage
+    DependsOn:
+      - MicroVMBuildRole
+      - MicroVMLogGroup
+    Properties:
+      Name: !Ref StackLabel
+      BaseImageArn: !Sub "arn:aws:lambda:${AWS::Region}:aws:microvm-image:al2023-1"
+      BaseImageVersion: "0"
+      BuildRoleArn: !GetAtt MicroVMBuildRole.Arn
+      Description: Vulnerability and security scanning tool (Trivy) in an isolated Lambda MicroVM
+      CodeArtifact:
+        Uri: !Sub "s3://${StagingBucket}/${ArtifactKey}"
+      CpuConfigurations:
+        - Architecture: ARM_64
+      AdditionalOsCapabilities:
+        - ALL
+      # The scanner pulls vulnerability feeds at runtime, so grant outbound
+      # internet egress. Ingress connectors are chosen per-run at launch time.
+      EgressNetworkConnectors:
+        - !Sub "arn:aws:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:INTERNET_EGRESS"
+      EnvironmentVariables:
+        - Key: APP_PORT
+          Value: "8080"
+        - Key: HOOKS_PORT
+          Value: "9000"
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref MicroVMLogGroup
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 300
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 60
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 60
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 60
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 60
+      Resources:
+        - MinimumMemoryInMiB: 2048
+      Tags:
+        - Key: Project
+          Value: !Ref StackLabel
+        - Key: Purpose
+          Value: vulnerability-scanner
+
+# ──────────────────────────────────────────────────────────────────────────────
+# OUTPUTS
+# ──────────────────────────────────────────────────────────────────────────────
+
+Outputs:
+  MicroVMImageArn:
+    Description: ARN of the scanner MicroVM image. Launch MicroVMs from this image.
+    Value: !GetAtt MicroVMImage.ImageArn
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMImageArn"
+  MicroVMExecutionRoleArn:
+    Description: IAM role a launched MicroVM assumes at runtime (pass to run-microvm).
+    Value: !GetAtt MicroVMExecutionRole.Arn
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMExecutionRoleArn"
+  MicroVMBuildRoleArn:
+    Description: IAM role the MicroVMs service assumes to build the image.
+    Value: !GetAtt MicroVMBuildRole.Arn
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMBuildRoleArn"
+  MicroVMLogGroupName:
+    Description: CloudWatch log group for image build and MicroVM runtime logs.
+    Value: !Ref MicroVMLogGroup
+    Export:
+      Name: !Sub "${StackLabel}-MicroVMLogGroupName"
