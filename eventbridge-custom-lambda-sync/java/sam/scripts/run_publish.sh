@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
-# Publish an ordered sequence of OrderPlaced events (one event group), then show
-# where to watch them being processed in order.
+# Publish an ordered sequence of OrderPlaced events (one event group) with the
+# AWS CLI, then show where to watch them being processed in order.
+#
+# Every event shares one SystemMetadata.EventGroupId and carries an increasing
+# seq, so the FIFO subscriber orders them and, invoking the consumer
+# synchronously, processes them one at a time, in sequence. The IAM action
+# needed is events:PutEvents on the bus (the prefix is events:, never eventsv2:).
 #
 # Usage:
 #   scripts/run_publish.sh [stack-name] [region] [count]
 #
 #   count  number of ordered events to publish (default 5).
 #
-# Requires: scripts/deploy.sh already run, a JDK 21+, and Maven. The publisher is
-# run from the shaded jar (built with `mvn package` if not already present).
+# Requires: the stack deployed (scripts/deploy.sh or sam deploy) and the AWS CLI
+# v2.37.3 or later, signed in to the account that owns the stack.
 set -euo pipefail
 
 STACK_NAME="${1:-lambda-sync-eventbridge-sample}"
@@ -24,8 +29,10 @@ if [ -z "${REGION}" ]; then
   echo "       or set a default with 'aws configure'." >&2
   exit 1
 fi
-
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if ! [[ "${COUNT}" =~ ^[0-9]+$ ]] || [ "${COUNT}" -lt 1 ]; then
+  echo "error: count must be a whole number >= 1 (got '${COUNT}')." >&2
+  exit 1
+fi
 
 get_output() {
   aws cloudformation describe-stacks \
@@ -33,6 +40,7 @@ get_output() {
     --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text
 }
 
+APP_NAME="$(get_output AppName)"
 LOG_GROUP="$(get_output ConsumerLogGroup)"
 BUS_ARN="$(get_output EventBusArn)"
 if [ "${BUS_ARN}" = "None" ] || [ -z "${BUS_ARN}" ]; then
@@ -40,18 +48,36 @@ if [ "${BUS_ARN}" = "None" ] || [ -z "${BUS_ARN}" ]; then
   exit 1
 fi
 
-# Build the shaded jar if it is not already present. Use `clean` so a prior
-# `sam build` (which writes into target/) can't leave a stale incremental state
-# that breaks the compile.
-JAR="${HERE}/target/eventbridge-custom-lambda-sync-sam-java-1.0.0.jar"
-if [ ! -f "${JAR}" ]; then
-  echo "Building the publisher jar (mvn clean package)..."
-  (cd "${HERE}" && mvn -q -DskipTests clean package)
-fi
+# One group per run, so each run is ordered independently of earlier runs.
+GROUP="order-group-$(date +%s)"
 
+echo "AppName: ${APP_NAME}"
 echo "Bus: ${BUS_ARN}"
-BUS_ARN="${BUS_ARN}" AWS_REGION="${REGION}" \
-  java -jar "${JAR}" --count "${COUNT}"
+echo "Publishing ${COUNT} ordered events in group '${GROUP}'..."
+
+for ((seq = 1; seq <= COUNT; seq++)); do
+  ORDER_ID="$(printf '%s-%03d' "${GROUP}" "${seq}")"
+  # The order record. PutEvents takes Detail as a JSON string, so it is escaped
+  # once more when embedded in the entry below.
+  DETAIL="$(printf '{"orderId":"%s","orderGroup":"%s","seq":%d,"customerId":"cust-987","amount":%d.0,"currency":"USD","placedAt":"%s"}' \
+    "${ORDER_ID}" "${GROUP}" "${seq}" "$((100 + seq))" "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
+  ENTRY="$(printf '[{"Source":"com.example.orders","DetailType":"OrderPlaced","Detail":"%s","SystemMetadata":{"EventGroupId":"%s"}}]' \
+    "${DETAIL//\"/\\\"}" "${GROUP}")"
+
+  # One event per call so each seq gets its own confirmed result. The CLI
+  # retries throttling on its own.
+  RESULT="$(aws eventsv2 put-events \
+    --event-bus-arn "${BUS_ARN}" --region "${REGION}" \
+    --entries "${ENTRY}" \
+    --query 'Entries[0].[SuccessCode, EventId, ErrorCode, ErrorMessage]' \
+    --output text)"
+  read -r SUCCESS EVENT_ID ERROR_CODE ERROR_MESSAGE <<< "${RESULT}"
+  if [ "${ERROR_CODE}" != "None" ]; then
+    echo "error: seq=${seq} orderId=${ORDER_ID} failed: ${ERROR_CODE} ${ERROR_MESSAGE}" >&2
+    exit 1
+  fi
+  echo "Published seq=${seq} orderId=${ORDER_ID} -> SuccessCode=${SUCCESS} EventId=${EVENT_ID}"
+done
 
 echo
 echo "Give it a few seconds, then watch the consumer process the group in order:"

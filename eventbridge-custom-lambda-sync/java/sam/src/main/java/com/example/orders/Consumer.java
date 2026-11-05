@@ -4,6 +4,7 @@
 package com.example.orders;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 /**
  * Consumer Lambda: the SYNCHRONOUS, ordered target of an EventBridge
- * custom-event-bus subscriber. It logs each delivered order to CloudWatch in the
+ * Custom Event Bus subscriber. It logs each delivered order to CloudWatch in the
  * order it is processed.
  *
  * <p>Why this demonstrates ordered processing:
@@ -51,6 +52,7 @@ public class Consumer implements RequestHandler<Object, Map<String, Object>> {
 
     @Override
     public Map<String, Object> handleRequest(Object event, Context context) {
+        LambdaLogger logger = context.getLogger();
         List<Map<String, Object>> delivered = normalizeBatch(event);
         List<Map<String, Object>> processed = new ArrayList<>();
 
@@ -60,9 +62,9 @@ public class Consumer implements RequestHandler<Object, Map<String, Object>> {
             Object group = order.get("orderGroup");
             Object seq = order.get("seq");
 
-            System.out.printf(
+            logger.log(String.format(
                 "Processing order group=%s seq=%s orderId=%s (batchIndex=%d)%n",
-                group, seq, orderId, batchIndex);
+                group, seq, orderId, batchIndex));
 
             Map<String, Object> summary = new LinkedHashMap<>();
             summary.put("orderId", orderId);
@@ -71,7 +73,7 @@ public class Consumer implements RequestHandler<Object, Map<String, Object>> {
             processed.add(summary);
         }
 
-        System.out.printf("Processed %d order(s): %s%n", processed.size(), processed);
+        logger.log(String.format("Processed %d order(s): %s%n", processed.size(), processed));
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("processed", processed.size());

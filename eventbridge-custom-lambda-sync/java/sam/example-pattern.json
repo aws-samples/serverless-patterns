@@ -1,15 +1,15 @@
 {
-  "title": "Amazon EventBridge custom event bus to AWS Lambda with ordered, synchronous delivery",
-  "description": "Process events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge custom event bus.",
+  "title": "Amazon EventBridge Custom Event Bus to AWS Lambda with ordered, synchronous delivery",
+  "description": "Process events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge Custom Event Bus.",
   "language": "Java",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern shows how an Amazon EventBridge custom event bus (the eventsv2 API) processes events in order by invoking an AWS Lambda function synchronously (InvocationType REQUEST_RESPONSE) from a FIFO subscriber.",
-      "The publisher sends a sequence of OrderPlaced events that share one EventGroupId, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer Lambda function synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the Amazon CloudWatch log shows the sequence handled in order, one at a time. Synchronous confirmation provides the reliability and back-pressure teams used to add an Amazon SQS queue between the bus and Lambda to get, so no SQS buffer sits in the path.",
-      "This deploys one EventBridge custom event bus, one FIFO subscriber configured for synchronous invocation, one Java 21 Lambda function, an SQS dead-letter queue, and the delivery role."
+      "This pattern shows how an Amazon EventBridge Custom Event Bus (the eventsv2 API) processes events in order by invoking an AWS Lambda function synchronously (InvocationType REQUEST_RESPONSE) from a FIFO subscriber.",
+      "The publisher sends a sequence of OrderPlaced events that share one EventGroupId, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer Lambda function synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the Amazon CloudWatch log shows the sequence handled in order. Because the bus waits for the function to confirm each delivery, you get reliable, back-pressured processing without placing an Amazon SQS queue between the bus and the function.",
+      "This deploys one EventBridge Custom Event Bus, one FIFO subscriber configured for synchronous invocation, one Java 21 Lambda function, an SQS dead-letter queue, and the delivery role."
     ]
   },
   "gitHub": {
@@ -20,12 +20,16 @@
   "resources": {
     "bullets": [
       {
-        "text": "Amazon EventBridge event buses",
-        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+        "text": "Subscribing to events on a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-subscribers.html"
       },
       {
-        "text": "Amazon EventBridge targets",
-        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+        "text": "Ordering and deduplicating events on a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-ordering.html"
+      },
+      {
+        "text": "Lambda function target",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-target-lambda.html"
       }
     ]
   },

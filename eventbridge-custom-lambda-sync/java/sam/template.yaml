@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Ordered processing with a synchronous Lambda target on an EventBridge custom
-  event bus (eventsv2), Java consumer. This template provisions the whole sample:
+  Ordered processing with a synchronous AWS Lambda target on an Amazon EventBridge Custom Event Bus (eventsv2), Java consumer. This template provisions the whole sample:
   the event bus, a FIFO subscriber that invokes the consumer Lambda synchronously
   (LambdaParameters.InvocationType = REQUEST_RESPONSE), the consumer Lambda, a
   dead-letter queue, and the delivery role.
@@ -25,7 +24,7 @@ Parameters:
 Resources:
 
   # --- Event bus -----------------------------------------------------------
-  # The new custom event bus. Ref returns the bus ARN.
+  # The new Custom Event Bus. Ref returns the bus ARN.
   OrdersBus:
     Type: AWS::EventsV2::EventBus
     Properties:
@@ -118,7 +117,7 @@ Outputs:
     Description: Resource-name prefix.
     Value: !Ref AppName
   EventBusArn:
-    Description: ARN of the custom event bus. Pass to the publisher.
+    Description: ARN of the Custom Event Bus. Pass to the publisher.
     Value: !Ref OrdersBus
   SubscriberArn:
     Description: ARN of the FIFO, synchronous subscriber.

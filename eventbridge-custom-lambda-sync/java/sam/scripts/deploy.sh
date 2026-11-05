@@ -37,13 +37,21 @@ sam deploy \
   --no-fail-on-empty-changeset \
   --resolve-s3
 
-BUS_ARN="$(aws cloudformation describe-stacks \
-  --stack-name "${STACK_NAME}" --region "${REGION}" \
-  --query "Stacks[0].Outputs[?OutputKey=='EventBusArn'].OutputValue" --output text)"
+get_output() {
+  aws cloudformation describe-stacks \
+    --stack-name "${STACK_NAME}" --region "${REGION}" \
+    --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text
+}
+
+BUS_ARN="$(get_output EventBusArn)"
+APP_NAME="$(get_output AppName)"
+LOG_GROUP="$(get_output ConsumerLogGroup)"
 
 echo
 echo "Deploy complete."
+echo "  AppName       : ${APP_NAME}"
 echo "  Event bus ARN : ${BUS_ARN}"
+echo "  Consumer logs : ${LOG_GROUP}"
 echo
 echo "Publish an ordered sequence:  scripts/run_publish.sh ${STACK_NAME} ${REGION}"
 echo "  (add a count:               scripts/run_publish.sh ${STACK_NAME} ${REGION} 8 )"
