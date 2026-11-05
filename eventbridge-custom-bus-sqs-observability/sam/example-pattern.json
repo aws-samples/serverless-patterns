@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys an Amazon EventBridge new Custom event bus with one Subscriber. The Subscriber filters events and delivers each match to an Amazon SQS queue. A second queue receives a record for any event that cannot be delivered after its retries.",
-      "The pattern also sets up what you need to follow one event from the publish call to the target. A CloudWatch Logs delivery sends the Subscriber's delivery records to a log group, and five Amazon CloudWatch alarms cover publish failures, throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to it. A template parameter removes the delivery role's access to the target queue, so you can break delivery on purpose, watch each signal react, and replay the failed events from the bus.",
+      "The pattern also sets up what you need to follow one event from the publish call to the target. A CloudWatch Logs delivery sends the Subscriber's delivery records to a log group, and five Amazon CloudWatch alarms cover publish failures, throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to it. A template parameter removes the delivery role's access to the target queue, so you can break delivery on purpose, see how the metrics, logs and alarms report it, and replay the failed events from the bus.",
       "This pattern deploys one event bus, one Subscriber, two Amazon SQS queues, one AWS IAM role, one log group with its log delivery, and five alarms."
     ]
   },

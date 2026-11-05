@@ -26,8 +26,8 @@ Parameters:
     AllowedValues: ['true', 'false']
     Description: >-
       Set to false (and update the stack) to remove the delivery role's permission on the target queue.
-      Deliveries then fail and the events are written to the dead-letter queue, so you can see what each
-      observability signal looks like. Allow a minute or two for the IAM change to take effect.
+      Deliveries then fail and the events are written to the dead-letter queue, so you can see how the
+      metrics, logs and alarms report a failure. Allow a minute or two for the IAM change to take effect.
 
 Conditions:
   LogLevelIsInfo: !Equals [!Ref LogLevel, INFO]
