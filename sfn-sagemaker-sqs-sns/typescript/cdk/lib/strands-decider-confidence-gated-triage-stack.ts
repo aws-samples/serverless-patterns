@@ -37,12 +37,11 @@ import * as tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
  */
 
 const DEFAULTS = {
-  // Hugging Face repo holding the Strands Decider adapter + head, pinned to a commit.
+  // Hugging Face repo holding the Strands Decider adapter + head. The repo has no tags, so it is
+  // pinned to a commit. Strands Decider 0.2.0 takes the base model revision from the checkpoint's
+  // provenance.json.
   checkpoint: "StrandsAgents/strands-decider-2B-hobson-v19",
   revision: "bb282d786bc251fd4e3068de3ada9ddbb38127cd",
-  // The base model the adapter was trained on (Qwen/Qwen3.5-2B-Base), pinned to the commit that the
-  // adapter's provenance.json records. The checkpoint itself names no revision.
-  baseRevision: "b1485b2fa6dfa1287294f269f5fb618e03d52d7c",
   instanceType: "ml.m5.2xlarge",
   // Strands Decider's own routing convention: 0.9 or above acts without a check.
   departmentThreshold: 0.9,
@@ -78,7 +77,6 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
     }
     const checkpoint = stringContext(this, "checkpoint");
     const revision = stringContext(this, "revision");
-    const baseRevision = stringContext(this, "baseRevision");
     const instanceType = stringContext(this, "instanceType");
 
     // --- Amazon SageMaker AI: the Strands Decider real-time endpoint ----------------------------
@@ -110,7 +108,6 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
         environment: {
           DECIDER_CHECKPOINT: checkpoint,
           DECIDER_REVISION: revision,
-          DECIDER_BASE_REVISION: baseRevision,
           DECIDER_DEVICE: "cpu",
         },
       },

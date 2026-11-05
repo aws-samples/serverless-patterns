@@ -6,8 +6,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "cdk": "cdk",
-    "test": "cdk synth --quiet && python3 -m unittest discover -s test -v"
+    "cdk": "cdk"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.274.0",

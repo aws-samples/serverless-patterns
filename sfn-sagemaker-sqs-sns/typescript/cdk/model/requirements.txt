@@ -4,7 +4,7 @@
 # and copy the result here.
 
 # Direct dependencies
-strands-decider==0.1.0
+strands-decider==0.2.0
 transformers==5.17.0
 peft==0.21.0
 accelerate==1.15.0

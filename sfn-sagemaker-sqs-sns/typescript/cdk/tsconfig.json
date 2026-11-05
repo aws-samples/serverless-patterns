@@ -16,5 +16,5 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "build", "src", "model", "test"]
+  "exclude": ["node_modules", "build", "src", "model"]
 }
