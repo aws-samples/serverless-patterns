@@ -1,0 +1,62 @@
+{
+  "title": "Amazon EventBridge new Custom event bus to Amazon SQS with observability",
+  "description": "Deploy an Amazon EventBridge new Custom event bus with a Subscriber that delivers to Amazon SQS, with delivery logs and Amazon CloudWatch alarms to trace a missing event.",
+  "language": "Integration",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon EventBridge new Custom event bus with one Subscriber. The Subscriber filters events and delivers each match to an Amazon SQS queue. A second queue receives a record for any event that cannot be delivered after its retries.",
+      "The pattern also sets up what you need to follow one event from the publish call to the target. A CloudWatch Logs delivery sends the Subscriber's delivery records to a log group, and five Amazon CloudWatch alarms cover publish failures, throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to it. A template parameter removes the delivery role's access to the target queue, so you can break delivery on purpose, watch each signal react, and replay the failed events from the bus.",
+      "This pattern deploys one event bus, one Subscriber, two Amazon SQS queues, one AWS IAM role, one log group with its log delivery, and five alarms."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Observability for the Amazon EventBridge Custom event bus: metrics, logs, and AWS CloudTrail",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-observability.html"
+      },
+      {
+        "text": "Creating Custom event bus resources with AWS CloudFormation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-cloudformation.html"
+      },
+      {
+        "text": "Publishing events to a Custom event bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-publish.html"
+      },
+      {
+        "text": "Introducing enhanced custom event buses in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/aws/introducing-enhanced-custom-event-buses-in-amazon-eventbridge-for-enterprise-scale-event-driven-applications/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete any replay Subscriber you created, then delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Surya Sai D",
+      "bio": "Surya Sai D is a Technical Account Manager at Amazon Web Services. His expertise lies with Serverless and Event Driven Architectures. Surya has been an active contributor to the Serverless community with his blogs and speaking sessions.",
+      "linkedin": "surya-sai-d-64920416a"
+    }
+  ]
+}

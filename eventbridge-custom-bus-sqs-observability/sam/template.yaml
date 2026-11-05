@@ -1,0 +1,275 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Amazon EventBridge new Custom event bus with one Subscriber that delivers to Amazon SQS,
+  plus delivery logs in Amazon CloudWatch Logs and Amazon CloudWatch alarms for tracing a missing event.
+  (uksb-1tthgi812)(tag:eventbridge-custom-bus-sqs-observability-sam)
+
+Parameters:
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues: [ERROR, INFO]
+    Description: >-
+      ERROR records failed delivery attempts only. INFO also records successful deliveries,
+      which you need to confirm that an event was delivered.
+  IncludePayload:
+    Type: String
+    Default: ON_ERROR_ONLY
+    AllowedValues: [ON_ERROR_ONLY, FULL]
+    Description: >-
+      FULL copies every event body into the log group, where anyone who can read the group can read your data.
+      Use FULL only while you debug.
+  GrantTargetAccess:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: >-
+      Set to false (and update the stack) to remove the delivery role's permission on the target queue.
+      Deliveries then fail and the events are written to the dead-letter queue, so you can see what each
+      observability signal looks like. Allow a minute or two for the IAM change to take effect.
+
+Conditions:
+  LogLevelIsInfo: !Equals [!Ref LogLevel, INFO]
+  TargetAccessGranted: !Equals [!Ref GrantTargetAccess, 'true']
+
+Resources:
+  # The new Custom event bus. Names are derived from the stack name so that you can deploy the pattern more than once.
+  EventBus:
+    Type: AWS::EventsV2::EventBus
+    Properties:
+      Name: !Sub '${AWS::StackName}-bus'
+      StorageConfiguration:
+        # The bus keeps events for this long. A Subscriber that starts from a point in time can only
+        # read back to the start of this window, which begins when the bus is created.
+        RetentionPeriodInDays: 1
+
+  TargetQueue:
+    Type: AWS::SQS::Queue
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  # EventBridge assumes this role to deliver to the queues.
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+            # Prevents another account's resources from using this role (confused deputy).
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: DeliverToQueues
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # The role needs SendMessage on the dead-letter queue as well as on the target.
+              # Without it, a failed delivery cannot be recorded in the dead-letter queue.
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+              - !If
+                - TargetAccessGranted
+                - Effect: Allow
+                  Action: sqs:SendMessage
+                  Resource: !GetAtt TargetQueue.Arn
+                - !Ref AWS::NoValue
+
+  Subscriber:
+    Type: AWS::EventsV2::Subscriber
+    Properties:
+      Name: !Sub '${AWS::StackName}-subscriber'
+      EventBusArn: !Ref EventBus
+      FilterConfiguration:
+        Filters:
+          # Scope DATA matches the event payload. PutEvents nests your data under "detail",
+          # so this pattern matches PutEvents entries. An event published with PutRawEvents
+          # keeps orderId at the top level, is evaluated, and does not match.
+          - Scope: DATA
+            Pattern: '{"detail":{"orderId":[{"exists":true}]}}'
+      InvokeConfiguration:
+        TargetArn: !GetAtt TargetQueue.Arn
+        RoleArn: !GetAtt DeliveryRole.Arn
+      RetryPolicy:
+        # Short values so that a failed delivery reaches the dead-letter queue within about a minute.
+        # The event is attempted once plus MaxRetryAttempts times.
+        MaxRetryAttempts: 2
+        MaxEventAgeInSeconds: 60
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+      # Logging is off by default. This turns it on when the Subscriber is created.
+      LogConfiguration:
+        Level: !Ref LogLevel
+        IncludePayload: !Ref IncludePayload
+
+  # Delivery logs. The Subscriber emits records only when a delivery pairs it with a destination.
+  # The log group name must start with /aws/vendedlogs/ so that CloudWatch Logs manages its resource policy.
+  SubscriberLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/vendedlogs/${AWS::StackName}-subscriber'
+      RetentionInDays: 7
+
+  SubscriberLogSource:
+    Type: AWS::Logs::DeliverySource
+    Properties:
+      Name: !Sub '${AWS::StackName}-source'
+      ResourceArn: !GetAtt Subscriber.SubscriberArn
+      # Must match the Subscriber's log level: INFO_LOGS for INFO, ERROR_LOGS for ERROR.
+      LogType: !If [LogLevelIsInfo, INFO_LOGS, ERROR_LOGS]
+
+  SubscriberLogDestination:
+    Type: AWS::Logs::DeliveryDestination
+    Properties:
+      Name: !Sub '${AWS::StackName}-destination'
+      DestinationResourceArn: !GetAtt SubscriberLogGroup.Arn
+
+  SubscriberLogDelivery:
+    Type: AWS::Logs::Delivery
+    Properties:
+      DeliverySourceName: !Ref SubscriberLogSource
+      DeliveryDestinationArn: !GetAtt SubscriberLogDestination.Arn
+
+  # Alarms. The EventBus and Subscriber dimension values are the resource name and its generated ID
+  # ("name/id"), not the full ARN, so they are derived from the ARNs here. An alarm built on the
+  # full ARN watches a metric that does not exist and never fires.
+  PublishFailedEntriesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Entries failed inside a PutEvents or PutRawEvents call that returned HTTP 200.
+      Namespace: AWS/EventsV2
+      MetricName: PublishEventsFailedEntriesCount
+      Dimensions:
+        - Name: EventBus
+          Value: !Select [1, !Split [':event-busv2/', !Ref EventBus]]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  PublishThrottledAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Publish calls were rejected with ThrottlingException.
+      Namespace: AWS/EventsV2
+      MetricName: PublishEventsApproximateThrottledCallCount
+      Dimensions:
+        - Name: EventBus
+          Value: !Select [1, !Split [':event-busv2/', !Ref EventBus]]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  # Fires on the first failed attempt, while the event is still retrying.
+  DeliveryAttemptsFailingAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Delivery attempts exceed successful deliveries (EventDeliveryAttempts minus EventsDelivered).
+      Metrics:
+        - Id: attempts
+          ReturnData: false
+          MetricStat:
+            Metric:
+              Namespace: AWS/EventsV2
+              MetricName: EventDeliveryAttempts
+              Dimensions:
+                - Name: EventBus
+                  Value: !Select [1, !Split [':event-busv2/', !Ref EventBus]]
+                - Name: Subscriber
+                  Value: !Select [1, !Split [':subscriber/', !GetAtt Subscriber.SubscriberArn]]
+            Period: 300
+            Stat: Sum
+        - Id: delivered
+          ReturnData: false
+          MetricStat:
+            Metric:
+              Namespace: AWS/EventsV2
+              MetricName: EventsDelivered
+              Dimensions:
+                - Name: EventBus
+                  Value: !Select [1, !Split [':event-busv2/', !Ref EventBus]]
+                - Name: Subscriber
+                  Value: !Select [1, !Split [':subscriber/', !GetAtt Subscriber.SubscriberArn]]
+            Period: 300
+            Stat: Sum
+        - Id: failing
+          Label: FailedAttempts
+          Expression: attempts - delivered
+          ReturnData: true
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  DeadLetteredAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Events ran out of retries and were written to the dead-letter queue.
+      Namespace: AWS/EventsV2
+      MetricName: OnFailureDestinationDelivered
+      Dimensions:
+        - Name: EventBus
+          Value: !Select [1, !Split [':event-busv2/', !Ref EventBus]]
+        - Name: Subscriber
+          Value: !Select [1, !Split [':subscriber/', !GetAtt Subscriber.SubscriberArn]]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  # Events counted here reached neither the target nor the dead-letter queue.
+  # EventsDropped covers a Subscriber that has no dead-letter queue configured, so it is not alarmed here.
+  DeadLetterFailedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: The write to the dead-letter queue also failed.
+      Namespace: AWS/EventsV2
+      MetricName: OnFailureDestinationFailed
+      Dimensions:
+        - Name: EventBus
+          Value: !Select [1, !Split [':event-busv2/', !Ref EventBus]]
+        - Name: Subscriber
+          Value: !Select [1, !Split [':subscriber/', !GetAtt Subscriber.SubscriberArn]]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  EventBusArn:
+    Description: ARN of the new Custom event bus. Pass it to put-events.
+    Value: !Ref EventBus
+  SubscriberArn:
+    Description: ARN of the Subscriber.
+    Value: !GetAtt Subscriber.SubscriberArn
+  TargetQueueUrl:
+    Description: URL of the queue that receives delivered events.
+    Value: !Ref TargetQueue
+  TargetQueueArn:
+    Value: !GetAtt TargetQueue.Arn
+  DeadLetterQueueUrl:
+    Description: URL of the queue that receives a record for each event that could not be delivered.
+    Value: !Ref DeadLetterQueue
+  DeadLetterQueueArn:
+    Value: !GetAtt DeadLetterQueue.Arn
+  DeliveryRoleArn:
+    Value: !GetAtt DeliveryRole.Arn
+  SubscriberLogGroupName:
+    Description: Log group that receives the delivery records.
+    Value: !Ref SubscriberLogGroup
