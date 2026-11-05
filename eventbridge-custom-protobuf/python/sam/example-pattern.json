@@ -1,6 +1,6 @@
 {
   "title": "Protobuf on an Amazon EventBridge custom event bus",
-  "description": "Publishes a Protobuf-encoded event to an EventBridge custom event bus with a Glue Schema Registry and delivers the decoded JSON to a Lambda",
+  "description": "Publishes a Protobuf-encoded event to an Amazon EventBridge custom event bus with an AWS Glue Schema Registry and delivers the decoded JSON to an AWS Lambda function",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

@@ -18,16 +18,19 @@ How Protobuf decoding is wired:
     registry named **on the publish request itself** via
     `SchemaRegistryConfiguration.RegistryUri`. It is not configured on the bus.
   * The registry is read with THIS caller's credentials, so the publishing IAM
-    identity must be allowed to read the Glue registry (see README).
+    identity needs `glue:GetSchemaVersion` on the registry and its schemas
+    (see README). It is the only Glue action required: this script calls it to
+    resolve the schema-version id, and the service calls it to decode.
 
 Other rules this script follows:
   * PutRawEvents carries the payload in `Data` as RAW BYTES. Do not base64-encode
     before handing to boto3 — the SDK does the wire encoding itself.
   * `ContentType` goes inside each entry's `SystemMetadata`; for Protobuf it is
     `application/protobuf`.
-  * Custom keys go in a per-entry `Metadata` map (up to 100 keys); a METADATA
-    subscriber filter routes on these, since a DATA filter cannot see inside
-    Protobuf binary.
+  * Custom keys go in a per-entry `Metadata` map (up to 100 keys); the
+    subscriber filters on these (METADATA scope) so routing doesn't depend on
+    the payload schema. A DATA filter would also work, because the service
+    deserializes the Protobuf against the Glue registry before filtering.
   * The response is a single `Entries` list aligned by index, each carrying a
     `SuccessCode` (PUBLISHED or DEDUPLICATED) or an `ErrorCode`; also check
     `FailedEntryCount`. `DEDUPLICATED` is a success, not an error.

@@ -72,13 +72,13 @@ Key considerations:
 - **Don't base64-encode before boto3.** `PutRawEvents` `Data` is a blob; the SDK does the wire encoding.
 - **The registry is named on each `PutRawEvents` request, not on the bus.** The delivered `SystemMetadata` gains `aws:SchemaId` and `aws:RegistryType: Glue`, and the consumer needs no Protobuf library.
 - **SDK and IAM naming differ.** The AWS CLI calls the service `aws eventsv2`, boto3 calls it `eventbridgev2` (`boto3.client("eventsv2")` raises `UnknownServiceError`), and IAM actions use the `events:` prefix.
-- **Protobuf binary can't be filtered on `DATA`**, so the subscriber filters on `METADATA`. `METADATA` patterns accept only literal-scalar arrays, with no operators.
+- **Filtering.** Because EventBridge deserializes `application/protobuf` against the Glue registry before filtering, a `DATA` filter can match decoded fields by their schema names (for example `{"currency":["USD"]}`). This pattern filters on `METADATA` (`eventType`) so routing doesn't depend on the payload schema. Payloads sent as `application/octet-stream` are opaque and can only be filtered on `METADATA` or `SYSTEM_METADATA`.
 - **The Lambda function receives a batch** (a JSON array), so the handler iterates it.
 - **The schema lives in two places that must match by hand.** `template.yaml` inlines the same schema as `proto/order_placed.proto`. If you change one, change the other and re-run `scripts/generate.sh`. Glue supports proto2/proto3 but not `extensions` or `groups`.
 - **Hardening the delivery role.** The role trusts only `events.amazonaws.com` and is scoped to the specific function and queue ARNs. In a shared account, add an `aws:SourceAccount: !Ref AWS::AccountId` condition to its `lambda:InvokeFunction` and `sqs:SendMessage` statements.
 - `cfn-lint` may flag `AWS::EventsV2::*` with `E3006` if its bundled resource spec is older than the resource types. The types deploy fine.
 
-The identity that runs the publisher needs `events:PutRawEvents` on the bus plus Glue read access on the registry:
+The identity that runs the publisher needs `events:PutRawEvents` on the bus and `glue:GetSchemaVersion` on the registry and its schemas. That is the only Glue action required, and it is used twice: the publisher calls it to look up the schema-version UUID for the wire header, and EventBridge calls it with the publisher's credentials to decode the payload. Without it, the entry fails with `Access denied to schema registry`.
 
 ```json
 {
@@ -91,11 +91,7 @@ The identity that runs the publisher needs `events:PutRawEvents` on the bus plus
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "glue:GetSchemaVersion",
-        "glue:GetSchemaByDefinition",
-        "glue:GetRegistry"
-      ],
+      "Action": ["glue:GetSchemaVersion"],
       "Resource": [
         "arn:aws:glue:<region>:<account>:registry/proto-orders-registry",
         "arn:aws:glue:<region>:<account>:schema/proto-orders-registry/*"
@@ -139,10 +135,10 @@ These cover the Protobuf round trip (including the Glue wire framing), the publi
     ```bash
     sam delete
     ```
-    `sam delete` uses the stack name saved in `samconfig.toml`; pass `--stack-name <name> --region <region>` if you deployed without `--guided`. `scripts/teardown.sh [stack-name] [region]` is an equivalent wrapper.
+    `sam delete` uses the stack name saved in `samconfig.toml`; pass `--stack-name <stack-name> --region <region>` if you deployed without `--guided`. `scripts/teardown.sh [stack-name] [region]` is an equivalent wrapper.
 1. Confirm the stack has been deleted:
     ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'<stack-name>')].StackStatus"
     ```
 
 ----

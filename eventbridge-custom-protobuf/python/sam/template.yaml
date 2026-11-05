@@ -36,7 +36,7 @@ Resources:
   # Protobuf is an open format: EventBridge decodes the payload against this
   # registry when the publisher names it on the PutRawEvents request. The
   # registry is read with the PUBLISHER's own credentials, so the publisher's
-  # IAM must allow Glue reads on it (see README).
+  # IAM must allow glue:GetSchemaVersion on it (see README).
   SchemaRegistry:
     Type: AWS::Glue::Registry
     Properties:
@@ -126,7 +126,9 @@ Resources:
                 Resource: !GetAtt DeadLetterQueue.Arn
 
   # --- Subscriber ----------------------------------------------------------
-  # Filters on METADATA (Protobuf binary is opaque to a DATA filter) and uses a
+  # Filters on METADATA (eventType) so routing doesn't depend on the payload
+  # schema. A DATA filter would also work: EventBridge deserializes the
+  # Protobuf against the Glue registry before filtering. Uses a
   # WITH_METADATA transformer so the Lambda receives the
   # Data + Metadata + SystemMetadata envelope.
   OrdersSubscriber:
