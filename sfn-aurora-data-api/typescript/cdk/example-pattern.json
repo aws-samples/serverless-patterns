@@ -1,0 +1,61 @@
+{
+  "title": "AWS Step Functions to Amazon Aurora Serverless v2 with Amazon RDS Data API transactions",
+  "description": "An AWS Step Functions workflow runs a multi-statement SQL transaction on Amazon Aurora Serverless v2 through the Amazon RDS Data API and rolls it back on failure.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An AWS Step Functions state machine opens a transaction with the Amazon RDS Data API, runs three SQL statements (insert an order, decrement stock with a guard, insert an audit row) with the same transaction id, and commits.",
+      "A statement error, or zero updated rows, calls RollbackTransaction and ends the execution in a Fail state, so none of the statements stay visible in the Amazon Aurora Serverless v2 database. No AWS Lambda function is in the request path."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/sfn-aurora-data-api-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "BeginTransaction in the Amazon RDS Data API reference",
+        "link": "https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_BeginTransaction.html"
+      },
+      {
+        "text": "Using the Amazon RDS Data API",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html"
+      },
+      {
+        "text": "AWS SDK integrations in AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
