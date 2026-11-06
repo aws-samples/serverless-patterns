@@ -43,12 +43,23 @@ Resources:
         # The bus keeps events for this long. A Subscriber that starts from a point in time can only
         # read back to the start of this window, which begins when the bus is created.
         RetentionPeriodInDays: 1
+      # For production workloads, encrypt retained events with a customer managed AWS KMS key
+      # so that you control key rotation and access. Use the key ARN for accurate drift detection:
+      # EncryptionConfiguration:
+      #   KmsKeyIdentifier: arn:aws:kms:REGION:ACCOUNT_ID:key/KEY_ID
 
+  # Both queues use server-side encryption with SQS managed keys (SSE-SQS). For production
+  # workloads, use KmsMasterKeyId with a customer managed AWS KMS key instead, and allow the
+  # delivery role kms:GenerateDataKey and kms:Decrypt on that key.
   TargetQueue:
     Type: AWS::SQS::Queue
+    Properties:
+      SqsManagedSseEnabled: true
 
   DeadLetterQueue:
     Type: AWS::SQS::Queue
+    Properties:
+      SqsManagedSseEnabled: true
 
   # EventBridge assumes this role to deliver to the queues.
   DeliveryRole:
@@ -61,10 +72,13 @@ Resources:
             Principal:
               Service: events.amazonaws.com
             Action: sts:AssumeRole
-            # Prevents another account's resources from using this role (confused deputy).
+            # Prevents other accounts' resources (confused deputy) and anything other than
+            # a Subscriber in this account and Region from using this role.
             Condition:
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:subscriber/*'
       Policies:
         - PolicyName: DeliverToQueues
           PolicyDocument:
@@ -116,6 +130,8 @@ Resources:
     Properties:
       LogGroupName: !Sub '/aws/vendedlogs/${AWS::StackName}-subscriber'
       RetentionInDays: 7
+      # For production workloads, especially with IncludePayload set to FULL, encrypt the log group
+      # with a customer managed AWS KMS key (KmsKeyId) whose key policy allows CloudWatch Logs to use it.
 
   SubscriberLogSource:
     Type: AWS::Logs::DeliverySource
@@ -137,7 +153,9 @@ Resources:
       DeliverySourceName: !Ref SubscriberLogSource
       DeliveryDestinationArn: !GetAtt SubscriberLogDestination.Arn
 
-  # Alarms. The EventBus and Subscriber dimension values are the resource name and its generated ID
+  # Alarms. They have no actions, so they change state without notifying anyone. For production
+  # workloads, add an Amazon SNS topic (or another target) to AlarmActions on each alarm.
+  # The EventBus and Subscriber dimension values are the resource name and its generated ID
   # ("name/id"), not the full ARN, so they are derived from the ARNs here. An alarm built on the
   # full ARN watches a metric that does not exist and never fires.
   PublishFailedEntriesAlarm:
@@ -172,7 +190,10 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       TreatMissingData: notBreaching
 
-  # Fires on the first failed attempt, while the event is still retrying.
+  # Fires on the first failed attempt, while the event is still retrying. This early warning can be
+  # noisy: an attempt that fails and then succeeds on retry also trips it. For production workloads,
+  # alarm on terminal failures (DeadLetteredAlarm, DeadLetterFailedAlarm) or raise EvaluationPeriods
+  # and DatapointsToAlarm so that a single recovered retry doesn't trip it.
   DeliveryAttemptsFailingAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:

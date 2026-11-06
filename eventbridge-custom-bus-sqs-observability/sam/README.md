@@ -42,7 +42,8 @@ The template creates the following resources:
 
 * **A new Custom event bus** that keeps events for one day. A Subscriber can start from a point in time only within this retention window, which begins when the bus is created.
 * **A Subscriber** that filters events with `orderId` under `detail`, delivers them to the target queue, retries a failed delivery twice, and then writes a record to the dead-letter queue. The filter uses the `DATA` scope. `PutEvents` nests your data under `detail`, so the filter matches it. An event published with `PutRawEvents` keeps its fields at the top level, so the Subscriber evaluates it and does not match it.
-* **A delivery role** that EventBridge assumes to call `sqs:SendMessage` on the target queue and on the dead-letter queue. The trust policy is limited to your account. Without the grant on the dead-letter queue, a failed delivery cannot be recorded there.
+* **Two Amazon SQS queues**, the target queue and the dead-letter queue, both with server-side encryption using SQS managed keys (SSE-SQS).
+* **A delivery role** that EventBridge assumes to call `sqs:SendMessage` on the target queue and on the dead-letter queue. The trust policy allows only Subscribers in your account and Region to assume the role, with `aws:SourceAccount` and `aws:SourceArn` conditions. Without the grant on the dead-letter queue, a failed delivery cannot be recorded there.
 * **Delivery logs.** Subscriber logging is off by default. A record reaches you only when two settings both exist: the Subscriber's log level, and a CloudWatch Logs delivery that connects the Subscriber to a destination. The template sets both when it creates the Subscriber, so you do not need to turn logging on separately. It creates a log group, a delivery source, a delivery destination and the delivery. The log group name starts with `/aws/vendedlogs/`, which lets CloudWatch Logs manage its resource policy.
 * **Five alarms** on publish failures, publish throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to the dead-letter queue. The alarms use the CloudWatch metrics that EventBridge publishes for every bus and Subscriber, so you do not need to turn the metrics on. The CLI and the CloudWatch console list them under the `AWS/EventsV2` namespace. The `EventBus` and `Subscriber` dimension values are the resource name plus its generated ID (for example `my-stack-bus/abc123`), not the full ARN, and the template derives them from the ARNs. The alarms have no actions. Add an Amazon SNS topic as an alarm action to be notified.
 
@@ -63,7 +64,7 @@ A few behaviors to know before you rely on the logs:
 * With `IncludePayload=ON_ERROR_ONLY`, failure records contain the event payload and success records do not. `FULL` copies every event body into the log group, where anyone who can read the group can read it. Use `FULL` only while you debug.
 * The dead-letter queue does not receive the event. It receives a record with the event ID, the error code and the retry count. To get the event back, replay it from the bus.
 
-For production, also consider encrypting the log group with an AWS KMS key, adding alarm actions, and sizing the retry policy and bus retention for your workload. This pattern uses short values so that failures appear within minutes.
+For production workloads, consider encrypting the bus, the queues, and the log group with a customer managed AWS KMS key, adding alarm actions, and sizing the retry policy and bus retention for your workload. The failed-attempts alarm fires on the first failed attempt, even one that later succeeds on retry, so for production you might alarm on terminal failures only or require more datapoints. The template has comments that show where each change goes. This pattern uses short values so that failures appear within minutes.
 
 ## Testing
 
@@ -160,7 +161,7 @@ For production, also consider encrypting the log group with an AWS KMS key, addi
     ```
     After a minute, the event is in the target queue. To replay more than one event, add more IDs to the `aws:EventId` list.
 
-    Two limits apply to a replay. You can replay only events that are still within the bus retention window, which is one day in this template, so recover failed events before they expire or raise the retention. A replay also delivers the event again, so a target that is not idempotent can process it twice. Make the consumer idempotent, for example by keying on the event ID, before you rely on replay in production.
+    Two limits apply to a replay. You can replay only events that are still within the bus retention window, which is one day in this template, so recover failed events before they expire or raise the retention. A replay also delivers the event again, so a target that is not idempotent can process it twice. Make the consumer idempotent before you rely on replay in production. The delivered message's `id` field is not the event ID from `put-events`, but it stays the same when the event is replayed, so it works as a deduplication key.
 
 ## Cleanup
 
