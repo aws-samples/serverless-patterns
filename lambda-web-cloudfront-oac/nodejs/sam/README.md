@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * Latest [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js](https://nodejs.org/) 24 or later installed (matches the `nodejs24.x` runtime)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed, **version 1.171.0 or later** (`sam --version`).
 
 ## Deployment Instructions
 
@@ -26,47 +26,25 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/lambda-web-cloudfront-oac/nodejs/sam
     ```
-1. Create the code bucket (one time per account and Region). `AWS::Lambda::WebFunctionRevision` requires a **versioning-enabled** bucket, and the bucket policy must let the Lambda service read the code:
+1. Build the application. `CodeUri` is the local `src/` directory, so the AWS SAM CLI packages it for you:
     ```bash
     export AWS_REGION=us-east-1
-    export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    export BUCKET=lambda-web-sam-$ACCOUNT_ID-$AWS_REGION
-
-    aws s3 mb s3://$BUCKET --region $AWS_REGION
-    aws s3api put-bucket-versioning --bucket $BUCKET \
-      --versioning-configuration Status=Enabled --region $AWS_REGION
-    aws s3api put-bucket-policy --bucket $BUCKET --region $AWS_REGION --policy "{
-      \"Version\": \"2012-10-17\",
-      \"Statement\": [{
-        \"Effect\": \"Allow\",
-        \"Principal\": {\"Service\": \"lambda.amazonaws.com\"},
-        \"Action\": [\"s3:GetObject\", \"s3:GetObjectVersion\"],
-        \"Resource\": \"arn:aws:s3:::$BUCKET/*\",
-        \"Condition\": {\"StringEquals\": {\"aws:SourceAccount\": \"$ACCOUNT_ID\"}}
-      }]
-    }"
+    sam build
     ```
-1. Package the application and upload it. The runtime loads `index.js` from the root of the zip; this app has no dependencies, so there is no `node_modules` to bundle:
-    ```bash
-    (cd src && zip -r ../function.zip index.js package.json)
-    aws s3 cp function.zip s3://$BUCKET/lambda-web-cloudfront-oac-sam/function.zip --region $AWS_REGION
-    ```
-1. Deploy the stack, passing the bucket and key of the uploaded code. The same bucket also holds the packaged template, so SAM does not need to create a managed bucket of its own:
+1. Deploy the stack:
     ```bash
     sam deploy \
       --stack-name lambda-web-cloudfront-oac-sam \
       --capabilities CAPABILITY_IAM \
       --region $AWS_REGION \
-      --s3-bucket $BUCKET \
-      --s3-prefix lambda-web-cloudfront-oac-sam/sam-artifacts \
-      --parameter-overrides \
-        CodeBucket=$BUCKET \
-        CodeKey=lambda-web-cloudfront-oac-sam/function.zip
+      --resolve-s3
     ```
+    The AWS SAM CLI uploads the Web Function code to a bucket it creates in a separate `lambda-web-cloudfront-oac-sam-<hash>-WebFunctionCode` stack. That bucket is versioning-enabled and carries a policy letting `lambda.amazonaws.com` read the code, which `AWS::Lambda::WebFunctionRevision` requires. The packaged template imports the bucket name, so CloudFormation will not delete the bucket while a revision still reads from it.
+
     The stack takes about 4 minutes, most of it waiting for the CloudFront distribution to deploy. Once you have run `sam deploy` once and saved arguments to a configuration file (`samconfig.toml`), you can use `sam deploy` in future to use these defaults.
 1. Note the `CloudFrontUrl` and `OriginUrl` outputs. From the moment the endpoint exists it only accepts signed requests; it is never public.
 
-To deploy a code change, upload the zip under a **new key** (for example `function-v2.zip`) and deploy again with the new `CodeKey`. CloudFormation creates a new revision, moves the endpoint to it and deletes the old one; the endpoint keeps its domain, its `IamAuth` setting and its resource policy, so nothing changes on the CloudFront side.
+To deploy a code change, run `sam build && sam deploy` again. Each upload pins a new object version in the code bucket, so CloudFormation creates a new revision, moves the endpoint to it and deletes the old one; the endpoint keeps its domain, its `IamAuth` setting and its resource policy, so nothing changes on the CloudFront side.
 
 ## How it works
 
@@ -190,16 +168,6 @@ aws logs tail /aws/lambda/web/lambda-web-cloudfront-oac-sam --region $AWS_REGION
     ```bash
     aws logs delete-log-group --log-group-name /aws/lambda/web/lambda-web-cloudfront-oac-sam --region $AWS_REGION
     aws logs delete-log-group --log-group-name /aws/lambda/web/lambda-web-cloudfront-oac-sam.local --region $AWS_REGION
-    ```
-1. Empty and delete the code bucket. Versioning is enabled, so every object version and delete marker must be removed first:
-    ```bash
-    aws s3api list-object-versions --bucket $BUCKET --region $AWS_REGION \
-      --query '[Versions,DeleteMarkers][][].[Key,VersionId]' --output text \
-      | while read -r key version; do
-          aws s3api delete-object --bucket $BUCKET --region $AWS_REGION \
-            --key "$key" --version-id "$version"
-        done
-    aws s3 rb s3://$BUCKET --region $AWS_REGION
     ```
 
 ----
