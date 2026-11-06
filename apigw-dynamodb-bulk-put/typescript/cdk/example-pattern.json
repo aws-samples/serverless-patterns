@@ -8,7 +8,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "An Amazon API Gateway REST API with AWS Identity and Access Management (IAM) authorization calls the Amazon DynamoDB StartBulkPutItems and DescribeBulkOperation APIs directly, through an AWS service integration and mapping templates. POST /operations starts a bulk put of the data files under an Amazon S3 prefix into a table, and GET /operations/{operationId} returns the status.",
+      "An Amazon API Gateway REST API with AWS Identity and Access Management (IAM) authorization calls the Amazon DynamoDB `StartBulkPutItems` and `DescribeBulkOperation` APIs directly, through an AWS service integration and mapping templates. `POST /operations` starts a bulk put of the data files under an Amazon S3 prefix into a table, and `GET /operations/{operationId}` returns the status.",
       "A record in the input file can carry its own condition expression. DynamoDB skips a record whose condition fails and lists it in a report in the S3 bucket. No AWS Lambda function is in the request path."
     ]
   },
