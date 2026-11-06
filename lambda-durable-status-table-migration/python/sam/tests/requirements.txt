@@ -1,0 +1,3 @@
+-r ../after/requirements.txt
+aws-durable-execution-sdk-python-testing>=1.4.0
+pytest>=8.0
