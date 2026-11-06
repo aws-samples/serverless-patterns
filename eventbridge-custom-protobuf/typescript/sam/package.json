@@ -1,0 +1,26 @@
+{
+  "name": "eventbridge-custom-protobuf-sam-typescript",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Protobuf on an EventBridge custom event bus with a Glue Schema Registry (TypeScript).",
+  "license": "MIT-0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "publish-event": "tsx publisher/publish.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-eventbridgev2": "^3.1141.0",
+    "@aws-sdk/client-glue": "^3.1141.0",
+    "protobufjs": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.9.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^5.0.2"
+  }
+}

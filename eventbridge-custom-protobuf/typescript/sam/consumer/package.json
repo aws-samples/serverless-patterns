@@ -1,0 +1,11 @@
+{
+  "name": "eventbridge-custom-protobuf-consumer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Consumer Lambda (TypeScript) for the Protobuf-on-EventBridge sample. EventBridge decodes the Protobuf server-side, so the consumer needs no Protobuf library.",
+  "license": "MIT-0",
+  "type": "module",
+  "dependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
