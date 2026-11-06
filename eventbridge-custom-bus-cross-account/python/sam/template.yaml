@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Cross-account Amazon EventBridge custom event bus sharing with AWS RAM. Deploy this one
+  template once per account. Role=Owner creates the custom event bus and shares it via AWS RAM.
+  Role=Consumer creates a Lambda target, an SQS dead-letter queue, the delivery role, and the
+  subscriber on the shared bus. Publish with the AWS CLI; verify in the consumer Lambda's logs.
+
+Parameters:
+  Role:
+    Type: String
+    AllowedValues: [Owner, Consumer]
+    Description: Which half of the pattern this deployment creates.
+  EventBusName:
+    Type: String
+    Default: cross-account-orders
+    Description: (Owner) Name of the custom event bus to create.
+  RetentionInDays:
+    Type: Number
+    Default: 7
+    MinValue: 1
+    MaxValue: 365
+    Description: (Owner) Number of days to retain events on the bus (1-365).
+  SharePrincipal:
+    Type: String
+    Default: ''
+    Description: >
+      (Owner) Principal to share with: a 12-digit account ID, or an AWS Organizations
+      Organization/OU ARN (arn:aws:organizations::<MGMT_ACCOUNT_ID>:ou/o-xxxx/ou-xxxx).
+  SharedBusArn:
+    Type: String
+    Default: ''
+    Description: (Consumer) ARN of the shared custom event bus (BusArn output of the Owner deploy).
+
+Conditions:
+  IsOwner: !Equals [!Ref Role, Owner]
+  IsConsumer: !Equals [!Ref Role, Consumer]
+
+Resources:
+
+  # ---------------- Owner account ----------------
+  CustomEventBus:
+    Type: AWS::EventsV2::EventBus
+    Condition: IsOwner
+    Properties:
+      Name: !Ref EventBusName
+      Description: Cross-account custom event bus shared via AWS RAM
+      StorageConfiguration:
+        RetentionPeriodInDays: !Ref RetentionInDays
+
+  BusShare:
+    Type: AWS::RAM::ResourceShare
+    Condition: IsOwner
+    Properties:
+      Name: !Sub '${EventBusName}-share'
+      ResourceArns:
+        - !Ref CustomEventBus
+      Principals:
+        - !Ref SharePrincipal
+      PermissionArns:
+        - !Sub 'arn:${AWS::Partition}:ram::aws:permission/AWSRAMEventBridgeEventBusV2SubscribeOnly'
+      # false = share within your AWS Organization (RAM org sharing must be enabled from the
+      # management account). Set true to share with an account outside your org (consumer accepts the invite).
+      AllowExternalPrincipals: false
+
+  # ---------------- Consumer account ----------------
+  ConsumerFunction:
+    Type: AWS::Serverless::Function
+    Condition: IsConsumer
+    Properties:
+      Runtime: python3.12
+      Handler: index.handler
+      Timeout: 30
+      InlineCode: |
+        import json
+        def handler(event, context):
+            print("Received event:", json.dumps(event))
+            return {"ok": True}
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Condition: IsConsumer
+
+  DeliveryRole:
+    Type: AWS::IAM::Role
+    Condition: IsConsumer
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DeliverToTargetAndDLQ
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt ConsumerFunction.Arn
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeadLetterQueue.Arn
+
+  Subscriber:
+    Type: AWS::EventsV2::Subscriber
+    Condition: IsConsumer
+    Properties:
+      Name: cross-account-consumer
+      EventBusArn: !Ref SharedBusArn
+      # No FilterConfiguration = receive every event on the bus. Add a Filters list to narrow.
+      InvokeConfiguration:
+        TargetArn: !GetAtt ConsumerFunction.Arn
+        RoleArn: !GetAtt DeliveryRole.Arn
+      RetryPolicy:
+        MaxRetryAttempts: 5
+        MaxEventAgeInSeconds: 300
+      OnFailureConfiguration:
+        Arn: !GetAtt DeadLetterQueue.Arn
+
+Outputs:
+  BusArn:
+    Condition: IsOwner
+    Description: ARN of the custom event bus. Pass as SharedBusArn to the Consumer deploy.
+    Value: !Ref CustomEventBus
+  ConsumerFunctionName:
+    Condition: IsConsumer
+    Description: Consumer Lambda function. Check its CloudWatch logs to verify delivery.
+    Value: !Ref ConsumerFunction
+  SubscriberArn:
+    Condition: IsConsumer
+    Description: ARN of the subscriber created on the shared bus.
+    Value: !GetAtt Subscriber.SubscriberArn
