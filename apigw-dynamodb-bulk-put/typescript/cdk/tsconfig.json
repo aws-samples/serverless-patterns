@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"commonjs","lib":["es2022"],"declaration":true,"strict":true,"noImplicitAny":true,"noImplicitReturns":true,"inlineSourceMap":true,"inlineSources":true,"experimentalDecorators":true,"strictPropertyInitialization":false,"outDir":"./build","rootDir":".","skipLibCheck":true},"exclude":["node_modules","cdk.out","build"]}
