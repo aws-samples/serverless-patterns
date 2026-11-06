@@ -8,9 +8,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an AWS Lambda MicroVM with the Codex CLI installed into the image. The MicroVM is launched with the SHELL_INGRESS network connector, so you connect over an interactive shell and run codex directly inside the isolated Firecracker VM.",
-      "Codex uses its built-in amazon-bedrock model provider, so inference runs on Amazon Bedrock with credentials supplied at runtime by the MicroVM execution role. No API keys are stored in the image. Codex is also connected to the AWS MCP Server from the Agent Toolkit for AWS through the MCP Proxy for AWS, which signs requests with the same execution-role credentials, so it can make live AWS API calls, search AWS documentation, and retrieve AWS skills. Access to AWS is read-only, enforced by IAM.",
-      "The image is Region-agnostic: the model, MCP endpoint, and Region are rendered into the Codex configuration at runtime from the MicroVM environment. The MicroVM suspends when idle, resumes on demand, and has a hard maximum lifetime, so treat it as disposable.",
+      "This pattern deploys an AWS Lambda MicroVM with the Codex CLI baked into the image. The MicroVM is launched with the `SHELL_INGRESS` network connector, so you connect over an interactive shell and run `codex` directly inside the isolated Firecracker VM.",
+      "Codex uses its built-in `amazon-bedrock` model provider, so inference runs on Amazon Bedrock with credentials supplied at runtime by the MicroVM execution role. There is no ChatGPT sign-in, no `OPENAI_API_KEY`, and no Amazon Bedrock API key stored in the image. Codex is also wired to the AWS MCP Server from the Agent Toolkit for AWS through the MCP Proxy for AWS, which signs each request with AWS Signature Version 4 (SigV4) using the same execution-role credentials, so it can make live AWS API calls, search AWS documentation, and retrieve AWS skills. Access is read-only, enforced by AWS Identity and Access Management (IAM).",
+      "The image is Region-agnostic: `src/app.py` renders the model, MCP endpoint, and Region into the Codex configuration at runtime from the MicroVM environment, at startup and on every run and resume. The MicroVM suspends when idle, resumes on demand, and has a hard maximum lifetime, so treat it as disposable.",
       "See the README in the GitHub repository for deployment steps, design notes, and troubleshooting."
     ]
   },
@@ -57,17 +57,21 @@
   },
   "deploy": {
     "text": [
-      "<code>./deploy.sh</code>"
+      "export AWS_REGION=\"us-east-2\"",
+      "./deploy.sh"
     ]
   },
   "testing": {
     "text": [
+      "Connect to the MicroVM over an interactive shell: <code>./connect.sh &lt;microvm-id&gt; $AWS_REGION</code>",
+      "Inside the shell, confirm Codex and run a completion: <code>codex --version</code> then <code>codex exec \"Say hello in one word\"</code>",
+      "Exercise the AWS MCP Server: <code>codex exec \"search the AWS documentation for Lambda MicroVMs idle policy\"</code>",
       "See the GitHub repo for detailed testing instructions."
     ]
   },
   "cleanup": {
     "text": [
-      "<code>./cleanup.sh</code>"
+      "<code>MICROVM_ID=\"&lt;microvm-id&gt;\" AWS_REGION=\"$AWS_REGION\" ./cleanup.sh</code>"
     ]
   },
   "authors": [
