@@ -1,6 +1,6 @@
 {
   "title": "Remote MCP server with an IAM-protected backend API on AWS Lambda Web Functions",
-  "description": "Run a remote MCP server as an AWS Lambda Web Function that calls an existing HTTP API on a second Web Function, protected with IamAuth and SigV4.",
+  "description": "API backend on AWS Lambda: run a remote MCP server as an AWS Lambda Web Function that calls an existing HTTP API on a second Web Function, protected with IamAuth and SigV4.",
   "language": "Node.js",
   "level": "300",
   "highlight": "true",

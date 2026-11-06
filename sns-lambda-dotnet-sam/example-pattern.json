@@ -1,6 +1,6 @@
 {
   "title": "Process Amazon SNS notification messages with AWS Lambda (.NET)",
-  "description": "This pattern shows how to process Amazon SNS messages using AWS Lambda.",
+  "description": "Event-driven processing in .NET: this pattern shows how to process Amazon SNS messages using AWS Lambda.",
   "language": ".NET",
   "level": "200",
   "framework": "AWS SAM",

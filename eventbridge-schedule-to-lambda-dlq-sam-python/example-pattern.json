@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge Scheduler to AWS Lambda with Dual Dead Letter Queues",
-  "description": "Creates an EventBridge schedule to invoke a Lambda function with dual DLQs for comprehensive failure handling",
+  "description": "Scheduled tasks with failure handling: an EventBridge schedule invokes a Lambda function on a recurring schedule, with dual DLQs for failed runs.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

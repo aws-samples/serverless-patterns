@@ -1,6 +1,6 @@
 {
   "title": "Function chaining with AWS Lambda durable functions",
-  "description": "Demonstrates the function chaining pattern using Lambda durable functions with automatic checkpointing and fault-tolerant sequential execution",
+  "description": "Durable multi-step workflow: the function chaining pattern using Lambda durable functions with automatic checkpointing and fault-tolerant sequential execution.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

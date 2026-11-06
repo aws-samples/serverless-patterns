@@ -1,6 +1,6 @@
 {
   "title": "Express.js CRUD API on AWS Lambda Web Functions with Amazon DynamoDB",
-  "description": "Run an unmodified Express.js REST API as a Lambda Web Function that reads and writes items in an Amazon DynamoDB table, using AWS SAM.",
+  "description": "Web app or API backend on AWS Lambda: run an unmodified Express.js REST API as a Lambda Web Function that reads and writes items in an Amazon DynamoDB table, using AWS SAM.",
   "language": "Node.js",
   "level": "200",
   "highlight": "true",

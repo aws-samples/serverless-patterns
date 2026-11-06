@@ -1,6 +1,6 @@
 {
   "title": "Hello World AWS Lambda and Amazon API Gateway REST API",
-  "description": "Create a simple Lambda function connected to a REST API.",
+  "description": "API backend on AWS Lambda in Python: create a simple Lambda function connected to an Amazon API Gateway REST API.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
