@@ -10,7 +10,7 @@
       "This pattern uses the enhanced custom event bus in Amazon EventBridge (the AWS::EventsV2 service) to deliver ordered events to an Amazon SQS FIFO queue. Unlike classic EventBridge, there are no rules or targets: a single Subscriber resource bundles the event filter, the target, the retry policy, and the dead-letter destination.",
       "The Subscriber is created with Type FIFO, so EventBridge preserves order within an event group (events are grouped by the publisher's EventGroupId at publish time). The subscriber sets the SQS MessageGroupId from the EventGroupId, so each event group becomes its own ordered group in the queue, and sets the SQS MessageDeduplicationId to the bus-assigned event id (aws:EventId), which is unique per accepted event and stable across retries.",
       "Delivery uses an IAM role that EventBridge assumes to call sqs:SendMessage on both the target queue and the dead-letter queue, replacing the queue resource policy used in classic EventBridge. Events that exhaust the retry policy go to a FIFO dead-letter queue, where EventBridge keeps each group's failure records in order.",
-      "This pattern deploys one enhanced custom event bus with 14-day retention, one FIFO subscriber with a filter and retry policy, one SQS FIFO target queue, one SQS FIFO dead-letter queue, the IAM delivery role, and a CloudWatch Logs vended-log delivery for the subscriber."
+      "This pattern deploys one enhanced custom event bus with 14-day retention, one FIFO subscriber with a filter and retry policy, one SQS FIFO target queue, one SQS FIFO dead-letter queue, the IAM delivery role, and an Amazon CloudWatch Logs vended-log delivery for the subscriber."
     ]
   },
   "gitHub": {

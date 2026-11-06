@@ -7,6 +7,20 @@ Description: >
   (AWS::EventsV2) to an Amazon SQS FIFO queue, using a FIFO Subscriber and an
   IAM delivery role.
 
+Parameters:
+  # A failing event blocks later events in its group while it is retried, and
+  # reaches the DLQ only after these limits. Lower them to test the DLQ quickly.
+  MaxRetryAttempts:
+    Type: Number
+    Default: 10
+    MinValue: 0
+    MaxValue: 185
+  MaxEventAgeInSeconds:
+    Type: Number
+    Default: 3600
+    MinValue: 60
+    MaxValue: 86400
+
 Resources:
 
   # Retention enables replay. It matches the DLQ's 14 days, because a DLQ record
@@ -86,8 +100,8 @@ Resources:
           # group, but SQS deduplicates across the whole queue.
           MessageDeduplicationId: '{% $events.SystemMetadata."aws:EventId" %}'
       RetryPolicy:
-        MaxRetryAttempts: 10
-        MaxEventAgeInSeconds: 3600
+        MaxRetryAttempts: !Ref MaxRetryAttempts
+        MaxEventAgeInSeconds: !Ref MaxEventAgeInSeconds
       OnFailureConfiguration:
         Arn: !GetAtt DeliveryDLQ.Arn
       LogConfiguration:
@@ -95,7 +109,7 @@ Resources:
         IncludePayload: ON_ERROR_ONLY   # FULL logs every event body; use it only while debugging
 
   # Subscriber delivery logs. The log group name must start with /aws/vendedlogs/
-  # for CloudWatch Logs to manage its resource policy.
+  # for Amazon CloudWatch Logs to manage its resource policy.
   SubscriberLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -137,6 +151,9 @@ Outputs:
   DeliveryDLQUrl:
     Description: URL of the delivery dead-letter queue
     Value: !Ref DeliveryDLQ
+  DeliveryRoleArn:
+    Description: ARN of the IAM role EventBridge assumes to deliver to SQS
+    Value: !GetAtt DeliveryRole.Arn
   SubscriberLogGroup:
-    Description: CloudWatch Logs group receiving subscriber delivery logs
+    Description: Amazon CloudWatch Logs log group receiving subscriber delivery logs
     Value: !Ref SubscriberLogGroup
