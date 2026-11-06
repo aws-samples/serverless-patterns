@@ -1,0 +1,61 @@
+{
+  "title": "Amazon EventBridge Custom Event Bus to AWS Lambda with ordered, synchronous delivery",
+  "description": "Process events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge Custom Event Bus.",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how an Amazon EventBridge Custom Event Bus (the eventsv2 API) processes events in order by invoking an AWS Lambda function synchronously (InvocationType REQUEST_RESPONSE) from a FIFO subscriber.",
+      "The publisher sends a sequence of OrderPlaced events that share one EventGroupId, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer Lambda function synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the Amazon CloudWatch log shows the sequence handled in order. Because the bus waits for the function to confirm each delivery, you get reliable, back-pressured processing without placing an Amazon SQS queue between the bus and the function.",
+      "This deploys one EventBridge Custom Event Bus, one FIFO subscriber configured for synchronous invocation, one Java 21 Lambda function, an SQS dead-letter queue, and the delivery role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Subscribing to events on a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-subscribers.html"
+      },
+      {
+        "text": "Ordering and deduplicating events on a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-ordering.html"
+      },
+      {
+        "text": "Lambda function target",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-target-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided --capabilities CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}
