@@ -1,0 +1,109 @@
+<mxfile host="drawio" type="device">
+  <diagram id="eb-custom-bus-sqs-observability" name="Architecture">
+    <mxGraphModel dx="1100" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="560" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- AWS Cloud boundary -->
+        <mxCell id="cloud" value="AWS Cloud" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=0;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#232F3E;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="20" width="800" height="520" as="geometry" />
+        </mxCell>
+
+        <!-- Amazon EventBridge group -->
+        <mxCell id="ebGroup" value="Amazon EventBridge" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;strokeColor=#E7157B;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontStyle=1;fontColor=#E7157B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="210" y="55" width="420" height="290" as="geometry" />
+        </mxCell>
+
+        <!-- Amazon CloudWatch group -->
+        <mxCell id="cwGroup" value="Amazon CloudWatch" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;strokeColor=#E7157B;verticalAlign=bottom;align=left;spacingLeft=10;spacingBottom=2;fontStyle=1;fontColor=#E7157B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="210" y="385" width="420" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- Publisher -->
+        <mxCell id="publisher" value="Publisher" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.client;" vertex="1" parent="1">
+          <mxGeometry x="50" y="221" width="60" height="58" as="geometry" />
+        </mxCell>
+
+        <!-- New Custom event bus -->
+        <mxCell id="bus" value="New Custom&lt;br&gt;event bus" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eventbridge;" vertex="1" parent="1">
+          <mxGeometry x="250" y="211" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- Subscriber -->
+        <mxCell id="subscriber" value="&lt;b&gt;Subscriber&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FCE4EF;strokeColor=#E7157B;fontColor=#232F3E;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="450" y="225" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Replay Subscriber (optional) -->
+        <mxCell id="replay" value="&lt;b&gt;Replay Subscriber&lt;/b&gt;&lt;br&gt;(optional)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E7157B;dashed=1;fontColor=#232F3E;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="450" y="95" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Target queue -->
+        <mxCell id="target" value="Target queue" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;" vertex="1" parent="1">
+          <mxGeometry x="820" y="211" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- Dead-letter queue -->
+        <mxCell id="dlq" value="Dead-letter queue" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;" vertex="1" parent="1">
+          <mxGeometry x="820" y="391" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- CloudWatch alarms -->
+        <mxCell id="alarms" value="Alarms" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.alarm;" vertex="1" parent="1">
+          <mxGeometry x="259" y="415" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- CloudWatch Logs -->
+        <mxCell id="logs" value="Delivery logs" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.logs;" vertex="1" parent="1">
+          <mxGeometry x="490" y="415" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 1 Publish -->
+        <mxCell id="e1" value="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="publisher" target="bus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- bus to Subscriber -->
+        <mxCell id="e2a" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="bus" target="subscriber">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 2 Deliver -->
+        <mxCell id="e2" value="2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="subscriber" target="target">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 3 Handle failures -->
+        <mxCell id="e3" value="3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="subscriber" target="dlq">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="268" />
+              <mxPoint x="700" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 4 Observe: delivery records -->
+        <mxCell id="e4a" value="4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="subscriber" target="logs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 4 Observe: metrics -->
+        <mxCell id="e4b" value="4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=0.188;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ebGroup" target="alarms">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 5 Recover: replay -->
+        <mxCell id="e5" value="5" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;dashed=1;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="bus" target="replay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e5b" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;dashed=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="replay" target="target">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
