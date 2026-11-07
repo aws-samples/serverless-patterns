@@ -38,33 +38,23 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The template creates the following resources:
+![Architecture: a publisher sends events to the new Custom event bus, a Subscriber delivers them to the target queue or the dead-letter queue, and CloudWatch receives delivery logs and metrics](architecture.png)
 
-* **A new Custom event bus** that keeps events for one day. A Subscriber can start from a point in time only within this retention window, which begins when the bus is created.
-* **A Subscriber** that filters events with `orderId` under `detail`, delivers them to the target queue, retries a failed delivery twice, and then writes a record to the dead-letter queue. The filter uses the `DATA` scope. `PutEvents` nests your data under `detail`, so the filter matches it. An event published with `PutRawEvents` keeps its fields at the top level, so the Subscriber evaluates it and does not match it.
-* **Two Amazon SQS queues**, the target queue and the dead-letter queue, both with server-side encryption using SQS managed keys (SSE-SQS).
-* **A delivery role** that EventBridge assumes to call `sqs:SendMessage` on the target queue and on the dead-letter queue. The trust policy allows only Subscribers in your account and Region to assume the role, with `aws:SourceAccount` and `aws:SourceArn` conditions. Without the grant on the dead-letter queue, a failed delivery cannot be recorded there.
-* **Delivery logs.** Subscriber logging is off by default. A record reaches you only when two settings both exist: the Subscriber's log level, and a CloudWatch Logs delivery that connects the Subscriber to a destination. The template sets both when it creates the Subscriber, so you do not need to turn logging on separately. It creates a log group, a delivery source, a delivery destination and the delivery. The log group name starts with `/aws/vendedlogs/`, which lets CloudWatch Logs manage its resource policy.
-* **Five alarms** on publish failures, publish throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to the dead-letter queue. The alarms use the CloudWatch metrics that EventBridge publishes for every bus and Subscriber, so you do not need to turn the metrics on. The CLI and the CloudWatch console list them under the `AWS/EventsV2` namespace. The `EventBus` and `Subscriber` dimension values are the resource name plus its generated ID (for example `my-stack-bus/abc123`), not the full ARN, and the template derives them from the ARNs. The alarms have no actions. Add an Amazon SNS topic as an alarm action to be notified.
+1. **Publish.** A publisher calls `put-events`. The new Custom event bus stores each event for one day, which is also the replay window.
+1. **Deliver.** The Subscriber matches events that have `detail.orderId`, assumes the delivery role, and sends them to the target queue.
+1. **Handle failures.** If the first attempt and both retries fail, the Subscriber writes a failure record to the dead-letter queue. The record holds the event ID, error code and retry count, not the event itself.
+1. **Observe.** The Subscriber writes a delivery record for every attempt to CloudWatch Logs. EventBridge publishes metrics in the `AWS/EventsV2` namespace, and five alarms watch publish failures, throttling, failed attempts, dead-lettered events, and failed dead-letter writes.
+1. **Recover.** To get a failed event back, create a replay Subscriber that reads from the bus at a point in time and filters on the event ID. The Testing section walks through it.
 
-What each source of telemetry tells you:
+### Good to know
 
-| Source | Where | What it answers |
-|---|---|---|
-| Publish response | The caller of `put-events` | Did the bus accept the event? Each entry returns `PUBLISHED` or an error code, even when the call returns HTTP 200. |
-| Publish metrics | CloudWatch | Did events reach the bus, and were any entries rejected or throttled? |
-| Subscriber metrics | CloudWatch | Did events match, was delivery attempted, and how did a failure end? |
-| Delivery records | CloudWatch Logs | What happened to one specific event? |
-
-A few behaviors to know before you rely on the logs:
-
-* EventBridge writes one `EVENT_DELIVERY_ATTEMPT` record per delivery attempt per event. An event that fails every attempt therefore produces one error record for each attempt: with two retries, as in this template, that is three records for the same event.
-* At `LogLevel=INFO` you get a `SUBSCRIBER_MATCHED` record and an `EVENT_DELIVERY_ATTEMPT` record for every attempt. The record that ends the event carries `details.terminal_kind`: `EVENTS_DELIVERED`, `ON_FAILURE_DESTINATION_DELIVERED`, `ON_FAILURE_DESTINATION_FAILED` or `EVENTS_DROPPED`.
-* At `LogLevel=ERROR` a successful delivery writes no record, and a dead-lettered event writes only its failed attempts. There is no terminal record, so you cannot tell success from a dead-lettered event in the logs alone. Use the metrics or the dead-letter queue.
-* With `IncludePayload=ON_ERROR_ONLY`, failure records contain the event payload and success records do not. `FULL` copies every event body into the log group, where anyone who can read the group can read it. Use `FULL` only while you debug.
-* The dead-letter queue does not receive the event. It receives a record with the event ID, the error code and the retry count. To get the event back, replay it from the bus.
-
-For production workloads, consider encrypting the bus, the queues, and the log group with a customer managed AWS KMS key, adding alarm actions, and sizing the retry policy and bus retention for your workload. The failed-attempts alarm fires on the first failed attempt, even one that later succeeds on retry, so for production you might alarm on terminal failures only or require more datapoints. The template has comments that show where each change goes. This pattern uses short values so that failures appear within minutes.
+* Logging needs two settings: the Subscriber's log configuration and a CloudWatch Logs delivery. The template sets both.
+* `LogLevel=INFO` also records successful deliveries. With `ERROR` you only see failures, so you cannot tell a delivered event from a dead-lettered one in the logs alone.
+* Each delivery attempt writes its own record, so an event that fails all three attempts produces three error records.
+* `IncludePayload=FULL` copies every event body into the log group. Use it only while you debug.
+* The filter uses the `DATA` scope. `PutEvents` nests your data under `detail`, so it matches. `PutRawEvents` keeps fields at the top level, so those events do not match.
+* Both queues use SSE-SQS encryption, and the delivery role can only be assumed by Subscribers in your account and Region.
+* For production, consider an AWS KMS key for the bus, queues and log group, alarm actions, and longer retry and retention values. The template comments show where each change goes.
 
 ## Testing
 
@@ -173,11 +163,7 @@ For production workloads, consider encrypting the bus, the queues, and the log g
     ```bash
     sam delete --stack-name "$STACK_NAME"
     ```
-1. Confirm the stack has been deleted:
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
-    ```
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
