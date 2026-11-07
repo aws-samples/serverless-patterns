@@ -1,0 +1,3 @@
+# Intentionally empty. The function imports only the OpenTelemetry metrics API,
+# which the AWS Distro for OpenTelemetry Lambda layer provides at runtime, and it
+# makes no AWS SDK calls, so no package needs to be bundled and nothing is pinned.
