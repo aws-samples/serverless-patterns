@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) **v2.37.3 or later**, installed and configured. Check with `aws --version`. This is the first release with `aws eventsv2` (v2.37.2 shipped it as `aws eventbridgev2`).
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) CLI **v1.168.0 or later**. Check with `sam --version`.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js](https://nodejs.org/) 20 or later, to run the publisher and the tests locally. Check with `node --version`.
+* [Node.js](https://nodejs.org/) 22.12 or later, to run the publisher and the tests locally (required by vitest 5). Check with `node --version`.
 * The new custom event bus (`eventsv2`) available in your Region. Confirm with `aws eventsv2 list-event-buses`.
 
 ## Deployment Instructions

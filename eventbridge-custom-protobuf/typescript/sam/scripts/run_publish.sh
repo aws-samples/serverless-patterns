@@ -8,7 +8,7 @@
 # Usage:
 #   scripts/run_publish.sh [stack-name] [region] [order-id]
 #
-# Requires: scripts/deploy.sh already run, Node.js 20+, and the publisher's deps
+# Requires: scripts/deploy.sh already run, Node.js 22.12+, and the publisher's deps
 # installed (npm install).
 set -euo pipefail
 

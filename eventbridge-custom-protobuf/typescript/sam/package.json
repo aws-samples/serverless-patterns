@@ -5,6 +5,9 @@
   "description": "Protobuf on an EventBridge custom event bus with a Glue Schema Registry (TypeScript).",
   "license": "MIT-0",
   "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
+  },
   "scripts": {
     "build": "tsc --noEmit",
     "test": "vitest run",
