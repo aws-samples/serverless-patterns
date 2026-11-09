@@ -31,9 +31,8 @@ import * as tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
  *   - department confidence >= departmentThreshold           -> auto-route
  *   - anything else                                          -> human review
  *
- * The urgency score travels with the answers as a priority hint but does not gate: on the 30
- * synthetic tickets recorded for this pattern its confidence stayed between 0.2 and 0.5 whatever
- * the ticket. The thresholds are starting points. Measure them on your own traffic.
+ * The urgency score travels with the answers as a priority hint but does not gate. The thresholds
+ * are starting points. Measure them on your own traffic.
  */
 
 const DEFAULTS = {
@@ -81,7 +80,7 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
 
     // --- Amazon SageMaker AI: the Strands Decider real-time endpoint ----------------------------
     // The container (./model) serves Strands Decider on CPU and downloads the model weights from
-    // Hugging Face at startup. See the README for the trade-offs and the GPU note.
+    // Hugging Face at startup. See the Important Notes in the README.
     const deciderImage = new ecrAssets.DockerImageAsset(this, "DeciderImage", {
       directory: path.join(__dirname, "..", "model"),
       platform: ecrAssets.Platform.LINUX_AMD64,

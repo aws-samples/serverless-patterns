@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Supported Regions
 
-The stack has no Region-specific values: it deploys to the Region of your AWS CLI profile or `AWS_REGION`, and its ARNs use the partition, Region and account of the stack. It was deployed and tested in us-west-2 only. In another Region, check that you have endpoint quota for the instance type there. The endpoint also needs outbound internet access to download the model (see Important Notes).
+The stack has no Region-specific values: it deploys to the Region of your AWS CLI profile or `AWS_REGION`, and its ARNs use the partition, Region and account of the stack. It was deployed and tested in us-west-2 only. In another Region, check that you have endpoint quota for the instance type there. The endpoint also needs outbound internet access to download the model.
 
 ## Architecture
 
