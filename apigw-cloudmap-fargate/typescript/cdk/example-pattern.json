@@ -1,0 +1,62 @@
+{
+  "title": "Amazon API Gateway HTTP API to Amazon ECS on AWS Fargate through AWS Cloud Map",
+  "description": "An Amazon API Gateway HTTP API reaches Amazon ECS on AWS Fargate tasks through a VPC link and an AWS Cloud Map service, with no load balancer.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "apigw-cloudmap-fargate",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon API Gateway HTTP API with AWS Identity and Access Management (IAM) authorization uses a VPC link V2 and an AWS Cloud Map service as its private integration target. API Gateway looks up the IP address and port of the healthy instances with DiscoverInstances and distributes requests across them.",
+      "The Amazon ECS service registers each AWS Fargate task in AWS Cloud Map with an SRV record, which carries the port that an A record does not. No load balancer sits between API Gateway and the tasks."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/apigw-cloudmap-fargate-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create private integrations for HTTP APIs in Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html"
+      },
+      {
+        "text": "Set up VPC links V2 in Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-vpc-links-v2.html"
+      },
+      {
+        "text": "Use service discovery to connect Amazon ECS services with DNS names",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
