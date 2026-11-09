@@ -8,7 +8,7 @@
 # Usage:
 #   scripts/run_publish.sh [stack-name] [region] [order-id]
 #
-# Requires: scripts/deploy.sh already run, Node.js 22.12+, and the publisher's deps
+# Requires: the stack already deployed (sam deploy), Node.js 22.12+, and the publisher's deps
 # installed (npm install).
 set -euo pipefail
 
@@ -37,7 +37,7 @@ LOG_GROUP="$(get_output ConsumerLogGroup)"
 BUS_ARN="$(get_output EventBusArn)"
 
 if [ "${BUS_ARN}" = "None" ] || [ -z "${BUS_ARN}" ]; then
-  echo "error: EventBusArn not found in stack '${STACK_NAME}'. Run scripts/deploy.sh first." >&2
+  echo "error: EventBusArn not found in stack '${STACK_NAME}'. Deploy it with 'sam deploy' first." >&2
   exit 1
 fi
 

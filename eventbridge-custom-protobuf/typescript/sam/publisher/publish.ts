@@ -8,8 +8,8 @@
  *
  * Usage:
  *   tsx publisher/publish.ts \
- *       --bus-arn arn:aws:events:<region>:<account>:event-busv2/proto-orders-bus/<id> \
- *       --registry-arn arn:aws:glue:<region>:<account>:registry/proto-orders-registry \
+ *       --bus-arn arn:aws:events:<region>:<account>:event-busv2/<AppName>-bus/<id> \
+ *       --registry-arn arn:aws:glue:<region>:<account>:registry/<AppName>-registry \
  *       [--region <region>] [--order-id order-123]
  *
  * Both ARNs can also be supplied via the BUS_ARN and REGISTRY_ARN environment
@@ -26,6 +26,8 @@ import {
   type PutRawEventsRequestEntry,
 } from "@aws-sdk/client-eventbridgev2";
 import { GetSchemaVersionCommand, GlueClient } from "@aws-sdk/client-glue";
+import { realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 import { buildOrder, encodeFramed, type Order } from "../common/protoio.js";
 
@@ -202,8 +204,21 @@ export async function main(argv: string[]): Promise<number> {
 }
 
 // Run main() only when invoked directly (not when imported by tests).
-const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
-if (isMain) {
+// Node resolves symlinks for the main module, so import.meta.url holds the real
+// path while process.argv[1] holds the path as typed. Resolve argv[1] the same
+// way and compare as file URLs (which also handles spaces and other characters
+// that a plain `file://` string concatenation gets wrong).
+function isInvokedDirectly(): boolean {
+  const entry = process.argv[1];
+  if (entry === undefined) return false;
+  try {
+    return import.meta.url === pathToFileURL(realpathSync(entry)).href;
+  } catch {
+    return false;
+  }
+}
+
+if (isInvokedDirectly()) {
   main(process.argv.slice(2)).then((code) => {
     process.exitCode = code;
   });

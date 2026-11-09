@@ -63,8 +63,6 @@ Important: this application uses various AWS services and there are costs associ
       --query "Stacks[0].Outputs" --output table
     ```
 
-`scripts/deploy.sh [stack-name] [region]` is a convenience wrapper that runs the same build and deploy non-interactively and prints those ARNs.
-
 ## How it works
 
 One template (`template.yaml`) provisions the event bus and subscriber (`AWS::EventsV2::EventBus` and `AWS::EventsV2::Subscriber`), the Glue registry and Protobuf schema, the consumer Lambda, an SQS dead-letter queue, and the delivery role.
@@ -86,8 +84,6 @@ eventbridge-custom-protobuf/typescript/sam/
   consumer/package.json        # marks the consumer as ESM + esbuild for the SAM build
   template.yaml                # bus, subscriber, Glue registry+schema, Lambda (nodejs24.x), DLQ, role
   scripts/run_publish.sh       # convenience: publish one event, print the log command
-  scripts/deploy.sh            # convenience wrapper around sam build + sam deploy
-  scripts/teardown.sh          # convenience wrapper around stack deletion
   tests/                       # vitest: round-trip, framing, message index, handler, publisher
   package.json, tsconfig.json  # deps, build, and test config
 ```
@@ -103,19 +99,21 @@ The identity running the publisher needs `events:PutRawEvents` on the bus, plus 
     {
       "Effect": "Allow",
       "Action": ["events:PutRawEvents"],
-      "Resource": "arn:aws:events:<region>:<account>:event-busv2/proto-orders-bus/*"
+      "Resource": "arn:aws:events:<region>:<account>:event-busv2/<AppName>-bus/*"
     },
     {
       "Effect": "Allow",
       "Action": ["glue:GetSchemaVersion", "glue:GetSchemaByDefinition", "glue:GetRegistry"],
       "Resource": [
-        "arn:aws:glue:<region>:<account>:registry/proto-orders-registry",
-        "arn:aws:glue:<region>:<account>:schema/proto-orders-registry/*"
+        "arn:aws:glue:<region>:<account>:registry/<AppName>-registry",
+        "arn:aws:glue:<region>:<account>:schema/<AppName>-registry/*"
       ]
     }
   ]
 }
 ```
+
+Replace `<AppName>` with the value you deployed with (`proto-orders` by default). The `EventBusArn` and `SchemaRegistryArn` stack outputs give the exact ARNs.
 
 ## Testing
 
@@ -136,15 +134,10 @@ result handling (against `EventBridgeV2Client` and `GlueClient` mocked with
     ```bash
     scripts/run_publish.sh <stack-name> <region> [order-id]
     ```
-    Or run the publisher directly:
-    ```bash
-    BUS_ARN=<bus-arn> REGISTRY_ARN=<registry-arn> AWS_REGION=<region> \
-      npx tsx publisher/publish.ts --order-id order-123
-    ```
     A successful publish prints `SuccessCode=PUBLISHED` and an `EventId`.
-1. After a few seconds, check the delivered event in CloudWatch:
+1. After a few seconds, check the delivered event in CloudWatch. The log group is `/aws/lambda/<AppName>-consumer` (`/aws/lambda/proto-orders-consumer` with the default `AppName`). `run_publish.sh` prints the exact command for your stack.  You can run manually using the command below and providing the AppName chosen during deploy.   
     ```bash
-    aws logs tail /aws/lambda/proto-orders-consumer --since 5m --format short
+    aws logs tail '/aws/lambda/<AppName>-consumer' --region us-east-1 --since 5m --format short
     ```
     You should see an `OrderPlaced[...]` line with the `orderId` you published, the full record (delivered as JSON), the custom `metadata`, and the Glue `schemaId` the service used to decode it.
 1. The dead-letter queue (`DeadLetterQueueUrl` output) should stay empty on a healthy run.
@@ -160,8 +153,6 @@ result handling (against `EventBridgeV2Client` and `GlueClient` mocked with
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
-
-`scripts/teardown.sh [stack-name] [region]` is a convenience wrapper that deletes the stack and waits for completion.
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.

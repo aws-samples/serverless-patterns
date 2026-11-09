@@ -43,7 +43,7 @@
   "testing": {
     "text": [
       "Publish one Protobuf OrderPlaced event: scripts/run_publish.sh <stack-name> <region>",
-      "Check the delivered (decoded JSON) event in CloudWatch: aws logs tail /aws/lambda/proto-orders-consumer --since 5m --format short"
+      "Check the delivered (decoded JSON) event in CloudWatch: aws logs tail /aws/lambda/<AppName>-consumer --since 5m --format short (run_publish.sh prints the exact command for your stack)"
     ]
   },
   "cleanup": {
