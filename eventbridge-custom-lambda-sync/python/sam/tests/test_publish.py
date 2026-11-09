@@ -46,6 +46,12 @@ def test_build_entry_sets_event_group_id():
     assert json.loads(entry["Detail"])["seq"] == 1
 
 
+def test_build_entry_uses_order_id_as_deduplication_id():
+    order = publish.build_order("grp", 2)
+    entry = publish.build_entry(order, "grp")
+    assert entry["SystemMetadata"]["DeduplicationId"] == order["orderId"] == "grp-002"
+
+
 def test_find_failures_empty_on_success():
     assert publish.find_failures({"FailedEntryCount": 0, "Entries": [{"EventId": "e1"}]}) == []
 
@@ -72,6 +78,22 @@ def test_publish_sequence_publishes_each_in_order():
     with stubber:
         event_ids = publish.publish_sequence(client, BUS_ARN, group, count)
     assert event_ids == ["e1", "e2", "e3"]
+
+
+def test_publish_one_treats_deduplicated_as_success():
+    client = _client()
+    order = publish.build_order("grp", 1)
+    entry = publish.build_entry(order, "grp")
+
+    stubber = Stubber(client)
+    stubber.add_response(
+        "put_events",
+        {"FailedEntryCount": 0, "Entries": [{"EventId": "e1", "SuccessCode": "DEDUPLICATED"}]},
+        {"EventBusArn": BUS_ARN, "Entries": [entry]},
+    )
+    with stubber:
+        response = publish.publish_one(client, BUS_ARN, order, "grp")
+    assert response["Entries"][0]["SuccessCode"] == "DEDUPLICATED"
 
 
 def test_publish_one_raises_on_failed_entry():

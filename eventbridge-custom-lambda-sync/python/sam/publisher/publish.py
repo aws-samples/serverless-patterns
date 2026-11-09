@@ -23,8 +23,13 @@ Ordered processing:
 
 Notes:
   * This publishes JSON with `PutEvents`; no schema registry is involved.
+  * Each event's `DeduplicationId` (SystemMetadata) is its `orderId`. The bus
+    suppresses a duplicate published within 5 minutes in the same event group,
+    so an SDK retry, or rerunning with the same `--group`, does not deliver an
+    order twice.
   * The response is a single `Entries` list; check `FailedEntryCount` and each
-    entry's `SuccessCode`/`ErrorCode`. `DEDUPLICATED` is a success.
+    entry's `SuccessCode`/`ErrorCode`. `DEDUPLICATED` (a suppressed duplicate)
+    is a success.
   * The AWS CLI calls the service `aws eventsv2`, but boto3 calls it
     `eventbridgev2` (boto3 >= 1.43.102).
   * The IAM namespace is `events:`, never `eventsv2:`.
@@ -35,16 +40,19 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import random
 import sys
 import time
 from typing import Any, Dict, List
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.config import Config
 
 SOURCE = "com.example.orders"
 DETAIL_TYPE = "OrderPlaced"
+
+# botocore retries ThrottlingException and transient 5xx errors with
+# exponential backoff and jitter, so no hand-rolled retry loop is needed.
+RETRY_CONFIG = Config(retries={"mode": "standard", "max_attempts": 5})
 
 
 def build_order(group: str, seq: int) -> Dict[str, Any]:
@@ -61,15 +69,19 @@ def build_order(group: str, seq: int) -> Dict[str, Any]:
 
 
 def build_entry(order: Dict[str, Any], group: str) -> Dict[str, Any]:
-    """Build a PutEvents entry, grouping the event for FIFO ordering.
+    """Build a PutEvents entry, grouped for FIFO ordering and deduplicated.
 
     SystemMetadata.EventGroupId is what the FIFO subscriber orders within.
+    SystemMetadata.DeduplicationId uses the orderId, so a retried or repeated
+    publish of the same order within the 5-minute deduplication window is
+    suppressed at the bus (SuccessCode DEDUPLICATED) instead of being delivered
+    to the consumer twice.
     """
     return {
         "Source": SOURCE,
         "DetailType": DETAIL_TYPE,
         "Detail": json.dumps(order),
-        "SystemMetadata": {"EventGroupId": group},
+        "SystemMetadata": {"EventGroupId": group, "DeduplicationId": order["orderId"]},
     }
 
 
@@ -82,26 +94,13 @@ def find_failures(response: Dict[str, Any]) -> List[Dict[str, Any]]:
     return failures
 
 
-def put_events_with_backoff(
-    client, bus_arn: str, entries: List[Dict[str, Any]], attempts: int = 5
-) -> Dict[str, Any]:
-    """Call put_events, retrying ThrottlingException with backoff + jitter."""
-    delay = 0.2
-    for attempt in range(attempts):
-        try:
-            return client.put_events(EventBusArn=bus_arn, Entries=entries)
-        except ClientError as error:
-            code = error.response["Error"]["Code"]
-            if code != "ThrottlingException" or attempt == attempts - 1:
-                raise
-            time.sleep(delay + random.uniform(0, delay))
-            delay *= 2
-    raise RuntimeError("exhausted retry attempts without a response")
-
-
 def publish_one(client, bus_arn: str, order: Dict[str, Any], group: str) -> Dict[str, Any]:
-    """Publish a single grouped order; raise on a per-entry failure."""
-    response = put_events_with_backoff(client, bus_arn, [build_entry(order, group)])
+    """Publish a single grouped order; raise on a per-entry failure.
+
+    Throttling and transient errors are retried by botocore (see RETRY_CONFIG);
+    per-entry failures come back in a successful response and are raised here.
+    """
+    response = client.put_events(EventBusArn=bus_arn, Entries=[build_entry(order, group)])
     failures = find_failures(response)
     if failures or response.get("FailedEntryCount"):
         raise RuntimeError(f"publish had failed entries: {failures}")
@@ -140,7 +139,7 @@ def main(argv: List[str]) -> int:
         return 2
 
     group = args.group or f"order-group-{int(time.time())}"
-    client = boto3.client("eventbridgev2", region_name=args.region)
+    client = boto3.client("eventbridgev2", region_name=args.region, config=RETRY_CONFIG)
 
     print(f"Publishing {args.count} ordered events in group '{group}'...")
     publish_sequence(client, args.bus_arn, group, args.count)

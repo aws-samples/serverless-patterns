@@ -5,11 +5,13 @@
 # where to watch them being processed in order.
 #
 # Usage:
-#   scripts/run_publish.sh [stack-name] [region] [count]
+#   scripts/run_publish.sh [stack-name] [region] [count] [group]
 #
 #   count  number of ordered events to publish (default 5).
+#   group  EventGroupId to publish under (default: a new order-group-<timestamp>).
+#          Reuse a group within 5 minutes to see its events come back DEDUPLICATED.
 #
-# Requires: scripts/deploy.sh already run, and the publisher's deps installed
+# Requires: the stack deployed with `sam deploy`, and the publisher's deps installed
 # (pip install -r publisher/requirements.txt).
 set -euo pipefail
 
@@ -18,6 +20,7 @@ STACK_NAME="${1:-eventbridge-custom-lambda-sync}"
 # then the region configured in your AWS CLI profile. Nothing is hardcoded.
 REGION="${2:-${AWS_REGION:-${AWS_DEFAULT_REGION:-$(aws configure get region 2>/dev/null || true)}}}"
 COUNT="${3:-5}"
+GROUP="${4:-}"
 
 if [ -z "${REGION}" ]; then
   echo "error: no AWS region set. Pass one as the 2nd argument, export AWS_REGION," >&2
@@ -36,7 +39,7 @@ get_output() {
 LOG_GROUP="$(get_output ConsumerLogGroup)"
 BUS_ARN="$(get_output EventBusArn)"
 if [ "${BUS_ARN}" = "None" ] || [ -z "${BUS_ARN}" ]; then
-  echo "error: EventBusArn not found in stack '${STACK_NAME}'. Run scripts/deploy.sh first." >&2
+  echo "error: EventBusArn not found in stack '${STACK_NAME}'. Deploy it with 'sam deploy' first." >&2
   exit 1
 fi
 
@@ -56,9 +59,14 @@ if ! "${PYBIN}" -c "import boto3" >/dev/null 2>&1; then
   exit 1
 fi
 
+PUBLISH_ARGS=(--count "${COUNT}")
+if [ -n "${GROUP}" ]; then
+  PUBLISH_ARGS+=(--group "${GROUP}")
+fi
+
 echo "Bus: ${BUS_ARN}"
 BUS_ARN="${BUS_ARN}" AWS_REGION="${REGION}" \
-  "${PYBIN}" "${HERE}/publisher/publish.py" --count "${COUNT}"
+  "${PYBIN}" "${HERE}/publisher/publish.py" "${PUBLISH_ARGS[@]}"
 
 echo
 echo "Give it a few seconds, then watch the consumer process the group in order:"

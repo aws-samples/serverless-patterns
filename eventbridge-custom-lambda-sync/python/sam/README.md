@@ -55,14 +55,12 @@ Important: this application uses various AWS services and there are costs associ
       --query "Stacks[0].Outputs" --output table
     ```
 
-`scripts/deploy.sh [stack-name] [region]` is a convenience wrapper that runs the same build and deploy non-interactively and prints the bus ARN.
-
 ## How it works
 
 The template (`template.yaml`) deploys an EventBridge custom event bus (`AWS::EventsV2::EventBus`), a FIFO subscriber (`AWS::EventsV2::Subscriber`), a Python 3.14 consumer Lambda function, an SQS dead-letter queue, and the delivery role EventBridge assumes to invoke the function.
 
-1. The publisher (`publisher/publish.py`) sends a sequence of `OrderPlaced` JSON events with `PutEvents`. Every event in a run shares one `SystemMetadata.EventGroupId` and carries an increasing `seq` (1, 2, 3, ...).
-1. The subscriber filters on `detail.orderId` and delivers matching events to the consumer function. Two settings work together to enforce order:
+1. The publisher (`publisher/publish.py`) sends a sequence of `OrderPlaced` JSON events with `PutEvents`. Every event in a run shares one `SystemMetadata.EventGroupId` and carries an increasing `seq` (1, 2, 3, ...). Each event also sets `SystemMetadata.DeduplicationId` to its `orderId`, so a retried or repeated publish of the same order is suppressed at the bus.
+1. The subscriber filters on `detail.orderId` and delivers matching events to the consumer function. Three settings work together to process events in order, one at a time:
     ```yaml
     Type: FIFO
     InvokeConfiguration:
@@ -70,15 +68,19 @@ The template (`template.yaml`) deploys an EventBridge custom event bus (`AWS::Ev
       RoleArn: <delivery role arn>
       LambdaParameters:
         InvocationType: REQUEST_RESPONSE
+    BatchConfiguration:
+      MaxBatchSize: 1
     ```
     * `Type: FIFO` orders events within an event group.
-    * `InvocationType: REQUEST_RESPONSE` invokes the function synchronously, so the bus waits for each event to be confirmed before delivering the next. `EVENT` (asynchronous) cannot guarantee ordered, confirmed processing.
-1. The consumer (`consumer/handler.py`) receives a batch (a JSON array) and logs each order's `seq` as it processes it. With the default `RAW` transformer and `PutEvents`, the order fields are under `detail`.
+    * `InvocationType: REQUEST_RESPONSE` invokes the function synchronously, so the bus waits for each delivery to be confirmed before sending the next. `EVENT` (asynchronous) cannot guarantee ordered, confirmed processing.
+    * `MaxBatchSize: 1` makes each delivery a single event. By default a subscriber delivers batches of up to 10 events, which stay in order but are confirmed as a batch.
+1. The consumer (`consumer/handler.py`) receives a batch (a JSON array, here holding one event) and logs each order's `seq` as it processes it. With the default `RAW` transformer and `PutEvents`, the order fields are under `detail`.
 1. A delivery that ultimately fails goes to the SQS dead-letter queue. The delivery role trusts `events.amazonaws.com` and has `lambda:InvokeFunction` on the consumer and `sqs:SendMessage` on the dead-letter queue.
 
 Key considerations:
 
 * Events are ordered within an `EventGroupId`. Events in different groups are not ordered relative to each other.
+* Deduplication happens at publish time. EventBridge suppresses an entry whose `DeduplicationId` repeats one accepted within the last 5 minutes in the same event group, and returns `SuccessCode: DEDUPLICATED`, which the publisher treats as a success. Using a key the producer already has (here `orderId`) avoids the separate charge for `CONTENT_BASED` deduplication. See [Ordering and deduplicating events](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-ordering.html).
 * IAM actions use the `events:` prefix, never `eventsv2:`. The AWS CLI calls the service `aws eventsv2`, but boto3 calls it `eventbridgev2`.
 * No account ID or Region is hardcoded. Resource names come from the `AppName` parameter.
 
@@ -90,35 +92,39 @@ Create a virtual environment, install dependencies, and run the tests. They run 
 
 ```bash
 python3 -m venv .venv
-./.venv/bin/pip install -r publisher/requirements.txt pytest
+./.venv/bin/pip install -r tests/requirements.txt
 ./.venv/bin/python -m pytest tests/ -q
 ```
 
 ### End to end
 
-1. Publish an ordered sequence (default 5 events; pass a count to change it):
+1. Publish an ordered sequence (default 5 events; pass a count to change it, and optionally a group name):
     ```bash
-    scripts/run_publish.sh [stack-name] [region] [count]
+    scripts/run_publish.sh [stack-name] [region] [count] [group]
     ```
-    Or call the publisher directly with the `EventBusArn` output:
-    ```bash
-    ./.venv/bin/python publisher/publish.py --bus-arn <EventBusArn> --region <region> --count 5
-    ```
+    > To try [deduplication](#deduplication) afterwards, pass your own group name (for example `order-group-demo`) so it is easy to reuse. Otherwise the publisher generates one and prints it.
 1. Give it a few seconds, then watch the consumer process the group in order:
     ```bash
     aws logs tail /aws/lambda/sync-orders-consumer --since 5m --format short
     ```
-    (Replace `sync-orders` if you changed `AppName`.)
+    > Replace `sync-orders` with the AppName you typed during deploy if you did not stick with the default.
 
-The `Processing order ... seq=` lines appear in order (`seq=1`, then `seq=2`, then `seq=3`, ...), because the FIFO subscriber invokes the function synchronously and confirms each event before delivering the next.
+The `Processing order ... seq=` lines appear in order (`seq=1`, then `seq=2`, then `seq=3`, ...), each in its own invocation (`batchIndex=0`), because the FIFO subscriber delivers one event per batch, invokes the function synchronously, and confirms each event before delivering the next.
+
+### Deduplication
+
+1. Within 5 minutes of a run, publish the same group again. Use the group name you passed, or the one the publisher printed (`Publishing 5 ordered events in group '<group>'...`):
+    ```bash
+    scripts/run_publish.sh <stack-name> <region> 5 <group>
+    ```
+1. Each line reports `SuccessCode=DEDUPLICATED`, because every `orderId` repeats one the bus already accepted. Tail the consumer log again: no new `Processing order` lines appear for that group.
 
 ## Cleanup
 
-1. Delete the stack. This removes the bus, subscriber, function, dead-letter queue, and delivery role:
+1. From the pattern directory, delete the stack. This removes the bus, subscriber, function, dead-letter queue, and delivery role. AWS SAM reads the stack name and Region from the `samconfig.toml` file written by `sam deploy --guided`:
     ```bash
     sam delete
     ```
-    `sam delete` uses the stack name saved in `samconfig.toml`. Pass `--stack-name <name> --region <region>` if you deployed without `--guided`. `scripts/teardown.sh [stack-name] [region]` is a convenience wrapper that deletes the stack and waits for completion.
 1. Confirm the stack has been deleted:
     ```bash
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"

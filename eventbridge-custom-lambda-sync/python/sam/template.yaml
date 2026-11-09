@@ -35,7 +35,7 @@ Resources:
 
   # --- Consumer Lambda -----------------------------------------------------
   # The SYNCHRONOUS, ordered subscriber target. It logs each order in the order
-  # it is processed. SAM creates the log group and a basic execution role.
+  # it is processed. 
   ConsumerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -85,11 +85,14 @@ Resources:
                 Resource: !GetAtt DeadLetterQueue.Arn
 
   # --- Subscriber (FIFO, synchronous) --------------------------------------
-  # The two settings that enable ordered processing:
+  # The three settings that enable one-at-a-time ordered processing:
   #   Type: FIFO                                  -> events in a group are ordered
   #   InvokeConfiguration.LambdaParameters.InvocationType: REQUEST_RESPONSE
   #     -> EventBridge invokes the Lambda synchronously and waits for it to
-  #        confirm each event before delivering the next in the group.
+  #        confirm each delivery before sending the next in the group.
+  #   BatchConfiguration.MaxBatchSize: 1
+  #     -> each delivery holds exactly one event (the default is a batch of up
+  #        to 10), so every event is confirmed before the next is delivered.
   # A DATA filter is fine because the payload is JSON. The DLQ is the safety net.
   OrdersSubscriber:
     Type: AWS::EventsV2::Subscriber
@@ -106,6 +109,8 @@ Resources:
         RoleArn: !GetAtt DeliveryRole.Arn
         LambdaParameters:
           InvocationType: REQUEST_RESPONSE
+      BatchConfiguration:
+        MaxBatchSize: 1
       OnFailureConfiguration:
         Arn: !GetAtt DeadLetterQueue.Arn
 

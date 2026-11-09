@@ -6,7 +6,9 @@ custom-event-bus subscriber. It logs each delivered order to CloudWatch in the
 order it is processed.
 
 Why this demonstrates ordered processing:
-  * The subscriber is FIFO (Type = FIFO) and invokes this function synchronously
+  * The subscriber is FIFO (Type = FIFO), delivers one event per batch
+    (BatchConfiguration.MaxBatchSize = 1; the default is up to 10), and invokes
+    this function synchronously
     (InvocationType = REQUEST_RESPONSE). EventBridge waits for the function to
     confirm successful processing of each event before acknowledging it and
     moving on to the next event in the same event group.
@@ -20,7 +22,8 @@ Why this demonstrates ordered processing:
 
 Delivery shape:
   * A Lambda target receives a BATCH — a JSON array of delivered events — so the
-    handler iterates it.
+    handler iterates it. With MaxBatchSize = 1 the array holds one event; the
+    loop keeps the handler correct if the batch size is raised.
   * With the default RAW transformer and a PutEvents publish, each element is the
     classic envelope, so the order fields are under `detail`. The handler
     tolerates top-level fields too, for easy hand-invocation.
