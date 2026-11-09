@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Stack 2 - Self-managed Kafka 4.2.x broker on EC2 (KRaft, PLAINTEXT)
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.medium
+  LatestAL2023AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Resources:
+
+  KafkaInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  KafkaInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref KafkaInstanceRole
+
+  KafkaInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref LatestAL2023AmiId
+      SubnetId: !ImportValue kafka-queue-PublicSubnetId
+      SecurityGroupIds:
+        - !ImportValue kafka-queue-BrokerSecurityGroupId
+      IamInstanceProfile: !Ref KafkaInstanceProfile
+      Tags:
+        - Key: Name
+          Value: kafka-queue-kafka-broker
+
+Outputs:
+  BootstrapServers:
+    Value: !Sub "${KafkaInstance.PrivateIp}:9092"
+    Export:
+      Name: kafka-queue-BootstrapServers
+
+  BrokerInstanceId:
+    Value: !Ref KafkaInstance
+    Export:
+      Name: kafka-queue-BrokerInstanceId

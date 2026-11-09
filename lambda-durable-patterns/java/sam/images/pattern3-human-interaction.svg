@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow3" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+    <marker id="arrow3green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1B660F"/>
+    </marker>
+    <marker id="arrow3red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#D13212"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="520" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad3)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad3)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 3: Human Interaction</text>
+  <text x="295" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="315" y="36" fill="#D5DBDB" font-size="14">Suspend execution awaiting external callback</text>
+
+  <!-- Step 1: Prepare Approval -->
+  <rect x="30" y="80" width="150" height="80" fill="url(#stepGrad3)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow3)"/>
+  <rect x="30" y="80" width="150" height="24" fill="#1B660F" rx="6"/>
+  <rect x="30" y="94" width="150" height="10" fill="#1B660F"/>
+  <text x="44" y="96" fill="#FFF" font-size="10" font-weight="bold">prepare-approval</text>
+  <text x="43" y="118" fill="#16191F" font-size="9">Build approval request</text>
+  <text x="43" y="132" fill="#16191F" font-size="9">Identify approver</text>
+  <text x="43" y="146" fill="#687078" font-size="8" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- Arrow 1-2 -->
+  <line x1="180" y1="120" x2="210" y2="120" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- Step 2: Notify Approver -->
+  <rect x="215" y="80" width="150" height="80" fill="url(#stepGrad3)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow3)"/>
+  <rect x="215" y="80" width="150" height="24" fill="#1B660F" rx="6"/>
+  <rect x="215" y="94" width="150" height="10" fill="#1B660F"/>
+  <text x="237" y="96" fill="#FFF" font-size="10" font-weight="bold">notify-approver</text>
+  <text x="228" y="118" fill="#16191F" font-size="9">Send email/SMS</text>
+  <text x="228" y="132" fill="#16191F" font-size="9">Include callback URL</text>
+  <text x="228" y="146" fill="#687078" font-size="8" font-style="italic">Retry: 3x, exp backoff</text>
+
+  <!-- Arrow 2-3 -->
+  <line x1="365" y1="120" x2="395" y2="120" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- SUSPENDED box (large orange-bordered) -->
+  <rect x="400" y="72" width="310" height="100" fill="#FFF9F0" stroke="#FF9900" stroke-width="2.5" rx="8" filter="url(#shadow3)"/>
+  <text x="420" y="96" fill="#FF9900" font-size="13" font-weight="bold">EXECUTION SUSPENDED</text>
+  <text x="420" y="116" fill="#545B64" font-size="11">createCallback()</text>
+  <text x="420" y="136" fill="#16191F" font-size="10">No compute charges during wait</text>
+  <text x="420" y="154" fill="#687078" font-size="10">Timeout: 72 hours</text>
+  <rect x="560" y="86" width="136" height="22" fill="#FF9900" rx="4" opacity="0.15"/>
+  <text x="568" y="101" fill="#FF9900" font-size="9" font-weight="bold">$0.00 / hour billed</text>
+
+  <!-- Callback ID note -->
+  <rect x="400" y="180" width="310" height="36" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" rx="4"/>
+  <text x="415" y="196" fill="#2C3E50" font-size="9" font-weight="bold">Callback ID logged for external use:</text>
+  <text x="415" y="209" fill="#545B64" font-size="8" font-family="monospace">send-durable-execution-callback-success</text>
+
+  <!-- Branch arrows -->
+  <!-- APPROVED branch (goes down-right) -->
+  <line x1="555" y1="172" x2="555" y2="250" stroke="#1B660F" stroke-width="1.5"/>
+  <line x1="555" y1="250" x2="590" y2="250" stroke="#1B660F" stroke-width="1.5" marker-end="url(#arrow3green)"/>
+  <rect x="520" y="228" width="80" height="18" fill="#E8F5E9" rx="3"/>
+  <text x="530" y="240" fill="#1B660F" font-size="9" font-weight="bold">APPROVED</text>
+
+  <!-- REJECTED branch (goes down-left) -->
+  <line x1="480" y1="172" x2="480" y2="250" stroke="#D13212" stroke-width="1.5"/>
+  <line x1="480" y1="250" x2="380" y2="250" stroke="#D13212" stroke-width="1.5"/>
+  <line x1="380" y1="250" x2="380" y2="280" stroke="#D13212" stroke-width="1.5" marker-end="url(#arrow3red)"/>
+  <rect x="405" y="228" width="75" height="18" fill="#FDECEA" rx="3"/>
+  <text x="414" y="240" fill="#D13212" font-size="9" font-weight="bold">REJECTED</text>
+
+  <!-- APPROVED path: Process Request -->
+  <rect x="595" y="230" width="150" height="70" fill="url(#stepGrad3)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow3)"/>
+  <rect x="595" y="230" width="150" height="24" fill="#1B660F" rx="6"/>
+  <rect x="595" y="244" width="150" height="10" fill="#1B660F"/>
+  <text x="611" y="246" fill="#FFF" font-size="10" font-weight="bold">process-request</text>
+  <text x="608" y="268" fill="#16191F" font-size="9">Execute approved action</text>
+  <text x="608" y="282" fill="#16191F" font-size="9">Update database record</text>
+
+  <!-- Arrow to Send Confirmation -->
+  <line x1="745" y1="265" x2="775" y2="265" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- Send Confirmation -->
+  <rect x="780" y="230" width="150" height="70" fill="url(#stepGrad3)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow3)"/>
+  <rect x="780" y="230" width="150" height="24" fill="#1B660F" rx="6"/>
+  <rect x="780" y="244" width="150" height="10" fill="#1B660F"/>
+  <text x="795" y="246" fill="#FFF" font-size="10" font-weight="bold">send-confirmation</text>
+  <text x="793" y="268" fill="#16191F" font-size="9">Notify requester</text>
+  <text x="793" y="282" fill="#16191F" font-size="9">Include approval details</text>
+
+  <!-- Arrow to COMPLETED -->
+  <line x1="930" y1="265" x2="960" y2="265" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+  <!-- COMPLETED badge -->
+  <rect x="965" y="252" width="100" height="28" fill="#E8F5E9" stroke="#1B660F" stroke-width="1.5" rx="14"/>
+  <text x="981" y="270" fill="#1B660F" font-size="11" font-weight="bold">COMPLETED</text>
+
+  <!-- REJECTED path: Return Status -->
+  <rect x="320" y="285" width="150" height="55" fill="url(#stepGrad3)" stroke="#D13212" stroke-width="1.5" rx="6" filter="url(#shadow3)"/>
+  <rect x="320" y="285" width="150" height="24" fill="#D13212" rx="6"/>
+  <rect x="320" y="299" width="150" height="10" fill="#D13212"/>
+  <text x="354" y="301" fill="#FFF" font-size="10" font-weight="bold">return-status</text>
+  <text x="333" y="322" fill="#16191F" font-size="9">Return REJECTED status</text>
+
+  <!-- Key Concept Box -->
+  <rect x="30" y="360" width="1040" height="140" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow3)"/>
+  <rect x="30" y="360" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="378" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="380" fill="#FF9900" font-size="12" font-weight="bold">Key Concept: Callback-Based Suspension</text>
+
+  <text x="50" y="412" fill="#16191F" font-size="11">The execution is fully suspended during the wait. No Lambda compute is consumed. The function resumes only when an</text>
+  <text x="50" y="428" fill="#16191F" font-size="11">external system calls back with the callback ID, or when the timeout (72 hours) expires.</text>
+
+  <!-- Timeline illustration -->
+  <line x1="50" y1="455" x2="1020" y2="455" stroke="#D5DBDB" stroke-width="1"/>
+  <rect x="50" y="448" width="120" height="14" fill="#1B660F" rx="2"/>
+  <text x="70" y="458" fill="#FFF" font-size="8">Active (~200ms)</text>
+  <rect x="170" y="448" width="680" height="14" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="2"/>
+  <text x="420" y="458" fill="#FF9900" font-size="8" font-weight="bold">SUSPENDED - Zero compute (minutes to 72 hours)</text>
+  <rect x="850" y="448" width="170" height="14" fill="#1B660F" rx="2"/>
+  <text x="880" y="458" fill="#FFF" font-size="8">Resumed (~100ms)</text>
+
+  <text x="50" y="482" fill="#687078" font-size="10" font-style="italic">External trigger: aws lambda invoke ... send-durable-execution-callback-success --payload '{"callbackId": "...", "result": "APPROVED"}'</text>
+</svg>

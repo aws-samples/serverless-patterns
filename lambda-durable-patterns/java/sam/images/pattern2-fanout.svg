@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow2" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="560" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad2)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad2)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 2: Fan-Out / Fan-In</text>
+  <text x="280" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="300" y="36" fill="#D5DBDB" font-size="14">Parallel execution with result aggregation</text>
+
+  <!-- SNS Input -->
+  <rect x="30" y="78" width="70" height="30" fill="#ED7100" rx="4"/>
+  <text x="40" y="98" fill="#FFF" font-size="11" font-weight="bold">SNS Topic</text>
+  <line x1="100" y1="93" x2="140" y2="93" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- Fan-out box - parallel -->
+  <rect x="145" y="68" width="700" height="185" fill="#FFF" stroke="#3F8624" stroke-width="2" rx="8" filter="url(#shadow2)"/>
+  <rect x="145" y="68" width="700" height="30" fill="#3F8624" rx="8"/>
+  <rect x="145" y="86" width="700" height="12" fill="#3F8624"/>
+  <text x="165" y="88" fill="#FFF" font-size="12" font-weight="bold">parallel("analyze-data") - 3 concurrent branches</text>
+
+  <!-- Branch 1 -->
+  <rect x="170" y="110" width="200" height="70" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="5" filter="url(#shadow2)"/>
+  <rect x="170" y="110" width="200" height="22" fill="#1B660F" rx="5"/>
+  <rect x="170" y="122" width="200" height="10" fill="#1B660F"/>
+  <text x="185" y="126" fill="#FFF" font-size="10" font-weight="bold">Branch: sentiment-analysis</text>
+  <text x="183" y="148" fill="#16191F" font-size="10">Analyze document sentiment</text>
+  <text x="183" y="163" fill="#687078" font-size="9">Result: "POSITIVE (0.87)"</text>
+
+  <!-- Branch 2 -->
+  <rect x="390" y="110" width="200" height="70" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="5" filter="url(#shadow2)"/>
+  <rect x="390" y="110" width="200" height="22" fill="#1B660F" rx="5"/>
+  <rect x="390" y="122" width="200" height="10" fill="#1B660F"/>
+  <text x="405" y="126" fill="#FFF" font-size="10" font-weight="bold">Branch: entity-extraction</text>
+  <text x="403" y="148" fill="#16191F" font-size="10">Extract named entities</text>
+  <text x="403" y="163" fill="#687078" font-size="9">Result: [AWS, Lambda, Java...]</text>
+
+  <!-- Branch 3 -->
+  <rect x="610" y="110" width="200" height="70" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="5" filter="url(#shadow2)"/>
+  <rect x="610" y="110" width="200" height="22" fill="#1B660F" rx="5"/>
+  <rect x="610" y="122" width="200" height="10" fill="#1B660F"/>
+  <text x="640" y="126" fill="#FFF" font-size="10" font-weight="bold">Branch: summarization</text>
+  <text x="623" y="148" fill="#16191F" font-size="10">Generate document summary</text>
+  <text x="623" y="163" fill="#687078" font-size="9">Result: "Document discusses..."</text>
+
+  <!-- Parallel timing -->
+  <rect x="170" y="195" width="640" height="24" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="3"/>
+  <text x="350" y="212" fill="#1B660F" font-size="10" font-weight="bold">All branches execute concurrently - total time = slowest branch (~700ms)</text>
+
+  <!-- Barrier indicator -->
+  <rect x="845" y="68" width="4" height="185" fill="#FF9900"/>
+  <text x="860" y="155" fill="#FF9900" font-size="10" font-weight="bold" transform="rotate(90, 860, 155)">BARRIER</text>
+
+  <!-- Arrow down to map -->
+  <line x1="495" y1="253" x2="495" y2="278" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- Fan-in box - map -->
+  <rect x="145" y="283" width="700" height="140" fill="#FFF" stroke="#1F78B4" stroke-width="2" rx="8" filter="url(#shadow2)"/>
+  <rect x="145" y="283" width="700" height="30" fill="#1F78B4" rx="8"/>
+  <rect x="145" y="301" width="700" height="12" fill="#1F78B4"/>
+  <text x="165" y="303" fill="#FFF" font-size="12" font-weight="bold">map("process-documents") - 5 items processed concurrently</text>
+
+  <!-- Document items -->
+  <rect x="170" y="325" width="110" height="55" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="194" y="343" fill="#16191F" font-size="10" font-weight="bold">doc-1</text>
+  <text x="183" y="358" fill="#687078" font-size="9">wordCount: 150</text>
+  <text x="183" y="371" fill="#1B660F" font-size="9" font-weight="bold">PROCESSED &#x2713;</text>
+
+  <rect x="295" y="325" width="110" height="55" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="319" y="343" fill="#16191F" font-size="10" font-weight="bold">doc-2</text>
+  <text x="308" y="358" fill="#687078" font-size="9">wordCount: 300</text>
+  <text x="308" y="371" fill="#1B660F" font-size="9" font-weight="bold">PROCESSED &#x2713;</text>
+
+  <rect x="420" y="325" width="110" height="55" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="444" y="343" fill="#16191F" font-size="10" font-weight="bold">doc-3</text>
+  <text x="433" y="358" fill="#687078" font-size="9">wordCount: 450</text>
+  <text x="433" y="371" fill="#1B660F" font-size="9" font-weight="bold">PROCESSED &#x2713;</text>
+
+  <rect x="545" y="325" width="110" height="55" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="569" y="343" fill="#16191F" font-size="10" font-weight="bold">doc-4</text>
+  <text x="558" y="358" fill="#687078" font-size="9">wordCount: 600</text>
+  <text x="558" y="371" fill="#1B660F" font-size="9" font-weight="bold">PROCESSED &#x2713;</text>
+
+  <rect x="670" y="325" width="110" height="55" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="694" y="343" fill="#16191F" font-size="10" font-weight="bold">doc-5</text>
+  <text x="683" y="358" fill="#687078" font-size="9">wordCount: 750</text>
+  <text x="683" y="371" fill="#1B660F" font-size="9" font-weight="bold">PROCESSED &#x2713;</text>
+
+  <!-- Map concurrency note -->
+  <rect x="170" y="392" width="610" height="20" fill="#EBF5FB" stroke="#1F78B4" stroke-width="1" rx="3"/>
+  <text x="260" y="406" fill="#1F78B4" font-size="10">Each item gets its own child context with independent checkpointing</text>
+
+  <!-- Arrow down to aggregate -->
+  <line x1="495" y1="423" x2="495" y2="448" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+  <!-- Aggregate step -->
+  <rect x="350" y="453" width="290" height="80" fill="url(#stepGrad2)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow2)"/>
+  <rect x="350" y="453" width="290" height="26" fill="#232F3E" rx="6"/>
+  <rect x="350" y="467" width="290" height="12" fill="#232F3E"/>
+  <text x="385" y="471" fill="#FF9900" font-size="11" font-weight="bold">Step: aggregate-results</text>
+  <text x="363" y="498" fill="#16191F" font-size="10">Combines parallel analysis + map results</text>
+  <text x="363" y="513" fill="#545B64" font-size="9">sentiment + entities + summary + docsProcessed</text>
+  <text x="363" y="527" fill="#1B660F" font-size="9" font-weight="bold">&#x2192; Returns: FAN_OUT_FAN_IN COMPLETED</text>
+
+  <!-- Legend -->
+  <rect x="880" y="283" width="190" height="140" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="895" y="303" fill="#232F3E" font-size="10" font-weight="bold">Legend</text>
+  <rect x="895" y="312" width="12" height="12" fill="#3F8624" rx="2"/>
+  <text x="913" y="322" fill="#545B64" font-size="9">parallel() - heterogeneous</text>
+  <rect x="895" y="332" width="12" height="12" fill="#1F78B4" rx="2"/>
+  <text x="913" y="342" fill="#545B64" font-size="9">map() - homogeneous</text>
+  <rect x="895" y="352" width="12" height="12" fill="#FF9900" rx="2"/>
+  <text x="913" y="362" fill="#545B64" font-size="9">Barrier (wait for all)</text>
+  <rect x="895" y="372" width="12" height="12" fill="#1B660F" rx="2"/>
+  <text x="913" y="382" fill="#545B64" font-size="9">Checkpointed step</text>
+  <text x="895" y="405" fill="#687078" font-size="9" font-style="italic">parallel() runs different</text>
+  <text x="895" y="417" fill="#687078" font-size="9" font-style="italic">tasks concurrently; map()</text>
+  <text x="895" y="429" fill="#687078" font-size="9" font-style="italic">applies same logic to each</text>
+</svg>

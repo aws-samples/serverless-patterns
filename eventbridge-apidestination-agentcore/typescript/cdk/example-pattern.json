@@ -1,0 +1,78 @@
+{
+  "title": "Amazon EventBridge API Destination to Amazon Bedrock AgentCore Runtime",
+  "description": "Invoke an Amazon Bedrock AgentCore Runtime agent directly from Amazon EventBridge without AWS Lambda glue code, using an API Destination with Amazon Cognito M2M OAuth.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon EventBridge rule on a custom event bus sends matching events through an API Destination straight to an Amazon Bedrock AgentCore Runtime agent, with no AWS Lambda function in the path. The AWS CDK stack also builds and deploys the agent container, so one `cdk deploy` gives you a working pattern.",
+      "The EventBridge connection gets an access token from Amazon Cognito with the machine-to-machine (M2M) `client_credentials` grant and sends it as a Bearer token. The AgentCore Runtime validates the JWT with a `customJwtAuthorizer` wired to the same Cognito user pool, so there's no manual step after deploy.",
+      "API Destinations time out after 5 seconds, so the agent acknowledges each request at once and does the work in the background with the AgentCore SDK `@app.async_task` decorator, which keeps the session alive. Deliveries that still fail after three retries go to an Amazon SQS dead-letter queue. Failures in the background work are logged to Amazon CloudWatch Logs.",
+      "See the README for the endpoint URL format, idempotency, least-privilege IAM, and what to add for production."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/eventbridge-agentcore-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge API Destinations",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Runtime",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html"
+      },
+      {
+        "text": "Handle asynchronous and long running agents with AgentCore Runtime",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-long-run.html"
+      },
+      {
+        "text": "AgentCore Runtime inbound JWT authorizer",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html"
+      },
+      {
+        "text": "Cognito machine-to-machine authorization (client credentials grant)",
+        "link": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html"
+      },
+      {
+        "text": "Asynchronous patterns for calling Amazon Bedrock AgentCore agents in serverless pipelines",
+        "link": "https://aws.amazon.com/blogs/machine-learning/asynchronous-patterns-for-calling-amazon-bedrock-agentcore-agents-in-serverless-pipelines/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Publish a test event to the custom bus (the EventBusName output, agentcore-events): <code>aws events put-events --entries '[{\"EventBusName\":\"agentcore-events\",\"Source\":\"demo.orders\",\"DetailType\":\"OrderCreated\",\"Detail\":\"{\\\"orderId\\\":\\\"12345\\\",\\\"prompt\\\":\\\"Summarize this order and flag any anomalies.\\\"}\"}]'</code>",
+      "Check the AgentCore Runtime's Amazon CloudWatch Logs (`/aws/bedrock-agentcore/runtimes/<AgentRuntimeId>-DEFAULT`) to see the event arrive and the background processing run.",
+      "Confirm the connection is usable: <code>aws events describe-connection --name agentcore-cognito-oauth</code> should show `AUTHORIZED`.",
+      "If delivery fails after retries, inspect the DLQ: `aws sqs receive-message --queue-url <DeadLetterQueueUrl output>`."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "From the <code>cdk</code> folder: <code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Antoine Boucherie",
+      "bio": "Principal Solutions Architect, AWS Global Financial Services",
+      "linkedin": "antoineboucherie"
+    }
+  ]
+}

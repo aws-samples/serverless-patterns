@@ -1,0 +1,11 @@
+{
+  "name": "eventbridge-custom-lambda-sync-consumer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Consumer Lambda (TypeScript) for the ordered synchronous-Lambda EventBridge sample.",
+  "license": "MIT-0",
+  "type": "module",
+  "dependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

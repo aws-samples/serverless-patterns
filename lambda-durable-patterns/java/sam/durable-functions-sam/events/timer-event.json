@@ -1,0 +1,6 @@
+{
+  "taskId": "TASK-TEST-001",
+  "assignee": "developer@example.com",
+  "reminderIntervalSeconds": 10,
+  "escalationSeconds": 20
+}

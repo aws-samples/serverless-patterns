@@ -1,0 +1,6 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /documents",
+  "body": "{\"documentId\":\"doc-1\",\"title\":\"DynamoDB vector search\",\"content\":\"Amazon DynamoDB stores vector embeddings alongside operational data and supports similarity search with the SearchVectors API.\",\"tenantId\":\"tenant-1\",\"category\":\"aws\"}",
+  "isBase64Encoded": false
+}

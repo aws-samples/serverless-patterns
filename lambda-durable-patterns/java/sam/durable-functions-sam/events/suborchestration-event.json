@@ -1,0 +1,9 @@
+{
+  "orderId": "ORD-TEST-001",
+  "customerId": "CUST-TEST-001",
+  "amount": 499.99,
+  "items": [
+    {"productId": "PROD-001", "name": "Widget", "qty": 2},
+    {"productId": "PROD-002", "name": "Gadget", "qty": 1}
+  ]
+}
