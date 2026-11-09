@@ -156,31 +156,35 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
     });
 
     // --- AWS Step Functions: ask the model, then apply the confidence gate -----------------------
+    // The whole state machine uses the JSONata query language (queryLanguage on the StateMachine), so
+    // every state reads its input as $states.input and writes its output with an `outputs` expression.
     const questions = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "questions.json"), "utf-8"));
 
+    // Add a value to the state: the output is the input plus one new top-level field.
+    const withField = (field: string, value: string) => `{% $merge([$states.input, {'${field}': ${value}}]) %}`;
+
     const tag = (name: string, outcome: string, reason: string) =>
-      new sfn.Pass(this, name, {
-        result: sfn.Result.fromObject({ outcome, reason }),
-        resultPath: "$.gate",
+      sfn.Pass.jsonata(this, name, {
+        outputs: withField("gate", `{'outcome': '${outcome}', 'reason': '${reason}'}`),
       });
 
-    const sendToHumanReview = new tasks.SqsSendMessage(this, "SendToHumanReview", {
+    const sendToHumanReview = tasks.SqsSendMessage.jsonata(this, "SendToHumanReview", {
       queue: humanReviewQueue,
       // The message carries the ticket, the model's full answers (every probability) and why the
       // gate escalated it, so the reviewer sees exactly which confidence fell short.
-      messageBody: sfn.TaskInput.fromJsonPathAt("$"),
-      resultPath: "$.review",
+      messageBody: sfn.TaskInput.fromText("{% $states.input %}"),
+      outputs: withField("review", "$states.result"),
     });
 
-    const pageOnCall = new tasks.SnsPublish(this, "PageSecurityOnCall", {
+    const pageOnCall = tasks.SnsPublish.jsonata(this, "PageSecurityOnCall", {
       topic: securityPagingTopic,
       subject: "Suspected security incident in a support ticket",
       // Ticket text is deliberately not in the page. The reviewer reads it from the review queue.
       message: sfn.TaskInput.fromObject({
-        "ticket_id.$": "$.id",
-        "security_probability.$": "$.model.response.answers.security_incident.noul",
+        ticket_id: "{% $states.input.id %}",
+        security_probability: "{% $states.input.model.response.answers.security_incident.noul %}",
       }),
-      resultPath: "$.page",
+      outputs: withField("page", "$states.result"),
     });
 
     // The error names of the SQS and SNS integrations do not separate transient from permanent causes (an
@@ -197,7 +201,10 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
     const reviewUnavailable = tag("ReasonDecisionUnavailable", "review", "decision_unavailable").next(sendToHumanReview);
     // If the page cannot be published the ticket still goes to a person, and says why.
     const reviewPageFailed = tag("ReasonPageFailed", "review", "security_incident_page_failed").next(sendToHumanReview);
-    pageOnCall.addCatch(reviewPageFailed, { errors: ["States.ALL"], resultPath: "$.page_error" });
+    pageOnCall.addCatch(reviewPageFailed, {
+      errors: ["States.ALL"],
+      outputs: withField("page_error", "$states.errorOutput"),
+    });
     const reviewSecurity = tag("ReasonSecurityIncident", "paged_and_review", "security_incident_suspected")
       .next(pageOnCall)
       .next(sendToHumanReview);
@@ -206,12 +213,10 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
     const autoRoute = tag("AutoRoute", "auto_routed", "confident");
 
     // Direct AWS SDK integration: Step Functions serialises Body to JSON, calls InvokeEndpoint and
-    // returns the response body as a string. This one state uses the JSONata query language (the rest
-    // of the workflow is JSONPath, which a state machine may mix) because JSONata is the one that
-    // lets the Catch below see an unparsable body. In JSONPath, States.StringToJson on a body that is
-    // not JSON raises States.Runtime, which no Catch can handle, so the whole execution would fail and
-    // the ticket would never reach the review queue. JSONata's $parse raises
-    // States.QueryEvaluationError instead, which States.ALL catches.
+    // returns the response body as a string. JSONata's $parse raises States.QueryEvaluationError on a
+    // body that is not JSON, which the Catch below handles. (In JSONPath, States.StringToJson on such a
+    // body raises States.Runtime, which no Catch can handle, so the execution would fail and the ticket
+    // would never reach the review queue.)
     // The output keeps the shape the gate reads: the ticket fields plus model.response.
     const askDecider = tasks.CallAwsService.jsonata(this, "AskDecider", {
       service: "sagemakerruntime",
@@ -226,7 +231,7 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
       // The IAM action for InvokeEndpoint is in the sagemaker namespace. Ref returns the endpoint ARN.
       iamAction: "sagemaker:InvokeEndpoint",
       iamResources: [deciderEndpoint.ref],
-      outputs: "{% $merge([$states.input, {'model': {'response': $parse($states.result.Body)}}]) %}",
+      outputs: withField("model", "{'response': $parse($states.result.Body)}"),
       taskTimeout: sfn.Timeout.duration(Duration.seconds(60)),
     });
     // Retry throttling and the transient service errors. A ModelError (the container itself answered
@@ -243,34 +248,46 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
       backoffRate: 2,
     });
     // Fail closed: any other failure (model error, timeout, unparsable body) goes to a person.
-    // The ticket fields travel on with the error added at $.error, as {Error, Cause}.
+    // The ticket fields travel on with the error added at `error`, as {Error, Cause}.
     askDecider.addCatch(reviewUnavailable, {
       errors: ["States.ALL"],
-      outputs: "{% $merge([$states.input, {'error': $states.errorOutput}]) %}",
+      outputs: withField("error", "$states.errorOutput"),
     });
 
-    const answer = (field: string) => `$.model.response.answers.${field}`;
-    const department = answer("department.confidence");
-    const incident = answer("security_incident.noul");
+    // The gate only trusts numbers it can see: a JSON number inside [0, 1]. Each condition is written so
+    // that it is always true or false and never throws. A comparison on a missing field returns nothing
+    // (not false), `$not()` of nothing is nothing, and a comparison on a non-number throws. Any of these
+    // would end the execution with States.QueryEvaluationError, which a Choice state cannot catch. So the
+    // test is `$type(x) = 'number'` first (a missing field gives nothing, and `nothing = 'number'` is
+    // false), then the range, and "not usable" is the $not() of that always-boolean expression.
+    // JSONata also looks inside an array at every step of a path (JSONPath does not), so each step down to
+    // the number must be an object. A rule is only reached once the rules above it did not match, so the
+    // plain comparisons below can rely on the answers they use being numbers in [0, 1].
+    const response = "$states.input.model.response";
+    const answer = (question: string, key: string) => `${response}.answers.${question}.${key}`;
+    const usable = (question: string, key: string) =>
+      [response, `${response}.answers`, `${response}.answers.${question}`]
+        .map((step) => `$type(${step}) = 'object'`)
+        .concat(
+          `$type(${answer(question, key)}) = 'number'`,
+          `${answer(question, key)} >= 0`,
+          `${answer(question, key)} <= 1`
+        )
+        .join(" and ");
+    const incident = answer("security_incident", "noul");
+    const department = answer("department", "confidence");
+    const when = (expression: string) => sfn.Condition.jsonata(`{% ${expression} %}`);
 
-    // The gate only trusts numbers it can see: present, numeric and inside [0, 1]. The security answer
-    // is checked first and on its own, so a page never depends on another answer being well formed.
-    const usable = (path: string) =>
-      sfn.Condition.and(
-        sfn.Condition.isPresent(path),
-        sfn.Condition.isNumeric(path),
-        sfn.Condition.numberGreaterThanEquals(path, 0),
-        sfn.Condition.numberLessThanEquals(path, 1)
-      );
-
-    const confidenceGate = new sfn.Choice(this, "ConfidenceGate", {
+    // The security answer is checked first and on its own, so a page never depends on another answer
+    // being well formed.
+    const confidenceGate = sfn.Choice.jsonata(this, "ConfidenceGate", {
       comment: "Fail closed: anything that is not clearly safe to automate goes to a person.",
     })
-      .when(sfn.Condition.not(usable(incident)), reviewUnavailable)
-      .when(sfn.Condition.numberGreaterThanEquals(incident, securityPageThreshold), reviewSecurity)
-      .when(sfn.Condition.not(usable(department)), reviewUnavailable)
-      .when(sfn.Condition.numberGreaterThan(incident, securityClearThreshold), reviewSecurityUncertain)
-      .when(sfn.Condition.numberGreaterThanEquals(department, departmentThreshold), autoRoute)
+      .when(when(`$not(${usable("security_incident", "noul")})`), reviewUnavailable)
+      .when(when(`${incident} >= ${securityPageThreshold}`), reviewSecurity)
+      .when(when(`$not(${usable("department", "confidence")})`), reviewUnavailable)
+      .when(when(`${incident} > ${securityClearThreshold}`), reviewSecurityUncertain)
+      .when(when(`${department} >= ${departmentThreshold}`), autoRoute)
       .otherwise(reviewLowConfidence);
 
     const invalidTicket = new sfn.Fail(this, "InvalidTicket", {
@@ -278,13 +295,13 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
       cause: 'The input must be {"id": "<string>", "text": "<string>"}',
     });
 
-    const validateInput = new sfn.Choice(this, "ValidateInput")
+    // $type() is 'string' only for a string, so a missing, null or non-string field is refused. The
+    // input must also be an object: for an array holding one ticket, `$states.input.id` would find the
+    // id inside the array.
+    const validateInput = sfn.Choice.jsonata(this, "ValidateInput")
       .when(
-        sfn.Condition.and(
-          sfn.Condition.isPresent("$.id"),
-          sfn.Condition.isString("$.id"),
-          sfn.Condition.isPresent("$.text"),
-          sfn.Condition.isString("$.text")
+        sfn.Condition.jsonata(
+          "{% $type($states.input) = 'object' and $type($states.input.id) = 'string' and $type($states.input.text) = 'string' %}"
         ),
         askDecider.next(confidenceGate)
       )
@@ -292,6 +309,7 @@ export class StrandsDeciderConfidenceGatedTriageStack extends Stack {
 
     const stateMachine = new sfn.StateMachine(this, "TriageStateMachine", {
       definitionBody: sfn.DefinitionBody.fromChainable(validateInput),
+      queryLanguage: sfn.QueryLanguage.JSONATA,
       stateMachineType: sfn.StateMachineType.EXPRESS,
       timeout: Duration.minutes(3),
       logs: {

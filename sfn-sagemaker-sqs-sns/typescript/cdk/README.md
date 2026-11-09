@@ -48,7 +48,7 @@ AWS Step Functions Express workflow
 3. `ConfidenceGate` is the Choice state (see [The gate](#the-gate)).
 4. The outcome states tag the execution with `gate.outcome` and `gate.reason`. Tickets that need a person are sent to the Amazon SQS queue, and a suspected security incident is first published to the Amazon SNS topic. Both calls are retried up to three times, except for errors that a retry cannot fix (a missing queue or topic, or missing permission), which fail at once. If the page still fails, the ticket goes to the queue with the reason `security_incident_page_failed`. If the queue itself stays unreachable, the execution fails, so the caller knows the ticket was not queued.
 
-Step Functions serialises the request `Body` to JSON and returns the response body as a string. The container is asked for JSON, and `AskDecider` parses the body with the JSONata `$parse` function. This one state uses the JSONata query language (the other states use JSONPath, and a state machine may mix them). A body that is not valid JSON raises `States.QueryEvaluationError`, which is caught and treated as "no usable answer". The equivalent JSONPath intrinsic function `States.StringToJson` raises `States.Runtime` for such a body, an error that no `Catch` can handle, so the whole execution would fail and the ticket would never reach the review queue (seen in a check with the Step Functions TestState API).
+Step Functions serialises the request `Body` to JSON and returns the response body as a string. The container is asked for JSON, and `AskDecider` parses the body with the JSONata `$parse` function. A body that is not valid JSON raises `States.QueryEvaluationError`, which is caught and treated as "no usable answer".
 
 ### The questions
 
