@@ -1,0 +1,17 @@
+# Owned by the customers team.
+type Customer {
+  id: ID!
+  name: String!
+  email: String
+}
+
+# The customers team adds one field to the Order type that the orders team owns.
+# The Merged API combines both declarations of Order into one type.
+type Order {
+  id: ID!
+  customer: Customer
+}
+
+type Query {
+  getCustomer(id: ID!): Customer
+}
