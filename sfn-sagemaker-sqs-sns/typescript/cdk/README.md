@@ -92,7 +92,7 @@ The Choice state evaluates its rules in order and fails toward a person. An answ
 
 `auto_routed` ends the workflow: the `AutoRoute` state only tags the result. Replace it with your own action, for example a call that assigns the ticket to the chosen department.
 
-The gate thresholds, the model revision and the instance type are AWS CDK context values, for example `npx cdk deploy -c departmentThreshold=0.8 -c securityPageThreshold=0.6 -c instanceType=ml.m5.4xlarge`. The thresholds are compiled into the state machine definition, so changing one is a stack update.
+The gate thresholds, the model revision and the instance type are AWS CDK context values, for example `npx cdk deploy -c departmentThreshold=0.8 -c securityPageThreshold=0.6 -c instanceType=ml.m5.4xlarge`. The stack checks the thresholds when it synthesises (each from 0 to 1, `securityClearThreshold` below `securityPageThreshold`) and writes them into the Choice state as fixed numbers, so an execution input cannot change them, and changing one is a stack update that touches only the state machine. A `-c` value applies to that deploy only: put the values you want to keep in `cdk.json` under `context`. To tune the thresholds without a stack update, add a state before `ConfidenceGate` that reads them from AWS Systems Manager Parameter Store and checks them.
 
 ## Important Notes
 
