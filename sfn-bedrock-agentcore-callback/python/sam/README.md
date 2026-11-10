@@ -57,7 +57,7 @@ The template creates the following resources:
 * **An AgentCore Runtime agent** deployed from the code zip in S3 (direct code deployment, Python 3.13). The agent uses [Strands Agents](https://strandsagents.com/) to call the Amazon Bedrock model.
 * **An execution role for the agent** that can invoke Amazon Bedrock models, write to its log group, and call `states:SendTaskSuccess`, `states:SendTaskFailure` and `states:SendTaskHeartbeat`. The task token authorizes the callback calls, so they use `Resource: "*"` instead of a state machine ARN.
 * **A Request Response state machine.** The Task state uses `arn:aws:states:::aws-sdk:bedrockagentcore:invokeAgentRuntime`. Step Functions waits for the agent's response, for up to 15 minutes, and parses the JSON response into the state output.
-* **A callback state machine.** The Task state appends `.waitForTaskToken` to the same resource and passes `$states.context.Task.Token` in the payload as `task_token`. Step Functions pauses until the agent returns the token. `TimeoutSeconds` is set to 7200, so a lost callback cannot leave an execution waiting for up to a year.
+* **A callback state machine.** The Task state appends `.waitForTaskToken` to the same resource and passes `$states.context.Task.Token` in the payload as `task_token`. Step Functions pauses until the agent returns the token. `TimeoutSeconds` is set to 7200, so a lost callback can't leave an execution waiting for up to a year.
 
 Both state machine roles can call `bedrock-agentcore:InvokeAgentRuntime` on the runtime ARN and on the runtime ARN followed by `/*`. Step Functions authorizes the call against the runtime and against its endpoint (`runtime/NAME/runtime-endpoint/DEFAULT`). If you grant only one of the two, the call fails with `AccessDeniedException`.
 
@@ -76,7 +76,7 @@ A few details in the agent code matter:
 Choosing a pattern:
 
 * Use Request Response when the agent finishes within 15 minutes. It works in Standard and Express workflows.
-* Use the callback pattern when the agent can take longer. It works in Standard workflows only. The callback pattern needs the AWS SDK integration (`aws-sdk:bedrockagentcore`). The optimized Amazon Bedrock AgentCore integration supports only Request Response.
+* Use the callback pattern when the agent can take longer. It works in Standard workflows only.
 
 ## Testing
 
