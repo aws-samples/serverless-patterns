@@ -7,10 +7,10 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured, with a default Region. This pattern was tested with 2.38.1.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* Python 3 with `pip`, and `zip`. The build downloads Linux ARM64 wheels, so it works on any operating system and does not need Docker.
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed. This pattern was tested with SAM CLI 1.162.1.
+* Python 3 and `zip`. The build downloads Linux ARM64 wheels, so it works on any operating system and does not need Docker.
 * Access to the Amazon Bedrock model that the agent calls. The default is the `global.anthropic.claude-haiku-4-5-20251001-v1:0` inference profile. To use another model, set the `ModelId` parameter during deployment.
 * A Region where Amazon Bedrock AgentCore Runtime is available. This pattern was tested in `us-east-1`.
 
@@ -24,26 +24,27 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/sfn-bedrock-agentcore-callback/python/sam
     ```
-1. Create an S3 bucket for the agent code. New buckets block public access by default. Replace `REGION` with your Region:
-    ```
+1. Create an S3 bucket for the agent code in your default Region. New buckets block public access and encrypt objects by default:
+    ```bash
+    REGION=$(aws configure get region)
     ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    BUCKET=agentcore-code-$ACCOUNT_ID-REGION
-    aws s3 mb s3://$BUCKET --region REGION
+    BUCKET=agentcore-code-$ACCOUNT_ID-$REGION
+    aws s3 mb "s3://$BUCKET" --region "$REGION"
     ```
 1. Package the agent and upload it. The script prints the S3 key of the zip:
-    ```
-    ./build.sh $BUCKET
+    ```bash
+    ./build.sh "$BUCKET"
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
-    ```
+    ```bash
     sam deploy --guided
     ```
 1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region. Use the same Region as the bucket.
+    * Enter a stack name of 42 characters or fewer. The agent's name is built from it.
+    * Enter the same Region as the bucket.
     * For `AgentCodeBucket`, enter the bucket name.
     * For `AgentCodeKey`, enter the key that `build.sh` printed.
-    * Keep the defaults for `AgentRuntimeName` and `ModelId`, or change them.
+    * Keep the default for `ModelId`, or enter another model ID.
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults. After you change the agent code, run `./build.sh` again and pass the new key with `sam deploy --parameter-overrides AgentCodeKey=NEW_KEY`.
@@ -52,46 +53,45 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The template creates the following resources:
+![Architecture: a caller starts either state machine, Step Functions invokes the AgentCore Runtime agent, the agent calls the Amazon Bedrock model, and the agent calls back to the callback state machine](architecture.png)
 
-* **An AgentCore Runtime agent** deployed from the code zip in S3 (direct code deployment, Python 3.13). The agent uses [Strands Agents](https://strandsagents.com/) to call the Amazon Bedrock model.
-* **An execution role for the agent** that can invoke Amazon Bedrock models, write to its log group, and call `states:SendTaskSuccess`, `states:SendTaskFailure` and `states:SendTaskHeartbeat`. The task token authorizes the callback calls, so they use `Resource: "*"` instead of a state machine ARN.
-* **A Request Response state machine.** The Task state uses `arn:aws:states:::aws-sdk:bedrockagentcore:invokeAgentRuntime`. Step Functions waits for the agent's response, for up to 15 minutes, and parses the JSON response into the state output.
-* **A callback state machine.** The Task state appends `.waitForTaskToken` to the same resource and passes `$states.context.Task.Token` in the payload as `task_token`. Step Functions pauses until the agent returns the token. `TimeoutSeconds` is set to 7200, so a lost callback can't leave an execution waiting for up to a year.
+1. **Start.** A caller starts an execution of either state machine with a prompt.
+1. **Invoke.** The Task state calls `InvokeAgentRuntime` through the AWS SDK integration. The Request Response state machine waits for the agent's response, for up to 15 minutes. The callback state machine adds `.waitForTaskToken` and passes the task token in the payload, and the agent returns `{"status": "ACCEPTED"}` at once.
+1. **Reason.** The agent calls the Amazon Bedrock model. For a callback, it does this in a background task.
+1. **Call back.** For a callback, the agent sends the result with `SendTaskSuccess`, or the error with `SendTaskFailure`, and the execution resumes. `TimeoutSeconds` is set to 7200, so a lost callback can't leave an execution waiting for up to a year.
 
-Both state machine roles can call `bedrock-agentcore:InvokeAgentRuntime` on the runtime ARN and on the runtime ARN followed by `/*`. Step Functions authorizes the call against the runtime and against its endpoint (`runtime/NAME/runtime-endpoint/DEFAULT`). If you grant only one of the two, the call fails with `AccessDeniedException`.
+### Good to know
 
-The agent code in `agent/main.py` decides the pattern from the payload:
-
-* **No `task_token`:** the agent runs inline and returns `{"result": ...}` in the response.
-* **A `task_token`:** the agent starts a background task and returns `{"status": "ACCEPTED"}` immediately. When the work finishes, it sends the result with `SendTaskSuccess`. If the work fails, it sends `SendTaskFailure` with the error `AgentRuntimeError`, so the execution fails at once instead of waiting for its timeout.
-
-A few details in the agent code matter:
-
-* `@app.async_task` marks the background work, so the runtime reports itself busy and AgentCore keeps the session alive. Without it, the platform can stop the session while the work is still running, and the callback never arrives.
-* The agent call and the callback calls run in worker threads (`asyncio.to_thread`), so the event loop stays free to answer health checks.
-* The agent creates a new `Agent` object for each invocation. Invocations that share a runtime session therefore do not share conversation history.
-* `Accept` is set in the Task state's `Arguments`, not in `Payload`. In `Payload` it would be sent to the agent as data instead of as a header.
-
-Choosing a pattern:
-
-* Use Request Response when the agent finishes within 15 minutes. It works in Standard and Express workflows.
-* Use the callback pattern when the agent can take longer. It works in Standard workflows only.
+* The agent code in `agent/main.py` decides the pattern from the payload. Without `task_token`, it answers inline. With `task_token`, it calls back.
+* `@app.async_task` marks the background work, so AgentCore keeps the session alive. Without it, the session can stop while the work runs, and the callback never arrives.
+* The agent creates a new `Agent` object for each invocation, so invocations that share a runtime session don't share conversation history.
+* `Accept` is set in the Task state's `Arguments`, not in `Payload`. In `Payload` it would reach the agent as data.
+* The state machine role can call `bedrock-agentcore:InvokeAgentRuntime` on the runtime ARN and on the runtime ARN followed by `/*`. Step Functions authorizes the call against the runtime and against its endpoint, so with only one of them the call fails with `AccessDeniedException`.
+* The agent's role can call `SendTaskSuccess`, `SendTaskFailure` and `SendTaskHeartbeat` on `*`, because the task token authorizes these calls. Without this grant, the agent runs but the execution waits until it times out.
+* Both trust policies accept only the matching service in your account and Region, through `aws:SourceAccount` and `aws:SourceArn`.
+* Request Response works in Standard and Express workflows. The callback pattern works in Standard workflows only.
+* For production, the template comments show where to add heartbeats, VPC networking, execution logging, tracing and a customer managed AWS KMS key.
 
 ## Testing
 
-1. Set the state machine ARNs from the stack outputs. Replace `STACK_NAME` with your stack name:
+1. Store the stack outputs in variables. Replace `STACK_NAME` with the name you chose:
     ```bash
-    RR_ARN=$(aws cloudformation describe-stacks --stack-name STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='RequestResponseStateMachineArn'].OutputValue" --output text)
-    CB_ARN=$(aws cloudformation describe-stacks --stack-name STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='CallbackStateMachineArn'].OutputValue" --output text)
+    STACK_NAME=STACK_NAME
+    get_output() { aws cloudformation describe-stacks --stack-name "$STACK_NAME" \
+      --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
+    RR_ARN=$(get_output RequestResponseStateMachineArn)
+    CB_ARN=$(get_output CallbackStateMachineArn)
+    AGENT_RUNTIME_ARN=$(get_output AgentRuntimeArn)
     ```
 1. Start the Request Response state machine:
     ```bash
-    EXEC=$(aws stepfunctions start-execution --state-machine-arn $RR_ARN --input '{"prompt":"What is the capital of Japan? Answer in one word."}' --query executionArn --output text)
+    EXEC=$(aws stepfunctions start-execution --state-machine-arn "$RR_ARN" \
+      --input '{"prompt":"What is the capital of Japan? Answer in one word."}' \
+      --query executionArn --output text)
     ```
 1. After a few seconds, read the result:
     ```bash
-    aws stepfunctions describe-execution --execution-arn $EXEC --query "[status,output]"
+    aws stepfunctions describe-execution --execution-arn "$EXEC" --query "[status,output]"
     ```
     The status is `SUCCEEDED`, and the output contains the agent's answer:
     ```json
@@ -99,36 +99,45 @@ Choosing a pattern:
     ```
 1. Start the callback state machine and read its result the same way:
     ```bash
-    EXEC=$(aws stepfunctions start-execution --state-machine-arn $CB_ARN --input '{"prompt":"What is the capital of Egypt? Answer in one word."}' --query executionArn --output text)
-    aws stepfunctions describe-execution --execution-arn $EXEC --query "[status,output]"
+    EXEC=$(aws stepfunctions start-execution --state-machine-arn "$CB_ARN" \
+      --input '{"prompt":"What is the capital of Egypt? Answer in one word."}' \
+      --query executionArn --output text)
+    aws stepfunctions describe-execution --execution-arn "$EXEC" --query "[status,output]"
     ```
-    While the agent works, the status is `RUNNING`. After the agent calls `SendTaskSuccess`, the status is `SUCCEEDED` and the output is the JSON that the agent sent:
+    While the agent works, the status is `RUNNING`. Run the `describe-execution` command again after a few seconds. After the agent calls `SendTaskSuccess`, the status is `SUCCEEDED` and the output is the JSON that the agent sent:
     ```json
     {"result": {"role": "assistant", "content": [{"text": "Cairo"}], ...}}
     ```
 1. To see the failure path, redeploy with a model ID that does not exist, then start the callback state machine again:
     ```bash
     sam deploy --parameter-overrides ModelId=invalid-model-id
+    EXEC=$(aws stepfunctions start-execution --state-machine-arn "$CB_ARN" \
+      --input '{"prompt":"Hello"}' --query executionArn --output text)
+    sleep 10
+    aws stepfunctions describe-execution --execution-arn "$EXEC" --query "[status,error,cause]"
     ```
-    The execution fails within seconds with the error `AgentRuntimeError` and the cause `The provided model identifier is invalid.` Redeploy with the original `ModelId` value when you are done.
+    The status is `FAILED`, the error is `AgentRuntimeError`, and the cause ends with `The provided model identifier is invalid.` The execution fails within seconds, not after `TimeoutSeconds`.
+1. Restore the default model:
+    ```bash
+    sam deploy --parameter-overrides ModelId=global.anthropic.claude-haiku-4-5-20251001-v1:0
+    ```
 
-The agent's logs are in the CloudWatch Logs group whose name starts with `/aws/bedrock-agentcore/runtimes/`, followed by the runtime ID.
+The agent's logs are in the CloudWatch Logs log group `/aws/bedrock-agentcore/runtimes/RUNTIME_ID-DEFAULT`, where `RUNTIME_ID` is the last part of `AGENT_RUNTIME_ARN`.
 
 ## Cleanup
 
-1. Delete the stack:
+1. Delete the agent's log group, which AgentCore creates outside the stack:
     ```bash
-    sam delete
+    aws logs delete-log-group --log-group-name "/aws/bedrock-agentcore/runtimes/${AGENT_RUNTIME_ARN##*/}-DEFAULT"
     ```
-1. Delete the agent code and the bucket:
+1. Delete the agent code and the bucket, which you created outside the stack:
     ```bash
-    aws s3 rm s3://$BUCKET --recursive
-    aws s3 rb s3://$BUCKET
+    aws s3 rm "s3://$BUCKET" --recursive
+    aws s3 rb "s3://$BUCKET"
     ```
-1. Optionally, delete the agent's log group, which AgentCore creates and the stack does not delete:
+1. Delete the stack. SAM CLI asks you to confirm, so answer `y` to the prompts:
     ```bash
-    aws logs describe-log-groups --log-group-name-prefix /aws/bedrock-agentcore/runtimes/ --query "logGroups[].logGroupName"
-    aws logs delete-log-group --log-group-name LOG_GROUP_NAME
+    sam delete --stack-name "$STACK_NAME"
     ```
 
 ----
