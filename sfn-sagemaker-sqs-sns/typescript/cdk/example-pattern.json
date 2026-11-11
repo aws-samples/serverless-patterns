@@ -9,7 +9,7 @@
     "text": [
       "This pattern deploys an AWS Step Functions Express workflow that calls an Amazon SageMaker AI endpoint serving the open-weight Strands Decider decision model, directly through the AWS SDK integration. The model answers three typed questions about a support ticket in one call: a choice for the owning department, a score for urgency, and a yes/no question about an active security incident.",
       "A Choice state is the confidence gate. A confident department answer is auto-routed. A suspected security incident is published to an Amazon SNS topic and still goes to a person. Everything else, including any ticket for which the model call failed or returned something unusable, goes to an Amazon SQS human-review queue with a dead-letter queue behind it.",
-      "The model decides what, and its confidence decides whether to act."
+      "The stack builds the model container image, so you need a container builder (Docker, or Finch with `CDK_DOCKER=finch`), and the account and Region must be bootstrapped with `npx cdk bootstrap`."
     ]
   },
   "gitHub": {
@@ -39,19 +39,20 @@
   },
   "deploy": {
     "text": [
-      "<code>npm install</code>",
-      "<code>npx cdk deploy</code>",
-      "The stack builds the model container image, so a container builder must be available (Docker, or Finch with <code>CDK_DOCKER=finch</code>), and the account and Region must be bootstrapped (<code>npx cdk bootstrap</code>)."
+      "npm install",
+      "npx cdk deploy"
     ]
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Run the three sample tickets in the `events` folder: a clear one is auto-routed, an ambiguous one goes to the Amazon SQS review queue, and a security one also sends a page to Amazon SNS.",
+      "See the GitHub repo for the commands and expected output."
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>npx cdk destroy</code>."
+      "Delete the stack: <code>npx cdk destroy</code>.",
+      "Delete the endpoint log group that Amazon SageMaker AI creates: <code>aws logs delete-log-group --log-group-name /aws/sagemaker/Endpoints/$ENDPOINT</code>. Read <code>$ENDPOINT</code> from the <code>DeciderEndpointName</code> stack output before you delete the stack."
     ]
   },
   "authors": [
