@@ -161,7 +161,7 @@ const main = async () => {
   }
 
   const { createPatternSchema } = await import('./pattern-schema.mjs');
-  // No servicesMap here, so patternArch service keys aren't checked.
+  // patternArch isn't checked here: Serverless Land adds and checks it on import.
   const schema = createPatternSchema();
 
   const failures = [];

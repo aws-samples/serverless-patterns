@@ -50,7 +50,10 @@
       "image": "link-to-your-photo.jpg",
       "bio": "Your bio.",
       "linkedin": "linked-in-ID",
-      "twitter": "twitter_handle"
+      "twitter": "twitter_handle",
+      "github": "github-username",
+      "bluesky": "your-handle.bsky.social",
+      "builderid": "builder-center-alias"
     }
   ]
 }
