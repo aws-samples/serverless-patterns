@@ -126,17 +126,17 @@ Important: this application uses various AWS services and there are costs associ
     done
     aws s3 rm "s3://$BUCKET" --recursive
     ```
-1. Delete the stack. SAM CLI asks you to confirm, so answer `y` to the prompts:
-    ```bash
-    sam delete --stack-name "$STACK_NAME"
-    ```
-    If the stack can't delete the Code Interpreter while a session is still active, stop the sessions and run `sam delete` again:
+1. Stop any active Code Interpreter session. A session can stay active for several minutes after a run, and the stack can't delete the Code Interpreter while it is:
     ```bash
     CI_ID=$(get_output CodeInterpreterId)
     for s in $(aws bedrock-agentcore list-code-interpreter-sessions --code-interpreter-identifier "$CI_ID" \
         --status READY --query 'items[].sessionId' --output text); do
       aws bedrock-agentcore stop-code-interpreter-session --code-interpreter-identifier "$CI_ID" --session-id "$s"
     done
+    ```
+1. Delete the stack. SAM CLI asks you to confirm, so answer `y` to the prompts:
+    ```bash
+    sam delete --stack-name "$STACK_NAME"
     ```
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.

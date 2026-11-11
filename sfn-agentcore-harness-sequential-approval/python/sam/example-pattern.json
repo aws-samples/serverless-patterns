@@ -54,7 +54,7 @@
   },
   "cleanup": {
     "text": [
-      "Stop running executions and empty the bucket, then delete the stack: <code>sam delete</code>."
+      "Stop running executions, empty the bucket and stop any Code Interpreter session, then delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
