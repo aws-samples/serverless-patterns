@@ -1,0 +1,26 @@
+{
+  "accountHolder": "Richard Roe",
+  "transactions": [
+    {
+      "id": "C1",
+      "amount": 12.5,
+      "merchant": "Coffee Corner",
+      "city": "Austin",
+      "time": "2026-11-10T08:00:00Z"
+    },
+    {
+      "id": "C2",
+      "amount": 64.2,
+      "merchant": "Grocery Mart",
+      "city": "Austin",
+      "time": "2026-11-10T18:00:00Z"
+    },
+    {
+      "id": "C3",
+      "amount": 30.0,
+      "merchant": "Gas Stop",
+      "city": "Austin",
+      "time": "2026-11-11T07:30:00Z"
+    }
+  ]
+}

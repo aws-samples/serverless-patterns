@@ -1,0 +1,26 @@
+{
+  "accountHolder": "Mary Major",
+  "transactions": [
+    {
+      "id": "R1",
+      "amount": 38.0,
+      "merchant": "Bakery",
+      "city": "Denver",
+      "time": "2026-11-10T08:00:00Z"
+    },
+    {
+      "id": "R2",
+      "amount": 640.0,
+      "merchant": "Online Electronics",
+      "city": "Online",
+      "time": "2026-11-10T23:55:00Z"
+    },
+    {
+      "id": "R3",
+      "amount": 22.5,
+      "merchant": "Pharmacy",
+      "city": "Denver",
+      "time": "2026-11-11T09:00:00Z"
+    }
+  ]
+}

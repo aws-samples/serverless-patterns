@@ -1,0 +1,63 @@
+{
+  "title": "AWS Step Functions conditional routing on an Amazon Bedrock AgentCore harness agent verdict",
+  "description": "Route a batch of transactions on the verdict of Amazon Bedrock AgentCore harness agents. Risky batches wait for a reviewer who signs in with Amazon Cognito.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An AWS Step Functions workflow reviews a batch of card transactions with three agents, each a call to the same Amazon Bedrock AgentCore harness through the optimized InvokeHarness integration. A fraud analyst lists suspicious transactions, and a compliance specialist explains them and ends with a verdict token: RISK_IMMEDIATE, RISK_REVIEW or RISK_NONE.",
+      "A Choice state routes on the token. Clear fraud goes to a third agent that drafts a customer notification, then to approval. A RISK_REVIEW verdict, a missing token, an incomplete reply or a failed call goes to human review, and only RISK_NONE closes the batch without a person. Approval emails from Amazon SNS link to the Amazon Cognito sign-in page, and an AWS Lambda function behind Amazon API Gateway records the decision for users in the approvers group. Every outcome is stored in Amazon DynamoDB.",
+      "This pattern deploys one AgentCore harness, one Step Functions state machine, one SNS topic, one Cognito user pool, one HTTP API, one Lambda function and one DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke Amazon Bedrock AgentCore harness with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-bedrockagentcore.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore harness",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html"
+      },
+      {
+        "text": "Harness tools and allowedTools",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness-tools.html"
+      },
+      {
+        "text": "Choice workflow state",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/state-choice.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Stop running executions, then delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Surya Sai D",
+      "bio": "Surya Sai D is a Technical Account Manager at Amazon Web Services. His expertise lies with Serverless and Event Driven Architectures. Surya has been an active contributor to the Serverless community with his blogs and speaking sessions.",
+      "linkedin": "surya-sai-d-64920416a"
+    }
+  ]
+}

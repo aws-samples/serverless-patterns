@@ -1,0 +1,274 @@
+{
+  "Comment": "Conditional routing on an agent verdict: detect -> explain -> route (draft + approval, human review, or auto close) -> record",
+  "QueryLanguage": "JSONata",
+  "StartAt": "DetectAnomalies",
+  "States": {
+    "DetectAnomalies": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+      "Arguments": {
+        "HarnessArn": "${HarnessArn}",
+        "RuntimeSessionId": "{% $uuid() %}",
+        "Messages": [
+          {
+            "Role": "user",
+            "Content": [
+              {
+                "Text": "{% 'Account holder: ' & $states.input.accountHolder & '\\nTransactions:\\n' & $string($states.input.transactions) %}"
+              }
+            ]
+          }
+        ],
+        "SystemPrompt": [
+          {
+            "Text": "You are a financial fraud detection analyst. List any transactions with a real risk signal (amount far outside this customer's pattern, rapid repeat purchases, geographic impossibility) and the reason for each. Ordinary purchases are not suspicious. If nothing is suspicious say: No suspicious transactions."
+          }
+        ],
+        "AllowedTools": [],
+        "MaxIterations": 5,
+        "TimeoutSeconds": 120,
+        "Model": {
+          "BedrockModelConfig": {
+            "ModelId": "${AgentModelId}"
+          }
+        }
+      },
+      "Output": "{% $merge([$states.input,{'findings':$states.result.Output.Message.Content[0].Text,'detStop':$states.result.StopReason}]) %}",
+      "Next": "ExplainAnomalies",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "BedrockAgentCore.ThrottlingException"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "HumanReview",
+          "Output": "{% $merge([$states.input,{'route':'HUMAN_REVIEW','reason':'An agent call failed.'}]) %}"
+        }
+      ]
+    },
+    "ExplainAnomalies": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+      "Arguments": {
+        "HarnessArn": "${HarnessArn}",
+        "RuntimeSessionId": "{% $uuid() %}",
+        "Messages": [
+          {
+            "Role": "user",
+            "Content": [
+              {
+                "Text": "{% 'Account holder: ' & $states.input.accountHolder & '\\nAnalyst findings:\\n' & $string($states.input.findings) %}"
+              }
+            ]
+          }
+        ],
+        "SystemPrompt": [
+          {
+            "Text": "You are a compliance specialist. For each finding from the fraud analyst, explain in plain language why it matters and give a confidence level of high, medium, or low. End your answer with a final line that holds exactly one verdict token: RISK_IMMEDIATE if there is clear fraud that needs action now, RISK_REVIEW if a person should look, or RISK_NONE if nothing is suspicious. Don't write any verdict token anywhere else."
+          }
+        ],
+        "AllowedTools": [],
+        "MaxIterations": 5,
+        "TimeoutSeconds": 120,
+        "Model": {
+          "BedrockModelConfig": {
+            "ModelId": "${AgentModelId}"
+          }
+        }
+      },
+      "Output": "{% $merge([$states.input,{'explanation':$states.result.Output.Message.Content[0].Text,'expStop':$states.result.StopReason}]) %}",
+      "Next": "Route",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "BedrockAgentCore.ThrottlingException"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "HumanReview",
+          "Output": "{% $merge([$states.input,{'route':'HUMAN_REVIEW','reason':'An agent call failed.'}]) %}"
+        }
+      ]
+    },
+    "Route": {
+      "Comment": "Only a clean RISK_NONE closes automatically. Anything unclear goes to a person.",
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $states.input.expStop != 'end_turn' or $states.input.detStop != 'end_turn' %}",
+          "Next": "HumanReview",
+          "Output": "{% $merge([$states.input,{'reason':'An agent reply was incomplete.'}]) %}"
+        },
+        {
+          "Condition": "{% $contains($string($states.input.explanation),'RISK_IMMEDIATE') %}",
+          "Next": "DraftAction"
+        },
+        {
+          "Condition": "{% $contains($string($states.input.explanation),'RISK_NONE') and $not($contains($string($states.input.explanation),'RISK_REVIEW')) %}",
+          "Next": "AutoClose"
+        }
+      ],
+      "Default": "HumanReview",
+      "Output": "{% $merge([$states.input,{'reason':'The verdict was RISK_REVIEW or missing.'}]) %}"
+    },
+    "DraftAction": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+      "Arguments": {
+        "HarnessArn": "${HarnessArn}",
+        "RuntimeSessionId": "{% $uuid() %}",
+        "Messages": [
+          {
+            "Role": "user",
+            "Content": [
+              {
+                "Text": "{% 'Account holder: ' & $states.input.accountHolder & '\\nCompliance explanation:\\n' & $states.input.explanation %}"
+              }
+            ]
+          }
+        ],
+        "SystemPrompt": [
+          {
+            "Text": "You are a fraud operations specialist. Draft a short notification to the customer about the suspicious transactions and short internal case notes. Don't include card numbers."
+          }
+        ],
+        "AllowedTools": [],
+        "MaxIterations": 5,
+        "TimeoutSeconds": 120,
+        "Model": {
+          "BedrockModelConfig": {
+            "ModelId": "${AgentModelId}"
+          }
+        }
+      },
+      "Output": "{% $merge([$states.input,{'draft':$states.result.Output.Message.Content[0].Text,'draftStop':$states.result.StopReason}]) %}",
+      "Next": "CheckDraft",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "BedrockAgentCore.ThrottlingException"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "HumanReview",
+          "Output": "{% $merge([$states.input,{'route':'HUMAN_REVIEW','reason':'An agent call failed.'}]) %}"
+        }
+      ]
+    },
+    "CheckDraft": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $states.input.draftStop = 'end_turn' and $length($string($states.input.draft)) > 0 %}",
+          "Next": "RequestApproval"
+        }
+      ],
+      "Default": "HumanReview",
+      "Output": "{% $merge([$states.input,{'reason':'The draft was incomplete.'}]) %}"
+    },
+    "RequestApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish.waitForTaskToken",
+      "Arguments": {
+        "TopicArn": "${ApprovalTopicArn}",
+        "Subject": "Fraud action awaiting approval",
+        "Message": "{% ($token := $replace($replace($replace($states.context.Task.Token, '+', '-'), '/', '_'), '=', '.'); 'Account holder: ' & $states.input.accountHolder & '\\n\\nCompliance explanation:\\n' & $states.input.explanation & '\\n\\nDraft action:\\n' & $states.input.draft & '\\n\\nApprove and send: ${AuthorizeUrl}approve:' & $token & '\\n\\nReject: ${AuthorizeUrl}reject:' & $token) %}"
+      },
+      "TimeoutSeconds": 86400,
+      "Output": "{% $merge([$states.input, $states.result, {'route':'ACTION'}]) %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "DecisionTimedOut"
+        }
+      ],
+      "Next": "RecordOutcome"
+    },
+    "HumanReview": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish.waitForTaskToken",
+      "Arguments": {
+        "TopicArn": "${ApprovalTopicArn}",
+        "Subject": "Transaction batch needs review",
+        "Message": "{% ($token := $replace($replace($replace($states.context.Task.Token, '+', '-'), '/', '_'), '=', '.'); 'Account holder: ' & $states.input.accountHolder & '\\nReason: ' & $states.input.reason & '\\n\\nTransactions:\\n' & $string($states.input.transactions) & '\\n\\nCompliance explanation:\\n' & $string($states.input.explanation) & '\\n\\nApprove (mark reviewed): ${AuthorizeUrl}approve:' & $token & '\\n\\nReject (escalate): ${AuthorizeUrl}reject:' & $token) %}"
+      },
+      "TimeoutSeconds": 86400,
+      "Output": "{% $merge([$states.input, $states.result, {'route':'HUMAN_REVIEW'}]) %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "DecisionTimedOut"
+        }
+      ],
+      "Next": "RecordOutcome"
+    },
+    "AutoClose": {
+      "Type": "Pass",
+      "Output": "{% $merge([$states.input,{'route':'AUTO_CLOSE','decision':'closed','approver':'none'}]) %}",
+      "Next": "RecordOutcome"
+    },
+    "RecordOutcome": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Arguments": {
+        "TableName": "${CaseTableName}",
+        "Item": {
+          "executionName": {
+            "S": "{% $states.context.Execution.Name %}"
+          },
+          "accountHolder": {
+            "S": "{% $states.input.accountHolder %}"
+          },
+          "route": {
+            "S": "{% $states.input.route %}"
+          },
+          "decision": {
+            "S": "{% $states.input.decision %}"
+          },
+          "approver": {
+            "S": "{% $states.input.approver %}"
+          },
+          "explanation": {
+            "S": "{% $string($states.input.explanation) %}"
+          }
+        }
+      },
+      "Output": "{% { 'route': $states.input.route, 'decision': $states.input.decision, 'approver': $states.input.approver } %}",
+      "End": true
+    },
+    "DecisionTimedOut": {
+      "Type": "Fail",
+      "Error": "DecisionTimedOut",
+      "Cause": "Nobody decided within 24 hours."
+    }
+  }
+}
