@@ -1,0 +1,408 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS Step Functions runs two Amazon Bedrock AgentCore harness agents in sequence on a CSV file
+  uploaded to Amazon S3, then waits for an approver who signs in with Amazon Cognito.
+  (uksb-1tthgi812)(tag:sfn-agentcore-harness-sequential-approval-python-sam)
+
+Parameters:
+  ApproverEmail:
+    Type: String
+    Description: Email address of the approver. It receives the approval emails and a temporary Cognito password.
+    AllowedPattern: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+  AgentModelId:
+    Type: String
+    Default: global.anthropic.claude-haiku-4-5-20251001-v1:0
+    AllowedPattern: '^global\..+'
+    Description: Global cross-Region inference profile ID for the analyst and report writer calls. Each call overrides the harness default model.
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # Data: CSV files go to input/, the analyst writes results/<execution>.json
+  # ---------------------------------------------------------------------------
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          # For production workloads, consider SSE-KMS with a customer managed AWS KMS key.
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # Send object events to Amazon EventBridge so an upload starts the workflow.
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  DataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DataBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource: [!GetAtt DataBucket.Arn, !Sub '${DataBucket.Arn}/*']
+            Condition: { Bool: { 'aws:SecureTransport': 'false' } }
+
+  ReportTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: executionName, AttributeType: S }]
+      KeySchema: [{ AttributeName: executionName, KeyType: HASH }]
+      # Encrypted at rest with an AWS owned key by default. For production workloads,
+      # consider SSESpecification with a customer managed AWS KMS key.
+      PointInTimeRecoverySpecification: { PointInTimeRecoveryEnabled: true }
+
+  # ---------------------------------------------------------------------------
+  # Agents: one harness, a custom Code Interpreter that can reach the bucket
+  # ---------------------------------------------------------------------------
+  # The managed Code Interpreter has no AWS credentials, so it cannot read S3.
+  # A custom Code Interpreter runs with this role. It can read the bucket and
+  # write only under results/.
+  CodeInterpreterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: bedrock-agentcore.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              ArnLike: { 'aws:SourceArn': !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:code-interpreter-custom/*' }
+      Policies:
+        - PolicyName: ReadInputWriteResults
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub '${DataBucket.Arn}/input/*'
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub '${DataBucket.Arn}/results/*'
+
+  CodeInterpreter:
+    Type: AWS::BedrockAgentCore::CodeInterpreterCustom
+    Properties:
+      # Names allow letters, digits and underscores, so build one from the stack name.
+      Name: !Join ['_', [!Join ['_', !Split ['-', !Ref AWS::StackName]], 'ci']]
+      ExecutionRoleArn: !GetAtt CodeInterpreterRole.Arn
+      NetworkConfiguration: { NetworkMode: PUBLIC }
+
+  HarnessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: bedrock-agentcore.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              # A harness runs on AgentCore Runtime, and both services assume this role.
+              ArnLike:
+                'aws:SourceArn':
+                  - !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:harness/*'
+                  - !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:runtime/*'
+      Policies:
+        - PolicyName: ModelsAndCodeInterpreter
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+                Resource:
+                  # Harness default model
+                  - !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.nova-lite-v1:0'
+                  # Model the workflow sets on each call. A global inference profile can
+                  # route to the model in any Region, so the foundation model ARN uses *.
+                  - !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${AgentModelId}'
+                  - !Sub
+                    - 'arn:${AWS::Partition}:bedrock:*::foundation-model/${ModelName}'
+                    - ModelName: !Select [1, !Split ['global.', !Ref AgentModelId]]
+              - Effect: Allow
+                Action:
+                  - bedrock-agentcore:StartCodeInterpreterSession
+                  - bedrock-agentcore:InvokeCodeInterpreter
+                  - bedrock-agentcore:StopCodeInterpreterSession
+                  - bedrock-agentcore:GetCodeInterpreterSession
+                Resource: !GetAtt CodeInterpreter.CodeInterpreterArn
+
+  Harness:
+    Type: AWS::BedrockAgentCore::Harness
+    Properties:
+      HarnessName: !Join ['_', [!Join ['_', !Split ['-', !Ref AWS::StackName]], 'harness']]
+      ExecutionRoleArn: !GetAtt HarnessRole.Arn
+      Model:
+        BedrockModelConfig: { ModelId: amazon.nova-lite-v1:0 }
+      # Managed memory is shared by every session of the same actor, and Step Functions
+      # calls all use the same actor. Turn it off so one file's data never reaches another run.
+      Memory: { Disabled: {} }
+      Tools:
+        - Type: agentcore_code_interpreter
+          Name: code_interpreter
+          Config:
+            AgentCoreCodeInterpreter: { CodeInterpreterArn: !GetAtt CodeInterpreter.CodeInterpreterArn }
+      # Without AllowedTools the harness also offers built-in tools such as shell and
+      # web_fetch. Allow only the Code Interpreter by default. Calls can narrow this further.
+      AllowedTools: ['@code_interpreter']
+
+  # ---------------------------------------------------------------------------
+  # Approval: SNS email with links to the Cognito sign-in page
+  # ---------------------------------------------------------------------------
+  ApprovalTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      # Encrypted with the AWS managed key for Amazon SNS. For production workloads,
+      # consider a customer managed AWS KMS key.
+      KmsMasterKeyId: alias/aws/sns
+
+  ApprovalSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref ApprovalTopic
+      Protocol: email
+      Endpoint: !Ref ApproverEmail
+
+  # Only an administrator can create users. Approvers must be in the approvers group.
+  ApproverPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig: { AllowAdminCreateUserOnly: true }
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      # For production workloads, consider turning on multi-factor authentication.
+      MfaConfiguration: 'OFF'
+
+  ApproverGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref ApproverPool
+      GroupName: approvers
+
+  ApproverUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      UserPoolId: !Ref ApproverPool
+      Username: !Ref ApproverEmail
+      DesiredDeliveryMediums: [EMAIL]
+      UserAttributes:
+        - { Name: email, Value: !Ref ApproverEmail }
+        - { Name: email_verified, Value: 'true' }
+
+  ApproverInGroup:
+    Type: AWS::Cognito::UserPoolUserToGroupAttachment
+    Properties:
+      UserPoolId: !Ref ApproverPool
+      GroupName: !Ref ApproverGroup
+      Username: !Ref ApproverUser
+
+  ApproverPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref ApproverPool
+      # Domain prefixes are global. Use part of the stack ID to keep this one unique.
+      Domain: !Sub
+        - 'approvals-${Suffix}'
+        - Suffix: !Select [0, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]
+      ManagedLoginVersion: 1
+
+  ApproverPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref ApproverPool
+      GenerateSecret: true
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows: [code]
+      AllowedOAuthScopes: [openid, email]
+      SupportedIdentityProviders: [COGNITO]
+      CallbackURLs:
+        - !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/callback'
+      ExplicitAuthFlows: [ALLOW_REFRESH_TOKEN_AUTH]
+      PreventUserExistenceErrors: ENABLED
+
+  ApprovalApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub '${AWS::StackName}-approval'
+      ProtocolType: HTTP
+
+  ApprovalApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ApprovalApi
+      StageName: $default
+      AutoDeploy: true
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 10
+        ThrottlingRateLimit: 5
+
+  ApprovalIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApprovalApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt ApprovalFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  ApprovalRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApprovalApi
+      # Cognito redirects here after sign-in. The function rejects any request
+      # without a valid authorization code from the approvers group.
+      RouteKey: GET /callback
+      Target: !Sub 'integrations/${ApprovalIntegration}'
+
+  ApprovalInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApprovalFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${ApprovalApi}/*/GET/callback'
+
+  ApprovalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/approval/
+      Handler: app.handler
+      Runtime: python3.13
+      Architectures: [arm64]
+      Timeout: 15
+      Environment:
+        Variables:
+          USER_POOL_ID: !Ref ApproverPool
+          CLIENT_ID: !Ref ApproverPoolClient
+          COGNITO_DOMAIN: !Sub 'https://${ApproverPoolDomain}.auth.${AWS::Region}.amazoncognito.com'
+          CALLBACK_URL: !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/callback'
+          APPROVER_GROUP: !Ref ApproverGroup
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: cognito-idp:DescribeUserPoolClient
+              Resource: !GetAtt ApproverPool.Arn
+            - Effect: Allow
+              Action: states:SendTaskSuccess
+              Resource: !Ref Workflow
+
+  # ---------------------------------------------------------------------------
+  # Workflow
+  # ---------------------------------------------------------------------------
+  WorkflowRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: states.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              ArnLike: { 'aws:SourceArn': !Sub 'arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*' }
+      Policies:
+        - PolicyName: Workflow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # The InvokeHarness integration checks both actions.
+              - Effect: Allow
+                Action: [bedrock-agentcore:InvokeHarness, bedrock-agentcore:InvokeAgentRuntime]
+                Resource: !GetAtt Harness.Arn
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub '${DataBucket.Arn}/results/*'
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref ApprovalTopic
+              - Effect: Allow
+                Action: dynamodb:PutItem
+                Resource: !GetAtt ReportTable.Arn
+
+  Workflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: statemachine/workflow.asl.json
+      Role: !GetAtt WorkflowRole.Arn
+      DefinitionSubstitutions:
+        HarnessArn: !GetAtt Harness.Arn
+        AgentModelId: !Ref AgentModelId
+        DataBucketName: !Ref DataBucket
+        ApprovalTopicArn: !Ref ApprovalTopic
+        ReportTableName: !Ref ReportTable
+        # The links in the email. The callback URL is URL-encoded, and the workflow
+        # appends the state: "approve:" or "reject:" and a URL-safe copy of the task token.
+        AuthorizeUrl: !Sub 'https://${ApproverPoolDomain}.auth.${AWS::Region}.amazoncognito.com/oauth2/authorize?response_type=code&client_id=${ApproverPoolClient}&scope=openid+email&redirect_uri=https%3A%2F%2F${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com%2Fcallback&state='
+
+  # An upload under input/ with a .csv suffix starts the workflow.
+  UploadRuleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: events.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              ArnLike: { 'aws:SourceArn': !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/*' }
+      Policies:
+        - PolicyName: StartWorkflow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: states:StartExecution
+                Resource: !Ref Workflow
+
+  UploadRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source: [aws.s3]
+        detail-type: [Object Created]
+        detail:
+          bucket: { name: [!Ref DataBucket] }
+          object: { key: [{ wildcard: 'input/*.csv' }] }
+      Targets:
+        - Id: Workflow
+          Arn: !Ref Workflow
+          RoleArn: !GetAtt UploadRuleRole.Arn
+
+Outputs:
+  DataBucketName:
+    Description: Upload CSV files under input/ in this bucket
+    Value: !Ref DataBucket
+  WorkflowArn:
+    Value: !Ref Workflow
+  HarnessArn:
+    Value: !GetAtt Harness.Arn
+  CodeInterpreterId:
+    Value: !GetAtt CodeInterpreter.CodeInterpreterId
+  ReportTableName:
+    Value: !Ref ReportTable
+  UserPoolId:
+    Value: !Ref ApproverPool
+  CallbackUrl:
+    Value: !Sub 'https://${ApprovalApi}.execute-api.${AWS::Region}.amazonaws.com/callback'
