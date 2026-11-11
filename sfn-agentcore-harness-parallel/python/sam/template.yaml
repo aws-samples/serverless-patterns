@@ -1,0 +1,239 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS Step Functions fans out three Amazon Bedrock AgentCore harness agents in parallel on a text
+  document uploaded to Amazon S3, then merges their answers into one report.
+  (uksb-1tthgi812)(tag:sfn-agentcore-harness-parallel-python-sam)
+
+Parameters:
+  NotificationEmail:
+    Type: String
+    Description: Email address that receives the finished report.
+    AllowedPattern: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # Data: documents go to docs/, reports go to DynamoDB
+  # ---------------------------------------------------------------------------
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          # For production workloads, consider SSE-KMS with a customer managed AWS KMS key.
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # Send object events to Amazon EventBridge so an upload starts the workflow.
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  DataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DataBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource: [!GetAtt DataBucket.Arn, !Sub '${DataBucket.Arn}/*']
+            Condition: { Bool: { 'aws:SecureTransport': 'false' } }
+
+  ReportTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{ AttributeName: documentKey, AttributeType: S }]
+      KeySchema: [{ AttributeName: documentKey, KeyType: HASH }]
+      # Encrypted at rest with an AWS owned key by default. For production workloads,
+      # consider SSESpecification with a customer managed AWS KMS key.
+      PointInTimeRecoverySpecification: { PointInTimeRecoveryEnabled: true }
+
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      # Encrypted with the AWS managed key for Amazon SNS. For production workloads,
+      # consider a customer managed AWS KMS key.
+      KmsMasterKeyId: alias/aws/sns
+
+  NotificationSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref NotificationTopic
+      Protocol: email
+      Endpoint: !Ref NotificationEmail
+
+  # ---------------------------------------------------------------------------
+  # Agents: one harness, three system prompts that run at the same time
+  # ---------------------------------------------------------------------------
+  HarnessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: bedrock-agentcore.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              # A harness runs on AgentCore Runtime, and both services assume this role.
+              ArnLike:
+                'aws:SourceArn':
+                  - !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:harness/*'
+                  - !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:runtime/*'
+      Policies:
+        - PolicyName: Model
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+                Resource: !Sub 'arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.nova-lite-v1:0'
+
+  Harness:
+    Type: AWS::BedrockAgentCore::Harness
+    Properties:
+      # Names allow letters, digits and underscores, so build one from the stack name.
+      HarnessName: !Join ['_', [!Join ['_', !Split ['-', !Ref AWS::StackName]], 'harness']]
+      ExecutionRoleArn: !GetAtt HarnessRole.Arn
+      Model:
+        BedrockModelConfig: { ModelId: amazon.nova-lite-v1:0 }
+      # Managed memory is shared by every session of the same actor, and Step Functions
+      # calls all use the same actor. Turn it off so one document never reaches another run.
+      Memory: { Disabled: {} }
+      # Without AllowedTools the harness also offers built-in tools such as shell and
+      # web_fetch. These agents only read the text they are given, so allow no tools.
+      AllowedTools: []
+
+  # ---------------------------------------------------------------------------
+  # Functions: read the document, merge the three answers
+  # ---------------------------------------------------------------------------
+  ExtractFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/extract/
+      Handler: app.handler
+      Runtime: python3.13
+      Architectures: [arm64]
+      Timeout: 30
+      Environment:
+        Variables:
+          # Step Functions limits state input and output to 256 KiB, and the text
+          # travels in the payload. Leave room for the rest of the state.
+          MAX_DOCUMENT_BYTES: '200000'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub '${DataBucket.Arn}/docs/*'
+
+  MergeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/merge/
+      Handler: app.handler
+      Runtime: python3.13
+      Architectures: [arm64]
+      Timeout: 10
+
+  # ---------------------------------------------------------------------------
+  # Workflow
+  # ---------------------------------------------------------------------------
+  WorkflowRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: states.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              ArnLike: { 'aws:SourceArn': !Sub 'arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*' }
+      Policies:
+        - PolicyName: Workflow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # The InvokeHarness integration checks both actions.
+              - Effect: Allow
+                Action: [bedrock-agentcore:InvokeHarness, bedrock-agentcore:InvokeAgentRuntime]
+                Resource: !GetAtt Harness.Arn
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: [!GetAtt ExtractFunction.Arn, !GetAtt MergeFunction.Arn]
+              - Effect: Allow
+                Action: dynamodb:PutItem
+                Resource: !GetAtt ReportTable.Arn
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref NotificationTopic
+
+  Workflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: statemachine/workflow.asl.json
+      Role: !GetAtt WorkflowRole.Arn
+      DefinitionSubstitutions:
+        HarnessArn: !GetAtt Harness.Arn
+        ExtractFunctionArn: !GetAtt ExtractFunction.Arn
+        MergeFunctionArn: !GetAtt MergeFunction.Arn
+        ReportTableName: !Ref ReportTable
+        NotificationTopicArn: !Ref NotificationTopic
+
+  # An upload under docs/ with a .txt suffix starts the workflow.
+  UploadRuleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: events.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals: { 'aws:SourceAccount': !Ref AWS::AccountId }
+              ArnLike: { 'aws:SourceArn': !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/*' }
+      Policies:
+        - PolicyName: StartWorkflow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: states:StartExecution
+                Resource: !Ref Workflow
+
+  UploadRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source: [aws.s3]
+        detail-type: [Object Created]
+        detail:
+          bucket: { name: [!Ref DataBucket] }
+          object: { key: [{ wildcard: 'docs/*.txt' }] }
+      Targets:
+        - Id: Workflow
+          Arn: !Ref Workflow
+          RoleArn: !GetAtt UploadRuleRole.Arn
+
+Outputs:
+  DataBucketName:
+    Description: Upload text documents under docs/ in this bucket
+    Value: !Ref DataBucket
+  WorkflowArn:
+    Value: !Ref Workflow
+  HarnessArn:
+    Value: !GetAtt Harness.Arn
+  ReportTableName:
+    Value: !Ref ReportTable

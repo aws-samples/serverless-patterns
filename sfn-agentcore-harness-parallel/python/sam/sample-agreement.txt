@@ -1,0 +1,6 @@
+Vendor Services Agreement - Summary of Terms (Draft v3)
+This agreement between Example Corp ("Customer") and Acme Logistics ("Vendor") covers warehousing and last-mile delivery in the Northeast region for 24 months starting January 1, 2027.
+Pricing: Vendor charges $2.10 per parcel with an annual escalator of 6%. There is no cap on fuel surcharges.
+Liability: Vendor liability is limited to $50,000 per year regardless of loss. Customer data (names, addresses, phone numbers) will be stored by a Vendor subcontractor outside the United States; the subcontractor is not named.
+Termination: Either party may terminate with 30 days notice; Customer pays an early termination fee equal to 6 months of average invoices.
+Action items: Legal (Jane Doe) must review the data residency clause by December 5, 2026. Procurement (John Doe) must request a fuel surcharge cap by November 30, 2026. Finance must approve the budget before signature, target date December 12, 2026.

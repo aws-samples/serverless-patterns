@@ -1,0 +1,63 @@
+{
+  "title": "AWS Step Functions parallel agents on one Amazon Bedrock AgentCore harness",
+  "description": "Fan out three Amazon Bedrock AgentCore harness agents in parallel on a document uploaded to Amazon S3, and publish the merged report only if all three finish.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An upload of a text document to Amazon S3 starts an AWS Step Functions workflow through Amazon EventBridge. An AWS Lambda function reads the document, and a Parallel state calls the same Amazon Bedrock AgentCore harness three times at once through the optimized InvokeHarness integration: a summarizer, a risk analyst and an action-item extractor, each set by its system prompt.",
+      "A Choice state continues only if all three calls ended normally and each answer holds a completion marker. A second Lambda function merges the sections, and the workflow stores the report in Amazon DynamoDB and emails it through Amazon SNS. A failed or incomplete branch stops the workflow, so a partial report is never published.",
+      "This pattern deploys one AgentCore harness, one Step Functions state machine, one S3 bucket, one EventBridge rule, two Lambda functions, one DynamoDB table and one SNS topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke Amazon Bedrock AgentCore harness with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-bedrockagentcore.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore harness",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html"
+      },
+      {
+        "text": "Harness tools and allowedTools",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness-tools.html"
+      },
+      {
+        "text": "Parallel workflow state",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/state-parallel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Empty the bucket, then delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Surya Sai D",
+      "bio": "Surya Sai D is a Technical Account Manager at Amazon Web Services. His expertise lies with Serverless and Event Driven Architectures. Surya has been an active contributor to the Serverless community with his blogs and speaking sessions.",
+      "linkedin": "surya-sai-d-64920416a"
+    }
+  ]
+}
