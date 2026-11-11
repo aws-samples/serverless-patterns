@@ -144,6 +144,22 @@ Resources:
       Architectures: [arm64]
       Timeout: 10
 
+  ExtractFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      # Created by the stack so that it has a retention period and is deleted with the stack.
+      # For production workloads, consider a customer managed AWS KMS key (KmsKeyId).
+      LogGroupName: !Sub '/aws/lambda/${ExtractFunction}'
+      RetentionInDays: 14
+
+  MergeFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      # Created by the stack so that it has a retention period and is deleted with the stack.
+      # For production workloads, consider a customer managed AWS KMS key (KmsKeyId).
+      LogGroupName: !Sub '/aws/lambda/${MergeFunction}'
+      RetentionInDays: 14
+
   # ---------------------------------------------------------------------------
   # Workflow
   # ---------------------------------------------------------------------------
