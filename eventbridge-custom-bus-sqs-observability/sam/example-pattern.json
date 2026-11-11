@@ -1,15 +1,15 @@
 {
-  "title": "Amazon EventBridge new Custom event bus to Amazon SQS with observability",
-  "description": "Deploy an Amazon EventBridge new Custom event bus with a Subscriber that delivers to Amazon SQS, with delivery logs and Amazon CloudWatch alarms to trace a missing event.",
+  "title": "Amazon EventBridge Custom Event Bus to Amazon SQS with observability",
+  "description": "Deploy an Amazon EventBridge Custom Event Bus with a subscriber that delivers to Amazon SQS, with delivery logs and Amazon CloudWatch alarms to trace a missing event.",
   "language": "Integration",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon EventBridge new Custom event bus with one Subscriber. The Subscriber filters events and delivers each match to an Amazon SQS queue. A second queue receives a record for any event that cannot be delivered after its retries.",
-      "The pattern also sets up what you need to follow one event from the publish call to the target. A CloudWatch Logs delivery sends the Subscriber's delivery records to a log group, and five Amazon CloudWatch alarms cover publish failures, throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to it. A template parameter removes the delivery role's access to the target queue, so you can break delivery on purpose, see how the metrics, logs and alarms report it, and replay the failed events from the bus.",
-      "This pattern deploys one event bus, one Subscriber, two Amazon SQS queues, one AWS IAM role, one log group with its log delivery, and five alarms."
+      "This pattern deploys an Amazon EventBridge Custom Event Bus with one subscriber. The subscriber filters events that have `detail.orderId` and delivers each match to an Amazon SQS queue. A second queue receives a failure record for any event that cannot be delivered after the first attempt and two retries.",
+      "The pattern also sets up what you need to follow one event from the publish call to the target. An Amazon CloudWatch Logs delivery sends the subscriber's delivery records to a log group, and five CloudWatch alarms cover publish failures, throttling, failed delivery attempts, events written to the dead-letter queue, and failed writes to it. A template parameter removes the delivery role's access to the target queue, so you can break delivery on purpose, see how the metrics, logs and alarms report it, and replay the failed events from the bus.",
+      "This pattern deploys one event bus, one subscriber, two Amazon SQS queues, one AWS Identity and Access Management (IAM) role, one log group with its log delivery, and five alarms."
     ]
   },
   "gitHub": {
@@ -20,15 +20,15 @@
   "resources": {
     "bullets": [
       {
-        "text": "Observability for the Amazon EventBridge Custom event bus: metrics, logs, and AWS CloudTrail",
+        "text": "Observability for the Amazon EventBridge Custom Event Bus: metrics, logs, and AWS CloudTrail",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-observability.html"
       },
       {
-        "text": "Creating Custom event bus resources with AWS CloudFormation",
+        "text": "Creating Custom Event Bus resources with AWS CloudFormation",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-cloudformation.html"
       },
       {
-        "text": "Publishing events to a Custom event bus",
+        "text": "Publishing events to a Custom Event Bus",
         "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-publish.html"
       },
       {
@@ -44,12 +44,16 @@
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Publish an `OrderPlaced` event with `aws eventsv2 put-events`, read it from the target queue, and find its `SUBSCRIBER_MATCHED` and `EVENT_DELIVERY_ATTEMPT` records in the delivery log group.",
+      "Break delivery on purpose: redeploy with `--parameter-overrides GrantTargetAccess=false` and publish again. The publish still succeeds, the delivery log shows three `ACCESS_DENIED` attempts, the dead-letter queue gets a failure record, and the `DeadLetteredAlarm` and `DeliveryAttemptsFailingAlarm` alarms go to `ALARM`.",
+      "Recover the event: redeploy with `GrantTargetAccess=true`, then create a point-in-time subscriber that replays only the failed event ID from the bus.",
+      "See the GitHub repo for the full commands."
     ]
   },
   "cleanup": {
     "text": [
-      "Delete any replay Subscriber you created, then delete the stack: <code>sam delete</code>."
+      "Delete the replay subscriber if you created one (the variables are set in the README testing steps), otherwise the stack deletion fails: <code>aws eventsv2 delete-subscriber --subscriber-arn \"$REPLAY_ARN\"</code>",
+      "Delete the stack: <code>sam delete --stack-name \"$STACK_NAME\"</code>"
     ]
   },
   "authors": [
