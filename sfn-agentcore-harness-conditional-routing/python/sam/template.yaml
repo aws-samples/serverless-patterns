@@ -226,6 +226,14 @@ Resources:
               Action: states:SendTaskSuccess
               Resource: !Ref Workflow
 
+  ApprovalFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      # Created by the stack so that it has a retention period and is deleted with the stack.
+      # For production workloads, consider a customer managed AWS KMS key (KmsKeyId).
+      LogGroupName: !Sub '/aws/lambda/${ApprovalFunction}'
+      RetentionInDays: 14
+
   # ---------------------------------------------------------------------------
   # Workflow
   # ---------------------------------------------------------------------------
