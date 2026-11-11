@@ -261,13 +261,13 @@ export const patternPathSchema = z
   );
 
 /**
- * Pattern fields, without the people fields. Pass a servicesMap
- * ({ "lambda": "AWS Lambda", ... }) to also check patternArch service keys.
+ * Pattern fields, without the people fields. `patternArch` optionally
+ * replaces the default (any value) rule for the architecture diagram.
  *
  * Checks sit on the fields themselves so every error is reported in one go
  * (Zod 4 skips object-level refinements while any field is invalid).
  */
-export function createPatternShape(servicesMap) {
+export function createPatternShape({ patternArch } = {}) {
   return {
     title: z
       .string({ required_error: "Missing 'title'" })
@@ -326,14 +326,9 @@ export function createPatternShape(servicesMap) {
     testing: testingSchema,
     cleanup: cleanupSchema,
     resources: resourcesSchema,
-    patternArch: servicesMap
-      ? z
-          .any()
-          .optional()
-          .superRefine((arch, ctx) =>
-            checkPatternArchServices(arch, ctx, servicesMap),
-          )
-      : z.any().optional(),
+    // Serverless Land adds the architecture diagram when it imports a pattern,
+    // so contributors don't need to write it.
+    patternArch: patternArch ?? z.any().optional(),
   };
 }
 
@@ -341,10 +336,10 @@ export function createPatternShape(servicesMap) {
  * The pattern file schema: every field rule, with people given as "authors"
  * and/or "contributors" (at least one required). Extra fields are allowed.
  */
-export function createPatternSchema({ servicesMap } = {}) {
+export function createPatternSchema({ patternArch } = {}) {
   return z
     .object({
-      ...createPatternShape(servicesMap),
+      ...createPatternShape({ patternArch }),
       authors: authorsSchema.optional(),
       contributors: contributorsSchema.optional(),
     })
@@ -380,58 +375,4 @@ function checkTitleServiceNames(title, ctx) {
       message: `Use official service name "${expected}" instead of "${found}" in title.`,
     });
   }
-}
-
-function checkPatternArchServices(arch, ctx, servicesMap) {
-  if (!arch || typeof arch !== "object") return;
-  for (const [key, value] of Object.entries(arch)) {
-    if (value && typeof value === "object" && "service" in value) {
-      if (value.service && !Object.hasOwn(servicesMap, value.service)) {
-        ctx.addIssue({
-          code: "custom",
-          path: [key, "service"],
-          message: `Invalid service "${value.service}" — not a known service key.`,
-        });
-      }
-      const retired = retiredServiceMessage(value.service);
-      if (retired) {
-        ctx.addIssue({ code: "custom", path: [key, "service"], message: retired });
-      }
-      // Icons are centred on y; below 75% the label runs off the bottom of the diagram.
-      // Each extra label line ("\n") needs about 18px, so the limit drops by 5 per extra line.
-      const labelLines = typeof value.label === "string" ? value.label.split("\n").length : 1;
-      const maxY = PATTERN_ARCH_MAX_Y - (labelLines - 1) * PATTERN_ARCH_Y_PER_EXTRA_LINE;
-      if (key.includes("icon") && typeof value.y === "number" && value.y > maxY) {
-        ctx.addIssue({
-          code: "custom",
-          path: [key, "y"],
-          message: labelLines > 1
-            ? `${key}.y is ${value.y}; with a ${labelLines}-line label, keep icons at y ${maxY} or less so the label fits.`
-            : `${key}.y is ${value.y}; keep icons at y ${PATTERN_ARCH_MAX_Y} or less so the label fits.`,
-        });
-      }
-    }
-  }
-}
-
-/** Highest icon y (percent) in patternArch. */
-export const PATTERN_ARCH_MAX_Y = 75;
-
-/** How much lower the highest icon y gets for each extra icon-label line ("\n"): ~18px of 250. */
-export const PATTERN_ARCH_Y_PER_EXTRA_LINE = 5;
-
-/**
- * Service keys that are still in servicesMap (other content uses them) but
- * must not be used in patterns, repos, workflows, snippets or testing
- * patterns. Value = the key to use instead. Plain "lambda" stays for
- * learning resources, where it means Lambda as a whole.
- */
-export const RETIRED_SERVICE_KEYS = {
-  lambda: "lambda-event-functions",
-};
-
-/** Error message for a retired key, or null if the key is fine. */
-export function retiredServiceMessage(key) {
-  if (!Object.hasOwn(RETIRED_SERVICE_KEYS, key)) return null;
-  return `Service "${key}" is retired here — use "${RETIRED_SERVICE_KEYS[key]}".`;
 }
