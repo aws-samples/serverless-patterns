@@ -22,7 +22,7 @@ annotated-types==0.8.0
 anyio==4.15.1
 certifi==2026.10.19
 click==8.5.0
-filelock==3.32.3
+filelock==4.2.1
 fsspec==2026.7.0
 h11==0.16.0
 hf-xet==1.6.0
@@ -45,7 +45,7 @@ python-dotenv==1.2.4
 PyYAML==6.0.3
 regex==2026.9.29
 rich==15.0.0
-setuptools==83.0.0
+setuptools==84.1.0
 shellingham==1.5.4
 starlette==1.7.0
 sympy==1.14.0
