@@ -220,6 +220,18 @@ export const authorsSchema = z
           /^@?[A-Za-z0-9_]+$/,
           'twitter must be your handle only — letters, numbers and _ (e.g. "jane_doe"), not a URL',
         ),
+        github: socialHandle(
+          /^[A-Za-z0-9-]+$/,
+          'github must be your username only (e.g. "janedoe"), not a URL',
+        ),
+        bluesky: socialHandle(
+          /^@?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/,
+          'bluesky must be your handle only (e.g. "janedoe.bsky.social"), not a URL',
+        ),
+        builderid: socialHandle(
+          /^@?[A-Za-z0-9._-]+$/,
+          'builderid must be your AWS Builder Center alias only, the part after @ in builder.aws.com/community/@alias (e.g. "janedoe"), not a URL',
+        ),
       })
       .strict(),
   )
@@ -381,12 +393,21 @@ function checkPatternArchServices(arch, ctx, servicesMap) {
           message: `Invalid service "${value.service}" — not a known service key.`,
         });
       }
+      const retired = retiredServiceMessage(value.service);
+      if (retired) {
+        ctx.addIssue({ code: "custom", path: [key, "service"], message: retired });
+      }
       // Icons are centred on y; below 75% the label runs off the bottom of the diagram.
-      if (key.includes("icon") && typeof value.y === "number" && value.y > PATTERN_ARCH_MAX_Y) {
+      // Each extra label line ("\n") needs about 18px, so the limit drops by 5 per extra line.
+      const labelLines = typeof value.label === "string" ? value.label.split("\n").length : 1;
+      const maxY = PATTERN_ARCH_MAX_Y - (labelLines - 1) * PATTERN_ARCH_Y_PER_EXTRA_LINE;
+      if (key.includes("icon") && typeof value.y === "number" && value.y > maxY) {
         ctx.addIssue({
           code: "custom",
           path: [key, "y"],
-          message: `${key}.y is ${value.y}; keep icons at y ${PATTERN_ARCH_MAX_Y} or less so the label fits.`,
+          message: labelLines > 1
+            ? `${key}.y is ${value.y}; with a ${labelLines}-line label, keep icons at y ${maxY} or less so the label fits.`
+            : `${key}.y is ${value.y}; keep icons at y ${PATTERN_ARCH_MAX_Y} or less so the label fits.`,
         });
       }
     }
@@ -395,3 +416,22 @@ function checkPatternArchServices(arch, ctx, servicesMap) {
 
 /** Highest icon y (percent) in patternArch. */
 export const PATTERN_ARCH_MAX_Y = 75;
+
+/** How much lower the highest icon y gets for each extra icon-label line ("\n"): ~18px of 250. */
+export const PATTERN_ARCH_Y_PER_EXTRA_LINE = 5;
+
+/**
+ * Service keys that are still in servicesMap (other content uses them) but
+ * must not be used in patterns, repos, workflows, snippets or testing
+ * patterns. Value = the key to use instead. Plain "lambda" stays for
+ * learning resources, where it means Lambda as a whole.
+ */
+export const RETIRED_SERVICE_KEYS = {
+  lambda: "lambda-event-functions",
+};
+
+/** Error message for a retired key, or null if the key is fine. */
+export function retiredServiceMessage(key) {
+  if (!Object.hasOwn(RETIRED_SERVICE_KEYS, key)) return null;
+  return `Service "${key}" is retired here — use "${RETIRED_SERVICE_KEYS[key]}".`;
+}

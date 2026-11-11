@@ -80,7 +80,7 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
   - `title` is 100 characters or fewer and `description` is 175 or fewer.
   - `language`, `framework` and `level` must use one of the values in the schema, e.g. `"framework": "AWS SAM"`.
   - `gitHub.template.templateFile` is required: the file shown on the pattern page, relative to your pattern folder, e.g. `"template.yaml"` or `"cdk/lib/my-stack.ts"`, not `"my-pattern/template.yaml"`. That's the only `gitHub` field you need. Serverless Land records the folder itself, so don't add `repoURL`, `templateURL` or `projectFolder`.
-  - In `authors`, `linkedin` is your profile ID (`jane-doe`) and `twitter` is your handle (`jane_doe`), not URLs. If you have a page at `serverlessland.com/about/your-name`, you can use `"contributors": ["content/contributors/your-name.json"]` instead.
+  - In `authors`, links are optional and are handles, not URLs: `linkedin` is your profile ID (`jane-doe`), `twitter` your X handle (`jane_doe`), `github` your GitHub username (`janedoe`), `bluesky` your Bluesky handle (`janedoe.bsky.social`), and `builderid` your AWS Builder Center alias, the part after `@` in `builder.aws.com/community/@alias` (`janedoe`). If you have a page at `serverlessland.com/about/your-name`, you can use `"contributors": ["content/contributors/your-name.json"]` instead.
   - The `deploy` and `cleanup` commands match your framework, e.g. `sam deploy` and `sam delete`, or `cdk deploy` and `cdk destroy`.
 - **Check the pattern file** from the repo root:
 
