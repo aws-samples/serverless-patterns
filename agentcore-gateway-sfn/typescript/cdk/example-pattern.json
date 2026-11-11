@@ -1,0 +1,60 @@
+{
+  "title": "Amazon Bedrock AgentCore Gateway with AWS Step Functions connector target",
+  "description": "Expose an AWS Step Functions Standard workflow as MCP tools through an Amazon Bedrock AgentCore Gateway connector target, with a task token callback through Amazon SQS.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "agentcore-gateway-sfn",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon Bedrock AgentCore Gateway with the AWS_IAM authorizer has two targets that use the built-in AWS Step Functions connector. There is no AWS Lambda function or MCP server in the tool path.",
+      "An MCP client calls StartExecution, which is pinned to a Standard workflow, and DescribeExecution through the Gateway.",
+      "The workflow pauses on a waitForTaskToken task that sends the task token and the request to an Amazon SQS queue.",
+      "The client reads the message and completes the task by calling SendTaskSuccess or SendTaskFailure through the same Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/agentcore-gateway-sfn-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Step Functions as a connector target in Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-target-connector-step-functions.html"
+      },
+      {
+        "text": "Wait for a callback with the task token in AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk bootstrap</code> (first use of the AWS CDK in the account and Region)",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
