@@ -1,0 +1,3 @@
+# The Lambda runtime's bundled boto3 may predate the durable execution APIs.
+boto3>=1.43.0
+botocore>=1.43.0
