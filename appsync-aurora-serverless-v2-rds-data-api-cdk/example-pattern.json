@@ -1,0 +1,81 @@
+{
+  "title": "AWS AppSync to Amazon Aurora Serverless v2 via the RDS Data API",
+  "description": "Serve a GraphQL API straight from Amazon Aurora Serverless v2 through the RDS Data API using AWS AppSync JavaScript resolvers, with zero AWS Lambda.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS AppSync GraphQL API that reads and writes an Amazon Aurora Serverless v2 (PostgreSQL) database directly through the RDS Data API, with no AWS Lambda functions in the request path.",
+      "AWS AppSync runs JavaScript (APPSYNC_JS) resolvers that issue parameterised SQL over the RDS Data API HTTPS endpoint. The Data API authenticates with a generated AWS Secrets Manager credential, so there is no VPC-attached compute layer to manage.",
+      "Each service is load-bearing: AWS AppSync terminates the GraphQL request, the RDS Data API turns the resolver into an HTTPS SQL call that removes the need for AWS Lambda, and Amazon Aurora Serverless v2 stores the data and scales capacity down when idle."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/appsync-aurora-serverless-v2-rds-data-api-cdk",
+      "templateURL": "serverless-patterns/appsync-aurora-serverless-v2-rds-data-api-cdk",
+      "projectFolder": "appsync-aurora-serverless-v2-rds-data-api-cdk",
+      "templateFile": "cdk/lib/appsync-aurora-serverless-v2-rds-data-api-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Building an AWS AppSync API with an RDS Data API data source",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-rds-resolvers-js.html"
+      },
+      {
+        "text": "Using the RDS Data API for Amazon Aurora Serverless v2",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd appsync-aurora-serverless-v2-rds-data-api-cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for a curl-based test that creates a todo and lists it back through the GraphQL API."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>.",
+      "Confirm removal: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'AppSyncAuroraServerlessStack')].StackStatus\"</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "",
+      "twitter": ""
+    }
+  ],
+  "patternArch": {
+    "icon1": "fa:fa-code",
+    "icon2": "fa:fa-database",
+    "icon3": "fa:fa-server",
+    "label1": "GraphQL client",
+    "label2": "AWS AppSync",
+    "label3": "Amazon Aurora Serverless v2",
+    "line1": {
+      "startLabel": "GraphQL client",
+      "endLabel": "AWS AppSync",
+      "label": "GraphQL request"
+    },
+    "line2": {
+      "startLabel": "AWS AppSync",
+      "endLabel": "Amazon Aurora Serverless v2",
+      "label": "RDS Data API (HTTPS SQL)"
+    }
+  },
+  "patternType": "Building"
+}
