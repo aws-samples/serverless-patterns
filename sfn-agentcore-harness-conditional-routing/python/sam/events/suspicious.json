@@ -1,0 +1,26 @@
+{
+  "accountHolder": "Jane Doe",
+  "transactions": [
+    {
+      "id": "A1",
+      "amount": 42.1,
+      "merchant": "Grocery Mart",
+      "city": "Seattle",
+      "time": "2026-11-10T09:00:00Z"
+    },
+    {
+      "id": "A2",
+      "amount": 4999.0,
+      "merchant": "Electronics Hub",
+      "city": "Lagos",
+      "time": "2026-11-10T09:20:00Z"
+    },
+    {
+      "id": "A3",
+      "amount": 4999.0,
+      "merchant": "Electronics Hub",
+      "city": "Lagos",
+      "time": "2026-11-10T09:21:00Z"
+    }
+  ]
+}
