@@ -1,0 +1,37 @@
+{
+  "title": "Amazon DynamoDB Global Tables with Cross-Account Read Access",
+  "description": "Deploy an Amazon DynamoDB global table with an AWS Identity and Access Management (IAM) role that grants another AWS account read-only access in both Regions.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon DynamoDB global table (same-account, multi-Region) with an IAM role for cross-account read access.",
+      "The reader account assumes the IAM role with an external ID and can query the table in either Region.",
+      "DynamoDB handles replication automatically with sub-second latency between Regions.",
+      "Point-in-time recovery is enabled for data protection."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/dynamodb-cross-account-replication-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      { "text": "Amazon DynamoDB global tables now support replication across AWS accounts", "link": "https://aws.amazon.com/blogs/database/amazon-dynamodb-global-tables-now-support-replication-across-aws-accounts/" },
+      { "text": "DynamoDB Global Tables Documentation", "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html" }
+    ]
+  },
+  "deploy": { "text": ["cdk deploy --parameters ReplicaAccountId=<READER_ACCOUNT_ID> --parameters ExternalId=<EXTERNAL_ID> -c replicaRegion=us-west-2"] },
+  "testing": { "text": ["See the README for testing instructions."] },
+  "cleanup": { "text": ["cdk destroy -c replicaRegion=<REPLICA_REGION>"] },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS, passionate about serverless and AI/ML.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
