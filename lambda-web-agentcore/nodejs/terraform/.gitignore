@@ -1,0 +1,11 @@
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan
+*.tfvars
+crash.log
+build/
+node_modules/
+__pycache__/
+.DS_Store
+.terraform.lock.hcl
