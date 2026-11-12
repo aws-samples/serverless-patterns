@@ -1,0 +1,67 @@
+{
+  "title": "AWS Step Functions sequential agents on Amazon Bedrock AgentCore harness with human approval",
+  "description": "Run two Amazon Bedrock AgentCore harness agents in sequence on a CSV file in Amazon S3, then wait for an approver who signs in with Amazon Cognito.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An upload of a CSV file to Amazon S3 starts an AWS Step Functions workflow through Amazon EventBridge. The workflow calls one Amazon Bedrock AgentCore harness twice with the optimized InvokeHarness integration. The first call acts as a data analyst: its Python code runs in a custom AgentCore Code Interpreter that can read the file and write the figures back to S3. The workflow reads and checks that file itself, then the second call writes a short report.",
+      "The workflow emails the report through Amazon SNS with Approve and Reject links and waits for up to 24 hours. Each link opens the Amazon Cognito sign-in page, and an AWS Lambda function behind Amazon API Gateway records the decision only for users in the approvers group. The decision is stored in Amazon DynamoDB.",
+      "This pattern deploys one AgentCore harness, one custom Code Interpreter, one Step Functions state machine, one S3 bucket, one EventBridge rule, one SNS topic, one Cognito user pool, one HTTP API, one Lambda function and one DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke Amazon Bedrock AgentCore harness with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-bedrockagentcore.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore harness",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness.html"
+      },
+      {
+        "text": "Harness tools and allowedTools",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/harness-tools.html"
+      },
+      {
+        "text": "Wait for a callback with a task token",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+      },
+      {
+        "text": "AgentCore Code Interpreter",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-tool.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Stop running executions, empty the bucket and stop any Code Interpreter session, then delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Surya Sai D",
+      "bio": "Surya Sai D is a Technical Account Manager at Amazon Web Services. His expertise lies with Serverless and Event Driven Architectures. Surya has been an active contributor to the Serverless community with his blogs and speaking sessions.",
+      "linkedin": "surya-sai-d-64920416a"
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "Comment": "Sequential agents with a human approval gate: analyst -> verified results -> report writer -> approval -> record",
+  "QueryLanguage": "JSONata",
+  "StartAt": "AnalyzeSales",
+  "States": {
+    "AnalyzeSales": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+      "Arguments": {
+        "HarnessArn": "${HarnessArn}",
+        "RuntimeSessionId": "{% $uuid() %}",
+        "Messages": [
+          {
+            "Role": "user",
+            "Content": [
+              {
+                "Text": "{% 'Input file: s3://' & $states.input.detail.bucket.name & '/' & $states.input.detail.object.key & '\\nResults file: s3://' & $states.input.detail.bucket.name & '/results/' & $states.context.Execution.Name & '.json' %}"
+              }
+            ]
+          }
+        ],
+        "SystemPrompt": [
+          {
+            "Text": "You are a data analyst. Use the code interpreter to run Python. The code interpreter already has AWS credentials, so never pass, set, or invent access keys. With boto3, download the CSV file named in the user message. It has the columns order_id, region, product, quantity, unit_price, and returned. Revenue is quantity times unit_price. Compute total_revenue, revenue_by_region, and return_rate_by_region, where a return rate is the share of orders with returned set to True, as a fraction between 0 and 1. Round revenue to 2 decimals and rates to 4 decimals. Write only these three keys as valid JSON (use json.dumps) with boto3 put_object to the results file named in the user message. Then reply with one line: RESULTS_WRITTEN."
+          }
+        ],
+        "Model": {
+          "BedrockModelConfig": {
+            "ModelId": "${AgentModelId}"
+          }
+        },
+        "AllowedTools": [
+          "@code_interpreter"
+        ],
+        "MaxIterations": 15,
+        "TimeoutSeconds": 600
+      },
+      "Output": "{% { 'inputKey': $states.input.detail.object.key, 'analystStop': $states.result.StopReason } %}",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "BedrockAgentCore.ThrottlingException"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "ReadResults"
+    },
+    "ReadResults": {
+      "Comment": "Use the figures the code wrote, not the agent's reply. A missing file or invalid JSON fails the workflow.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObject",
+      "Arguments": {
+        "Bucket": "${DataBucketName}",
+        "Key": "{% 'results/' & $states.context.Execution.Name & '.json' %}"
+      },
+      "Output": "{% { 'inputKey': $states.input.inputKey, 'figures': $parse($states.result.Body) } %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "CheckFigures"
+    },
+    "CheckFigures": {
+      "Comment": "The file must hold the figures the report needs.",
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $type($states.input.figures.total_revenue) = 'number' and $count($keys($states.input.figures.revenue_by_region)) > 0 %}",
+          "Next": "WriteReport"
+        }
+      ],
+      "Default": "AnalysisFailed"
+    },
+    "WriteReport": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+      "Arguments": {
+        "HarnessArn": "${HarnessArn}",
+        "RuntimeSessionId": "{% $uuid() %}",
+        "Messages": [
+          {
+            "Role": "user",
+            "Content": [
+              {
+                "Text": "{% 'Sales figures (JSON, return rates are fractions):\\n' & $string($states.input.figures) %}"
+              }
+            ]
+          }
+        ],
+        "SystemPrompt": [
+          {
+            "Text": "You are a report writer. Turn the sales figures in the user message into a short executive report of at most 200 words in plain text. Use only the figures given and do not invent numbers. Show return rates as percentages."
+          }
+        ],
+        "Model": {
+          "BedrockModelConfig": {
+            "ModelId": "${AgentModelId}"
+          }
+        },
+        "Tools": [],
+        "AllowedTools": [],
+        "MaxIterations": 3,
+        "TimeoutSeconds": 120
+      },
+      "Output": "{% $merge([$states.input, { 'report': $states.result.Output.Message.Content[0].Text, 'reportStop': $states.result.StopReason }]) %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "CheckReport"
+    },
+    "CheckReport": {
+      "Comment": "Advance only on a positive signal: a complete reply with text.",
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $states.input.reportStop = 'end_turn' and $length($string($states.input.report)) > 0 %}",
+          "Next": "RequestApproval"
+        }
+      ],
+      "Default": "AnalysisFailed"
+    },
+    "RequestApproval": {
+      "Comment": "Waits up to 24 hours. The links open the Cognito sign-in page, and only users in the approvers group can decide. Cognito returns the state parameter decoded, so the token is made URL-safe first.",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish.waitForTaskToken",
+      "Arguments": {
+        "TopicArn": "${ApprovalTopicArn}",
+        "Subject": "Sales report awaiting approval",
+        "Message": "{% ($token := $replace($replace($replace($states.context.Task.Token, '+', '-'), '/', '_'), '=', '.'); $states.input.report & '\\n\\nApprove: ${AuthorizeUrl}approve:' & $token & '\\n\\nReject: ${AuthorizeUrl}reject:' & $token) %}"
+      },
+      "TimeoutSeconds": 86400,
+      "Output": "{% $merge([$states.input, $states.result]) %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "RecordDecision"
+    },
+    "RecordDecision": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Arguments": {
+        "TableName": "${ReportTableName}",
+        "Item": {
+          "executionName": {
+            "S": "{% $states.context.Execution.Name %}"
+          },
+          "inputKey": {
+            "S": "{% $states.input.inputKey %}"
+          },
+          "figures": {
+            "S": "{% $string($states.input.figures) %}"
+          },
+          "report": {
+            "S": "{% $states.input.report %}"
+          },
+          "decision": {
+            "S": "{% $states.input.decision %}"
+          },
+          "approver": {
+            "S": "{% $states.input.approver %}"
+          }
+        }
+      },
+      "Output": "{% { 'decision': $states.input.decision, 'approver': $states.input.approver } %}",
+      "End": true
+    },
+    "AnalysisFailed": {
+      "Type": "Fail",
+      "Error": "AnalysisFailed",
+      "Cause": "An agent step failed, returned an incomplete answer, or the approval timed out."
+    }
+  }
+}
