@@ -1,0 +1,66 @@
+{
+  "title": "Amazon Aurora DSQL CDC to Amazon EventBridge",
+  "description": "Stream changes from Amazon Aurora DSQL through Amazon Kinesis Data Streams and AWS Lambda to Amazon EventBridge events.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Aurora DSQL captures committed row-level changes (INSERT, UPDATE, DELETE) and streams them as JSON records to Amazon Kinesis Data Streams.",
+      "AWS Lambda consumes the stream, classifies each CDC event by operation type, and publishes typed events to an Amazon EventBridge custom event bus.",
+      "Add Amazon EventBridge rules and targets to route events to any downstream consumer such as Amazon SQS, AWS Step Functions, or Amazon SNS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dsql-cdc-eventbridge-fanout-cdk",
+      "templateURL": "serverless-patterns/dsql-cdc-eventbridge-fanout-cdk",
+      "projectFolder": "dsql-cdc-eventbridge-fanout-cdk",
+      "templateFile": "cdk/lib/dsql-cdc-eventbridge-fanout-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Aurora DSQL CDC documentation",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/cdc-streams.html"
+      },
+      {
+        "text": "Amazon EventBridge content-based filtering",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>git clone https://github.com/aws-samples/serverless-patterns</code>",
+      "<code>cd serverless-patterns/dsql-cdc-eventbridge-fanout-cdk/cdk</code>",
+      "Create an Amazon Aurora DSQL cluster in the Region you deploy to and wait until it is ACTIVE; Docker or Finch must be running. See the GitHub repo for the commands.",
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk deploy --parameters DsqlClusterId=your-cluster-id</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Connect to your Amazon Aurora DSQL cluster with psql and insert, update and delete a row to generate CDC events.",
+      "Add a temporary Amazon EventBridge rule with an Amazon SQS queue target on the dsql-cdc-events bus and read the events. See the GitHub repo for the exact commands."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the temporary Amazon EventBridge rule, its target and the Amazon SQS queue from the testing step first: the event bus cannot be deleted while it has rules.",
+      "<code>npx cdk destroy</code>",
+      "<code>aws dsql update-cluster --identifier your-cluster-id --no-deletion-protection-enabled</code>",
+      "<code>aws dsql delete-cluster --identifier your-cluster-id</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
