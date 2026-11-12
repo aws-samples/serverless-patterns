@@ -1,0 +1,5 @@
+{
+  "stackName": "release-gate-demo-app",
+  "changeSetType": "UPDATE",
+  "templateBody": "{\"Resources\":{\"Queue\":{\"Type\":\"AWS::SQS::Queue\",\"Properties\":{\"VisibilityTimeout\":90}}}}"
+}
