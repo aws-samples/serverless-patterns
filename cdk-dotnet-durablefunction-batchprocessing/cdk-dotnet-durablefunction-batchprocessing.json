@@ -1,0 +1,63 @@
+{
+  "title": "Lambda Durable Function — Dynamic Batch Processing with Fan-Out/Fan-In (.NET)",
+  "description": "A durable function that discovers files in S3 at runtime, dynamically fans out a parallel task per file, then aggregates results into a summary report.",
+  "language": ".NET",
+  "level": "300",
+  "framework": "CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Lambda durable function that implements dynamic fan-out/fan-in. Given an S3 prefix, it lists all files at runtime and creates a parallel processing task for each one — the parallelism is not hardcoded at design time.",
+      "Each file is processed independently (parsed, transformed, written to an output prefix), and all branches are awaited with ParallelAsync. Once all files complete, the function aggregates results and writes a summary report to S3.",
+      "This demonstrates dynamic parallelism with durable functions: the number of branches is determined at runtime, each branch is independently checkpointed, and the orchestration is resilient to interruptions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-dotnet-durablefunction-batchprocessing",
+      "templateURL": "serverless-patterns/cdk-dotnet-durablefunction-batchprocessing",
+      "projectFolder": "cdk-dotnet-durablefunction-batchprocessing",
+      "templateFile": "cdk.json"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Durable Functions Documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "Build multi-step applications and AI workflows with Lambda durable functions",
+        "link": "https://aws.amazon.com/blogs/aws/build-multi-step-applications-and-ai-workflows-with-aws-lambda-durable-functions/"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Doug Perkes",
+      "image": "",
+      "bio": "Senior Solutions Architect at AWS, focused on .NET and serverless.",
+      "linkedin": "dougperkes",
+      "twitter": ""
+    }
+  ]
+}
