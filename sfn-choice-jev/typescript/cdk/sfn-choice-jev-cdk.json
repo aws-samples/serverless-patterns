@@ -1,119 +1,86 @@
 {
-    "title": "Confidence-gated ticket triage with TypeSafe Jev",
-    "description": "Triage tickets with the TypeSafe Jev model: AWS Lambda gets typed decisions plus calibrated confidence, and a Step Functions Choice state decides whether to act.",
-    "language": "TypeScript",
-    "level": "300",
-    "framework": "AWS CDK",
-    "introBox": {
-        "headline": "How it works",
-        "text": [
-            "This pattern deploys an Amazon API Gateway REST API that ingests support tickets, an AWS Lambda function that calls the TypeSafe Jev System One model, an AWS Step Functions Express workflow that gates on confidence, an Amazon SQS human-review queue, and an Amazon SNS security paging topic.",
-            "When a ticket arrives, the AWS Lambda function sends the ticket state plus three typed questions to Jev in a single HTTPS call and reads back typed decisions, each with a calibrated 0-1 confidence. It then starts a synchronous AWS Step Functions execution whose Choice state branches on the confidence per action type.",
-            "When every decision clears its confidence threshold the workflow auto-routes the ticket and pages on-call for a high-confidence security incident; when any decision is uncertain the ticket is sent to the Amazon SQS human-review queue with the full Jev output attached. The model decides what, and its calibrated confidence decides whether to act."
-        ]
-    },
-    "gitHub": {
-        "template": {
-            "templateFile": "lib/jev-confidence-gated-triage-stack.ts"
-        }
-    },
-    "resources": {
-        "bullets": [
-            {
-                "text": "TypeSafe Jev - typed decisions with calibrated confidence",
-                "link": "https://typesafe.ai/"
-            },
-            {
-                "text": "AWS Step Functions Choice state",
-                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/state-choice.html"
-            },
-            {
-                "text": "Retrieving a secret with AWS Secrets Manager",
-                "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets.html"
-            }
-        ]
-    },
-    "deploy": {
-        "text": [
-            "<code>cdk deploy</code>"
-        ]
-    },
-    "testing": {
-        "text": [
-            "See the GitHub repo for detailed testing instructions."
-        ]
-    },
-    "cleanup": {
-        "text": [
-            "Delete the stack: <code>cdk destroy</code>."
-        ]
-    },
-    "authors": [
-        {
-            "name": "Nithin Chandran R",
-            "bio": "Technical Account Manager at AWS",
-            "linkedin": "nithin-chandran-r"
-        }
-    ],
-    "patternType": "Serverless",
-    "services": {
-        "from": {
-            "serviceName": "Amazon API Gateway",
-            "serviceURL": "/api-gateway/"
-        },
-        "to": {
-            "serviceName": "AWS Step Functions",
-            "serviceURL": "/step-functions/"
-        }
-    },
-    "patternArch": {
-        "icon1": {
-            "x": 14,
-            "y": 50,
-            "service": "apigw",
-            "label": "Amazon API Gateway"
-        },
-        "icon2": {
-            "x": 35,
-            "y": 50,
-            "service": "lambda-event-functions",
-            "label": "AWS Lambda"
-        },
-        "icon3": {
-            "x": 56,
-            "y": 50,
-            "service": "sfn",
-            "label": "AWS Step Functions"
-        },
-        "icon4": {
-            "x": 87,
-            "y": 30,
-            "service": "sns",
-            "label": "Amazon SNS"
-        },
-        "icon5": {
-            "x": 87,
-            "y": 70,
-            "service": "sqs",
-            "label": "Amazon SQS"
-        },
-        "line1": {
-            "from": "icon1",
-            "to": "icon2"
-        },
-        "line2": {
-            "from": "icon2",
-            "to": "icon3"
-        },
-        "line3": {
-            "from": "icon3",
-            "to": "icon4",
-            "label": "high confidence"
-        },
-        "line4": {
-            "from": "icon3",
-            "to": "icon5",
-            "label": "low confidence"
-        }
+  "title": "AWS Step Functions HTTP Task to TypeSafe Jev confidence gate",
+  "description": "An AWS Step Functions Choice state acts on TypeSafe Jev answers only when Jev is confident; the rest, and any failed Jev call, go to an Amazon SQS review queue.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API that starts an AWS Step Functions Express workflow synchronously. An HTTP Task in the workflow calls the TypeSafe Jev API through an Amazon EventBridge connection that holds the API key, so no AWS Lambda function sits in the request path. Jev answers three typed questions about a support ticket in one call: a choice for the owning department, a score for urgency, and a yes/no question about an active security incident.",
+      "A Choice state is the confidence gate. A ticket is auto-routed only when the department and urgency confidences clear their thresholds and a security incident is not suspected. A suspected security incident is published to an Amazon SNS topic and still goes to a person. Everything else, including any ticket for which the Jev call failed or returned something unusable, goes to an Amazon SQS human-review queue with a dead-letter queue behind it.",
+      "You need a TypeSafe account and API key, which is billed by TypeSafe separately from AWS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/sfn-choice-jev-stack.ts",
+      "patternPath": "sfn-choice-jev/typescript/cdk"
     }
+  },
+  "services": {
+    "from": {
+      "serviceName": "Amazon API Gateway",
+      "serviceURL": "/apigw/"
+    },
+    "to": {
+      "serviceName": "AWS Step Functions",
+      "serviceURL": "/sfn/"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "TypeSafe API reference",
+        "link": "https://docs.typesafe.ai/api"
+      },
+      {
+        "text": "AWS Step Functions Choice state",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/state-choice.html"
+      },
+      {
+        "text": "Call HTTPS APIs in Step Functions workflows",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/call-https-apis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>git clone https://github.com/aws-samples/serverless-patterns</code>",
+      "<code>cd serverless-patterns/sfn-choice-jev/typescript/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>read -rs JEV_API_KEY</code>",
+      "<code>npx cdk deploy --parameters JevApiKey=\"$JEV_API_KEY\"</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a clear ticket, an ambiguous ticket and a security ticket to the POST /tickets endpoint with curl, and read the Amazon SQS review queue.",
+      "See the GitHub repo for the commands and expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>. This also deletes the review queues and any tickets still in them."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ],
+  "patternArch": {
+    "icon1": { "x": 12, "y": 50, "service": "apigw", "label": "API Gateway" },
+    "icon2": { "x": 50, "y": 50, "service": "sfn", "label": "Step Functions" },
+    "icon3": { "x": 88, "y": 30, "service": "sns", "label": "SNS" },
+    "icon4": { "x": 88, "y": 70, "service": "sqs", "label": "SQS" },
+    "line1": { "from": "icon1", "to": "icon2" },
+    "line2": { "from": "icon2", "to": "icon3" },
+    "line3": { "from": "icon2", "to": "icon4" }
+  },
+  "patternType": "Serverless"
 }
