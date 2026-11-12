@@ -1,0 +1,68 @@
+{
+  "title": "Amazon ECS Gateway with a shared Application Load Balancer, AWS WAF and Amazon S3 access logs",
+  "description": "Two AWS Fargate services join an Amazon ECS Gateway, one connector each, and get HTTPS hostnames on a shared Application Load Balancer with AWS WAF and Amazon S3 access logs.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon ECS Gateway and connects two AWS Fargate services to it. The gateway owns the ingress: Amazon ECS provisions an Application Load Balancer, its listener, certificates and a generated HTTPS hostname for each service. The template contains none of them.",
+      "Each service opts in with one gatewayConnector entry that names a container port. The settings that apply to every service behind the gateway are set once on the gateway: an AWS WAF web ACL with a rate-based rule, Amazon S3 access logs, the inbound security group and the load balancer limit.",
+      "The gateway creates an internet-facing load balancer by default. The pattern takes the allowed client range as an explicit input and offers an internal option. The AWS CDK has no construct for the gateway yet, so the stack uses CfnResource and property overrides."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/ecs-gateway-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon ECS Gateway",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/gateway-overview.html"
+      },
+      {
+        "text": "Create and manage an Amazon ECS Gateway",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/gateway-managing.html"
+      },
+      {
+        "text": "Connect Amazon ECS services to a gateway",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/gateway-connect-service.html"
+      },
+      {
+        "text": "Access logs for your Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd ecs-gateway/typescript/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>MY_CIDR=$(curl -s https://checkip.amazonaws.com)/32</code>",
+      "<code>npx cdk deploy -c allowedCidr=$MY_CIDR</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Read the gateway connections of both services with <code>aws ecs describe-service-revisions</code> and call the two generated HTTPS URLs with curl. Each returns its own page.",
+      "See the GitHub repo for the exact commands and expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy -c allowedCidr=203.0.113.7/32</code>. The app only needs a valid CIDR to synthesize, so any value works. Add <code>-c scheme=internal</code> if you deployed the internal variant."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
