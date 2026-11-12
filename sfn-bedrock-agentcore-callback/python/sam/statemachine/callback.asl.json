@@ -1,0 +1,24 @@
+{
+  "Comment": "Invoke an AgentCore Runtime agent and wait for a task-token callback (Standard workflows only)",
+  "StartAt": "InvokeAgentRuntime",
+  "States": {
+    "InvokeAgentRuntime": {
+      "Type": "Task",
+      "TimeoutSeconds": 7200,
+      "Arguments": {
+        "AgentRuntimeArn": "${AgentRuntimeArn}",
+        "Accept": "application/json",
+        "Payload": {
+          "prompt": "{% $states.input.prompt %}",
+          "task_token": "{% $states.context.Task.Token %}"
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:bedrockagentcore:invokeAgentRuntime.waitForTaskToken",
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
+    }
+  },
+  "QueryLanguage": "JSONata"
+}

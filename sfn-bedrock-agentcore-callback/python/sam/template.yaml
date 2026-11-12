@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS Step Functions invokes an Amazon Bedrock AgentCore Runtime agent with the
+  Request Response pattern and with the Wait for a Callback with a Task Token
+  pattern (uksb-1tthgi812)(tag:sfn-bedrock-agentcore-callback-python-sam)
+
+Parameters:
+  AgentCodeBucket:
+    Type: String
+    Description: S3 bucket that holds the agent code zip that build.sh uploaded
+  AgentCodeKey:
+    Type: String
+    Description: S3 object key of the agent code zip that build.sh printed
+  ModelId:
+    Type: String
+    Default: global.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: Amazon Bedrock model ID or inference profile ID that the agent calls
+
+Resources:
+  # Execution role that the AgentCore Runtime agent runs as
+  AgentRuntimeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+            # Only AgentCore runtimes in this account and Region can assume the role
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:runtime/*
+      Policies:
+        - PolicyName: AgentRuntimePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Foundation models in any Region, so that cross-Region inference profiles work
+              - Sid: InvokeModel
+                Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource:
+                  - !Sub arn:${AWS::Partition}:bedrock:*::foundation-model/*
+                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*
+              - Sid: RuntimeLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource:
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/bedrock-agentcore/runtimes/*
+              - Sid: DescribeLogGroups
+                Effect: Allow
+                Action: logs:DescribeLogGroups
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+              # Task tokens authorize these calls, so they are not scoped to a
+              # state machine ARN.
+              - Sid: StepFunctionsCallback
+                Effect: Allow
+                Action:
+                  - states:SendTaskSuccess
+                  - states:SendTaskFailure
+                  - states:SendTaskHeartbeat
+                Resource: "*"
+
+  # The agent, deployed from a code zip in S3 (no container image needed).
+  # For production workloads, consider NetworkMode VPC to run the agent in your own subnets.
+  AgentRuntime:
+    Type: AWS::BedrockAgentCore::Runtime
+    Properties:
+      # Runtime names allow letters, numbers and underscores, so the hyphens in
+      # the stack name become underscores.
+      AgentRuntimeName: !Join
+        - _
+        - !Split
+          - "-"
+          - !Sub ${AWS::StackName}_agent
+      Description: Agent invoked by AWS Step Functions
+      RoleArn: !GetAtt AgentRuntimeRole.Arn
+      AgentRuntimeArtifact:
+        CodeConfiguration:
+          Code:
+            S3:
+              Bucket: !Ref AgentCodeBucket
+              Prefix: !Ref AgentCodeKey
+          Runtime: PYTHON_3_13
+          EntryPoint:
+            - main.py
+      NetworkConfiguration:
+        NetworkMode: PUBLIC
+      ProtocolConfiguration: HTTP
+      EnvironmentVariables:
+        MODEL_ID: !Ref ModelId
+
+  # Role that both state machines run as
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+            # Only state machines in this account and Region can assume the role
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*
+      Policies:
+        - PolicyName: InvokeAgentRuntime
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # InvokeAgentRuntime is authorized on the runtime and on its endpoint
+              # (runtime/NAME/runtime-endpoint/DEFAULT), so both ARNs are needed.
+              - Effect: Allow
+                Action: bedrock-agentcore:InvokeAgentRuntime
+                Resource:
+                  - !GetAtt AgentRuntime.AgentRuntimeArn
+                  - !Sub "${AgentRuntime.AgentRuntimeArn}/*"
+
+  # Request Response: Step Functions waits for the HTTP response (up to 15 minutes).
+  # For production workloads, consider execution logging, AWS X-Ray tracing, and a
+  # customer managed AWS KMS key (EncryptionConfiguration) for both state machines.
+  RequestResponseStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: statemachine/request-response.asl.json
+      DefinitionSubstitutions:
+        AgentRuntimeArn: !GetAtt AgentRuntime.AgentRuntimeArn
+      Role: !GetAtt StateMachineRole.Arn
+
+  # Callback: Step Functions pauses on a task token until the agent calls back.
+  # .waitForTaskToken is supported in Standard workflows only. For production
+  # workloads with long jobs, add HeartbeatSeconds to the task and have the agent
+  # call SendTaskHeartbeat, so that a stalled agent is detected before TimeoutSeconds.
+  CallbackStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      DefinitionUri: statemachine/callback.asl.json
+      DefinitionSubstitutions:
+        AgentRuntimeArn: !GetAtt AgentRuntime.AgentRuntimeArn
+      Role: !GetAtt StateMachineRole.Arn
+
+Outputs:
+  AgentRuntimeArn:
+    Description: ARN of the AgentCore Runtime agent
+    Value: !GetAtt AgentRuntime.AgentRuntimeArn
+  RequestResponseStateMachineArn:
+    Description: ARN of the Request Response state machine
+    Value: !Ref RequestResponseStateMachine
+  CallbackStateMachineArn:
+    Description: ARN of the callback state machine
+    Value: !Ref CallbackStateMachine

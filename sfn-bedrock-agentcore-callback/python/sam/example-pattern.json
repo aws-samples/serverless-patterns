@@ -1,0 +1,63 @@
+{
+  "title": "AWS Step Functions to Amazon Bedrock AgentCore Runtime with a task-token callback",
+  "description": "Invoke an Amazon Bedrock AgentCore Runtime agent from AWS Step Functions with Request Response, or with a task-token callback for work longer than 15 minutes.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon Bedrock AgentCore Runtime agent and two AWS Step Functions state machines that invoke it through the AWS SDK service integration for InvokeAgentRuntime.",
+      "The Request Response state machine waits for the agent's response, for up to 15 minutes. The callback state machine appends .waitForTaskToken and passes the task token in the payload. The agent returns immediately, runs its work in the background, and resumes the workflow with SendTaskSuccess, or with SendTaskFailure on error. The callback pattern works in Standard workflows only.",
+      "One agent serves both state machines: without a task token it answers inline, and with a token it calls back. The pattern deploys one AgentCore Runtime agent from a code zip in Amazon S3, its execution role, and two Standard state machines that share one role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Discover service integration patterns in Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html"
+      },
+      {
+        "text": "Wait for a callback with a task token",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+      },
+      {
+        "text": "Invoke an AgentCore Runtime agent",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-invoke-agent.html"
+      },
+      {
+        "text": "InvokeAgentRuntime API reference",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_InvokeAgentRuntime.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "./build.sh BUCKET_NAME",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>. Then delete the agent code bucket."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Surya Sai D",
+      "bio": "Surya Sai D is a Technical Account Manager at Amazon Web Services. His expertise lies with Serverless and Event Driven Architectures. Surya has been an active contributor to the Serverless community with his blogs and speaking sessions.",
+      "linkedin": "surya-sai-d-64920416a"
+    }
+  ]
+}
