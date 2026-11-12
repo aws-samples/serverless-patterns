@@ -1,0 +1,4 @@
+# The Trivy binary is fetched into this build context by scripts/deploy.sh at
+# package time (the image build sandbox has no internet egress). It must not be
+# committed to the repository.
+trivy
