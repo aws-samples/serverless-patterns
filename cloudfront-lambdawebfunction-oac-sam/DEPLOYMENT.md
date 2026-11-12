@@ -122,6 +122,16 @@ Confirm deletion:
       --region "${AWS_REGION}" \
       --query "StackSummaries[?contains(StackName,'${STACK_NAME}')].StackStatus"
 
-The deployment package object(s) in S3 are not removed by `sam delete`. Delete them separately if no longer needed:
+The code bucket lives outside the stack, so `sam delete` doesn't remove it. The bucket is versioned, so `aws s3 rm` would only add a delete marker and every earlier `app.zip` version would stay and keep billing ([Deleting object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html)).
 
-    aws s3 rm "s3://${CODE_BUCKET}/${CODE_KEY}" --region "${AWS_REGION}"
+If the bucket is dedicated to this pattern (for example, the one `./deploy.sh` created), remove every object version and delete marker, then delete the bucket:
+
+    aws s3api list-object-versions --bucket "${CODE_BUCKET}" --region "${AWS_REGION}" \
+      --query '[Versions,DeleteMarkers][][].[Key,VersionId]' --output text \
+      | while read -r key version; do
+          aws s3api delete-object --bucket "${CODE_BUCKET}" --region "${AWS_REGION}" \
+            --key "$key" --version-id "$version"
+        done
+    aws s3 rb "s3://${CODE_BUCKET}" --region "${AWS_REGION}"
+
+If you brought a shared bucket, don't delete it. Remove only the `${CODE_KEY}` versions instead.
