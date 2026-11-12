@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The durable execution SDK logs through SLF4J. Without a binding on the classpath SLF4J
+  falls back to a no-op implementation and every ctx.getLogger() call is silently dropped,
+  so the orchestrator pom pulls in Log4j2 (see log4j-slf4j2-impl there).
+
+  Output is JSON so CloudWatch Logs Insights can query fields directly. The SDK puts the
+  execution's identity into the SLF4J MDC, and the template below promotes those keys to
+  top-level fields, which makes it possible to isolate one execution - or one step - in a
+  busy log group:
+
+      fields @timestamp, level, message, operationName
+      | filter executionArn like /review-approve-01/
+      | sort @timestamp asc
+-->
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <JsonTemplateLayout>
+                <EventTemplate>
+                    {
+                      "timestamp": {"$resolver": "timestamp", "pattern": {"format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"}},
+                      "level": {"$resolver": "level", "field": "name"},
+                      "logger": {"$resolver": "logger", "field": "name"},
+                      "message": {"$resolver": "message", "stringified": true},
+                      "executionArn": {"$resolver": "mdc", "key": "executionArn"},
+                      "operationId": {"$resolver": "mdc", "key": "operationId"},
+                      "operationName": {"$resolver": "mdc", "key": "operationName"},
+                      "exception": {
+                        "class": {"$resolver": "exception", "field": "className"},
+                        "message": {"$resolver": "exception", "field": "message"},
+                        "stackTrace": {"$resolver": "exception", "field": "stackTrace", "stringified": true}
+                      }
+                    }
+                </EventTemplate>
+            </JsonTemplateLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <!-- The SDK reports its own checkpointing at DEBUG; INFO keeps the volume sane. -->
+        <Logger name="software.amazon.lambda.durable" level="INFO"/>
+        <Logger name="com.example.durableagent" level="INFO"/>
+        <!-- The AWS SDK is chatty while building clients. -->
+        <Logger name="software.amazon.awssdk" level="WARN"/>
+    </Loggers>
+</Configuration>
