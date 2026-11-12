@@ -1,0 +1,34 @@
+{
+  "version": "0",
+  "id": "a1b2c3d4-5678-90ab-cdef-EXAMPLE11111",
+  "detail-type": "Config Rules Compliance Change",
+  "source": "aws.config",
+  "account": "111122223333",
+  "time": "2026-09-30T12:00:06Z",
+  "region": "eu-west-2",
+  "resources": [],
+  "detail": {
+    "resourceId": "vol-0123456789abcdef0",
+    "awsRegion": "eu-west-2",
+    "awsAccountId": "111122223333",
+    "configRuleName": "ec2-volume-inuse-check",
+    "recordVersion": "1.0",
+    "configRuleARN": "arn:aws:config:eu-west-2:111122223333:config-rule/config-rule-abc123",
+    "messageType": "ComplianceChangeNotification",
+    "newEvaluationResult": {
+      "evaluationResultIdentifier": {
+        "evaluationResultQualifier": {
+          "configRuleName": "ec2-volume-inuse-check",
+          "resourceType": "AWS::EC2::Volume",
+          "resourceId": "vol-0123456789abcdef0"
+        },
+        "orderingTimestamp": "2026-09-30T12:00:00.000Z"
+      },
+      "complianceType": "NON_COMPLIANT",
+      "resultRecordedTime": "2026-09-30T12:00:05.000Z",
+      "configRuleInvokedTime": "2026-09-30T12:00:04.000Z"
+    },
+    "notificationCreationTime": "2026-09-30T12:00:06.000Z",
+    "resourceType": "AWS::EC2::Volume"
+  }
+}
