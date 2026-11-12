@@ -1,0 +1,319 @@
+# SPDX-License-Identifier: MIT-0
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Code sandboxes on AWS Lambda MicroVMs with the open-source Rayito
+  sandbox SDK. Builds the sandbox image from the signed Rayito release
+  artifact and creates the least-privilege IAM the SDK caller needs.
+  Optional: a second image with OS capabilities, the base for an in-sandbox
+  coding agent that calls Amazon Bedrock through a secrets gateway.
+
+Parameters:
+  ArtifactBucket:
+    Type: String
+    Description: >-
+      Existing S3 bucket, in this Region, that holds the Rayito image
+      artifact at rayito/rayito-image.zip (see README, step 2).
+  ArtifactKey:
+    Type: String
+    Default: rayito/rayito-image.zip
+    AllowedPattern: "^rayito/.+\\.zip$"
+    Description: Key of the uploaded rayito-image.zip (must start with rayito/).
+  EnableAgent:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: >-
+      true also builds <stack>-base-caps (the base of the coding agent image)
+      and creates the image build, Secrets Manager and Amazon Bedrock
+      policies the agent example needs. Off by default: zero extra cost.
+  AgentModelId:
+    Type: String
+    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: >-
+      Amazon Bedrock cross-Region inference profile the agent example may
+      call (only used with EnableAgent=true).
+
+Conditions:
+  AgentEnabled: !Equals [!Ref EnableAgent, "true"]
+
+Resources:
+  # Lambda assumes this role to read the artifact and build the image.
+  BuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: read-artifacts-and-write-logs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ArtifactBucket}/rayito/*
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/rayito/${AWS::StackName}-*
+
+  BaseImageLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /rayito/${AWS::StackName}-base
+      RetentionInDays: 7
+
+  # The sandbox image: Amazon Linux 2023 managed base + the rayd agent from
+  # the Rayito release zip. Hooks on port 9000 are the ones rayd serves.
+  BaseImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Sub ${AWS::StackName}-base
+      Description: Rayito sandbox image (rayd agent, Python kernel)
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1
+      BaseImageVersion: "1"
+      BuildRoleArn: !GetAtt BuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${ArtifactBucket}/${ArtifactKey}
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: 2048
+      AdditionalOsCapabilities: []
+      EgressNetworkConnectors: []
+      EnvironmentVariables: []
+      Hooks: &hooks
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 600
+          Validate: ENABLED
+          ValidateTimeoutInSeconds: 600
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 30
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 30
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 30
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 10
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref BaseImageLogGroup
+
+  CapsImageLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: AgentEnabled
+    Properties:
+      LogGroupName: !Sub /rayito/${AWS::StackName}-base-caps
+      RetentionInDays: 7
+
+  AgentImageLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: AgentEnabled
+    Properties:
+      LogGroupName: !Sub /rayito/${AWS::StackName}-agent
+      RetentionInDays: 7
+
+  # Same artifact with additional OS capabilities: required to enforce
+  # allowInternetAccess=false inside the guest, and the base that the
+  # agent image (built by src/build-agent-image.ts) composes on.
+  CapsImage:
+    Type: AWS::Lambda::MicrovmImage
+    Condition: AgentEnabled
+    Properties:
+      Name: !Sub ${AWS::StackName}-base-caps
+      Description: Rayito sandbox image with OS capabilities (agent base)
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1
+      BaseImageVersion: "1"
+      BuildRoleArn: !GetAtt BuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${ArtifactBucket}/${ArtifactKey}
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: 2048
+      AdditionalOsCapabilities: [ALL]
+      EgressNetworkConnectors: []
+      EnvironmentVariables: []
+      Hooks: *hooks
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref CapsImageLogGroup
+
+  # Attach to the identity that runs the client (a developer role, or the
+  # role of the service that creates sandboxes). Runtime verbs only.
+  SandboxLauncherPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Create, drive and terminate Rayito sandboxes from this stack's images.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: List
+            Effect: Allow
+            Action:
+              - lambda:ListMicrovms
+              - lambda:ListMicrovmImages
+              - lambda:ListManagedMicrovmImages
+              - lambda:ListManagedMicrovmImageVersions
+            Resource: "*"
+          - Sid: RunAndDriveMicrovms
+            Effect: Allow
+            Action:
+              - lambda:RunMicrovm
+              - lambda:GetMicrovm
+              - lambda:SuspendMicrovm
+              - lambda:ResumeMicrovm
+              - lambda:TerminateMicrovm
+              - lambda:CreateMicrovmAuthToken
+              - lambda:GetMicrovmImage
+              - lambda:GetMicrovmImageVersion
+              - lambda:ListMicrovmImageVersions
+              - lambda:ListTags
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:${AWS::StackName}-*
+          # RunMicrovm passes the AWS managed network connectors even when
+          # none is named.
+          - Sid: PassManagedConnectors
+            Effect: Allow
+            Action: lambda:PassNetworkConnector
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:*
+          - !If
+            - AgentEnabled
+            # The gateway resolves the model credential with the caller's
+            # credentials (never the sandbox's); Rayito names live under rayito/.
+            - Sid: ReadModelCredential
+              Effect: Allow
+              Action: secretsmanager:GetSecretValue
+              Resource: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:rayito/${AWS::StackName}-*
+            - !Ref AWS::NoValue
+
+  # Only with EnableAgent=true: what src/build-agent-image.ts needs to
+  # compose <stack>-agent on top of <stack>-base-caps, and what src/agent.ts
+  # needs to store the model credential. Keep it off the role of a service
+  # that only launches sandboxes.
+  AgentImageBuilderPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: AgentEnabled
+    Properties:
+      Description: Build the Rayito agent image on top of this stack's caps image.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: CreateImages
+            Effect: Allow
+            Action: lambda:CreateMicrovmImage
+            Resource: "*"
+          - Sid: BuildAgentImage
+            Effect: Allow
+            Action:
+              - lambda:UpdateMicrovmImage
+              - lambda:GetMicrovmImage
+              - lambda:GetMicrovmImageVersion
+              - lambda:ListMicrovmImageVersions
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:${AWS::StackName}-*
+          - Sid: DeleteAgentImage
+            Effect: Allow
+            Action: lambda:DeleteMicrovmImage
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:${AWS::StackName}-agent
+          - Sid: PassManagedConnectors
+            Effect: Allow
+            Action: lambda:PassNetworkConnector
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:*
+          - Sid: PassBuildRole
+            Effect: Allow
+            Action: iam:PassRole
+            Resource: !GetAtt BuildRole.Arn
+            Condition:
+              StringEquals:
+                iam:PassedToService: lambda.amazonaws.com
+          - Sid: Artifacts
+            Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub arn:${AWS::Partition}:s3:::${ArtifactBucket}/rayito/*
+          - Sid: BuildLogs
+            Effect: Allow
+            Action:
+              - logs:DescribeLogStreams
+              - logs:GetLogEvents
+            Resource: !GetAtt AgentImageLogGroup.Arn
+          # src/agent.ts stores the short-term Bedrock API key it mints.
+          - Sid: StoreModelCredential
+            Effect: Allow
+            Action:
+              - secretsmanager:CreateSecret
+              - secretsmanager:PutSecretValue
+            Resource: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:rayito/${AWS::StackName}-*
+
+  # Only with EnableAgent=true: the short-term Bedrock API key that
+  # src/agent.ts mints carries the permissions of the identity that mints
+  # it, so that identity needs to invoke the model, through the inference
+  # profile only.
+  ModelInvokePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: AgentEnabled
+    Properties:
+      Description: Invoke one Amazon Bedrock inference profile with a short-term API key.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: UseBedrockApiKeys
+            Effect: Allow
+            Action: bedrock:CallWithBearerToken
+            Resource: "*"
+          - Sid: InvokeInferenceProfile
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${AgentModelId}
+          - Sid: InvokeModelsThroughTheProfile
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+              - bedrock:InvokeModelWithResponseStream
+            Resource: !Sub arn:${AWS::Partition}:bedrock:*::foundation-model/*
+            Condition:
+              StringEquals:
+                bedrock:InferenceProfileArn: !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${AgentModelId}
+
+Outputs:
+  SandboxImageName:
+    Description: Image name to export as RAYITO_TEMPLATE for the client.
+    Value: !Sub ${AWS::StackName}-base
+  SandboxImageArn:
+    Description: ARN of the sandbox image.
+    Value: !GetAtt BaseImage.ImageArn
+  SandboxLauncherPolicyArn:
+    Description: Managed policy to attach to the identity that runs the client.
+    Value: !Ref SandboxLauncherPolicy
+  CapsImageName:
+    Condition: AgentEnabled
+    Description: Base image of the agent image (src/build-agent-image.ts).
+    Value: !Sub ${AWS::StackName}-base-caps
+  AgentImageName:
+    Condition: AgentEnabled
+    Description: Name src/build-agent-image.ts gives the agent image (not managed by this stack).
+    Value: !Sub ${AWS::StackName}-agent
+  AgentImageBuilderPolicyArn:
+    Condition: AgentEnabled
+    Description: Managed policy for whoever builds the agent image and stores the model credential.
+    Value: !Ref AgentImageBuilderPolicy
+  ModelInvokePolicyArn:
+    Condition: AgentEnabled
+    Description: Managed policy for the identity that mints the Bedrock API key (runs src/agent.ts).
+    Value: !Ref ModelInvokePolicy

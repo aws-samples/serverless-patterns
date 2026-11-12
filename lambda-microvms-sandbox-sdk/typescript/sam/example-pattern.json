@@ -1,0 +1,69 @@
+{
+  "title": "Code sandboxes on AWS Lambda MicroVMs with a sandbox SDK",
+  "description": "Run untrusted code in AWS Lambda MicroVM sandboxes from a few lines of TypeScript with an open-source sandbox SDK, in your own AWS account.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern lets you spin up code sandboxes, isolated environments where an application or an AI agent runs untrusted code, on AWS Lambda MicroVMs in your own AWS account, in seconds and with a few lines of code. Each sandbox is one MicroVM with its own kernel, memory and disk. You drive it from TypeScript or Python with Rayito, an open-source (Apache-2.0) sandbox SDK: create a sandbox, run code, move files and terminate it, without writing any MicroVM plumbing yourself. There is no third-party service and no API key: the SDK calls the Lambda MicroVMs APIs with your AWS credentials.",
+      "The AWS SAM template builds an AWS::Lambda::MicrovmImage on the AWS managed Amazon Linux 2023 base image from the signed release artifact of Rayito, which you download, verify and upload to Amazon S3. The artifact contains rayd, a small agent written in Rust that serves the MicroVM lifecycle hooks and an API for processes, files and a stateful Python kernel. Lambda boots the image, waits for the ready hook, validates it and takes a snapshot, so every sandbox starts from a warm snapshot in seconds. The template also creates an IAM build role, an Amazon CloudWatch Logs log group and a least-privilege customer managed policy that lets the client run, drive and terminate MicroVMs of this stack's images but not change them.",
+      "A short TypeScript client creates a sandbox (RunMicrovm), runs Python code whose variables persist between calls, runs shell commands, writes and reads files, and terminates the MicroVM (TerminateMicrovm).",
+      "An optional part, off by default, builds a second image with additional OS capabilities and composes on it an image with the OpenCode coding agent. The client mints a short-term Amazon Bedrock API key, stores it in AWS Secrets Manager, and starts a sandbox without Internet access whose only way out is a gateway in the sandbox agent: it adds the key to requests for one allowed model, so code in the sandbox can use the key but cannot read it. The agent then fixes a bug in a file inside the MicroVM.",
+      "This pattern deploys one or two MicroVM images, one IAM role, up to three CloudWatch Logs log groups and up to three customer managed policies."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "AWS::Lambda::MicrovmImage CloudFormation resource",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html"
+      },
+      {
+        "text": "Amazon Bedrock API keys",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html"
+      },
+      {
+        "text": "AWS Lambda pricing",
+        "link": "https://aws.amazon.com/lambda/pricing/"
+      },
+      {
+        "text": "Rayito sandbox SDK documentation",
+        "link": "https://alejandro-cedeno-10.github.io/rayito/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "aws s3 cp rayito-image.zip s3://<bucket>/rayito/rayito-image.zip",
+      "sam deploy --template-file template.yaml --stack-name sandbox-sdk --capabilities CAPABILITY_IAM --parameter-overrides ArtifactBucket=<bucket>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>.",
+      "Delete the artifact bucket: <code>aws s3 rb s3://<bucket> --force</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alejandro Cedeño",
+      "bio": "Maintainer of Rayito, an open-source sandbox SDK for AWS Lambda MicroVMs."
+    }
+  ]
+}
