@@ -1,0 +1,157 @@
+# SPDX-License-Identifier: MIT-0
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Code execution sandbox on AWS Lambda MicroVMs, driven from TypeScript with
+  the open-source Rayito SDK. Builds the sandbox image from the Rayito release
+  artifact and creates an IAM policy with the runtime actions the SDK caller
+  needs, scoped to this stack's image.
+
+Parameters:
+  ArtifactBucket:
+    Type: String
+    Description: >-
+      Existing S3 bucket, in this Region, that holds the Rayito image artifact
+      (see README, step 4).
+  ArtifactKey:
+    Type: String
+    Default: rayito/rayito-image.zip
+    AllowedPattern: "^rayito/.+\\.zip$"
+    Description: Key of the uploaded rayito-image.zip (must start with rayito/).
+  BaseImageVersion:
+    Type: String
+    Default: "1"
+    Description: Version of the AWS managed al2023-1 base image to build on (a version listed by list-managed-microvm-image-versions).
+
+Resources:
+  # Lambda assumes this role to read the artifact and write the build logs.
+  BuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+              - sts:TagSession
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: read-artifact-and-write-logs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ArtifactBucket}/rayito/*
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt SandboxImageLogGroup.Arn
+
+  SandboxImageLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /rayito/${AWS::StackName}-base
+      RetentionInDays: 7
+
+  # The sandbox image: the AWS managed Amazon Linux 2023 base image plus the
+  # rayd agent from the Rayito release zip. Lambda builds it server side,
+  # starts it, waits for the /ready hook, runs /validate and takes the
+  # snapshot every sandbox starts from. rayd serves the hooks on port 9000.
+  SandboxImage:
+    Type: AWS::Lambda::MicrovmImage
+    Properties:
+      Name: !Sub ${AWS::StackName}-base
+      Description: Rayito sandbox image (rayd agent, Python kernel)
+      BaseImageArn: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:microvm-image:al2023-1
+      BaseImageVersion: !Ref BaseImageVersion
+      BuildRoleArn: !GetAtt BuildRole.Arn
+      CodeArtifact:
+        Uri: !Sub s3://${ArtifactBucket}/${ArtifactKey}
+      CpuConfigurations:
+        - Architecture: ARM_64
+      Resources:
+        - MinimumMemoryInMiB: 2048
+      # No additional OS capabilities: not needed here. Restricting the outbound
+      # network of a sandbox does need them (see the README, Network access).
+      AdditionalOsCapabilities: []
+      EgressNetworkConnectors: []
+      EnvironmentVariables: []
+      Hooks:
+        Port: 9000
+        MicrovmImageHooks:
+          Ready: ENABLED
+          ReadyTimeoutInSeconds: 600
+          Validate: ENABLED
+          ValidateTimeoutInSeconds: 600
+        MicrovmHooks:
+          Run: ENABLED
+          RunTimeoutInSeconds: 30
+          Resume: ENABLED
+          ResumeTimeoutInSeconds: 30
+          Suspend: ENABLED
+          SuspendTimeoutInSeconds: 30
+          Terminate: ENABLED
+          TerminateTimeoutInSeconds: 10
+      Logging:
+        CloudWatch:
+          LogGroup: !Ref SandboxImageLogGroup
+
+  # Attach to the identity that runs the client (a developer role, or the
+  # role of the service that creates sandboxes). Runtime actions only: it
+  # cannot create or change an image. A least-privilege starting point scoped
+  # to this stack's image; review it before using it in production.
+  SandboxLauncherPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Create, drive and terminate sandboxes from this stack's image.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # The List actions do not support resource-level permissions, so
+          # they need Resource "*".
+          - Sid: List
+            Effect: Allow
+            Action:
+              - lambda:ListMicrovms
+              - lambda:ListMicrovmImages
+              - lambda:ListManagedMicrovmImages
+              - lambda:ListManagedMicrovmImageVersions
+            Resource: "*"
+          - Sid: RunAndDriveMicrovms
+            Effect: Allow
+            Action:
+              - lambda:RunMicrovm
+              - lambda:GetMicrovm
+              - lambda:SuspendMicrovm
+              - lambda:ResumeMicrovm
+              - lambda:TerminateMicrovm
+              - lambda:CreateMicrovmAuthToken
+              - lambda:GetMicrovmImage
+              - lambda:GetMicrovmImageVersion
+              - lambda:ListMicrovmImageVersions
+              - lambda:ListTags
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:microvm-image:${AWS::StackName}-base
+          # RunMicrovm passes the AWS managed network connectors even when
+          # none is named.
+          - Sid: PassManagedConnectors
+            Effect: Allow
+            Action: lambda:PassNetworkConnector
+            Resource: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:aws:network-connector:aws-network-connector:*
+
+Outputs:
+  SandboxImageName:
+    Description: Image name to export as RAYITO_TEMPLATE for the client.
+    Value: !Sub ${AWS::StackName}-base
+  SandboxImageArn:
+    Description: ARN of the sandbox image.
+    Value: !GetAtt SandboxImage.ImageArn
+  SandboxLauncherPolicyArn:
+    Description: Managed policy to attach to the identity that runs the client.
+    Value: !Ref SandboxLauncherPolicy

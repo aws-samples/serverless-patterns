@@ -1,0 +1,25 @@
+{
+  "name": "lambda-microvms-code-execution-sandbox-client",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TypeScript client for the code execution sandbox on AWS Lambda MicroVMs (Rayito SDK)",
+  "license": "MIT-0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sandbox": "tsx sandbox.ts",
+    "pool": "tsx pool.ts",
+    "e2b": "tsx e2b.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "rayito": "0.17.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

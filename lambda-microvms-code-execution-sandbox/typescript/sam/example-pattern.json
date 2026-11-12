@@ -1,0 +1,61 @@
+{
+  "title": "Code execution sandbox on AWS Lambda MicroVMs with a TypeScript SDK",
+  "description": "Run code in AWS Lambda MicroVM sandboxes from TypeScript with an open-source SDK: stateful Python, commands, files, pause and resume, and a pool.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS SAM",
+  "patternGroup": "lambda-microvms-code-execution-sandbox",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This variant of the code execution sandbox pattern builds an AWS Lambda MicroVM image that turns each MicroVM into a sandbox you drive from TypeScript with Rayito, an open-source (Apache-2.0) SDK. Each sandbox is one MicroVM with its own kernel, memory and disk. The SDK calls only AWS APIs, with your credentials, and needs no API key. The author of this variant also maintains Rayito.",
+      "The AWS SAM template builds an AWS::Lambda::MicrovmImage on the AWS managed Amazon Linux 2023 base image from the Rayito release artifact, which you download, verify and upload to Amazon S3. The artifact contains rayd, an agent that serves the MicroVM lifecycle hooks and an API for processes, files and a Python kernel. Lambda runs the build, waits for the ready hook, runs the validate hook and takes a snapshot that every sandbox starts from. The template also creates an IAM build role, an Amazon CloudWatch Logs log group and a customer managed policy with the runtime actions only, scoped to this stack's image.",
+      "Compared with the CloudFormation and Python variant, the client creates a sandbox with Sandbox.create(), runs Python code whose variables persist between calls, runs shell commands, reads and writes files, pauses and resumes the MicroVM, takes warm sandboxes from a SandboxPool, and terminates them. An entry point that implements a subset of the E2B API is included."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Rayito documentation",
+        "link": "https://alejandro-cedeno-10.github.io/rayito/"
+      },
+      {
+        "text": "Rayito source code",
+        "link": "https://github.com/alejandro-cedeno-10/rayito"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Download the Rayito release artifact, verify its signature and checksum, upload it to S3 under the <code>rayito/</code> prefix, then run <code>sam deploy --template-file template.yaml --stack-name &lt;stack&gt; --capabilities CAPABILITY_IAM --parameter-overrides ArtifactBucket=&lt;bucket&gt; ArtifactKey=&lt;key&gt;</code>.",
+      "See the GitHub repo for the download, signature check and upload steps."
+    ]
+  },
+  "testing": {
+    "text": [
+      "Run <code>pnpm install --frozen-lockfile</code> in the <code>src</code> folder, export <code>RAYITO_TEMPLATE=&lt;stack&gt;-base</code> and run <code>pnpm sandbox</code>.",
+      "See the GitHub repo for detailed testing instructions and the expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name &lt;stack&gt;</code>.",
+      "Delete the artifact: if this run created the bucket for it, <code>aws s3 rb s3://&lt;bucket&gt; --force</code>; if you reused a bucket, only <code>aws s3 rm s3://&lt;bucket&gt;/&lt;key&gt;</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alejandro Cedeño",
+      "bio": "Author of this pattern variant and maintainer of Rayito."
+    }
+  ]
+}
