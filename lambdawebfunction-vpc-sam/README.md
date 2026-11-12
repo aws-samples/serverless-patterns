@@ -181,9 +181,25 @@ These are intentionally *not* baked into the baseline so the pattern stays gener
 
 ## Cleanup
 
-    sam delete
+    export AWS_REGION=us-east-1                      # the Region you deployed to
+    export STACK_NAME=lambdawebfunction-vpc          # deploy.sh default
+    export CODE_BUCKET="${STACK_NAME}-code-$(aws sts get-caller-identity --query Account --output text)-${AWS_REGION}"   # deploy.sh default; set your own if you passed --bucket
 
-Deleting the stack removes the Web Function, its revisions and endpoint, and the network connector (including all its versions). Delete the `app.zip` object(s) from S3 separately if no longer needed.
+    sam delete --stack-name "${STACK_NAME}" --region "${AWS_REGION}"
+
+Deleting the stack removes the Web Function, its revisions and endpoint, and the network connector (including all its versions). It does **not** remove the code bucket, which lives outside the stack. The bucket is versioned, so `aws s3 rm` would only add a delete marker and every earlier `app.zip` version would stay and keep billing ([Deleting object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html)).
+
+If the bucket is dedicated to this pattern (for example, the one `./deploy.sh` created), remove every object version and delete marker, then delete the bucket:
+
+    aws s3api list-object-versions --bucket "${CODE_BUCKET}" --region "${AWS_REGION}" \
+      --query '[Versions,DeleteMarkers][][].[Key,VersionId]' --output text \
+      | while read -r key version; do
+          aws s3api delete-object --bucket "${CODE_BUCKET}" --region "${AWS_REGION}" \
+            --key "$key" --version-id "$version"
+        done
+    aws s3 rb "s3://${CODE_BUCKET}" --region "${AWS_REGION}"
+
+If you brought a shared bucket, don't delete it. Remove only the `${CODE_KEY}` versions instead.
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
