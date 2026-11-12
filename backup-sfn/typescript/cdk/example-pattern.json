@@ -1,0 +1,69 @@
+{
+  "title": "AWS Backup restore testing validated by AWS Step Functions",
+  "description": "Amazon EventBridge starts an AWS Step Functions workflow when an AWS Backup restore test completes. It checks the restored Amazon DynamoDB table and reports to AWS Backup.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS Backup restore testing plan for an Amazon DynamoDB table and an AWS Step Functions workflow that validates every restored copy. AWS Backup restores the latest recovery point on a schedule, and validating the restored data is left to you.",
+      "When the restore job completes, an Amazon EventBridge rule starts the state machine. The state machine takes the restored table name from the event, counts the items with a dynamodb:Scan SDK integration (Select COUNT, Limit 3) and chooses a verdict. It then calls the AWS Backup PutRestoreValidationResult API once with SUCCESSFUL or FAILED, so the result appears on the restore job.",
+      "The AWS Backup documentation shows this validation with an AWS Lambda function and notes that PutRestoreValidationResult is not available through the Lambda SDK. Here the workflow uses AWS SDK service integrations, and the synthesized template contains no Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/backup-sfn-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Restore testing in AWS Backup",
+        "link": "https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html"
+      },
+      {
+        "text": "Restore testing validation",
+        "link": "https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing-validation.html"
+      },
+      {
+        "text": "PutRestoreValidationResult API reference",
+        "link": "https://docs.aws.amazon.com/aws-backup/latest/devguide/API_PutRestoreValidationResult.html"
+      },
+      {
+        "text": "Call AWS SDK services from AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once.",
+      "<code>CRON=$(node -e 'const d=new Date(Date.now()+30*60000);console.log(`cron(${d.getUTCMinutes()} ${d.getUTCHours()} * * ? *)`)')</code>",
+      "<code>npx cdk deploy -c restoreTestCron=\"$CRON\"</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Put a few items into the table, take an on-demand backup with <code>aws backup start-backup-job</code>, then wait for the restore test to start. The plan has no run-now call: it starts at a random time within one hour after the cron time, so plan for about two hours.",
+      "Check the result with <code>aws backup describe-restore-job</code>. Expected: a ValidationStatus of SUCCESSFUL and a message with the restored table name.",
+      "See the GitHub repo for the exact commands, a check of the wiring that does not need to wait, and the expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the recovery points in the vault first, because a vault that holds recovery points cannot be deleted. The GitHub repo has the commands.",
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
