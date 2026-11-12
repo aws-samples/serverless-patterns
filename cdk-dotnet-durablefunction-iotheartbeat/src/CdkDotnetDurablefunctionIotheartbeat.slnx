@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+  </Configurations>
+  <Project Path="Infra/Infra.csproj" />
+  <Project Path="HeartbeatMonitor/HeartbeatMonitor.csproj" />
+</Solution>
