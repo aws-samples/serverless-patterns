@@ -1,0 +1,20 @@
+{
+  "name": "ecs-vpc-lattice-bluegreen",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "node --test lambda/hook.test.js",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.273.0",
+    "constructs": "^10.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "aws-cdk": "^2.1145.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.6.0"
+  }
+}
