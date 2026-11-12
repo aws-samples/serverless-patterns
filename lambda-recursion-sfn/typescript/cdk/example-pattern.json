@@ -1,0 +1,67 @@
+{
+  "title": "Contain an AWS Lambda loop with Amazon CloudWatch and AWS Step Functions",
+  "description": "An Amazon EventBridge rule on an Amazon CloudWatch alarm starts an AWS Step Functions workflow that throttles an AWS Lambda function that invoked itself in a loop.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a demo AWS Lambda function that can invoke itself asynchronously, and a containment workflow for it. The loop starts only when you invoke the function with the loop flag set.",
+      "When Lambda recursive loop detection stops an invocation, Lambda emits the RecursiveInvocationsDropped metric. An Amazon CloudWatch alarm on that metric enters ALARM, and an Amazon EventBridge rule on the default event bus starts an AWS Step Functions workflow.",
+      "The workflow calls lambda:PutFunctionConcurrency to set the reserved concurrency of the function to 0, so that the function cannot start another loop. The call is an AWS SDK service integration, so there is no Lambda function in the remediation path. The workflow role can change only that one function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/lambda-recursion-sfn-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Use Lambda recursive loop detection to prevent infinite loops",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-recursion.html"
+      },
+      {
+        "text": "How Lambda handles errors and retries with asynchronous invocation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html"
+      },
+      {
+        "text": "Alarm events and Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-and-eventbridge.html"
+      },
+      {
+        "text": "AWS service SDK integrations in AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once.",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Invoke the function asynchronously with the loop flag set. The function invokes itself approximately 16 times, then AWS Lambda stops the chain.",
+      "Wait for the Amazon CloudWatch alarm and the AWS Step Functions execution, then check that the reserved concurrency is 0 and that a direct invoke is refused. A second loop event causes no invocations.",
+      "See the GitHub repo for the exact commands, the negative cases and the reset steps."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
