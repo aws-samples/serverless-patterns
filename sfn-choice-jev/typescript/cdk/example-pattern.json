@@ -1,0 +1,62 @@
+{
+  "title": "AWS Step Functions HTTP Task to TypeSafe Jev confidence gate",
+  "description": "An AWS Step Functions Choice state acts on TypeSafe Jev answers only when Jev is confident; the rest, and any failed Jev call, go to an Amazon SQS review queue.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API that starts an AWS Step Functions Express workflow synchronously. An HTTP Task in the workflow calls the TypeSafe Jev API through an Amazon EventBridge connection that holds the API key, so no AWS Lambda function sits in the request path. Jev answers three typed questions about a support ticket in one call: a choice for the owning department, a score for urgency, and a yes/no question about an active security incident.",
+      "A Choice state is the confidence gate. A ticket is auto-routed only when the department and urgency confidences clear their thresholds and a security incident is not suspected. A suspected security incident is published to an Amazon SNS topic and still goes to a person. Everything else, including any ticket for which the Jev call failed or returned something unusable, goes to an Amazon SQS human-review queue with a dead-letter queue behind it.",
+      "You need a TypeSafe account and API key, which is billed by TypeSafe separately from AWS, and the account and Region must be bootstrapped with `npx cdk bootstrap`."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/sfn-choice-jev-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "TypeSafe API reference",
+        "link": "https://docs.typesafe.ai/api"
+      },
+      {
+        "text": "AWS Step Functions Choice state",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/state-choice.html"
+      },
+      {
+        "text": "Call HTTPS APIs in Step Functions workflows",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/call-https-apis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npx cdk bootstrap",
+      "npm install",
+      "npx cdk deploy --parameters JevApiKey=YOUR_JEV_API_KEY"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a clear ticket, an ambiguous ticket and a security ticket to the POST /tickets endpoint with curl, and read the Amazon SQS review queue.",
+      "See the GitHub repo for the commands and expected output."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}

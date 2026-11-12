@@ -16,5 +16,5 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "build", "src"]
+  "exclude": ["node_modules", "build", "cdk.out"]
 }
