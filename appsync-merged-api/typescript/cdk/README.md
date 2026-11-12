@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured (the commands below were written against 2.31.3)
 * [Node.js 22 or later](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`), and `cdk bootstrap` run once for the account and Region
+* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html), with your account and Region bootstrapped (`npx cdk bootstrap`). The commands below use `npx cdk`, which runs the CDK CLI version this project installs, so no global install is needed.
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [curl](https://curl.se/) 7.75 or later (for `--aws-sigv4`)
 
