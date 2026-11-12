@@ -1,0 +1,34 @@
+{
+  "submissionId": "DOC-2026-001236",
+  "submissionType": "equipment_purchase",
+  "submitter": {
+    "name": "Carol Davis",
+    "email": "carol.davis@example.com",
+    "department": "IT",
+    "employeeId": "EMP-3456"
+  },
+  "document": {
+    "title": "Development Team Laptop Upgrades",
+    "amount": 15750.00,
+    "currency": "USD",
+    "category": "Equipment & Hardware",
+    "description": "Purchase of 15 MacBook Pro laptops for engineering team to support new AI/ML development initiatives",
+    "items": [
+      {
+        "description": "MacBook Pro 16\" M3 Max (Qty: 15)",
+        "amount": 14250.00,
+        "date": "2026-02-12"
+      },
+      {
+        "description": "AppleCare+ Protection (Qty: 15)",
+        "amount": 1500.00,
+        "date": "2026-02-12"
+      }
+    ],
+    "attachments": [
+      "s3://expense-receipts/2026/carol-davis/apple-quote.pdf",
+      "s3://expense-receipts/2026/carol-davis/budget-justification.pdf"
+    ]
+  },
+  "submittedAt": "2026-02-13T09:15:00Z"
+}
