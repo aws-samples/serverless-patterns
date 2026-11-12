@@ -1,0 +1,63 @@
+{
+  "title": "Bulk object tagging with Amazon S3 Batch Operations and AWS Step Functions",
+  "description": "AWS Step Functions creates an Amazon S3 Batch Operations job with a generated manifest, polls it to the end, and publishes the result to Amazon SNS.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An AWS Step Functions workflow calls Amazon S3 Control CreateJob through the AWS SDK integration. Amazon S3 generates the object list from a key prefix, so there is no manifest file to build, and the job tags every matching object.",
+      "The workflow waits, calls DescribeJob, and loops until the job reaches a final status. The loop is bounded and the state machine has a timeout.",
+      "A Choice state branches on the failed-task count. A job with zero failed tasks publishes a success message to Amazon SNS. Any other end publishes a message with the job ID and counts, and the execution fails.",
+      "The job role can tag only objects under one prefix, so a run with another prefix exercises the failure branch."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/s3-sfn-batch-operations-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 Batch Operations",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/batch-ops.html"
+      },
+      {
+        "text": "Amazon S3 Control CreateJob API",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/API/API_control_CreateJob.html"
+      },
+      {
+        "text": "AWS Step Functions AWS SDK integrations",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "If the account and Region are not bootstrapped for the AWS CDK yet: <code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
