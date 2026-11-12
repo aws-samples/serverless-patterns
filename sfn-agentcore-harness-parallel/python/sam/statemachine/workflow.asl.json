@@ -1,0 +1,243 @@
+{
+  "Comment": "Parallel fan-out and fan-in: three specialists analyze the same document at the same time",
+  "QueryLanguage": "JSONata",
+  "StartAt": "ExtractText",
+  "States": {
+    "ExtractText": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Arguments": {
+        "FunctionName": "${ExtractFunctionArn}",
+        "Payload": {
+          "bucket": "{% $states.input.detail.bucket.name %}",
+          "key": "{% $states.input.detail.object.key %}"
+        }
+      },
+      "Output": "{% $states.result.Payload %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "AnalyzeInParallel"
+    },
+    "AnalyzeInParallel": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "SummarizeDocument",
+          "States": {
+            "SummarizeDocument": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+              "Arguments": {
+                "HarnessArn": "${HarnessArn}",
+                "RuntimeSessionId": "{% $uuid() %}",
+                "Messages": [
+                  {
+                    "Role": "user",
+                    "Content": [
+                      {
+                        "Text": "{% $states.input.body %}"
+                      }
+                    ]
+                  }
+                ],
+                "SystemPrompt": [
+                  {
+                    "Text": "Write a short executive summary of the document. The full document text is in the user message. You do not need any tools or files. Answer only from that text. If the document contains nothing for this section, say so in one sentence (for example: None found). End your answer with a final line containing exactly SECTION_COMPLETE. Write SECTION_FAILED and nothing else only if you cannot read or understand the document."
+                  }
+                ],
+                "AllowedTools": [],
+                "MaxIterations": 3,
+                "TimeoutSeconds": 90
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "BedrockAgentCore.ThrottlingException"
+                  ],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "Output": "{% { 'summary': $states.result.Output.Message.Content[0].Text, 'summaryOk': $states.result.StopReason = 'end_turn' and $contains($string($states.result.Output.Message.Content[0].Text),'SECTION_COMPLETE') and $not($contains($string($states.result.Output.Message.Content[0].Text),'SECTION_FAILED')) } %}",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "AnalyzeRisks",
+          "States": {
+            "AnalyzeRisks": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+              "Arguments": {
+                "HarnessArn": "${HarnessArn}",
+                "RuntimeSessionId": "{% $uuid() %}",
+                "Messages": [
+                  {
+                    "Role": "user",
+                    "Content": [
+                      {
+                        "Text": "{% $states.input.body %}"
+                      }
+                    ]
+                  }
+                ],
+                "SystemPrompt": [
+                  {
+                    "Text": "List the risks and compliance concerns with a severity rating. The full document text is in the user message. You do not need any tools or files. Answer only from that text. If the document contains nothing for this section, say so in one sentence (for example: No risks identified). End your answer with a final line containing exactly SECTION_COMPLETE. Write SECTION_FAILED and nothing else only if you cannot read or understand the document."
+                  }
+                ],
+                "AllowedTools": [],
+                "MaxIterations": 3,
+                "TimeoutSeconds": 90
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "BedrockAgentCore.ThrottlingException"
+                  ],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "Output": "{% { 'risks': $states.result.Output.Message.Content[0].Text, 'risksOk': $states.result.StopReason = 'end_turn' and $contains($string($states.result.Output.Message.Content[0].Text),'SECTION_COMPLETE') and $not($contains($string($states.result.Output.Message.Content[0].Text),'SECTION_FAILED')) } %}",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ExtractActions",
+          "States": {
+            "ExtractActions": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::bedrockagentcore:invokeHarness",
+              "Arguments": {
+                "HarnessArn": "${HarnessArn}",
+                "RuntimeSessionId": "{% $uuid() %}",
+                "Messages": [
+                  {
+                    "Role": "user",
+                    "Content": [
+                      {
+                        "Text": "{% $states.input.body %}"
+                      }
+                    ]
+                  }
+                ],
+                "SystemPrompt": [
+                  {
+                    "Text": "List the action items with their deadlines and owners. The full document text is in the user message. You do not need any tools or files. Answer only from that text. If the document contains nothing for this section, say so in one sentence (for example: No action items). End your answer with a final line containing exactly SECTION_COMPLETE. Write SECTION_FAILED and nothing else only if you cannot read or understand the document."
+                  }
+                ],
+                "AllowedTools": [],
+                "MaxIterations": 3,
+                "TimeoutSeconds": 90
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "BedrockAgentCore.ThrottlingException"
+                  ],
+                  "IntervalSeconds": 5,
+                  "MaxAttempts": 3,
+                  "BackoffRate": 2
+                }
+              ],
+              "Output": "{% { 'actions': $states.result.Output.Message.Content[0].Text, 'actionsOk': $states.result.StopReason = 'end_turn' and $contains($string($states.result.Output.Message.Content[0].Text),'SECTION_COMPLETE') and $not($contains($string($states.result.Output.Message.Content[0].Text),'SECTION_FAILED')) } %}",
+              "End": true
+            }
+          }
+        }
+      ],
+      "Output": "{% $merge($append($states.result, [{ 'documentKey': $states.input.key }])) %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "CheckBranches"
+    },
+    "CheckBranches": {
+      "Comment": "Publish only when all three specialists finished their section.",
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Condition": "{% $states.input.summaryOk and $states.input.risksOk and $states.input.actionsOk %}",
+          "Next": "MergeReport"
+        }
+      ],
+      "Default": "AnalysisFailed"
+    },
+    "MergeReport": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Arguments": {
+        "FunctionName": "${MergeFunctionArn}",
+        "Payload": "{% $states.input %}"
+      },
+      "Output": "{% $states.result.Payload %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "AnalysisFailed"
+        }
+      ],
+      "Next": "StoreReport"
+    },
+    "StoreReport": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Arguments": {
+        "TableName": "${ReportTableName}",
+        "Item": {
+          "documentKey": {
+            "S": "{% $states.input.documentKey %}"
+          },
+          "executionName": {
+            "S": "{% $states.context.Execution.Name %}"
+          },
+          "summary": {
+            "S": "{% $states.input.summary %}"
+          },
+          "risks": {
+            "S": "{% $states.input.risks %}"
+          },
+          "actions": {
+            "S": "{% $states.input.actions %}"
+          }
+        }
+      },
+      "Output": "{% $states.input %}",
+      "Next": "NotifyReady"
+    },
+    "NotifyReady": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Arguments": {
+        "TopicArn": "${NotificationTopicArn}",
+        "Subject": "Document insights ready",
+        "Message": "{% 'Document: ' & $states.input.documentKey & '\\n\\nSUMMARY\\n' & $states.input.summary & '\\n\\nRISKS\\n' & $states.input.risks & '\\n\\nACTION ITEMS\\n' & $states.input.actions %}"
+      },
+      "Output": "{% { 'documentKey': $states.input.documentKey } %}",
+      "End": true
+    },
+    "AnalysisFailed": {
+      "Type": "Fail",
+      "Error": "AnalysisFailed",
+      "Cause": "The document was too large, a specialist failed, or a section was incomplete. No partial report was published."
+    }
+  }
+}
