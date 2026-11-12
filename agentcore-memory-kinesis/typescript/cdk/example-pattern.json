@@ -1,0 +1,61 @@
+{
+  "title": "Amazon Bedrock AgentCore Memory record streaming to Amazon Kinesis Data Streams",
+  "description": "Stream Amazon Bedrock AgentCore Memory long-term records to Amazon Kinesis Data Streams and sync an Amazon DynamoDB table with AWS Lambda, including deletions.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Bedrock AgentCore Memory extracts long-term records with the built-in semantic and user-preference strategies and publishes a created, updated or deleted event for each record to Amazon Kinesis Data Streams.",
+      "An AWS Lambda event source mapping filters on the documented event types and skips the StreamingEnabled validation event.",
+      "The AWS Lambda function upserts or deletes an Amazon DynamoDB item keyed by memory record ID, so deletions reach the table even though deleted events carry no actor or namespace."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/agentcore-memory-kinesis-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Memory record streaming",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-record-streaming.html"
+      },
+      {
+        "text": "Amazon Bedrock AgentCore Memory strategies",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-strategies.html"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon Kinesis Data Streams",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code> (once per account and Region)",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
