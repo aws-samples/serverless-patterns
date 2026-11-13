@@ -1,0 +1,71 @@
+{
+  "title": "Run agent-generated code in Amazon Bedrock AgentCore Code Interpreter with Amazon S3 Files",
+  "description": "An AgentCore Runtime agent writes Python code and runs it in an isolated Code Interpreter sandbox that reads files from an Amazon S3 bucket through an S3 Files mount.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "agentcore-runtime-code-interpreter-s3",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how an AI agent can write Python code and run it safely in an isolated sandbox that can read files from an Amazon S3 bucket. A Strands agent on Amazon Bedrock AgentCore Runtime answers questions about files by asking Claude Sonnet 5.5 to write Python code, then runs that code with the <code>python_repl</code> tool in an Amazon Bedrock AgentCore Code Interpreter session instead of in the agent's own environment.",
+      "For each request, the agent starts a Code Interpreter session that mounts an Amazon S3 Files access point at <code>/mnt/s3data</code>, so the files under one prefix of the bucket appear as a local directory. The code can do what a model can't do reliably on its own, such as exact calculations over many rows, joining data across files, and reading form fields, comments and attachments inside a PDF.",
+      "The Code Interpreter runs in an Amazon VPC with no internet access. Its security group allows only NFS traffic to the S3 Files mount targets and HTTPS to an Amazon S3 gateway endpoint that serves read requests for the document bucket only, which the S3 Files mount client uses to read large files directly. The mount is read-only, the Code Interpreter's execution role can only mount the file system and read the files under one prefix, and the agent's own role has no access to the bucket. Every code snippet and the start of its output are logged to Amazon CloudWatch Logs.",
+      "S3 Files copies files smaller than 128 KiB onto the file system, but the mount client reads larger files directly from the bucket for higher throughput. That's why the Code Interpreter's role can read objects under the prefix and the VPC has the gateway endpoint: without them, the first read of each large file in a session waits for an S3 request to time out before it falls back to NFS.",
+      "A script in the repository generates a sample PDF bank statement and an Excel ledger, and <code>test.sh</code> uploads them to the bucket and asks the agent to reconcile them and to report the form fields and metadata hidden in the PDF."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/stack/agentcore_runtime_code_interpreter_s3_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Code Interpreter",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-tool.html"
+      },
+      {
+        "text": "File system configurations for AgentCore Code Interpreter",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter-filesystem-configurations.html"
+      },
+      {
+        "text": "Configure AgentCore Runtime and tools for VPC",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-vpc.html"
+      },
+      {
+        "text": "Amazon S3 Files prerequisites",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-files-prereq-policies.html"
+      },
+      {
+        "text": "AgentCore Runtime direct code deployment",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-code-deploy.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Pick two or more supported Availability Zone IDs for your Region from the AgentCore Developer Guide, then deploy: <code>./deploy.sh -c availabilityZoneIds=&lt;az-id-1&gt;,&lt;az-id-2&gt;</code>",
+      "See the GitHub repo for details on choosing the zones."
+    ]
+  },
+  "testing": {
+    "text": [
+      "Run <code>./test.sh</code>. It generates a sample PDF bank statement and an Excel ledger, uploads them to the bucket and asks the agent two questions about them.",
+      "See the GitHub repo for the manual testing steps and for how to see the code that the agent ran."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>./destroy.sh</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dmitry Gulin",
+      "bio": "Senior Delivery Consultant at AWS Professional Services, specializing in Serverless and Agentic AI workloads.",
+      "linkedin": "dmitry-gulin"
+    }
+  ]
+}

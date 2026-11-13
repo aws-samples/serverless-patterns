@@ -1,0 +1,4 @@
+bedrock-agentcore>=1.25.4,<2.0.0
+# sandbox.py calls the Code Interpreter API directly; this version has filesystemConfigurations.
+boto3>=1.43.127
+strands-agents>=1.64.0,<2.0.0
