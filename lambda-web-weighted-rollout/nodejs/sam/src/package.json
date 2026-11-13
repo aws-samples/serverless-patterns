@@ -1,0 +1,11 @@
+{
+  "name": "lambda-web-weighted-rollout-app",
+  "version": "1.0.0",
+  "description": "Lambda Web Function app that reports which revision slot served each request.",
+  "type": "module",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  }
+}
