@@ -1,0 +1,72 @@
+{
+  "title": "Amazon API Gateway to Amazon CloudWatch Logs",
+  "description": "Create a REST API Gateway that proxies requests to Amazon CloudWatch Logs to get and put log event data.",
+  "language": "YAML",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API endpoint that connects to Amazon CloudWatch Logs using an AWS service integration.",
+      "The API exposes two POST methods. 'POST /putLog' maps to the CloudWatch Logs PutLogEvents action to push a log event into a stream, and 'POST /getLog' maps to the GetLogEvents action to read log events back from a stream.",
+      "API Gateway assumes an IAM role that allows GetLogEvents and PutLogEvents, and transforms the incoming JSON body into the request format expected by the CloudWatch Logs API using mapping templates. Clients pass the log group name, stream name, timestamp, message, and (when the stream already has data) a sequence token in the request body.",
+      "This is useful for browser or mobile clients, IoT devices, or third-party systems that need to write to or read from CloudWatch Logs over plain HTTPS without bundling the AWS SDK or signing requests.",
+      "Review the Amazon API Gateway and Amazon CloudWatch Logs quotas for the limits that apply when working with this pattern."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-cloudwatch-logs-proxy",
+      "templateURL": "serverless-patterns/apigw-cloudwatch-logs-proxy",
+      "projectFolder": "apigw-cloudwatch-logs-proxy",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Tutorial: Create a REST API with an AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "Amazon CloudWatch Logs API Reference - PutLogEvents",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html"
+      },
+      {
+        "text": "Amazon CloudWatch Logs API Reference - GetLogEvents",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_GetLogEvents.html"
+      },
+      {
+        "text": "Amazon API Gateway Quotas",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
+      },
+      {
+        "text": "Amazon CloudWatch Logs Quotas",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sphoorti Poojary",
+      "bio": "Sphoorti is a Technical Account Manager at Amazon Web Services. She helps customers build and operate serverless applications on AWS.",
+      "image":"https://avatars.githubusercontent.com/u/44513369?v=4",
+      "linkedin": "sphoorti-poojary"
+    }
+  ]
+}
