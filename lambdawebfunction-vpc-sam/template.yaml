@@ -186,6 +186,10 @@ Resources:
   # ARN. NOTE: a revision with a network connector supports ONLY HomeRegion endpoints.
   MyWebFunctionRevision:
     Type: AWS::Lambda::WebFunctionRevision
+    # Revisions are immutable, so a code or config change replaces this resource.
+    # Retain the old revision on replacement (as AWS::Serverless::WebFunction does)
+    # so the endpoint is never left routing to a deleted revision mid-update.
+    UpdateReplacePolicy: Retain
     # The bucket policy must exist before Lambda reads the code from S3 to create the
     # revision; CloudFormation can't infer this ordering, so make it explicit.
     DependsOn: CodeBucketPolicy
