@@ -70,11 +70,7 @@ aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
