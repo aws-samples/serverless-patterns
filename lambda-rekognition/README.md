@@ -29,7 +29,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 cd lambda-rekognition
 ```
 
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
 
 ```
 sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
@@ -41,9 +41,7 @@ sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
    * Enter some bucket name that exists and can be used for testing
    * Allow SAM CLI to create IAM roles with the required permissions.
 
-```
-Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
-```
+   Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 
 ## How it works
