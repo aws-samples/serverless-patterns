@@ -1,0 +1,11 @@
+# Owned by the orders team.
+type Order {
+  id: ID!
+  customerId: ID!
+  status: String!
+  total: Float!
+}
+
+type Query {
+  getOrder(id: ID!): Order
+}
