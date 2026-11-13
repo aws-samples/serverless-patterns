@@ -4,6 +4,7 @@
     "language": "Python",
     "level": "300",
     "framework": "AWS SAM",
+    "patternGroup": "lambda-cloudwatch-otlp-metrics",
     "introBox": {
         "headline": "How it works",
         "text": [

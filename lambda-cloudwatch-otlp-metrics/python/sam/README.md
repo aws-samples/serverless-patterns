@@ -2,7 +2,7 @@
 
 This pattern records custom application metrics in an AWS Lambda function using the OpenTelemetry metrics API and sends them to Amazon CloudWatch over the OpenTelemetry Protocol (OTLP). The AWS Distro for OpenTelemetry (ADOT) Lambda layer runs a collector next to the function that signs each request with AWS Signature Version 4 (SigV4) and forwards it to the Amazon CloudWatch OTLP metrics endpoint. The function makes no PutMetricData calls, writes no embedded metric format logs, and performs no request signing of its own. The metrics are then queried with Prometheus Query Language (PromQL).
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-cloudwatch-otlp-metrics-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-cloudwatch-otlp-metrics-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -35,7 +35,7 @@ The AWS SAM template deploys these resources, and the data flow between them is:
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/lambda-cloudwatch-otlp-metrics-sam
+    cd serverless-patterns/lambda-cloudwatch-otlp-metrics/python/sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file. No `sam build` step is needed: `src/requirements.txt` is intentionally empty because the ADOT layer provides the OpenTelemetry API at runtime, so `sam deploy` packages `src/` as it is:
     ```
