@@ -1,0 +1,62 @@
+{
+  "title": "Protobuf on an Amazon EventBridge custom event bus",
+  "description": "Publish a Protobuf-encoded event to an Amazon EventBridge custom event bus with an AWS Glue Schema Registry, and deliver the decoded JSON to an AWS Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to publish a rich domain event, Protobuf-encoded, to an Amazon EventBridge custom event bus (the <code>eventsv2</code> API) using <code>PutRawEvents</code> together with an AWS Glue Schema Registry, and then deliver that same event to a Lambda subscriber.",
+      "The publisher encodes an <code>OrderPlaced</code> event from a <code>.proto</code> definition and wraps it in the Glue wire format (including the <code>message-index</code> that tells Glue which message type to decode as). EventBridge decodes the Protobuf against the Glue registry server-side and delivers the payload as plain JSON, so the consumer Lambda needs no Protobuf library and logs the event to CloudWatch. A matching <code>orderId</code>, fields, and metadata show the delivered event matches the published one.",
+      "This deploys one EventBridge custom event bus, one subscriber, an AWS Glue Schema Registry and Protobuf schema, one Python 3.14 Lambda function, an SQS dead-letter queue, and the delivery role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge event buses",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      },
+      {
+        "text": "AWS Glue Schema Registry",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/schema-registry.html"
+      },
+      {
+        "text": "Protocol Buffers documentation",
+        "link": "https://protobuf.dev/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>scripts/generate.sh</code>",
+      "<code>sam build</code>",
+      "<code>sam deploy --guided --capabilities CAPABILITY_NAMED_IAM</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}
