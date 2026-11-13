@@ -1,0 +1,57 @@
+{
+  "title": "Amazon EventBridge custom event bus to AWS Lambda with ordered, synchronous delivery",
+  "description": "Process events in order by invoking an AWS Lambda function synchronously from a FIFO subscriber on an Amazon EventBridge custom event bus.",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how an Amazon EventBridge custom event bus (the <code>eventsv2</code> API) processes events in order by invoking an AWS Lambda function synchronously (<code>InvocationType</code> <code>REQUEST_RESPONSE</code>) from a FIFO subscriber.",
+      "The publisher sends a sequence of <code>OrderPlaced</code> events that share one <code>EventGroupId</code>, each carrying a monotonically increasing sequence number. The FIFO subscriber invokes the consumer Lambda function synchronously, waiting for each event to be confirmed before delivering the next in the group. The consumer logs each sequence number as it processes, and the Amazon CloudWatch log shows the sequence handled in order, one at a time. Synchronous confirmation gives the reliability and back-pressure that teams used to get by adding an Amazon SQS queue between the bus and Lambda, so no queue is needed.",
+      "This deploys one EventBridge custom event bus, one FIFO subscriber configured for synchronous invocation, one Java 21 Lambda function, an SQS dead-letter queue, and the delivery role."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge event buses",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      },
+      {
+        "text": "Amazon EventBridge targets",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam build</code>",
+      "<code>sam deploy --guided --capabilities CAPABILITY_NAMED_IAM</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "image": "https://drive.google.com/uc?export=view&id=1ny7F-OwtRCmozvJCVPwCPGecM70xgdlF",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "linkedin": "kurt-tometich",
+      "twitter": ""
+    }
+  ]
+}
