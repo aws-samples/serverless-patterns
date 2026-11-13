@@ -1,0 +1,10 @@
+.aws-sam/
+samconfig.toml
+*.zip
+*.pkg
+node_modules/
+npm-debug.log*
+.claude/
+.vscode/
+.idea/
+.DS_Store
