@@ -1,0 +1,43 @@
+{
+  "title": "AWS Lambda Web Function with private VPC egress",
+  "description": "Run a Lambda Web Function that reaches private resources in your VPC through a Lambda network connector",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+      "headline": "How it works",
+      "text": [
+          "The SAM template creates a Lambda network connector that provisions elastic network interfaces (ENIs) in your VPC subnets and security groups, a Lambda Web Function, and an immutable revision whose ServiceConfig.EgressNetworkConnectorArn references the connector's version-qualified ARN so outbound traffic is routed through your VPC. An IamAuth HomeRegion endpoint routes traffic to the revision. Because a revision with a network connector supports only HomeRegion endpoints, multi-Region endpoint types are not used in this pattern. The sample Node.js HTTP server optionally probes a private INTERNAL_TARGET_URL to demonstrate reaching resources inside the VPC."
+      ]
+  },
+  "gitHub": {
+      "template": {
+          "templateFile": "template.yaml"
+      }
+  },
+  "resources": {},
+  "deploy": {
+      "text": [
+          "See the GitHub repo for detailed build and deploy instructions."
+      ]
+  },
+  "testing": {
+      "text": [
+          "See the GitHub repo for detailed testing instructions."
+      ]
+  },
+  "cleanup": {
+      "text": [
+          "See the GitHub repo for detailed cleanup instructions."
+      ]
+  },
+  "authors": [
+      {
+          "name": "Shekhar Shrinivasan",
+          "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
+          "bio": "Senior Technical Consultant (TAM)",
+          "linkedin": "shekhar-shrinivasan",
+          "twitter": ""
+      }
+  ]
+}

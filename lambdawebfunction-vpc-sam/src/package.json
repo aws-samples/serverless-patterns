@@ -1,0 +1,7 @@
+{
+  "name": "lambdawebfunction-vpc-sam-app",
+  "version": "1.0.0",
+  "description": "Sample Lambda Web Function HTTP server (ESM) with private VPC egress via a network connector.",
+  "type": "module",
+  "main": "index.js"
+}
