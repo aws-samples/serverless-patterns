@@ -2,38 +2,36 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const AWS = require('aws-sdk')
-AWS.config.update({ region: process.env.AWS_REGION })
+const { RekognitionClient, DetectTextCommand } = require('@aws-sdk/client-rekognition')
 
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event) => {
 
     console.log('Received s3 event:', JSON.stringify(event, null, 2));
 
     bucketName = event['detail']['requestParameters']['bucketName']
     imageName = event['detail']['requestParameters']['key']
 
-    rekognition_client = new AWS.Rekognition();
+    rekognition_client = new RekognitionClient();
 
     // Analyze image to see if there is text in the image
-    rekognition_client.detectText({
-        Image: {
-            S3Object: {
-                Bucket: bucketName,
-                Name: imageName,
+    try {
+        const textDetectionResponse = await rekognition_client.send(new DetectTextCommand({
+            Image: {
+                S3Object: {
+                    Bucket: bucketName,
+                    Name: imageName,
+                },
             },
-        },
-    }, function (error, textDetectionResponse) {
-        if (error)
-            console.log("Error in Text Detection from Rekognition: ", error.message, error.stack);
-        else {
-            console.log("textDetectionResponse: ", textDetectionResponse);
+        }));
+        console.log("textDetectionResponse: ", textDetectionResponse);
 
-            console.log(`========== Detected Text for: ${imageName} ==========`);
-            textDetectionResponse.TextDetections.forEach(label => {
-                if(label.ParentId == undefined)
-                    console.log(`Detected Text: ${label.DetectedText}`)
-            });
-        }
-    });
+        console.log(`========== Detected Text for: ${imageName} ==========`);
+        textDetectionResponse.TextDetections.forEach(label => {
+            if(label.ParentId == undefined)
+                console.log(`Detected Text: ${label.DetectedText}`)
+        });
+    } catch (error) {
+        console.log("Error in Text Detection from Rekognition: ", error.message, error.stack);
+    }
 }
