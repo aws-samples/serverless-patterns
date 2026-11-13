@@ -129,6 +129,17 @@ Decide your error and latency thresholds before you start the canary, then `shif
 - **Change weights only through the stack.** If you change the endpoint's weights in the console or with the `aws lambda-web` CLI, the stack parameters no longer match what's serving traffic, and the next `deploy.sh` command overwrites your change.
 - **Identical releases.** Running `canary` without changing `src/` still creates a new revision with a new code version. The page shows the same release in both slots.
 
+## Production considerations
+
+This pattern keeps the baseline small so the rollout mechanics stay clear. Before you use it for production traffic, add what your workload needs:
+
+- **AWS WAF.** Attach a web ACL to the distribution to filter malicious requests and rate-limit clients. WAF has its own charges.
+- **Access logging.** Turn on CloudFront standard logging or real-time logs so you can audit requests and investigate incidents.
+- **Custom domain and TLS.** With the default `*.cloudfront.net` certificate, CloudFront doesn't enforce a minimum viewer TLS version. The template sets `MinimumProtocolVersion: TLSv1.2_2021`, which takes effect when you add a custom domain with an AWS Certificate Manager certificate.
+- **Log encryption with your own key.** CloudWatch Logs encrypts log data at rest by default. If compliance requires a customer managed key, set `KmsKeyId` on both log groups and allow CloudWatch Logs in the key policy.
+- **Cost guardrails.** Set an [AWS Budgets](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) alert, and tune the endpoint's `ThrottleConfig` and `ScalingConfig` caps for your expected load.
+- **Automated promotion.** Run `deploy.sh` from a pipeline that checks your canary's error rate and latency before each `shift` or `promote`.
+
 ## Cleanup
 
     export AWS_REGION="${AWS_REGION:-$(aws configure get region)}"   # the Region you deployed to

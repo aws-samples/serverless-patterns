@@ -237,8 +237,12 @@ Resources:
           # real traffic split. No origin request policy: no viewer headers, cookies or
           # query strings are forwarded, and Host stays the endpoint domain.
           CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+        # With the default *.cloudfront.net certificate, CloudFront doesn't enforce a
+        # minimum viewer TLS version. The setting takes effect when you add a custom
+        # domain with an ACM certificate (see Production considerations in the README).
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
 
   # Web Functions don't support AWS::Lambda::Permission. Allow only this distribution.
   EndpointResourcePolicy:

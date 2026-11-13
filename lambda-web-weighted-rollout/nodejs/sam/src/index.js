@@ -4,7 +4,7 @@
 import http from 'node:http';
 import { createHash, randomUUID } from 'node:crypto';
 
-const RELEASE = 'v4';
+const RELEASE = 'v1';
 const ACCENT = '#2563eb';
 
 // The runtime sets AWS_LAMBDA_HTTP_ENDPOINT to host:port. Locally, fall back to 127.0.0.1:3000.
