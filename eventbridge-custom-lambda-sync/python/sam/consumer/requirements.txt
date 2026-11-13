@@ -1,0 +1,2 @@
+# The consumer needs no third-party packages at deploy time: boto3 is provided
+# by the Lambda runtime. The tests use a botocore Stubber; see the README.
