@@ -1,0 +1,7 @@
+{
+  "name": "microvm-edge-sessions-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hello-world in-MicroVM app that returns its session id."
+}

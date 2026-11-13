@@ -1,0 +1,6 @@
+node_modules
+cdk.out
+cdk.context.json
+# Compiled JS, except the hand-written in-VM app server
+*.js
+!src/microvm-app/server.js
