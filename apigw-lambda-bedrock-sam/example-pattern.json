@@ -29,8 +29,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided",
-      "./create_lambda_layer.sh"
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -40,8 +39,7 @@
   },
   "cleanup": {
     "text": [
-      "1. Delete the stack: <code>sam delete</code>.",
-      "2. Delete Lambda layer stack: <code>./delete_lambda_layer.sh</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [
