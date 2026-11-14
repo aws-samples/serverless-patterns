@@ -43,8 +43,8 @@ Important: this application uses various AWS services and there are costs associ
     
     (View Salesforce documentation for Salesforce connection parameters)
 
-    * [SalesforceOAuthUrl](https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-enrich-with-sfdc#:~:text=Salesforce%20connection%20parameters.-,SalesforceOAuthUrl,-for%20token%20requests) for token requests.
-    * [SFEndpointUrl](https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-enrich-with-sfdc#:~:text=for%20token%20requests-,SFEndpointUrl,-SalesforceOauthClientId%2C%20SalesforceOauthClientSecret%2C%20SalesforceUsername)
+    * [SalesforceOAuthUrl](https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-enrich-with-sfdc/sam#:~:text=Salesforce%20connection%20parameters.-,SalesforceOAuthUrl,-for%20token%20requests) for token requests.
+    * [SFEndpointUrl](https://github.com/aws-samples/serverless-patterns/tree/main/eventbridge-pipes-sqs-enrich-with-sfdc/sam#:~:text=for%20token%20requests-,SFEndpointUrl,-SalesforceOauthClientId%2C%20SalesforceOauthClientSecret%2C%20SalesforceUsername)
     * [SalesforceClientId, SalesforceClientSecret](https://onlinehelp.coveo.com/en/ces/7.0/administrator/getting_salesforce_client_id_and_client_secret_values.htm)
     * Allow SAM CLI to create IAM roles with the required permissions.
 
