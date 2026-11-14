@@ -5,6 +5,7 @@ This repo holds serverless patterns published on [Serverless Land](https://serve
 To create or change a pattern, follow the [pattern checklist](PUBLISHING.md#pattern-checklist) in PUBLISHING.md. These rules apply on top of it:
 
 - Before writing a new pattern, search the repo for one with the same services, in both folder styles. If one exists, add a variant to its family instead of a duplicate.
+- Put a new pattern in a nested folder that follows [folder structure](PUBLISHING.md#folder-structure): no `yaml/` folder, and Integration patterns skip the language level. Check it with `node _scripts/check-folder.js {pattern-folder}`.
 - Work in one pattern variant folder only. Start from `_pattern-model/` or a similar existing pattern. If you copy a pattern, update every reference to the original: `example-pattern.json`, README, and resource and stack names.
 - Don't edit `_scripts/pattern-schema.mjs`. It's generated from serverless-land. Don't edit other files in `_scripts/`, `_pattern-model/` or `.github/` unless asked.
 - Before you finish, run the pattern file check and the framework's build or synth:

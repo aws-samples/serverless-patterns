@@ -69,10 +69,13 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
 - **One pattern variant per pull request.** Put everything in one variant folder. Don't change other pattern folders.
 - <a id="folder-structure"></a>**Folder structure:** `{family}/{language}/{framework}`, all lowercase, e.g. `sqs-lambda/python/sam`.
   - The family folder names the services, hyphenated, e.g. `sqs-lambda`. It groups patterns that differ only by language or framework.
-  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`.
-  - Skip the language level when the pattern has no language (infra-only, e.g. `language` is `""`): use `{family}/{framework}`, e.g. `apigw-sqs/sam`.
+  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`, `Serverless Framework` → `serverlessframework`.
+  - A pattern with no function code uses the language `Integration` and has no language folder: `{family}/{framework}`, e.g. `apigw-sqs/sam`. Don't use a `yaml` folder.
+  - A collection can number its folders to set the order they show in on Serverless Land, e.g. `eventbridge-api-destinations/2-slack`. The `N-` prefix is optional and does nothing else.
   - Each variant folder holds a complete pattern: `README.md`, `example-pattern.json`, the template and the code.
-  - Older patterns still use single folders such as `sqs-lambda-python-sam`. Use the new structure for new patterns.
+  - Make resource names unique to the stack, so two variants can deploy side by side in one account and Region. Include the stack name, e.g. `!Sub ${AWS::StackName}-orders`, or leave the name out and let CloudFormation pick one.
+  - Older patterns still use single folders such as `sqs-lambda-python-sam`. They're moving into family folders over the coming weeks. Use the new structure for new patterns.
+  - Pull requests check the path of each pattern folder they add: it must be nested and can't contain a `yaml` folder. Check yours with `node _scripts/check-folder.js {family}/{language}/{framework}`.
 - **Scope:** patterns are infrastructure as code for 2–4 AWS services with minimal custom code. Utilities, demos and full applications belong in [Serverless Land repos](https://serverlessland.com/repos).
 - **README.md:** keep the headings from `_pattern-model/README.md` and fill in every section: requirements, deployment, how it works, testing and cleanup.
 - **example-pattern.json:** this file builds the pattern page on Serverless Land. Pull requests check it against the [pattern schema](_scripts/pattern-schema.mjs). The rules people most often miss:
