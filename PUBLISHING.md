@@ -69,7 +69,7 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
 - **One pattern variant per pull request.** Put everything in one variant folder. Don't change other pattern folders.
 - <a id="folder-structure"></a>**Folder structure:** `{family}/{language}/{framework}`, all lowercase, e.g. `sqs-lambda/python/sam`.
   - The family folder names the services, hyphenated, e.g. `sqs-lambda`. It groups patterns that differ only by language or framework.
-  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`, `Serverless Framework` → `serverlessframework`.
+  - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`, `Serverless Framework` → `sls`.
   - A pattern with no function code uses the language `Integration` and has no language folder: `{family}/{framework}`, e.g. `apigw-sqs/sam`. Don't use a `yaml` folder.
   - A collection can number its folders to set the order they show in on Serverless Land, e.g. `eventbridge-api-destinations/2-slack`. The `N-` prefix is optional and does nothing else.
   - Each variant folder holds a complete pattern: `README.md`, `example-pattern.json`, the template and the code.
@@ -155,7 +155,7 @@ Delete any unnecessary local and origin branches.
 
 ## Example Patterns
 
-1. API Gateway HTTP API to Lambda: [Website](https://serverlessland.com/patterns/apigw-lambda) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda)
+1. API Gateway HTTP API to Lambda: [Website](https://serverlessland.com/patterns/apigw-lambda) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda/nodejs/sam)
 2. API Gateway REST API to DynamoDB: [Website](https://serverlessland.com/patterns/apigw-dynamodb) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-dynamodb)
 3. Lambda to SSM Parameter Store: [Website](https://serverlessland.com/patterns/lambda-ssm) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ssm-parameter)
 4. Lambda to S3 via a Custom Resource: [Website](https://serverlessland.com/patterns/lambda-s3-cfn) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/cfn-custom-resource-s3-create)

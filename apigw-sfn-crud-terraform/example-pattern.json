@@ -27,7 +27,7 @@
       },
       {
         "text": "Simple CRUD with API Gateway & DynamboDB",
-        "link": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ddb-openapi-crud"
+        "link": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-ddb-openapi-crud/openapi/sam"
       }
     ]
   },
