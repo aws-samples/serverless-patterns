@@ -8,11 +8,11 @@
     "headline": "How it works",
     "text": [
       "This pattern provides two resources - ",
-      " - An Amazon CloudFormation template to deploy a serverless or provisioned MSK cluster and Cloud9 instance in the same VPC to interact with the MSK cluster",
+      " - An AWS CloudFormation template to deploy a serverless or provisioned MSK cluster (Apache Kafka 4.1.x in KRaft mode by default) and a Kafka client EC2 instance in a private subnet of the same VPC. You connect to the instance with Session Manager to interact with the MSK cluster.",
       " - An AWS SAM project with a Lambda Function to demonstrate SASL authentication.",
-      "To test this pattern, first deploy the CloudFormation stack using the template file MSKSampleStack.yml under msk-cfn-sasl-lambda/create-cluster-cfn. You will need to chose if you'd like to provision serverless or provisioned cluster. For both options, all available authentication mechanisms are enabled - TLS, SASL/SCRAM, and IAM for provisioned cluster, and IAM for serverless. Follow msk-cfn-sasl-lambda/create-cluster-cfn/README.md for detailed instructions",
+      "To test this pattern, first deploy the CloudFormation stack using the template file MSKSampleStack.yml under msk-cfn-sasl-lambda/create-cluster-cfn. The cluster type defaults to provisioned, which SASL/SCRAM needs. The provisioned cluster enables TLS, SASL/SCRAM and IAM authentication, and the serverless cluster enables IAM. Follow msk-cfn-sasl-lambda/create-cluster-cfn/README.md for detailed instructions",
       "Next step is to deploy the Lambda Function. Follow steps under msk-cfn-sasl-lambda/README.md to deploy and test the Lambda Function.",
-      "Note - Presently MSK with serverless is not supported for SASL authentication, you must use Provisioned option when deplying the MSK cluster."
+      "Note - MSK Serverless doesn't support SASL/SCRAM authentication, so use the provisioned cluster for this pattern."
     ]
   },
   "gitHub": {

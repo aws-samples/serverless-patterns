@@ -40,14 +40,9 @@ Resources:
   KafkaClientInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
-      GroupName: !Sub "${AWS::StackName} Security group attached to the kakfa client producer"
+      GroupDescription: Kafka client instances. No inbound rules; connect with Session Manager.
+      GroupName: !Sub "${AWS::StackName} Security group attached to the kafka client producer"
       VpcId: !Ref VPCId
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 10.0.0.0/24
   
   MSKSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -56,11 +51,6 @@ Resources:
       GroupDescription: Security Group for the MSK cluster
       VpcId: !Ref VPCId
       SecurityGroupIngress:
-      - Description: ZooKeeper Plaintext
-        FromPort: 2181
-        ToPort: 2181
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
       - Description: Bootstrap servers Plaintext
         FromPort: 9092
         ToPort: 9092
@@ -69,16 +59,6 @@ Resources:
       - Description: Bootstrap servers TLS
         FromPort: 9094
         ToPort: 9094
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
-      - Description: Kafka Connect
-        FromPort: 8083
-        ToPort: 8083
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
-      - Description: Enable access to Schema Registry inside the SG
-        FromPort: 8081
-        ToPort: 8081
         IpProtocol: tcp
         SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
 
@@ -153,3 +133,6 @@ Outputs:
   MSKCluster: 
     Description: MSK Cluster details
     Value: !Ref MSKCluster
+  KafkaClientInstanceSecurityGroupID:
+    Description: Security group for Kafka client instances. The brokers accept connections from it on ports 9092 and 9094.
+    Value: !GetAtt KafkaClientInstanceSecurityGroup.GroupId

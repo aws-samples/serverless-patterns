@@ -9,7 +9,7 @@
     "text": [
       "Lambda is a consumer application for your Kafka topic. It processes records from one or more partitions and sends the payload to the target function. Lambda continues to process batches until there are no more messages in the topic.",
       "Lambda internally polls for new messages from the event source and then synchronously invokes the target Lambda function. Lambda reads the messages in batches and provides these to your function as an event payload. The maximum batch size is configurable. (The default is 100 messages.)",
-      "The CDK template creates a Lambda Function that uses a AWSLambdaMSKExecutionRole IAM role to poll a certain topic within a certain MSK Stream as defined as the Event source in the template."
+      "The CDK stack creates an Amazon MSK provisioned cluster (Apache Kafka 4.1.x in KRaft mode) in private subnets, a Lambda function with the AWSLambdaMSKExecutionRole managed policy that polls a topic on the cluster, and a Kafka client EC2 instance that you connect to with Session Manager. The broker security group allows only the Lambda event source mapping and the client instance."
     ]
   },
   "gitHub": {
@@ -38,8 +38,8 @@
   "testing": {
     "headline": "Testing",
     "text": [
-      "1. Publish messages to the Amazon MSK topic. Follow the steps as outlined in Step 4 to create a client machine and publish messages to the MSK Topic.",
-      "2. Retrieve the logs from the Lambda function: <code> sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME</code>."
+      "1. Connect to the Kafka client instance with Session Manager, create the topic and publish messages. See the GitHub repo for detailed steps.",
+      "2. Check the CloudWatch Logs of the Lambda function."
     ]
   },
   "cleanup": {

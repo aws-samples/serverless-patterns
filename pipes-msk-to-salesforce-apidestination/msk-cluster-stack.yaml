@@ -2,19 +2,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   MSKKafkaVersion:
     Type: String
-    Default: 2.8.1
+    Default: 4.1.x.kraft
     AllowedValues:
-    - 2.8.1
-    - 2.8.0
-    - 2.7.1
-    - 2.7.0
-    - 2.6.2
-    - 2.6.1
-    - 2.6.0
-    - 2.5.1
-    - 2.4.1.1
-    - 2.3.1
-    - 2.2.1
+    - 4.1.x.kraft
+    - 4.0.x.kraft
+    - 3.9.x.kraft
+    - 3.9.x
+    - 3.8.x.kraft
+    - 3.8.x
   InstanceType:
     Type: String
     Default: kafka.t3.small
@@ -45,14 +40,9 @@ Resources:
   MSKProducerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
+      GroupDescription: Kafka client instance. No inbound rules; connect with Session Manager.
       GroupName: !Sub "${AWS::StackName} Security group attached to the Kafka client producer"
       VpcId: !Ref MskClusterVPCId
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/24
 
   MSKSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -61,34 +51,9 @@ Resources:
       GroupDescription: Security Group for the MSK cluster
       VpcId: !Ref MskClusterVPCId
       SecurityGroupIngress:
-      - Description: ZooKeeper Plaintext
-        FromPort: 2181
-        ToPort: 2181
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt MSKProducerSG.GroupId
-      - Description: Bootstrap servers Plaintext
-        FromPort: 9092
-        ToPort: 9092
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt MSKProducerSG.GroupId
-      - Description: IAM Auth access control
+      - Description: Kafka client, IAM auth
         FromPort: 9098
         ToPort: 9098
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt MSKProducerSG.GroupId
-      - Description: Bootstrap servers TLS
-        FromPort: 9094
-        ToPort: 9094
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt MSKProducerSG.GroupId
-      - Description: Kafka Connect
-        FromPort: 8083
-        ToPort: 8083
-        IpProtocol: tcp
-        SourceSecurityGroupId: !GetAtt MSKProducerSG.GroupId
-      - Description: Enable access to Schema Registry inside the SG
-        FromPort: 8081
-        ToPort: 8081
         IpProtocol: tcp
         SourceSecurityGroupId: !GetAtt MSKProducerSG.GroupId
 

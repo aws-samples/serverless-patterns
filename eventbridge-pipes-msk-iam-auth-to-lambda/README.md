@@ -33,7 +33,7 @@ Important: This application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Enter MSK Kafka Version, defaults to **2.8.1**
+    * Enter MSK Kafka Version, defaults to **4.1.x.kraft**
     * Select MSK Cluster Instance Type, defaults to **kafka.m5.large**
     * Enter MSK Topic name
     * Allow SAM CLI to create IAM roles with the required permissions.
@@ -79,12 +79,12 @@ More details [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-
 
 In order to test sending messages into Amazon MSK cluster, deploy two EC2 instances - one into a private subnet and another one in the public subnet (serve as bastion host). Follow the [Step 3](https://docs.aws.amazon.com/msk/latest/developerguide/create-client-machine.html), [Step 4](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html) and [Step 5](https://docs.aws.amazon.com/msk/latest/developerguide/produce-consume.html) to setup the client instance, MSK topic and publish messages. Additionally you will need to [aws-msk-iam-auth](https://github.com/aws/aws-msk-iam-auth) library and [set the client for IAM authentication](https://github.com/aws/aws-msk-iam-auth#configuring-a-kafka-client-to-use-aws-iam).
 
-In case you want to try out testing with Kafka producer client provided as part of this example, please expand the section below and try it out. 
+In case you want to try out testing with the Kafka producer client provided as part of this example, expand the section below.
 
 <details>
   <summary><b> Testing using Kafka producer client</b></summary>
   
-- Uncomment KafkaProducerStack resource in the template.yaml (line 75 to 87)
+- Uncomment the `KafkaProducerStack` resource and the `Outputs` section at the end of template.yaml.
 
 - Redeploy the SAM template 
     ```
@@ -92,40 +92,38 @@ In case you want to try out testing with Kafka producer client provided as part 
     sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
     ```
 
-    This will deploy a Cloud9 instance and an EC2 instance in a private subnet with Kakfa and IAM Auth library downloaded and configured.
+    This deploys an EC2 instance (Amazon Linux 2023) in a private subnet with Amazon Corretto 21, the Apache Kafka 4.1.2 client and the Amazon MSK IAM auth library installed and configured. The instance has no public IP address and no SSH access. Its role allows the Kafka actions it needs on this cluster only, plus `AmazonSSMManagedInstanceCore` for Session Manager. The `KafkaClientInstanceId` stack output has the instance ID.
 
-- Login to the Cloud 9 environment. Run the following command to get the bootstrap server details. Replace the **REGION** accordingly
+- Connect to the instance with AWS Systems Manager Session Manager in one of these ways:
+    - In the [Amazon EC2 console](https://console.aws.amazon.com/ec2/), select the instance, choose **Connect**, choose the **Session Manager** tab, then choose **Connect**.
+    - From your terminal, with the [Session Manager plugin for the AWS CLI](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) installed:
+        ```
+        aws ssm start-session --target <KafkaClientInstanceId>
+        ```
 
-    ```
-    export ARN=$(aws kafka list-clusters --region REGION --query 'ClusterInfoList[*].ClusterArn' --output text)
-    
-   aws kafka get-bootstrap-brokers --cluster-arn $ARN --region REGION --output text
-    ```
-- Make a note of the bootstrap brokers. 
-- **SSH into EC2 instance** deployed in the private subnet. 
-- Set the environment varialable with the bootstrap broker details.
+- Session Manager signs you in as `ssm-user`. Switch to `ec2-user`, which has the Kafka client in `~/kafka` and the `CLUSTER_ARN`, `AWS_REGION` and `TOPIC` environment variables:
 
     ```
-    export BOOTSTRAP=<Copy and Paste the bootstrap-brokers>
+    sudo su - ec2-user
+    cd kafka
     ```
 
-    ![Set environment](./images/set-env.png)
-
-
-- Next, create topic in the MSK cluster. The following command would create a topic with replication factor as 2 and four partitions.
+- Get the IAM bootstrap brokers:
 
     ```
-    cd kafka_2.12-2.8.1
-
-    bin/kafka-topics.sh --create --bootstrap-server $BOOTSTRAP --replication-factor 2 --partitions 4 --topic msk-demo-topic --command-config bin/client.properties
-
+    export BOOTSTRAP=$(aws kafka get-bootstrap-brokers --cluster-arn $CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)
     ```
 
-- Copy and paste the following command
+- Next, create the topic in the MSK cluster. The following command creates a topic with replication factor 2 and four partitions.
 
     ```
-    bin/kafka-console-producer.sh --broker-list $BOOTSTRAP --topic msk-demo-topic --producer.config bin/client.properties
+    bin/kafka-topics.sh --create --bootstrap-server $BOOTSTRAP --replication-factor 2 --partitions 4 --topic $TOPIC --command-config client.properties
+    ```
 
+- Start a producer:
+
+    ```
+    bin/kafka-console-producer.sh --bootstrap-server $BOOTSTRAP --topic $TOPIC --producer.config client.properties
     ```
 
 - When prompted to enter a message, type `first message`

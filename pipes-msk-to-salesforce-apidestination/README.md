@@ -17,7 +17,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Salesforce security token](https://help.salesforce.com/s/articleView?language=en_US&id=sf.user_security_token.htm)
 * [Salesforce custom platform event](https://developer.salesforce.com/docs/atlas.en-us.234.0.platform_events.meta/platform_events/platform_events_define.htm)
 * [Salesforce Flow](https://help.salesforce.com/s/articleView?id=sf.c360_a_build_a_flow_in_customer_data_platform.htm&type=5)
-* [SSH Key Pair for an EC2 instance in the region where this will be deployed](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html) 
+* [Session Manager plugin for the AWS CLI](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html), if you want to connect to the Kafka client instance from your terminal instead of the EC2 console
 
 ## Deployment Instructions
 
@@ -30,17 +30,14 @@ Important: this application uses various AWS services and there are costs associ
     cd pipes-msk-to-salesforce-apidestination
     ```
 
-Note: This pattern can be deployed in us-west-1 region. If you'd like to deploy to another region, update the AMI Id in line 25 of producer-stack with a public community AMI Id in that region
-
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
     sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM
     ```
 4. During the prompts:
     * Enter a stack name
-    * Enter the desired AWS Region(default is us-west-1. Replace AMI Id in producer-stack.yaml file with your AMI Id if you want to deploy in another region)
-    * Enter a name for EC2 Key (this EC2 Key pair should exist in the region selected above)
-    * Enter MSK Kafka Version, defaults to 2.8.1
+    * Enter the desired AWS Region. The Kafka client instance uses the latest Amazon Linux 2023 AMI for that Region.
+    * Enter MSK Kafka Version, defaults to 4.1.x.kraft
     * Select MSK Cluster Instance Type, defaults to kafka.t3.small
     * Enter MSK Topic name
     
@@ -66,37 +63,31 @@ Note: Based on specific use case, the pattern can be modified to perform particu
 
 In order to test sending messages into Amazon MSK cluster, follow these steps:
 
-Getting the MSK brokers:
+The stack deploys a Kafka client EC2 instance (Amazon Linux 2023) in a private subnet with Amazon Corretto 21, the Apache Kafka 4.1.2 client and the Amazon MSK IAM auth library installed. The instance has no public IP address and no SSH access. Its role allows the Kafka actions it needs on this cluster only, plus `AmazonSSMManagedInstanceCore` for Session Manager.
 
-1. Open a new Cloudshell environment and set environment variables as below:
+1. Connect to the instance with AWS Systems Manager Session Manager. The `KafkaClientInstanceId` stack output has the instance ID.
+    * In the [Amazon EC2 console](https://console.aws.amazon.com/ec2/), select the instance, choose **Connect**, choose the **Session Manager** tab, then choose **Connect**.
+    * Or, from your terminal:
+        ```
+        aws ssm start-session --target <KafkaClientInstanceId>
+        ```
 
-```
-export REGION=<region>
-export ARN=$(aws kafka list-clusters --region $REGION --query 'ClusterInfoList[*].ClusterArn' --output text)
-aws kafka get-bootstrap-brokers --cluster-arn $ARN --region $REGION --output text
-```
-3. Make a note of the bootstrap brokers
-
-Sending JSON test data
-
-1. SSH into the EC2 instance deployed in public subnet
-
-2. Set the environment variable with bootstrap broker details
+2. Session Manager signs you in as `ssm-user`. Switch to `ec2-user`, which has the Kafka client in `~/kafka` and the `CLUSTER_ARN`, `AWS_REGION` and `TOPIC` environment variables:
 
 ```
-export BOOTSTRAP=<copy and paste the MSK bootstrap servers>
-export TOPIC=<topic name>
-``` 
-
-3. Next, create topic in the MSK cluster
-```
-cd kafka_2.13-2.8.1/bin
-./kafka-topics.sh --create --bootstrap-server $BOOTSTRAP --topic $TOPIC --command-config client.properties
+sudo su - ec2-user
+cd kafka
+export BOOTSTRAP=$(aws kafka get-bootstrap-brokers --cluster-arn $CLUSTER_ARN --query 'BootstrapBrokerStringSaslIam' --output text)
 ```
 
-4. Copy and paste the following command
+3. Next, create the topic in the MSK cluster
 ```
-./kafka-console-producer.sh --broker-list $BOOTSTRAP --topic $TOPIC --producer.config client.properties
+bin/kafka-topics.sh --create --bootstrap-server $BOOTSTRAP --topic $TOPIC --command-config client.properties
+```
+
+4. Start a producer
+```
+bin/kafka-console-producer.sh --bootstrap-server $BOOTSTRAP --topic $TOPIC --producer.config client.properties
 ```
 
 5. When prompted to enter a message, paste the following JSON 
