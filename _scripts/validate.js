@@ -10,12 +10,16 @@
 // script also comments on and labels the pull request (needs TOKEN, PR_NUMBER,
 // ACTOR and GITHUB_REPOSITORY).
 //
-// It also scans each pattern folder for admin-equivalent IAM grants (see check-iam.js).
+// It also scans each pattern folder for admin-equivalent IAM grants (see check-iam.js),
+// and checks the folder path (see check-folder.js). In CI, only folders whose
+// example-pattern.json the pull request adds must be nested; local runs check `yaml` only.
 //
-// Exits non-zero if any file fails validation or any pattern has a broad IAM grant.
+// Exits non-zero if any file fails validation, any pattern has a broad IAM grant,
+// or any folder path breaks the folder rules.
 const fs = require('fs');
 const path = require('path');
 const { checkPatternIam } = require('./check-iam');
+const { checkPatternFolder } = require('./check-folder');
 
 const PATTERN_FILE = 'example-pattern.json';
 const repoRoot = path.join(__dirname, '..');
@@ -33,6 +37,15 @@ const patternFiles = isLocalRun
   : [...new Set([...splitList(process.env.ADDED_FILES), ...splitList(process.env.MODIFIED_FILES)])]
       .filter((f) => path.basename(f) === PATTERN_FILE)
       .map((f) => path.join(repoRoot, f));
+
+// Folders whose example-pattern.json is new in this pull request. A moved folder counts as new.
+const newPatternDirs = new Set(
+  isLocalRun
+    ? []
+    : splitList(process.env.ADDED_FILES)
+        .filter((f) => path.basename(f) === PATTERN_FILE)
+        .map((f) => path.dirname(path.join(repoRoot, f)))
+);
 
 let github;
 const getGitHub = () => {
@@ -128,6 +141,20 @@ const reportIamFindings = async (iamFailures) => {
   console.info('Broad IAM found: Added comments back to the pull request requesting changes');
 };
 
+const reportFolderProblems = async (folderFailures) => {
+  if (!githubAutomation) return;
+  const sections = folderFailures.map(({ dir, problems }) => {
+    const list = problems.map((problem, index) => `${index + 1}. ${problem}`).join('\n');
+    return `**${path.relative(repoRoot, dir)}**\n\n${list}`;
+  });
+  await comment(
+    `@${process.env.ACTOR} please move this pattern to a folder that follows the [folder structure](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md#folder-structure) \n\n` +
+      `${sections.join('\n\n')} \n\n`
+  );
+  await addLabels(['requested-changes']);
+  console.info('Folder problems found: Added comments back to the pull request requesting changes');
+};
+
 const reportSuccess = async (parsedPatterns) => {
   if (!githubAutomation) return;
   try {
@@ -193,9 +220,23 @@ const main = async () => {
     }
   }
 
+  const folderFailures = [];
+  for (const dir of [...new Set(patternFiles.map((file) => path.dirname(file)))]) {
+    const problems = checkPatternFolder(path.relative(repoRoot, dir), repoRoot, { isNew: newPatternDirs.has(dir) });
+    const name = path.relative(process.cwd(), dir) || '.';
+    if (problems.length) {
+      folderFailures.push({ dir, problems });
+      console.error(`✘ ${name}: folder structure`);
+      problems.forEach((problem, index) => console.error(`  ${index + 1}. ${problem.replace(/`/g, '')}`));
+    } else {
+      console.info(`✔ ${name}: folder structure`);
+    }
+  }
+
   if (failures.length) await reportErrors(failures);
   if (iamFailures.length) await reportIamFindings(iamFailures);
-  if (failures.length || iamFailures.length) {
+  if (folderFailures.length) await reportFolderProblems(folderFailures);
+  if (failures.length || iamFailures.length || folderFailures.length) {
     process.exitCode = 1;
     return;
   }
