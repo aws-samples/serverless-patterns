@@ -30,8 +30,8 @@
         "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/aws-secretsmanager-readme.html"
       },
       {
-        "text": "CDK documentation for RDS Serverless Cluster",
-        "link": "https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-rds.ServerlessCluster.html"
+        "text": "CDK documentation for RDS Database Cluster (Aurora Serverless v2)",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_rds.DatabaseCluster.html"
       }
     ]
   },

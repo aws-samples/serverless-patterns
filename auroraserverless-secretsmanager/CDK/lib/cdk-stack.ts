@@ -2,7 +2,7 @@
 import { Stack, StackProps, CfnOutput  } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { aws_secretsmanager as sm } from "aws-cdk-lib";
-import { CfnDBCluster, CfnDBSubnetGroup } from 'aws-cdk-lib/aws-rds';
+import { CfnDBCluster, CfnDBInstance, CfnDBSubnetGroup } from 'aws-cdk-lib/aws-rds';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 
 export class CdkStack extends Stack {
@@ -17,7 +17,7 @@ export class CdkStack extends Stack {
     const vpc = new Vpc(this, 'Vpc', {
       cidr: '10.0.0.0/16',
       natGateways: 0,
-      subnetConfiguration: [   { name: 'aurora_isolated_', subnetType: SubnetType.ISOLATED } ] }); 
+      subnetConfiguration: [   { name: 'aurora_isolated_', subnetType: SubnetType.PRIVATE_ISOLATED } ] }); 
 
     const subnetIds: string[] = [];
     vpc.isolatedSubnets.forEach((subnet, index) => { subnetIds.push(subnet.subnetId); });
@@ -37,25 +37,31 @@ export class CdkStack extends Stack {
       },
     });
 
-    //Serverless cluster
+    //Aurora Serverless v2 cluster (the Data API needs Aurora MySQL 3.07 or higher)
     const aurora = new CfnDBCluster(this, 'AuroraServerless', {
       databaseName: 'dbname',
       dbClusterIdentifier: 'aurora-serverless',
-      engine: 'aurora',
-      engineMode: 'serverless',
+      engine: 'aurora-mysql',
+      engineVersion: '8.0.mysql_aurora.3.10.4',
       enableHttpEndpoint: true,
+      storageEncrypted: true,
       masterUserPassword: secret.secretValueFromJson("password").toString(),
       masterUsername: secret.secretValueFromJson("username").toString(),
       port: 3306,
       dbSubnetGroupName: dbSubnetGroup.dbSubnetGroupName,
-      scalingConfiguration: {
-        autoPause: true,
-        maxCapacity: 2,
-        minCapacity: 2,
-        secondsUntilAutoPause: 3600
+      serverlessV2ScalingConfiguration: {
+        minCapacity: 0.5,
+        maxCapacity: 2
       }
     });
-    aurora.addDependsOn(dbSubnetGroup);
+    aurora.node.addDependency(dbSubnetGroup);
+
+    //Serverless v2 writer instance
+    new CfnDBInstance(this, 'AuroraServerlessWriter', {
+      dbClusterIdentifier: aurora.ref,
+      dbInstanceClass: 'db.serverless',
+      engine: 'aurora-mysql'
+    });
 
 
     // Outputs

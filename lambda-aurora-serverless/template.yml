@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda function and an Amazon Aurora Serverless DB cluster with Data API and a Secrets Manager secret (uksb-1tthgi812) (tag:lambda-aurora-serverless)
+Description: An AWS Lambda function and an Amazon Aurora Serverless v2 DB cluster with Data API and a Secrets Manager secret (uksb-1tthgi812) (tag:lambda-aurora-serverless)
 
 # Global values that are applied to all applicable resources in this template
 Globals:
@@ -42,7 +42,7 @@ Resources:
         GenerateStringKey: password
         PasswordLength: 30
         ExcludeCharacters: '"@/\'
-  # Aurora Serverless DB Cluster with Data API
+  # Aurora Serverless v2 DB Cluster with Data API
   AuroraCluster:
     Type: 'AWS::RDS::DBCluster'
     Properties:
@@ -51,15 +51,21 @@ Resources:
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${DBSecret}:SecretString:password}}'
       DatabaseName: !Ref DatabaseName
       Engine: aurora-mysql
-      EngineMode: serverless
+      # The Data API needs Aurora MySQL 3.07 or higher on Aurora Serverless v2
+      EngineVersion: 8.0.mysql_aurora.3.10.4
       StorageEncrypted: true
-      # Enable the Data API for Aurora Serverless
+      # Enable the Data API
       EnableHttpEndpoint: true
-      ScalingConfiguration:
-        AutoPause: true
-        MinCapacity: 1
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 0.5
         MaxCapacity: 2
-        SecondsUntilAutoPause: 3600
+  # Aurora Serverless v2 writer instance
+  AuroraWriterInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBClusterIdentifier: !Ref AuroraCluster
+      DBInstanceClass: db.serverless
+      Engine: aurora-mysql
   # Lambda Function - uses Globals to define additional configuration values
   LambdaFunction:
     Type: 'AWS::Serverless::Function'

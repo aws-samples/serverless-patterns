@@ -1,6 +1,6 @@
 # AWS  VPC, Subnets, Aurora Serverless, Secrets Manager
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying  an Aurora Serverless db Cluster, a Secret Manager, and required VPC with subnets.
+This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an Aurora Serverless v2 DB cluster (Aurora MySQL 3 with the Data API turned on) with one serverless writer instance, a Secret Manager, and required VPC with subnets.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
