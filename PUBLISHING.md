@@ -158,4 +158,4 @@ Delete any unnecessary local and origin branches.
 1. API Gateway HTTP API to Lambda: [Website](https://serverlessland.com/patterns/apigw-lambda) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-http-api-lambda/nodejs/sam)
 2. API Gateway REST API to DynamoDB: [Website](https://serverlessland.com/patterns/apigw-dynamodb) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/apigw-rest-api-dynamodb/sam)
 3. Lambda to SSM Parameter Store: [Website](https://serverlessland.com/patterns/lambda-ssm) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/lambda-ssm-parameter)
-4. Lambda to S3 via a Custom Resource: [Website](https://serverlessland.com/patterns/lambda-s3-cfn) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/cfn-custom-resource-s3-create)
+4. Lambda to S3 via a Custom Resource: [Website](https://serverlessland.com/patterns/lambda-s3-cfn) | [GitHub](https://github.com/aws-samples/serverless-patterns/tree/main/custom-resource-s3-create/nodejs/sam)
