@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/waf-cloudfront-ai-monetization-cdk
+    cd serverless-patterns/waf-cloudfront-ai-monetization/typescript/cdk
     ```
 3. Install dependencies:
     ```

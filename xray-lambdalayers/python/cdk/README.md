@@ -64,7 +64,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd serverless-patterns/xray-lambdalayers-cdk-python
+cd serverless-patterns/xray-lambdalayers/python/cdk
 ```
 
 3. Create a [lambda layer](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda/README.html#layers) for AWS X-Ray.

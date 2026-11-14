@@ -1,9 +1,9 @@
 {
-  "title": "AWS WAF ACL attached to Amazon AppSync GraphQL API",
+  "title": "AWS WAF ACL attached to Amazon AppSync graphql API",
   "description": "Create an AppSync graphql API protected with WAF rules. This WebACL limits the requests to certain countries and protects against common graphql attacks.",
   "language": "TypeScript",
   "level": "300",
-  "framework": "AWS SAM",
+  "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -13,6 +13,9 @@
   },
   "gitHub": {
     "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/waf-appsync/typescript/cdk",
+      "templateURL": "serverless-patterns/waf-appsync/typescript/cdk",
+      "projectFolder": "waf-appsync/typescript/cdk",
       "templateFile": "cdk.ts"
     }
   },
@@ -37,21 +40,21 @@
     ]
   },
   "deploy": {
-    "text": [
-      "cdk deploy --all"
-    ]
+    "text": ["cdk deploy --all"]
   },
   "testing": {
-    "text": [
-      "See the GitHub repo for detailed testing instructions."
-    ]
+    "text": ["See the GitHub repo for detailed testing instructions."]
   },
   "cleanup": {
-    "text": [
-      "Delete the stack: <code>cdk destroy</code>."
-    ]
+    "text": ["Delete the stack: <code>cdk destroy</code>."]
   },
-  "contributors": [
-    "content/contributors/harun-hasdal.json"
+  "authors": [
+    {
+      "name": "Harun Hasdal",
+      "image": "https://avatars.githubusercontent.com/u/4698942",
+      "bio": "AWS Solution Architect. Serverless advocate.",
+      "linkedin": "harunhasdal",
+      "twitter": "@harunhasdal"
+    }
   ]
 }

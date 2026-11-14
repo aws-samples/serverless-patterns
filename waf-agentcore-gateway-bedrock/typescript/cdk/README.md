@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns
-   cd serverless-patterns/waf-agentcore-gateway-bedrock-cdk/cdk
+   cd serverless-patterns/waf-agentcore-gateway-bedrock/typescript/cdk/cdk
    ```
 
 2. Install dependencies:
