@@ -6,25 +6,16 @@ Description: >
   The MSK cluster is deployed into private subnet.
 
 Parameters:
-  KeyName:
-    Description: Name of an existing EC2 KeyPair to enable SSH access to the kafka client instance
-    Type: String
-    Default: default-key
   MSKKafkaVersion:
     Type: String
-    Default: 2.8.1
+    Default: 4.1.x.kraft
     AllowedValues:
-    - 2.8.1
-    - 2.8.0
-    - 2.7.1
-    - 2.7.0
-    - 2.6.2
-    - 2.6.1
-    - 2.6.0
-    - 2.5.1
-    - 2.4.1.1
-    - 2.3.1
-    - 2.2.1
+    - 4.1.x.kraft
+    - 4.0.x.kraft
+    - 3.9.x.kraft
+    - 3.9.x
+    - 3.8.x.kraft
+    - 3.8.x
   InstanceType:
     Type: String
     Default: kafka.t3.small
@@ -104,10 +95,15 @@ Resources:
       Properties:
         TemplateURL: "./producer-stack.yaml"
         Parameters:
-          PublicSubnet: !GetAtt VPCStack.Outputs.PublicSubnet
           PrivateSubnet: !GetAtt VPCStack.Outputs.PrivateSubnet1
           MSKProducerSGID: !GetAtt MSKCluster.Outputs.MSKProducerSGID
-          KeyName: !Ref KeyName
-          MSKKafkaVersion: !Ref MSKKafkaVersion
           MSKCluster: !GetAtt MSKCluster.Outputs.MSKCluster
+          ClusterName: !GetAtt MSKCluster.Outputs.ClusterName
+          ClusterId: !GetAtt MSKCluster.Outputs.ClusterId
+          MSKTopic: !Ref MSKTopic
+
+Outputs:
+  KafkaClientInstanceId:
+    Description: Kafka client instance. Connect to it with Session Manager.
+    Value: !GetAtt KafkaProducerStack.Outputs.KafkaClientInstanceId
 

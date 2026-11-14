@@ -50,25 +50,21 @@ Resources:
       VpcConfig:
         SubnetIds: !Ref SubnetIds
         SecurityGroupIds: !Ref SecurityGroups
+      # SASL/SCRAM auth needs no kafka-cluster:* actions. The event source mapping reads
+      # the SCRAM secret, and decrypts it with the secret's customer managed key.
       Policies:
-        - SecretsManagerReadWrite
         - AWSLambdaBasicExecutionRole
-        - AWSKeyManagementServicePowerUser
         - AWSLambdaMSKExecutionRole
-        - Version: '2012-10-17' 
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretArn
+        - Version: '2012-10-17'
           Statement:
             - Effect: Allow
-              Action:
-                - kafka-cluster:Connect
-                - kafka-cluster:AlterCluster
-                - kafka-cluster:DescribeCluster
-                - kafka-cluster:*Topic*
-                - kafka-cluster:WriteData
-                - kafka-cluster:ReadData
-                - kafka-cluster:AlterGroup
-                - kafka-cluster:DescribeGroup
-                - kafka:ListScramSecrets
-              Resource: !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:*'
+              Action: kms:Decrypt
+              Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/*'
+              Condition:
+                StringEquals:
+                  'kms:ViaService': !Sub 'secretsmanager.${AWS::Region}.amazonaws.com'
 
 Outputs:
   TopicConsumerFunction:

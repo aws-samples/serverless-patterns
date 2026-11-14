@@ -21,11 +21,12 @@ Ensure you have met the following:
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * Deploy a provisioned Amazon MSK cluster - <br>
-   Please follow instructions in `create-cluster-cfn/README.md` to deploy a provisioned MSK cluster. SASL/SCRAM authentication is only available for provisioned Amazon MSK cluster. So while deploying the stack, select `EnvType` as `Provisoned`. After deployment, make a note of following from the cloud formation output - 
+   Follow the instructions in `create-cluster-cfn/README.md` to deploy a provisioned MSK cluster (Apache Kafka 4.1.x in KRaft mode by default) and a Kafka client EC2 instance. SASL/SCRAM authentication is only available for provisioned Amazon MSK clusters, so keep `EnvType` as `Provisioned` (the default). After deployment, make a note of the following from the CloudFormation outputs - 
     - ProvisionedMSKArn - MSK cluster arn
     - CredentialsSecretArn - ARN for secret manager secret with credentials
-    - PrivateSubnetMSKOne, PrivateSubnetMSKTwo, and PrivateSubnetMSKThree - Subent ids
-    - SecurityGroupId - Secruity group id
+    - PrivateSubnetMSKOne, PrivateSubnetMSKTwo, and PrivateSubnetMSKThree - Subnet ids
+    - SecurityGroupId - Security group id of the MSK cluster
+    - KafkaClientInstanceId - the Kafka client instance, which you connect to with Session Manager
 * Complete `Basic Set up` and `SASL/SCRAM authentication` sections in `create-cluster-cfn/README.md` 
 ## Design
 The following diagram describes how MSK and Lambda event driven patter using SASL/SCRAM authentication mechanism.
@@ -48,11 +49,11 @@ The following diagram describes how MSK and Lambda event driven patter using SAS
     * Enter a stack name (e.g. `msk-lambda-sasl-sample-stack`)
     * Enter the desired AWS Region (e.g. `us-east-1`)
     * Parameter MSKClusterId arn (e.g. `arn:aws:kafka:us-east-1:1234567890:cluster/msk-sample-sasl-cluster-cluster/34xxxx-23xx-4311-bbd1-429fxxx-11`)
-    * Parameter Secret Arn (e.g. `arn:aws:secretsmanager:us-east-1:1234567890:secret:AmazonMSK_Credentials-sda2w`)
+    * Parameter Secret Arn (e.g. `arn:aws:secretsmanager:us-east-1:1234567890:secret:AmazonMSK_MSKStack_Credentials-sda2w`)
     * Parameter TopicName (e.g. `DemoSASLTopic`)
     * Parameter SubnetIds (e.g. `subnet-xxxxxx,subnet-yyyyyyy,subnet-zzzzzz`)
     * Parameter SecurityGroups (e.g. `sg-xxx222yyy11zz`)
-    * Allow SAM CLI to create IAM roles with the required permissions.
+    * Allow SAM CLI to create IAM roles with the required permissions. The function role can read only the SCRAM secret you pass in, and decrypt it only through Secrets Manager. SASL/SCRAM doesn't need `kafka-cluster` IAM actions.
 
 Keep the rest of the default values. After successful run of sam deploy you would see the  message like - _Successfully created/updated stack - msk-lambda-sasl-sample-stack in us-east-1_
 
@@ -89,13 +90,13 @@ The Lambda function’s event payload contains an array of records. Each array i
 
 ## Testing
 
-1. Publish messages to the Amazon MSK topic. You can start the producer with the following command.
+1. Publish messages to the Amazon MSK topic. Connect to the Kafka client instance with Session Manager as described in `create-cluster-cfn/README.md`, then start the producer from `~/kafka` with the following command.
 
 ```
-./bin/kafka-console-producer.sh --broker-list BootstrapBrokerStringSaslScram --topic DemoSASLTopic --producer.config client_sasl.properties
+./bin/kafka-console-producer.sh --bootstrap-server $BOOTSTRAP_SCRAM --topic DemoSASLTopic --producer.config client_sasl.properties
 
 ```
-2. Open the Lambda function, check the MSK trigger, if the trigger is disabled, make sure you are using the sane topic name when sending the messages via the producer.
+2. Open the Lambda function, check the MSK trigger, if the trigger is disabled, make sure you are using the same topic name when sending the messages via the producer.
 
 3. Retrieve the topic messages from the logs of Lambda function with the following command. Alternatively you can check in the Lambda logs from the Amazon CloudWatch Logs.
 

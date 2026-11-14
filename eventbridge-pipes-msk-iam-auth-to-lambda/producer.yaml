@@ -1,50 +1,40 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: Kafka client instance in a private subnet. Connect with Session Manager; there is no SSH access.
 Parameters:
-  KeyName:
-    Type: String
-  PublicSubnetOne:
-    Type: String
-    Description: 'Public Subnet'
   PrivateSubnetMSKOne:
     Type: String
     Description: 'Private Subnet One'
-  PrivateSubnetMSKTwo:
-    Type: String
-    Description: 'Private Subnet Two'
   KafkaClientInstanceSecurityGroupID:
-    Type: String
-  MSKKafkaVersion:
     Type: String
   MSKCluster:
     Type: String
-    Description: 'MSK Cluster'
-  
-Resources:
-  Cloud9EC2Bastion:
-    Type: AWS::Cloud9::EnvironmentEC2
-    Properties: 
-      AutomaticStopTimeMinutes: 600
-      Description: "Cloud9 EC2 environment"
-      InstanceType: t3.small
-      Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
-      SubnetId: !Ref PublicSubnetOne
-      Tags: 
-        - Key: 'Purpose'
-          Value: 'Cloud9EC2BastionHostInstance'
+    Description: 'MSK Cluster ARN'
+  ClusterName:
+    Type: String
+  ClusterId:
+    Type: String
+  MSKTopic:
+    Type: String
+  ApacheKafkaInstallerLocation:
+    Type: String
+    Default: https://archive.apache.org/dist/kafka/4.1.2/kafka_2.13-4.1.2.tgz
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
 
+Resources:
+  # The instance has no public IP address. The SSM agent reaches Systems Manager
+  # through the VPC's NAT gateway.
   KafkaClientEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.large
-      KeyName: !Ref KeyName
+      InstanceType: t3.small
       IamInstanceProfile: !Ref EC2InstanceProfile
-      AvailabilityZone: 
-        Fn::Select:
-         - 0
-         - Fn::GetAZs: {Ref: 'AWS::Region'}
       SubnetId: !Ref PrivateSubnetMSKOne
       SecurityGroupIds: [!Ref KafkaClientInstanceSecurityGroupID]
-      ImageId: ami-006dcf34c09e50022
+      ImageId: !Ref LatestAmiId
+      MetadataOptions:
+        HttpTokens: required
       Tags:
         - Key: 'Name'
           Value: 'KafkaClientInstance'
@@ -52,23 +42,21 @@ Resources:
         Fn::Base64: 
           !Sub |
             #!/bin/bash
-            yum update -y
-            sudo yum install java-1.8.0 -y
-
-            # Download Kafka
+            dnf install -y java-21-amazon-corretto-headless
             cd /home/ec2-user
-            sudo wget https://archive.apache.org/dist/kafka/${MSKKafkaVersion}/kafka_2.12-${MSKKafkaVersion}.tgz
-            sudo tar -xzf kafka_2.12-${MSKKafkaVersion}.tgz
-
-            # Get IAM Auth library and move it into lib folder
-            sudo wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.5/aws-msk-iam-auth-1.1.5-all.jar -P kafka_2.12-${MSKKafkaVersion}/libs
-            
-            cd /home/ec2-user/kafka_2.12-${MSKKafkaVersion}/bin
-            sudo touch client.properties
-            sudo echo "security.protocol=SASL_SSL" >> client.properties
-            sudo echo "sasl.mechanism=AWS_MSK_IAM" >> client.properties
-            sudo echo "sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;" >> client.properties
-            sudo echo "sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> client.properties
+            curl -sSfL -o kafka.tgz ${ApacheKafkaInstallerLocation}
+            mkdir kafka && tar -xzf kafka.tgz -C kafka --strip-components 1 && rm kafka.tgz
+            curl -sSfL -o kafka/libs/aws-msk-iam-auth-2.2.0-all.jar https://github.com/aws/aws-msk-iam-auth/releases/download/v2.2.0/aws-msk-iam-auth-2.2.0-all.jar
+            cat > kafka/client.properties <<'EOF'
+            security.protocol=SASL_SSL
+            sasl.mechanism=AWS_MSK_IAM
+            sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;
+            sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler
+            EOF
+            echo "export AWS_REGION=${AWS::Region}" >> /home/ec2-user/.bashrc
+            echo "export CLUSTER_ARN=${MSKCluster}" >> /home/ec2-user/.bashrc
+            echo "export TOPIC=${MSKTopic}" >> /home/ec2-user/.bashrc
+            chown -R ec2-user:ec2-user /home/ec2-user
 
   EC2Role: 
     Type: AWS::IAM::Role
@@ -82,6 +70,8 @@ Resources:
               Service: ec2.amazonaws.com
             Action: 'sts:AssumeRole'
       Path: "/"
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
       
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -98,24 +88,30 @@ Resources:
         Statement:
               - Effect: Allow
                 Action:
-                  - kafka:DescribeCluster
                   - kafka:DescribeClusterV2
                   - kafka:GetBootstrapBrokers
-                Resource: 
-                  - "*"
+                Resource: !Ref MSKCluster
               - Effect: Allow
                 Action:
                   - kafka-cluster:Connect
-                  - kafka-cluster:DescribeGroup
-                  - kafka-cluster:AlterGroup
+                  - kafka-cluster:DescribeCluster
+                Resource: !Ref MSKCluster
+              - Effect: Allow
+                Action:
+                  - kafka-cluster:CreateTopic
                   - kafka-cluster:DescribeTopic
-                  - kafka-cluster:ReadData
-                  - kafka-cluster:DescribeClusterDynamicConfiguration
-                  - kafka-cluster:*Topic*
                   - kafka-cluster:WriteData
-                Resource:
-                  - !Ref MSKCluster
-                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/*/*/*'
-                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/*/*/*'
+                  - kafka-cluster:ReadData
+                Resource: !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:topic/${ClusterName}/${ClusterId}/*'
+              - Effect: Allow
+                Action:
+                  - kafka-cluster:AlterGroup
+                  - kafka-cluster:DescribeGroup
+                Resource: !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:group/${ClusterName}/${ClusterId}/*'
       Roles:
         - !Ref EC2Role
+
+Outputs:
+  KafkaClientInstanceId:
+    Description: Kafka client instance. Connect to it with Session Manager.
+    Value: !Ref KafkaClientEC2Instance

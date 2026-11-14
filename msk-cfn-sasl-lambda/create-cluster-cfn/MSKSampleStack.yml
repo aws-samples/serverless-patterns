@@ -1,13 +1,31 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   EnvType:
-    Description: MSK Cluster Type.
-    Default: Serverless
+    Description: MSK Cluster Type. SASL/SCRAM needs a provisioned cluster.
+    Default: Provisioned
     Type: String
     AllowedValues:
       - Serverless
       - Provisioned
     ConstraintDescription: Must specify Serverless or Provisioned.
+  MSKKafkaVersion:
+    Type: String
+    Description: Apache Kafka version of the provisioned cluster
+    Default: 4.1.x.kraft
+    AllowedValues:
+    - 4.1.x.kraft
+    - 4.0.x.kraft
+    - 3.9.x.kraft
+    - 3.9.x
+    - 3.8.x.kraft
+    - 3.8.x
+  ApacheKafkaInstallerLocation:
+    Type: String
+    Description: Apache Kafka client that the client instance installs
+    Default: https://archive.apache.org/dist/kafka/4.1.2/kafka_2.13-4.1.2.tgz
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
 Conditions:
   CreateProvisionedCluster: !Equals 
     - !Ref EnvType
@@ -160,30 +178,134 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnetMSKThree
   
-  Cloud9EC2Bastion:
-    Type: AWS::Cloud9::EnvironmentEC2
-    Properties: 
-      AutomaticStopTimeMinutes: 30
-      Description: "Cloud9 EC2 environment"
-      ImageId: "amazonlinux-2023-x86_64"
-      InstanceType: t3.large
-      Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
-      SubnetId: !Ref PublicSubnetOne
-      Tags: 
-        - Key: 'Purpose'
-          Value: 'Cloud9EC2BastionHostInstance'
-  
+  # Kafka client in a private subnet. It has no public IP address and no SSH access:
+  # connect with Session Manager. The SSM agent reaches Systems Manager through the NAT gateway.
+  KafkaClientInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.small
+      ImageId: !Ref LatestAmiId
+      IamInstanceProfile: !Ref KafkaClientInstanceProfile
+      SubnetId: !Ref PrivateSubnetMSKOne
+      SecurityGroupIds:
+        - !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+      MetadataOptions:
+        HttpTokens: required
+      Tags:
+        - Key: 'Name'
+          Value: !Sub '${AWS::StackName}-kafka-client'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          dnf install -y java-21-amazon-corretto-headless jq
+          cd /home/ec2-user
+          curl -sSfL -o kafka.tgz ${ApacheKafkaInstallerLocation}
+          mkdir kafka && tar -xzf kafka.tgz -C kafka --strip-components 1 && rm kafka.tgz
+          curl -sSfL -o kafka/libs/aws-msk-iam-auth-2.2.0-all.jar https://github.com/aws/aws-msk-iam-auth/releases/download/v2.2.0/aws-msk-iam-auth-2.2.0-all.jar
+          cat > kafka/client_iam.properties <<'EOF'
+          security.protocol=SASL_SSL
+          sasl.mechanism=AWS_MSK_IAM
+          sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;
+          sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler
+          EOF
+          echo "export AWS_REGION=${AWS::Region}" >> /home/ec2-user/.bashrc
+          chown -R ec2-user:ec2-user /home/ec2-user
+
+  KafkaClientInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
+      Policies:
+        - PolicyName: KafkaClusterAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: FindClusters
+                Effect: Allow
+                Action: kafka:ListClustersV2
+                Resource: '*'
+              - Sid: DescribeThisStacksClusters
+                Effect: Allow
+                Action:
+                  - kafka:DescribeClusterV2
+                  - kafka:GetBootstrapBrokers
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-serverless-cluster/*'
+              - Sid: ConnectWithIamAuth
+                Effect: Allow
+                Action:
+                  - kafka-cluster:Connect
+                  - kafka-cluster:DescribeCluster
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:cluster/${AWS::StackName}-serverless-cluster/*'
+              - Sid: UseTopics
+                Effect: Allow
+                Action:
+                  - kafka-cluster:CreateTopic
+                  - kafka-cluster:DescribeTopic
+                  - kafka-cluster:WriteData
+                  - kafka-cluster:ReadData
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:topic/${AWS::StackName}-serverless-cluster/*'
+              - Sid: UseConsumerGroups
+                Effect: Allow
+                Action:
+                  - kafka-cluster:AlterGroup
+                  - kafka-cluster:DescribeGroup
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:group/${AWS::StackName}-cluster/*'
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:group/${AWS::StackName}-serverless-cluster/*'
+
+  # Only for the provisioned cluster: read the SCRAM secret, and issue a client
+  # certificate from the private CA for the mutual TLS test.
+  KafkaClientProvisionedClusterPolicy:
+    Type: AWS::IAM::Policy
+    Condition: CreateProvisionedCluster
+    Properties:
+      PolicyName: ProvisionedClusterClientAccess
+      Roles:
+        - !Ref KafkaClientInstanceRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ReadScramSecret
+            Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource: !Ref CredentialsSecret
+          - Sid: DecryptScramSecret
+            Effect: Allow
+            Action: kms:Decrypt
+            Resource: !GetAtt CredentialsKMSKey.Arn
+          - Sid: IssueClientCertificate
+            Effect: Allow
+            Action:
+              - acm-pca:IssueCertificate
+              - acm-pca:GetCertificate
+            Resource: !Ref MSKCertAuthority
+
+  KafkaClientInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref KafkaClientInstanceRole
+
   KafkaClientInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH access via port 22 from BastionHostSecurityGroup
-      GroupName: !Sub "${AWS::StackName} Security group attached to the kakfa client producer"
+      GroupDescription: Kafka client instance. No inbound rules; connect with Session Manager.
+      GroupName: !Sub "${AWS::StackName} Security group attached to the kafka client"
       VpcId: !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 10.0.0.0/24
 
   MSKSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -191,34 +313,21 @@ Resources:
       GroupDescription: Security Group for the MSK cluster
       GroupName: !Sub "${AWS::StackName} Security group for the MSK cluster"
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 9092
-          ToPort: 9092
-          CidrIp: 10.0.0.0/24
-        - IpProtocol: tcp
+        - Description: Kafka client, mutual TLS
+          IpProtocol: tcp
           FromPort: 9094
           ToPort: 9094
-          CidrIp: 10.0.0.0/24
-        - IpProtocol: tcp
-          FromPort: 2181
-          ToPort: 2181
-          CidrIp: 10.0.0.0/24
-        - IpProtocol: tcp
-          FromPort: 9098
-          ToPort: 9098
-          CidrIp: 10.0.0.0/24
-        - IpProtocol: tcp
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - Description: Kafka client, SASL/SCRAM
+          IpProtocol: tcp
           FromPort: 9096
           ToPort: 9096
-          CidrIp: 10.0.0.0/24
-        - IpProtocol: tcp
-          FromPort: 8083
-          ToPort: 8083
-          CidrIp: 10.0.0.0/24
-        - IpProtocol: tcp
-          FromPort: 8081
-          ToPort: 8081
-          CidrIp: 10.0.0.0/24
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
+        - Description: Kafka client, IAM
+          IpProtocol: tcp
+          FromPort: 9098
+          ToPort: 9098
+          SourceSecurityGroupId: !GetAtt KafkaClientInstanceSecurityGroup.GroupId
       VpcId: !Ref 'VPC'
 
 
@@ -274,7 +383,7 @@ Resources:
         - MSKCertAuthority
         - CertificateSigningRequest
       SigningAlgorithm: "SHA256WITHRSA"
-      TemplateArn: arn:aws:acm-pca:::template/RootCACertificate/V1
+      TemplateArn: !Sub 'arn:${AWS::Partition}:acm-pca:::template/RootCACertificate/V1'
       Validity: 
         Type: YEARS
         Value: 10
@@ -315,11 +424,7 @@ Resources:
           - Sid: Enable IAM User Permissions
             Effect: Allow
             Principal:
-              AWS: !Join 
-                - ''
-                - - 'arn:aws:iam::'
-                  - !Ref 'AWS::AccountId'
-                  - ':root'
+              AWS: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
             Action: 'kms:*'
             Resource: '*'
           - Sid: Enable Secret Manager Permissions
@@ -347,7 +452,7 @@ Resources:
     Type: AWS::KMS::Alias
     Condition: CreateProvisionedCluster
     Properties: 
-      AliasName: alias/mskstack_secret_manager_key
+      AliasName: !Sub 'alias/${AWS::StackName}-secret-manager-key'
       TargetKeyId: !Ref 'CredentialsKMSKey'
 
   CredentialsSecret:
@@ -355,7 +460,8 @@ Resources:
     Condition: CreateProvisionedCluster
     Properties: 
       Description: "Secret to use for SCRAM Auth"
-      Name: "AmazonMSK_Credentials"
+      # MSK requires SCRAM secret names to start with AmazonMSK_
+      Name: !Sub "AmazonMSK_${AWS::StackName}_Credentials"
       GenerateSecretString:
         SecretStringTemplate: '{"username": "test-user"}'
         GenerateStringKey: "password"
@@ -368,7 +474,7 @@ Resources:
     Condition: CreateProvisionedCluster
     Properties: 
       Description: "MSKConfiguration"
-      Name: "MSKConfiguration"
+      Name: !Sub "${AWS::StackName}-configuration"
       ServerProperties: |
         auto.create.topics.enable=true
         default.replication.factor=3
@@ -382,7 +488,6 @@ Resources:
         socket.request.max.bytes=104857600
         socket.send.buffer.bytes=102400
         unclean.leader.election.enable=true
-        zookeeper.session.timeout.ms=18000
         delete.topic.enable=true
         log.retention.hours=8
 
@@ -421,7 +526,7 @@ Resources:
         EncryptionInTransit: 
           ClientBroker: TLS
           InCluster: True
-      KafkaVersion: "3.3.1"
+      KafkaVersion: !Ref MSKKafkaVersion
       NumberOfBrokerNodes: 3
 
   SecretMSKAssociation:
@@ -498,8 +603,15 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-Serverless"
     Condition: "CreateServerlessCluster"
+  KafkaClientInstanceId:
+    Description: ID of the Kafka client instance. Connect to it with Session Manager.
+    Value: !Ref KafkaClientInstance
+  CertificateAuthorityArn:
+    Description: ARN of the private certificate authority for mutual TLS.
+    Value: !Ref MSKCertAuthority
+    Condition: "CreateProvisionedCluster"
   SecurityGroupId:
-    Description: ID of scurity group for MSK clients. 
+    Description: ID of the MSK cluster security group. Use it for the Lambda function.
     Value: !GetAtt MSKSecurityGroup.GroupId
     Export:
       Name: !Sub "${AWS::StackName}-SecurityGroupId"

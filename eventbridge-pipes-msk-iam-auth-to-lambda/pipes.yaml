@@ -55,8 +55,8 @@ Resources:
                   - kafka-cluster:DescribeClusterDynamicConfiguration
                 Resource:
                   - !Ref MSKCluster
-                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:group/${ClusterName}/${ClusterId}/*'
-                  - !Sub 'arn:aws:kafka:${AWS::Region}:${AWS::AccountId}:topic/${ClusterName}/${ClusterId}/${MSKTopic}'
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:group/${ClusterName}/${ClusterId}/*'
+                  - !Sub 'arn:${AWS::Partition}:kafka:${AWS::Region}:${AWS::AccountId}:topic/${ClusterName}/${ClusterId}/${MSKTopic}'
               - Effect: Allow
                 Action:
                   - ec2:DescribeNetworkInterfaces
@@ -114,7 +114,6 @@ Resources:
   Pipe:
     Type: AWS::Pipes::Pipe
     Properties:
-      Name: msk-pipe-lambda
       Description: "EventBridge Pipe with Amazon MSK Cluster as the source and Lambda function as target"
       RoleArn: !GetAtt PipeRole.Arn
       Source: !Ref MSKCluster

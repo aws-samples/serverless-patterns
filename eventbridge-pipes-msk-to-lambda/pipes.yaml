@@ -104,7 +104,6 @@ Resources:
   Pipe:
     Type: AWS::Pipes::Pipe
     Properties:
-      Name: msk-pipe-lambda
       Description: "EventBridge Pipe with Amazon MSK Cluster as the source and Lambda function as target"
       RoleArn: !GetAtt PipeRole.Arn
       Source: !Ref MSKCluster
