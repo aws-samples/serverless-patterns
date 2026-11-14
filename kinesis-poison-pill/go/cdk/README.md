@@ -27,7 +27,7 @@ Learn more about this pattern at Serverless Land Patterns: << Add the live URL h
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-kinesis-poison-pill
+    cd kinesis-poison-pill/go/cdk
     ```
 3. Install the project dependencies
     ```

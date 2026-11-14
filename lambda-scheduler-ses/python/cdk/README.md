@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-lambda-scheduler-ses
+    cd lambda-scheduler-ses/python/cdk
     ```
 3. Install dependencies
     ```

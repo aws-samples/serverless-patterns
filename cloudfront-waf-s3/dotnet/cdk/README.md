@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cloudfront-waf-s3-cdk
+    cd cloudfront-waf-s3/dotnet/cdk
     ```
 1. Build the application:
     ```

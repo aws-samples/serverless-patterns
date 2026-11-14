@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd dynamodb-streams-lambda-terraform
+    cd dynamodb-streams-lambda/nodejs/terraform
     ```
 1. From the command line, initialize terraform to  to downloads and installs the providers defined in the configuration:
     ```
@@ -49,7 +49,7 @@ After deployment, add an item to the DynamoDB table. Go to the CloudWatch Logs f
  
 1. Change directory to the pattern directory:
     ```
-    cd dynamodb-streams-lambda-terraform
+    cd dynamodb-streams-lambda/nodejs/terraform
     ```
 1. Delete all created resources
     ```bash

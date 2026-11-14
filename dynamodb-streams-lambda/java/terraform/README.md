@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd dynamodb-streams-lambda-terraform-java
+    cd dynamodb-streams-lambda/java/terraform
     ```
 1. Buid the Java Lambda function jar file using Maven. 
    ```
@@ -56,7 +56,7 @@ After deployment, add an item to the DynamoDB table. Go to the CloudWatch Logs f
  
 1. Change directory to the pattern directory:
     ```
-    cd dynamodb-streams-lambda-terraform-java
+    cd dynamodb-streams-lambda/java/terraform
     ```
 1. Delete all created resources
     ```bash

@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cloudfront-apigw-rest-api-lambda-dynamodb-sam
+    cd cloudfront-apigw-rest-api-lambda-dynamodb/nodejs/sam
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the workflow as specified in the template.yaml file:
     ```

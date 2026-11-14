@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
 
     ```shell
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/cloudfront-agentcore-runtime-cdk
+    cd serverless-patterns/cloudfront-agentcore-runtime/python/cdk
     ```
 
 2. Create and activate a Python virtual environment:

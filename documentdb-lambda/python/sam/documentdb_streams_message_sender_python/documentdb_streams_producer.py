@@ -83,7 +83,7 @@ def main():
 
     people = []
     with open(
-        "/home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_message_sender_python/us-500.csv",
+        "/home/ec2-user/serverless-patterns/documentdb-lambda/python/sam/documentdb_streams_message_sender_python/us-500.csv",
         "r",
     ) as f:
         reader = csv.reader(f)

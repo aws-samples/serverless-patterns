@@ -35,7 +35,7 @@ For guidance on choosing between durable functions and Step Functions for standa
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cdk-stepfunction-durable-lambda-function
+    cd stepfunction-durable-lambda-function/python/cdk
     ```
 1. Create a virtual environment for python:
     ```bash

@@ -28,9 +28,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cdk-eventbridge-stepfunction-sqs-java/infrastructure/
+    cd eventbridge-stepfunction-sqs/java/cdk/infrastructure/
     ```
-2. Inside the `cdk-eventbridge-stepfunction-sqs-java/infrastructure` directory run 
+2. Inside the `eventbridge-stepfunction-sqs/java/cdk/infrastructure` directory run 
     ```
     cdk synth
     ```

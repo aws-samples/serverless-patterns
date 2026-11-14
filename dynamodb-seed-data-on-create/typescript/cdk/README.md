@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd dynamodb-seed-data-on-create-cdk
+    cd dynamodb-seed-data-on-create/typescript/cdk
     ```
 2. Run below command to install required dependancies:
     ```

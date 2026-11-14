@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Modify the `cdk/bin/cdk.ts` and `cdk/lib/lambda-edge/authEdge.js` with your prefered region (the default is `eu-central-1`)    
 1. Change directory to the pattern directory:
     ```bash
-    cd cloudfront-lambda-url-iam-cdk-ts/cdk
+    cd cloudfront-lambda-url-iam/typescript/cdk/cdk
     ```    
 1. From the command line, install the Node.js dependencies, bootstrap CDK in your AWS account, and finally deploy the pattern:
     ```bash

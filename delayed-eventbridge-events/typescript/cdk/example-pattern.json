@@ -10,7 +10,7 @@
       "This pattern listens for EventBridge events, processes them and creates schedules for every user. 24 hours after user has been created a schedule is run that publishes events directly into EventBridge",
       "<h5>How the pattern works</h5>",
       "<ul style=\"list-style-type: none;\"><li>1. UserCreated event is triggered. In this example we assume a UserCreated event is triggered into our event bus.</li><li>2. Rule setup to listen to the UserCreated event.</li><li>3. Lambda function listens to UserCreated and creates an Amazon EventBridge Schedule for 24 hours in the future (2 mins for development mode)</li><li>4. 24 hours pass, and schedule is triggered and raises UserCreated24HoursAgo event directly into EventBridge..</li><li>5. Consumers listen for event and process it. An example would be email a welcome message to customers or an offer etc.</li></ul>",
-      "<a target=\"_blank\" href=\"https://github.com/aws-samples/serverless-patterns/blob/main/delayed-eventbridge-events/cdk/README.md\">Read more about this pattern</a>",
+      "<a target=\"_blank\" href=\"https://github.com/aws-samples/serverless-patterns/blob/main/delayed-eventbridge-events/typescript/cdk/cdk/README.md\">Read more about this pattern</a>",
       "<hr />",
       "<h5>Things to know</h5>",
       "This pattern will create schedules for every user, at the moment the schedules will need to be managed and removed once triggered."

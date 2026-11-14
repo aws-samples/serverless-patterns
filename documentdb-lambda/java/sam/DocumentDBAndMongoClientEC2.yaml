@@ -588,9 +588,9 @@ Resources:
             SERVERLESS_LAND_GITHUB_LOCATION=${serverless_land_github_location}
             git clone -n --depth=1 --filter=tree:0 $SERVERLESS_LAND_GITHUB_LOCATION
             cd ./serverless-patterns
-            git sparse-checkout set --no-cone /documentdb-lambda-java-sam
+            git sparse-checkout set --no-cone /documentdb-lambda/java/sam
             git checkout
-            cd documentdb-lambda-java-sam
+            cd documentdb-lambda/java/sam
             sudo chown -R ec2-user .
             
             #Install MongoShell
@@ -604,7 +604,7 @@ Resources:
             cd /home/ec2-user
             mkdir mongotruststore
             cd /home/ec2-user/mongotruststore
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/java_keystore_script.sh .
+            cp /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/java_keystore_script.sh .
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/TRUSTSTORE_PASSWORD/$DOCDB_TRUST_STORE_PASSWORD/g" java_keystore_script.sh
@@ -614,9 +614,9 @@ Resources:
             #Create DocumentDB database and collection
             cd /home/ec2-user/mongoshell
             wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/docdb_db_collection.sh .
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/mongodbcolcreate.js .
-            cp /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/connect_to_mongo_shell.sh .
+            cp /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/docdb_db_collection.sh .
+            cp /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/mongodbcolcreate.js .
+            cp /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/connect_to_mongo_shell.sh .
             sudo chown -R ec2-user .
             source /home/ec2-user/.bash_profile
             sed -i "s/DOCDB_CLUSTER_ENDPOINT/$DOCDB_CLUSTER_ENDPOINT/g" docdb_db_collection.sh
@@ -634,7 +634,7 @@ Resources:
             sh ./docdb_db_collection.sh
             
             #Substitute SAM template variables
-            cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam
+            cd /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam
             cd documentdb_streams_consumer_dynamo_sam
             cp template_original.yaml template.yaml
             sudo chown -R ec2-user .
@@ -655,7 +655,7 @@ Resources:
             aws secretsmanager put-secret-value --secret-id AmazonDocumentDBCredentials --secret-string "{\"host\":\"$DOCDB_CLUSTER_ENDPOINT\",\"port\":\"27017\",\"username\":\"$DOCDB_CLUSTER_ADMIN_USER\",\"password\":\"$DOCDB_CLUSTER_PASSWORD\",\"engine\":\"mongo\",\"ssl\":\"true\",\"dbClusterIdentifier\":\"$DOCDB_CLUSTER_IDENTIFIER\"}"
                         
             #Compiling Sender Program and Updating Command File with DocumentDB Database and Collection names
-            cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_message_sender_json
+            cd /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/documentdb_streams_message_sender_json
             sudo chown -R ec2-user .
             sed -i "s/DOCDB_DATABASE/$DOCDB_DATABASE/g" commands.sh
             sed -i "s/DOCDB_COLLECTION/$DOCDB_COLLECTION/g" commands.sh

@@ -1,7 +1,7 @@
 {
   "title": "Amazon CloudFront to Amazon S3 secured with OAC",
   "description": "Create a CloudFront distribution with an S3 origin secured with origin access control (OAC).",
-  "language": "YAML",
+  "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {

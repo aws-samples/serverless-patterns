@@ -36,7 +36,7 @@ Learn more about this pattern at Serverless Land Patterns: [here](https://server
 2. Change directory to the pattern directory its source code folder:
 
     ```bash
-    cd cloudfront-le-apigw-cdk
+    cd cloudfront-le-apigw/typescript/cdk
     ```
 
 3. From the command line, use npm to install the development dependencies:

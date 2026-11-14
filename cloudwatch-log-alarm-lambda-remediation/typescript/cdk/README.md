@@ -37,7 +37,7 @@ The `AWS::CloudWatch::LogAlarm` resource eliminates the need for metric filters.
 ### Step 1: Install dependencies and synthesize
 
 ```bash
-cd cloudwatch-log-alarm-lambda-remediation-cdk/cdk
+cd cloudwatch-log-alarm-lambda-remediation/typescript/cdk/cdk
 npm install
 npx cdk synth
 ```
@@ -100,7 +100,7 @@ aws ssm list-commands \
 > **Warning:** This will delete the log group and all log data. The Amazon CloudWatch Log Alarm and all associated resources will be removed.
 
 ```bash
-cd cloudwatch-log-alarm-lambda-remediation-cdk/cdk
+cd cloudwatch-log-alarm-lambda-remediation/typescript/cdk/cdk
 npx cdk destroy
 ```
 

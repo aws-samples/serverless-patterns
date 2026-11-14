@@ -25,7 +25,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd serverless-patterns/custom-http-headers-to-sqs-message-attributes-using-http-api-gateway
+cd serverless-patterns/apigw-http-headers-sqs-attributes/sam
 ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
 

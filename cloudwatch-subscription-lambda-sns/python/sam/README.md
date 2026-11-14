@@ -24,7 +24,7 @@ Important:
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cloudwatch-account-subscription-Lambda-sns-notification
+    cd cloudwatch-subscription-lambda-sns/python/sam
     ```
 3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```

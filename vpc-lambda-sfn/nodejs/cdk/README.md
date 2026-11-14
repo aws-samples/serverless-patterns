@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-vpc-lambda-sfn
+    cd vpc-lambda-sfn/nodejs/cdk
     ```
 3. To deploy from the command line use the following:
     ```bash

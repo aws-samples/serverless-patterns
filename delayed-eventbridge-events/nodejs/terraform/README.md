@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd delayed-eventbridge-events-terraform
+    cd delayed-eventbridge-events/nodejs/terraform
     ```
 1. From the command line, initialize Terraform:
     ```

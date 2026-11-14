@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd dynamodb-kinesis-cdk/src
+    cd dynamodb-kinesis/typescript/cdk/src
     ```
 3. Install dependencies
     ```

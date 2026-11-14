@@ -24,7 +24,7 @@ Set up and use HTTP Event Collector in Splunk Web https://docs.splunk.com/Docume
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cloudwatch-logs-to-splunk-using-lambda-kinesis
+    cd cloudwatch-logs-to-splunk-using-lambda-kinesis/nodejs/cdk
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```

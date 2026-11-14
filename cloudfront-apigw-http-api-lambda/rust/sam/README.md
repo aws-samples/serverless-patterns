@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cloudfront-apigw-http-lambda-rust
+    cd cloudfront-apigw-http-api-lambda/rust/sam
     ```
 3. Install dependencies and build:
     ```

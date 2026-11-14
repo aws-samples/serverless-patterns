@@ -26,9 +26,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cdk-eventbridge-stepfunction-sqs
+    cd eventbridge-stepfunction-sqs/typescript/cdk
     ```
-2. Inside the `cdk-eventbridge-stepfunction-sqs` directory run ` npm install` to fetch the cdk project's dependencies
+2. Inside the `eventbridge-stepfunction-sqs/typescript/cdk` directory run ` npm install` to fetch the cdk project's dependencies
 
 3. Run `cdk bootstrap`
 

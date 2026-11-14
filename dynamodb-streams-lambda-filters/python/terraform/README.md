@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory and the terraform directory:
     ```
-    cd dynamodb-streams-lambda-filters-tf/tf
+    cd dynamodb-streams-lambda-filters/python/terraform/tf
     ```
 1. From the command line, run the following command to initializes terraform:
     ```

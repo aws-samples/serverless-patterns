@@ -27,7 +27,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
     ```
 2. Change the working directory.
     ```
-    cd dynamodb-streams-lambda-dynamodb/cdk
+    cd dynamodb-streams-lambda-dynamodb/dotnet/cdk/cdk
     ```
 3. Bootstrap AWS Environment.
     ```

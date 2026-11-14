@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/dynamodb-eventbridge-scheduler
+    cd serverless-patterns/dynamodb-eventbridge-scheduler/python/sam
     ```
 3. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
     ```

@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd cloudfront-lambda-url-cdk-ts/cdk
+    cd cloudfront-lambda-url/typescript/cdk/cdk
     ```
 1. From the command line, install the Node.js dependencies, bootstrap CDK in your AWS account, and finally deploy the pattern:
     ```bash

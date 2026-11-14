@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/cloudmap-fargate-terraform
+    cd serverless-patterns/cloudmap-fargate/terraform
     ```
 1. From the command line, initialize terraform to  to downloads and installs the providers defined in the configuration:
     ```
@@ -47,7 +47,7 @@ Application having VPC connectivity can now access the ECS tasks not only from t
  
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/cloudmap-fargate-terraform
+    cd serverless-patterns/cloudmap-fargate/terraform
     ```
 1. Delete all created resources
     ```bash

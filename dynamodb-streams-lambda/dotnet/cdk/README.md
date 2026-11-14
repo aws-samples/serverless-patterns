@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change the working directory to this pattern's directory
     ```
-    cd dynamodb-stream-lambda-cdk-dotnet/cdk/src/
+    cd dynamodb-streams-lambda/dotnet/cdk/cdk/src/
     ```
 3. Build the application
     ```

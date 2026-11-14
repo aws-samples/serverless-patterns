@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd cdk-eventbridge-stepfunction
+    cd eventbridge-stepfunction/nodejs/cdk
     ```
 1. Install Node.js dependencies:
     ```

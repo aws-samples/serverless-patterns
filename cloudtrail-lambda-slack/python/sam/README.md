@@ -33,7 +33,7 @@ User 'arn:aws:iam::<account-id>:user/RogueUser' performed Invoke on function 'ar
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/cloudtrail-lambda-slack-sam
+    cd serverless-patterns/cloudtrail-lambda-slack/python/sam
     ```
 1. From the command line, run the sam command as follows:
 ```
@@ -60,7 +60,7 @@ User 'arn:aws:iam::<account-id>:user/RogueUser' performed Invoke on function 'ar
  
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/cloudtrail-lambda-slack-sam
+    cd serverless-patterns/cloudtrail-lambda-slack/python/sam
     ```
 1. Delete all created resources
     ```

@@ -47,7 +47,7 @@ The Bedrock model ID and inference parameters can be configured via environment 
 
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns
-   cd cognito-appsync-bedrock/cdk
+   cd cognito-appsync-bedrock/typescript/cdk/cdk
    ```
 
 2. Install dependencies:
@@ -312,7 +312,7 @@ To delete the stack and remove the resources created by this CDK application:
 
 Recommended cleanup steps:
 
-1. Stay in the `cognito-appsync-bedrock/cdk` directory
+1. Stay in the `cognito-appsync-bedrock/typescript/cdk/cdk` directory
 2. Verify that your AWS CLI is still configured for the same account and region used during deployment
 3. Run the destroy command shown above
 4. Approve the destroy when prompted by CDK

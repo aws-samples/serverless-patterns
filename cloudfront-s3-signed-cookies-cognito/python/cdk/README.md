@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cloudfront-s3-signed-cookies-cognito
+    cd cloudfront-s3-signed-cookies-cognito/python/cdk
     ```
 3. Create a virtual environment for Python:
     ```bash

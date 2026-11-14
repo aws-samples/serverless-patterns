@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
 
 2. Change the working directory to this pattern's directory
     ```bash
-    cd cloudfront-oac-lambda-url-nodejs-cdk
+    cd cloudfront-oac-lambda-url/nodejs/cdk
     ```
 
 3. Install dependencies

@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd dynamodb-lambda-cdk-kotlin/
+    cd dynamodb-streams-lambda/java/cdk/
     ```
 1. From the command line, build a shadow jar containing the lambda deployment package
      ```

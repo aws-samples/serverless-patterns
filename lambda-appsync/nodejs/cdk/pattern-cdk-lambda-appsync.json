@@ -20,9 +20,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-appsync",
-      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/cdk-lambda-appsync/cdk/lib/main.ts",
-      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-lambda-appsync/README.md"
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-appsync/nodejs/cdk",
+      "templateURL": "https://raw.githubusercontent.com/aws-samples/serverless-patterns/main/lambda-appsync/nodejs/cdk/cdk/lib/main.ts",
+      "readmeURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-appsync/nodejs/cdk/README.md"
     }
   },
   "resources": {

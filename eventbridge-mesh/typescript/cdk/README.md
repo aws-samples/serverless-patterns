@@ -29,7 +29,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd cdk-eventbridge-mesh
+cd eventbridge-mesh/typescript/cdk
 ```
 
 3. Install the project dependencies

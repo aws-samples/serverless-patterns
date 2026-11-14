@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/claim-check-pattern-dotnet-cdk/cdk
+    cd serverless-patterns/claim-check-pattern/dotnet/cdk/cdk
     ```
 3. Build the solution:
     #### Using VSCode.

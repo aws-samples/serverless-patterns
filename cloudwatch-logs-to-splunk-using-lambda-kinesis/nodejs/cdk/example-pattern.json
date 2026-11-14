@@ -1,7 +1,7 @@
 {
   "title": "Stream Amazon CloudWatch Logs to Splunk in Near Real-Time",
   "description": "This pattern creates a Lambda Function to continuously send CloudWatch logs to Splunk",
-  "language": "Python",
+  "language": "Node.js",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
@@ -36,7 +36,7 @@
   "deploy": {
     "text": [
       "git clone https://github.com/aws-samples/serverless-patterns",
-      "cd cloudwatch-logs-to-splunk-using-lambda-kinesis",
+      "cd cloudwatch-logs-to-splunk-using-lambda-kinesis/nodejs/cdk",
       "cdk deploy",
       "Note: Please refer to manual steps/instructions after the AWS CDK has successfully deployed in the Readme.md file"
     ]

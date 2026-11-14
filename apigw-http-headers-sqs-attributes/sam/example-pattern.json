@@ -1,7 +1,7 @@
 {
   "title": "Send customer headers from Amazon API Gateway to Amazon SQS",
   "description": "Amazon API Gateway (HTTP) to Amazon Simple Queue Service (SQS) for passing custom http headers as message attributes.",
-  "language": "YAML",
+  "language": "Integration",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {

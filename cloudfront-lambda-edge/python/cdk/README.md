@@ -49,7 +49,7 @@ Amazon Cloudfront to AWS Lambda@Edge
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd cloudfront-lambda-edge-cdk-python
+    cd cloudfront-lambda-edge/python/cdk
     ```
 1. Create a virtual environment for python:
     ```bash

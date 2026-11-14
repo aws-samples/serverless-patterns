@@ -33,7 +33,7 @@ The entire solution is built on CDK typescript and CustomSMSSender Lambda functi
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cognito-sns-sms-origination-id
+    cd cognito-sns-sms-origination-id/typescript/cdk
     ```
 3. Configure origination identities for countries you want use sending sms messages from cognito:
 
@@ -69,7 +69,7 @@ The entire solution is built on CDK typescript and CustomSMSSender Lambda functi
     npm install --save google-libphonenumber @aws-crypto/client-node base64-js
     ```
 
-5. Change directory to main directory cognito-sns-sms-origination-id:
+5. Change directory to main directory cognito-sns-sms-origination-id/typescript/cdk:
     ```
     cd -
     ```

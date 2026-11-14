@@ -43,7 +43,7 @@ Amazon Cloudfront to Amazon Cloudfront Functions to Amazon S3
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd cloudfront-cff-s3-cdk-python
+    cd cloudfront-cff-s3/python/cdk
     ```
 1. Create a virtual environment for python:
     ```bash

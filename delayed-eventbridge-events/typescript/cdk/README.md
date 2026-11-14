@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/delayed-eventbridge-events/cdk
+   cd serverless-patterns/delayed-eventbridge-events/typescript/cdk/cdk
    ```
 3. Install dependencies:
    ```bash

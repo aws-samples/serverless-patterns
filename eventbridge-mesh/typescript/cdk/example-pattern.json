@@ -1,7 +1,7 @@
 {
   "title": "Meshing together Amazon EventBridge Custom Buses",
   "description": "Mesh EventBuses with EventBridge Rules and Event Patterns for feature isolation, producer/consumer clarity using CDK and TypeScript.",
-  "language": "Go",
+  "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
   "introBox": {

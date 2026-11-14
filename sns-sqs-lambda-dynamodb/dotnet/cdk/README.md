@@ -21,7 +21,7 @@ The pattern also features usage of CrossStack to export resources from one Cloud
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-sns-sqs-lambda-dynamodb-dotnet
+    cd sns-sqs-lambda-dynamodb/dotnet/cdk
     ```
 3. Install dependencies
     ```

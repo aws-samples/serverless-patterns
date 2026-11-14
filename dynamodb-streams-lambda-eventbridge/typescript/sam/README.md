@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd dynamodb-streams-lambda-eventbridge-sam-node
+    cd dynamodb-streams-lambda-eventbridge/typescript/sam
     ```
 3. From the command line, initialize terraform to  to downloads and installs the providers defined in the configuration:
     ```

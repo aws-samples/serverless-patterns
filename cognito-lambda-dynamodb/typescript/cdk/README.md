@@ -28,7 +28,7 @@ Learn more about this pattern at Serverless Land Patterns: **<< Add the live URL
    ```
 2. Change directory to the pattern directory:
    ```
-   cd serverless-patterns/cognito-lambda-dynamodb/cdk
+   cd serverless-patterns/cognito-lambda-dynamodb/typescript/cdk/cdk
    ```
 3. Install Dependencies:
 

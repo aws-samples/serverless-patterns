@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/claim-check-pattern-cdk/src
+    cd serverless-patterns/claim-check-pattern/typescript/cdk/src
     ```
 1. Install dependencies:
     ```

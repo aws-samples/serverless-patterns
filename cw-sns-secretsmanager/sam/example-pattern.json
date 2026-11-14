@@ -1,7 +1,7 @@
 {
   "title": "Amazon CloudWatch Events, Amazon SNS, and AWS Secrets Manager integration",
   "description": "An application that detects and notifies on Amazon Secrets Manager secret key creation.",
-  "language": "Python",
+  "language": "Integration",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {

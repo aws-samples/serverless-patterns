@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cdk-sns-sqs-eventbridge-pipes-stepfunctions
+    cd sns-sqs-eventbridge-pipes-stepfunctions/typescript/cdk
     ```
 3. Install the project dependencies
     ```

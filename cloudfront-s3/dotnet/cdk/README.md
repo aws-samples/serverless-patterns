@@ -24,13 +24,13 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change the working directory to this pattern's directory
     ```
-    cd cloudfront-s3-cdk-dotnet/src/cdk/src
+    cd cloudfront-s3/dotnet/cdk/src/cdk/src
     ```
 3. Build the application
     ```
     dotnet build
     ```
-4. Return one level back to the path `cloudfront-s3-cdk-dotnet/src/cdk`
+4. Return one level back to the path `cloudfront-s3/dotnet/cdk/src/cdk`
     ```
     cd..
     ```

@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/cloudtrail-lambda-dynamo-cdk/src
+    cd serverless-patterns/cloudtrail-lambda-dynamodb/typescript/cdk/src
     ```
 1. Run the following command to install the required project dependencies
     ```

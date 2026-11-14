@@ -47,7 +47,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 mac
     ```
 Change directory to the pattern directory:
     ```
-    cd serverless-patterns/documentdb-lambda-java-sam
+    cd serverless-patterns/documentdb-lambda/java/sam
     ```
 
 ### Build the project with SAM CLI
@@ -79,7 +79,7 @@ The following is example test output:
 ***** Begin sam local invoke response *****
 
 Mounting                                                                                                                                               
-/home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_consumer_dynamo_sam/.aws-sam/build/LambdaDocumentDBStreamsConsumerJava
+/home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/documentdb_streams_consumer_dynamo_sam/.aws-sam/build/LambdaDocumentDBStreamsConsumerJava
 Function as /var/task:ro,delegated, inside runtime container                                                                                           
 SAM_CONTAINER_ID: c0e42e24e4e3d1e515960af9eaecd1a59d11f8cb03f640bd4b789635e97a5edb                                                                     
 START RequestId: cd50e0ee-7859-4d70-8265-a0b3afa7ce7a Version: $LATEST
@@ -139,7 +139,7 @@ sh ./docdb_db_collection.sh
 For your convenience, a Java program and a shell script are included on the EC2 instance provisioned by CloudFormation.
 
 ```
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_message_sender_json
+cd /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/documentdb_streams_message_sender_json
 
 chmod +x commands.sh
 ```
@@ -193,7 +193,7 @@ aws dynamodb scan --table-name DocumentDBStreamsConsumerDynamoDBTableJava --sele
 
 First, delete the lambda function stack:
 ```
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-java-sam/documentdb_streams_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/documentdb-lambda/java/sam/documentdb_streams_consumer_dynamo_sam
 sam delete
 
 ```

@@ -21,7 +21,7 @@ Important: This application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd dynamodb-glue-s3-terraform
+    cd dynamodb-glue-s3/python/terraform
     ```
 3. Run below terraform commands to deploy to your AWS account in the desired region (default is us-east-1):
     ```

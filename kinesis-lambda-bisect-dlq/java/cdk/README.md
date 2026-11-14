@@ -21,7 +21,7 @@
 2. Change directory to the pattern directory:
 
     ```
-    cd serverless-patterns/cdk-kinesis-lambda-java
+    cd serverless-patterns/kinesis-lambda-bisect-dlq/java/cdk
     ```
 3. From the command line, use AWS CDK to deploy the AWS resources for the serverless application
 

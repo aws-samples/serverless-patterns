@@ -14,11 +14,11 @@ This application leverages multiple AWS services, and there are associated costs
 ## Deployment Instructions
 Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:  
     
-    git clone https://github.com/aws-samples/serverless-patterns/cloudfront-lambdafunctionurl-oac-sam
+    git clone https://github.com/aws-samples/serverless-patterns
 
 Change directory to the solution directory:  
     
-    cd cloudfront-lambdafunctionurl-oac-sam
+    cd cloudfront-oac-lambda-url/nodejs/sam
 
 From the command line, use AWS SAM to build and deploy the AWS resources as specified in the template.yml file.  
 

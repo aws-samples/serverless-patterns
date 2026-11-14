@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change the working directory to this pattern's directory:
     ```
-    cd cloudfront-cff-s3-geo-uri-rewrite-cdk-dotnet
+    cd cloudfront-cff-s3-geo-uri-rewrite/dotnet/cdk
     ```
 1. Build the .NET CDK project:
     ```

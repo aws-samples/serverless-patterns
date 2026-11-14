@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/cloudwatch-metric-streams-firehose-terraform
+    cd serverless-patterns/cloudwatch-metric-streams-firehose/terraform
     ```
 3. Run below terraform commands to deploy to your AWS account in the desired region (default is eu-west-2):
     ```

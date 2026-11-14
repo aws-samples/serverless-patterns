@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
  2. Change directory to the pattern directory:
      ```
-     cd cdk-s3-sqs-lambda-dynamodb
+     cd s3-sqs-lambda-dynamodb/python/cdk
      ```
  3. Install dependencies:
      ```

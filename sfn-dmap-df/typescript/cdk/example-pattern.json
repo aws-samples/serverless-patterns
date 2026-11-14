@@ -37,7 +37,7 @@
   "deploy": {
     "text": [
       "Clone the repository: <code>git clone https://github.com/aws-samples/serverless-patterns</code>",
-      "Change directory: <code>cd cdk-sfn-dmap-df</code>",
+      "Change directory: <code>cd sfn-dmap-df/typescript/cdk</code>",
       "Install dependencies: <code>npm install</code>",
       "Run tests: <code>npm test</code>",
       "Deploy the CDK stack: <code>cdk deploy</code>"

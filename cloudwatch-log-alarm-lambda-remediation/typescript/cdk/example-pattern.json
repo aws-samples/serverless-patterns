@@ -35,7 +35,7 @@
   },
   "deploy": {
     "text": [
-      "<code>cd cloudwatch-log-alarm-lambda-remediation-cdk/cdk</code>",
+      "<code>cd cloudwatch-log-alarm-lambda-remediation/typescript/cdk/cdk</code>",
       "<code>npm install</code>",
       "<code>npx cdk deploy</code>"
     ]

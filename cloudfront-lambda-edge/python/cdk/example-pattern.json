@@ -1,7 +1,7 @@
 {
   "title": "Amazon CloudFront to AWS Lambda@Edge",
   "description": "CloudFront to Lambda@Edge",
-  "language": "TypeScript",
+  "language": "Python",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {

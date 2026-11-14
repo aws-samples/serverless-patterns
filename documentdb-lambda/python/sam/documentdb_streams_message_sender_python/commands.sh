@@ -6,4 +6,4 @@
 export AWS_DEFAULT_REGION=AWS_REGION
 
 
-PYTHON3_VERSION /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_message_sender_python/documentdb_streams_producer.py DOCDB_DATABASE DOCDB_COLLECTION $1 $2
+PYTHON3_VERSION /home/ec2-user/serverless-patterns/documentdb-lambda/python/sam/documentdb_streams_message_sender_python/documentdb_streams_producer.py DOCDB_DATABASE DOCDB_COLLECTION $1 $2

@@ -43,7 +43,7 @@
   "cleanup": {
     "headline": "Cleanup",
     "text": [
-      "1. Change directory: <code>cd eventbridge-cloudwatch-terraform</code>.",
+      "1. Change directory: <code>cd dynamodb-streams-lambda/nodejs/terraform</code>.",
       "2. Delete the stack: <code>terraform destroy</code>.",
       "3. Confirm the stack has been deleted: <code>terraform show</code>."
     ]

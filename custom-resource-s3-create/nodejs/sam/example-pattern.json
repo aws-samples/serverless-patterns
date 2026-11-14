@@ -1,7 +1,7 @@
 {
   "title": "AWS Lambda to Amazon S3 via a custom resource",
   "description": "Creates a Lambda function that writes to an S3 bucket during deployment.",
-  "language": "Python",
+  "language": "Node.js",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {

@@ -31,7 +31,7 @@ This pattern sets up an AWS AppSync GraphQL API configured with Amazon Cognito U
 
 ### Resources
 
-The AWS CDK project under `cognito-appsync-bedrock/cdk` provisions the following resources:
+The AWS CDK project under `cognito-appsync-bedrock/typescript/cdk/cdk` provisions the following resources:
 
 - An Amazon Cognito User Pool and User Pool Client
 - An AWS AppSync GraphQL API (`schema.gql`) with Cognito User Pool as the default authorization mode
@@ -39,7 +39,7 @@ The AWS CDK project under `cognito-appsync-bedrock/cdk` provisions the following
 - An AppSync Lambda Data Source and a Resolver connecting the `invoke` mutation to the Lambda function
 - CloudFormation outputs for easy access to API endpoints and Cognito identifiers
 
-The Bedrock model ID and inference parameters can be configured in `cognito-appsync-bedrock/cdk/lib/cdk-stack.ts` and consumed in `cognito-appsync-bedrock/cdk/src/lambda/invokeBedrock/index.ts`.
+The Bedrock model ID and inference parameters can be configured in `cognito-appsync-bedrock/typescript/cdk/cdk/lib/cdk-stack.ts` and consumed in `cognito-appsync-bedrock/typescript/cdk/cdk/src/lambda/invokeBedrock/index.ts`.
 
 ## Step-By-Step Deployment
 
@@ -47,7 +47,7 @@ The Bedrock model ID and inference parameters can be configured in `cognito-apps
 
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns
-   cd serverless-patterns/cognito-appsync-bedrock/cdk
+   cd serverless-patterns/cognito-appsync-bedrock/typescript/cdk/cdk
    ```
 
 2. Install dependencies:
@@ -96,7 +96,7 @@ The Bedrock model ID and inference parameters can be configured in `cognito-apps
    - `CognitoUserPoolClientId`
    - `BedrockModelIdUsed`
 
-9. For the most detailed instructions, troubleshooting notes, and exact test flow, continue with [`cognito-appsync-bedrock/cdk/README.md`](cdk/README.md).
+9. For the most detailed instructions, troubleshooting notes, and exact test flow, continue with [`cognito-appsync-bedrock/typescript/cdk/cdk/README.md`](cdk/README.md).
 
 ## Using A Different Bedrock Model
 
@@ -134,7 +134,7 @@ aws bedrock get-inference-profile \
 
 ### Step 3: Update the model configured by this pattern
 
-Change the `modelIdForLambda` value in `cognito-appsync-bedrock/cdk/lib/cdk-stack.ts`.
+Change the `modelIdForLambda` value in `cognito-appsync-bedrock/typescript/cdk/cdk/lib/cdk-stack.ts`.
 
 Examples:
 
@@ -152,7 +152,7 @@ Examples:
 
 ### Step 4: Confirm the Lambda payload format matches the model family
 
-The Lambda handler in `cognito-appsync-bedrock/cdk/src/lambda/invokeBedrock/index.ts` currently supports:
+The Lambda handler in `cognito-appsync-bedrock/typescript/cdk/cdk/src/lambda/invokeBedrock/index.ts` currently supports:
 
 - Amazon Nova-style payloads and responses
 - Anthropic-style Messages API payloads and responses
@@ -229,7 +229,7 @@ Important notes:
 To delete the stack and remove the resources created by this pattern:
 
 ```bash
-cd cognito-appsync-bedrock/cdk
+cd cognito-appsync-bedrock/typescript/cdk/cdk
 ./node_modules/.bin/cdk destroy AppsyncBedrockCognitoStack
 ```
 

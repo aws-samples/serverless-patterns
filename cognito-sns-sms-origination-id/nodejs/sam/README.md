@@ -33,7 +33,7 @@ The entire solution is built on AWS SAM and the CustomSMSSender Lambda function 
     ```
 2. Change directory to the pattern directory:
     ```
-    cd cognito-sns-sms-origination-id-sam
+    cd cognito-sns-sms-origination-id/nodejs/sam
    
 3. Change directory and run npm init command to initialize the project 
 
@@ -46,7 +46,7 @@ The entire solution is built on AWS SAM and the CustomSMSSender Lambda function 
    ```
    npm install
    ```
-5. Change directory to main directory cognito-sns-sms-origination-id-sam:
+5. Change directory to main directory cognito-sns-sms-origination-id/nodejs/sam:
 
    ```aidl
    cd -

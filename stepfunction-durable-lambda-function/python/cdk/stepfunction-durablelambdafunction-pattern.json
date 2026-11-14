@@ -15,9 +15,9 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/cdk-stepfunction-durable-lambda-function",
-      "templateURL": "serverless-patterns/cdk-stepfunction-durable-lambda-function",
-      "projectFolder": "cdk-stepfunction-durable-lambda-function",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/stepfunction-durable-lambda-function/python/cdk",
+      "templateURL": "serverless-patterns/stepfunction-durable-lambda-function/python/cdk",
+      "projectFolder": "stepfunction-durable-lambda-function/python/cdk",
       "templateFile": "cdk_stepfunction_durable_lambda_function_stack.py"
     }
   },

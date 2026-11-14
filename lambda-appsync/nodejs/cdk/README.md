@@ -29,7 +29,7 @@ Make sure you install the Amplify CLI:
 2. Change the working directory to this pattern's directory
 
    ```sh
-   cd cdk-lambda-appsync/cdk
+   cd lambda-appsync/nodejs/cdk/cdk
    ```
 
 3. Install the project dependencies

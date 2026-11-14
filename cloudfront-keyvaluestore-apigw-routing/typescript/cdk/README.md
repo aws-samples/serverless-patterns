@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Change directory to the pattern directory:
 
     ```
-    cd cloudfront-keyvaluestore-apigw-routing-cdk
+    cd cloudfront-keyvaluestore-apigw-routing/typescript/cdk
     ```
 
 1. Install dependencies:

@@ -37,7 +37,7 @@
   "deploy": {
     "text": [
       "Clone the repository: <code>git clone https://github.com/aws-samples/serverless-patterns</code>",
-      "Change directory: <code>cd cloudfront-keyvaluestore-apigw-routing-cdk</code>",
+      "Change directory: <code>cd cloudfront-keyvaluestore-apigw-routing/typescript/cdk</code>",
       "Install dependencies: <code>npm install</code>",
       "Deploy the CDK stack: <code>cdk deploy</code>"
     ]

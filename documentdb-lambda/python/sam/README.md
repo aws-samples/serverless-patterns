@@ -46,7 +46,7 @@ We have also cloned the Github repository for serverless-patterns on the EC2 mac
     ```
 Change directory to the pattern directory:
     ```
-    cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam
+    cd /home/ec2-user/serverless-patterns/documentdb-lambda/python/sam
     ```
 
 ### Build the project with SAM CLI
@@ -56,7 +56,7 @@ Make sure you are connected to the EC2 instance as mentioned in the "Connect to 
 Build your application with the `sam build` command.
 
 ```bash
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/documentdb-lambda/python/sam/documentdb_streams_consumer_dynamo_sam
 sam build
 ```
 
@@ -78,7 +78,7 @@ sam local invoke --event events/event.json
 To deploy your application for the first time, run the following in your shell. Make sure the shell variable $AWS_REGION is set. If not, replace $AWS_REGION with the region in which you are deploying the AWS Lambda function:
 
 ```bash
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/documentdb-lambda/python/sam/documentdb_streams_consumer_dynamo_sam
 sam deploy --capabilities CAPABILITY_IAM --no-confirm-changeset --no-disable-rollback --region $AWS_REGION --stack-name documentdb-lambda-python-sam --guided
 ```
 
@@ -124,7 +124,7 @@ You should see a script called commands.sh. Run that script by passing a random 
 
 
 ```
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_message_sender_python
+cd /home/ec2-user/serverless-patterns/documentdb-lambda/python/sam/documentdb_streams_message_sender_python
 
 chmod +x commands.sh
 
@@ -178,7 +178,7 @@ aws dynamodb scan --table-name DocumentDBStreamsConsumerDynamoDBTablePython --se
 
 First, delete the lambda function stack:
 ```
-cd /home/ec2-user/serverless-patterns/documentdb-lambda-python-sam/documentdb_streams_consumer_dynamo_sam
+cd /home/ec2-user/serverless-patterns/documentdb-lambda/python/sam/documentdb_streams_consumer_dynamo_sam
 sam delete
 
 ```

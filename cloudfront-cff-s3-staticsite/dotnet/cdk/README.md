@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
 2. Change directory to the pattern directory:
     ```
     cd serverless-patterns
-    cd cloudfront-cff-s3-staticsite-dotnet
+    cd cloudfront-cff-s3-staticsite/dotnet/cdk
     ```
 3. Install dependencies
     ```

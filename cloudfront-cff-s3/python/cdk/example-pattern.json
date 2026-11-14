@@ -1,7 +1,7 @@
 {
   "title": "Amazon CloudFront with Amazon CloudFront Functions to Amazon S3",
   "description": "CloudFront with CloudFront Functions to S3",
-  "language": "TypeScript",
+  "language": "Python",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {

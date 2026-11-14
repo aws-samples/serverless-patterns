@@ -28,7 +28,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-pattern/cdk-kinesis-flink-firehose
+    cd serverless-patterns/kinesis-flink-firehose/typescript/cdk
     ```
 3. From the command line, use AWS CDK to navigate into the cdk folder and deploy the infrastructure:
     ```
@@ -57,7 +57,7 @@ To test this project, follow the below steps:
 
 4. Press the Run button on the upper panel of the next screen, then choose Run without snapshot and click Run. Wait until the application enters a Running state.
 
-5. In this repository, open the file serverless-patterns/cdk-kinesis-flink-firehose/test/dataGen.py and update the STREAM_NAME variable with the Kinesis Data Stream name output from the stack. Update the REGION variable with region name where the solution is deployed. Navigate into the directory where the file is located and run:
+5. In this repository, open the file serverless-patterns/kinesis-flink-firehose/typescript/cdk/test/dataGen.py and update the STREAM_NAME variable with the Kinesis Data Stream name output from the stack. Update the REGION variable with region name where the solution is deployed. Navigate into the directory where the file is located and run:
 ```
 python dataGen.py
 ```
