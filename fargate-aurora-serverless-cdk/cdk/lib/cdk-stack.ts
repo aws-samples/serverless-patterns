@@ -1,6 +1,6 @@
-import { Duration, Stack, StackProps} from 'aws-cdk-lib';
+import { Stack, StackProps} from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { AuroraCapacityUnit, Credentials, DatabaseClusterEngine, ServerlessCluster } from 'aws-cdk-lib/aws-rds';
+import { AuroraMysqlEngineVersion, ClusterInstance, Credentials, DatabaseCluster, DatabaseClusterEngine } from 'aws-cdk-lib/aws-rds';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Cluster, ContainerImage } from 'aws-cdk-lib/aws-ecs';
@@ -28,17 +28,17 @@ export class CdkStack extends Stack {
       }
     });
 
-    const auroraServerlessCluster = new ServerlessCluster(this, 'AuroraServerlessCluster', {
+    // Aurora Serverless v2 cluster with one serverless writer instance.
+    // The Data API needs Aurora MySQL 3.07 or higher on Serverless v2.
+    const auroraServerlessCluster = new DatabaseCluster(this, 'AuroraServerlessCluster', {
       defaultDatabaseName: DATABASE_NAME,
       enableDataApi: true,
-      engine: DatabaseClusterEngine.AURORA,
+      engine: DatabaseClusterEngine.auroraMysql({ version: AuroraMysqlEngineVersion.VER_3_10_4 }),
       credentials: Credentials.fromSecret(databaseCredentialsSecret),
       vpc,
-      scaling: {
-        autoPause: Duration.minutes(10),
-        minCapacity: AuroraCapacityUnit.ACU_1,
-        maxCapacity: AuroraCapacityUnit.ACU_2,
-      }
+      writer: ClusterInstance.serverlessV2('writer'),
+      serverlessV2MinCapacity: 0.5,
+      serverlessV2MaxCapacity: 2,
     });
 
     const cluster = new Cluster(this, 'Cluster', {

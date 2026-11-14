@@ -46,7 +46,7 @@ Warning: As of this writing, there are known issues with the images built on App
 - The image is constructed directly from sources on disk when `cdk deploy` is executed
 - The image is automatically pushed to Amazon ECR
 - Networking resources are created
-- The Aurora Serverless Cluster is created
+- The Aurora Serverless v2 cluster (Aurora MySQL 3 with the Data API turned on, 0.5 to 2 ACUs) is created
 - The ECS cluster is created
 - Finally the Fargate Service and the Task Definitions are created. This also passes the environment variables (database name, secrets ARN, and Aurora Serverless Cluster ARN) to the image
 
@@ -106,7 +106,7 @@ Running all the requests above should produce the following output:
 
 - [CDK documentation for ApplicationLoadBalancedFargateService](https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-ecs-patterns.ApplicationLoadBalancedFargateService.html)
 - [CDK documentation for Secrets Manager](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-secretsmanager-readme.html)
-- [CDK documentation for RDS Serverless Cluster](https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-rds.ServerlessCluster.html)
+- [CDK documentation for RDS Database Cluster (Aurora Serverless v2)](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_rds.DatabaseCluster.html)
 
 ---
 

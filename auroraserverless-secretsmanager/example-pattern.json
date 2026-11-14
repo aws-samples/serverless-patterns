@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an Aurora Serverless database cluster, a secret in Secrets Manager, and required VPC with subnets."
+      "This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an Aurora Serverless v2 database cluster (Aurora MySQL 3 with the Data API turned on), a secret in Secrets Manager, and required VPC with subnets."
     ]
   },
   "gitHub": {
