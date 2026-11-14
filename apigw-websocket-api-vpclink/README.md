@@ -5,7 +5,7 @@ The SAM template deploys an Amazon API Gateway Websocket API endpoint with a VPC
 Since Websocket APIs only support VPC Links associated with NLBs (Network Load Balancers), this pattern assumes that an internal NLB already exists in a VPC in the same Region.
 
 =======
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-api-vpclink
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-websocket-api-vpclink
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

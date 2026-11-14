@@ -2,7 +2,7 @@
 
 Sends notifications from S3 to SNS when an object is created.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda](https://serverlessland.com/patterns/s3-lambda)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-sns](https://serverlessland.com/patterns/s3-sns)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

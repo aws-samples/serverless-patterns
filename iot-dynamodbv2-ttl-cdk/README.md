@@ -6,7 +6,7 @@ This pattern contains a sample AWS CDK stack to create an IoT Rule with a Dynamo
 
 This pattern uses the [DynamoDBv2](https://docs.aws.amazon.com/iot/latest/developerguide/dynamodb-v2-rule-action.html) action to write all or parts of an MQTT message to an Amazon DynamoDB table. Each attribute in the payload is written to a separate column in the DynamoDB table. The SQL statement calculates a [Time to live (TTL)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html) and puts into the payload when writing to the table.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-dynamodbv2-ttl-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/iot-dynamodb-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

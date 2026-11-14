@@ -2,7 +2,7 @@
 
 This CDK application demonstrates how to create fan-out pattern using sns topic and sqs queues using subscription filters. Number of queues required and type of filter (Message attribute based or message body based) can be defined in appSettings.json (Sample json is provided, replace queue names and filter by conditions as needed). 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-sqs-fanout-pattern-cdk-dotnet
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-sqs-fan-out
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

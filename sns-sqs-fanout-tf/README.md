@@ -2,7 +2,7 @@
 
 This template demonstrates how to create fan-out pattern using SNS topic and sqs queues using subscription filters. The template uses one SNS topic and three SQS queues subscribed to the SNS topic. The messages from the SNS topic will move to different topic depending on the message attribute set in the SNS topic message.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-sqs-fanout-tf
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sns-sqs-fanout-terraform
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

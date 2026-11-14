@@ -2,7 +2,7 @@
 
 This pattern shows how to access a GraphQL API on AWS AppSync using API Gateway HTTP API as a proxy to the GraphQL API. Amazon API Gateway HTTP API is setup via integration to route all requests to the AppSync API GraphQL endpoint. This implementation will support all GraphQL `queries` and `mutations` defined in the AppSync API GraphQL schema however will not support `subscriptions`. To demonstrate this pattern, the template will deploy a simple Restaurant API with Amazon DynamoDB as a data source.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigateway-appsync-dynamodb-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-appsync-dynamodb-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

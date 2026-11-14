@@ -11,7 +11,7 @@ This pattern deploys a Lambda function that uses an Amazon MSK topic as an event
 Sign-in credentials authentication for Amazon MSK uses SASL/SCRAM authentication. To set up sign-in credentials authentication for a cluster, you create a Secret resource in AWS Secrets Manager, and associate sign-in credentials with that secret. And, configure your MSK cluster with this secret.
 
 
-[//]: # (Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/msk-lambda-sasl)
+[//]: # (Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/msk-cfn-sasl-lambda)
 
 
 ## Pre-requisites

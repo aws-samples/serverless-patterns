@@ -2,7 +2,7 @@
 
 This pattern will create an [EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html) to run a task in Amazon [Elastic Container Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html) cluster every 15 minutes. The pattern is deployed using the AWS Cloud Development Kit (AWS CDK) for Java. 
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/eventbridge-schedule-ecs-publish-cdk-java](https://serverlessland.com/patterns/eventbridge-schedule-ecs-cdk-java)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/eventbridge-schedule-ecs-cdk-java](https://serverlessland.com/patterns/eventbridge-schedule-ecs-cdk-java)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

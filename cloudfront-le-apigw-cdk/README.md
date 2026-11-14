@@ -15,7 +15,7 @@ an unauthenticated user is able to get the response from the backend Lambda thro
 
 ![Concept](img/architecture.drawio.png)
 
-Learn more about this pattern at Serverless Land Patterns: [here](https://serverlessland.com/patterns/cloudfront-le-apigw-cdk)
+Learn more about this pattern at Serverless Land Patterns: [here](https://serverlessland.com/patterns/cloudfront-lambda-edge-apigw-cdk)
 
 ## Requirements
 

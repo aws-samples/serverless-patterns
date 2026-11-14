@@ -4,7 +4,7 @@ This pattern creates a CloudWatch RUM application monitor and an associated Cogn
 
 The Cognito Identity Pool is configured to allow unauthenticated access to the CloudWatch RUM web client in order to publish generated events.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cloudwatch-rum-cognito](https://serverlessland.com/patterns/cloudwatch-rum-cognito)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/cognito-cloudwatch](https://serverlessland.com/patterns/cognito-cloudwatch)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

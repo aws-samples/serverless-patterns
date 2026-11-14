@@ -4,7 +4,7 @@ This pattern in CDK offers a boilerlate to generate an Amazon API Gateway HTTP A
 
 Amazon API Gateway has two ReSTful API products: REST APIs and HTTP APIs. REST APIs (v1) support more [features](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html) than HTTP APIs, while HTTP APIs are designed with minimal features so that they can be offered at a lower price. For instance, [calculator.aws](https://calculator.aws/#/createCalculator/APIGateway) shows that 10 millions of requests cost 10 USD/month (Region: US East) whereas REST APIs costs 35 USD/month.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-http-api-lambda-ts-cdk](https://serverlessland.com/patterns/apigw-http-api-lambda-ts-cdk)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-http-api-lambda-cdk-ts](https://serverlessland.com/patterns/apigw-http-api-lambda-cdk-ts)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

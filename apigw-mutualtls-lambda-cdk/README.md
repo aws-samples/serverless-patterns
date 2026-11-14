@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon [API Gateway RESTful API](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html), an AWS [Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html), and API is authenticated by certificate based MutualTLS(https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-mutual-tls.html) using the AWS Cloud Development Kit (AWS CDK) in Python.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-mutualtls-lambda-cdk](https://serverlessland.com/patterns/apigw-mutualtls-lambda-cdk).
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-lambda-tls-cdk](https://serverlessland.com/patterns/apigw-lambda-tls-cdk).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

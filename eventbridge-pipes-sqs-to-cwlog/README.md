@@ -3,7 +3,7 @@
 This pattern will use Amazon EventBridge Pipe connecting an Amazon SQS queue with an Amazon CloudWatch Log group. The pipe will apply a filter and transformation before sending the message to the CloudWatch Log group.
 This pattern is implemented with AWS Serverless Application Model (AWS SAM).
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-sqs-to-cwlog
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-pipes-sqs-cwlog
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

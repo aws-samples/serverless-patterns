@@ -2,7 +2,7 @@
 
 The SAM template deploys an Amazon API Gateway REST API endpoint with a simple public HTTP endpoint integration.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-rest-api-http-integration](https://serverlessland.com/patterns/apigw-rest-api-http-integration)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigateway-rest-http-sam](https://serverlessland.com/patterns/apigateway-rest-http-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -10,7 +10,7 @@ With Amazon Athena you can get [up to 1000 results](https://docs.aws.amazon.com/
 This pattern deploys one Step Functions, two S3 Buckets, one Glue table and one Glue database.
 
 
-Learn more about this pattern at: https://serverlessland.com/patterns/sfn-athena-cdk-python
+Learn more about this pattern at: https://serverlessland.com/patterns/sfn-athena-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

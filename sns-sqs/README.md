@@ -2,7 +2,7 @@
 
 The SAM template deploys a SNS topic and an SQS queue. The SQS queue is subscribed to the SNS topic. SNS invokes the SQS queue when new messages are available. When messages are sent to the SNS topic, they are delivered as a JSON event payload to the SQS queue.
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sql](https://serverlessland.com/patterns/sns-sqs)
+Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sns-sqs](https://serverlessland.com/patterns/sns-sqs)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

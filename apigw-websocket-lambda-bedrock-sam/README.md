@@ -3,7 +3,7 @@
 This serverless architecture enables real-time AI chat using AWS services. A WebSocket Amazon API Gateway maintains persistent connections between clients and a Node.js AWS Lambda function. The AWS Lambda function handles user connections/disconnections, stores connection IDs in Amazon DynamoDB, and processes messages through an Amazon Bedrock LLM. The system includes error handling, automatic scaling, and pay-per-use pricing. The AWS SAM template provisions all necessary resources and IAM permissions, outputting a WebSocket URL for client connections.
 
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-websockets-lambda-bedrock-sam)
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/apigw-websocket-lambda-bedrock-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

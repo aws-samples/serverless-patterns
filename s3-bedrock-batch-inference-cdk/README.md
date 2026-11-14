@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to trigger a Bedrock batch inference job when an object, that is the input to the batch inference job, is uploaded to S3. The pattern is implemented using AWS CDK.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/s3-eventbridge-bedrock-batch-cdk)
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/s3-bedrock-batch-inference-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

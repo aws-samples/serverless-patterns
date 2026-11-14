@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon Route 53 Failover policy route front of Amazon API Gateway.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/route53-failover](https://serverlessland.com/patterns/route53-failover)
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-route53-failover](https://serverlessland.com/patterns/apigw-route53-failover)
 
 Important: 
 With Amazon Route 53, you don’t have to pay any upfront fees or commit to the number of queries the service answers for your domain. - please see the [AWS Pricing page](https://aws.amazon.com/route53/pricing/) for details.

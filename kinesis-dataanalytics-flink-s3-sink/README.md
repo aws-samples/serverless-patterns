@@ -8,7 +8,7 @@ Kinesis Data Analytics provides the underlying infrastructure for your Apache Fl
 
 In this project, you create an Amazon Kinesis Data Analytics for Apache Flink application that has a Kinesis data stream as a source and an Amazon S3 bucket as a sink. 
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/firehose-dataanalytics-flink-s3-sink).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/kinesis-dataanalytics-flink-s3-sink).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

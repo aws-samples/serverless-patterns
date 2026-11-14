@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway REST API and an AWS Lambda function that calls AWS Translate and Polly services and saves the audio file to S3.
 
-Learn more about this pattern at: https://serverlessland.com/patterns/apigw-lambda-translate-polly-s3.
+Learn more about this pattern at: https://serverlessland.com/patterns/apigw-lambda-translate.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

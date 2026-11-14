@@ -5,7 +5,7 @@ An Amazon API Gateway REST API is deployed, one AWS Lambda Authorizer, one Amazo
 	  
 The Amazon API Gateway is defined in the AWS Serverless Application Model (SAM) ```template.yaml``` file using the OpenAPI specification.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-s3-lambda-dotnet
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-direct-s3-lambda-dotnet
 
 ## Architecture
 ![architecture](assets/img/apigw-s3-lambda-dotnet-architecture.png)

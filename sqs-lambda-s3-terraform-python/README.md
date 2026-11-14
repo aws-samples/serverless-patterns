@@ -4,7 +4,7 @@ This pattern creates an SQS queue, a Lambda function, an S3 bucket along with ev
 
 An example of where this pattern could be useful is **handling large number of deployment requests asynchronously**. Given that deployment requests can vary in terms of application target and payload, this pattern can be employed as an _entry point_ component for deployment systems, that receive and process a large number of requests for deployments across multiple applications. Requests can be processed in batches and outcomes can be saved on the S3 bucket, which can further trigger notifications workflows.
 
-Learn more about this pattern at Serverless Land Patterns: [SQS to Lambda to S3](https://serverlessland.com/patterns/sqs-lambda-s3)
+Learn more about this pattern at Serverless Land Patterns: [SQS to Lambda to S3](https://serverlessland.com/patterns/sqs-lambda-s3-terraform-python)
 
 **Important:** this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
