@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change the working directory to this pattern's directory
     ```
-    cd textract-lambda-cdk-dotnet/Cdk/
+    cd textract-lambda/dotnet/cdk/cdk/
     ```
 3. Build the application
     ```

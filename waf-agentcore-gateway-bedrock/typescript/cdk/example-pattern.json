@@ -36,7 +36,7 @@
   },
   "deploy": {
     "text": [
-      "<code>cd waf-agentcore-gateway-bedrock-cdk/cdk</code>",
+      "<code>cd waf-agentcore-gateway-bedrock/typescript/cdk/cdk</code>",
       "<code>npm install</code>",
       "<code>cdk deploy</code>"
     ]
