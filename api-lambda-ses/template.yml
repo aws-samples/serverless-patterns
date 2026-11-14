@@ -1,30 +1,37 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API to AWS Lambda to Amazon SES
+
+Parameters:
+  SENDER:
+    Type: String
+    Default: abc@xyz.com
+    Description: Sender email address. It must be a verified identity in Amazon SES.
+  RECIPIENT:
+    Type: String
+    Default: abc@xyz.com
+    Description: Recipient email address. In the SES sandbox, it must be a verified identity too.
 
 Resources:
   RestApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: s1
-      DefinitionBody: # an OpenApi definition
+      DefinitionBody: # OpenAPI definition
         'Fn::Transform':
           Name: 'AWS::Include'
           Parameters:
             Location: 'src/api.yml'
       OpenApiVersion: 3.0.3
       EndpointConfiguration:
-          Type: REGIONAL
+        Type: REGIONAL
 
   lambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/index.zip
-      Description: Example Lambda function
-      FunctionName: LambdaFunctionName
+      CodeUri: src/
+      Description: Sends an email with Amazon SES
       Handler: index.handler
-      Role: !GetAtt 
-        - LambdaExecutionRole
-        - Arn
       MemorySize: 128
       Timeout: 5
       Runtime: python3.14
@@ -32,6 +39,14 @@ Resources:
         Variables:
           RECIPIENT: !Ref RECIPIENT
           SENDER: !Ref SENDER
+      Policies:
+        # In the SES sandbox, SendEmail is authorized against the recipient identity as well as the sender
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource:
+                - !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${SENDER}
+                - !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${RECIPIENT}
       Events:
         APIEvent:
           Type: Api
@@ -39,49 +54,10 @@ Resources:
             Path: /
             Method: GET
             RestApiId: !Ref RestApi
-  LambdaExecutionRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-      Path: /
-      Policies:
-        - PolicyName: root
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource: 'arn:aws:logs:*:*:*'
-              - Sid: SES
-                Effect: Allow
-                Action:
-                  - 'ses:SendEmail'
-                Resource: '*'
 
-Parameters:
-  RECIPIENT:
-    Type: String
-    Default: abc@xyz.com
-    Description: Enter the recipent's email address
-  SENDER:
-    Type: String
-    Default: abc@xyz.com
-    Description: Enter the sender's email address
-  
 Outputs:
   lambdaArn:
     Value: !GetAtt lambdaFunction.Arn
 
   apiGatewayInvokeURL:
-    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/s1
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/s1
