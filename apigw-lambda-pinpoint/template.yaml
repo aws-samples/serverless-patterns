@@ -1,37 +1,34 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Parameters:
-  PinpointAppId:
-    Type: String
-    Description: Pinpoint application id through which you wish to send SMS
 Description: (uksb-1tthgi812) (tag:apigw-lambda-pinpoint)
+
+Parameters:
+  OriginationIdentityArn:
+    Type: String
+    AllowedPattern: '^arn:aws[a-z-]*:sms-voice:[a-z0-9-]+:[0-9]{12}:(phone-number|pool|sender-id)/.+$'
+    Description: >-
+      ARN of the AWS End User Messaging SMS phone number, pool or sender ID to send from,
+      for example arn:aws:sms-voice:us-east-1:111122223333:phone-number/phone-abc123
+
 Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
-        - ResourceName: PinpointSMSApigw
+        - ResourceName: SMSApigw
       StageName: Prod
-      DefinitionBody:
-        openapi: '3.0'
-        info: {}
-        paths:
-          /send_message:
-            post:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PinpointFunction.Arn}/invocations
-              responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
-  PinpointFunction:
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+
+  SmsFunction:
     Type: AWS::Serverless::Function
     Properties:
       Description: !Sub
         - Stack ${AWS::StackName} Function ${ResourceName}
-        - ResourceName: PinpointFunction
+        - ResourceName: SmsFunction
       CodeUri: src/
       Handler: lambda_function.lambda_handler
       Runtime: python3.14
@@ -40,8 +37,7 @@ Resources:
       Tracing: Active
       Environment:
         Variables:
-          PINPOINT_APP_ID: 
-            Ref: PinpointAppId
+          ORIGINATION_IDENTITY: !Ref OriginationIdentityArn
       Events:
         ApiPOSTsendmessage:
           Type: Api
@@ -53,18 +49,21 @@ Resources:
         - Statement:
             - Effect: Allow
               Action:
-                - "mobiletargeting:PhoneNumberValidate"
-              Resource: !Join
-                - ""
-                - - "arn:aws:mobiletargeting:*:"
-                  - !Ref AWS::AccountId
-                  - ":phone/number/validate"
+                - mobiletargeting:PhoneNumberValidate
+              Resource: !Sub arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:phone/number/validate
             - Effect: Allow
               Action:
-                - "mobiletargeting:SendMessages"
-              Resource: !Join
-                - ""
-                - - "arn:aws:mobiletargeting:*:"
-                  - !Ref AWS::AccountId
-                  - ":apps/*/messages"
+                - sms-voice:SendTextMessage
+              Resource:
+                - !Ref OriginationIdentityArn
+                # Checked when the account has a default configuration set or protect configuration
+                - !Sub arn:${AWS::Partition}:sms-voice:${AWS::Region}:${AWS::AccountId}:configuration-set/*
+                - !Sub arn:${AWS::Partition}:sms-voice:${AWS::Region}:${AWS::AccountId}:protect-configuration/*
 
+Outputs:
+  SendMessageUrl:
+    Description: URL of the POST /send_message endpoint (requires SigV4-signed requests)
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/send_message
+  SmsFunctionName:
+    Description: Lambda function that validates the number and sends the SMS
+    Value: !Ref SmsFunction

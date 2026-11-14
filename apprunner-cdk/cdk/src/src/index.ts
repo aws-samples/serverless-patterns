@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.status(200).send({
-    message: `Hello from AWS AppRunner service running in region ${process.env.region} !`,
+    message: `Hello from Amazon ECS Express Mode service running in region ${process.env.region} !`,
   });
 });
 

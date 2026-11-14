@@ -1,7 +1,7 @@
 {
   "name": "express-typescript",
   "version": "1.0.0",
-  "description": "deploys a typescript express app that will be used to create a AWS AppRunner Service",
+  "description": "deploys a typescript express app that will be used to create an Amazon ECS Express Mode service",
   "main": "dist/index.js",
   "repository": {
     "type": "git",

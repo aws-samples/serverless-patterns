@@ -1,80 +1,42 @@
-import logging
-import boto3
 import json
 import os
 
-# Initialize Pinpoint client
+import boto3
+
+# Amazon Pinpoint phone number validation is still supported for all accounts.
 pinpoint_client = boto3.client('pinpoint')
+# SMS sending uses the AWS End User Messaging SMS and Voice v2 API.
+sms_client = boto3.client('pinpoint-sms-voice-v2')
+
+ORIGINATION_IDENTITY = os.environ.get("ORIGINATION_IDENTITY")
+MESSAGE = "Your OTP is 1234"
+MESSAGE_TYPE = "TRANSACTIONAL"
+
 
 def lambda_handler(event, context):
-    
-    print(event)
-    event_body = json.loads(event['body'])
-    
-    app_id = os.environ.get("PINPOINT_APP_ID")
-    
-    destination_number = event_body["destination_number"]
-    
-    message = "Your OTP is 1234"
-    
-    origination_number = ""
-    
-    message_type = "TRANSACTIONAL"
-    
-
-    response = dict()
     try:
-        response_number_validation = pinpoint_client.phone_number_validate(NumberValidateRequest={'PhoneNumber':destination_number})
-        
-        if response_number_validation["NumberValidateResponse"]["PhoneType"] != "INVALID":
-            
-            print("Sending SMS message.")
-            
-            response_send_message = pinpoint_client.send_messages(
-            ApplicationId=app_id,
-            MessageRequest={
-                'Addresses': {destination_number: {'ChannelType': 'SMS'}},
-                'MessageConfiguration': {
-                    'SMSMessage': {
-                        'Body': message,
-                        'MessageType': message_type,
-                        'OriginationNumber': origination_number}}})
-            
-            
-            message_id = response_send_message['MessageResponse']['Result'][destination_number]['MessageId']
-            
-            if message_id:
-                
-                print(f"Message sent! Message ID: {message_id}.")
-                response = dict()
-                response['statusCode'] = 200
-                response['body'] = f"Message sent! Message ID: {message_id}."
-                return response
-                
-            else:
-                
-                print(f"Unable to send message")
-                response = dict()
-                response['statusCode'] = 500
-                response['body'] = response_send_message
-                return response
-        
-        
+        destination_number = json.loads(event.get('body') or '{}')["destination_number"]
+    except (ValueError, KeyError, TypeError):
+        return {'statusCode': 400, 'body': "Request body must be JSON with a destination_number."}
+
+    try:
+        validation = pinpoint_client.phone_number_validate(
+            NumberValidateRequest={'PhoneNumber': destination_number})
+        number = validation["NumberValidateResponse"]
+        if number["PhoneType"] == "INVALID":
+            return {'statusCode': 400, 'body': "The destination number isn't a valid phone number."}
+
+        print("Sending SMS message.")
+        response = sms_client.send_text_message(
+            DestinationPhoneNumber=number.get("CleansedPhoneNumberE164", destination_number),
+            OriginationIdentity=ORIGINATION_IDENTITY,
+            MessageBody=MESSAGE,
+            MessageType=MESSAGE_TYPE)
+
+        message_id = response['MessageId']
+        print(f"Message sent! Message ID: {message_id}.")
+        return {'statusCode': 200, 'body': f"Message sent! Message ID: {message_id}."}
+
     except Exception as e:
-        
-        print("Couldn't send message!")
-        response['statusCode'] = 500
-        response['body'] = "Couldn't send message!\n" + str(e)
-        return response
-    
-    
-
-        
-
-        
-
-
-        
-    
-
-
+        print(f"Couldn't send message: {e}")
+        return {'statusCode': 500, 'body': "Couldn't send message!"}
