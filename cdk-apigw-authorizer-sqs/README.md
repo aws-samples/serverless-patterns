@@ -51,14 +51,6 @@ $ source .venv/bin/activate
 ```
 python -m pip install -r requirements.txt
 ```
-7. Install aws_sqs module
-```
-python -m pip install aws-cdk.aws-sqs
-```
-8. Install APIGateway Module
-```
-python -m pip install aws-cdk.aws-apigateway
-```
 9. Update 'cdk-apigw-authorizer-sqs/cdk.context.json' file with your application specific parameters
 ```
 {

@@ -1,7 +1,8 @@
-import { Stack, Construct, StackProps } from '@aws-cdk/core';
-import { CfnServer, CfnUser } from '@aws-cdk/aws-transfer';
-import { Role, PolicyStatement, ServicePrincipal } from '@aws-cdk/aws-iam';
-import { Bucket } from '@aws-cdk/aws-s3';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { CfnServer, CfnUser } from 'aws-cdk-lib/aws-transfer';
+import { Role, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
 
 import { conf } from './options';
 

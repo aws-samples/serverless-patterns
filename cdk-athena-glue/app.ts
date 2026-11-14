@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import { App } from '@aws-cdk/core';
+import { App } from 'aws-cdk-lib';
 
 import { S3GlueStack } from './src/stacks/stack_s3buckets';
 import { TestGlueStack } from './src/stacks/stack_glue';

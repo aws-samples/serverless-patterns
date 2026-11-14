@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+import aws_cdk as cdk
 from aws_cdk import (
     aws_lambda as _lambda,
     aws_logs as logs,
-    aws_sns as sns,
-    core as cdk
+    aws_sns as sns
 )
 
 from constructs import Construct
