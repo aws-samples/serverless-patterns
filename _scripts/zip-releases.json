@@ -1,0 +1,5 @@
+{
+  "about": "Release settings for .github/workflows/create_update_release.yaml. Shard count and tag prefix are in zip-shard.mjs. dualWriteV1: also upload each changed pattern's zip to v1Tag, as before sharding (honours serverlessland.com/pattern-zip-exclude.json). Set it to false once the site links to the shards, then run the cleanup job.",
+  "v1Tag": "v1.0.0",
+  "dualWriteV1": true
+}
