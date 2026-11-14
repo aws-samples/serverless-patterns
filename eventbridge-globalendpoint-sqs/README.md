@@ -4,7 +4,7 @@ The AWS SAM template deploys a global endpoint for Amazon EventBridge with an SQ
 For more information about global endpoints for Amazon EventBridge, read more at https://aws.amazon.com/blogs/compute/introducing-global-endpoints-for-amazon-eventbridge/.
 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-globalendpoint-sqs.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-sqs-global-endpoint-sam.
 
 Necessary: This application uses various AWS services, and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

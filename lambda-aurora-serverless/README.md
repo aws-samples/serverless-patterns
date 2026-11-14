@@ -2,7 +2,7 @@
 
 This pattern creates an AWS Lambda function and an [Amazon Aurora MySQL database version 2 (with MySQL 5.7 compatibility)](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraMySQLReleaseNotes/AuroraMySQL.Updates.20Updates.html) in an [Aurora Serverless version 1](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html) DB cluster with Data API and a Secrets Manager secret.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-aurora
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-aurora-serverless
 
 For AWS Lambda with Aurora Serverless v2, please use [another pattern](https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql)
 

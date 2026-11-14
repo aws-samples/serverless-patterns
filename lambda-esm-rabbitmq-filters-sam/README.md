@@ -2,7 +2,7 @@
 
 You can use event filtering to control which events Lambda sends to your function for processing. You can use this template to explore and test how to configure event filtering for AmazonMQ RabbitMQ messages triggering a lambda function. The SAM template deploys multiple Lambda consumer functions, an MQ broker and the permissions required to run the application. The template also deploys an additional helper Lambda function used for creating the RabbitMQ Queues and pushing messages to it for testing purposes.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-esm-rabbitmq-filters-sam/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/esm-rabbitmq-filters-sam/
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to create a serverless real-time data pipeline using Amazon Kinesis for data ingestion, AWS Lambda for processing, Amazon DynamoDB for data storage. The pattern is implemented using AWS CDK with .NET.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/kinesis-lambda-dynamodb-pipeline-dotnet-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/kinesis-lambda-dynamodb-dotnet-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

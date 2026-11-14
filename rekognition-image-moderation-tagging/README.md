@@ -2,7 +2,7 @@
 
 This pattern explains how to deploy an AWS SAM application with Amazon S3, AWS Lambda, and Amazon DynamoDB to detect (inappropriate images)[https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectModerationLabels.html]. When an image file is created in Amazon S3, the event-driven workflow begins, sending an event to AWS Lambda. This Lambda function, written in Python, invokes the Amazon Rekognition `DetectModerationLabels` function using boto3. Once Rekognition's function has returned it's response, Lambda stores the detected moderation labels in Amazon DynamoDB table.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/rekognition-video-tagging](https://serverlessland.com/patterns/rekognition-video-tagging) 
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/rekognition-image-moderation-tagging](https://serverlessland.com/patterns/rekognition-image-moderation-tagging) 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -2,7 +2,7 @@
 
 This pattern creates an AWS Step Function, AWS Lambda function and an Amazon ECS Fargate task. The state machine can then invoke either. The template creates all the required networking and uses VPC endpoints instead of Nat Gateways for the Fargate networking requirements.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/stepfunction-fargate-lambda
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/stepfunctions-fargate-lambda
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

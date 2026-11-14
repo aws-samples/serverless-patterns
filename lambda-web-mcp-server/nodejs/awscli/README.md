@@ -9,7 +9,7 @@ The MCP server exposes two tools:
 | `get_current_time` | MCP server | Returns the current time as ISO 8601 and as a formatted local time in an optional IANA time zone (default `UTC`) |
 | `run_cpu_work` | CPU API | Calls the API, which runs 1-20 seconds of SHA-256 hashing and streams a line every second. The MCP server relays each line to the client as a progress update, then returns the total hashes, the hash rate, the elapsed time and the execution environment ids of both functions |
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-web-mcp-server/nodejs/awscli
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-web-mcp-server-nodejs-awscli/nodejs/awscli
 
 > **Warning:** the MCP server endpoint has no authentication. Anyone with its URL can call the tools, including `run_cpu_work`, which runs CPU work that you pay for. The CPU API is protected by IAM, but the MCP server calls it on behalf of any caller. Delete the functions when you finish testing (see [Cleanup](#cleanup)), and add authentication to the MCP server before you use this pattern outside a demo.
 

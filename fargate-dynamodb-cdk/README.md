@@ -4,7 +4,7 @@ This project contains a sample AWS Cloud Development Kit (AWS CDK) template for 
 
 This project also shows how to set up a DynamoDB Gateway Endpoint to the VPC. A VPC Endpoint policy is created to only allow the Fargate task definition to perform `PutItem` actions through the VPC endpoint.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/fargate-dynamodb-cdk.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cdk-fargate-dynamodb.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

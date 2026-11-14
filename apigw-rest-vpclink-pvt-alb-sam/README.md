@@ -15,7 +15,7 @@ This AWS SAM template deploys a REST API Gateway with Amazon VPC link V2 integra
 * Amazon VPC link V2 connecting API Gateway to the private ALB
 * API Gateway REST API (AWS::Serverless::Api) with proxy integration to the ALB
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-vpclink-pvt-alb-sam/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-rest-vcplink-pvt-alb-sam/
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

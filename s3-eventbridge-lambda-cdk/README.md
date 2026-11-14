@@ -2,7 +2,7 @@
 
 This pattern contains a sample AWS Cloud Development Kit (AWS CDK) template for creating an AWS S3 bucket with AWS EventBridge notifications turned on. All S3 events in this bucket is sent to AWS EventBridge. This CDK template also deploys a AWS Lambda function which will process the event sent to AWS EventBridge and create a tag for the S3 object that was created. An AWS EventBridge rule is also created to send only the `Object Created` event of the bucket to the Lambda function.
 
-Learn more about this pattern at Serverless Land Patterns:: https://serverlessland.com/patterns/s3-eventbridge-lambda
+Learn more about this pattern at Serverless Land Patterns:: https://serverlessland.com/patterns/s3-eventbridge-lambda-cdk
 
 Important: This template uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -2,7 +2,7 @@
 
 This pattern creates an Amazon API Gateway REST API that integrates with an Amazon DynamoDB table.
 
-Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-rest-api-dynamodb-sls](https://serverlessland.com/patterns/apigw-rest-api-dynamodb-sls).
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/apigw-dynamodb-sls](https://serverlessland.com/patterns/apigw-dynamodb-sls).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
