@@ -115,8 +115,19 @@ export class CdkStack extends cdk.Stack {
     });
     flinkRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("CloudWatchFullAccess"));
 
+    // Builds the Flink application jar with Maven in a container at synth time.
     const flinkAsset = new s3Asset.Asset(this, "flinkAppAsset2", {
-      path: path.join(__dirname, "../flink-application/kinesis-flink-firehose-app/target/kinesis-flink-firehose-app-0.1.jar"),
+      path: path.join(__dirname, "../flink-application/kinesis-flink-firehose-app"),
+      exclude: ["target"],
+      bundling: {
+        image: cdk.DockerImage.fromRegistry("public.ecr.aws/docker/library/maven:3.9-amazoncorretto-11"),
+        command: [
+          "bash",
+          "-c",
+          "cp -r /asset-input /tmp/app && cd /tmp/app && mvn -q -B -Dmaven.repo.local=/tmp/m2 package && cp target/kinesis-flink-firehose-app-0.1.jar /asset-output/",
+        ],
+        outputType: cdk.BundlingOutput.ARCHIVED,
+      },
     });
 
     const flinkSg = new ec2.SecurityGroup(this, "FlinkSg", {

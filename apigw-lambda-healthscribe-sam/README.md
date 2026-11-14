@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Prerequisite
-This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/transcribe/client/start_medical_scribe_job.html) or above. This is not the current default version of boto3 on AWS Lambda. Hence we will use a Lambda layer.
+This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/transcribe/client/start_medical_scribe_job.html) or above. The boto3 version included in the Lambda `python3.14` runtime has this API.
 
 ## Deployment Instructions
 
@@ -26,8 +26,9 @@ This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com
    ```bash
    cd apigw-lambda-healthscribe-sam
    ```
-3. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
    ```bash
+   sam build
    sam deploy --guided
    ```
 4. During the prompts:
@@ -42,66 +43,7 @@ This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com
 
    For production applications, you should [enable authentication for the API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html) using one of several available options and [follow the API Gateway security best practices](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-best-practices.html).
 
-5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for next step as well as testing.
-6. Run the `create_lambda_layer.sh`. You may have to change the file permission to make it executable.  This will create the Lambda layer with the necessary boto3 version for calling AWS HealthScribe API.
-   ```bash
-   bash create_lambda_layer.sh
-   ```
-7. Provide a name for the Lambda layer. Such as: 
-   ```bash
-   Enter the name of the Layer: boto3-lambda-layer
-   ```
-   Provide the AWS region where you have depoyed. Such as: 
-   ```bash
-   Enter the deployment region: {your-region}
-   ```
-
-   It will show output like below:
-   ```bash
-   Publishing the layer. Please wait ...
-   {
-    "Content": {
-      .....
-      .....
-    },
-    "LayerArn": "arn:aws:lambda:{your-region}:xxxxxxxxxxxx:layer:boto3-lambda-layer",
-    "LayerVersionArn": "arn:aws:lambda:{your-region}:xxxxxxxxxxxx:layer:boto3-lambda-layer:1",
-    "Description": "",
-    "CreatedDate": "YYYY-MM-DDT10:47:36.983+0000",
-    "Version": 1
-   }
-   ``` 
-8. You may have to press `q` to come out of the output. Copy the value of `LayerVersionArn` from the above output and provide it into the next step. Such as:
-
-   ```bash
-   Enter the LayerVersionArn from the above command: arn:aws:lambda:{your-region}:xxxxxxxxxxxx:layer:boto3-lambda-layer:1
-   ```
-9. Please replace the value of `{ClinicalNotesGenerationLambdaFunction}` with the value from the `sam deploy --guided` output:
-   ```bash
-   Enter the Lambda function name from the SAM deploy output: {ClinicalNotesGenerationLambdaFunction}
-   ```
-   The script will now run aws cli command to add the newly created layer to the Lambda function. It will show output as below:
-   It will show output like below:
-   ```bash
-   Adding the new layer to your Lambda function's configuration. Please wait ...
-   {
-      "FunctionName": "{ClinicalNotesGenerationLambdaFunction}",
-      ......
-      ......
-      "State": "Active",
-      "LastUpdateStatus": "InProgress",
-      "LastUpdateStatusReason": "The function is being created.",
-      "LastUpdateStatusReasonCode": "Creating",
-      "PackageType": "Zip",
-      "Architectures": [
-         "arm64"
-      ],
-      "EphemeralStorage": {
-         "Size": 512
-      }
-   }      
-   ```    
-10. You may have to press `q` to come out of the output. The setup is ready for testing.
+5. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 ## How it works
 
@@ -160,10 +102,6 @@ Here's a breakdown of the steps:
 2. To delete the resources deployed to your AWS account via AWS SAM, run the following command:
    ```bash
    sam delete
-   ```
-3. Delete the Lambda layer version using the `delete_lambda_layer.sh` script. You may have to give execution permission to the file. You will need to pass the Lambda layer name, the version and the region in the inpout when requested:
-   ```bash
-   bash delete_lambda_layer.sh
    ```
 
 ---

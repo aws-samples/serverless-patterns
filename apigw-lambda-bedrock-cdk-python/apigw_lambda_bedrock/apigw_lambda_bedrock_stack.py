@@ -12,12 +12,6 @@ class ApigwLambdaBedrockStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        #AWS Lambda Layer containing boto
-        layer = _lambda.LayerVersion(self, "Boto3Layer",
-            code=_lambda.Code.from_asset("./boto_layer.zip"),
-            compatible_runtimes=[_lambda.Runtime.PYTHON_3_14]
-        )
-
         #add policy to invoke Amazon Bedrock model
         invoke_model_policy = iam.Policy(self, "InvokeModelPolicy",
             statements=[
@@ -28,12 +22,11 @@ class ApigwLambdaBedrockStack(Stack):
             ]
         )
 
-        # Create AWS Lambda function and attach the layer
+        # Create AWS Lambda function. The python3.14 runtime's boto3 includes bedrock-runtime.
         lambda_function = _lambda.Function(self, "MyFunction",
             runtime=_lambda.Runtime.PYTHON_3_14,
             handler="index.handler",
             code=_lambda.Code.from_asset("./function_code"),
-            layers=[layer],
             timeout=Duration.seconds(30)
             )
 

@@ -11,7 +11,6 @@ s3-lambda-translate-cdk-python
 - assets/
     - AmazonSimpleStorageService.html
     - fr-AmazonSimpleStorageService.html
-- python.zip
 ```
 
 ## Common Errors & Troubleshooting

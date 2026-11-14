@@ -18,6 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
+* [Docker](https://docs.docker.com/get-docker/) (or another container runtime CDK supports, such as Finch with `CDK_DOCKER=finch`) running. `cdk deploy` builds the Flink application jar with Maven in a container, so you don't need Java or Maven installed.
 
 ## Deployment Instructions
 
@@ -34,6 +35,8 @@ Important: this application uses various AWS services and there are costs associ
     cd cdk
     cdk deploy
     ```
+    The first deploy builds the Flink application jar from `flink-application/kinesis-flink-firehose-app/pom.xml` in a Maven container, which takes a few minutes.
+
 4. When prompted, confirm that you wish to deploy the changes
 
 5. Note the Kinesis Data Stream Name output. This value will be used for testing.

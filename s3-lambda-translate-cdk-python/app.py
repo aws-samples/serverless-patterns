@@ -56,15 +56,6 @@ class S3LambdaTranslateServerless(Stack):
             iam.ManagedPolicy.from_aws_managed_policy_name("AWSLambdaExecute")
         )
 
-        # lambda layer containing boto3, Pillow for image processing, and Pyshortener for shortening the pre-signed
-        # s3 url.
-        layer = lambda_.LayerVersion(
-            self,
-            "Boto3Layer",
-            code=lambda_.Code.from_asset("./python.zip"),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_14],
-        )
-
         # Log group for Lambda function
         log_group = logs.LogGroup(self, "Lambda Group", removal_policy=cdk.RemovalPolicy.DESTROY)
 
@@ -76,7 +67,6 @@ class S3LambdaTranslateServerless(Stack):
             handler="lambda_function.lambda_handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
             timeout=Duration.minutes(1),
-            layers=[layer],
             memory_size=256,
             log_group=log_group,
             environment={
