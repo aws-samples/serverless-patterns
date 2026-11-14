@@ -36,3 +36,23 @@ variable "compression_type" {
     type        = string 
     default     = "zip"
 }
+
+# Flink Kinesis SQL connector, downloaded from Maven Central at apply time.
+# The file name must match jar_file in the kinesisanalytics module.
+variable "connector_jar_name" {
+    description = "File name of the Flink Kinesis SQL connector jar in the application zip"
+    type        = string
+    default     = "flink-sql-connector-kinesis-1.15.2.jar"
+}
+
+variable "connector_jar_url" {
+    description = "Maven Central URL of the Flink Kinesis SQL connector jar"
+    type        = string
+    default     = "https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kinesis/1.15.2/flink-sql-connector-kinesis-1.15.2.jar"
+}
+
+variable "connector_jar_sha256" {
+    description = "SHA-256 checksum of the Flink Kinesis SQL connector jar"
+    type        = string
+    default     = "defbbe300be769569218a014d23d6f435bd97ae2e6696abe74fc14705ffa39c6"
+}

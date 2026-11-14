@@ -18,6 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
+* `curl` and `sha256sum` or `shasum`. `terraform apply` downloads the Flink Kinesis SQL connector (`flink-sql-connector-kinesis-1.15.2.jar`) from Maven Central, checks its SHA-256 checksum and packages it into the application zip.
 
 ## Deployment Instructions
 

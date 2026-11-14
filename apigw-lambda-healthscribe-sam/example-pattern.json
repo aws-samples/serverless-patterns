@@ -32,8 +32,8 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided",
-      "bash create_lambda_layer.sh"
+      "sam build",
+      "sam deploy --guided"
     ]
   },
   "testing": {
@@ -44,8 +44,7 @@
   "cleanup": {
     "text": [
       "Delete the Amazon S3 bucket content: <code>aws s3 rm s3://{TranscribeNotesBucket} --recursive</code>",
-      "Delete the stack: <code>sam delete</code>.",
-      "Delete Lambda Layer stack: <code>bash delete_lambda_layer.sh</code>."
+      "Delete the stack: <code>sam delete</code>."
     ]
   },
   "authors": [

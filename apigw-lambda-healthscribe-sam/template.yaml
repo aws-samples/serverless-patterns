@@ -20,6 +20,8 @@ Resources:
         - arm64
       Timeout: 60
       Role: !GetAtt LambdaTranscribeExecutionRole.Arn
+      Layers:
+        - !Ref Boto3Layer
       Environment:
         Variables:
           BUCKET_NAME: !Ref TranscribeNotesBucket
@@ -31,6 +33,18 @@ Resources:
             Path: /generate_clinical_notes
             Method: post
             RestApiId: !Ref GenerateClinicalNotesAPI
+  Boto3Layer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: boto3 with the AWS HealthScribe API, built by sam build from layer/requirements.txt
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - python3.14
+      CompatibleArchitectures:
+        - arm64
+    Metadata:
+      BuildMethod: python3.14
+      BuildArchitecture: arm64
   LambdaTranscribeExecutionRole:
     Type: AWS::IAM::Role
     Properties:

@@ -29,7 +29,7 @@ You must use a role that has sufficient permissions to create IAM roles, as well
 
 #### Python >=3.8
 Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.14.
-As `TranslateDocument` API is yet to be made available in the latest Boto3 library, a layer `python.zip` with Boto3 version >= 1.28.56 has been attached.
+The Lambda function uses a layer with a pinned Boto3 version that has the `TranslateDocument` API (1.28.56 or later). CDK builds the layer from `layer/requirements.txt` in a container when you synthesize or deploy, so Docker (or another container runtime CDK supports) must be running.
 
 #### AWS CDK
 Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) installed in the Cloud9 environment.

@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_iam as iam,
     Duration,
+    BundlingOptions,
     aws_apigateway as apigw
 )
 from constructs import Construct
@@ -12,9 +13,14 @@ class ApigwLambdaBedrockStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        #AWS Lambda Layer containing boto
+        #AWS Lambda Layer containing boto, built from layer/requirements.txt at synth time
         layer = _lambda.LayerVersion(self, "Boto3Layer",
-            code=_lambda.Code.from_asset("./boto_layer.zip"),
+            code=_lambda.Code.from_asset("./layer",
+                bundling=BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_14.bundling_image,
+                    command=["bash", "-c", "pip install --no-cache-dir -r requirements.txt -t /asset-output/python"],
+                ),
+            ),
             compatible_runtimes=[_lambda.Runtime.PYTHON_3_14]
         )
 

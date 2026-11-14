@@ -2,6 +2,7 @@
 import os
 import aws_cdk as cdk
 from aws_cdk import (
+    BundlingOptions,
     Duration,
     Stack,
     aws_iam as iam,
@@ -61,7 +62,13 @@ class S3LambdaTranslateServerless(Stack):
         layer = lambda_.LayerVersion(
             self,
             "Boto3Layer",
-            code=lambda_.Code.from_asset("./python.zip"),
+            code=lambda_.Code.from_asset(
+                os.path.join(DIRNAME, "layer"),
+                bundling=BundlingOptions(
+                    image=lambda_.Runtime.PYTHON_3_14.bundling_image,
+                    command=["bash", "-c", "pip install --no-cache-dir -r requirements.txt -t /asset-output/python"],
+                ),
+            ),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_14],
         )
 

@@ -4,7 +4,7 @@
 
 This pattern demonstrates how to expose an endpoint to invoke models in Amazon Bedrock.
 
-Note: this pattern includes a layer with a custom version of boto3. Using an outdated boto3 version will result in an ["unknown service error"](https://repost.aws/knowledge-center/lambda-python-runtime-errors)
+Note: this pattern includes a layer with a pinned version of boto3, which CDK builds from `layer/requirements.txt` in a container when you synthesize or deploy, so Docker (or another container runtime CDK supports) must be running. Using an outdated boto3 version will result in an ["unknown service error"](https://repost.aws/knowledge-center/lambda-python-runtime-errors)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
