@@ -51,16 +51,16 @@ Parameters:
     Default: https://velocity-enterprise-676.my.salesforce.com/services/data/v58.0/sobjects/Cloud_New__e
   SalesforceOauthClientId:
     Type: String
+    NoEcho: true
     Description: 'Salesforce Integration Application Client ID'
     MinLength: 1
     MaxLength: 256
-    Default: 3MVG9Rr0EZ2YOVMZ01EUNfA.XERigZ7YR5nZHeVyathjalq3mA1iGPFv6JvSmSW7L161w5.jyZE0wE_feesr4
   SalesforceOauthClientSecret:
     Type: String
+    NoEcho: true
     Description: 'Salesforce Integration Application Client Secret'
     MinLength: 1
     MaxLength: 256
-    Default: 47C98BD15C48248F79DAAEDB82C297280287A120986E413AA40983F6746BE421
 
 Resources:
   VPCStack:
