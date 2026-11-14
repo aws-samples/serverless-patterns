@@ -1,0 +1,51 @@
+{
+  "title": "AWS Lambda to AWS IoT Core",
+  "description": "AWS Lambda function publishing to AWS IoT Core topic.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern contains a sample AWS SAM stack with an AWS IoT Core thing and a Lambda function.",
+      "The Lambda function publishes a message to the IoT topic which you can view in the console."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "IoT Rule",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rules.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Daniele Frasca",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}
