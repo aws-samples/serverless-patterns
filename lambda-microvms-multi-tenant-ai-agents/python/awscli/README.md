@@ -27,7 +27,7 @@ Docker is **not** required locally — the container image build runs on AWS as 
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/lambda-microvms-multi-tenant-ai-agents
+    cd serverless-patterns/lambda-microvms-multi-tenant-ai-agents/python/awscli
     ```
 1. Deploy the whole system with one command (takes ~10 minutes: CloudFormation stack + server-side MicroVM image build + VPC egress connector):
     ```
