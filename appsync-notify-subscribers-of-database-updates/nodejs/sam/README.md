@@ -193,7 +193,7 @@ Note: EventBridge does not guarantee "only once event delivery" but the client c
 
 4. https://aws.amazon.com/blogs/mobile/using-multiple-authorization-types-with-aws-appsync-graphql-apis/
 
-5. https://github.com/aws-samples/serverless-patterns/tree/main/cognito-httpapi
+5. https://github.com/aws-samples/serverless-patterns/tree/main/cognito-httpapi/nodejs/sam
 
 6. https://www.youtube.com/watch?v=J0qfMYRmQcc
 

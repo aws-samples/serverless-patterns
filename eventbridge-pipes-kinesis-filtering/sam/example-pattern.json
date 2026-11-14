@@ -1,0 +1,62 @@
+{
+  "title": "Amazon Kinesis to Amazon Kinesis with filtering using Amazon EventBridge Pipes",
+  "description": "This pattern will connect Kinesis data streams together with EventBridge Pipes. The source stream is filtered into multiple Kinesis streams downstream.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Kinesis stream is configured as the pipe source, and filters are created to filter records to downstream kinesis streams. This pattern allows you to filter kinesis streams into other kinesis streams.",
+      "<h5>How the pattern works</h5>",
+      "EventBridge Pipes is used to filter records from the source Kinesis stream into downstream consumers. Records are base64 encoded in Kinesis and EventBridge Pipes decodes the message and supports filtering on the payload of the message."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
+    }
+  ]
+}
