@@ -1,6 +1,7 @@
 import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 import { GraphqlApi, SchemaFile, FieldLogLevel } from 'aws-cdk-lib/aws-appsync'
+import { Runtime } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { join } from 'path'
 
@@ -18,7 +19,9 @@ export class MainStack extends Stack {
 			},
 		})
 
-		const directLambda = new NodejsFunction(this, 'resolver')
+		const directLambda = new NodejsFunction(this, 'resolver', {
+			runtime: Runtime.NODEJS_24_X,
+		})
 		const datasource = api.addLambdaDataSource('directLambda', directLambda)
 
 		const fields = [

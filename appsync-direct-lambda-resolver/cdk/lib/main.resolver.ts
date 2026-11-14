@@ -1,10 +1,5 @@
 import { AppSyncResolverEvent } from 'aws-lambda'
-const AWS = require('aws-sdk')
-const {
-  util: {
-    uuid: { v4: uuid },
-  },
-} = AWS
+import { randomUUID as uuid } from 'crypto'
 
 type Todo = {
   id: string
