@@ -42,7 +42,7 @@ See `rabbitmq-private-lambda/python/sam` for a scoped instance role.
 - For IAM auth, add the [aws-msk-iam-auth](https://github.com/aws/aws-msk-iam-auth/releases) jar and scope `kafka-cluster` actions to the pattern's cluster, topics and groups.
 - Kafka 4 dropped `--zookeeper` and `--broker-list`. Use `--bootstrap-server` in README commands.
 
-See `msk-lambda-iam-python-sam` for a full example.
+See `msk-lambda-iam/python/sam` for a full example.
 
 ### AWS IP ranges
 
