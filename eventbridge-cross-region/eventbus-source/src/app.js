@@ -2,8 +2,8 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-const AWS = require('aws-sdk')
-const eventBridge = new AWS.EventBridge()
+const { EventBridgeClient, PutEventsCommand } = require('@aws-sdk/client-eventbridge')
+const eventBridge = new EventBridgeClient()
 
 exports.handler = async (event) => {
 	console.log(JSON.stringify(event, null, 2))
@@ -21,7 +21,7 @@ exports.handler = async (event) => {
 	}
 
 	console.log('Sending to EventBridge: ', ebEvent)
-	const result = await eventBridge.putEvents(ebEvent).promise()
+	const result = await eventBridge.send(new PutEventsCommand(ebEvent))
 
 	console.log('Result: ', JSON.stringify(result, null, 2))
 

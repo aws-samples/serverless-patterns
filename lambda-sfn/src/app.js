@@ -3,7 +3,7 @@
  */
 
 // dependencies
-const AWS = require('aws-sdk');
+const { SFNClient, StartExecutionCommand } = require('@aws-sdk/client-sfn');
 const moment = require('moment');
 
 exports.handler =  async (event) => {
@@ -15,10 +15,10 @@ exports.handler =  async (event) => {
         name: `ArchiveAt${rightNow}`
     };
 
-    const stepfunctions = new AWS.StepFunctions();
+    const stepfunctions = new SFNClient();
     let res
     try {
-     res = await  stepfunctions.startExecution(params).promise()
+     res = await  stepfunctions.send(new StartExecutionCommand(params))
     }catch(err){
     console.error(err)
     }

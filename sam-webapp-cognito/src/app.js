@@ -3,9 +3,10 @@
 
 const randomBytes = require('crypto').randomBytes;
 
-const AWS = require('aws-sdk');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
-const ddb = new AWS.DynamoDB.DocumentClient();
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient());
 
 const fleet = [
     {
@@ -25,10 +26,9 @@ const fleet = [
     },
 ];
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context) => {
     if (!event.requestContext.authorizer) {
-      errorResponse('Authorization not configured', context.awsRequestId, callback);
-      return;
+      return errorResponse('Authorization not configured', context.awsRequestId);
     }
 
     const rideId = toUrlString(randomBytes(16));
@@ -49,14 +49,12 @@ exports.handler = (event, context, callback) => {
 
     const unicorn = findUnicorn(pickupLocation);
 
-    recordRide(rideId, username, unicorn).then(() => {
-        // You can use the callback function to provide a return value from your Node.js
-        // Lambda functions. The first parameter is used for failed invocations. The
-        // second parameter specifies the result data of the invocation.
+    try {
+        await recordRide(rideId, username, unicorn);
 
         // Because this Lambda function is called by an API Gateway proxy integration
         // the result object must use the following structure.
-        callback(null, {
+        return {
             statusCode: 201,
             body: JSON.stringify({
                 Id: rideId,
@@ -68,16 +66,16 @@ exports.handler = (event, context, callback) => {
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
-        });
-    }).catch((err) => {
+        };
+    } catch (err) {
         console.error(err);
 
         // If there is an error during processing, catch it and return
         // from the Lambda function successfully. Specify a 500 HTTP status
         // code and provide an error message in the body. This will provide a
         // more meaningful error response to the end client.
-        errorResponse(err.message, context.awsRequestId, callback)
-    });
+        return errorResponse(err.message, context.awsRequestId);
+    }
 };
 
 // This is where you would implement logic to find the optimal unicorn for
@@ -89,7 +87,7 @@ function findUnicorn(pickupLocation) {
 }
 
 function recordRide(rideId, username, unicorn) {
-    return ddb.put({
+    return ddb.send(new PutCommand({
         TableName: 'Rides',
         Item: {
             Id: rideId,
@@ -98,7 +96,7 @@ function recordRide(rideId, username, unicorn) {
             UnicornName: unicorn.Name,
             RequestTime: new Date().toISOString(),
         },
-    }).promise();
+    }));
 }
 
 function toUrlString(buffer) {
@@ -108,8 +106,8 @@ function toUrlString(buffer) {
         .replace(/=/g, '');
 }
 
-function errorResponse(errorMessage, awsRequestId, callback) {
-  callback(null, {
+function errorResponse(errorMessage, awsRequestId) {
+  return {
     statusCode: 500,
     body: JSON.stringify({
       Error: errorMessage,
@@ -118,5 +116,5 @@ function errorResponse(errorMessage, awsRequestId, callback) {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
-  });
+  };
 }
