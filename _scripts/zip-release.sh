@@ -13,7 +13,8 @@
 # Env: DRY_RUN=true reads GitHub as usual but prints each create, upload and delete instead
 # of doing it. MAX_UPLOADS caps backfill uploads and cleanup deletes (default 450: each
 # upload is about 2 API calls, against GITHUB_TOKEN's 1,000 requests an hour and GitHub's
-# ~500 content-creating requests an hour). Re-run to resume.
+# ~500 content-creating requests an hour). Re-run to resume. Each write is tried RETRIES times
+# (default 3), waiting RETRY_WAIT seconds (default 30) times the try number in between.
 set -euo pipefail
 
 REPO=${GITHUB_REPOSITORY:-aws-samples/serverless-patterns}
@@ -29,8 +30,22 @@ known_releases=" "
 
 case "$MAX_UPLOADS" in '' | *[!0-9]*) echo "MAX_UPLOADS must be a number" >&2; exit 1 ;; esac
 
-write() { # a GitHub write, or just print it in a dry run
-  if [ "$DRY_RUN" = true ]; then echo "DRY RUN: $*"; else "$@"; fi
+RETRIES=${RETRIES:-3}
+RETRY_WAIT=${RETRY_WAIT:-30}
+
+write() { # a GitHub write, or just print it in a dry run. Retried: GitHub sometimes
+  # answers a burst of writes with a transient error such as "release not found".
+  if [ "$DRY_RUN" = true ]; then echo "DRY RUN: $*"; return 0; fi
+  local try=1
+  until "$@"; do
+    if [ "$try" -ge "$RETRIES" ]; then
+      echo "::error::Gave up after $try tries: $*" >&2
+      return 1
+    fi
+    echo "::warning::Try $try failed, retrying in $((RETRY_WAIT * try))s: $*" >&2
+    sleep $((RETRY_WAIT * try))
+    try=$((try + 1))
+  done
 }
 
 all_folders() { # every folder holding an example-pattern.json
