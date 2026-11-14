@@ -7,7 +7,7 @@
 			"path": "../s3-lambda-comprehend-cdk-python"
 		},
 		{
-			"path": "../eventbridge-firehose-cdk"
+			"path": "../eventbridge-firehose-s3/python/cdk"
 		}
 	],
 	"settings": {}
