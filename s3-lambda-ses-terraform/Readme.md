@@ -58,7 +58,7 @@ Wait for few seconds hopefully you should receive an notification over your emai
 
 1. Change directory to the pattern directory:
 
-`cd serverless-patterns/apigw-http-api-lambda-terraform`
+`cd serverless-patterns/apigw-http-api-lambda/python/terraform`
 
 2. Delete all created resources
 
