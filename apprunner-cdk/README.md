@@ -1,12 +1,10 @@
-# AWS App Runner Service
+# Amazon ECS Express Mode service with AWS CDK
 
-AWS App Runner is an AWS service that provides a fast, simple, and cost-effective way to deploy from source code or a container image directly to a scalable and secure web application in the AWS Cloud. You don't need to learn new technologies, decide which compute service to use, or know how to provision and configure AWS resources.
+This pattern deploys a containerized Node.js web application on [Amazon ECS Express Mode](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-overview.html) with the AWS CDK in TypeScript. You give Express Mode a container image and two IAM roles, and it creates a Fargate service, an internet-facing Application Load Balancer with HTTPS, auto scaling, logging and a URL for the service.
 
-App Runner connects directly to your code or image repository. It provides an automatic integration and delivery pipeline with fully managed operations, high performance, scalability, and security.
+AWS App Runner is closed to new customers, and AWS recommends Amazon ECS Express Mode as the replacement. See [App Runner availability change](https://docs.aws.amazon.com/apprunner/latest/dg/apprunner-availability-change.html). This pattern used to deploy the same app on App Runner.
 
-This project contains a sample AWS Cloud Development Kit (AWS CDK) template for deploying an AWS App Runner service. 
-This template showes how to add a custom image for AWS App Runner service to use without having to pre-push the image to Amazon Elastic Container Registry (ECR) or another container library. This makes use of the in-built `apprunner.Source.fromAsset` method.
-The custom image used is a simple hello world Node Js application. This project also provides an example of how to pass an environment variable to the image. Note that the image can be changed to other images that suit your use case by changing the codes found in the src directory.
+The CDK app builds the image from the `cdk/src` folder with `DockerImageAsset` when you run `cdk deploy`, so you don't need to push an image to Amazon ECR first. The stack defines the service with the `AWS::ECS::ExpressGatewayService` CloudFormation resource (`CfnExpressGatewayService` in `aws-cdk-lib`) and passes an environment variable to the container.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apprunner.
 
@@ -17,7 +15,10 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
+- [Node.js](https://nodejs.org/) 22 or later
+- [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) CLI 2.1148.0 or later. `npx aws-cdk@latest` works too.
+- Docker or another container runtime, to build the image
+- A default VPC with public subnets in the Region you deploy to. Express Mode puts the load balancer there when you don't give it subnets.
 
 ## Deployment Instructions
 
@@ -33,48 +34,42 @@ Important: this application uses various AWS services and there are costs associ
    ```bash
    npm install
    ```
-4. From the command line, configure AWS CDK:
+4. If you haven't used the CDK in this account and Region before, bootstrap it:
    ```bash
-   cdk bootstrap ACCOUNT-NUMBER/REGION # e.g.
-   cdk bootstrap 1111111111/us-east-1
-   cdk bootstrap --profile test 1111111111/us-east-1
+   cdk bootstrap aws://ACCOUNT-NUMBER/REGION
    ```
 5. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/cdk-stack.ts` file:
    ```bash
    cdk deploy
    ```
-6. Note the outputs from the CDK deployment process. This contains the service URL that is used to make GET request.
+6. Note the outputs from the CDK deployment process. `ExpressServiceEndpoint` is the URL you use for testing.
 
 ## How it works
 
-- The image is constructed directly from sources on disk when `cdk deploy` is executed
-- The image is automatically pushed to Amazon ECR
-- An AWS App Runner service is created using the image pushed to ECR
+- `cdk deploy` builds the image from the files in `cdk/src` and pushes it to the CDK bootstrap ECR repository.
+- The stack creates an ECS cluster, a task execution role with `AmazonECSTaskExecutionRolePolicy`, and an infrastructure role with `AmazonECSInfrastructureRoleforExpressGatewayServices`.
+- The `AWS::ECS::ExpressGatewayService` resource runs the image on Fargate with 1 vCPU and 2 GB of memory, on container port 80, and health checks `/`.
+- Using the infrastructure role, ECS creates an internet-facing Application Load Balancer with a TLS certificate, security groups, an auto scaling policy and a CloudWatch log group, and gives the service a URL in the format `https://<service-name>.ecs.<region>.on.aws`.
+
+The service is public: anyone with the URL can call it. That fits this hello-world sample. For an app that holds private data, add authentication in the app, or put the service in private subnets with the `NetworkConfiguration` property.
 
 ## Testing
 
-Retrieve the App Runner Service URL from the `cdk deploy` output. Example of the output is:
+Get the service URL from the `ExpressServiceEndpoint` output of `cdk deploy`. The service can take a few minutes to become active after the stack finishes.
 
-```
-CdkStack-apprunner.AppRunnerServiceURL = https://abcde12345.us-east-1.awsapprunner.com
-```
-
-For reference:
-
-<img src="./docs/01-cdk-deploy-output.png" alt="cdk-deploy-output" width="80%"/>
-
-The service has only one endpoint `/` and making a GET request to this endpoint returns a JSON with a hello message. For example:
+The service has one endpoint, `/`. A GET request returns a JSON hello message:
 
 ```bash
-curl --location --request GET '<REPLACE WITH FARGATE SERVICE URL>/' | json_pp
-# Example
-curl --location --request GET 'https://abcde12345.us-east-1.awsapprunner.com/' | json_pp
+curl https://<ExpressServiceEndpoint>/
 ```
 
-Running the request above should produce the following output:
+The response looks like this:
 
-<img src="./docs/02-example-request.png" alt="example-requests" width="90%"/>
+```json
+{"message":"Hello from Amazon ECS Express Mode service running in region us-east-1 !"}
+```
 
+If the endpoint output already starts with `https://`, use it as it is.
 
 ## Cleanup
 
@@ -83,9 +78,10 @@ Running the request above should produce the following output:
    cdk destroy
    ```
 
-2. Navigate to ECR in the AWS console and delete the container images created
-
+2. The image stays in the CDK bootstrap ECR repository (`cdk-hnb659fds-container-assets-ACCOUNT-REGION`). Delete it from the Amazon ECR console if you don't need it.
 
 ## Documentation and useful references
-- [AWS App Runner Documentation](https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html)
-- [AWS App Runner CDK](https://docs.aws.amazon.com/cdk/api/v1/docs/aws-apprunner-readme.html)
+- [Amazon ECS Express Mode](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-overview.html)
+- [AWS::ECS::ExpressGatewayService](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ecs-expressgatewayservice.html)
+- [CfnExpressGatewayService in aws-cdk-lib](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs.CfnExpressGatewayService.html)
+- [Amazon ECS infrastructure IAM role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/infrastructure_IAM_role.html)

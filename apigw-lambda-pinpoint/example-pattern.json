@@ -1,13 +1,14 @@
 {
-  "title": "Pinpoint SMS via Amazon API Gateway and AWS Lambda",
-  "description": "Validate phone number and send SMS from Pinpoint via API Gateway and Lambda",
+  "title": "SMS with AWS End User Messaging via Amazon API Gateway and AWS Lambda",
+  "description": "Validate a phone number with Amazon Pinpoint and send an SMS with AWS End User Messaging SMS from an API Gateway REST API and Lambda.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern shows an example how a phone number can be validated and how a SMS message can be send using Pinpoint APIs which via API Gateway and Lambda deployed using AWS SAM."
+      "This pattern deploys an Amazon API Gateway REST API with IAM authorization and an AWS Lambda function using AWS SAM.",
+      "The function validates the destination phone number with the Amazon Pinpoint PhoneNumberValidate API, then sends an SMS from your origination identity with the AWS End User Messaging SMS SendTextMessage API."
     ]
   },
   "gitHub": {
@@ -18,18 +19,22 @@
   "resources": {
     "bullets": [
       {
-        "text": "Send Messages Pinpoint",
-        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-messages.html#apps-application-id-messagespost"
+        "text": "AWS End User Messaging SMS SendTextMessage API",
+        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference_smsvoicev2/API_SendTextMessage.html"
       },
       {
-        "text": "Phone number validate",
+        "text": "Amazon Pinpoint phone number validate API",
         "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html"
+      },
+      {
+        "text": "Amazon Pinpoint end of support",
+        "link": "https://docs.aws.amazon.com/pinpoint/latest/userguide/migrate.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy"
+      "sam deploy --guided"
     ]
   },
   "testing": {
