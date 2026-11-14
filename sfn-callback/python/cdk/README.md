@@ -43,7 +43,7 @@ AWS Step Functions to Amazon SQS / AWS Lambda to AWS Step Functions
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd sqs-lambda-cdk
+    cd sfn-callback/python/cdk
     ```
 1. Create a virtual environment for python:
     ```bash

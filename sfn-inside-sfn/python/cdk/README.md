@@ -47,7 +47,7 @@ AWS Step Functions
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd sqs-lambda-cdk
+    cd sfn-inside-sfn/python/cdk
     ```
 1. Create a virtual environment for python:
     ```bash

@@ -44,7 +44,7 @@ Amazon SQS to AWS Lambda
     ```
 1. Change directory to the pattern directory:
     ```bash
-    cd sqs-lambda-cdk
+    cd sqs-lambda-eb/python/cdk
     ```
 1. Create a virtual environment for python:
     ```bash

@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd step-function-lambda-function-crossaccount-terraform
+    cd sfn-lambda-function-crossaccount/python/terraform
     ```
 1. From the command line, initialize terraform to to downloads and installs the providers defined in the configuration:
     ```
@@ -60,7 +60,7 @@ Important: this application uses various AWS services and there are costs associ
  
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/step-function-lambda-function-crossaccount-terraform
+    cd serverless-patterns/sfn-lambda-function-crossaccount/python/terraform
     ```
 1. Delete all created resources
     ```
