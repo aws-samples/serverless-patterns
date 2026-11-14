@@ -1,6 +1,6 @@
 {
   "title": "Process Amazon SQS records with AWS Lambda (Python)",
-  "description": "This pattern shows how to process Amazon SQS messages using AWS Lambda.",
+  "description": "Run background jobs in Python: this pattern shows how to process Amazon SQS messages using AWS Lambda as a queue worker, with no worker hosts to manage.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",

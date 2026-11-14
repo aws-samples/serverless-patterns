@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge Schedule to AWS Lambda",
-  "description": "Creates an EventBridge schedule to run a Lambda every 5 minutes",
+  "description": "Scheduled tasks and cron jobs in Java: an EventBridge schedule runs a Lambda function every 5 minutes.",
   "language": "Java",
   "level": "200",
   "framework": "AWS CDK",

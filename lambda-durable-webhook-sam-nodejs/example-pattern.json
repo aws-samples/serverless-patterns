@@ -1,6 +1,6 @@
 {
   "title": "Webhook Receiver with AWS Lambda durable functions - NodeJS",
-  "description": "This serverless pattern demonstrates building a webhook receiver using AWS Lambda durable functions with automatic checkpointing and fault tolerance, implemented in Node.js",
+  "description": "Webhook receiver: this serverless pattern demonstrates receiving webhooks with AWS Lambda durable functions, with automatic checkpointing and fault tolerance, implemented in Node.js.",
   "language": "Node.js",
   "level": "200",
   "framework": "AWS SAM",

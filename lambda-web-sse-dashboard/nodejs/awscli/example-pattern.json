@@ -1,6 +1,6 @@
 {
   "title": "Real-time metrics dashboard with Server-Sent Events on AWS Lambda Web Functions",
-  "description": "Stream live metrics to the browser over server-sent events (SSE) from a zero-dependency Node.js HTTP server running as an AWS Lambda Web Function.",
+  "description": "Real-time web app on AWS Lambda: stream live metrics to the browser over server-sent events (SSE) from a zero-dependency Node.js HTTP server running as an AWS Lambda Web Function.",
   "language": "Node.js",
   "level": "200",
   "highlight": "true",

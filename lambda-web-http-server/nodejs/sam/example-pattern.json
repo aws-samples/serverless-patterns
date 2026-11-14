@@ -1,6 +1,6 @@
 {
   "title": "Node.js HTTP server on AWS Lambda Web Functions",
-  "description": "Run a zero-dependency Node.js http.createServer app as a Lambda Web Function with a public HTTPS endpoint, using AWS SAM.",
+  "description": "Web app on AWS Lambda: run a zero-dependency Node.js http.createServer app as a Lambda Web Function with a public HTTPS endpoint, using AWS SAM.",
   "language": "Node.js",
   "level": "100",
   "highlight": "true",

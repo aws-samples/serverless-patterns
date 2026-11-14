@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge Scheduler to AWS Lambda",
-  "description": "Creates an EventBridge schedule to invoke a Go based Lambda function every 5 minutes",
+  "description": "Scheduled tasks and cron jobs in Go: an EventBridge schedule invokes a Go based Lambda function every 5 minutes.",
   "language": "Go",
   "level": "200",
   "framework": "AWS SAM",
