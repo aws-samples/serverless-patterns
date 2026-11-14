@@ -33,7 +33,7 @@ When a pattern adds a helper EC2 instance, for example a Kafka producer for Amaz
 - Include the stack name in resource names (secrets, configurations, log groups) so two stacks can deploy in the same Region.
 - Describe how to connect and run the test in the README: `aws ssm start-session --target <instance-id>` or the EC2 console's Connect button.
 
-See `rabbitmq-private-lambda-python-sam` for a scoped instance role.
+See `rabbitmq-private-lambda/python/sam` for a scoped instance role.
 
 ### Kafka clients (Amazon MSK)
 
