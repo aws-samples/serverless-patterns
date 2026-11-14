@@ -3,7 +3,6 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_iam as iam,
     Duration,
-    BundlingOptions,
     aws_apigateway as apigw
 )
 from constructs import Construct
@@ -12,17 +11,6 @@ class ApigwLambdaBedrockStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
-        #AWS Lambda Layer containing boto, built from layer/requirements.txt at synth time
-        layer = _lambda.LayerVersion(self, "Boto3Layer",
-            code=_lambda.Code.from_asset("./layer",
-                bundling=BundlingOptions(
-                    image=_lambda.Runtime.PYTHON_3_14.bundling_image,
-                    command=["bash", "-c", "pip install --no-cache-dir -r requirements.txt -t /asset-output/python"],
-                ),
-            ),
-            compatible_runtimes=[_lambda.Runtime.PYTHON_3_14]
-        )
 
         #add policy to invoke Amazon Bedrock model
         invoke_model_policy = iam.Policy(self, "InvokeModelPolicy",
@@ -34,12 +22,11 @@ class ApigwLambdaBedrockStack(Stack):
             ]
         )
 
-        # Create AWS Lambda function and attach the layer
+        # Create AWS Lambda function. The python3.14 runtime's boto3 includes bedrock-runtime.
         lambda_function = _lambda.Function(self, "MyFunction",
             runtime=_lambda.Runtime.PYTHON_3_14,
             handler="index.handler",
             code=_lambda.Code.from_asset("./function_code"),
-            layers=[layer],
             timeout=Duration.seconds(30)
             )
 

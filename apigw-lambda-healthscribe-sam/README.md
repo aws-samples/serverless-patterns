@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Prerequisite
-This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/transcribe/client/start_medical_scribe_job.html) or above. `sam build` builds a Lambda layer with the boto3 version pinned in `layer/requirements.txt`, and the stack attaches it to the function.
+This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/transcribe/client/start_medical_scribe_job.html) or above. The boto3 version included in the Lambda `python3.14` runtime has this API.
 
 ## Deployment Instructions
 
@@ -26,7 +26,7 @@ This code asset has a dependency on [boto3 v1.34.26](https://boto3.amazonaws.com
    ```bash
    cd apigw-lambda-healthscribe-sam
    ```
-3. From the command line, use AWS SAM to build the Lambda layer and deploy the AWS resources for the pattern as specified in the template.yml file:
+3. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
    ```bash
    sam build
    sam deploy --guided
