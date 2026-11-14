@@ -3,52 +3,59 @@
  */
 
 const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3')
-const s3 = new S3Client({ region: process.env.AWS_REGION })
+const sharp = require('sharp')
 
-const gm = require('gm')
+const s3 = new S3Client({})
 const NEW_SIZE_PX = 480
 
-// 1. Get S3 Event from SQS Event
-// 2. Load the image from S3.
-// 3. Transform the image.
-// 4. Save the new image in another S3 bucket.
+// For each SQS message:
+// 1. Read the S3 event from the message body.
+// 2. Load the image from the source bucket.
+// 3. Resize the image with sharp.
+// 4. Save the new image in the destination bucket. The object stays private.
+// Failed messages are returned in batchItemFailures, so only they are retried.
 
 exports.handler = async (event) => {
-  // console.log(JSON.stringify(event, null, 2))
+  const batchItemFailures = []
 
-  const s3Event = JSON.parse(event.Records[0].body)
+  for (const record of event.Records) {
+    try {
+      const s3Event = JSON.parse(record.body)
+      // S3 sends an s3:TestEvent with no Records when the notification is created
+      for (const s3Record of s3Event.Records ?? []) {
+        await processObject(s3Record)
+      }
+    } catch (err) {
+      console.error(`Failed to process message ${record.messageId}`, err)
+      batchItemFailures.push({ itemIdentifier: record.messageId })
+    }
+  }
 
-  const Key = decodeURIComponent(s3Event.Records[0].s3.object.key.replace(/\+/g, " "))
+  return { batchItemFailures }
+}
 
-  // Read the object from S3
-  const s3Object = await s3.send(new GetObjectCommand({
-    Bucket: s3Event.Records[0].s3.bucket.name,
-    Key
-  }))
+const processObject = async (s3Record) => {
+  const Bucket = s3Record.s3.bucket.name
+  const Key = decodeURIComponent(s3Record.s3.object.key.replace(/\+/g, ' '))
 
-  // Resize the image
+  const s3Object = await s3.send(new GetObjectCommand({ Bucket, Key }))
   const data = await resizeImage(Buffer.from(await s3Object.Body.transformToByteArray()))
 
-  // Write to S3
-  const result = await s3.send(new PutObjectCommand({
+  await s3.send(new PutObjectCommand({
     Bucket: process.env.DESTINATION_BUCKETNAME,
     Key,
     ContentType: 'image/jpeg',
-    Body: data,
-    ACL: 'public-read'
+    Body: data
   }))
-  console.log('Write result: ', result)
+  console.log(`Resized s3://${Bucket}/${Key} to s3://${process.env.DESTINATION_BUCKETNAME}/${Key}`)
 }
 
+// Resize - takes and returns an image buffer (JPEG, fits inside NEW_SIZE_PX x NEW_SIZE_PX)
+const resizeImage = (buffer) =>
+  sharp(buffer)
+    .rotate()
+    .resize(NEW_SIZE_PX, NEW_SIZE_PX, { fit: 'inside', withoutEnlargement: true })
+    .jpeg()
+    .toBuffer()
 
-// Resize - takes and returns a image buffer
-const resizeImage = async (buffer) => {
-  return new Promise((resolve, reject) => {
-    gm(buffer)
-        .resize(NEW_SIZE_PX, NEW_SIZE_PX)
-        .toBuffer('jpg', function (err, data) {
-          if (err) return reject(err)
-          resolve(data)
-        })
-  })
-}
+exports.resizeImage = resizeImage

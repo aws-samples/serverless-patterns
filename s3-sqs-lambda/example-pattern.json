@@ -8,8 +8,8 @@
     "headline": "How it works",
     "text": [
       "The SAM template deploys a Lambda function, an SQS queue, 2 S3 buckets and the IAM resources required to run the application.",
-      "An SQS queue consumes ObjectCreated events from an Amazon S3 bucket if the file has .jpg extension. The SQS triggers a Lambda function.",
-      "The Lambda code checks the uploaded file is an image and creates a thumbnail version of the image in another bucket."
+      "The source bucket sends an ObjectCreated event to the SQS queue for each uploaded .jpg file. The queue triggers the Lambda function, which reports failed messages so one bad image doesn't retry the whole batch.",
+      "The function resizes the image with sharp and saves it in the destination bucket. Both buckets block public access, so the resized images stay private."
     ]
   },
   "gitHub": {
@@ -32,7 +32,6 @@
   },
   "deploy": {
     "text": [
-      "npm --prefix ./src install ./src",
       "sam build",
       "sam deploy --guided"
     ]
@@ -40,16 +39,18 @@
   "testing": {
     "headline": "Testing",
     "text": [
-      "1. Run the following S3 CLI command to upload an image to the S3 bucket. Note, you must edit the {SourceBucketName} placeholder with the name of the source S3 Bucket. This is provided in the stack outputs.",
-      "<code>aws s3 cp './events/exampleImage.png' s3://{SourceBucketName}</code>",
-      "2. Run the following command to check that a new version of the image has been created in the destination bucket.",
-      "<code>aws s3 ls s3://{DestinationBucketName}</code>"
+      "1. Upload a .jpg image to the source bucket. Replace {SourceBucketName} with the name from the stack outputs.",
+      "<code>aws s3 cp ./my-image.jpg s3://{SourceBucketName}/my-image.jpg</code>",
+      "2. Check that the resized image is in the destination bucket.",
+      "<code>aws s3 ls s3://{DestinationBucketName}/</code>",
+      "3. Check that the image is private. A request without credentials returns 403 Forbidden.",
+      "<code>curl -I https://{DestinationBucketName}.s3.amazonaws.com/my-image.jpg</code>"
     ]
   },
   "cleanup": {
     "headline": "Cleanup",
     "text": [
-      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "1. Empty both buckets, then delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
       "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
     ]
   },

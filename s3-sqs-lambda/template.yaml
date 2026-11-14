@@ -5,10 +5,19 @@ Description: Image resizing service through SQS (uksb-1tthgi812) (tag:s3-sqs-lam
 Parameters:
   SourceBucketName:
     Type: String
+    Description: Name of the bucket you upload images to. Must differ from DestinationBucketName.
   QueueName:
     Type: String
   DestinationBucketName:
     Type: String
+    Description: Name of the bucket that receives the resized images. Must differ from SourceBucketName.
+
+Rules:
+  # Writing resized images back to the source bucket would trigger the function again
+  DifferentBuckets:
+    Assertions:
+      - Assert: !Not [!Equals [!Ref SourceBucketName, !Ref DestinationBucketName]]
+        AssertDescription: SourceBucketName and DestinationBucketName must be different buckets.
 
 Resources:
   ## S3 bucket
@@ -18,6 +27,15 @@ Resources:
       - ResizerQueueQueuePolicy
     Properties:
       BucketName: !Ref SourceBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
       NotificationConfiguration:
         QueueConfigurations:
           - Event: "s3:ObjectCreated:*"
@@ -32,12 +50,27 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref DestinationBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
 
   ## SQS Queue
   ResizerQueue:
     Type: "AWS::SQS::Queue"
     Properties:
       QueueName: !Ref QueueName
+      # At least 6x the function timeout, as Lambda recommends for SQS event sources
+      VisibilityTimeout: 180
+      SqsManagedSseEnabled: true
 
   ## Policies
   ResizerQueueQueuePolicy:
@@ -69,14 +102,19 @@ Resources:
       CodeUri: src/
       Handler: app.handler
       Runtime: nodejs24.x
+      # src/.npmrc installs the matching Linux build of sharp. Change both together.
+      Architectures:
+        - arm64
       MemorySize: 2048
-      Layers:
-        - !Sub 'arn:aws:lambda:${AWS::Region}:175033217214:layer:graphicsmagick:2'
+      Timeout: 30
       Policies:
-        - S3ReadPolicy:
-            BucketName: !Ref SourceBucketName
-        - S3CrudPolicy:
-            BucketName: !Ref DestinationBucketName
+        - Statement:
+            - Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub 'arn:${AWS::Partition}:s3:::${SourceBucketName}/*'
+            - Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub 'arn:${AWS::Partition}:s3:::${DestinationBucketName}/*'
       Environment:
         Variables:
           DESTINATION_BUCKETNAME: !Ref DestinationBucketName
@@ -85,6 +123,9 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt ResizerQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
 
 Outputs:
   SourceBucketName:
