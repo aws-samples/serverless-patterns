@@ -1,0 +1,54 @@
+{
+  "title": "AWS AppSync to Amazon DynamoDB - SingleTable",
+  "description": "Create an AWS AppSync API endpoint with a custom resolver to Amazon DynamoDB using a single table design",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK project deploys an AppSync API, a DynamoDB table, a GraphQL schema and a custom resolver that demonstrates a Single Table design on Amazon DynamoDB that is formatted for AppSync."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/appsync-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "DynamoDB Office Hours - Building a Single Table Design SAM template for AWS AppSync",
+        "link": "https://youtu.be/I-L89SpoDxI"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "1. Once the application is deployed, open the AppSync console at https://us-west-2.console.aws.amazon.com/appsync/home ensuring you are in the same region that the API was deployed to.",
+      "2. See the repo for additional testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Michael Liendo",
+      "bio": "Senior Developer Advocate | AWS AppSync 🦦",
+      "image": "https://pbs.twimg.com/profile_images/1610321865213444096/OttGok0S_400x400.jpg",
+      "linkedin": "focusotter",
+      "twitter": "focusotter"
+    }
+  ]
+}
