@@ -21,7 +21,9 @@ To create or change a pattern, follow the [pattern checklist](PUBLISHING.md#patt
 
 ## Helper EC2 instances
 
-Some patterns need a client inside a VPC to produce test data or reach a private resource, for example a Kafka producer for Amazon MSK, an Amazon MQ client or a database shell. When a pattern adds a helper EC2 instance:
+Test a pattern from AWS CloudShell or the AWS CLI on the user's machine where you can. Add a helper EC2 instance only when CloudShell can't do the job, for example when the test must reach a resource that is only reachable inside the VPC (a private MSK cluster, Amazon MQ broker or database), needs a long-running process, or needs tools or ports CloudShell doesn't support. Say in the README why the pattern needs one.
+
+When a pattern adds a helper EC2 instance, for example a Kafka producer for Amazon MSK, an Amazon MQ client or a database shell:
 
 - Put it in a private subnet and use the existing NAT for outbound access. Don't give it a public IP.
 - Take the AMI from SSM, e.g. `/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64`, instead of a hardcoded AMI ID.
