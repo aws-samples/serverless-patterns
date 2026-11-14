@@ -74,7 +74,6 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
   - A collection can number its folders to set the order they show in on Serverless Land, e.g. `eventbridge-api-destinations/2-slack`. The `N-` prefix is optional and does nothing else.
   - Each variant folder holds a complete pattern: `README.md`, `example-pattern.json`, the template and the code.
   - Make resource names unique to the stack, so two variants can deploy side by side in one account and Region. Include the stack name, e.g. `!Sub ${AWS::StackName}-orders`, or leave the name out and let CloudFormation pick one.
-  - Older patterns still use single folders such as `sqs-lambda-python-sam`. They're moving into family folders over the coming weeks. Use the new structure for new patterns.
   - Pull requests check the path of each pattern folder they add: it must be nested and can't contain a `yaml` folder. Check yours with `node _scripts/check-folder.js {family}/{language}/{framework}`.
 - **Scope:** patterns are infrastructure as code for 2–4 AWS services with minimal custom code. Utilities, demos and full applications belong in [Serverless Land repos](https://serverlessland.com/repos).
 - **README.md:** keep the headings from `_pattern-model/README.md` and fill in every section: requirements, deployment, how it works, testing and cleanup.
