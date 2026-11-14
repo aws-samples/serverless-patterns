@@ -3,17 +3,16 @@ const stream = require('stream');
 const { Readable } = stream;
 const pipeline = util.promisify(stream.pipeline);
 
-const AWS = require('aws-sdk');
-AWS.config.update({ region: process.env.AWS_REGION });
-const s3 = new AWS.S3();
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 exports.handler = awslambda.streamifyResponse(async (event, responseStream, context) => {
     const params = {
         Bucket: "da-public-assets",
         Key: "serverlessland/pdf/SVS401-ri22.pdf"
     };
-    console.log ("Streaming PDF file using S3 createReadStream");
-    const requestStream = s3.getObject(params).createReadStream();
+    console.log ("Streaming PDF file from S3 GetObject");
+    const requestStream = (await s3.send(new GetObjectCommand(params))).Body;
     const metadata = {
         statusCode: 200,
         headers: {

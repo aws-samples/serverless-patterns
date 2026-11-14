@@ -1,8 +1,7 @@
 // Load the AWS SDK for Node.js
-const AWS = require('aws-sdk')
+const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses')
 // Set the region 
-AWS.config.region = process.env.AWS_REGION 
-const ses = new AWS.SES({apiVersion: '2010-12-01'})
+const ses = new SESClient({ region: process.env.AWS_REGION })
 //Get Email Addresses
 const senderEmailAddress = process.env.SES_SENDER_IDENTITY;
 
@@ -38,6 +37,6 @@ var params = {
   ]
 }
     // Send to SES
-    const result = await ses.sendEmail(params).promise();
+    const result = await ses.send(new SendEmailCommand(params));
     console.log(result)
 }

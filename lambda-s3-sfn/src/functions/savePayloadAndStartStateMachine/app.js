@@ -1,7 +1,8 @@
 'use strict'
 
-const AWS = require('aws-sdk')
-const s3 = new AWS.S3();
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
+const s3 = new S3Client();
+const { SFNClient, StartSyncExecutionCommand } = require('@aws-sdk/client-sfn')
 
 exports.handler = async(event) => {
     const key = getKey()
@@ -13,18 +14,18 @@ exports.handler = async(event) => {
     };    
     
     //Store payload in S3
-    const stored = await s3.upload(uploadParams).promise()
-    console.log("\rUploaded payload to ", stored.Location);
+    await s3.send(new PutObjectCommand(uploadParams))
+    console.log("\rUploaded payload to ", `s3://${uploadParams.Bucket}/${key}`);
     
     console.log("\rStarting step functions", process.env["PROCESS_FILE_STATE_MACHINE_ARN"]);
     
     //startsync execution here and return the result
-    const stepfunctions = new AWS.StepFunctions();
+    const stepfunctions = new SFNClient();
     const params = {
       stateMachineArn: process.env["PROCESS_FILE_STATE_MACHINE_ARN"],
       input: JSON.stringify({ Bucket: uploadParams.Bucket, Key: uploadParams.Key }),
     };
-    const result = await stepfunctions.startSyncExecution(params).promise()
+    const result = await stepfunctions.send(new StartSyncExecutionCommand(params))
 
     return result
 };

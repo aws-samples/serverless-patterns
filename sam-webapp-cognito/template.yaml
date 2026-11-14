@@ -26,7 +26,6 @@ Resources:
         DefaultTTL: 10800
         MaxTTL: 10800
         MinTTL: 10800
-        Name: 3h
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
             CookieBehavior: none

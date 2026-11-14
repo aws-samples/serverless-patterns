@@ -3,9 +3,10 @@
  */
 
 // dependencies
-const AWS = require('aws-sdk');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const moment = require('moment');
-const documentClient = new AWS.DynamoDB.DocumentClient();
+const documentClient = DynamoDBDocumentClient.from(new DynamoDBClient());
 
 exports.handler =  async (event) => {
     let params = {
@@ -17,7 +18,7 @@ exports.handler =  async (event) => {
         }
     }
     try {
-        let data = await documentClient.put(params).promise()
+        let data = await documentClient.send(new PutCommand(params))
     }
     catch (err) {
         console.log(err)
