@@ -30,7 +30,7 @@ Important: This application uses various AWS services and there are costs associ
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region
-    * Enter MSK Kafka Version, defaults to **2.8.1**
+    * Enter MSK Kafka Version, defaults to **4.1.x.kraft**
     * Select MSK Cluster Instance Type, defaults to **kafka.m5.large**
     * Enter MSK Topic name
     * Allow SAM CLI to create IAM roles with the required permissions.

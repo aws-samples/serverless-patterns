@@ -8,19 +8,14 @@ Description: >
 Parameters:
   MSKKafkaVersion:
     Type: String
-    Default: 2.8.1
+    Default: 4.1.x.kraft
     AllowedValues:
-    - 2.8.1
-    - 2.8.0
-    - 2.7.1
-    - 2.7.0
-    - 2.6.2
-    - 2.6.1
-    - 2.6.0
-    - 2.5.1
-    - 2.4.1.1
-    - 2.3.1
-    - 2.2.1
+    - 4.1.x.kraft
+    - 4.0.x.kraft
+    - 3.9.x.kraft
+    - 3.9.x
+    - 3.8.x.kraft
+    - 3.8.x
   InstanceType:
     Type: String
     Default: kafka.m5.large
@@ -54,8 +49,8 @@ Resources:
           PublicSubnetOne: !GetAtt MSKVPCStack.Outputs.PublicSubnetOne
           PrivateSubnetMSKOne: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKOne
           PrivateSubnetMSKTwo: !GetAtt MSKVPCStack.Outputs.PrivateSubnetMSKTwo
-          InstanceType: kafka.m5.large
-          MSKKafkaVersion: 2.8.1
+          InstanceType: !Ref InstanceType
+          MSKKafkaVersion: !Ref MSKKafkaVersion
 
   PipesStack:
       Type: AWS::CloudFormation::Stack
