@@ -5,7 +5,6 @@ using EventTargets = Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Logs;
 using Constructs;
-using Amazon.CDK.AWS.Apigatewayv2.Alpha;
 using System.Collections.Generic;
 
 namespace ApigwHttpApiEventbridgeDotnetCdk
@@ -55,10 +54,10 @@ namespace ApigwHttpApiEventbridgeDotnetCdk
             })
             );
 
-            var eventbridgeIntegration = new CfnIntegration(
+            var eventbridgeIntegration = new Amazon.CDK.AWS.Apigatewayv2.CfnIntegration(
                 this,
                 "EventBridgeIntegration",
-                new CfnIntegrationProps
+                new Amazon.CDK.AWS.Apigatewayv2.CfnIntegrationProps
                 {
                     ApiId = httpApi.HttpApiId,
                     IntegrationType = "AWS_PROXY",

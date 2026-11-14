@@ -1,7 +1,8 @@
-import { Stack, Construct, RemovalPolicy, Duration} from '@aws-cdk/core';
-import { CfnWorkGroup, CfnNamedQuery } from '@aws-cdk/aws-athena';
-import { AthenaStartQueryExecution, EncryptionOption } from '@aws-cdk/aws-stepfunctions-tasks';
-import { IntegrationPattern, StateMachine, IStateMachine, LogLevel} from '@aws-cdk/aws-stepfunctions';
+import { Stack, RemovalPolicy, Duration} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { CfnWorkGroup, CfnNamedQuery } from 'aws-cdk-lib/aws-athena';
+import { AthenaStartQueryExecution, EncryptionOption } from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { IntegrationPattern, StateMachine, IStateMachine, LogLevel} from 'aws-cdk-lib/aws-stepfunctions';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -41,7 +42,7 @@ export class AthenaStack extends Stack {
             name: 'empDetails',
             workGroup: workgroup.name,
         });
-        empRoster.addDependsOn(workgroup);
+        empRoster.addDependency(workgroup);
 
         this.vw_emp_roster = empRoster;
         this.WG = workgroup.name;

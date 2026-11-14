@@ -41,10 +41,6 @@ $ source .venv/bin/activate
 ```
 python -m pip install -r requirements.txt
 ```
-7. Install APIGateway Module
-```
-python -m pip install aws-cdk.aws-apigateway
-```
 10. To generate a cloudformation templates (optional)
 ```
 cdk synth
@@ -75,14 +71,6 @@ $ source .venv/bin/activate
 6. After activating your virtual environment for the first time, install the app's standard dependencies:
 ```
 python -m pip install -r requirements.txt
-```
-7. Install aws_sqs module
-```
-python -m pip install aws-cdk.aws-sqs
-```
-8. Install APIGateway Module
-```
-python -m pip install aws-cdk.aws-apigateway
 ```
 9. To generate a cloudformation templates (optional)
 ```

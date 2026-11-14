@@ -1,5 +1,5 @@
+import aws_cdk as core
 from aws_cdk import (
-    core as core,
     aws_sqs as sqs,
     aws_apigateway as apigateway,
     aws_iam as iam,
@@ -7,10 +7,11 @@ from aws_cdk import (
 )
 import os
 import json
+from constructs import Construct
 
 class ApigwSqsStack(core.Stack):
 
-    def __init__(self, scope: core.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
 # Get config values from cdk.out.context

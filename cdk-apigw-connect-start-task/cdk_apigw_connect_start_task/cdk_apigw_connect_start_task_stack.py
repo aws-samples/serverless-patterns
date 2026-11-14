@@ -1,14 +1,15 @@
+import aws_cdk as cdk
 from aws_cdk import (
-    core as cdk,
     aws_apigateway as apigw,
     aws_iam as iam
 
 )
+from constructs import Construct
 
 class CdkApigwConnectStartTaskStack(cdk.Stack):
 
         # The code that defines your stack goes here
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
             super().__init__(scope, construct_id, **kwargs)
 
             # Create Mapping template for APIGW integration request
