@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Change directory to the pattern directory:
 
     ``` sh
-    cd serverless-patterns/alb-lambda/nodejs/serverlessframework
+    cd serverless-patterns/alb-lambda/nodejs/sls
     ```
 
 1. From the command line, use npm/yarn to install the development dependencies:

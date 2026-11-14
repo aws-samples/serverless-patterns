@@ -19,7 +19,7 @@ addPattern('sqs-lambda-python-sam');
 test('nested paths pass', () => {
   assert.deepEqual(checkPatternFolder('sqs-lambda/python/sam', root), []);
   assert.deepEqual(checkPatternFolder('apigw-sqs/sam', root), []);
-  assert.deepEqual(checkPatternFolder('alb-lambda/nodejs/serverlessframework', root), []);
+  assert.deepEqual(checkPatternFolder('alb-lambda/nodejs/sls', root), []);
   assert.deepEqual(checkPatternFolder('eventbridge-api-destinations/2-slack', root), []);
 });
 

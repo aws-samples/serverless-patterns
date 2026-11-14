@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Change directory to the pattern directory its source code folder:
 
     ``` sh
-        cd serverless-patterns/apigw-lambda/typescript/serverlessframework
+        cd serverless-patterns/apigw-lambda/typescript/sls
     ```
 
 1. From the command line, use npm to install the development dependencies:
