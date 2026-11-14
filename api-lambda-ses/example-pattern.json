@@ -1,13 +1,14 @@
 {
   "title": "Amazon API Gateway REST API to AWS Lambda and Amazon SES",
-  "description": "This sample project demonstrates how to publish an email using Amazon SES (Amazon Simple Email Service) by invoking a Lambda function via a REST API",
+  "description": "Send an email with Amazon SES from an AWS Lambda function behind an Amazon API Gateway REST API.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
   "introBox": {
-    "headline": "Create an Amazon API Gateway REST API that invokes Lambda and SES.",
+    "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway REST API with Lambda function  and SES integration."
+      "This pattern deploys an Amazon API Gateway REST API with a GET method, defined in an OpenAPI file. The method invokes an AWS Lambda function, which uses the AWS SDK for Python (Boto3) to send an email with a text and an HTML body through Amazon SES in the function's own Region.",
+      "You set the sender and recipient addresses as stack parameters. The function can only send from the sender address, and to the recipient address. Verify the sender in Amazon SES before you deploy. In the SES sandbox, verify the recipient too."
     ]
   },
   "gitHub": {
@@ -18,18 +19,19 @@
   "resources": {
     "bullets": [
       {
-        "text": "Publishing Emails in Amazon SES.",
-        "link": "https://docs.aws.amazon.com/ses/latest/dg/getting-started.html"
+        "text": "Send email with the Amazon SES API",
+        "link": "https://docs.aws.amazon.com/ses/latest/dg/send-email-api.html"
       },
       {
-        "text": "Creating and verifying identities in Amazon SES.",
+        "text": "Creating and verifying identities in Amazon SES",
         "link": "https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html"
       }
     ]
   },
   "deploy": {
     "text": [
-      "sam deploy --guided --parameter-overrides  SENDER=sender@email.com RECIPIENT=recipient@email.com"
+      "sam build",
+      "sam deploy --guided --parameter-overrides SENDER=sender@example.com RECIPIENT=recipient@example.com"
     ]
   },
   "testing": {
