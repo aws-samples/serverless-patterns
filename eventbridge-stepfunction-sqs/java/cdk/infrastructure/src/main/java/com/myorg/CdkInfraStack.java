@@ -57,7 +57,7 @@ public class CdkInfraStack extends Stack {
 						+ "&& cp /asset-input/lambda-handler/target/lambda-handler.jar /asset-output/");
 
 		BundlingOptions.Builder builderOptions = BundlingOptions.builder().command(functionOnePackagingInstructions)
-				.image(Runtime.JAVA_11.getBundlingImage()).volumes(singletonList(
+				.image(Runtime.JAVA_25.getBundlingImage()).volumes(singletonList(
 						// Mount local .m2 repo to avoid download all the dependencies again inside the
 						// container
 						DockerVolume.builder().hostPath(System.getProperty("user.home") + "/.m2/")
@@ -65,7 +65,7 @@ public class CdkInfraStack extends Stack {
 				.user("root").outputType(ARCHIVED);
 
 		Function executionLambda = new Function(this, "lambda-handler",
-				FunctionProps.builder().runtime(Runtime.JAVA_11)
+				FunctionProps.builder().runtime(Runtime.JAVA_25)
 						.code(Code.fromAsset("../software/", AssetOptions.builder()
 								.bundling(builderOptions.command(functionOnePackagingInstructions).build()).build()))
 						.handler("com.myorg.App").memorySize(1024).timeout(Duration.seconds(900))

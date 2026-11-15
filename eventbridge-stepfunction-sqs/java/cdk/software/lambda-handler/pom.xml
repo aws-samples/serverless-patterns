@@ -57,9 +57,9 @@
     <build>
       <plugins>
         <plugin>
-             <groupId>org.codehaus.mojo</groupId>
+             <groupId>dev.aspectj</groupId>
              <artifactId>aspectj-maven-plugin</artifactId>
-             <version>1.14.0</version>
+             <version>1.14.1</version>
              <configuration>
                  <source>${maven.compiler.source}</source>
                  <target>${maven.compiler.target}</target>
@@ -75,6 +75,13 @@
                      </aspectLibrary>
                  </aspectLibraries>
              </configuration>
+             <dependencies>
+                 <dependency>
+                     <groupId>org.aspectj</groupId>
+                     <artifactId>aspectjtools</artifactId>
+                     <version>1.9.27</version>
+                 </dependency>
+             </dependencies>
              <executions>
                  <execution>
                      <goals>

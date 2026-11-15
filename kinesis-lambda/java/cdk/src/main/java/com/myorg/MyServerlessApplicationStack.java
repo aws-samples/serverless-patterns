@@ -33,7 +33,7 @@ public class MyServerlessApplicationStack extends Stack {
 
         BundlingOptions.Builder builderOptions = BundlingOptions.builder()
                 .command(functionOnePackagingInstructions)
-                .image(Runtime.JAVA_11.getBundlingImage())
+                .image(Runtime.JAVA_25.getBundlingImage())
                 .volumes(singletonList(
                         // Mount local .m2 repo to avoid download all the dependencies again inside the container
                         DockerVolume.builder()
@@ -46,7 +46,7 @@ public class MyServerlessApplicationStack extends Stack {
 
         Function lambdaFn = Function.Builder.create(this,"KinesisLambda-Function")
                 .currentVersionOptions(VersionOptions.builder().removalPolicy(RemovalPolicy.RETAIN).build())
-                .runtime(Runtime.JAVA_11)
+                .runtime(Runtime.JAVA_25)
                 .handler("com.example.MyFunction")
                 .timeout(Duration.seconds(300))
                 .code(Code.fromAsset("software/", AssetOptions.builder()

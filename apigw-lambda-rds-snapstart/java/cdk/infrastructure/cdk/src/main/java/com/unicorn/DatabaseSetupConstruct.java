@@ -29,7 +29,7 @@ public class DatabaseSetupConstruct extends Construct {
 
     private Function createDbSetupLambdaFunction() {
         return Function.Builder.create(this, "DBSetupLambdaFunction")
-                .runtime(Runtime.JAVA_17)
+                .runtime(Runtime.JAVA_17_AL2023)
                 .memorySize(512)
                 .timeout(Duration.seconds(29))
                 .code(Code.fromAsset("../db-setup/target/db-setup.jar"))
