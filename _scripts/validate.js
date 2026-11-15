@@ -10,16 +10,19 @@
 // script also comments on and labels the pull request (needs TOKEN, PR_NUMBER,
 // ACTOR and GITHUB_REPOSITORY).
 //
-// It also scans each pattern folder for admin-equivalent IAM grants (see check-iam.js),
-// and checks the folder path (see check-folder.js). In CI, only folders whose
-// example-pattern.json the pull request adds must be nested; local runs check `yaml` only.
+// It also scans pattern folders for admin-equivalent IAM grants (see check-iam.js), and
+// checks the folder path (see check-folder.js). In CI, the IAM scan covers every pattern
+// folder with an added or modified file (the nearest folder above the file that holds an
+// example-pattern.json), so a template-only change is scanned too. The schema check covers
+// only changed example-pattern.json files, and only folders whose example-pattern.json the
+// pull request adds must be nested; local runs check `yaml` only.
 //
 // Exits non-zero if any file fails validation, any pattern has a broad IAM grant,
 // or any folder path breaks the folder rules.
 const fs = require('fs');
 const path = require('path');
 const { checkPatternIam } = require('./check-iam');
-const { checkPatternFolder } = require('./check-folder');
+const { checkPatternFolder, findPatternDir } = require('./check-folder');
 
 const PATTERN_FILE = 'example-pattern.json';
 const repoRoot = path.join(__dirname, '..');
@@ -32,11 +35,17 @@ const githubAutomation = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION =
 const splitList = (value) => (value ? value.split(',').map((f) => f.trim()).filter(Boolean) : []);
 
 // Local paths are relative to the current directory; CI paths are relative to the repo root.
+const changedFiles = isLocalRun
+  ? []
+  : [...new Set([...splitList(process.env.ADDED_FILES), ...splitList(process.env.MODIFIED_FILES)])];
 const patternFiles = isLocalRun
   ? cliFiles.map((f) => path.resolve(f))
-  : [...new Set([...splitList(process.env.ADDED_FILES), ...splitList(process.env.MODIFIED_FILES)])]
-      .filter((f) => path.basename(f) === PATTERN_FILE)
-      .map((f) => path.join(repoRoot, f));
+  : changedFiles.filter((f) => path.basename(f) === PATTERN_FILE).map((f) => path.join(repoRoot, f));
+
+// Pattern folders to scan for IAM grants: every folder with a changed file in CI.
+const iamDirs = isLocalRun
+  ? [...new Set(patternFiles.map((file) => path.dirname(file)))]
+  : [...new Set(changedFiles.map((f) => findPatternDir(f, repoRoot)).filter(Boolean))];
 
 // Folders whose example-pattern.json is new in this pull request. A moved folder counts as new.
 const newPatternDirs = new Set(
@@ -100,8 +109,6 @@ const validateFile = (schema, file) => {
 };
 
 const reportMissingFile = async () => {
-  console.info(`No ${PATTERN_FILE} found, skipping any validation phase.`);
-  if (!githubAutomation) return;
   await addLabels(['missing-example-pattern-file']);
   await comment(
     `@${process.env.ACTOR} looks like you are missing the example-pattern.json file in your pattern. \n\n` +
@@ -182,8 +189,9 @@ const reportSuccess = async (parsedPatterns) => {
 };
 
 const main = async () => {
-  if (patternFiles.length === 0) {
-    await reportMissingFile();
+  if (patternFiles.length === 0 && iamDirs.length === 0) {
+    console.info('No pattern files changed, nothing to validate.');
+    if (githubAutomation) await reportMissingFile();
     return;
   }
 
@@ -207,7 +215,7 @@ const main = async () => {
   }
 
   const iamFailures = [];
-  for (const dir of [...new Set(patternFiles.map((file) => path.dirname(file)))]) {
+  for (const dir of iamDirs) {
     if (!fs.existsSync(dir)) continue;
     const findings = checkPatternIam(dir, repoRoot);
     const name = path.relative(process.cwd(), dir) || '.';
