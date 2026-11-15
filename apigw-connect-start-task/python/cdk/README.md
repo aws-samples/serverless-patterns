@@ -58,7 +58,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 ```
 2. Change directory
 ```
-cd serverless-patterns/apigw-authorizer-sqs/python/cdk
+cd serverless-patterns/apigw-connect-start-task/python/cdk
 ```
 3. To manually create a virtualenv on MacOS and Linux:
 ```

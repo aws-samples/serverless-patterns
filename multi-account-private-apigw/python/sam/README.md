@@ -26,11 +26,11 @@ Important: This application uses various AWS Services and there are costs associ
 
 1.  Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` bash
-    git clone https://github.com/aws-samples/serverless-pattern
+    git clone https://github.com/aws-samples/serverless-patterns
     ```
 2. Change directory to the pattern directory:
     ```bash
-    cd aws-samples/serverless-patterns/multi-account-private-apigw/python/sam
+    cd serverless-patterns/multi-account-private-apigw/python/sam
     ```
 
 #### VPC (Optional)

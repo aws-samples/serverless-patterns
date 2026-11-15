@@ -22,7 +22,7 @@ Follow these steps to deploy the three templates in the correct order:
 1. Navigate to the directory containing Template 1:
 
 ```
-cd aws-samples/serverless-patterns/private-apigw-cross-region/python/sam/
+cd serverless-patterns/private-apigw-cross-region/python/sam
 ```
 
 2. Deploy Template 1 using AWS SAM:
@@ -50,7 +50,7 @@ sam deploy --guided --template template1-regionA.yaml
 1. Navigate to the directory containing Template 2:
 
 ```
-cd aws-samples/serverless-patterns/private-apigw-cross-region/python/sam/
+cd serverless-patterns/private-apigw-cross-region/python/sam
 ```
 
 2. Deploy Template 2 using AWS SAM:
@@ -80,7 +80,7 @@ sam deploy --guided --template template2-regionB.yaml --region <region 2 name>
 1. Navigate to the directory containing Template 3:
 
 ```
-cd aws-samples/serverless-patterns/private-apigw-cross-region/python/sam/
+cd serverless-patterns/private-apigw-cross-region/python/sam
 ```
 
 2. Deploy Template 3 using AWS SAM:

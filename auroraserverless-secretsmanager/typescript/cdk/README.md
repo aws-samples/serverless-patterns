@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/s3-cdk/cdk
+   cd serverless-patterns/auroraserverless-secretsmanager/typescript/cdk/CDK
    ```
 3. Install dependencies:
    ```bash
