@@ -20,7 +20,7 @@ export class BedrockAgentOpenaiStack extends cdk.Stack {
 
     // Lambda action group handler
     const actionFn = new lambda.Function(this, "ActionGroupFn", {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("src"),
       timeout: cdk.Duration.seconds(30),

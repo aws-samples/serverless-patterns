@@ -61,7 +61,7 @@ export class ApigwDynamodbApikeyStack extends cdk.Stack {
 
     // Lambda authorizer
     const authorizerFn = new lambda.NodejsFunction(this, "DynamoDbApiKeyAuthorizer", {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       entry: path.join(__dirname, "lambda/dynamodb-authorizer.js"),
       timeout: cdk.Duration.seconds(10),
       environment: {

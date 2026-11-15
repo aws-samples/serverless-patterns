@@ -38,7 +38,7 @@ export class CdkSfnDmapDfStack extends cdk.Stack {
     const itemProcessor = new nodejs.NodejsFunction(this, 'ItemProcessorFunction', {
       functionName: 'catalog-item-processor',
       description: 'Durable function that validates and updates a single product catalog item',
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'handler',
       entry: path.join(__dirname, 'lambda', 'item-processor.ts'),
       timeout: cdk.Duration.minutes(1),

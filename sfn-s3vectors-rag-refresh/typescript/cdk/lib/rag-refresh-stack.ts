@@ -39,7 +39,7 @@ export class RagRefreshStack extends cdk.Stack {
     // --- Lambda: embed & store vectors ---
     const embedFunction = new NodejsFunction(this, 'EmbedFunction', {
       functionName: 'ragEmbedAndStore',
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '../lambda/embed.ts'),
       handler: 'handler',
       timeout: cdk.Duration.minutes(5),
@@ -66,7 +66,7 @@ export class RagRefreshStack extends cdk.Stack {
     // --- Lambda: validate vectors via QueryVectors ---
     const validateFunction = new NodejsFunction(this, 'ValidateFunction', {
       functionName: 'ragValidateVectors',
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '../lambda/validate.ts'),
       handler: 'handler',
       timeout: cdk.Duration.minutes(1),
@@ -92,7 +92,7 @@ export class RagRefreshStack extends cdk.Stack {
     // --- Lambda: rollback (delete vectors) ---
     const rollbackFunction = new NodejsFunction(this, 'RollbackFunction', {
       functionName: 'ragRollbackVectors',
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '../lambda/rollback.ts'),
       handler: 'handler',
       timeout: cdk.Duration.minutes(2),

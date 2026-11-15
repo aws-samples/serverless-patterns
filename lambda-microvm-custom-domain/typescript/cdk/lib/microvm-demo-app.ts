@@ -60,7 +60,7 @@ export class MicroVmDemoApp extends Construct {
     // Bundled with esbuild because the @aws-sdk/client-lambda-microvms client is
     // not in the Lambda runtime, and the demo HTML is inlined via a text loader.
     const provisionFn = new NodejsFunction(this, 'ProvisionFn', {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '..', 'lambda', 'provision.ts'),
       handler: 'handler',
       timeout: cdk.Duration.seconds(60),

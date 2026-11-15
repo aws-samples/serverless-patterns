@@ -22,7 +22,7 @@ describe('CdkBedrockAsyncInvokeStack', () => {
     test('creates a durable Lambda function', () => {
         template.hasResourceProperties('AWS::Lambda::Function', {
             FunctionName: 'video-generator-durable',
-            Runtime: 'nodejs22.x',
+            Runtime: 'nodejs24.x',
         });
     });
 

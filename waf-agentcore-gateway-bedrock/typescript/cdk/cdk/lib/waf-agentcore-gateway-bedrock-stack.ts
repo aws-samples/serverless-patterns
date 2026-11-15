@@ -38,7 +38,7 @@ export class WafAgentcoreGatewayBedrockStack extends cdk.Stack {
     });
 
     const toolFunction = new lambda.Function(this, 'BedrockToolFunction', {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '..', 'lambda')),
       role: toolRole,

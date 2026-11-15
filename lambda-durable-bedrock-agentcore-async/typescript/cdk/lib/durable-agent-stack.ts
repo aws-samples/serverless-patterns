@@ -25,7 +25,7 @@ export class DurableAgentStack extends cdk.Stack {
 
     const durableFunction = new NodejsFunction(this, 'DurableAgentCaller', {
       functionName: 'durableAgentCaller',
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       entry: path.join(__dirname, '../durable-lambda/index.ts'),
       handler: 'handler',
       timeout: cdk.Duration.minutes(15),

@@ -35,7 +35,7 @@ export class CdkBedrockAsyncInvokeStack extends cdk.Stack {
             functionName: 'video-generator-durable',
             description:
                 'Durable function demonstrating Bedrock async invoke for AI video generation',
-            runtime: lambda.Runtime.NODEJS_22_X,
+            runtime: lambda.Runtime.NODEJS_24_X,
             handler: 'handler',
             entry: path.join(__dirname, 'lambda', 'video-generator.ts'),
             timeout: cdk.Duration.minutes(1),
