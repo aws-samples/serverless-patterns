@@ -128,7 +128,7 @@ class FirehoseTransformationCdkStack(Stack):
 
         #Output
         CfnOutput(self, "S3 Destination Bucket Name", description="S3 Destination Bucket Name", value=destination_bucket.bucket_name)
-        CfnOutput(self, "Kinesis Firehose Delivery Stream Name", description="Kinesis Firehose Delivery Stream Name", value=firehose_delivery_stream.delivery_stream_name)
+        CfnOutput(self, "Kinesis Firehose Delivery Stream Name", description="Kinesis Firehose Delivery Stream Name", value=firehose_delivery_stream.ref)
 
 
 app = App()

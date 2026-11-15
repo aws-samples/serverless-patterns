@@ -29,16 +29,22 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd inspector-lambda/python/cdk
     ```
-3. If you have not deployed a CDK application in your account yet, bootstap the CDK environment:
+3. Create and activate a Python virtual environment, then install the dependencies:
+    ```
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
+4. If you have not deployed a CDK application in your account yet, bootstap the CDK environment:
     ```
     cdk bootstrap
     ```
-4. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the app.py file:
+5. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the app.py file:
     ```
     cdk deploy
     ```
 
-5. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
+6. Note the outputs from the CDK deployment process. These contain the resource names and/or ARNs which are used for testing.
 
 The CDK template does not enable Amazon Inspector in the deployment account. To use this pattern, ensure that Amazon Inspector is already enabled. 
 

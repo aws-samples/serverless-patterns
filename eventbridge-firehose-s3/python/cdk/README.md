@@ -23,12 +23,18 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd eventbridge-firehose-s3/python/cdk
     ```
-3. Bootstrap environment -- only if you haven't already 
+3. Create and activate a Python virtual environment, then install the dependencies:
+    ```
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
+4. Bootstrap environment -- only if you haven't already 
     ```
     cdk bootstrap
     ```
 
-4.  Deploy the stack to your default AWS account and region:
+5.  Deploy the stack to your default AWS account and region:
     ```
     cdk deploy
     ```
