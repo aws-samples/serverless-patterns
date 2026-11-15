@@ -3,7 +3,7 @@
 This pattern in SAM provides a means to generate a WebACL and associate it with an existing REST or Websocket API. (Note
 that older HTTP APIs are not currently supported.)
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-waf
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

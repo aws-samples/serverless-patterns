@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to detect if individuals are wearing the correct personal protective equipment (PPE) and sends an alert via IoT Core. This pattern is compatible with the published [AWS IoT Puppy Park workshop](https://catalog.workshops.aws/iot-puppy-park). 
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-lambda-rekognition-iot-cdk
 
 # Requirements
 
