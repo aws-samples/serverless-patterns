@@ -13,11 +13,16 @@ public class FunctionTest
     public void TestToUpperFunction()
     {
 
+        Environment.SetEnvironmentVariable("BUCKET_NAME", "test-bucket");
+        Environment.SetEnvironmentVariable("QUERYSTRING_KEY", "key");
+
         var mock = new Mock<IAmazonS3>();
+        mock.Setup(s => s.GetObjectMetadataAsync("test-bucket", "value", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Amazon.S3.Model.GetObjectMetadataResponse { HttpStatusCode = System.Net.HttpStatusCode.OK });
         mock.Setup<string>(s => s.GetPreSignedURL(It.IsAny<Amazon.S3.Model.GetPreSignedUrlRequest>()))
             .Returns("hello");
 
-        // Invoke the lambda function and confirm the string was upper cased.
+        // Invoke the Lambda function and confirm it returns the presigned URL.
         var function = new Function(mock.Object);
         var context = new TestLambdaContext();
         var request = new APIGatewayProxyRequest();
@@ -27,6 +32,8 @@ public class FunctionTest
 
         Console.Write(casing.Body);
 
+        Assert.Equal(200, casing.StatusCode);
+        Assert.Equal("hello", casing.Body);
         mock.Verify(s => s.GetPreSignedURL(It.IsAny<Amazon.S3.Model.GetPreSignedUrlRequest>()), Times.Once);
     }
 }
