@@ -1,6 +1,6 @@
 # Agent instructions
 
-This repo holds serverless patterns published on [Serverless Land](https://serverlessland.com/patterns). New patterns use family folders that group variants of the same services, e.g. `sqs-lambda/python/sam`; older patterns use single top-level folders such as `sqs-lambda-python-sam`. See [folder structure](PUBLISHING.md#folder-structure) in PUBLISHING.md for the naming rules. Folders starting with `_` and `.github/` are repo tooling.
+This repo holds serverless patterns published on [Serverless Land](https://serverlessland.com/patterns). Patterns live in family folders that group variants of the same services by language and framework, e.g. `sqs-lambda/python/sam` and `sqs-lambda/nodejs/sam`. See [folder structure](PUBLISHING.md#folder-structure) in PUBLISHING.md for the naming rules. Folders starting with `_` and `.github/` are repo tooling.
 
 To create or change a pattern, follow the [pattern checklist](PUBLISHING.md#pattern-checklist) in PUBLISHING.md. These rules apply on top of it:
 
