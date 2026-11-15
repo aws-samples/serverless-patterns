@@ -14,8 +14,6 @@ namespace Cdk
             // Lambda Function Build Commands
             var buildCommands = new[]
             {
-                "rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm",
-                "yum -y install aspnetcore-runtime-6.0",
                 "cd /asset-input",
                 "export DOTNET_CLI_HOME=\"/tmp/DOTNET_CLI_HOME\"",
                 "export XDG_DATA_HOME=\"/tmp/DOTNET_CLI_HOME\"",

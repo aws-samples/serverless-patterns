@@ -8,13 +8,6 @@
     <AWSProjectType>Lambda</AWSProjectType>
     <!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <!-- Generate ready to run images during publishing to improve cold start time. -->
-    <!-- Generate native aot images during publishing to improve cold start time. -->
-    <PublishAot>true</PublishAot>
-	  <!-- StripSymbols tells the compiler to strip debugging symbols from the final executable if we're on Linux and put them into their own file. 
-		This will greatly reduce the final executable's size.-->
-	  <StripSymbols>true</StripSymbols>
-    <TrimMode>partial</TrimMode>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="2.3.0" />
