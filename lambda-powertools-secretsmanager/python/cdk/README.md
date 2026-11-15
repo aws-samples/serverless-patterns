@@ -47,7 +47,7 @@ This pattern creates an AWS Lambda function to call a protected API endpoint. It
 
 ## How it works
 
-The deployed Lambda function uses [Lambda Powertools](https://awslabs.github.io/aws-lambda-powertools-python/2.5.0/) to query AWS SecretsManager for an API key. This API key is then used to invoke an API endpoint using [urllib3](https://urllib3.readthedocs.io/en/stable/index.html).
+The deployed Lambda function uses [Lambda Powertools](https://docs.aws.amazon.com/powertools/python/2.5.0/) to query AWS SecretsManager for an API key. This API key is then used to invoke an API endpoint using [urllib3](https://urllib3.readthedocs.io/en/stable/index.html).
 
 ## Testing
 

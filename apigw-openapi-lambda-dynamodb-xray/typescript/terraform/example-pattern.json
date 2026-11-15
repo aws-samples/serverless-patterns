@@ -23,7 +23,7 @@
       },
       {
         "text": "Integrating X-Ray SDK in Lambda using Powertools",
-        "link": "https://docs.powertools.aws.dev/lambda/typescript/latest/core/tracer/"
+        "link": "https://docs.aws.amazon.com/powertools/typescript/latest/features/tracer/"
       },
       {
         "text": "Configuring REST API using OpenAPI",
