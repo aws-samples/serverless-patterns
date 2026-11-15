@@ -31,7 +31,9 @@
   },
   "deploy": {
     "text": [
-      "cd ./event-source",
+      "cd ./eventbus-destination",
+      "sam deploy --guided",
+      "cd ../eventbus-source",
       "sam deploy --guided"
     ]
   },
