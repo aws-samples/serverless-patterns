@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.1</version>
+        <version>3.5.16</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.unicorn</groupId>
@@ -171,6 +171,7 @@
                     <source>17</source> <!-- or higher -->
                     <target>17</target> <!-- or higher -->
                     <complianceLevel>17</complianceLevel> <!-- or higher -->
+                    <parameters>true</parameters>
                     <aspectLibraries>
                         <aspectLibrary>
                             <groupId>software.amazon.lambda</groupId>
