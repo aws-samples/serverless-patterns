@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 
@@ -115,12 +115,12 @@ resource "aws_api_gateway_integration" "API_SF_CRUD-tf_APIInt" {
   http_method             = aws_api_gateway_method.API_SF_CRUD-tf_API_method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/StartExecution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.region}:states:action/StartExecution"
   credentials             = aws_iam_role.API_SF_CRUD-tf_APIRole.arn
   passthrough_behavior    = "NEVER"
   request_templates = {
     "application/json" = <<EOF
-#set($body= $input.json('$'))#set($inputRoot='{"data" :'+$body+',"httpMethod" :"'+$context.httpMethod+'"}')#set($apiData=$util.escapeJavaScript($inputRoot))#set($apiData=$apiData.replaceAll("\\'","'")){"input" :"$apiData","stateMachineArn": "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.API_SF_CRUD-tf_CF.name}"}
+#set($body= $input.json('$'))#set($inputRoot='{"data" :'+$body+',"httpMethod" :"'+$context.httpMethod+'"}')#set($apiData=$util.escapeJavaScript($inputRoot))#set($apiData=$apiData.replaceAll("\\'","'")){"input" :"$apiData","stateMachineArn": "arn:aws:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.API_SF_CRUD-tf_CF.name}"}
     EOF
   }
 }
@@ -171,12 +171,12 @@ resource "aws_api_gateway_integration" "API_SF_CRUD-tf_APIIntChild" {
   http_method             = aws_api_gateway_method.API_SF_CRUD-tf_API_method_child.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/StartExecution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.region}:states:action/StartExecution"
   credentials             = aws_iam_role.API_SF_CRUD-tf_APIRole.arn
   passthrough_behavior    = "NEVER"
   request_templates = {
     "application/json" = <<EOF
-#set($body= $input.json('$'))#set($inputRoot='{"data" :'+$body+',"httpMethod" :"'+$context.httpMethod+'"}')#set($apiData=$util.escapeJavaScript($inputRoot))#set($apiData=$apiData.replaceAll("\\'","'")){"input" :"$apiData","stateMachineArn": "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.API_SF_CRUD-tf_CF.name}"}
+#set($body= $input.json('$'))#set($inputRoot='{"data" :'+$body+',"httpMethod" :"'+$context.httpMethod+'"}')#set($apiData=$util.escapeJavaScript($inputRoot))#set($apiData=$apiData.replaceAll("\\'","'")){"input" :"$apiData","stateMachineArn": "arn:aws:states:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.API_SF_CRUD-tf_CF.name}"}
     EOF
   }
 }
@@ -347,8 +347,8 @@ resource "aws_iam_role" "API_SF_CRUD-tf_CFRole" {
             "dynamodb:ConditionCheckItem"
           ],
           "Resource": [
-            "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.API_SF_CRUD-DB.name}",
-            "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.API_SF_CRUD-DB.name}index/*"
+            "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.API_SF_CRUD-DB.name}",
+            "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.API_SF_CRUD-DB.name}index/*"
           ],
           "Effect": "Allow"
         }
@@ -393,9 +393,9 @@ resource "aws_iam_role_policy_attachment" "API_SF_CRUD-tf_StateMachineRolePolicy
 # Displaying the values
 output "api_endpoint_Prod" {
   description = "API Gateway endpoint URL for Prod stage"
-  value       = "${aws_api_gateway_deployment.API_SF_CRUD-tf_API_deployment_Prod.invoke_url}${aws_api_gateway_stage.API_SF_CRUD-tf_API_Stage_Prod.stage_name}"
+  value       = "${aws_api_gateway_stage.API_SF_CRUD-tf_API_Stage_Prod.invoke_url}"
 }
 output "api_endpoint_Stage" {
   description = "API Gateway endpoint URL for Stage stage"
-  value       = "${aws_api_gateway_deployment.API_SF_CRUD-tf_API_deployment_Prod.invoke_url}${aws_api_gateway_stage.API_SF_CRUD-tf_API_Stage_Stage.stage_name}"
+  value       = "${aws_api_gateway_stage.API_SF_CRUD-tf_API_Stage_Stage.invoke_url}"
 }

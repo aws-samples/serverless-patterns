@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 6.0"
     }
   }
 
@@ -99,7 +99,7 @@ resource "aws_api_gateway_rest_api" "MyApiGatewayRestApi" {
             "type" : "aws",
             "credentials" : "${aws_iam_role.APIGWRole.arn}",
             "httpMethod" : "POST",
-            "uri" : "arn:aws:apigateway:${data.aws_region.current.name}:sqs:path/${data.aws_caller_identity.current.account_id}/${aws_sqs_queue.MySQSqueue.name}",
+            "uri" : "arn:aws:apigateway:${data.aws_region.current.region}:sqs:path/${data.aws_caller_identity.current.account_id}/${aws_sqs_queue.MySQSqueue.name}",
             "responses" : {
               "default" : {
                 "statusCode" : "200"
