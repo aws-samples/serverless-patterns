@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```
-   cd ./serverless-patterns/cognito-appsync-lambda-cdk/
+   cd serverless-patterns/appsync-cognito-lambda/typescript/cdk
    ```
 3. Navigate to `/cognito-appsync-lambda-cdk/bin/cognito-auth-cdk.ts` and change the `account` and `region` environment variables to suit your values.
 

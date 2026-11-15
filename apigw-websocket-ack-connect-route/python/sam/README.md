@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd ack-connect-route
+    cd serverless-patterns/apigw-websocket-ack-connect-route/python/sam
     ```
 3. From the command line, use AWS SAM to build and deploy the AWS resources for the pattern as specified in the template.yml file:
 

@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-websocket-sqs-lambda-terraform
+    cd serverless-patterns/apigw-websocket-api-sqs-lambda/python/terraform
     ```
 1. From the command line, initialize terraform to download and install the providers defined in the configuration:
     ```
@@ -73,7 +73,7 @@ connected (press CTRL+C to quit)
  
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigateway-rest-eventbridge-terraform
+    cd serverless-patterns/apigw-websocket-api-sqs-lambda/python/terraform
     ```
 1. Delete all created resources
     ```bash

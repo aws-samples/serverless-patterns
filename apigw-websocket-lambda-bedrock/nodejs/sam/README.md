@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd apigw-websockets-lambda-bedrock-sam
+    cd serverless-patterns/apigw-websocket-lambda-bedrock/nodejs/sam
     ```
 3. Install dependencies
     ```
