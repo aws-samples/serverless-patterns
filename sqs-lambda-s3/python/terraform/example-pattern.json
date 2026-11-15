@@ -20,7 +20,7 @@
     "bullets": [
       {
         "text": "Amazon SQS to AWS Lambda to Amazon S3 pattern",
-        "link": "https://serverlessland.com/patterns/sqs-lambda-s3"
+        "link": "https://serverlessland.com/patterns/sqs-lambda-s3-terraform-python"
       }
     ]
   },

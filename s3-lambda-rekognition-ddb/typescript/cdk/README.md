@@ -2,7 +2,7 @@
 
 This pattern shows how to detect labels using an event driven architecture.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-lambda-rekognition-ddb-cdk
 
 # Requirements
 

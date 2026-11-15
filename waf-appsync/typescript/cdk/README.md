@@ -2,7 +2,7 @@
 
 This pattern creates an AppSync graphql API with dynamodb resolvers and protects the api with associating AWS WAF WebACL including managed rules for IP reputation lists and custom rule for blocking graphql schema introspections.
 
-Learn more about this pattern at Serverless Land Patterns: [Serverless Land Pattern](https://serverlessland/patterns)
+Learn more about this pattern at Serverless Land Patterns: [Serverless Land Pattern](https://serverlessland.com/patterns/waf-appsync-cdk)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

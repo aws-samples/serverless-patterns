@@ -2,7 +2,7 @@
 
 This pattern demonstrates how to use AWS Lambda to process queries using Amazon Bedrock's model and store the conversation results in Amazon DynamoDB.
 
-Learn more about this pattern at Serverless Land Patterns: [Serverless Land](https://serverlessland.com/patterns/)
+Learn more about this pattern at Serverless Land Patterns: [Serverless Land](https://serverlessland.com/patterns/lambda-bedrock-dynamodb-sam)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

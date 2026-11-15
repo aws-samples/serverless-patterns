@@ -2,7 +2,7 @@
 
 Customers may want to connect to ElastiCache from their core lambda function(s) for use cases that involve fast read-write operations and improve latency of applications.In application like Leader board, Queue/wait-list , API rate limiting & Quota management, etc. that are built on Serverless platform there would a lambda that is computing would integrate with a either Redis or Memcache on Amazon ElastiCache. This documentation provides a quick start guide to launch Redis cluster in Amazon ElastiCache in a defined VPC and  creates a lambda function that read writes from the Cache. Customer can further modify the code in lambda function as per their requirements. Customers can also configure Memcached by modifying the config and change their lambda appropriately.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-elasticache-integrationpattern-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/?aws-products-pricing.sort-by=item.additionalFields.productNameLowercase&aws-products-pricing.sort-order=asc&awsf.Free%20Tier%20Type=*all&awsf.tech-category=*all) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
