@@ -20,7 +20,7 @@
     "bullets": [
       {
         "text": "Lambda PowerTools",
-        "link": "https://awslabs.github.io/aws-lambda-powertools-python/"
+        "link": "https://docs.aws.amazon.com/powertools/python/latest/"
       }
     ]
   },

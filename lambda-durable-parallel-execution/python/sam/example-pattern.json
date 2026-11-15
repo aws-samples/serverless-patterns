@@ -32,11 +32,11 @@
       },
       {
         "text": "Parallel Execution",
-        "link": "https://github.com/aws/aws-durable-execution-sdk-python/blob/main/docs/core/parallel.md"
+        "link": "https://docs.aws.amazon.com/durable-execution/sdk-reference/operations/parallel/"
       },
       {
         "text": "Retry Strategies",
-        "link": "https://github.com/aws/aws-durable-execution-sdk-python/blob/main/docs/advanced/error-handling.md#retry-strategies"
+        "link": "https://docs.aws.amazon.com/durable-execution/sdk-reference/error-handling/retries/"
       }
     ]
   },

@@ -161,8 +161,8 @@ sam delete --stack-name <stack-name>
 
 - [AWS Lambda durable functions documentation](https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html)
 - [Durable Execution SDK (Python)](https://github.com/aws/aws-durable-execution-sdk-python)
-- [Parallel Execution](https://github.com/aws/aws-durable-execution-sdk-python/blob/main/docs/core/parallel.md)
-- [Retry Strategies](https://github.com/aws/aws-durable-execution-sdk-python/blob/main/docs/advanced/error-handling.md#retry-strategies)
+- [Parallel Execution](https://docs.aws.amazon.com/durable-execution/sdk-reference/operations/parallel/)
+- [Retry Strategies](https://docs.aws.amazon.com/durable-execution/sdk-reference/error-handling/retries/)
 
 ---
 
