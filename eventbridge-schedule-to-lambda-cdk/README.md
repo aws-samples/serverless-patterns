@@ -1,7 +1,7 @@
 # EventBridge Scheduler to AWS Lambda
 This pattern will trigger a Lambda function every 5 minutes using an EventBridge schedule and CDK.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-enrichment-with-lambda-cdk.
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-schedule-to-lambda-cdk.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

@@ -12,7 +12,7 @@ exports.handler = async (event) => {
     bucketName = event['detail']['requestParameters']['bucketName']
     imageName = event['detail']['requestParameters']['key']
 
-    rekognition_client = new RekognitionClient();
+    rekognition_client = new RekognitionClient({ region: process.env.AWS_REGION });
 
     // Analyze image to see if there is text in the image
     try {

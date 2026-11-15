@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../s3-lambda-comprehend/python/cdk"
+		},
+		{
+			"path": "../../../eventbridge-firehose-s3/python/cdk"
+		}
+	],
+	"settings": {}
+}

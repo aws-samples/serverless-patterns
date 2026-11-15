@@ -1,0 +1,23 @@
+{
+  "app": "dotnet run --project src/ApigwHttpApiEventbridgeDotnetCdk/ApigwHttpApiEventbridgeDotnetCdk.csproj",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "src/*/obj",
+      "src/*/bin",
+      "src/*.sln",
+      "src/*/GlobalSuppressions.cs",
+      "src/*/*.csproj"
+    ]
+  },
+  "context": {
+    "@aws-cdk/core:target-partitions": [
+      "aws",
+      "aws-cn"
+    ]
+  }
+}

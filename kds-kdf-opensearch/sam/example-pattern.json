@@ -1,0 +1,58 @@
+{
+  "title": "Amazon Kinesis Data Streams to Amazon OpenSearch via Amazon Data Firehose",
+  "description": "Send data received by Kinesis Data Streams to Amazon OpenSearch via Amazon Data Firehose.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This SAM template creates a Kinesis Data Stream, Amazon Data Firehose and Amazon OpenSearch Service serverless collection. Amazon Data Firehose is configured with Kinesis Data Stream as a source and Amazon OpenSearch as a destination.",
+      "When a message is pushed to the Kinesis Data Stream, it's replicated to OpenSearch using Amazon Data Firehose. If any messages  can not be processed by Amazon Data Firehose, they are sent to an S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Writing to Amazon Data Firehose Using Kinesis Data Streams",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/writing-with-kinesis-streams.html"
+      },
+      {
+        "text": "Amazon Data Firehose with Amazon OpenSearch Destination Settings",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/create-destination.html#create-destination-elasticsearch"
+      },
+      {
+        "text": "Amazon OpenSearch Dashboard",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/dashboards.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

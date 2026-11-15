@@ -1,0 +1,57 @@
+{
+  "title": "Amazon Athena to Amazon S3 Express One Zone",
+  "description": "How to query Amazon S3 Express One Zone directory bucket using Amazon Athena.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Catalog the Amazon S3 Express One Zone directory bucket using AWS Glue Data Catalog.",
+      "Upload your data to Amzon S3 Express One Zone storage.",
+      "Query the data using Amazon Athena."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 User Guide",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-one-zone.html"
+      },
+      {
+        "text": "Querying S3 Express One Zone data",
+        "link": "https://docs.aws.amazon.com/athena/latest/ug/querying-express-one-zone.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 Input Express One Zone bucket content: <code>aws s3 rm s3://{MyInputBucketExpressOneZone} --recursive --region {my-region}</code>",
+      "Delete the Amazon S3 Output Express One Zone bucket content: <code>aws s3 rm s3://{MyOutputBucketExpressOneZone} --recursive --region {my-region}</code>",
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "title": "Amazon EventBridge Scheduler to Systems Manager Associations",
+  "description": "Create an EventBridge Scheduler to execute a SSM State Manager Association",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to use EventBridge Scheduler to run a SSM Association every 15 minutes and deployed using SAM."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "EventBridge Scheduler User Guide",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "CloudFormation AWS::Scheduler::Schedule",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html"
+      },
+      {
+        "text": "SSM Start_associations_Once SDK Reference",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm/client/start_associations_once.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed clean-up instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joe Losinski",
+      "bio": "AWS Senior Solutions Architect and Serverless Enthusiast.",
+      "image": "https://avatars.githubusercontent.com/u/128616881?s=400&u=709f313db9eab1162d1874860c96bbd44164f1bf&v=4"
+    }
+  ]
+}

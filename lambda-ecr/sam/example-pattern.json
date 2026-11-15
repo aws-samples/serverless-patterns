@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda function with ECR image",
+  "description": "Create a Lambda function with a container image",
+  "language": "Integration",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template will create a Lambda function running with an ECR container image.",
+      "You will need to already have the ECR image created in your account."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with Lambda container images",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/images-create.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alice Goumain",
+      "bio": "Cloud Support Engineer in Serverless @ AWS",
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "linkedin": "alice-goumain"
+    }
+  ]
+}

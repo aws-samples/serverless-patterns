@@ -1,0 +1,30 @@
+{
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "apigw",
+            "label": "API Gateway REST API"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "lambda-event-functions",
+            "label": "AWS Lambda"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "ses",
+            "label": "Amazon SES"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}

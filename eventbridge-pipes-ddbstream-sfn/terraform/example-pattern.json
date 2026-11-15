@@ -1,0 +1,51 @@
+{
+  "title": "Amazon DynamoDB Stream to AWS Step Functions",
+  "description": "Invoke AWS Step Functions workflow from a Amazon DynamoDB stream message",
+  "language": "Integration",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "Invoke a Step Functions workflow from a DynamoDB stream",
+    "text": [
+      "This sample project demonstrates how to invoke an AWS Step Functions state machine directly from a DynamoDB Stream using Amazon EventBridge Pipes.",
+      "This pattern deploys one Step Function, one DynamoDB with stream enabled, and one Amazon EventBridge Pipe."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes - connects sources to targets.",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Oriol Matavacas",
+      "bio": "Oriol Matavacas is a Sr. Solutions Architect at AWS based in Barcelona. Oriol primarily supporting customers on the journey to the Cloud. He enjoys building new solutions with scalability, availability and easy to maintain by using serverless.",
+      "image": "https://togithub.s3.eu-west-1.amazonaws.com/Oriol.jpg",
+      "linkedin": "oriol-matavacas-rodriguez-b165868a"
+    }
+  ]
+}
