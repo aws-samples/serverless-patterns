@@ -54,6 +54,19 @@ class ChatStack(Stack):
     def _add_nag_suppressions(self):
         """Add cdk-nag suppressions for CDK-managed resources."""
 
+        NagSuppressions.add_stack_suppressions(
+            self,
+            [
+                {
+                    "id": "AwsSolutions-L1",
+                    "reason": (
+                        "Functions stay on Python 3.14, the runtime this pattern is tested with. "
+                        "The Powertools layer ARN is built from the runtime name, so change both together."
+                    ),
+                },
+            ],
+        )
+
         for child in self.node.children:
             if child.node.id.startswith("LogRetention"):
                 NagSuppressions.add_resource_suppressions(

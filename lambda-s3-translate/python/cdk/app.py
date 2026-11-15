@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from lambda_s3_translate_cdk.lambda_s3_translate_cdk_stack import LambdaS3TranslateCdkStack
+from pattern.lambda_s3_translate_cdk_stack import LambdaS3TranslateCdkStack
 
 
 app = cdk.App()

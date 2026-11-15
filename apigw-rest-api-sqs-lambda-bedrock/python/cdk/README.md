@@ -27,9 +27,16 @@ The following diagram illustrates the solutions architecture
     cd apigw-rest-api-sqs-lambda-bedrock/python/cdk
     ```
 
+1. Change to the CDK app directory, then create and activate a Python virtual environment and install the dependencies:
+    ```
+    cd cdk
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
+
 1. Deploy the stack to your default AWS account and region with Amazon Bedrock availability. The output of this command should give you the REST API URL.
     ```
-	cd cdk
     cdk deploy
     ```
 
