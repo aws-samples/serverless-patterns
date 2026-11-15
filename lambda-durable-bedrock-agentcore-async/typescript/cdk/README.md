@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) (latest available version) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (version 2.221.0 or later) installed and configured
-* [Node.js 24.x](https://nodejs.org/) installed
+* [Node.js](https://nodejs.org/) installed
 * [Finch](https://runfinch.com/), [Docker](https://www.docker.com/products/docker-desktop/) or a compatible tool (required to build the agent container image)
 
 ## Deployment Instructions
@@ -57,7 +57,7 @@ This pattern creates two stacks:
 
 1. **AgentCoreStrandsStack** — Deploys a containerized Python agent on Amazon Bedrock AgentCore. The agent uses the Strands Agents SDK with Amazon Bedrock foundation models to process prompts. It is built from a local Dockerfile and pushed to ECR automatically by CDK.
 
-2. **DurableAgentStack** — Deploys a durable function (using Node.js 24.x) that orchestrates the agent invocation using `context.map` for parallel execution:
+2. **DurableAgentStack** — Deploys a Node.js durable function that orchestrates the agent invocation using `context.map` for parallel execution:
    - The durable function receives a city name and builds two prompts: a weekend trip agenda and a weeklong trip agenda
    - `context.map` fans out both prompts in parallel, each running in its own child context
    - Inside each map iteration, `waitForCallback` pauses the execution while the agent processes the prompt

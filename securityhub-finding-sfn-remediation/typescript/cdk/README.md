@@ -41,7 +41,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 ## Requirements
 
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed and configured
-- [Node.js 20+](https://nodejs.org/) with npm
+- [Node.js](https://nodejs.org/) with npm
 - AWS account [bootstrapped for CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
 - AWS Security Hub enabled in your account
 - Python 3 (for AWS Lambda functions)

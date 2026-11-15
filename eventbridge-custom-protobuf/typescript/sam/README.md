@@ -10,7 +10,7 @@ This is the TypeScript version. The publisher uses the AWS SDK for JavaScript v3
 (`@aws-sdk/client-eventbridgev2` and `@aws-sdk/client-glue`) and
 [`protobufjs`](https://www.npmjs.com/package/protobufjs), which loads
 `proto/order_placed.proto` at runtime, so there is no codegen step and no
-generated bindings to commit. The consumer Lambda runs on the Node.js 24
+generated bindings to commit. The consumer Lambda runs on the Node.js
 runtime, bundled by SAM with esbuild.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-custom-protobuf-typescript-sam

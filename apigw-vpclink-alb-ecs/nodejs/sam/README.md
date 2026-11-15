@@ -8,7 +8,7 @@ This sample project demonstrates how API Gateway connects to Application Load Ba
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-- [Node 24 or above](https://nodejs.org/en/download) installed
+- [Node](https://nodejs.org/en/download) installed
 - [Docker] installed
 
 ## Deployment Instructions

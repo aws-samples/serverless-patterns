@@ -10,7 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Node.js 20+](https://nodejs.org/en/download/) installed
+* [Node.js](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`)
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [Amazon Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) enabled for Anthropic Claude Sonnet in your target region

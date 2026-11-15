@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. The Testing commands use `aws configure export-credentials`, which needs AWS CLI v2. Your principal needs `execute-api:Invoke` on the API, plus the AWS CloudFormation, Amazon S3 and DynamoDB read and write permissions that the Testing commands use.
 * [curl](https://curl.se/) 7.75 or later, for the `--aws-sigv4` option, and bash or zsh with `sed` and `gunzip` for the Testing commands
-* [Node.js 22 or later](https://nodejs.org/en/download/) installed
+* [Node.js](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) and an account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) for it
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * The stack deploys to the Region that the CDK resolves from your environment (`AWS_REGION` or the Region of your AWS CLI profile). Run the Testing commands in that Region, for example `export AWS_REGION=us-west-2` (and `AWS_PROFILE` if you use a named profile).

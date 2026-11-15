@@ -44,7 +44,7 @@ Reserve Flight → Reserve Hotel → Reserve Car (FAILS) → Cancel Hotel → Ca
 ### Prerequisites
 - AWS CLI configured
 - SAM CLI installed
-- Node.js 24.x
+- Node.js
 
 ### Deploy
 ```bash

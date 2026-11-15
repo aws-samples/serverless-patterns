@@ -10,7 +10,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Node.js 24.x](https://nodejs.org/) installed
+* [Node.js](https://nodejs.org/) installed
 
 ## Deployment Instructions
 
