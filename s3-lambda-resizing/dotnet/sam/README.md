@@ -1,6 +1,6 @@
 # AWS Amazon S3 to AWS Lambda - Create a Lambda function that resizes images uploaded to S3
 
-The SAM template deploys a .NET 6 Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The function code checks the uploaded file is an image and creates a thumbnail version of the image in the same bucket.
+The SAM template deploys a .NET Lambda function, an S3 bucket and the IAM resources required to run the application. A Lambda function consumes <code>ObjectCreated</code> events from an Amazon S3 bucket. The function code checks the uploaded file is an image and creates a thumbnail version of the image in the same bucket.
 
 Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/s3-lambda-resizing-dotnet](https://serverlessland.com/patterns/s3-lambda-resizing-dotnet)
 
@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [.Net 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* [.NET](https://dotnet.microsoft.com/en-us/download)
 * [Docker](https://docs.docker.com/get-docker/) installed and running
 
 ## Deployment Instructions

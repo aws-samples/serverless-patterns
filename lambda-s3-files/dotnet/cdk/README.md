@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed
+* [.NET](https://dotnet.microsoft.com/en-us/download) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Deployment Instructions
@@ -50,7 +50,7 @@ S3 Files provides NFS access to S3 buckets with sub-millisecond latency on small
 - An **S3 Files file system** backed by the bucket
 - **Mount targets** in each isolated subnet for NFS connectivity
 - An **access point** defining the POSIX identity and root path
-- A **.NET 10 Lambda function** with the S3 Files file system mounted at `/mnt/s3data`
+- A **.NET Lambda function** with the S3 Files file system mounted at `/mnt/s3data`
 
 Multiple Lambda functions can connect to the same S3 Files file system simultaneously, sharing data through a common workspace without custom synchronization logic.
 
