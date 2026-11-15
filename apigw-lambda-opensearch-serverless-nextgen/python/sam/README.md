@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI installed and configured](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 * [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
-* [Python 3.14](https://www.python.org/downloads/)
+* [Python 3](https://www.python.org/downloads/)
 
 **Region availability:** This pattern uses OpenSearch Serverless AI connectors and hybrid search, which are available in the following regions: US East (N. Virginia), US East (Ohio), US West (Oregon), Asia Pacific (Mumbai), Asia Pacific (Singapore), Asia Pacific (Sydney), Asia Pacific (Tokyo), Europe (Frankfurt), Europe (Ireland), Europe (Spain), and Europe (Stockholm). See the [launch announcement](https://aws.amazon.com/about-aws/whats-new/2025/08/amazon-opensearch-serverless-ai-connectors-hybrid-search/) for details.
 

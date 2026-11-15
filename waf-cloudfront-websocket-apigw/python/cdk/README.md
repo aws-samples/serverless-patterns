@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ### Prerequisites
 
-- Python 3.9 or later
+- Python 3
 - AWS CDK CLI
 - AWS CLI configured with appropriate credentials 
 

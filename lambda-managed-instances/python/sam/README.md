@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed (v1.164.0+)
-- [Python 3.13](https://www.python.org/downloads/) installed and available in your PATH
+- [Python 3](https://www.python.org/downloads/) installed and available in your PATH
 
 ## Deployment Instructions
 

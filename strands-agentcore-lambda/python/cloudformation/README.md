@@ -20,10 +20,10 @@ User → Cognito (JWT) → Agent Lambda → AgentCore Gateway (MCP) → Intercep
 | Component | Description | Runtime |
 |-----------|-------------|---------|
 | Cognito User Pool | JWT access token authentication | Managed |
-| Agent Lambda | Strands Agent with `us.anthropic.claude-sonnet-4-6` via BedrockModel, MCPClient for tool discovery/execution | Python 3.12, 1024MB, 120s |
+| Agent Lambda | Strands Agent with `us.anthropic.claude-sonnet-4-6` via BedrockModel, MCPClient for tool discovery/execution | Python, 1024MB, 120s |
 | AgentCore Gateway | MCP protocol gateway with CUSTOM_JWT authorizer and REQUEST interceptor | Managed |
-| Interceptor Lambda | Extracts JWT claims (`sub`, `username`, `client_id`) and injects `user_context` into tool arguments | Python 3.12, 128MB, 5s |
-| Tool Lambda | Executes AWS operations (S3 ListBuckets) with user attribution | Python 3.12, 256MB, 10s |
+| Interceptor Lambda | Extracts JWT claims (`sub`, `username`, `client_id`) and injects `user_context` into tool arguments | Python, 128MB, 5s |
+| Tool Lambda | Executes AWS operations (S3 ListBuckets) with user attribution | Python, 256MB, 10s |
 
 ### Strands SDK Integration
 

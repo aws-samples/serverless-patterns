@@ -56,7 +56,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed and configured
 - [Node.js 20+](https://nodejs.org/) with npm
 - AWS account [bootstrapped for CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
-- Python 3.12 (for AWS Lambda functions)
+- Python 3 (for AWS Lambda functions)
 - Amazon GuardDuty: an account has at most one detector per Region. If GuardDuty is **not** already enabled, this stack creates a detector for you. If a detector **already exists**, deployment fails with `A detector already exists for the current account` unless you pass its ID with the `DetectorId` parameter (see Deployment below). Find an existing detector with `aws guardduty list-detectors`.
 
 ## Deployment

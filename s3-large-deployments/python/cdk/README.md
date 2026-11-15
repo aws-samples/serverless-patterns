@@ -29,7 +29,7 @@ cd serverless-patterns/s3-large-deployments/python/cdk
 ### Create Python virtual environment and install the dependencies
 
 ```bash
-python3.14 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install pip-licenses
 pip-licenses --output NOTICE.txt

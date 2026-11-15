@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Python 3.13](https://www.python.org/downloads/) installed and available in your PATH
+* [Python 3](https://www.python.org/downloads/) installed and available in your PATH
 
 ## Deployment Instructions
 
@@ -42,7 +42,7 @@ Important: this application uses various AWS services and there are costs associ
 
 This pattern creates:
 
-1. **Durable Lambda Function (Stream Processor)**: A Python 3.13 Lambda function that processes DynamoDB stream events through three checkpointed steps: validate, enrich, and notify.
+1. **Durable Lambda Function (Stream Processor)**: A Python Lambda function that processes DynamoDB stream events through three checkpointed steps: validate, enrich, and notify.
 
 2. **Source Table (DynamoDB with Streams)**: The table where items are written. DynamoDB Streams captures INSERT, MODIFY, and REMOVE events with NEW_AND_OLD_IMAGES.
 

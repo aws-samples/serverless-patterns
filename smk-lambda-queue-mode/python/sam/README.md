@@ -22,7 +22,7 @@ graph LR
 
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
-- [Python 3.12](https://www.python.org/downloads/)
+- [Python 3](https://www.python.org/downloads/)
 - [Docker](https://docs.docker.com/get-docker/) installed and running (required for `sam build --use-container`)
 - curl >= 7.75 (for `--aws-sigv4` support)
 - Apache Kafka 4.2+ cluster (see Deployment Path A to provision one automatically)

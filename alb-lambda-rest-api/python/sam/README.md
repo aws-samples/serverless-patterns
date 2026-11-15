@@ -1,7 +1,7 @@
 # AWS Lambda RESTful API with Amazon ALB and Path Based Listener Rules
 
 This configuration pattern creates an Application Load
-Balancer with path-based listener rules, paired with an AWS Lambda RESTful API function as the target. It uses Python 3.14 and the Serverless Application Model (SAM) CLI.
+Balancer with path-based listener rules, paired with an AWS Lambda RESTful API function as the target. It uses Python and the Serverless Application Model (SAM) CLI.
 
 Learn more about this pattern
 at [Serverless Land Patterns](https://serverlessland.com/patterns/alb-lambda-rest-api-sam-py).

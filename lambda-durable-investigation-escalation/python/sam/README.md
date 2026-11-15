@@ -74,7 +74,7 @@ The EventBridge rule matches events with this structure:
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) >= 1.150.0 (required for `DurableConfig` support)
-* Python 3.14 runtime (automatically provided by Lambda)
+* Python runtime (automatically provided by Lambda)
 * An active [AWS DevOps Agent](https://docs.aws.amazon.com/devopsagent/latest/userguide/) agent space with investigations configured
 
 ## Deployment

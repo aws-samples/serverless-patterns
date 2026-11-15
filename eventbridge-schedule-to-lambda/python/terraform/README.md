@@ -1,7 +1,7 @@
 # # Amazon EventBridge Schedule to AWS Lambda
 
 
-This pattern will create an EventBridge schedule to invoke a Python 3.14 based AWS Lambda function every 5 minutes. The pattern is deployed using Terraform. 
+This pattern will create an EventBridge schedule to invoke a Python based AWS Lambda function every 5 minutes. The pattern is deployed using Terraform. 
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
   resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Python 3.10+](https://www.python.org/downloads/) installed
+* [Python 3](https://www.python.org/downloads/) installed
 * [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
 
 ## Deployment Instructions

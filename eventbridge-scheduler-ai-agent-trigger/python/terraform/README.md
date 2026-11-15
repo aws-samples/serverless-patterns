@@ -20,9 +20,9 @@ Important: this application uses various AWS services and there are costs associ
 The pattern deploys the following resources:
 
 1. **Amazon EventBridge Scheduler** – Triggers the orchestrator Lambda on a recurring schedule (default: `rate(1 hour)`).
-2. **Orchestrator Lambda** (Python 3.14) – Receives the scheduler event and invokes the Bedrock Agent with a task payload.
+2. **Orchestrator Lambda** (Python) – Receives the scheduler event and invokes the Bedrock Agent with a task payload.
 3. **Amazon Bedrock Agent** – Processes the task payload, generates an execution summary using a foundation model (default: Claude 3 Haiku), and calls the action group.
-4. **Action Group Lambda** (Python 3.14) – Persists execution records to DynamoDB.
+4. **Action Group Lambda** (Python) – Persists execution records to DynamoDB.
 5. **Amazon DynamoDB Table** – Stores task execution records.
 6. **Amazon SQS Dead-Letter Queue** – Captures failed scheduler invocations after retries are exhausted.
 
