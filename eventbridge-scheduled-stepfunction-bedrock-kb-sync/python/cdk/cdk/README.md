@@ -5,7 +5,7 @@
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/home.html)
 - [AWS CLI v2](https://aws.amazon.com/cli/)
 - [Python 3.9+](https://www.python.org/downloads/)
-- [Node.js 14+](https://nodejs.org/)
+- [Node.js 22+](https://nodejs.org/)
 
 ### AWS Configuration
 1. [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)

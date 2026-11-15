@@ -13,7 +13,9 @@ OUTPUT_FILE="${SCRIPT_DIR}/saga-layer.zip"
 echo "Building Lambda layer for saga workflow..."
 
 # Find Python 3.11+ (required for aws-durable-execution-sdk-python)
-if command -v python3.12 &> /dev/null; then
+if command -v python3.14 &> /dev/null; then
+    PYTHON_CMD="python3.14"
+elif command -v python3.12 &> /dev/null; then
     PYTHON_CMD="python3.12"
 elif command -v python3.11 &> /dev/null; then
     PYTHON_CMD="python3.11"

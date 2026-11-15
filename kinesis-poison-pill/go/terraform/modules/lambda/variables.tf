@@ -13,7 +13,7 @@ variable "function_name" {
 variable "runtime" {
     description = "runtime"
     type        = string 
-    default     = "go1.x"
+    default     = "provided.al2023"
 }
 
 # Lambda - Timeout
