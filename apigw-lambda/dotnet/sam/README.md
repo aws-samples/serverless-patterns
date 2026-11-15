@@ -9,7 +9,7 @@ This project shows how to use AWS SAM for an ASP.NET Core Web API project using 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+* [.NET](https://dotnet.microsoft.com/en-us/download)
 
 ## Deployment Instructions
 

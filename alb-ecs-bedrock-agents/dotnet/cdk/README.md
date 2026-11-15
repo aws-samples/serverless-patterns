@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
-* [.NET](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) (.NET 8.0 or later) installed
+* [.NET](https://dotnet.microsoft.com/en-us/download) installed
 * [Grant Amazon Bedrock Model Access](https://console.aws.amazon.com/bedrock/home?#/modelaccess) to following models:
     * Titan Text Embeddings V2 (`amazon.titan-embed-text-v2:0`)
     * Claude 3 Haiku (`anthropic.claude-3-haiku-20240307-v1:0`)

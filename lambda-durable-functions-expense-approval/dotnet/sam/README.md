@@ -62,7 +62,7 @@ This sample demonstrates how to build an expense approval workflow using **AWS L
 
 ## Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [.NET SDK](https://dotnet.microsoft.com/en-us/download)
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 - AWS account with credentials configured (`aws configure`)
 

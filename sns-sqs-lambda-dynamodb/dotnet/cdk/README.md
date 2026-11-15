@@ -9,7 +9,7 @@ The pattern also features usage of CrossStack to export resources from one Cloud
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [.Net 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* [.NET](https://dotnet.microsoft.com/en-us/download)
 * [Docker](https://docs.docker.com/get-docker/) installed and running
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
