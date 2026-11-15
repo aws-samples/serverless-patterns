@@ -9,7 +9,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.65.0"
+      version = "~> 6.0"
     }
   }
 }
@@ -89,7 +89,7 @@ resource "aws_iam_role" "lambda_role" {
           Action = [
             "logs:CreateLogGroup"
           ]
-          Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+          Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"
         },
         {
           Effect = "Allow"
@@ -97,7 +97,7 @@ resource "aws_iam_role" "lambda_role" {
             "logs:CreateLogStream",
             "logs:PutLogEvents"
           ]
-          Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.function_name}:*"
+          Resource = "arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.function_name}:*"
         },
         {
           Effect = "Allow"
@@ -107,8 +107,8 @@ resource "aws_iam_role" "lambda_role" {
             "ec2:DeleteSnapshot"
           ]
           Resource = [
-            "arn:aws:ec2:${data.aws_region.current.name}::image/*",
-            "arn:aws:ec2:${data.aws_region.current.name}::snapshot/*"
+            "arn:aws:ec2:${data.aws_region.current.region}::image/*",
+            "arn:aws:ec2:${data.aws_region.current.region}::snapshot/*"
           ]
         },
         {
