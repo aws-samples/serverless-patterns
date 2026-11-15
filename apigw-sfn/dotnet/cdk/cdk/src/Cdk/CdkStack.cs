@@ -8,6 +8,8 @@ using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.Logs;
 using Amazon.CDK.AWS.SAM;
 using Amazon.CDK.AWS.StepFunctions;
+using CfnIntegration = Amazon.CDK.AWS.Apigatewayv2.CfnIntegration;
+using CfnIntegrationProps = Amazon.CDK.AWS.Apigatewayv2.CfnIntegrationProps;
 using AssetOptions = Amazon.CDK.AWS.S3.Assets.AssetOptions;
 using Constructs;
 

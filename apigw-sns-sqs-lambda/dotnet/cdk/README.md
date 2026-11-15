@@ -25,9 +25,10 @@ Important: This application uses various AWS services and there are costs associ
     cd apigw-sns-sqs-lambda/dotnet/cdk
     ```
 
-1. Build the .NET CDK project
+1. Build the .NET CDK project and the Lambda function
     ```
     dotnet build src
+    dotnet build src/lambdaHandler/ApiEventHandler/src/ApiEventHandler
     ```
 
 1. Deploy the stack to your default AWS account and region. The output of this command should give you the HTTP API URL.
