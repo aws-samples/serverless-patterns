@@ -1,0 +1,23 @@
+{
+  "about": "Zip names the AWS Toolkit for VS Code downloads from releases/latest/download/<name>.zip (packages/core/src/awsService/appBuilder/serverlessLand/metadata.json and appBuilder/walkthrough.ts). Each maps to the pattern folder whose zip is published under that name in v1Tag, the 'latest' release. When folders move, change only the right-hand side.",
+  "zips": {
+    "apigw-rest-api-lambda-dotnet": "apigw-rest-api-lambda-dotnet",
+    "apigw-rest-api-lambda-java": "apigw-rest-api-lambda-java",
+    "apigw-rest-api-lambda-node": "apigw-rest-api-lambda-node",
+    "apigw-rest-api-lambda-python": "apigw-rest-api-lambda-python",
+    "s3-lambda": "s3-lambda-resizing-node",
+    "s3-lambda-dotnet": "s3-lambda-resizing-dotnet",
+    "s3-lambda-resizing-dotnet": "s3-lambda-resizing-dotnet",
+    "s3-lambda-resizing-java": "s3-lambda-resizing-java",
+    "s3-lambda-resizing-node": "s3-lambda-resizing-node",
+    "s3-lambda-resizing-python": "s3-lambda-resizing-python",
+    "sns-lambda-dotnet-sam": "sns-lambda-dotnet-sam",
+    "sns-lambda-java-sam": "sns-lambda-java-sam",
+    "sns-lambda-nodejs-sam": "sns-lambda-nodejs-sam",
+    "sns-lambda-python-sam": "sns-lambda-python-sam",
+    "sqs-lambda-dotnet-sam": "sqs-lambda-dotnet-sam",
+    "sqs-lambda-java-sam": "sqs-lambda-java-sam",
+    "sqs-lambda-nodejs-sam": "sqs-lambda-nodejs-sam",
+    "sqs-lambda-python-sam": "sqs-lambda-python-sam"
+  }
+}

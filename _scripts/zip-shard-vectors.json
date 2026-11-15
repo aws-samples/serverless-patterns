@@ -1,0 +1,32 @@
+{
+  "about": "Test vectors for zip-shard.mjs. Keep this file identical in aws-samples/serverless-patterns (_scripts/) and serverless-land (tests/). Shards are for 16 shards; fnv1a64 values are hex.",
+  "shardCount": 16,
+  "fnv1a64": {
+    "": "cbf29ce484222325",
+    "a": "af63dc4c8601ec8c"
+  },
+  "shards": {
+    "apigw-rest-api-lambda-dotnet": 16,
+    "apigw-rest-api-lambda-java": 12,
+    "apigw-rest-api-lambda-node": 4,
+    "apigw-rest-api-lambda-python": 10,
+    "s3-lambda": 12,
+    "s3-lambda-dotnet": 3,
+    "s3-lambda-resizing-dotnet": 4,
+    "s3-lambda-resizing-java": 16,
+    "s3-lambda-resizing-node": 5,
+    "s3-lambda-resizing-python": 2,
+    "sns-lambda-dotnet-sam": 7,
+    "sns-lambda-java-sam": 3,
+    "sns-lambda-nodejs-sam": 14,
+    "sns-lambda-python-sam": 3,
+    "sqs-lambda-dotnet-sam": 5,
+    "sqs-lambda-java-sam": 2,
+    "sqs-lambda-nodejs-sam": 1,
+    "sqs-lambda-python-sam": 8,
+    "eventbridge-custom-sqs-fifo-yaml-sam": 13,
+    "activemq-private-lambda-python-sam": 16,
+    "lambda-durable-ddb-streams-python-sam": 13,
+    "café-lambda": 15
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "title": "Amazon EventBridge Scheduler to send messages to Amazon SQS",
+  "description": "Create an EventBridge Scheduler that sends messages to an SQS queue.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template using EventBridge Scheduler to trigger an SQS SendMessage API Call every minute."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Francesco Vergona",
+      "bio": "Solutions Architect, AWS",
+      "image": "https://avatars.githubusercontent.com/f-verg",
+      "linkedin": "francesco-vergona"
+    }
+  ]
+}

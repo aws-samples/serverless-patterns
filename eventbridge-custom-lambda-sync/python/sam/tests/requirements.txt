@@ -1,0 +1,4 @@
+# Test dependencies. The publisher requirements bring in boto3 (with the
+# eventbridgev2 service model the Stubber validates against).
+-r ../publisher/requirements.txt
+pytest==9.2.0

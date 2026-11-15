@@ -3,7 +3,7 @@
  */
 
 const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs')
-const sqs = new SQSClient()
+const sqs = new SQSClient({ region: process.env.AWS_REGION })
 
 // The Lambda handler
 exports.handler = async (event) => {

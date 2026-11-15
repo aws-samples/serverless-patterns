@@ -4,6 +4,7 @@ This repo contains serverless patterns showing how to integrate services using i
 
 - Learn more about these patterns at https://serverlessland.com/patterns.
 - To learn more about submitting a pattern, read the [publishing guidelines page](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md).
+- Patterns are moving into nested family folders, such as `sqs-lambda/python/sam`, over the coming weeks. Their Serverless Land links stay the same.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
