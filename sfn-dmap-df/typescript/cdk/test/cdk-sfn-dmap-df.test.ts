@@ -10,7 +10,7 @@ describe('CdkSfnDmapDfStack', () => {
   it('should create a durable Lambda function', () => {
     template.hasResourceProperties('AWS::Lambda::Function', {
       FunctionName: 'catalog-item-processor',
-      Runtime: 'nodejs22.x',
+      Runtime: 'nodejs24.x',
     });
   });
 

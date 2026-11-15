@@ -46,7 +46,7 @@ This pattern creates the following resources:
 
 2. **Amazon Bedrock AgentCore Gateway** — An MCP-protocol gateway that routes tool invocations to registered targets
 
-3. **AWS Lambda Function** — A Node.js 22 tool handler that invokes Amazon Bedrock Claude Sonnet 4 for AI inference
+3. **AWS Lambda Function** — A Node.js 24 tool handler that invokes Amazon Bedrock Claude Sonnet 4 for AI inference
 
 4. **AWS WAF Logging** — Full request logs delivered to Amazon CloudWatch Logs for security monitoring and incident response
 

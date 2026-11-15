@@ -61,7 +61,7 @@ export class VectorSearchStack extends cdk.Stack {
     const apiFunction = new lambdaNodejs.NodejsFunction(this, "VectorSearchFunction", {
       entry: path.join(__dirname, "../src/vector-search-handler.ts"),
       handler: "handler",
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       architecture: lambda.Architecture.ARM_64,
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
