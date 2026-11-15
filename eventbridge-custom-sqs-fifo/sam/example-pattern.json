@@ -1,7 +1,7 @@
 {
   "title": "Amazon EventBridge enhanced custom event bus to Amazon SQS FIFO queue",
   "description": "Deliver ordered events from an enhanced custom EventBridge event bus (AWS::EventsV2) to an Amazon SQS FIFO queue using a FIFO subscriber, with AWS SAM.",
-  "language": "YAML",
+  "language": "Integration",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
