@@ -2,7 +2,7 @@
  *  SPDX-License-Identifier: MIT-0
  */
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns')
-const sns = new SNSClient()
+const sns = new SNSClient({ region: process.env.AWS_REGION })
 
 // The Lambda handler
 exports.handler = async (event) => {

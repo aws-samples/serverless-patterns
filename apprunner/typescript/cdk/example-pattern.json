@@ -1,0 +1,59 @@
+{
+  "title": "Amazon ECS Express Mode service with AWS CDK",
+  "description": "Deploy a containerized web app on Amazon ECS Express Mode, which replaces AWS App Runner for new customers.",
+  "language": "TypeScript",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a containerized Node.js web application on Amazon ECS Express Mode with the AWS CDK. You give Express Mode a container image and two IAM roles, and it creates a Fargate service, an internet-facing Application Load Balancer with HTTPS, auto scaling, logging and a URL for the service.",
+      "AWS App Runner is closed to new customers, and AWS recommends Amazon ECS Express Mode as the replacement.",
+      "The CDK app builds the image from local source with DockerImageAsset during cdk deploy, so you don't push an image to Amazon ECR first. The stack uses the AWS::ECS::ExpressGatewayService resource (CfnExpressGatewayService) and passes an environment variable to the container."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Amazon ECS Express Mode",
+        "link": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-overview.html"
+      },
+      {
+        "text": "AWS::ECS::ExpressGatewayService resource",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ecs-expressgatewayservice.html"
+      },
+      {
+        "text": "App Runner availability change",
+        "link": "https://docs.aws.amazon.com/apprunner/latest/dg/apprunner-availability-change.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>",
+      "3. Delete the image from the CDK bootstrap ECR repository if you don't need it."
+    ]
+  },
+  "contributors": [
+    "content/contributors/arun-thangaraj.json"
+  ]
+}

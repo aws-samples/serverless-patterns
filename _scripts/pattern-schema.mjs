@@ -220,6 +220,18 @@ export const authorsSchema = z
           /^@?[A-Za-z0-9_]+$/,
           'twitter must be your handle only — letters, numbers and _ (e.g. "jane_doe"), not a URL',
         ),
+        github: socialHandle(
+          /^[A-Za-z0-9-]+$/,
+          'github must be your username only (e.g. "janedoe"), not a URL',
+        ),
+        bluesky: socialHandle(
+          /^@?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/,
+          'bluesky must be your handle only (e.g. "janedoe.bsky.social"), not a URL',
+        ),
+        builderid: socialHandle(
+          /^@?[A-Za-z0-9._-]+$/,
+          'builderid must be your AWS Builder Center alias only, the part after @ in builder.aws.com/community/@alias (e.g. "janedoe"), not a URL',
+        ),
       })
       .strict(),
   )
@@ -249,13 +261,13 @@ export const patternPathSchema = z
   );
 
 /**
- * Pattern fields, without the people fields. Pass a servicesMap
- * ({ "lambda": "AWS Lambda", ... }) to also check patternArch service keys.
+ * Pattern fields, without the people fields. `patternArch` optionally
+ * replaces the default (any value) rule for the architecture diagram.
  *
  * Checks sit on the fields themselves so every error is reported in one go
  * (Zod 4 skips object-level refinements while any field is invalid).
  */
-export function createPatternShape(servicesMap) {
+export function createPatternShape({ patternArch } = {}) {
   return {
     title: z
       .string({ required_error: "Missing 'title'" })
@@ -314,14 +326,9 @@ export function createPatternShape(servicesMap) {
     testing: testingSchema,
     cleanup: cleanupSchema,
     resources: resourcesSchema,
-    patternArch: servicesMap
-      ? z
-          .any()
-          .optional()
-          .superRefine((arch, ctx) =>
-            checkPatternArchServices(arch, ctx, servicesMap),
-          )
-      : z.any().optional(),
+    // Serverless Land adds the architecture diagram when it imports a pattern,
+    // so contributors don't need to write it.
+    patternArch: patternArch ?? z.any().optional(),
   };
 }
 
@@ -329,10 +336,10 @@ export function createPatternShape(servicesMap) {
  * The pattern file schema: every field rule, with people given as "authors"
  * and/or "contributors" (at least one required). Extra fields are allowed.
  */
-export function createPatternSchema({ servicesMap } = {}) {
+export function createPatternSchema({ patternArch } = {}) {
   return z
     .object({
-      ...createPatternShape(servicesMap),
+      ...createPatternShape({ patternArch }),
       authors: authorsSchema.optional(),
       contributors: contributorsSchema.optional(),
     })
@@ -369,29 +376,3 @@ function checkTitleServiceNames(title, ctx) {
     });
   }
 }
-
-function checkPatternArchServices(arch, ctx, servicesMap) {
-  if (!arch || typeof arch !== "object") return;
-  for (const [key, value] of Object.entries(arch)) {
-    if (value && typeof value === "object" && "service" in value) {
-      if (value.service && !Object.hasOwn(servicesMap, value.service)) {
-        ctx.addIssue({
-          code: "custom",
-          path: [key, "service"],
-          message: `Invalid service "${value.service}" — not a known service key.`,
-        });
-      }
-      // Icons are centred on y; below 75% the label runs off the bottom of the diagram.
-      if (key.includes("icon") && typeof value.y === "number" && value.y > PATTERN_ARCH_MAX_Y) {
-        ctx.addIssue({
-          code: "custom",
-          path: [key, "y"],
-          message: `${key}.y is ${value.y}; keep icons at y ${PATTERN_ARCH_MAX_Y} or less so the label fits.`,
-        });
-      }
-    }
-  }
-}
-
-/** Highest icon y (percent) in patternArch. */
-export const PATTERN_ARCH_MAX_Y = 75;

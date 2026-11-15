@@ -1,0 +1,15 @@
+{
+  "name": "resizer",
+  "version": "1.0.0",
+  "description": "Resizes images from S3 with sharp",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ahmed Mohamed",
+  "license": "MIT-0",
+  "dependencies": {
+    "sharp": "^0.35.5"
+  }
+}

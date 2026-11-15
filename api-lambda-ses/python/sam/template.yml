@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - Amazon API Gateway REST API to AWS Lambda to Amazon SES
+
+Parameters:
+  SENDER:
+    Type: String
+    Default: abc@xyz.com
+    Description: Sender email address. It must be a verified identity in Amazon SES.
+  RECIPIENT:
+    Type: String
+    Default: abc@xyz.com
+    Description: Recipient email address. In the SES sandbox, it must be a verified identity too.
+
+Resources:
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: s1
+      DefinitionBody: # OpenAPI definition
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: 'src/api.yml'
+      OpenApiVersion: 3.0.3
+      EndpointConfiguration:
+        Type: REGIONAL
+
+  lambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Description: Sends an email with Amazon SES
+      Handler: index.handler
+      MemorySize: 128
+      Timeout: 5
+      Runtime: python3.14
+      Environment:
+        Variables:
+          RECIPIENT: !Ref RECIPIENT
+          SENDER: !Ref SENDER
+      Policies:
+        # In the SES sandbox, SendEmail is authorized against the recipient identity as well as the sender
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource:
+                - !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${SENDER}
+                - !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${RECIPIENT}
+      Events:
+        APIEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: !Ref RestApi
+
+Outputs:
+  lambdaArn:
+    Value: !GetAtt lambdaFunction.Arn
+
+  apiGatewayInvokeURL:
+    Value: !Sub https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/s1

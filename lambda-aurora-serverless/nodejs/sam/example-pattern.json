@@ -1,0 +1,60 @@
+{
+  "title": "AWS Lambda and Amazon Aurora MySQL Serverless v2",
+  "description": "Creates a Lambda function with access to an Amazon Aurora MySQL Serverless v2 DB cluster.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an AWS Lambda function and an Amazon Aurora MySQL version 3 (with MySQL 8.0 compatibility) in an Aurora Serverless v2 DB cluster with Data API and a Secrets Manager secret.",
+      "The function creates an example table in the DB, inserts a row with data from the event object, then returns the results of a select query.",
+      "For Aurora PostgreSQL Serverless v2, see <a href=\"https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql\">another pattern</a>"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using the Amazon RDS Data API",
+        "link": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html"
+      },
+      {
+        "text": "Data API - ExecuteStatement",
+        "link": "https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html"
+      },
+      {
+        "text": "AWS Lambda and Aurora PostgreSQL Serverless v2",
+        "link": "https://serverlessland.com/patterns/lambda-aurora-serverlessv2-postgresql"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Greg Davis",
+      "bio": "I am a Principal Solutions Architect, Serverless Developer, Database Engineer, and Data Integration Architect. I specialize in architecting and developing Serverless, event-driven solutions.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/greg-davis.jpg",
+      "linkedin": "gregtx",
+      "twitter": "ServerlessGuy"
+    }
+  ]
+}

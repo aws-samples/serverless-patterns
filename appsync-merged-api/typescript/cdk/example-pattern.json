@@ -1,0 +1,62 @@
+{
+  "title": "AWS AppSync Merged API over two source APIs backed by Amazon DynamoDB",
+  "description": "An AWS AppSync Merged API combines two source GraphQL APIs, each backed by its own Amazon DynamoDB table, into one IAM-protected endpoint that merges automatically.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "appsync-merged-api",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Two AWS AppSync source GraphQL APIs, an Orders API and a Customers API, each read from their own Amazon DynamoDB table through an <code>APPSYNC_JS</code> resolver. An AWS AppSync Merged API associates both with <code>AUTO_MERGE</code> and exposes one <code>AWS_IAM</code> endpoint.",
+      "The Customers schema adds an <code>Order.customer</code> field to the <code>Order</code> type owned by the Orders API, so one GraphQL query returns an order and its customer from two tables.",
+      "The merge role can only reach these two source APIs and their associations. No AWS Lambda function sits in the request path."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/appsync-merged-api-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Merging APIs in AWS AppSync",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/merged-api.html"
+      },
+      {
+        "text": "AWS AppSync Definition.fromSourceApis in the AWS CDK API reference",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_appsync.Definition.html"
+      },
+      {
+        "text": "Attaching a data source in AWS AppSync",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/attaching-a-data-source.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
