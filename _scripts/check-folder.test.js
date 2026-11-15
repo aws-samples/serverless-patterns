@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { checkPatternFolder } = require('./check-folder');
+const { checkPatternFolder, findPatternDir } = require('./check-folder');
 
 // A small repo: one group folder with a pattern inside it, one flat pattern.
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'check-folder-'));
@@ -40,4 +40,28 @@ test('a group folder with its own example-pattern.json may stay flat', () => {
 
 test('segments named like yaml but longer pass', () => {
   assert.deepEqual(checkPatternFolder('yaml-parser/python/sam', root), []);
+});
+
+test('findPatternDir walks up to the nearest example-pattern.json', () => {
+  addPattern('sqs-lambda/python/sam');
+  fs.mkdirSync(path.join(root, 'sqs-lambda/python/sam/src/handlers'), { recursive: true });
+  const nested = path.join(root, 'sqs-lambda/python/sam');
+  assert.equal(findPatternDir('sqs-lambda/python/sam/template.yaml', root), nested);
+  assert.equal(findPatternDir('sqs-lambda/python/sam/src/handlers/app.py', root), nested);
+  assert.equal(findPatternDir('sqs-lambda/python/sam/example-pattern.json', root), nested);
+});
+
+test('findPatternDir picks the inner pattern inside a group folder', () => {
+  const inner = path.join(root, 'eventbridge-api-destinations/2-slack');
+  assert.equal(findPatternDir('eventbridge-api-destinations/2-slack/template.yaml', root), inner);
+  assert.equal(
+    findPatternDir('eventbridge-api-destinations/README.md', root),
+    path.join(root, 'eventbridge-api-destinations')
+  );
+});
+
+test('findPatternDir returns null outside any pattern folder', () => {
+  assert.equal(findPatternDir('README.md', root), null);
+  assert.equal(findPatternDir('.github/workflows/schema-validation.yml', root), null);
+  assert.equal(findPatternDir('sqs-lambda/python/README.md', root), null);
 });

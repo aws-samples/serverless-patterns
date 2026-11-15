@@ -3,7 +3,8 @@
 //   node _scripts/check-folder.js {pattern-folder} [more folders...]
 //
 // Paths are relative to the repo root. The CLI treats every folder as new.
-// validate.js runs the same check on the pattern folders a pull request adds or changes.
+// validate.js runs the same check on the pattern folders whose example-pattern.json a
+// pull request adds or changes, and uses findPatternDir to map changed files to patterns.
 //
 // Rules:
 // - No path segment is named `yaml`. A pattern with no function code is Integration
@@ -48,7 +49,20 @@ const checkPatternFolder = (folder, repoRoot, { isNew = true } = {}) => {
   return problems;
 };
 
-module.exports = { checkPatternFolder };
+// Returns the pattern folder a file belongs to: the nearest folder at or above the file's
+// own folder, below repoRoot, that holds an example-pattern.json. Null if there is none.
+// file is relative to repoRoot or absolute.
+const findPatternDir = (file, repoRoot) => {
+  const root = path.resolve(repoRoot);
+  let dir = path.dirname(path.resolve(root, file));
+  while (dir.startsWith(root + path.sep)) {
+    if (fs.existsSync(path.join(dir, PATTERN_FILE))) return dir;
+    dir = path.dirname(dir);
+  }
+  return null;
+};
+
+module.exports = { checkPatternFolder, findPatternDir };
 
 if (require.main === module) {
   const repoRoot = path.join(__dirname, '..');

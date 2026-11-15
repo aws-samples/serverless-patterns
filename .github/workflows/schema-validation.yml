@@ -15,12 +15,12 @@ jobs:
           node-version: 22
       - name: Get changed files
         id: changed-files
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          # HEAD is the PR merge commit. --no-renames reports a moved file as added.
-          added=$(git diff --name-only --no-renames --diff-filter=A "$BASE_SHA" HEAD | paste -sd, -)
-          modified=$(git diff --name-only --no-renames --diff-filter=M "$BASE_SHA" HEAD | paste -sd, -)
+          # HEAD is the PR merge commit and HEAD^1 is the main commit it merges into, so the
+          # diff holds only the PR's changes even when base.sha is stale.
+          # --no-renames reports a moved file as added.
+          added=$(git diff --name-only --no-renames --diff-filter=A HEAD^1 HEAD | paste -sd, -)
+          modified=$(git diff --name-only --no-renames --diff-filter=M HEAD^1 HEAD | paste -sd, -)
           echo "added_files=$added" >> "$GITHUB_OUTPUT"
           echo "modified_files=$modified" >> "$GITHUB_OUTPUT"
       - run: cd _scripts && npm i
