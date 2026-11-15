@@ -3,7 +3,7 @@ import * as cdk from "aws-cdk-lib";
 import { Duration, Fn, Tags } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as path from "path";
-import { IFunction } from "aws-cdk-lib/aws-lambda";
+import { IFunction, Runtime } from "aws-cdk-lib/aws-lambda";
 import { addHealthlakeToFunc } from "./function-utils";
 import { CfnFHIRDatastore } from "aws-cdk-lib/aws-healthlake";
 import { Key } from "aws-cdk-lib/aws-kms";
@@ -31,6 +31,7 @@ export class FunctionsConstruct extends Construct {
             `PatientHydratorFunction`,
             {
                 entry: path.join(__dirname, `../src/patient-hydrator`),
+                runtime: Runtime.PROVIDED_AL2023,
                 functionName: `healthlake-cdc-patient-hydrator`,
                 timeout: Duration.seconds(30),
                 environment: {
@@ -54,6 +55,7 @@ export class FunctionsConstruct extends Construct {
             `PatientPublisherFunction`,
             {
                 entry: path.join(__dirname, `../src/patient-publisher`),
+                runtime: Runtime.PROVIDED_AL2023,
                 functionName: `healthlake-cdc-patient-publisher`,
                 timeout: Duration.seconds(30),
                 environment: {},
