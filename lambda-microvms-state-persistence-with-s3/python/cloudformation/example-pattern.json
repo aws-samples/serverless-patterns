@@ -51,7 +51,7 @@
   },
   "testing": {
     "text": [
-      "Serve the UI: (cd web && python3 -m http.server 5173), then open http://localhost:5173.",
+      "Serve the UI: (cd src/web && python3 -m http.server 5173), then open http://localhost:5173.",
       "Paste the Middleware URL from deploy.sh, enter a Client ID, and open the workspace. Add notes and upload a file.",
       "Switch workspace (state flushes to S3), reopen with the same Client ID, and confirm the notes and files are restored from S3."
     ]

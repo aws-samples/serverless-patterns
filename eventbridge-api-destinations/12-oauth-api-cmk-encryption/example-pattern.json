@@ -39,7 +39,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./12-oauth-api-cmk-encryption",
       "sam deploy --guided"
     ]
   },

@@ -31,7 +31,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./11-oauth-api",
       "sam deploy --guided"
     ]
   },

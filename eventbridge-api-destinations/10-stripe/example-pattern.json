@@ -49,7 +49,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./10-stripe",
       "sam deploy --guided"
     ]
   },

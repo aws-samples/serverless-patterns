@@ -41,7 +41,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./7-datadog",
       "sam deploy --guided"
     ]
   },

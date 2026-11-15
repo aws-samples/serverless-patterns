@@ -42,7 +42,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./5-zendesk",
       "sam deploy --guided"
     ]
   },

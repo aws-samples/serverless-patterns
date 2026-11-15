@@ -34,7 +34,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./2-slack",
       "sam deploy --guided"
     ]
   },
