@@ -9,9 +9,8 @@ Parameters:
     Description: RabbitMQ engine version
   Python3Version:
     Type: String
-    Description: Choose the version of Python 3. Available options are 3.11, 3.12, 3.13, and 3.14. Note that Python 3.10 is not available on Amazon Linux 2023 so it is not offered as an option.
+    Description: Version to install on the client instance and use as the runtime of the Lambda function it deploys. Choose Python 3.12, Python 3.13 or Python 3.14.
     AllowedValues:
-      - python3.11
       - python3.12
       - python3.13
       - python3.14
