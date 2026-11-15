@@ -1,6 +1,6 @@
 # Amazon API Gateway to AWS Lambda to Amazon Bedrock using AWS SDK for Java and CDK
 
-This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in Java, calls the Amazon Bedrock API for Anthropic Claude-v2 model and returns a response containing the generated content.
+This sample project deploys an Amazon API Gateway REST API with an AWS Lambda integration. The Lambda function is written in Java, sends the prompt to Anthropic Claude Haiku 5.5 with the Amazon Bedrock [Converse API](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html) and returns a response containing the generated content.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-lambda-bedrock-java
 
@@ -9,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-- `Anthropic Claude` fundamental model access requested (check [Prerequisite](#Prerequisite) to see details).
+- Access to Anthropic Claude Haiku 5.5 in Amazon Bedrock (see [Prerequisite](#prerequisite)).
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Java](https://aws.amazon.com/corretto/) 
@@ -18,8 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 
 
 ## Prerequisite
-This pattern uses `Anthropic Claude` fundamental model provided by Amazon Bedrock. It is required to request access to the model before starting using the pattern. Please refer to the link below for an instruction:
-[Model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
+This pattern uses Anthropic Claude Haiku 5.5 (`anthropic.claude-haiku-5-5`) through the `global.anthropic.claude-haiku-5-5` [global cross-Region inference profile](https://docs.aws.amazon.com/bedrock/latest/userguide/global-cross-region-inference.html). Bedrock serves this model on demand only through an inference profile, and a global profile can route requests to any supported Region. The first time you use an Anthropic model in an account, submit the Anthropic use case form from the model catalog in the Amazon Bedrock console. See [Access Amazon Bedrock foundation models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 ## Deployment Instructions
 
@@ -38,14 +37,14 @@ This pattern uses `Anthropic Claude` fundamental model provided by Amazon Bedroc
    cdk bootstrap 1111111111/us-east-1
    cdk bootstrap --profile test 1111111111/us-east-1
    ```
-4. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/cdk-stack.ts` file:
+4. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `src/main/java/com/example/InfrastructureStack.java` file:
    ```bash
    deploy.sh
    ```
 
 ## How it works
 
-This CDK project uses the Amazon Bedrock API for Anthropic Claude-v2 model to generate content based on given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
+This CDK project uses the Amazon Bedrock Converse API with Anthropic Claude Haiku 5.5 to generate content based on a given prompt. This is exposed through a serverless REST API. Please refer to the architecture diagram below:
 ![End to End Architecture](images/architecture.png)
 
 
@@ -53,9 +52,9 @@ Here's a breakdown of the steps:
 
 1. **Amazon API Gateway**: Receives the HTTP POST request containing the prompt.
 
-2. **AWS Lambda**: Triggered by the API Gateway, this function forwards the prompt to Amazon Bedrock API using Bedrock SDK. It uses Anthropic Claude-v2 model and sets other required parameters to fixed values for simplicity.
+2. **AWS Lambda**: Triggered by the API Gateway, this function sends the prompt to Amazon Bedrock with the Converse API in the AWS SDK for Java. It calls Anthropic Claude Haiku 5.5 through the global inference profile, with a fixed limit of 1,024 output tokens for simplicity.
 
-3. **Amazon Bedrock**: Based on the given prompt, using Anthropic Claude-v2 model generates the content and returns the response to Lambda.
+3. **Amazon Bedrock**: Based on the given prompt, Anthropic Claude Haiku 5.5 generates the content and returns the response to Lambda.
 
 4. **Response**: Lambda processes the Bedrock output and sends it back to the user via the API Gateway.
 
@@ -71,7 +70,7 @@ The API returns a response with generated content. Your output may vary:
 
 ```
 {
-	"response": " Okay, let's solve this step-by-step:\n2 + 2 * 2\nStep 1) Perform the multiplication first: 2 * 2 = 4\nStep 2) Now perform the addition: 2 + 4 = 6\n\nTherefore, the final answer is:\n2 + 2 * 2 = 6"
+	"response": "Following the order of operations, multiplication comes before addition.\n\n1. Multiply: 2 * 2 = 4\n2. Add: 2 + 4 = 6\n\nSo 2 + 2 * 2 = 6."
 }
 ```
 

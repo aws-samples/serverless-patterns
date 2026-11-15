@@ -21,7 +21,10 @@ public class InfrastructureStackTest {
         JsonNode actual = JSON.valueToTree(app.synth().getStackArtifact(stack.getArtifactId()).getTemplate());
 
         assertThat(actual.toString())
-                .contains("AWS::ApiGatewayV2::Api")
-                .contains("AWS::Lambda::Function");
+                .contains("AWS::ApiGateway::RestApi")
+                .contains("AWS::Lambda::Function")
+                .contains("global.anthropic.claude-haiku-5-5")
+                .contains("bedrock:InferenceProfileArn")
+                .doesNotContain("\"Resource\":\"*\"");
     }
 }

@@ -8,8 +8,8 @@
     "headline": "How it works",
     "text": [
       "Amazon API Gateway receives the HTTP POST request containing the prompt.",
-      "AWS Lambda is triggered by API Gateway, this function forwards the prompt to Amazon Bedrock API using AWS SDK for Java. It uses Anthropic Claude-v2 model and sets other required parameters to fixed values for simplicity.",
-      "Based on the given prompt, using Anthropic Claude-v2 model, Amazon Bedrock generates the content and returns the response to Lambda.",
+      "AWS Lambda is triggered by API Gateway, this function sends the prompt to Amazon Bedrock with the Converse API in the AWS SDK for Java. It calls Anthropic Claude Haiku 5.5 through the global cross-Region inference profile, with a fixed output token limit for simplicity.",
+      "Based on the given prompt, Anthropic Claude Haiku 5.5 in Amazon Bedrock generates the content and returns the response to Lambda.",
       "Lambda processes the Bedrock output and sends it back to the user via the API Gateway."
     ]
   },
@@ -23,6 +23,10 @@
       {
         "text": "Amazon Bedrock Model Access",
         "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html"
+      },
+      {
+        "text": "Carry out a conversation with the Converse API operations",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html"
       }
     ]
   },
@@ -38,7 +42,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk delete</code>."
+      "Delete the stack: <code>cdk destroy</code>."
     ]
   },
   "authors": [
