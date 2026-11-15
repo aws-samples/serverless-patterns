@@ -25,12 +25,28 @@
       "Resource": "*"
     },
     {
-      "Sid": "AllowModelnvocation",
+      "Sid": "InvokeGlobalInferenceProfile",
       "Effect": "Allow",
       "Action": [
         "bedrock:InvokeModel"
       ],
-      "Resource": "*"
+      "Resource": "arn:aws:bedrock:${region}:${account_number}:inference-profile/global.${model_id}"
+    },
+    {
+      "Sid": "InvokeModelThroughInferenceProfile",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:${region}::foundation-model/${model_id}",
+        "arn:aws:bedrock:::foundation-model/${model_id}"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "bedrock:InferenceProfileArn": "arn:aws:bedrock:${region}:${account_number}:inference-profile/global.${model_id}"
+        }
+      }
     },
     {
       "Sid": "AccessToEncryptAndDeccryptKMSKeys",

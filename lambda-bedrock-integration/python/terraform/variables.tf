@@ -38,8 +38,8 @@ variable "logging_level" {
 
 variable "bedrock_foundation_model" {
   type        = string
-  description = "Bedrock Foundation Model"
-  default     = "anthropic.claude-v2"
+  description = "Bedrock model ID, called through its global cross-Region inference profile (global.<model ID>)"
+  default     = "anthropic.claude-haiku-5-5"
 }
 
 ####################################################

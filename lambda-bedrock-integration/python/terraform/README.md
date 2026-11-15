@@ -2,11 +2,13 @@
 
 This pattern will provision Amazon Elastic Container Registry (ECR), push the code into the Container Registry along with AWS Lambda function to execute the container.
 
-As part of the build process, a container will be built, pushed into ECR, and ultimately deployed as an AWS Lambda function. When an AWS Lambda is executed, it makes API calls to Amazon Bedrock and uses the prompt that the user has provided to get a generative answer from the foundation model. Logs will be sent to AWS Cloudwatch once the execution of the AWS lambda function is finished. The security component is likewise handled by KMS Keys and IAM Roles.
+As part of the build process, a container will be built, pushed into ECR, and ultimately deployed as an AWS Lambda function. When the AWS Lambda function runs, it sends the prompt that the user provided to Anthropic Claude Haiku 5.5 with the Amazon Bedrock [Converse API](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html) and returns the model's answer. Logs will be sent to AWS Cloudwatch once the execution of the AWS lambda function is finished. The security component is likewise handled by KMS Keys and IAM Roles.
 
 ## Prerequisites
 
-Before attempting this pattern, you must enable [model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) in your AWS Account. To provide you flexibility with foundation models, you can enable all or some of the foundation models. This pattern employs the anthropic.claude-v2 model by default so that's must be enabled for this pattern to work
+This pattern uses Anthropic Claude Haiku 5.5 (`anthropic.claude-haiku-5-5`) by default, through the `global.anthropic.claude-haiku-5-5` [global cross-Region inference profile](https://docs.aws.amazon.com/bedrock/latest/userguide/global-cross-region-inference.html). Bedrock serves this model on demand only through an inference profile, and a global profile can route requests to any supported Region. The first time you use an Anthropic model in an account, submit the Anthropic use case form from the model catalog in the Amazon Bedrock console. See [Access Amazon Bedrock foundation models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
+
+To use another model, set `bedrock_foundation_model` to a model ID that has a global inference profile. The function and its IAM policy both use `global.<model ID>`.
 
 You also need [docker](https://www.docker.com/) and md5 to be installed on your testing machine
 
@@ -14,7 +16,7 @@ You also need [docker](https://www.docker.com/) and md5 to be installed on your 
 
 The deployment will require you to provide the AWS VPC id along with the Subnet id(s) where you want this pattern to be deployed. It is expected that the subnets provided have internet access via NAT Gateway (incase of private subnets) or otherwise. Additionally, You can use AWS PrivateLink to create a private connection between your VPC and Amazon Bedrock. You can access Amazon Bedrock as if it were in your VPC, without the use of an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. You establish this private connection by creating an interface endpoint, powered by AWS PrivateLink. For more information, see [ Access AWS services through AWS PrivateLink](https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html) in the AWS PrivateLink Guide.
 
-Optionally, you can also specify foundation model name, env and organization (tagging purposes), timeout and memory_size (AWS Lambda function compute purposes) and lastly logging_level to specify the logging level for your function. These values default to entires in the variable.tf file if not provided at deployment.
+Optionally, you can also specify the model ID (`bedrock_foundation_model`), env and organization (tagging purposes), timeout and memory_size (AWS Lambda function compute purposes) and lastly logging_level to specify the logging level for your function. These values default to entires in the variable.tf file if not provided at deployment.
 
 ```shell
 # terraform init
@@ -27,7 +29,7 @@ terraform plan  -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","sub
 terraform apply -var="aws_vpc_id=vpc-xxxx" -var='aws_subnets=["subnet-xxxx","subnet-xxxx","subnet-xxxx"]' 
 ```
 
-Once deployed you can execute the Lambda function from the AWS Lambda Console or via AWS CLI. The logs will be published to Amazon Cloudwatch.
+Once deployed you can run the Lambda function from the AWS Lambda console or with the AWS CLI. The function returns the model's answer in `body` of `response.json`, and the logs are published to Amazon CloudWatch.
 
 ```shell
 aws lambda invoke \
@@ -86,7 +88,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_subnets"></a> [aws\_subnets](#input\_aws\_subnets) | A list of subnets inside the VPC | `set(any)` | n/a | yes |
 | <a name="input_aws_vpc_id"></a> [aws\_vpc\_id](#input\_aws\_vpc\_id) | VPC ID for Lambda Task | `string` | n/a | yes |
-| <a name="input_bedrock_foundation_model"></a> [bedrock\_foundation\_model](#input\_bedrock\_foundation\_model) | Bedrock Foundation Model | `string` | `"anthropic.claude-v2"` | no |
+| <a name="input_bedrock_foundation_model"></a> [bedrock\_foundation\_model](#input\_bedrock\_foundation\_model) | Bedrock model ID, called through its global cross-Region inference profile (global.<model ID>) | `string` | `"anthropic.claude-haiku-5-5"` | no |
 | <a name="input_env"></a> [env](#input\_env) | Name of the environment this infrastructure is for | `string` | `"testing"` | no |
 | <a name="input_logging_level"></a> [logging\_level](#input\_logging\_level) | Level of logging required for this Lambda function | `string` | `"INFO"` | no |
 | <a name="input_memory_size"></a> [memory\_size](#input\_memory\_size) | Memory for Lambda Task | `number` | `512` | no |
