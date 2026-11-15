@@ -6,7 +6,7 @@ This SAM template creates one S3 bucket, one SNS topic, one SQS queue and one La
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 ## Language:
-####This is a Maven project which uses Java 11 and AWS SDK
+####This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -30,7 +30,7 @@ SNS has two subscribers, one SQS queue and one Lambda function.
 The Lambda function will be triggered whenever a new file is deleted in the S3 bucket.
 The SQS will also receive the deleted object event from the SNS topic.
 
-This is fully functional example implemented in Java 11.
+This is fully functional example implemented in Java.
 
 ## Deployment commands
 

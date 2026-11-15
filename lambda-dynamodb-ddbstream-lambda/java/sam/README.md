@@ -1,14 +1,14 @@
 ## Description
 ## Lambda - DynamoDB - Dynamodb Stream - Lambda
 
-This pattern creates two lambda functions, a DynamoDB table and enables DynamoDB Stream using SAM and Java 11.
+This pattern creates two lambda functions, a DynamoDB table and enables DynamoDB Stream using SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the
 Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 
 ## Language:
-#### This is a Maven project which uses Java 11 and AWS SDK
+#### This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -36,7 +36,7 @@ into a DynamoDB table.
 The DynamoDB Stream will detect the new item in the DynamoDB table and will invoke the second Lambda function, 
 OrderSubscriber which will display the new record in CloudWatch Logs.
 
-This is fully functional example developed in Java 11.
+This is fully functional example developed in Java.
 
 
 ## Deployment commands

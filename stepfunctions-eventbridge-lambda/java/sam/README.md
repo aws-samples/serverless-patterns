@@ -2,12 +2,12 @@
 ## Step Functions - EventBridge - Lambda
 
 This pattern creates two Lambda functions, an EventBridge custom event bus and event Rule, 
-and a Step Functions Workflow using AWS SAM and Java 11.
+and a Step Functions Workflow using AWS SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 ## Language:
-#### This is a Maven project which uses Java 11 and AWS SDK
+#### This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -37,7 +37,7 @@ The event pattern Rule will invoke the ProcessOrder Lambda function with the Eve
 
 You can see the event in the CloudWatch Logs - Log Group of the ProcessOrder Lambda function.
 
-This is fully functional example implemented in Java 11.
+This is fully functional example implemented in Java.
 
 ## Deployment commands
 

@@ -2,12 +2,12 @@
 ## Producer-Consumer Pattern - Lambda - SQS - Lambda
 
 This pattern creates two Lambda functions and an SQS queue using AWS SAM,
-and the code is implemented in Java 11.
+and the code is implemented in Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 ## Language:
-####This is a Maven project which uses Java 11 and AWS SDK
+####This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -32,7 +32,7 @@ You will be able to create and delete the CloudFormation stack using the CLI com
 The PaymentProducer is invoked with a JSON payload and send it as a message to the SQS queue.
 The PaymentConsumer is triggered when are new messages in the SQS queue, and consumes the messages.
 
-This is fully functional example implemented in Java 11.
+This is fully functional example implemented in Java.
 
 ## Deployment commands
 

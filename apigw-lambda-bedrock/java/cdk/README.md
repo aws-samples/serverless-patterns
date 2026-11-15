@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 - `Anthropic Claude` fundamental model access requested (check [Prerequisite](#Prerequisite) to see details).
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) 
+- [Java](https://aws.amazon.com/corretto/) 
 - [Maven 3](https://maven.apache.org/)
 - [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK)
 

@@ -18,7 +18,7 @@ Please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Requirements
-* [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html)
+* [Java](https://aws.amazon.com/corretto/)
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have enough permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)

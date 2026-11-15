@@ -18,7 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2.37.3 or later installed and configured (earlier versions lack the `aws eventsv2` command)
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* JDK 21 and Apache Maven installed (the consumer runs on the `java21` AWS Lambda runtime; the publisher and tests build and run locally)
+* A JDK and Apache Maven installed (the publisher and tests build and run locally)
 * The new Amazon EventBridge custom event bus (`eventsv2`) available in your Region — confirm with `aws eventsv2 list-event-buses`
 
 ## Deployment Instructions
@@ -31,7 +31,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/eventbridge-custom-avro/java/sam
     ```
-1. Build the AWS Lambda consumer. `sam build` runs Maven for the Java consumer. If you build without a local JDK 21 / Maven, use `sam build --use-container` (needs Docker); it builds in the AWS Lambda `java21` image.
+1. Build the AWS Lambda consumer. `sam build` runs Maven for the Java consumer. If you build without a local JDK and Maven, use `sam build --use-container` (needs Docker); it builds in the AWS Lambda Java image.
     ```
     sam build
     ```

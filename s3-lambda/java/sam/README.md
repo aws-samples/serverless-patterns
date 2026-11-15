@@ -1,13 +1,13 @@
 ## Description
 ## S3 - Lambda - S3
 
-This pattern creates two S3 buckets and a Lambda function using SAM and Java 11.
+This pattern creates two S3 buckets and a Lambda function using SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 
 ## Language:
-###This is a Maven project which uses Java 11 and AWS SDK
+###This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -33,7 +33,7 @@ The source S3 bucket will trigger the Lambda function whenever a new object .txt
 and the Lambda function will download the object from the source bucket, will transform all the characters to
 uppercase and finally will upload the newly updated object into the second S3 bucket.
 
-This is fully functional example developed in Java 11.
+This is fully functional example developed in Java.
 
 
 ## Deployment commands

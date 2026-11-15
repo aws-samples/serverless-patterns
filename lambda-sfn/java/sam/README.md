@@ -1,13 +1,13 @@
 ## Description
 ## Lambda - StepFunctions
 
-This pattern creates an five Lambda function and an Step Functions Workflow using SAM and Java 11.
+This pattern creates an five Lambda function and an Step Functions Workflow using SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 
 ## Language:
-###This is a Maven project which uses Java 11 and AWS SDK
+###This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -32,7 +32,7 @@ You will be able to create and delete the CloudFormation stack using the CLI com
 The OrderEvent Lambda function will be invoked with an JSON payload which will send the message to the Step Functions workflow.
 Depending on the payload, the Step Function will execute a different Lambda function.
 
-This is fully functional example developed in Java 11.
+This is fully functional example developed in Java.
 
 
 ## Deployment commands
