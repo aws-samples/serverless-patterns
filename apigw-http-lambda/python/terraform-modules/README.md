@@ -2,9 +2,27 @@
 
 This pattern creates an Amazon API Gateway HTTP API and an AWS Lambda function.
 
-## Getting started with Terraform Serverless Patterns
+## Prerequisites
 
-Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md). 
+* [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
+* [Terraform](https://developer.hashicorp.com/terraform/install) installed
+* Python 3, which Terraform uses to build the function package
+
+## Deployment Instructions
+
+1. Clone the GitHub repository and change to the pattern directory:
+    ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
+    cd serverless-patterns/apigw-http-lambda/python/terraform-modules
+    ```
+1. Download the providers and modules, then deploy. The pattern deploys to `eu-west-1`; change the `provider "aws"` block in `main.tf` to use another Region.
+    ```bash
+    terraform init
+    terraform apply
+    ```
+1. Enter `yes` at the prompt. Note the outputs, which you use for testing.
 
 ## Testing
 
@@ -67,6 +85,15 @@ curl https://wargabe3ei.execute-api.eu-west-1.amazonaws.com
 ```
 
 Then check the logs for the Lambda function from the Lambda console.
+
+## Cleanup
+
+1. Delete the resources from the pattern directory:
+    ```bash
+    cd serverless-patterns/apigw-http-lambda/python/terraform-modules
+    terraform destroy
+    ```
+1. Enter `yes` at the prompt.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

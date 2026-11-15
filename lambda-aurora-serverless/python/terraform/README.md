@@ -4,10 +4,6 @@ The pattern creates an AWS Lambda function and an Amazon Aurora Serverless clust
 
 The Lambda function is written in Python that uses pymysql client to establish connectivity with the serverless database.
 
-## Getting started with Terraform Serverless Patterns
-
-Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
-
 ## Steps
 
 First of all, you will need to install the 'pymysql' client depedency which is used in the Lambda function code.
