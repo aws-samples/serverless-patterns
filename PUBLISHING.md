@@ -77,6 +77,9 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
   - Pull requests check the path of each pattern folder they add: it must be nested and can't contain a `yaml` folder. Check yours with `node _scripts/check-folder.js {family}/{language}/{framework}`.
 - **Scope:** patterns are infrastructure as code for 2–4 AWS services with minimal custom code. Utilities, demos and full applications belong in [Serverless Land repos](https://serverlessland.com/repos).
 - **README.md:** keep the headings from `_pattern-model/README.md` and fill in every section: requirements, deployment, how it works, testing and cleanup.
+  - Name the language (Python, Node.js, TypeScript, Java, .NET, Go, Rust, Ruby), not a version. The runtime version belongs only in the template or IaC code, so the README doesn't go out of date when the runtime is updated.
+  - If the pattern needs a particular version, name it and say why in a few words, e.g. "JDK 17 (Micronaut 3.9 doesn't compile on newer JDKs)".
+  - For a local build, a requirement such as "Python 3 installed, or Docker or Finch for `sam build --use-container`" is fine.
 - **example-pattern.json:** this file builds the pattern page on Serverless Land. Pull requests check it against the [pattern schema](_scripts/pattern-schema.mjs). The rules people most often miss:
   - The first mention of each service in `title` uses its official name: "AWS Lambda to Amazon DynamoDB", not "Lambda to DynamoDB".
   - `title` is 100 characters or fewer and `description` is 175 or fewer.

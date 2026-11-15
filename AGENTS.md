@@ -18,6 +18,7 @@ To create or change a pattern, follow the [pattern checklist](PUBLISHING.md#patt
 - Use least-privilege IAM, e.g. SAM policy templates, instead of `*` actions or resources.
 - Don't hardcode account IDs, Regions, ARNs or secrets. Use parameters, pseudo parameters or environment variables.
 - Keep custom code short. A pattern shows how services connect.
+- In the README, name the language, not a runtime version. The version lives in the template or IaC code. Name one only when the pattern needs it, and say why.
 - Stage files by name, e.g. `git add {pattern-folder}`. Don't use `git add .` or `git add -A`.
 
 ## Helper EC2 instances
