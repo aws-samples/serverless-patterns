@@ -46,12 +46,6 @@ resource "aws_security_group" "this_aws_security_group" {
   description = "Allow only outbound traffic for Lambda Function"
   vpc_id      = var.aws_vpc_id
   tags        = local.common_tags
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -161,6 +155,8 @@ resource "aws_iam_policy" "this_aws_iam_policy" {
     account_number         = local.account_id
     standard_resource_name = local.standard_resource_name
     kms_key_arn            = aws_kms_key.this_aws_kms_key.arn
+    region                 = local.region
+    model_id               = var.bedrock_foundation_model
   })
 }
 
@@ -203,7 +199,7 @@ resource "aws_lambda_function" "this_aws_lambda_function" {
       ENV                      = var.env
       ORGANIZATION             = var.organization
       LOGGING_LEVEL            = var.logging_level
-      BEDROCK_FOUNDATION_MODEL = var.bedrock_foundation_model
+      BEDROCK_MODEL_ID         = "global.${var.bedrock_foundation_model}"
     }
   }
 }
