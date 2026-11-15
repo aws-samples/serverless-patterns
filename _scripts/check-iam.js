@@ -64,10 +64,15 @@ const scanFile = (file) => {
   return findings;
 };
 
-// Returns an array of "path:line: message" strings for one pattern folder.
-const checkPatternIam = (patternDir, repoRoot) =>
+// Returns { file, line, message, text } findings for one pattern folder. file is relative to repoRoot.
+const findPatternIam = (patternDir, repoRoot) =>
   listFiles(patternDir).flatMap((file) =>
-    scanFile(file).map(({ line, message, text }) => `\`${path.relative(repoRoot, file)}:${line}\` ${message}: \`${text.slice(0, 120)}\``)
+    scanFile(file).map((finding) => ({ ...finding, file: path.relative(repoRoot, file) }))
   );
 
-module.exports = { checkPatternIam };
+const formatIamFinding = ({ file, line, message, text }) => `\`${file}:${line}\` ${message}: \`${text.slice(0, 120)}\``;
+
+// Returns an array of "path:line: message" strings for one pattern folder.
+const checkPatternIam = (patternDir, repoRoot) => findPatternIam(patternDir, repoRoot).map(formatIamFinding);
+
+module.exports = { checkPatternIam, findPatternIam, formatIamFinding };
