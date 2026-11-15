@@ -1,6 +1,2 @@
-aws-cdk.aws-apigateway
-aws-cdk.aws-lambda
-aws-cdk.aws-iam
-aws-cdk.aws-route53
-aws-cdk.aws-route53-targets
-aws-cdk.aws-s3
+aws-cdk-lib==2.263.0
+constructs>=10.5.0,<11.0.0

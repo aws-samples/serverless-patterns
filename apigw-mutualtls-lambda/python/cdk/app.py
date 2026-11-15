@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
 
+import aws_cdk as cdk
 from aws_cdk import (
-    core as cdk,
     aws_apigateway as apigateway,
     aws_lambda as lambda_,
     aws_s3 as s3,
@@ -11,12 +11,13 @@ from aws_cdk import (
     aws_route53_targets as targets,
     aws_iam as iam
 )
+from constructs import Construct
 
 DIRNAME = os.path.dirname(__file__)
 
 class MutualTLSAPIGatewayStack(cdk.Stack):
 
-    def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Create a Lambda function
