@@ -57,19 +57,6 @@ The AWS SAM template configures the custom runtime and builds the Go function us
       Handler: bootstrap
       Runtime: provided.al2023
 ```
-You can also use the managed Go.1 runtime by amending the AWS SAM template:
-
-AWS Lambda Golang runtime requires a flat folder with the executable generated on build step. SAM will use `CodeUri` property to know where to look up for the application:
-
-```yaml
-...
-  HelloWorldGoKafkaFunction:
-    Type: AWS::Serverless::Function 
-    Properties:
-      CodeUri: HandlerKafka/
-      Handler: handler
-      Runtime: go1.x            
-```
 
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```

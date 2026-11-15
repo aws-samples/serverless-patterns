@@ -40,7 +40,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys two S3 buckets, one AWS Lambda function and the required IAM Roles for making AWS Lambda capable of creating AWS Elemental MediaConvert jobs and write logs in Amazon CloudWatch Logs. AWS Lambda function is written in Python 3.9. Each time you upload a video file to the input S3 bucket, a Lambda function is triggered. The function gets invocation event, process it, and creates a job in AWS Elemental MediaConverter. The settings of the job are in the `job.json` file which is part of the lambda deployment package. The output of the job is a transcoded video which is saved in the output S3 bucket.  
+This pattern deploys two S3 buckets, one AWS Lambda function and the required IAM Roles for making AWS Lambda capable of creating AWS Elemental MediaConvert jobs and write logs in Amazon CloudWatch Logs. AWS Lambda function is written in Python 3.14. Each time you upload a video file to the input S3 bucket, a Lambda function is triggered. The function gets invocation event, process it, and creates a job in AWS Elemental MediaConverter. The settings of the job are in the `job.json` file which is part of the lambda deployment package. The output of the job is a transcoded video which is saved in the output S3 bucket.  
 
 ## Testing
 Once the application is deployed, navigate to Amazon S3 bucket and locate the `videoinput` bucket. Upload a video to root of the bucket. Then go to AWS CloudWatch Logs and locate the logs of the Lambda function. If the S3 event and the call top AWS Elemental MediaConverter worked, you should see the output of the Lambda function.

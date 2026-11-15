@@ -8,7 +8,7 @@ Built with a serverless-first approach, this solution automatically sends messag
 
 ### Getting Started
 
-The entire solution is built using AWS Cloud Development Kit (CDK) and AWS Lambda functions running on Python 3.11 runtime. This serverless architecture ensures minimal operational overhead while providing maximum flexibility for customization.
+The entire solution is built using AWS Cloud Development Kit (CDK) and AWS Lambda functions running on the Python 3.14 runtime. This serverless architecture ensures minimal operational overhead while providing maximum flexibility for customization.
 
 ### Requirements
 

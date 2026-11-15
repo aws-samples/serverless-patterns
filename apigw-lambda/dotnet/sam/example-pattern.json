@@ -1,6 +1,6 @@
 {
-  "title": "Amazon API Gateway HTTP API to AWS Lambda with ASP.NET 6.0",
-  "description": "HTTP API to AWS Lambda with ASP.NET 6.0",
+  "title": "Amazon API Gateway HTTP API to AWS Lambda with ASP.NET 10",
+  "description": "HTTP API to AWS Lambda with ASP.NET 10",
   "language": ".NET",
   "level": "200",
   "framework": "AWS SAM",

@@ -69,7 +69,7 @@ For more information about Lambda quota including invocation payload, see the [L
 
 You will be able to create and delete the CloudFormation stack using the CLI commands.
 
-This is fully functional example developed in python 3.9
+This is fully functional example developed in Python 3.14
 
 At the end of test, please remove objects in S3 bucket!
 
