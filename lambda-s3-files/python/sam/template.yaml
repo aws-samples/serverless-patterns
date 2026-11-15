@@ -72,11 +72,14 @@ Resources:
       GroupDescription: Security group for Lambda function
       VpcId: !Ref VPC
       SecurityGroupEgress:
+        # The private subnet has no internet route, so this traffic only reaches
+        # Amazon S3 through the gateway endpoint (direct reads). Narrow this rule
+        # if you ever add a NAT gateway.
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: !Ref VpcCidr
-          Description: HTTPS outbound to VPC endpoints
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS outbound to Amazon S3 through the gateway endpoint
         - IpProtocol: tcp
           FromPort: 2049
           ToPort: 2049
