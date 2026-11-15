@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.9-slim
+FROM public.ecr.aws/docker/library/python:3.14-slim
 
 WORKDIR /tmp
 
