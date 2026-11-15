@@ -17,12 +17,17 @@
 // only changed example-pattern.json files, and only folders whose example-pattern.json the
 // pull request adds must be nested; local runs check `yaml` only.
 //
+// In GitHub Actions (GITHUB_ACTIONS=true) it also prints each problem as an ::error
+// annotation and writes a summary table to GITHUB_STEP_SUMMARY (see annotate.js), so the
+// reason for a failure shows on the pull request without a comment.
+//
 // Exits non-zero if any file fails validation, any pattern has a broad IAM grant,
 // or any folder path breaks the folder rules.
 const fs = require('fs');
 const path = require('path');
-const { checkPatternIam } = require('./check-iam');
+const { findPatternIam, formatIamFinding } = require('./check-iam');
 const { checkPatternFolder, findPatternDir } = require('./check-folder');
+const { errorCommand, summaryMarkdown } = require('./annotate');
 
 const PATTERN_FILE = 'example-pattern.json';
 const repoRoot = path.join(__dirname, '..');
@@ -188,9 +193,35 @@ const reportSuccess = async (parsedPatterns) => {
   await removeLabel('missing-example-pattern-file');
 };
 
+// In GitHub Actions, print an ::error annotation per problem and add a job summary.
+const reportToActions = (failures, iamFailures, folderFailures) => {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  const rel = (p) => path.relative(repoRoot, p);
+  const problems = [
+    ...failures.flatMap(({ file, errors }) =>
+      errors.map((message) => ({ pattern: rel(path.dirname(file)), check: 'Pattern file', file: rel(file), message }))
+    ),
+    ...iamFailures.flatMap(({ dir, iamFindings }) =>
+      iamFindings.map((finding) => ({
+        pattern: rel(dir),
+        check: 'Broad IAM',
+        file: finding.file,
+        line: finding.line,
+        message: `${finding.message}: \`${finding.text.slice(0, 120)}\``,
+      }))
+    ),
+    ...folderFailures.flatMap(({ dir, problems: list }) =>
+      list.map((message) => ({ pattern: rel(dir), check: 'Folder structure', file: rel(path.join(dir, PATTERN_FILE)), message }))
+    ),
+  ];
+  problems.forEach((problem) => console.log(errorCommand(problem)));
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summaryMarkdown(problems));
+};
+
 const main = async () => {
   if (patternFiles.length === 0 && iamDirs.length === 0) {
     console.info('No pattern files changed, nothing to validate.');
+    reportToActions([], [], []);
     if (githubAutomation) await reportMissingFile();
     return;
   }
@@ -217,10 +248,11 @@ const main = async () => {
   const iamFailures = [];
   for (const dir of iamDirs) {
     if (!fs.existsSync(dir)) continue;
-    const findings = checkPatternIam(dir, repoRoot);
+    const iamFindings = findPatternIam(dir, repoRoot);
+    const findings = iamFindings.map(formatIamFinding);
     const name = path.relative(process.cwd(), dir) || '.';
     if (findings.length) {
-      iamFailures.push({ dir, findings });
+      iamFailures.push({ dir, findings, iamFindings });
       console.error(`✘ ${name}: broad IAM permissions`);
       findings.forEach((finding, index) => console.error(`  ${index + 1}. ${finding.replace(/`/g, '')}`));
     } else {
@@ -241,6 +273,7 @@ const main = async () => {
     }
   }
 
+  reportToActions(failures, iamFailures, folderFailures);
   if (failures.length) await reportErrors(failures);
   if (iamFailures.length) await reportIamFindings(iamFailures);
   if (folderFailures.length) await reportFolderProblems(folderFailures);
