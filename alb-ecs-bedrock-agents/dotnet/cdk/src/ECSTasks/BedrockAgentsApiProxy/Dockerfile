@@ -1,5 +1,5 @@
 # Use the official .NET SDK image to build the project
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
@@ -11,7 +11,7 @@ COPY . .
 RUN dotnet publish -c Release -o /app/publish
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 # install packages
 RUN apt-get update && apt-get install -y curl procps && rm -rf /var/lib/apt/lists/*
@@ -22,14 +22,11 @@ WORKDIR /app
 # Copy the published app to the /app directory
 COPY --from=build /app/publish .
 
-# Create a non-root user
-RUN adduser --disabled-password --gecos '' appuser
-
-# Give ownership of the /app directory to appuser
-RUN chown -R appuser:appuser /app
+# Give ownership of the /app directory to the image's built-in non-root user
+RUN chown -R $APP_UID:$APP_UID /app
 
 # Switch to the non-root user
-USER appuser
+USER $APP_UID
 
 # Expose the port the app will run on
 EXPOSE 8080
