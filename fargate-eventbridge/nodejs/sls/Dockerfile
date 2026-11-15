@@ -1,4 +1,4 @@
-FROM amd64/node:18.17-alpine
+FROM --platform=linux/amd64 node:24-alpine
 
 COPY . .
 
