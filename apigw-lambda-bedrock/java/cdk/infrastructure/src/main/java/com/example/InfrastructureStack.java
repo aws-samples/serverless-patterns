@@ -17,6 +17,7 @@ import software.amazon.awscdk.services.logs.RetentionDays;
 import software.constructs.Construct;
 
 import java.util.List;
+import java.util.Map;
 
 public class InfrastructureStack extends Stack {
     public InfrastructureStack(final App parent, final String id) {
@@ -26,10 +27,25 @@ public class InfrastructureStack extends Stack {
     public InfrastructureStack(final Construct parent, final String id, final StackProps props) {
         super(parent, id, props);
 
-        // Create policy to allow Lambda call Bedrock
+        // Claude Haiku 5.5 through the global cross-Region inference profile.
+        // Bedrock serves this model on demand only through an inference profile.
+        String modelName = "anthropic.claude-haiku-5-5";
+        String inferenceProfileArn = "arn:aws:bedrock:" + getRegion() + ":" + getAccount()
+                + ":inference-profile/global." + modelName;
+
+        // Allow Lambda to call the inference profile...
+        PolicyStatement invokeProfilePolicy = new PolicyStatement(PolicyStatementProps.builder()
+                .actions(List.of("bedrock:InvokeModel"))
+                .resources(List.of(inferenceProfileArn))
+                .build());
+
+        // ...and the model it routes to, only through that profile
         PolicyStatement invokeModelPolicy = new PolicyStatement(PolicyStatementProps.builder()
                 .actions(List.of("bedrock:InvokeModel"))
-                .resources(List.of("arn:aws:bedrock:" + getRegion() + "::foundation-model/anthropic.claude-v2"))
+                .resources(List.of(
+                        "arn:aws:bedrock:" + getRegion() + "::foundation-model/" + modelName,
+                        "arn:aws:bedrock:::foundation-model/" + modelName))
+                .conditions(Map.of("StringEquals", Map.of("bedrock:InferenceProfileArn", inferenceProfileArn)))
                 .build());
 
         // Create CloudWatch log group for storing Lambda logs
@@ -45,7 +61,8 @@ public class InfrastructureStack extends Stack {
                 .handler("com.example.BedrockClient::handleRequest")
                 .code(Code.fromAsset("../software/target/BedrockClient-1.0.jar"))
                 .timeout(Duration.seconds(60))
-                .initialPolicy(List.of(invokeModelPolicy))
+                .environment(Map.of("MODEL_ID", "global." + modelName))
+                .initialPolicy(List.of(invokeProfilePolicy, invokeModelPolicy))
                 .logGroup(functionLogGroup)
                 .build();
 
