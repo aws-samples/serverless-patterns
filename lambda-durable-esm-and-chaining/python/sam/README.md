@@ -12,7 +12,7 @@ The pattern showcases two key Durable Functions capabilities:
 1. **Direct Event Source Mapping**: SQS directly triggers the durable function (15-minute limit)
 2. **Lambda Invoke Chaining**: Orchestrates specialized processing functions
 
-![Architecture Diagram](architecture-diagram.png)
+![Architecture Diagram](architecture.png)
 
 ## Key Features
 

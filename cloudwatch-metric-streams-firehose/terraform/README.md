@@ -34,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 When AWS services are provisioned, the listed metrics(in the IaC) will be captured and streamed to Amazon Data Firehose. The destination in this case is a S3 bucket, where the metrics are saved. The code is configured to eu-west-2, but can be changed to any desired region via CLI as shown above. The example code includes AWS/EC2 and AWS/RDS namespaces with couple of metrics in each, which can be easily changed or new ones appended with new namespaces and/or metrics as required.
 
-![pattern](Images/pattern.png)
+![pattern](images/pattern.png)
 
 ## Testing
 

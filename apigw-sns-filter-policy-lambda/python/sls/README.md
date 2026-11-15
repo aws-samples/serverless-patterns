@@ -42,7 +42,7 @@ AWS costs incurred. No warranty is implied in this example.
    - `serverless-python-requirements` plugin will automatically detect `Pipfile` and pipenv installed and generate a `requirements.txt` file
    - `serverless-apigateway-service-proxy` plugin supports the AWS service proxy integration feature of API Gateway
 
-5. Deploy the services specified in [serverless.yml](./serverless-compose.yml) by running:
+5. Deploy the services specified in [serverless.yml](./serverless.yml) by running:
    ```commandline
       sls deploy --verbose
    ```

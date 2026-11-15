@@ -77,7 +77,7 @@ Use the Stack output `RdsProxyApiPath` after [above step](#deployment-instructio
     curl "ENDPOINT_URL"
    ```
 
-This should result in a json payload which returns current date. Current date is returned by [querying](src/app.py#L55) RDS Aurora(MySql) database 
+This should result in a json payload which returns current date. Current date is returned by [querying](src/main/java/com/example/RdsProxyFunction.java#L144) RDS Aurora(MySql) database 
 for current date.
 
    ```
