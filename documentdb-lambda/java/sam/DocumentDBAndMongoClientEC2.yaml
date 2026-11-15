@@ -9,10 +9,8 @@ Parameters:
     Description: DocumentDB engine version
   JavaVersion:
     Type: String
-    Description: Choose the version of Java. Lambda currently supports Java 11, 17 and 21
+    Description: Version to install on the client instance and use as the runtime of the Lambda function it deploys. Choose Java 21.
     AllowedValues:
-      - java11
-      - java17
       - java21
     Default: java21
   DocumentDBDatabaseName:

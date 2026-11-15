@@ -5,9 +5,8 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
   Python3Version:
     Type: String
-    Description: Choose the version of Python 3 between 3.9 and 3.12. Note that in Amazon Linux 2023, 3.9 is installed by default and maximum allowed version is 3.12. Also Python 3.10 is not available to install on Amazon Linux 2023 so it is not being offered as an option
+    Description: Version to install on the client instance and use as the runtime of the Lambda function it deploys. Choose Python 3.12, Python 3.13 or Python 3.14.
     AllowedValues:
-      - python3.11
       - python3.12
       - python3.13
       - python3.14
