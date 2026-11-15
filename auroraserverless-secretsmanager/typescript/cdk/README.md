@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
    cdk bootstrap 1111111111/us-east-1
    cdk bootstrap --profile test 1111111111/us-east-1
    ```
-5. Ensure that the bucket name is unique in [cdk-stack.ts](./cdk/lib/cdk-stack.ts)
+5. Ensure that the bucket name is unique in [cdk-stack.ts](./CDK/lib/cdk-stack.ts)
 6. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the `lib/s3cdk-stack.ts` file:
    ```bash
    cdk deploy

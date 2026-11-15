@@ -43,7 +43,7 @@ Important: This application uses various AWS services and there are costs associ
 
 Amazon MSK as an source operates similarly to using Amazon Simple Queue Service (Amazon SQS) or Amazon Kinesis. EventBridge internally polls for new messages from the source and then invokes the target. EventBridge reads the messages in batches and provides these to your function as an event payload. The maximum batch size is configurable. (The default is 100 messages). EventBridge reads the messages sequentially for each partition. After EventBridge processes each batch, it commits the offsets of the messages in that batch. If the pipe's target returns an error for any of the messages in a batch, EventBridge retries the entire batch of messages until processing succeeds or the messages expire.
 
-The cluster doesn't use client authentication, and accepts both plaintext (port 9092) and TLS (port 9094) connections from the client security group and from itself. The brokers are in private subnets. For IAM authentication, see the [eventbridge-pipes-msk-iam-auth-to-lambda](../eventbridge-pipes-msk-iam-auth-to-lambda) pattern.
+The cluster doesn't use client authentication, and accepts both plaintext (port 9092) and TLS (port 9094) connections from the client security group and from itself. The brokers are in private subnets. For IAM authentication, see the [eventbridge-pipes-msk-iam-auth-to-lambda](../../../eventbridge-pipes-msk-iam-auth-to-lambda/nodejs/sam) pattern.
 
 ## Testing
 

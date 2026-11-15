@@ -87,7 +87,7 @@ cdk destroy
 ## Roadmap
 
 1. Include a simulated IoT device sending MQTT messages to AWS IoT Core using [AWS IoT Device SDK v2 for Python](https://github.com/aws/aws-iot-device-sdk-python-v2)
-2. Support for using [`aws-kinesisfirehose-s3`](aws-kinesisfirehose-s3) solution construct.
+2. Support for using [`aws-kinesisfirehose-s3`](https://github.com/awslabs/aws-solutions-constructs/tree/main/source/patterns/%40aws-solutions-constructs/aws-kinesisfirehose-s3) solution construct.
 
 ## Resources
 1. [AWS IoT Rule Actions](https://docs.aws.amazon.com/iot/latest/developerguide/iot-rule-actions.html)
