@@ -15,6 +15,7 @@ AWS costs incurred. No warranty is implied in this example.
   have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls
   and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* `cdk synth` and `cdk deploy` need AWS credentials, because the app looks up an Amazon Machine Image (AMI) in your account and Region.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (
   AWS SAM) installed

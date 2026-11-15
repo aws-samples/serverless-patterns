@@ -12,6 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
   - Ensure you have a default [AWS VPC](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-getting-started.html) which contains at least one [public subnet](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured, with a default profile that points to the AWS account to use
+- `cdk synth` and `cdk deploy` need AWS credentials, because the app looks up the default VPC in your account.
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Python 3.10 or later](https://www.python.org/downloads/)
 - [pip and virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html#python-prerequisites)
