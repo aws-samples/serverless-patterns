@@ -10,7 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Node.js 22+](https://nodejs.org/en/download/) installed
+* [Node.js](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`)
 * CDK bootstrapped in your account/region (`cdk bootstrap`)
 * Amazon Bedrock model access enabled for the model set in `MODEL_ID` (`us.anthropic.claude-sonnet-5-5`) in us-east-1

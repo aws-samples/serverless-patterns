@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Node.js 22+](https://nodejs.org/en/download/) installed
+- [Node.js](https://nodejs.org/en/download/) installed
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`)
 - [AWS CDK bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) in your account/region
 
@@ -46,7 +46,7 @@ This pattern creates the following resources:
 
 2. **Amazon Bedrock AgentCore Gateway** — An MCP-protocol gateway that routes tool invocations to registered targets
 
-3. **AWS Lambda Function** — A Node.js 24 tool handler that invokes Amazon Bedrock Claude Sonnet 4 for AI inference
+3. **AWS Lambda Function** — A Node.js tool handler that invokes Amazon Bedrock Claude Sonnet 4 for AI inference
 
 4. **AWS WAF Logging** — Full request logs delivered to Amazon CloudWatch Logs for security monitoring and incident response
 

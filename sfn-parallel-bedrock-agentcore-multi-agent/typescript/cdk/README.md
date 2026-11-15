@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) (latest available version) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) (version 2.221.0 or later) installed and configured
-* [Node.js 22.x](https://nodejs.org/) installed
+* [Node.js](https://nodejs.org/) installed
 * [Finch](https://runfinch.com/), [Docker](https://www.docker.com/products/docker-desktop/) or a compatible tool (required to build the agent container image)
 
 ## Deployment Instructions

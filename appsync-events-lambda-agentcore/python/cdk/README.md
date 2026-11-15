@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI installed and configured](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 * [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Python 3.14](https://www.python.org/downloads/) with [pip](https://pip.pypa.io/en/stable/installation/)
-* [Node.js 22](https://nodejs.org/en/download/)
+* [Node.js](https://nodejs.org/en/download/)
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm install -g aws-cdk`)
 * [Finch](https://runfinch.com/) or [Docker](https://docs.docker.com/get-docker/) (used for CDK bundling)
 

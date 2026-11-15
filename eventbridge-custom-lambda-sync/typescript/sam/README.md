@@ -34,7 +34,7 @@ This sample demonstrates it end to end:
 
 The publisher uses the AWS SDK for
 JavaScript v3 (`@aws-sdk/client-eventbridgev2`), and the consumer AWS Lambda function runs on
-the Node.js 24 runtime, bundled by AWS SAM with esbuild. Python and Java versions
+the Node.js runtime, bundled by AWS SAM with esbuild. Python and Java versions
 of this pattern live in sibling `-python` / `-java` folders.
 
 ## Layout
@@ -64,8 +64,7 @@ net), and the delivery role. AWS SAM builds the TypeScript consumer with esbuild
 ## Prerequisites
 
 - Node.js 22.12+ or 24+ (the publisher and tests run locally; the test runner,
-  vitest 5, requires `^22.12.0 || ^24.0.0 || >=26.0.0`). The AWS Lambda function runs on
-  `nodejs24.x`, so Node.js 24 locally matches it.
+  vitest 5, requires `^22.12.0 || ^24.0.0 || >=26.0.0`).
 - AWS SAM CLI version 1.168.0+ and AWS Command Line Interface (AWS CLI) v2.
 - AWS credentials for a **non-production** account, with permission to create an
   AWS Lambda function, an AWS Identity and Access Management (IAM) role, an Amazon SQS queue, and an Amazon EventBridge (EventsV2) bus + subscriber.
@@ -120,7 +119,7 @@ aws cloudformation describe-stacks --stack-name <stack-name> \
 
 > `sam build` runs esbuild for the TypeScript consumer. If you build without a
 > local esbuild, use `sam build --use-container` (needs Docker); it builds in the
-> AWS Lambda `nodejs24.x` image.
+> AWS Lambda Node.js image.
 
 ## Publish and verify
 

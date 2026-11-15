@@ -9,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * AWS Account
 * AWS CLI already configured with Administrator permission
-* [Node.js 22+](https://nodejs.org/en/download/) installed
+* [Node.js](https://nodejs.org/en/download/) installed
 * CDK v2 installed: See Getting Started With the AWS CDK
 * Python CDK required libraries: (install with pip install -r requirements.txt)
 * Clone this repo!
