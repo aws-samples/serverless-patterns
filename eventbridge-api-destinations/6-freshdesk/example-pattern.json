@@ -43,7 +43,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./6-freshdesk",
       "sam deploy --guided"
     ]
   },

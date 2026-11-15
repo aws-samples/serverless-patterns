@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
 2. Change directory to the pattern directory:
     ```
-    cd eventbridge-partner-sources/1-okta/cdk-python
+    cd eventbridge-partner-sources/1-okta/python/cdk
     ```
 3. From the command line, use AWS CDK to deploy the AWS resources for the pattern as specified in the app.py file. A command-line argument is needed to deploy the CDK stack, "oktaEventBusName". This argument is the name of the **SaaS event bus** associated with your Okta [partner event source](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas.html).
     ```

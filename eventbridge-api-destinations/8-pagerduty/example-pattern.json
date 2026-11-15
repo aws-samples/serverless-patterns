@@ -30,7 +30,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./8-pagerduty",
       "sam deploy --guided"
     ]
   },

@@ -49,7 +49,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./9-shopify",
       "sam deploy --guided"
     ]
   },

@@ -42,7 +42,6 @@
   },
   "deploy": {
     "text": [
-      "cd ./4-mongodb",
       "sam deploy --guided"
     ]
   },
