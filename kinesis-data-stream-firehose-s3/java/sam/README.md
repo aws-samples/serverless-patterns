@@ -64,7 +64,7 @@ aws s3 rb s3://rtgvhgc8279238sdcd
 ----
 
 ## Language:
-This is a Java 11 Maven project.
+This is a Java Maven project.
 
 ## Framework
 

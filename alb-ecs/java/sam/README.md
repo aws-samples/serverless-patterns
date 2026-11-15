@@ -1,6 +1,6 @@
 # Deploying Spring Boot application on Amazon ECS/AWS Fargate with Application Load Balancer
 
-This sample project deploys a Java 21 Spring Boot application on Amazon ECS using AWS Fargate with Application Load Balancer to route traffic between two ECS Tasks.
+This sample project deploys a Java Spring Boot application on Amazon ECS using AWS Fargate with Application Load Balancer to route traffic between two ECS Tasks.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/alb-ecs-java-sam
 
@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-- [Java 21 or above](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html) installed
+- [Java](https://aws.amazon.com/corretto/) installed
 - [Maven 3.8.6 or above](https://maven.apache.org/download.cgi) installed
 - [Docker](https://docs.docker.com/engine/install/) installed
 - [jq](https://jqlang.github.io/jq/download/) installed
@@ -80,7 +80,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This sample project deploys a Java 21 Spring Boot application on Amazon ECS Fargate with Application Load Balancer to route traffic between two ECS Tasks. The application exposed REST APIs which can be accessed over HTTP.
+This sample project deploys a Java Spring Boot application on Amazon ECS Fargate with Application Load Balancer to route traffic between two ECS Tasks. The application exposed REST APIs which can be accessed over HTTP.
 
 Please refer to the architecture diagram below:
 

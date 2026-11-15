@@ -3,7 +3,7 @@
 <img src="topology.png" alt="topology" width="65%"/>
 
 The SAM template deploys a Lambda function, a DynamoDB table and a Kinesis Data Streams.
-This is a Java 11 implementation of this pattern.
+This is a Java implementation of this pattern.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -60,7 +60,7 @@ aws s3 rb s3://rtgvhgc8279238sdcd
 ----
 
 ## Language:
-This is a Maven project which uses Java 11 and AWS SDK.
+This is a Maven project which uses Java and AWS SDK.
 
 ## Framework
 

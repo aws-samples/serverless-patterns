@@ -43,7 +43,7 @@ This is useful when you want control over the handler method, for example to add
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Java 17](https://aws.amazon.com/corretto/)
+* [Java](https://aws.amazon.com/corretto/)
 * [Maven](https://maven.apache.org/)
 * [CURL](https://curl.se/)
 * [jq](https://jqlang.github.io/jq/)

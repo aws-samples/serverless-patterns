@@ -1,12 +1,12 @@
 ## Description
 ## A Lambda function read messages from a SQS queue, store them into a DynamoDB table, then removes them from the SQS queue
 
-This pattern creates one SQS queue, a Lambda function and a DynamoDB table using SAM and Java 11.
+This pattern creates one SQS queue, a Lambda function and a DynamoDB table using SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 ## Language:
-####This is a Maven project which uses Java 11 and AWS SDK
+####This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -30,7 +30,7 @@ You will be able to create and delete the CloudFormation stack using the CLI com
 
 The lambda function will read messages in batch, will store them into the DynamoDB table, then will remove messages from the queue.
 
-This is fully functional example developed in Java 11.
+This is fully functional example developed in Java.
 
 ## Deployment commands
 

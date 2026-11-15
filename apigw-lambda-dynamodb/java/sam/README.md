@@ -2,14 +2,14 @@
 ## Description
 ###API Gateway, Lambda Function and Dynamodb Table
 
-This pattern creates an Amazon API Gateway HTTP API, a AWS Lambda function and a DynamoDB Table using SAM and Java 11.
+This pattern creates an Amazon API Gateway HTTP API, a AWS Lambda function and a DynamoDB Table using SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 
 
 ## Language:
-###This is a Maven project which uses Java 11 and AWS SDK
+###This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 

@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) **v2.37.3 or later**, installed and configured. Check with `aws --version`. This is the first release with `aws eventsv2` (v2.37.2 shipped it as `aws eventbridgev2`).
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) CLI **v1.168.0 or later**. Check with `sam --version`.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [JDK 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) and [Apache Maven](https://maven.apache.org/install.html). The consumer runs on the `java21` Lambda runtime; the unit tests run locally. If you don't have them locally, `sam build --use-container` builds the function in the Lambda `java21` image (requires Docker).
+* A [JDK](https://aws.amazon.com/corretto/) and [Apache Maven](https://maven.apache.org/install.html). The unit tests run locally. If you don't have them locally, `sam build --use-container` builds the function in the Lambda Java image (requires Docker).
 * The new EventBridge Custom Event Bus available in your Region. Confirm with `aws eventsv2 list-event-buses`.
 
 ## Deployment Instructions
@@ -55,7 +55,7 @@ The template provisions:
 
 * An EventBridge Custom Event Bus (`AWS::EventsV2::EventBus`) that retains events for `RetentionInDays` (default 1 day).
 * A FIFO subscriber (`AWS::EventsV2::Subscriber`) that filters for events carrying an `orderId` and invokes the consumer function synchronously.
-* A Java 21 consumer Lambda function that logs each order in the order it is processed.
+* A Java consumer Lambda function that logs each order in the order it is processed.
 * An SQS dead-letter queue for deliveries that ultimately fail.
 * A delivery role, trusted by `events.amazonaws.com`, with `lambda:InvokeFunction` on the consumer and `sqs:SendMessage` on the dead-letter queue.
 

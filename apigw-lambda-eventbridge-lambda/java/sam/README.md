@@ -2,7 +2,7 @@
 ## Description
 ###API Gateway, Lambda to EventBridge to Lambda
 
-This pattern creates an Amazon API Gateway HTTP API, a AWS Lambda function(publisher), a custom EventBridge and Event Rule and another Lambda function(subscriber) using SAM and Java 11.
+This pattern creates an Amazon API Gateway HTTP API, a AWS Lambda function(publisher), a custom EventBridge and Event Rule and another Lambda function(subscriber) using SAM and Java.
 
 This example is an implementation of an publisher/subscriber pattern in Event-Drivent Architecture.
 
@@ -10,7 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 
 ## Language:
-###This is a Maven project which uses Java 11 and AWS SDK
+###This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 

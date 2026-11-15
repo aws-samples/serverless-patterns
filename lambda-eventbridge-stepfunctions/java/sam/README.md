@@ -2,13 +2,13 @@
 ## Lambda - EventBridge - Step Functions
 
 This pattern creates two Lambda functions, an EventBridge custom event bus and event Rule, 
-and a Step Functions Workflow using AWS SAM and Java 11.
+and a Step Functions Workflow using AWS SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 
 ## Language:
-####This is a Maven project which uses Java 11 and AWS SDK
+####This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
@@ -35,7 +35,7 @@ The event will match a custom event pattern Rule which will send the event to th
 The SFN workflow will start and invoke the OrderState Lambda function which will return a message and display the EventBridge 
 message in CloudWatch Logs.
 
-This is fully functional example implemented in Java 11.
+This is fully functional example implemented in Java.
 
 
 ## Deployment commands

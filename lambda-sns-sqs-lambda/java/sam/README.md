@@ -3,13 +3,13 @@
 
 ### Producer-Consumer pattern using Lambda - SNS - SQS - Lambda
 
-This pattern creates two Lambda functions, a producer and a consumer, an SNS topic and an SQS queue using SAM and Java 21.
+This pattern creates two Lambda functions, a producer and a consumer, an SNS topic and an SQS queue using SAM and Java.
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the AWS Pricing page for details. You are responsible for any AWS costs incurred.
 
 ## Language:
 
-### This is a Maven project which uses Java 21 and AWS SDK
+### This is a Maven project which uses Java and AWS SDK
 
 ## Framework
 
