@@ -9,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 1. Create an [AWS account](https://portal.aws.amazon.com/billing/signup?redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start/email) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-2. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured
+2. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured. `cdk synth` and `cdk deploy` need AWS credentials, because the app looks up the default VPC in your account.
 3. Git Installed
 4. [Node and NPM](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 5. [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) installed

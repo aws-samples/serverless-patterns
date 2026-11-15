@@ -10,6 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* `cdk synth` and `cdk deploy` need AWS credentials, because the app reads your account ID and Region from the AWS CLI configuration.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 * [Python 3.8+](https://www.python.org/downloads/) Installed
