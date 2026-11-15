@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * `cdk synth` and `cdk deploy` need AWS credentials, because the app reads your account ID and Region from the AWS CLI configuration.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
-* [Python 3.8+](https://www.python.org/downloads/) Installed
+* [Python 3](https://www.python.org/downloads/) Installed
 
 ## Deployment Instructions
 

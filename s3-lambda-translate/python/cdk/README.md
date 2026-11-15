@@ -27,8 +27,8 @@ If you have not yet run `aws configure` and set a default region, you must do so
 
 You must use a role that has sufficient permissions to create IAM roles, as well as CloudFormation resources
 
-#### Python >=3.8
-Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.14.
+#### Python 3
+Make sure you have [python3](https://www.python.org/downloads/) installed in the CDK environment.
 The Lambda function uses the Boto3 version included in the Lambda `python3.14` runtime, which has the `TranslateDocument` API (1.28.56 or later), so it needs no layer.
 
 #### AWS CDK

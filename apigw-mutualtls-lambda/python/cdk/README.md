@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
-* [Python 3.9+](https://www.python.org/downloads/) installed
+* [Python 3](https://www.python.org/downloads/) installed
 * [Custom domain name certificate](https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains-prerequisites.html) before setting up a custom domain name for an API, you must have an SSL/TLS certificate ready in AWS Certificate Manager.
 * [Configure truststore](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-mutual-tls.html) Create a truststore of X.509 certificates that you trust to access your API and upload the truststore to an Amazon S3 bucket in a single file.
 

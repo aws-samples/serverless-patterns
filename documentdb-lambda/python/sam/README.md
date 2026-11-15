@@ -36,7 +36,7 @@ The AWS SAM CLI is a serverless tool for building and testing Lambda application
 
 ### Pre-requisites to Deploy the sample Lambda function
 
-* Python 3.12 - On the EC2 machine, Python 3 comes pre-installed with Amazon Linux 2023
+* Python 3 - On the EC2 machine, Python 3 comes pre-installed with Amazon Linux 2023
 * pip - On the EC2 machine, pip3 is installed for package management
 * AWS SAM CLI - We have installed the AWS SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 

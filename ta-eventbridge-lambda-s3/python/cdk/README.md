@@ -17,7 +17,7 @@ You are responsible for any AWS costs incurred. No warranty is implied in this e
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-* [Python 3.6 or later](https://www.python.org/downloads/)
+* [Python 3](https://www.python.org/downloads/)
 * [pip and virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html#python-prerequisites)
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed

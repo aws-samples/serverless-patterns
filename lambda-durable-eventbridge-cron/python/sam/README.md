@@ -18,7 +18,7 @@ This architecture demonstrates a serverless cron job implementation using EventB
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Python 3.14](https://www.python.org/downloads/) installed and available in your PATH
+* [Python 3](https://www.python.org/downloads/) installed and available in your PATH
 
 ## Deployment Instructions
 
@@ -48,7 +48,7 @@ This architecture demonstrates a serverless cron job implementation using EventB
 
 This pattern creates:
 
-1. **Durable Lambda Function**: A Python 3.14 Lambda function that uses the durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.
+1. **Durable Lambda Function**: A Python Lambda function that uses the durable execution SDK to implement a multi-step workflow with automatic checkpointing and replay capabilities.
 
 2. **EventBridge Scheduler Schedule**: An EventBridge Scheduler schedule configured with `cron(* * * * ? *)` that triggers the Lambda function every minute, with `FlexibleTimeWindow` set to `OFF` for precise timing.
 

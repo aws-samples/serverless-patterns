@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * [Docker](https://docs.docker.com/get-docker/) installed (for building Lambda container images)
-* [Python 3.13](https://www.python.org/downloads/) or later
+* [Python 3](https://www.python.org/downloads/)
 
 ## Deployment Instructions
 

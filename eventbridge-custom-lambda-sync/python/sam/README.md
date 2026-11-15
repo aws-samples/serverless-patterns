@@ -20,7 +20,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) **v2.37.3 or later**, installed and configured. Check with `aws --version`. v2.37.3 is the first release with `aws eventsv2` (v2.37.2 shipped it as `aws eventbridgev2`).
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) CLI **v1.168.0 or later**. Check with `sam --version`.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* Python 3.14 (matches the Lambda runtime, so `sam build` runs natively). Without it, use `sam build --use-container` (needs Docker).
+* Python at the same version as the Lambda runtime in `template.yaml`, so `sam build` runs natively. Without it, use `sam build --use-container` (needs Docker).
 * The new EventBridge custom event bus available in your Region. Check the [feature availability page](https://docs.aws.amazon.com/eventbridge/latest/userguide/feature-availability.html).
 
 ## Deployment Instructions
@@ -57,7 +57,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-The template (`template.yaml`) deploys an EventBridge custom event bus (`AWS::EventsV2::EventBus`), a FIFO subscriber (`AWS::EventsV2::Subscriber`), a Python 3.14 consumer Lambda function, an SQS dead-letter queue, and the delivery role EventBridge assumes to invoke the function.
+The template (`template.yaml`) deploys an EventBridge custom event bus (`AWS::EventsV2::EventBus`), a FIFO subscriber (`AWS::EventsV2::Subscriber`), a Python consumer Lambda function, an SQS dead-letter queue, and the delivery role EventBridge assumes to invoke the function.
 
 1. The publisher (`publisher/publish.py`) sends a sequence of `OrderPlaced` JSON events with `PutEvents`. Every event in a run shares one `SystemMetadata.EventGroupId` and carries an increasing `seq` (1, 2, 3, ...). Each event also sets `SystemMetadata.DeduplicationId` to its `orderId`, so a retried or repeated publish of the same order is suppressed at the bus.
 1. The subscriber filters on `detail.orderId` and delivers matching events to the consumer function. Three settings work together to process events in order, one at a time:

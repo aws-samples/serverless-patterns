@@ -36,7 +36,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 - [Node.js](https://nodejs.org/) with npm
 - AWS account [bootstrapped for CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
 - Amazon Bedrock model access enabled for Claude Sonnet 4.6
-- Python 3.12 (for AWS Lambda functions)
+- Python 3 (for AWS Lambda functions)
 
 ## Deployment
 

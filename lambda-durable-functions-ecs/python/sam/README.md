@@ -15,7 +15,7 @@ Important: this application uses various AWS services and there are costs associ
 * A container runtime for building Lambda container images. Either:
   * [Docker](https://docs.docker.com/get-docker/) installed and running, OR
   * [Finch](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-finch.html) installed and running (open-source alternative to Docker). Start Finch with `finch vm start` before running `sam build`.
-* [Python 3.13](https://www.python.org/downloads/) or later
+* [Python 3](https://www.python.org/downloads/)
 
 ## Deployment Instructions
 
