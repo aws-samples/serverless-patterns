@@ -5,15 +5,15 @@ Description: Create an API destination in EventBridge for Zendesk Put Ticket API
 Parameters:
   MyPutTicketsAPI:
     Type: String
-    Default: 'https://<<EnterWorkspaceHere>>.zendesk.com/api/v2/tickets.json'
+    Description: Zendesk tickets API URL, for example https://your-workspace.zendesk.com/api/v2/tickets.json
   MyZendeskUsername:
     NoEcho: true
     Type: String
-    Default: ''
+    Description: Zendesk user name
   MyZendeskPassword:
     NoEcho: true
     Type: String
-    Default: '' 
+    Description: Zendesk password
 
 Resources:
   MyZendeskEventBus:

@@ -56,6 +56,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     sam deploy --guided
     ```
+    The `4-mongodb`, `5-zendesk`, `6-freshdesk`, `7-datadog` and `9-shopify` templates have their own names, so pass the file with `-t`, for example `sam deploy --guided -t mongoDB.yaml`.
 1. During the prompts:
     * Enter a stack name
     * Enter the desired AWS Region

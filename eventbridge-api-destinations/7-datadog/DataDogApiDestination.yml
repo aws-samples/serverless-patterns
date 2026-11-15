@@ -6,7 +6,7 @@ Parameters:
   MyDataDogAPIKey:
     NoEcho: true
     Type: String
-    Default: '' 
+    Description: Datadog API key
 
 Resources:
   MyDataDogEventBus:

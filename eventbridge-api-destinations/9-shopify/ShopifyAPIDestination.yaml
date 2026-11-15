@@ -5,11 +5,11 @@ Description: Create an API destination in EventBridge for Shopify Create Product
 Parameters:
   MyCreateProductAPI:
     Type: String
-    Default: 'https://<<EnterStoreNameHere>>.myshopify.com/admin/api/2022-01/products.json'
+    Description: Shopify create product API URL, for example https://your-store.myshopify.com/admin/api/2022-01/products.json
   MyShopifyAdminKey:
     NoEcho: true
     Type: String
-    Default: ''
+    Description: Shopify Admin API access token
 
 Resources:
   MyShopifyEventBus:

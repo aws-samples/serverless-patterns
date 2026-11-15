@@ -43,7 +43,7 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided"
+      "sam deploy --guided -t FreshdeskAPIDestination.yaml"
     ]
   },
   "testing": {
