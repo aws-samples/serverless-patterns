@@ -54,7 +54,7 @@ Create a new local branch for each serverless pattern or modification being made
 
 Now is the time to create your new serverless pattern or modify existing code.
 
-1. If you are creating a new serverless pattern, start from a template. Either copy the folder named "_pattern-model", or copy a similar existing pattern, such as another variant in the same family.For example: `mkdir -p sqs-lambda/python && cp -r _pattern-model sqs-lambda/python/sam`
+1. If you are creating a new serverless pattern, start from a template. Either copy the folder named "_pattern-model", or copy a similar existing pattern, such as another variant in the same family. For example: `mkdir -p sqs-lambda/python && cp -r _pattern-model sqs-lambda/python/sam`
     If you copy an existing pattern, update everything that refers to the original: `example-pattern.json` (title, description, language, framework, `gitHub.template.templateFile` and authors), the README, and resource and stack names in the template. Remove build output and anything the new variant doesn't use.
 2. If you are modifying existing code, make your code changes now.
 3. Work through the [pattern checklist](#pattern-checklist) below.
@@ -70,7 +70,7 @@ Use this checklist whether you write the pattern yourself or use an AI coding ag
 - <a id="folder-structure"></a>**Folder structure:** `{family}/{language}/{framework}`, all lowercase, e.g. `sqs-lambda/python/sam`.
   - The family folder names the services, hyphenated, e.g. `sqs-lambda`. It groups patterns that differ only by language or framework.
   - Slugs are the schema `language`/`framework` value, lowercased, with no dots or spaces and no `aws` prefix (`python`, `java`, `sam`, `cdk`, `terraform`). A few differ: `.NET` → `dotnet`, `Node.js` → `nodejs`, `AWS CLI` → `awscli`, `Terraform (with modules)` → `terraform-modules`, `AWS CDK for Terraform` → `cdktf`, `Serverless Framework` → `sls`.
-  - A pattern with no function code uses the language `Integration` and has no language folder: `{family}/{framework}`, e.g. `apigw-sqs/sam`. Don't use a `yaml` folder.
+  - A pattern with no function code uses the language `Integration` and has no language folder: `{family}/{framework}`, e.g. `sfn-s3/sam`. Don't use a `yaml` folder.
   - A collection can number its folders to set the order they show in on Serverless Land, e.g. `eventbridge-api-destinations/2-slack`. The `N-` prefix is optional and does nothing else.
   - Each variant folder holds a complete pattern: `README.md`, `example-pattern.json`, the template and the code.
   - Make resource names unique to the stack, so two variants can deploy side by side in one account and Region. Include the stack name, e.g. `!Sub ${AWS::StackName}-orders`, or leave the name out and let CloudFormation pick one.
