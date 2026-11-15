@@ -186,9 +186,14 @@ resource "aws_api_gateway_deployment" "productapistageprod" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.unicornstockbroker_apigw.id
-  stage_name  = "prod"
+}
+
+resource "aws_api_gateway_stage" "prod" {
+  rest_api_id   = aws_api_gateway_rest_api.unicornstockbroker_apigw.id
+  deployment_id = aws_api_gateway_deployment.productapistageprod.id
+  stage_name    = "prod"
 }
 
 output "apigw-url" {
-  value = aws_api_gateway_deployment.productapistageprod.invoke_url
+  value = aws_api_gateway_stage.prod.invoke_url
 }

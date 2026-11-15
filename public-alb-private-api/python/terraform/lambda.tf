@@ -6,7 +6,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
   function_name = aws_lambda_function.lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_deployment.deploy.execution_arn}*/${aws_api_gateway_method.get.http_method}/"
+  source_arn = "${aws_api_gateway_rest_api.private_api.execution_arn}/*/${aws_api_gateway_method.get.http_method}/"
   provider = aws.crossaccount
 }
 
