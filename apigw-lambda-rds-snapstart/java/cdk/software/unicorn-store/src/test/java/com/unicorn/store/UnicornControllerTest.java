@@ -1,46 +1,40 @@
 package com.unicorn.store;
 
-import com.amazonaws.serverless.exceptions.ContainerInitializationException;
-import com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext;
-import com.amazonaws.serverless.proxy.model.AwsProxyRequest;
-import com.amazonaws.serverless.proxy.model.AwsProxyResponse;
-import com.amazonaws.serverless.proxy.model.SingleValueHeaders;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unicorn.store.model.Unicorn;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.function.aws.proxy.MicronautLambdaHandler;
+import io.micronaut.function.aws.proxy.MockLambdaContext;
+import io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
 import org.junit.jupiter.api.Test;
-import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UnicornControllerTest {
 
     private static final Context lambdaContext = new MockLambdaContext();
 
     @Test
-    void unicornCrud() throws ContainerInitializationException, JsonProcessingException {
-        MicronautLambdaHandler handler = new MicronautLambdaHandler();
+    void unicornCrud() throws JsonProcessingException {
+        ApiGatewayProxyRequestEventFunction handler = new ApiGatewayProxyRequestEventFunction();
         Unicorn unicorn = pojo();
         ObjectMapper objectMapper = handler.getApplicationContext().getBean(ObjectMapper.class);
-        AwsProxyRequest createRequest = create(unicorn, objectMapper);
-        AwsProxyResponse response = handler.handleRequest(createRequest, lambdaContext);
+        APIGatewayProxyRequestEvent createRequest = create(unicorn, objectMapper);
+        APIGatewayProxyResponseEvent response = handler.handleRequest(createRequest, lambdaContext);
         assertEquals(201, response.getStatusCode());
-        List<String> paths = response.getMultiValueHeaders().get(HttpHeaders.LOCATION);
-        assertNotNull(paths);
-        assertTrue(CollectionUtils.isNotEmpty(paths));
-        String path = paths.get(0);
+        String path = response.getHeaders().get(HttpHeaders.LOCATION);
+        assertNotNull(path);
 
-        AwsProxyRequest getRequest = get(path);
-        AwsProxyResponse getResponse = handler.handleRequest(getRequest, lambdaContext);
+        APIGatewayProxyRequestEvent getRequest = get(path);
+        APIGatewayProxyResponseEvent getResponse = handler.handleRequest(getRequest, lambdaContext);
         assertEquals(200, getResponse.getStatusCode());
 
         unicorn.setId(path.substring("/unicorns/".length()));
@@ -53,22 +47,18 @@ class UnicornControllerTest {
         handler.close();
     }
 
-    AwsProxyRequest create(Unicorn unicorn, ObjectMapper objectMapper) throws JsonProcessingException {
-        AwsProxyRequest proxyRequest = new AwsProxyRequest();
+    APIGatewayProxyRequestEvent create(Unicorn unicorn, ObjectMapper objectMapper) throws JsonProcessingException {
+        APIGatewayProxyRequestEvent proxyRequest = new APIGatewayProxyRequestEvent();
         proxyRequest.setBody(sampleBody(unicorn, objectMapper));
-        SingleValueHeaders headers = new SingleValueHeaders();
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-        proxyRequest.setHeaders(headers);
+        proxyRequest.setHeaders(Map.of(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
         proxyRequest.setPath("/unicorns");
         proxyRequest.setHttpMethod(HttpMethod.POST.toString());
         return proxyRequest;
     }
 
-    AwsProxyRequest get(String path) {
-        AwsProxyRequest proxyRequest = new AwsProxyRequest();
-        SingleValueHeaders headers = new SingleValueHeaders();
-        headers.put(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
-        proxyRequest.setHeaders(headers);
+    APIGatewayProxyRequestEvent get(String path) {
+        APIGatewayProxyRequestEvent proxyRequest = new APIGatewayProxyRequestEvent();
+        proxyRequest.setHeaders(Map.of(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON));
         proxyRequest.setPath(path);
         proxyRequest.setHttpMethod(HttpMethod.GET.toString());
         return proxyRequest;

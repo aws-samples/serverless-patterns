@@ -61,19 +61,18 @@ public class UnicornStoreStack extends Stack {
 
     private Function createUnicornLambdaFunction() {
         Function function = Function.Builder.create(this, "UnicornStoreFunction")
-                .runtime(Runtime.JAVA_17_AL2023)
+                .runtime(Runtime.JAVA_25)
                 .functionName("unicorn-store")
                 .memorySize(2048)
                 .timeout(Duration.seconds(29))
                 .code(Code.fromAsset("../../software/unicorn-store/target/store-micronaut-1.0.0.jar"))
-                .handler("io.micronaut.function.aws.proxy.MicronautLambdaHandler")
+                .handler("io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction")
                 .vpc(infrastructureStack.getVpc())
                 .securityGroups(List.of(infrastructureStack.getApplicationSecurityGroup()))
                 .environment(Map.of(
                         "DATASOURCES_DEFAULT_USERNAME", "postgres",
                         "DATASOURCES_DEFAULT_PASSWORD", infrastructureStack.getDatabaseSecretString(),
-                        "DATASOURCES_DEFAULT_URL", infrastructureStack.getDatabaseJDBCConnectionString(),
-                        "AWS_SERVERLESS_JAVA_CONTAINER_INIT_GRACE_TIME", "500"
+                        "DATASOURCES_DEFAULT_URL", infrastructureStack.getDatabaseJDBCConnectionString()
                 ))
                 .snapStart(SnapStartConf.ON_PUBLISHED_VERSIONS)
                 .build();
