@@ -1,14 +1,14 @@
 {
   "title": "Stream Amazon Bedrock completions via AWS AppSync subscriptions",
-  "description": "Use AppSync subscriptions to interact with Bedrock models.",
+  "description": "Stream Anthropic Claude responses from Amazon Bedrock to clients with AppSync subscriptions.",
   "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern takes a prompt that will be used to invoke an Amazon Bedrock model from via a Lambda resolver.",
-      "The model's completions will be sent via an AppSync Subscription, to which the client can subscribe by providing the corresponding Chat ID."
+      "This pattern takes a prompt from the ask mutation and sends it to Anthropic Claude Haiku 5.5 in Amazon Bedrock from a Lambda resolver, using the ConverseStream API.",
+      "As each part of the response arrives, the function calls the send mutation, and clients receive the parts through an AppSync subscription for the corresponding chat ID."
     ]
   },
   "gitHub": {
@@ -35,8 +35,8 @@
         "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-local-resolvers-js.html"
       },
       {
-        "text": "Bedrock's Response Stream API",
-        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html"
+        "text": "Amazon Bedrock ConverseStream API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html"
       }
     ]
   },

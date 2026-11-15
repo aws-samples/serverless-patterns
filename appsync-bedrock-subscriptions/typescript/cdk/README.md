@@ -13,14 +13,15 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node and NPM](https://nodejs.org/en/download/) installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/cli.html) (AWS CDK) installed
-* Make sure to enable the **Anthropic - Claude V2** model on the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/modelaccess).
+* Access to **Anthropic Claude Haiku 5.5** in Amazon Bedrock. The first time you use an Anthropic model in an account, submit the Anthropic use case form from the model catalog in the [Bedrock console](https://console.aws.amazon.com/bedrock/home#/model-catalog).
+* Deploy in a Region that supports the `global.anthropic.claude-haiku-5-5` [global cross-Region inference profile](https://docs.aws.amazon.com/bedrock/latest/userguide/global-cross-region-inference.html), for example us-east-1. Bedrock can route requests from this profile to any supported Region. To keep requests in one geography, change `MODEL_ID` and the IAM policy in [lib/backend-stack.ts](lib/backend-stack.ts) to a geographic profile such as `us.anthropic.claude-haiku-5-5` or `eu.anthropic.claude-haiku-5-5`.
 
 
 ## How it works
 ![diagram](assets/diagram.png)
 1. The Client subscribes to `chat` and performs the `ask` mutation passing the prompt as an argument via its API KEY;
-2. The [Lambda Resolver](src/ask.ts) takes the input prompt and establishes a connection with Bedrock through the [Response Stream API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html) via [Langchain streaming](https://js.langchain.com/docs/modules/model_io/models/chat/how_to/streaming);
-3. The prompt is sent to Bedrock;
+2. The [Lambda Resolver](src/ask.ts) takes the input prompt and calls the Bedrock [ConverseStream API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html) with the AWS SDK for JavaScript v3;
+3. The prompt is sent to Claude Haiku 5.5 through its global inference profile;
 4. The Lambda receives multiple completion chunks in a stream;
 5. The Lambda performs the `send` mutation every time it receives a new completion chunk from Bedrock;
 6. The `send` mutation is attached to a Local Resolver;
@@ -33,6 +34,7 @@ Important: this application uses various AWS services and there are costs associ
 * The GraphQL [schema](src/schema.gql) uses [multiple authorization types](https://aws.amazon.com/blogs/mobile/using-multiple-authorization-types-with-aws-appsync-graphql-apis/) to ensure that:
   * The Client is only able to perfom the `ask` mutation and the `chat` subscription via its API_KEY;
   * The Lambda is only able to perform the `send` mutation via IAM.
+* The Lambda role can stream only from the Claude Haiku 5.5 inference profile, and from the model only when the request comes through that profile.
 
 
 
@@ -59,7 +61,7 @@ npm run deploy
 Open the AWS Management console and use the API KEY authentication method to subscribe to the `chat` subscription by providing the `chatId` parameter:
 ![Subscription-before](assets/subscription-before.png)
 
-Run tests with jest:
+Run tests with jest. `test/backend.test.ts` calls the deployed API using `cdk-outputs.json`, and `test/backend-stack.test.ts` checks the synthesized template:
 ```sh
 npm run test
 ```
