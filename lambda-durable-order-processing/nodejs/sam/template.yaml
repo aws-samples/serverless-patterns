@@ -5,7 +5,7 @@ Description: Order Processing Workflow using AWS Lambda Durable Functions (uksb-
 Globals:
   Function:
     Timeout: 900
-    Runtime: nodejs22.x
+    Runtime: nodejs24.x
     Architectures:
       - arm64
     Environment:

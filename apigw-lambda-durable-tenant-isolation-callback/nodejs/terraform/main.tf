@@ -82,7 +82,7 @@ resource "aws_lambda_function" "workflow" {
   filename         = data.archive_file.workflow_zip.output_path
   source_code_hash = data.archive_file.workflow_zip.output_base64sha256
   handler          = "workflow.handler"
-  runtime          = "nodejs22.x"
+  runtime          = "nodejs24.x"
   architectures    = ["arm64"]
   role             = aws_iam_role.lambda_role.arn
   timeout          = 900
@@ -116,7 +116,7 @@ resource "aws_lambda_function" "callback" {
   filename         = data.archive_file.callback_zip.output_path
   source_code_hash = data.archive_file.callback_zip.output_base64sha256
   handler          = "callback.handler"
-  runtime          = "nodejs22.x"
+  runtime          = "nodejs24.x"
   architectures    = ["arm64"]
   role             = aws_iam_role.lambda_role.arn
   timeout          = 30

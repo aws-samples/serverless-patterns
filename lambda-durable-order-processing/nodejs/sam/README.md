@@ -58,7 +58,7 @@ Each step is automatically checkpointed, allowing the workflow to resume from th
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) installed
-* [Node.js 18+](https://nodejs.org/) installed
+* [Node.js 24.x](https://nodejs.org/) installed
 
 ### Required IAM Permissions
 
@@ -364,7 +364,7 @@ The durable function must be created with durable configuration (cannot be added
 ```bash
 aws lambda create-function \
   --function-name my-durable-function \
-  --runtime nodejs22.x \
+  --runtime nodejs24.x \
   --durable-config '{"ExecutionTimeout":86400,"RetentionPeriodInDays":7}' \
   ...
 ```

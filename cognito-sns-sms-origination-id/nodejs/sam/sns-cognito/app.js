@@ -1,6 +1,8 @@
-const AWS = require('aws-sdk');
+const { SNSClient, ListOriginationNumbersCommand, PublishCommand } = require('@aws-sdk/client-sns');
 const b64 = require('base64-js');
 const encryptionSdk = require('@aws-crypto/client-node');
+
+const sns = new SNSClient({});
 
 console.log('Lambda function invoked');
 
@@ -23,7 +25,6 @@ exports.handler = async (event) => {
     const keyring = new encryptionSdk.KmsKeyringNode({ generatorKeyId, keyIds });
     console.log('Keyring is: ', keyring);
     console.log('Event is:', event);
-    const sns = new AWS.SNS();
     const countryCode = event.request.userAttributes.phone_number.substring(0, 2);
     console.log('Country code:', countryCode);
     let plainTextCode;
@@ -43,7 +44,7 @@ exports.handler = async (event) => {
 
     try {
         // Retrieve Origination Numbers using the listOriginationNumbers API
-        const originationNumbersResponse = await sns.listOriginationNumbers().promise();
+        const originationNumbersResponse = await sns.send(new ListOriginationNumbersCommand({}));
         const originationNumbers = originationNumbersResponse.PhoneNumbers;
 
         // Filter Origination Numbers based on the countryCode
@@ -68,7 +69,7 @@ exports.handler = async (event) => {
         console.log('Selected Origination Number:', originationNumber);
 
         // Send SMS using the determined origination number
-        await sns.publish({
+        await sns.send(new PublishCommand({
             PhoneNumber: event.request.userAttributes.phone_number,
             Message: 'Your verification code is: '+plainTextCode,
             MessageAttributes: {
@@ -77,7 +78,7 @@ exports.handler = async (event) => {
                     StringValue: originationNumber,
                 },
             },
-        }).promise();
+        }));
 
         console.log('SMS sent');
     } catch (error) {

@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
 ## Getting Started
-The entire solution is built on AWS SAM and the CustomSMSSender Lambda function in Node.js 18.x. The instructions below shows the prerequisities, deployment instructions and testing steps.
+The entire solution is built on AWS SAM and the CustomSMSSender Lambda function in Node.js 24.x. The instructions below shows the prerequisities, deployment instructions and testing steps.
 
 ### Prerequisites
 * Amazon SNS SMS account is moved out of [SMS Sandbox](https://aws.amazon.com/blogs/compute/introducing-the-sms-sandbox-for-amazon-sns/)

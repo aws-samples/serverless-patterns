@@ -39,7 +39,7 @@ Resources:
       # delete old version of layer
       RetentionPolicy: Delete
     Metadata:
-      BuildMethod: nodejs22.x
+      BuildMethod: nodejs24.x
 
   AppSyncLambdaUseIAM:
     Type: 'AWS::Serverless::Function'

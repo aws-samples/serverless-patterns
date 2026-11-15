@@ -44,7 +44,7 @@ const listener = new aws.lb.Listener("listener", {
 });
 
 const lambdaFunction = new aws.lambda.CallbackFunction("lambdaFunction", {
-    runtime: aws.lambda.Runtime.NodeJS18dX,
+    runtime: "nodejs24.x",
     callback: lambda.handler,
 });
 

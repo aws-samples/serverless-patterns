@@ -51,7 +51,7 @@ const lambdaRole = new aws.iam.Role("lambda-role", {
 });
 
 const lambdaFunction = new aws.lambda.Function("lambdaFunction", {
-    runtime: aws.lambda.Runtime.NodeJS18dX,
+    runtime: "nodejs24.x",
     code: new pulumi.asset.AssetArchive({
         ".": new pulumi.asset.FileArchive("./lambda")
     }),
