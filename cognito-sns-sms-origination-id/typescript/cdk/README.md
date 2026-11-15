@@ -61,6 +61,7 @@ The entire solution is built on CDK typescript and CustomSMSSender Lambda functi
 4. Change directory and install CustomSMSSender Lambda function Node.js dependencies 
     ```
     cd - 
+    mkdir -p lambda/layer/nodejs
     cd lambda/layer/nodejs 
     ```
 

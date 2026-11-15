@@ -51,13 +51,8 @@ export class MediaLive extends Construct {
     };
     const role = new iam.Role(this, "MediaLiveAccessRole", {
       managedPolicies: [
-        {
-          managedPolicyArn:
-            "arn:aws:iam::aws:policy/AWSElementalMediaPackageFullAccess",
-        },
-        {
-          managedPolicyArn: "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-        },
+        iam.ManagedPolicy.fromManagedPolicyArn(this, "MediaPackageFullAccess", "arn:aws:iam::aws:policy/AWSElementalMediaPackageFullAccess"),
+        iam.ManagedPolicy.fromManagedPolicyArn(this, "CloudWatchLogsFullAccess", "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"),
       ],
       inlinePolicies: {
         medialivecustom: iam.PolicyDocument.fromJson(policyMediaConnect),

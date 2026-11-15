@@ -11,7 +11,7 @@ import {
   Table,
 } from "aws-cdk-lib/aws-dynamodb";
 import { EventBus } from "aws-cdk-lib/aws-events";
-import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { StartingPosition } from "aws-cdk-lib/aws-lambda";
 import { CfnPipe } from "aws-cdk-lib/aws-pipes";
 import { Construct } from "constructs";
@@ -76,11 +76,8 @@ export class EventBridgePipesIotCoreStack extends cdk.Stack {
         credentialsRole: new Role(this, "Iot-Topic-Endpoint-Role", {
           assumedBy: new ServicePrincipal("apigateway.amazonaws.com"),
           managedPolicies: [
-            { managedPolicyArn: "arn:aws:iam::aws:policy/AWSIoTDataAccess" },
-            {
-              managedPolicyArn:
-                "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-            },
+            ManagedPolicy.fromManagedPolicyArn(this, "AWSIoTDataAccess", "arn:aws:iam::aws:policy/AWSIoTDataAccess"),
+            ManagedPolicy.fromManagedPolicyArn(this, "AmazonAPIGatewayPushToCloudWatchLogs", "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"),
           ],
         }),
         integrationResponses: [

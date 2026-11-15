@@ -27,9 +27,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd cloudfront-to-s3-and-lambda/typescript/cdk/cdk
     ```
-1. Install Node.js dependencies:
+1. Install Node.js dependencies for the CDK app and the Lambda functions:
     ```
     npm i
+    npm i --prefix ../api
     ```
 1. Update the `./cdk/bin/static-site.ts` file to adjust the target region (default is `eu-west-2`).
 1. From the command line, use CDK to deploy the AWS resources for the pattern. You'll be prompted to approve security related changes during the deployment.
