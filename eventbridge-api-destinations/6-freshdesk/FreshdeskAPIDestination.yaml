@@ -5,15 +5,15 @@ Description: Create an API destination in EventBridge - open API using freshdesk
 Parameters:
   MyFreshdeskURL:
     Type: String
-    Default: https://<<EnterWorkspaceHere>>.freshdesk.com/api/v2/tickets
+    Description: Freshdesk tickets API URL, for example https://your-workspace.freshdesk.com/api/v2/tickets
   MyAPIKeyValue:
     NoEcho: true
     Type: String
-    Default: '<<Enter your APIKeyValue>>'
+    Description: Freshdesk API key
   Password:
     NoEcho: true
     Type: String
-    Default: '<<Enter your Password>>'
+    Description: Freshdesk password
 
 Resources:
   MyEventBus:
