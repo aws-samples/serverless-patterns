@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * `cdk synth` and `cdk deploy` need AWS credentials, because the app reads your account ID and Region from the AWS CLI configuration.
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-* [Python](https://www.python.org/downloads/) Python 3.7 or later including pip and virtualenv
+* [Python 3](https://www.python.org/downloads/) including pip and virtualenv
 * [Node.js](https://nodejs.org/en/download) installed in order to use npm for installing the AWS CDK
 * [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_prerequisites) installed
 

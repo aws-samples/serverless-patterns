@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) **v2.37.3 or later**, installed and configured. Check with `aws --version`. v2.37.3 is the first release with `aws eventsv2`.
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) CLI **v1.168.0 or later**. Check with `sam --version`.
 * [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Python 3.14](https://www.python.org/downloads/) (matches the Lambda runtime, so `sam build` runs natively). Without it, use `sam build --use-container` (needs Docker).
+* [Python](https://www.python.org/downloads/) at the same version as the Lambda runtime in `template.yaml`, so `sam build` runs natively. Without it, use `sam build --use-container` (needs Docker).
 * The new EventBridge custom event bus available in your Region. See [feature availability](https://docs.aws.amazon.com/eventbridge/latest/userguide/feature-availability.html).
 
 ## Deployment Instructions

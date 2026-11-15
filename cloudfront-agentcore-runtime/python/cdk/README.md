@@ -21,7 +21,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
 - [Docker](https://docs.docker.com/get-docker/) installed and running
-- [Python 3.12](https://www.python.org/downloads/) installed
+- [Python 3](https://www.python.org/downloads/) installed
 
 ## Deployment Instructions
 

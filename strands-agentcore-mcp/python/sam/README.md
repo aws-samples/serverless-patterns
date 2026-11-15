@@ -25,7 +25,7 @@ The agent is model-driven: Claude decides which tool to call based on the user's
 
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) installed
 - AWS CLI v2 configured with credentials for `us-east-1`
-- Python 3.13 and `pip3`
+- Python 3 and `pip3`
 - **No Docker required.** The build is Docker-free: `sam build` runs the root `Makefile`'s `BuildMethod: makefile` targets, which perform the two-step `pip3` manylinux install directly on your machine. There is no `--use-container` step and no Docker daemon to run.
 - Bedrock model access enabled in your account:
   - Open the [Bedrock console](https://console.aws.amazon.com/bedrock) → Model Access

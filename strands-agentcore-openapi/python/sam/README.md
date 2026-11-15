@@ -50,7 +50,7 @@ User → Agent Lambda → AgentCore Gateway (MCP) → WeatherAPI.com
 
 ## Requirements
 
-- Python 3.12+ — [python.org/downloads](https://www.python.org/downloads/)
+- Python 3 — [python.org/downloads](https://www.python.org/downloads/)
 - AWS CLI v2 (2.28+ recommended) — [docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - AWS SAM CLI — [docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 - `make` (used by the SAM Makefile build; preinstalled on macOS via Xcode CLT and most Linux distros). No Docker required.

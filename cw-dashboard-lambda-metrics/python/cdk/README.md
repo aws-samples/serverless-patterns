@@ -18,7 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Docker](https://docs.docker.com/get-docker/) installed and running on Architecture: x86_64
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed and configured
-* [Python 3.9+](https://www.python.org/downloads/) installed
+* [Python 3](https://www.python.org/downloads/) installed
 
 ## Deployment Instructions
 

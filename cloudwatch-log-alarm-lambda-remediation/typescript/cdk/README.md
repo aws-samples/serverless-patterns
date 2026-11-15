@@ -29,7 +29,7 @@ The `AWS::CloudWatch::LogAlarm` resource eliminates the need for metric filters.
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed and configured
 - [Node.js 20+](https://nodejs.org/) with npm
 - AWS account [bootstrapped for CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
-- Python 3.12 (for AWS Lambda functions)
+- Python 3 (for AWS Lambda functions)
 - (Optional) Amazon EC2 instances tagged with `AutoRemediate=true` for SSM remediation
 
 ## Deployment

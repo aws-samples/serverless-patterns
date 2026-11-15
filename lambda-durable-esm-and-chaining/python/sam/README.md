@@ -41,7 +41,7 @@ The pattern showcases two key Durable Functions capabilities:
 
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured with appropriate permissions
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) latest version installed
-- [Python 3.14](https://www.python.org/downloads/release/python-3140/) runtime installed
+- [Python 3](https://www.python.org/downloads/) installed
 
 ## Deployment
 

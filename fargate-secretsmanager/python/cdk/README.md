@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured, with a default profile that points to the AWS account to use
 - `cdk synth` and `cdk deploy` need AWS credentials, because the app looks up the default VPC in your account.
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Python 3.10 or later](https://www.python.org/downloads/)
+- [Python 3](https://www.python.org/downloads/)
 - [pip and virtualenv](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html#python-prerequisites)
 - [Node and NPM](https://nodejs.org/en/download/) installed
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured

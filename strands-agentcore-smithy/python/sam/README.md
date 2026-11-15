@@ -34,7 +34,7 @@ User → test.sh → Agent Lambda ──────────────→ 
 
 - AWS CLI v2
 - AWS SAM CLI
-- Python 3.13+
+- Python 3
 - pip3
 - `make` (used by the SAM Makefile build — no Docker required)
 - AWS account with Amazon Bedrock and Amazon Bedrock AgentCore enabled in `us-east-1`
