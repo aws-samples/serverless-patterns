@@ -1,0 +1,60 @@
+{
+  "title": "Content safety image moderation using Amazon S3 and AWS Lambda",
+  "description": "Securely upload images to Amazon S3 and detect inappropriate content with Amazon Rekognition",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Using this sample pattern, users can securely upload images to an Amazon S3 bucket by requesting a pre-signed URL through Amazon API Gateway. This URL allows secure and temporary access for uploading files directly to S3.",
+      "Once an image is uploaded, an S3 event invokes an AWS Lambda function to analyze the content using the DetectModerationLabels API. If the image is identified as inappropriate, a notification is sent via Amazon SNS, ensuring automated content moderation and alerting."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Uploading objects with presigned URLs",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+      },
+      {
+        "text": "Moderating content",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/dg/moderation.html"
+      },
+      {
+        "text": "DetectModerationLabels",
+        "link": "https://docs.aws.amazon.com/rekognition/latest/APIReference/API_DetectModerationLabels.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Archana V",
+      "bio": "Cloud Support Engineer at AWS",
+      "image": "https://media.licdn.com/dms/image/D5603AQF_QwVjCkS_UQ/profile-displayphoto-shrink_200_200/0/1670929520771?e=1724284800&v=beta&t=FFJJko4OO8h1tCFrxMyneTyRPAKmyEmIaDOYOeTaFEk",
+      "linkedin": "archana-venkat-9b80b7184"
+    }
+  ]
+}

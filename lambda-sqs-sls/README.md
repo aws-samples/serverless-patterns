@@ -2,7 +2,7 @@
 
 This Serverless Framework project deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. The Lambda function publishes a message to the SQS queue when invoked.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-sls/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-sqs-python-sls/
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 

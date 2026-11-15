@@ -2,7 +2,7 @@
 
 This pattern publishes a rich domain event, Avro-encoded, to an Amazon EventBridge custom event bus (the `eventsv2` API) using `PutRawEvents` with an AWS Glue Schema Registry. EventBridge decodes the Avro server-side and a subscriber delivers the event as JSON to an AWS Lambda function, which logs it to Amazon CloudWatch, showing the event survives the round trip intact.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-custom-avro
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-custom-avro-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
