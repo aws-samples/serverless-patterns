@@ -44,7 +44,7 @@ The template creates a shell Step Function, with a CloudWatch log group for erro
 
 Launch an EC2 instance using the AWS Console (recommend using the Amazon Linux AMI and a t2.micro instance type).
 
-Detailed instructions can be found in the AWS Quick Start Guide: https://docs.aws.amazon.com/quickstarts/latest/vmlaunch/welcome.html
+Detailed instructions can be found in the Amazon EC2 User Guide: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html
 
 Once the instance is running, go to the Step Function created by this template to view the new execution that ran.
 

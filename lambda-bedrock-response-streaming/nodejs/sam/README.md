@@ -44,7 +44,7 @@ Once the application is deployed, a public function URL (furl) endpoint is publi
 
 ## Testing
 
-In order to use the curl commands with IAM auth enabled, you can use the `--user access_key:secret_access_key` parameter but this is insecure as it exposes your credentials to the command line history. Alternatively, you can configure a `~/.netrc` file and setup your credentials there. This allows you to instead use `--netrc` which then retrieves the credentials from that file. More details can be found in the [curl](https://everything.curl.dev/usingcurl/netrc) documentation.
+In order to use the curl commands with IAM auth enabled, you can use the `--user access_key:secret_access_key` parameter but this is insecure as it exposes your credentials to the command line history. Alternatively, you can configure a `~/.netrc` file and setup your credentials there. This allows you to instead use `--netrc` which then retrieves the credentials from that file. More details can be found in the [curl](https://everything.curl.dev/usingcurl/netrc.html) documentation.
 
 You use `events/event.json` for the POST body request:
 
