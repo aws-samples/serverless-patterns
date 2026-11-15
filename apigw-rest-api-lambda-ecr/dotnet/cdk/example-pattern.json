@@ -1,6 +1,6 @@
 {
   "title": "Amazon API Gateway to AWS Lambda Container Image",
-  "description": "This AWS CDK application demonstrates how to deploy ASP.NET Core Web API (.NET 6) to AWS Lambda as Container Image.",
+  "description": "This AWS CDK application demonstrates how to deploy ASP.NET Core Web API (.NET 10) to AWS Lambda as Container Image.",
   "language": ".NET",
   "level": "200",
   "framework": "AWS CDK",

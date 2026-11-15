@@ -1,6 +1,6 @@
-FROM public.ecr.aws/lambda/dotnet:6 as base
+FROM public.ecr.aws/lambda/dotnet:10 as base
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 as build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 as build
 WORKDIR /src
 COPY ["AWSLamdaDemo.csproj", "AWSLamdaDemo/"]
 RUN dotnet restore "AWSLamdaDemo/AWSLamdaDemo.csproj"

@@ -1,6 +1,6 @@
 # Deploy ASP.NET Core Web API to AWS Lambda as Container Image
 
-This AWS CDK application demonstrates how to deploy ASP.NET Core Web API (.NET 6) to to AWS Lambda as Container Image.
+This AWS CDK application demonstrates how to deploy ASP.NET Core Web API (.NET 10) to to AWS Lambda as Container Image.
 
 This pattern uses .NET as a programming language to create the entire AWS CDK stack. Many .NET customers have started their modernization journey by breaking monoliths into micro-services and containerizing them, as it gives them the flexibility to scale, save on costs and run applications consistently across environments. AWS Lambda is one of the most commonly known services on AWS and, this service has helped hundreds of thousands of customers to gain cloud native benefits and modernize their applications on AWS but until recently it did not support packaging containers as functions. But now AWS Lambda enables packaging and deploying functions as container images up to 10 GB. This combines the flexibility and familiarity of container tooling and the agility and operational simplicity of AWS Lambda. This feature will help customers who have invested in container tooling, development workflows and expertise to leverage the full benefits of AWS lambda along with containers. 
 
@@ -16,7 +16,7 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [.NET 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) installed
+* [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) SDK installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) (AWS CDK) installed
 
 ## Deployment Instructions
