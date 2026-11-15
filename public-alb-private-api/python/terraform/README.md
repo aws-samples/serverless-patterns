@@ -30,7 +30,7 @@ Important: this ready-to-use application uses various AWS services and there are
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://github.com/aws-samples/serverless-pattern
+    git clone https://github.com/aws-samples/serverless-patterns
     ```
 1. Change directory to the pattern directory:
     ```

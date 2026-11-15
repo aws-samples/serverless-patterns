@@ -36,7 +36,7 @@ This pattern deploys an Edge-optimized Amazon API Gateway with a single method (
 ## How it works
 <img width="1273" alt="image" src="assets/architecture.png">
 
-This pattern uses CloudFormation custom resources to implement custom provisioning logic using Lambda functions. For more information, please refer to this [workshop](https://mng.workshop.aws/cloudformation/customresource.html).
+This pattern uses CloudFormation custom resources to implement custom provisioning logic using Lambda functions. For more information, see [custom resources](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html) in the AWS CloudFormation User Guide.
 
 1. Create the "certificate.yaml" file.
 

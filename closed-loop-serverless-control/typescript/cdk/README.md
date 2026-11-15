@@ -57,7 +57,7 @@ Important: this application uses various AWS services and there are costs associ
 >Control theory deals with the control of dynamical systems in engineered processes and machines. Feedback control, which is one fundamental type of control loops, involves taking measurements using a sensor and making calculated adjustments to keep the measured variable within a set range by means of a "final control element".
 _Reference: [Control theory](https://en.wikipedia.org/wiki/Control_theory)_
 
-[![Feedback loop with descriptions.svg](https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Feedback_loop_with_descriptions.svg/1200px-Feedback_loop_with_descriptions.svg.png)](images/Feedback_loop_with_descriptions.png)
+[![Feedback loop with descriptions.svg](images/Feedback_loop_with_descriptions.png)](images/Feedback_loop_with_descriptions.png)
 By [Orzetto](//commons.wikimedia.org/wiki/User_talk:Orzetto~commonswiki "User talk:Orzetto~commonswiki") - Own work, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0 "Creative Commons Attribution-Share Alike 4.0"), [Link](https://commons.wikimedia.org/w/index.php?curid=5000019)
 
 This pattern is implemented to showcase third-party API load control and throttle-handling use cases but it will be helpful for the most cases when you don't have any ability for a direct effect on a system but you want to manage and influence it's behaviour. Furthermore, even if sometimes you can't manage it, you may want to reduce the exposure on your system. For a third-party API call control system, that exposure may be the increasing concurrency and cost on Lambda functions due to the increased response time.
