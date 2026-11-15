@@ -1,5 +1,5 @@
 use aws_lambda_events::dynamodb::Event;
-use aws_sdk_eventbridge::model::PutEventsRequestEntry;
+use aws_sdk_eventbridge::types::PutEventsRequestEntry;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use std::sync::Arc;
 use tokio::task::JoinSet;
