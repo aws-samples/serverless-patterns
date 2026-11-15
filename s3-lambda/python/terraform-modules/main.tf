@@ -16,7 +16,7 @@ module "lambda_function" {
   runtime       = "python3.14"
   publish       = true
 
-  source_path = "${path.module}/../terraform-fixtures/python"
+  source_path = "${path.module}/src"
 
   allowed_triggers = {
     AllowExecutionFromS3Bucket = {

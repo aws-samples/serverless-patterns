@@ -17,11 +17,6 @@ For cases where we need to process files using Glue jobs, we can use Glue Workfl
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Terraform](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 
-## Getting started with Terraform Serverless Patterns
-
-Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md). 
-
-
 ## Deployment Instructions (Review input variables at variables.tf)
 
 1. Change directory to the module directory:

@@ -4,9 +4,7 @@ This pattern will provision Amazon Elastic Container Registry (ECR), push the co
 
 As part of the build process, a container will be built, pushed into ECR, and ultimately deployed as an AWS Lambda function. When an AWS Lambda is executed, it makes API calls to Amazon Bedrock and uses the prompt that the user has provided to get a generative answer from the foundation model. Logs will be sent to AWS Cloudwatch once the execution of the AWS lambda function is finished. The security component is likewise handled by KMS Keys and IAM Roles.
 
-## Getting started with Terraform Serverless Patterns
-
-Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
+## Prerequisites
 
 Before attempting this pattern, you must enable [model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) in your AWS Account. To provide you flexibility with foundation models, you can enable all or some of the foundation models. This pattern employs the anthropic.claude-v2 model by default so that's must be enabled for this pattern to work
 

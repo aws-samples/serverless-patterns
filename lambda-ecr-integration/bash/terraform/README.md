@@ -4,9 +4,7 @@ This pattern will provision Amazon Elastic Container Registry (ECR), push the co
 
 As part of the build process, a container will be built, pushed into ECR, and ultimately deployed as an AWS Lambda function. When an AWS Lambda is executed, the container's example bash script will run. Following the completion of the AWS lambda function execution, logs will be published to AWS CloudWatch. The security component is likewise handled by KMS Keys and IAM Roles.
 
-## Getting started with Terraform Serverless Patterns
-
-Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
+## Prerequisites
 
 You also need [docker](https://www.docker.com/) and md5 to be installed on your testing machine
 

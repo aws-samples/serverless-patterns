@@ -4,9 +4,7 @@ This pattern creates an Amazon EFS file system and integrates with ECS for a per
 
 You will build a container as part of the build, publish it into ECR, and then publish it as an ECS Task in the end. A sample file will be created in the EFS (persistent file system) after the task has been completed. The security component is likewise handled by KMS Keys and IAM Roles.
 
-## Getting started with Terraform Serverless Patterns
-
-Read more about general requirements and deployment instructions for Terraform Serverless Patterns [here](https://github.com/aws-samples/serverless-patterns/blob/main/terraform-fixtures/docs/README.md).
+## Prerequisites
 
 You also need [docker](https://www.docker.com/) and md5 to be installed on your testing machine
 

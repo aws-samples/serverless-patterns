@@ -42,11 +42,11 @@ module "lambda_function" {
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
-  handler       = "index.lambda_handler"
+  handler       = "app.lambda_handler"
   runtime       = "python3.14"
   publish       = true
 
-  source_path = "${path.module}/../terraform-fixtures/python"
+  source_path = "${path.module}/src"
 
   allowed_triggers = {
     ScheduledEventBridgeRule = {
