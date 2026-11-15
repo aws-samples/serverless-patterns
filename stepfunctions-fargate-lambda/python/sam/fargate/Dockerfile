@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.14-slim
 
 ADD script.py /
 ADD requirements.txt /
