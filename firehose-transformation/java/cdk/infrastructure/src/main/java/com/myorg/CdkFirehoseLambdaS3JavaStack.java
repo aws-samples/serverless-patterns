@@ -7,6 +7,7 @@ import software.amazon.awscdk.services.kinesisfirehose.destinations.alpha.S3Buck
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.lambda.RuntimeFamily;
 import software.amazon.awscdk.services.s3.Bucket;
 import software.amazon.awscdk.services.s3.BucketProps;
 import software.amazon.awscdk.services.s3.assets.AssetOptions;
@@ -26,6 +27,8 @@ public class CdkFirehoseLambdaS3JavaStack extends Stack {
 
     public CdkFirehoseLambdaS3JavaStack(final Construct parent, final String id, final StackProps props) {
         super(parent, id, props);
+        // Declared by name because the aws-cdk-lib version that the Firehose alpha modules pull in may predate Runtime.JAVA_25.
+        Runtime java25 = new Runtime("java25", RuntimeFamily.JAVA);
         List<String> kinesisLambdaClientPackagingInstructions = Arrays.asList(
                 "/bin/sh",
                 "-c",
@@ -36,7 +39,7 @@ public class CdkFirehoseLambdaS3JavaStack extends Stack {
 
         BundlingOptions.Builder builderOptions = BundlingOptions.builder()
                 .command(kinesisLambdaClientPackagingInstructions)
-                .image(Runtime.JAVA_17.getBundlingImage())
+                .image(java25.getBundlingImage())
                 .volumes(singletonList(
                         // Mount local .m2 repo to avoid download all the dependencies again inside the container
                         DockerVolume.builder()
@@ -53,7 +56,7 @@ public class CdkFirehoseLambdaS3JavaStack extends Stack {
                 .build());
 
         Function lambdaFunction = Function.Builder.create(this, "fh-lambda-transformer")
-                .runtime(Runtime.JAVA_17)
+                .runtime(java25)
                 .code(Code.fromAsset("../software/", AssetOptions.builder()
                         .bundling(builderOptions
                                 .command(kinesisLambdaClientPackagingInstructions)

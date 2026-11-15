@@ -22,7 +22,7 @@ public class CdkSchedulerStack extends Stack {
 
         // Create our basic function
         Function lambdaFn = Function.Builder.create(this,"ScheduledFunction")
-                .runtime(Runtime.JAVA_11)
+                .runtime(Runtime.JAVA_25)
                 .memorySize(256)
                 .handler("com.myorg.SchedulerHandler")
                 .timeout(Duration.seconds(30))
