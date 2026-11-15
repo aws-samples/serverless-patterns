@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 6.0"
     }
   }
 
@@ -151,7 +151,7 @@ resource "aws_sqs_queue_policy" "MySQSDLQ-Policy" {
         "AWS": "*"
       },
       "Action": "sqs:*",
-      "Resource": "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sqs_queue.MySQSDLQ-Queue.name}",
+      "Resource": "arn:aws:sqs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${aws_sqs_queue.MySQSDLQ-Queue.name}",
       "Condition": {
         "Bool": {
           "aws:SecureTransport": "false"
@@ -165,7 +165,7 @@ resource "aws_sqs_queue_policy" "MySQSDLQ-Policy" {
         "Service": "events.amazonaws.com"
       },
       "Action": "sqs:SendMessage",
-      "Resource": "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_sqs_queue.MySQSDLQ-Queue.name}",
+      "Resource": "arn:aws:sqs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${aws_sqs_queue.MySQSDLQ-Queue.name}",
       "Condition": {
         "ArnEquals": {
           "aws:SourceArn": "${aws_cloudwatch_event_rule.MyEventRule.arn}"
@@ -209,7 +209,7 @@ resource "aws_iam_role" "MySTFRole" {
     Statement = [
       {
         Effect    = "Allow"
-        Principal = { Service = "states.${data.aws_region.current.name}.amazonaws.com" }
+        Principal = { Service = "states.${data.aws_region.current.region}.amazonaws.com" }
         Action    = "sts:AssumeRole"
       }
     ]

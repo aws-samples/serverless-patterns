@@ -8,7 +8,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
     archive = {
       source  = "hashicorp/archive"
@@ -728,7 +728,6 @@ resource "aws_cloudwatch_log_group" "api_gateway" {
 
 resource "aws_api_gateway_account" "account" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch.arn
-  reset_on_delete    = true
 }
 
 resource "aws_iam_role" "api_gateway_cloudwatch" {
