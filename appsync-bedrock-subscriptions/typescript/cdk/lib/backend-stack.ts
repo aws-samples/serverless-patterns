@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { GraphqlApi, SchemaFile, AuthorizationType, FieldLogLevel, MappingTemplate, FunctionRuntime, Code } from 'aws-cdk-lib/aws-appsync';
+import { GraphqlApi, Definition, AuthorizationType, FieldLogLevel, MappingTemplate, FunctionRuntime, Code } from 'aws-cdk-lib/aws-appsync';
 import { PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
@@ -12,7 +12,7 @@ export class BackendStack extends cdk.Stack {
     // Appsync API
     const api = new GraphqlApi(this, 'Api', {
       name: 'Api',
-      schema: SchemaFile.fromAsset("src/schema.gql"),
+      definition: Definition.fromFile("src/schema.gql"),
       authorizationConfig: {
         defaultAuthorization: {
           authorizationType: AuthorizationType.IAM
@@ -28,35 +28,46 @@ export class BackendStack extends cdk.Stack {
       },
     })
 
+    // Claude Haiku 5.5 through the global cross-Region inference profile.
+    // Bedrock serves this model on demand only through an inference profile.
+    const modelName = "anthropic.claude-haiku-5-5";
+    const inferenceProfileArn = `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/global.${modelName}`;
+
     // Lambda Function
     const lambdaFunction = new NodejsFunction(this, "chat", {
       entry: "src/ask.ts",
-      timeout: cdk.Duration.seconds(15),
+      timeout: cdk.Duration.seconds(60),
       runtime: cdk.aws_lambda.Runtime.NODEJS_24_X,
-      memorySize: 2048,
-      bundling: {
-        nodeModules: ["langchain"],
-      },
+      memorySize: 512,
       environment: {
         GRAPHQL_URL: api.graphqlUrl,
         REGION: this.region,
+        MODEL_ID: `global.${modelName}`,
       },
       role: new Role(this, "LambdaRole", {
-        roleName: "langchain-lambda",
         assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
         inlinePolicies: {
           "LambdaPolicy": new PolicyDocument({
             statements: [
-              // Grant Lambda permissions to call Bedrock API
+              // Grant Lambda permissions to stream from the inference profile
+              new PolicyStatement({
+                resources: [inferenceProfileArn],
+                actions: ["bedrock:InvokeModelWithResponseStream"],
+              }),
+              // ...and from the model it routes to, only through that profile
               new PolicyStatement({
                 resources: [
-                  `arn:aws:bedrock:${this.region}::foundation-model/anthropic.claude-v2`,
+                  `arn:aws:bedrock:${this.region}::foundation-model/${modelName}`,
+                  `arn:aws:bedrock:::foundation-model/${modelName}`,
                 ],
-                actions: ["bedrock:*"],
+                actions: ["bedrock:InvokeModelWithResponseStream"],
+                conditions: {
+                  StringEquals: { "bedrock:InferenceProfileArn": inferenceProfileArn },
+                },
               }),
               // Grant Lambda permissions to call AppSync API
               new PolicyStatement({
-                resources: [`${api.arn}/*`],
+                resources: [`${api.arn}/types/Mutation/fields/send`],
                 actions: ["appsync:GraphQL"],
               }),
               // Grant Lambda permissions to write to CloudWatch Logs
