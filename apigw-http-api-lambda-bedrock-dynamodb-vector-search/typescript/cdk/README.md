@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The identity used to deploy must be able to create the resources in this pattern.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured.
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed.
-* [Node.js 22 or later](https://nodejs.org/en/download) installed.
+* [Node.js](https://nodejs.org/en/download) installed.
 * [AWS CDK v2 prerequisites](https://docs.aws.amazon.com/cdk/v2/guide/prerequisites.html) completed, including a bootstrapped environment.
 * Access to invoke the Amazon Titan Text Embeddings V2 model (`amazon.titan-embed-text-v2:0`) in the deployment Region.
 
@@ -83,7 +83,7 @@ The stack creates one vector index on a new, empty on-demand table through Cloud
 
 For automated deployments, use short-lived credentials from your CI/CD provider's OpenID Connect integration instead of storing AWS access keys. Configure the deployment role and Region outside the repository, then run these stages:
 
-1. Check out the repository and configure Node.js 22.
+1. Check out the repository and configure Node.js.
 2. Install dependencies with `npm install`.
 3. Run `npm run build`, `npm test`, and `npm run synth` as validation gates.
 4. Assume the deployment role through OpenID Connect.

@@ -9,7 +9,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-* [Node.js 22+](https://nodejs.org/) installed
+* [Node.js](https://nodejs.org/) installed
 * [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npm install -g aws-cdk`)
 * [Python 3.11+](https://www.python.org/downloads/) installed (required for building the Lambda layer)
 

@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js 22 or later](https://nodejs.org/en/download/) installed
+* [Node.js](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html), with your account and Region bootstrapped (`npx cdk bootstrap`). The commands below use `npx cdk`, which runs the CDK CLI version this project installs. An older global `cdk` can fail with "Cloud assembly schema version mismatch".
 * A container builder that the AWS CDK can use (Docker, or [Finch](https://github.com/runfinch/finch) with `CDK_DOCKER=finch`). `npx cdk deploy` builds the model container for `linux/amd64`, which is slow on Apple silicon.
 * Amazon SageMaker AI quota for one endpoint instance of the instance type you choose (default `ml.m5.2xlarge`; check Service Quotas, "ml.m5.2xlarge for endpoint usage")

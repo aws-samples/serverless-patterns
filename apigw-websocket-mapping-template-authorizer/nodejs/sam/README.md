@@ -71,7 +71,7 @@ The backend Lambda function `SendMessageFunction` operates independently by retr
 
 This implementation includes security through a Lambda REQUEST Authorizer. The authorizer function validates the header `token`, granting access only when the token value is "hello". Requests with invalid tokens receive a 401 Unauthorized response.
 
-All Lambda functions use Node.js 24 with ".mjs" files and implement ES module import syntax. To send responses to clients, the Lambda function constructs the endpoint URL using environment variables:
+All Lambda functions use Node.js with ".mjs" files and implement ES module import syntax. To send responses to clients, the Lambda function constructs the endpoint URL using environment variables:
 `"https://" + process.env.API_ID + ".execute-api." + process.env.AWS_REGION + ".amazonaws.com/" + process.env.STAGE + "/"` and the command `PostToConnectionCommand` from the client [`ApiGatewayManagementApiClient`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/apigatewaymanagementapi/).
 
 ## Testing

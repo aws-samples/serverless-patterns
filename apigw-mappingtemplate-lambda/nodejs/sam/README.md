@@ -37,7 +37,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern deploys an Amazon API Gateway Rest Regional API with a non-proxy Lambda integration. The AWS Lambda function runs on Node.js 24 and is integrated with a mapping template. The function returns a small message and a status code to the caller.
+This pattern deploys an Amazon API Gateway Rest Regional API with a non-proxy Lambda integration. The AWS Lambda function runs on Node.js and is integrated with a mapping template. The function returns a small message and a status code to the caller.
 
 ## Testing
 

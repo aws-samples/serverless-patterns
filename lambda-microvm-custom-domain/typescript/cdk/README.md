@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
-* [Node.js 22+](https://nodejs.org/en/download/) and [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npx cdk` works; no global install required).
+* [Node.js](https://nodejs.org/en/download/) and [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed (`npx cdk` works; no global install required).
 * An **existing Amazon Route 53 public hosted zone** for your domain (e.g. `example.com`). This stack imports it and adds a wildcard record.
 * Access to [AWS Lambda MicroVMs](https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html) and its regional PrivateLink service (`com.amazonaws.<region>.lambda-microvm`) in your target Region.
 * The **ALB Host/URL rewrite (Transforms) feature** available in your account/Region.

@@ -22,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started) installed
-* [Node.js 24.x](https://nodejs.org/) installed (for installing Lambda dependencies)
+* [Node.js](https://nodejs.org/) installed (for installing Lambda dependencies)
 
 ## Deployment Instructions
 

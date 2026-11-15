@@ -45,7 +45,7 @@ This architecture consists of a serverless cron job implementation using Amazon 
 
 This pattern creates:
 
-1. **Durable Orchestrator Lambda Function**: A Node.js 24.x Lambda function that uses the AWS durable execution SDK to implement a multi-step workflow (invoking 2 Lambda functions) with automatic checkpointing and replay capabilities.
+1. **Durable Orchestrator Lambda Function**: A Node.js Lambda function that uses the AWS durable execution SDK to implement a multi-step workflow (invoking 2 Lambda functions) with automatic checkpointing and replay capabilities.
 
 2. **Data Processor Lambda Function**: An activity function that simulates processing records.
 

@@ -60,7 +60,7 @@ WebSocket API Gateway serves as the entry point, enabling bidirectional real-ti
 * $disconnect - when users leave
 * $default - for processing chat messages
 
-Lambda Function (Node.js 22.x) acts as the central orchestrator, handling all WebSocket events and business logic. It manages connection lifecycle, processes user messages, and coordinates with other AWS services.
+Lambda Function (Node.js) acts as the central orchestrator, handling all WebSocket events and business logic. It manages connection lifecycle, processes user messages, and coordinates with other AWS services.
 DynamoDB Table stores active WebSocket connection IDs, enabling the system to track which users are currently connected and send responses back to the correct clients.
 Amazon Bedrock provides AI capabilities using Claude 3 Sonnet model, processing user messages and generating intelligent responses.
 
