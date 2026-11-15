@@ -23,7 +23,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd lambda-sns
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam deploy --guided
     ```
@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter the desired AWS Region
     * Allow SAM CLI to create IAM roles with the required permissions.
 
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
 
@@ -68,11 +68,7 @@ aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME response.json
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
-    ```
-1. Confirm the stack has been deleted
-    ```bash
-    aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
+    sam delete
     ```
 ----
 Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
