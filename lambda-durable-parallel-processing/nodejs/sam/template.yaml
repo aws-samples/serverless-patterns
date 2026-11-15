@@ -4,7 +4,7 @@ Description: AWS Lambda durable functions - Parallel Processing Demo with Node.j
 
 Globals:
   Function:
-    Runtime: nodejs22.x
+    Runtime: nodejs24.x
     Timeout: 900
     MemorySize: 512
     Architectures:

@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: src/orchestrator/
       Handler: index.handler
-      Runtime: nodejs22.x
+      Runtime: nodejs24.x
       Timeout: 900
       MemorySize: 512
       AutoPublishAlias: prod

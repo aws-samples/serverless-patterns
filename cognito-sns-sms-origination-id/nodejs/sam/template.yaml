@@ -62,7 +62,6 @@ Resources:
       AutoVerifiedAttributes:
         - phone_number
       MfaConfiguration: "ON"
-      MfaConfiguration: OPTIONAL
       SmsConfiguration:
         SnsCallerArn: !GetAtt SnsRole.Arn
         ExternalId: !Ref SmsRoleName

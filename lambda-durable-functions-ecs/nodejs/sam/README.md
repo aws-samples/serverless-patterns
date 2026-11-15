@@ -151,7 +151,7 @@ aws lambda send-durable-execution-callback-success \
 ### Key Configuration
 
 **Lambda Function:**
-- Runtime: `nodejs22.x` (see [supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/durable-supported-runtimes.html))
+- Runtime: `nodejs24.x` (see [supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/durable-supported-runtimes.html))
 - `AutoPublishAlias: prod`
 - `DurableConfig` with execution timeout and retention period
 
