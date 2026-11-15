@@ -7,7 +7,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
     null = {
       source  = "hashicorp/null"
@@ -313,8 +313,8 @@ resource "null_resource" "docker_build_push" {
     working_dir = "${path.module}/src"
     command     = <<-EOT
       set -euo pipefail
-      aws ecr get-login-password --region ${data.aws_region.current.name} \
-        | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com
+      aws ecr get-login-password --region ${data.aws_region.current.region} \
+        | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.region}.amazonaws.com
       docker build --platform linux/amd64 -t ${aws_ecr_repository.app.repository_url}:${var.image_tag} .
       docker push ${aws_ecr_repository.app.repository_url}:${var.image_tag}
     EOT
@@ -434,7 +434,7 @@ resource "aws_ecs_task_definition" "main" {
         logDriver = "awslogs"
         options = merge({
           "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name
-          "awslogs-region"        = data.aws_region.current.name
+          "awslogs-region"        = data.aws_region.current.region
           "awslogs-stream-prefix" = "ecs"
           }, var.enable_log_insights ? {
           "awslogs-create-group" = "true"

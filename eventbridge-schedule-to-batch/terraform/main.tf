@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>4.0"
+      version = "~> 6.0"
     }
   }
 }
@@ -205,7 +205,11 @@ resource "aws_iam_role" "batch_role" {
       },
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"]
+}
+
+resource "aws_iam_role_policy_attachment" "batch_role_policy" {
+  role       = aws_iam_role.batch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
 }
 
 #Create the ECS instance role
@@ -223,7 +227,11 @@ resource "aws_iam_role" "batch_ecs_role" {
       },
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"]
+}
+
+resource "aws_iam_role_policy_attachment" "batch_ecs_role_policy" {
+  role       = aws_iam_role.batch_ecs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
 # Create the ECS instance profile
@@ -234,7 +242,7 @@ resource "aws_iam_instance_profile" "ecs_profile" {
 
 # Create the Batch compute environment
 resource "aws_batch_compute_environment" "batch_compute_env" {
-  compute_environment_name = "BatchComputeEnvironment-${random_string.random.result}"
+  name         = "BatchComputeEnvironment-${random_string.random.result}"
   type         = "MANAGED"
   service_role = aws_iam_role.batch_role.arn
   compute_resources {
@@ -255,7 +263,9 @@ resource "aws_batch_compute_environment" "batch_compute_env" {
     aws_iam_role.batch_ecs_role,
     aws_subnet.subnet,
     aws_security_group.batch_sg,
-    aws_iam_role.batch_role
+    aws_iam_role.batch_role,
+    aws_iam_role_policy_attachment.batch_role_policy,
+    aws_iam_role_policy_attachment.batch_ecs_role_policy
   ]
 }
 
@@ -264,9 +274,10 @@ resource "aws_batch_job_queue" "batch_job_queue" {
   name     = "Scheduler-Batch-Queue-${random_string.random.result}"
   state    = "ENABLED"
   priority = 1
-  compute_environments = [
-    aws_batch_compute_environment.batch_compute_env.arn
-  ]
+  compute_environment_order {
+    order               = 1
+    compute_environment = aws_batch_compute_environment.batch_compute_env.arn
+  }
 }
 
 # This section creates schedules using Amazon EventBridge Scheduler, as well as the required IAM roles to interact with Batch
@@ -327,7 +338,6 @@ resource "aws_iam_policy" "scheduler_batch_policy" {
 
 resource "aws_iam_role" "scheduler-batch-role" {
   name = "scheduler-batch-role"
-  managed_policy_arns = [aws_iam_policy.scheduler_batch_policy.arn]
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -342,5 +352,10 @@ resource "aws_iam_role" "scheduler-batch-role" {
       },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "scheduler_batch_role_policy" {
+  role       = aws_iam_role.scheduler-batch-role.name
+  policy_arn = aws_iam_policy.scheduler_batch_policy.arn
 }
 
