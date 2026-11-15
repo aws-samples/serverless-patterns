@@ -61,13 +61,5 @@
       "linkedin": "kurt-tometich",
       "twitter": ""
     }
-  ],
-  "services": [
-    "eventbridge",
-    "glue",
-    "lambda-event-functions",
-    "sqs",
-    "cloudwatch"
-  ],
-  "patternType": "Serverless"
+  ]
 }
