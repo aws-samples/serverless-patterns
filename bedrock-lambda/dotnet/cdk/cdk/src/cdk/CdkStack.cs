@@ -69,6 +69,8 @@ namespace Cdk
                 LogRetention = RetentionDays.ONE_DAY,
                 Role = lambdaIAMRole,
                 ProjectDir = "../BedrockLambda/",
+                // Without a local Amazon.Lambda.Tools install, build in the .NET 10 image (the construct's default image is .NET 7)
+                Bundling = new XaasKit.CDK.AWS.Lambda.DotNet.BundlingOptions { DockerImage = Runtime.DOTNET_10.BundlingImage },
                 Events = [
                     new S3EventSource(bucket, new S3EventSourceProps(){
                         Events = [ EventType.OBJECT_CREATED ],
