@@ -1,6 +1,7 @@
 # OpenClaw on Lambda MicroVMs — EFS-persisted state variant (arm64).
 # Runs as ROOT (mounting NFS needs privileges + ALL os capabilities at image level).
-FROM ghcr.io/openclaw/openclaw:slim
+# Pinned: from 2026.8.1 the image no longer bundles the duckduckgo web search plugin that openclaw.json uses.
+FROM ghcr.io/openclaw/openclaw:2026.7.35-slim@sha256:8dc86a49392f4af8f7bc1db0cccced7f06d2f2d425585a408d6a43510a3bc706
 
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends nfs-common \
