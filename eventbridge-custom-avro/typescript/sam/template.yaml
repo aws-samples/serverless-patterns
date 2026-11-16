@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Avro on an Amazon EventBridge custom event bus (eventsv2), TypeScript consumer. This
   template provisions the whole sample: the event bus, a subscriber that delivers
-  to the consumer Lambda, the AWS Glue Schema Registry + Avro schema for OrderPlaced,
+  to the consumer AWS Lambda function, the AWS Glue Schema Registry + Avro schema for OrderPlaced,
   the consumer Lambda, a dead-letter queue, and the delivery role.
 
   Account- and region-agnostic: no account id or region is hardcoded; resources
