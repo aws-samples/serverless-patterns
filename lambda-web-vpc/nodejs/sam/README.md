@@ -1,205 +1,146 @@
-# AWS Lambda Web Function with private VPC egress
+# AWS Lambda Web Function with private VPC egress (SAM)
 
-This pattern demonstrates how to give an **AWS Lambda Web Function** private network egress into your Amazon VPC using a **Lambda network connector**. With the connector attached, outbound calls from your Web Function are routed through elastic network interfaces (ENIs) in your VPC subnets, so your HTTP server can reach private resources — internal APIs, databases, caches — that are not exposed to the internet.
+This pattern gives an AWS Lambda Web Function private network egress into your Amazon VPC through a Lambda network connector. Outbound calls from the function go through network interfaces that Lambda creates in your subnets, so the HTTP server can reach private resources such as internal APIs, databases and caches that aren't exposed to the internet.
 
-**Important Note:**
-This application leverages multiple AWS services, and there are associated costs beyond the Free Tier usage. Please refer to the [AWS Pricing page](https://aws.amazon.com/pricing/) for specific details. You are accountable for any incurred AWS costs. This example solution does not imply any warranty.
+The endpoint uses the `IamAuth` authentication type, so it accepts only requests signed with AWS Signature Version 4. The application is a plain Node.js `http` server with no dependencies that can call one private URL and report the result.
+
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-web-vpc-nodejs-sam
+
+Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
 ## Architecture
 
 ![Architecture: Lambda Web Function with private VPC egress via a Lambda network connector](docs/architecture.png)
 
-## Key constraint: HomeRegion endpoints only
-
-A Web Function revision that references a network connector supports **only `HomeRegion` endpoints** — not `MultiRegion` or `PerRegion`. If you need multi-Region routing, you cannot also use VPC egress on the same revision. This pattern therefore uses a single `HomeRegion` endpoint.
-
-## How Lambda Web Functions and network connectors fit together
-
-A Lambda Web Function uses a three-part resource model — a **Web Function** (container), immutable **revisions** (code + configuration), and **endpoints** (HTTPS entry points). To route outbound traffic through your VPC, you create an `AWS::Lambda::NetworkConnector` (which provisions ENIs in your subnets) and reference its **version-qualified ARN** from the revision's `ServiceConfig.EgressNetworkConnectorArn`. Your code is a standard Node.js HTTP server that binds to the host and port Lambda provides via the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable. Code is supplied only as a `.zip` package in an Amazon S3 bucket.
-
 ## Requirements
+
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
+* Latest [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* `zip` on your PATH (used to package `src/` into the deployment archive)
-* Permissions for the deploying identity to pass the roles and connector: `lambda:PassNetworkConnector` on the connector and `iam:PassRole` on the execution and operator roles. To run the test step, the caller also needs `lambda:InvokeWebFunctionEndpoint` on the endpoint.
-* An existing VPC with:
-  - One or more **private subnets** (two or more in different Availability Zones recommended for resilience).
-  - Egress to any AWS services your app calls (for example Amazon S3) via a **NAT gateway** or **VPC interface/gateway endpoints** — a Web Function in a VPC does not have a public route unless you provide one.
-  - Optionally, a **security group** permitting the outbound traffic your app needs (you can attach more than one if you compose SGs, but one is typical). If you don't provide any, the stack creates an egress-only security group for you.
-* (Manual path only) An Amazon S3 bucket with **versioning enabled (required by Lambda)** to hold the Web Function `.zip` deployment package. The Quick start `deploy.sh` creates a versioning-enabled bucket for you if you don't pass one.
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed, **version 1.171.0 or later** (`sam --version`).
+* A VPC with two private subnets in different Availability Zones. The subnets need a route to anything your app calls outside the VPC, such as other AWS services, through a NAT gateway or VPC endpoints. A web function in a VPC has no public route unless you provide one.
 
 ## Deployment Instructions
 
+1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
+    ```
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/lambdawebfunction-vpc/nodejs/sam
+    ```
+1. Change directory to the pattern directory:
+    ```
+    cd serverless-patterns/lambda-web-vpc/nodejs/sam
+    ```
+1. Build the application. `CodeUri` is the local `src/` directory, so the AWS SAM CLI packages it for you:
+    ```bash
+    export AWS_REGION=us-east-1
+    sam build
+    ```
+1. Deploy the stack with your VPC details:
+    ```bash
+    sam deploy \
+      --stack-name lambda-web-vpc-sam \
+      --capabilities CAPABILITY_IAM \
+      --region $AWS_REGION \
+      --resolve-s3 \
+      --parameter-overrides VpcId=vpc-0123456789abcdef0 VpcSubnetIds=subnet-0123456789abcdef0,subnet-0fedcba9876543210
+    ```
+    Or run `sam deploy --guided` and answer the prompts. The parameters are:
+    * `VpcId`: the VPC the subnets belong to.
+    * `VpcSubnetIds`: exactly two subnet IDs in different Availability Zones.
+    * `VpcSecurityGroupId` (optional): a security group for the network interfaces. Leave it out and the stack creates an egress-only security group.
+    * `NetworkProtocol` (optional): `IPv4` (default) or `DualStack`.
+    * `InternalTargetUrl` (optional): a private URL inside the VPC for the app to call. See [Testing](#testing).
 
-### Quick start (recommended)
+    To use more subnets or security groups, add them to the `SubnetIds` and `SecurityGroupIds` lists in the connector's `VpcConfig` in `template.yaml`.
 
-From the solution directory, run the deploy script with your VPC networking details. It
-resolves your region, creates the code S3 bucket if needed, packages `src/` and uploads it,
-then runs `sam build` and `sam deploy`:
+    The AWS SAM CLI uploads the code to a versioning-enabled, Lambda-readable bucket in a separate `lambda-web-vpc-sam-<hash>-WebFunctionCode` stack, which `sam delete` removes.
+1. Note the `WebFunctionEndpointDomain` output.
 
-    ./deploy.sh --vpc-id vpc-aaa --subnets subnet-aaa,subnet-bbb
-
-`--vpc-id` and `--subnets` are required. `--security-groups` is optional — omit it and the
-stack creates an egress-only security group for you, or pass `--security-groups sg-aaa`
-to bring your own (comma-separate more than one only if you compose SGs). Other optional flags:
-`--stack-name NAME --bucket BUCKET --key KEY --network-protocol IPv4|DualStack --region REGION`.
-Set your AWS credentials and a Region where Lambda Web Functions is available first — the script fails fast if no region is resolvable.
-
-`--internal-target-url` is also optional: it points the sample app at a private HTTP
-endpoint inside your VPC to demonstrate egress. Omit it for a normal deploy (the page
-then shows the egress status as **Not configured**); see [Testing](#testing) for how to use it.
-
-Re-run `./deploy.sh` any time to ship new code — each run uploads a fresh `.zip` and creates
-a new immutable revision.
-
-### Manual steps
-
-Prefer to run the steps yourself (package → upload to S3 → `sam build` → `sam deploy --guided`
-with the VPC parameters)? See [DEPLOYMENT.md](DEPLOYMENT.md) for the exact copy-paste commands,
-including the non-interactive deploy, versioning, testing, and cleanup. The deploy script above
-automates exactly those steps.
-
-**Note:** `sam deploy` does not upload your Web Function code — you must zip and upload `src/` to `s3://<CodeBucket>/<CodeKey>` first (DEPLOYMENT.md Step 1), or the stack fails with *"The specified S3 object does not exist"*.
+To deploy a code change, run `sam build && sam deploy` again. CloudFormation creates a new revision and moves the endpoint to it.
 
 ## How it works
 
-The template creates a Lambda network connector that provisions ENIs in your chosen subnets and security groups, associated with the `WebFunction` compute type. It then creates a Web Function and an initial revision whose `ServiceConfig.EgressNetworkConnectorArn` points at the connector's version-qualified ARN, so the function's outbound traffic is routed through your VPC. An `IamAuth` `HomeRegion` endpoint routes all traffic to the revision. A dedicated operator role grants Lambda the EC2 permissions needed to manage ENIs on your behalf.
+`template.yaml` declares three resources:
+
+* **`NetworkConnector`** (`AWS::Serverless::NetworkConnector`) with `ComputeTypes: [WebFunction]`. SAM expands it into an `AWS::Lambda::NetworkConnector`, which creates network interfaces in your two subnets, and an operator role with the AWS managed `AWSLambdaNetworkConnectorOperatorPolicy` that Lambda uses to manage those interfaces.
+* **`ConnectorSecurityGroup`** (`AWS::EC2::SecurityGroup`), created only when you don't pass `VpcSecurityGroupId`. It allows all outbound traffic and no inbound traffic.
+* **`WebFunction`** (`AWS::Serverless::WebFunction`) with `AuthType: IamAuth` and `EndpointType: HomeRegion`. SAM expands it into `AWS::Lambda::WebFunction`, an immutable `AWS::Lambda::WebFunctionRevision` (code and configuration), an `AWS::Lambda::WebFunctionEndpoint` routed 100% to that revision, and a logs-only execution role. The revision's `EgressNetworkConnectorArn` is the connector's version-qualified ARN, so all outbound traffic from the function goes through your VPC.
+
+A revision that uses a network connector supports only `HomeRegion` endpoints, not `MultiRegion` or `PerRegion`. If you need multi-Region routing, you can't use VPC egress on the same revision.
+
+The server reads its listen address from the `AWS_LAMBDA_HTTP_ENDPOINT` environment variable that the runtime sets. When `INTERNAL_TARGET_URL` is set, each request calls that URL and the page shows the result.
 
 ## Testing
 
-Testing the egress path has three steps: point the sample at a private target, invoke the (`IamAuth`) endpoint with a signed request, then read the result on the returned page. Each step is covered in a subsection below.
+### Call the endpoint
 
-### Set a private target
+Every request must be SigV4-signed for the `lambda` service and carry an `x-amz-content-sha256` header with the hash of the body (the value below is the hash of an empty body). This example uses `curl --aws-sigv4` (curl 7.75 or later) with temporary credentials, such as those from AWS CloudShell, IAM Identity Center or an assumed role. The caller needs `lambda:InvokeWebFunctionEndpoint` on the endpoint.
 
-To exercise the egress path, use the `--internal-target-url` flag introduced above to point the sample at a private endpoint reachable only inside your VPC (for example an internal ALB, or a small HTTP server on EC2/ECS) at deploy time:
+```bash
+export ENDPOINT=$(aws cloudformation describe-stacks --stack-name lambda-web-vpc-sam \
+  --region $AWS_REGION --query "Stacks[0].Outputs[?OutputKey=='WebFunctionEndpointDomain'].OutputValue" --output text)
+eval "$(aws configure export-credentials --format env)"
 
-    ./deploy.sh --vpc-id vpc-aaa --subnets subnet-aaa,subnet-bbb \
-      --internal-target-url http://<private-ip-or-internal-dns>/
+curl -s -w '\nHTTP %{http_code}\n' \
+  --aws-sigv4 "aws:amz:${AWS_REGION}:lambda" \
+  --user "${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}" \
+  -H "x-amz-security-token: ${AWS_SESSION_TOKEN}" \
+  -H "x-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" \
+  "https://${ENDPOINT}/" | grep -o 'Not configured\|Unreachable\|Reachable\|HTTP [0-9]*' | sort -u
+# HTTP 200
+# Not configured
+```
 
-This sets `INTERNAL_TARGET_URL` on the new revision (leave the flag off and the page shows **Not configured**). The sample app probes that URL and the returned page reports the result: **Reachable** (with HTTP status and latency) when VPC egress works, **Unreachable** (subnet routing or security-group rules) otherwise.
+An unsigned request is rejected before it reaches your code:
 
-### Invoking the `IamAuth` endpoint
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' "https://$ENDPOINT/"
+# 403
+```
 
-Because the endpoint uses `IamAuth`, every request must be **SigV4-signed with the service name `lambda`**. Invoke from inside the account (CloudShell, or an EC2 instance with an instance role) so credentials are picked up and signed correctly. Replace `<WebFunctionEndpointDomain>` below with your endpoint domain from the stack outputs (`WebFunctionEndpointDomain`):
+### Call a private target
 
-    python3 - <<'EOF'
-    import os, urllib.request, hashlib, re, html as _html
-    import botocore.session
-    from botocore.auth import SigV4Auth
-    from botocore.awsrequest import AWSRequest
-    url = "https://<WebFunctionEndpointDomain>/"
-    session = botocore.session.Session()
-    creds = session.get_credentials().get_frozen_credentials()
-    # Sign for the Region the stack is deployed in (a HomeRegion endpoint is signed for its own Region).
-    region = os.environ.get("AWS_REGION") or session.get_config_variable("region")
-    req = AWSRequest(method="GET", url=url)
-    req.headers["X-Amz-Content-SHA256"] = hashlib.sha256(b"").hexdigest()  # required empty-body hash
-    SigV4Auth(creds, "lambda", region).add_auth(req)
-    resp = urllib.request.urlopen(urllib.request.Request(url, headers=dict(req.headers)))
-    body = resp.read().decode()
+To test the egress path, redeploy with `InternalTargetUrl` set to an HTTP endpoint that is reachable only inside the VPC, for example an internal Application Load Balancer or a small server on Amazon EC2 or Amazon ECS:
 
-    # Render the card's content as readable text (instead of dumping raw HTML).
-    def grab(pat, default="n/a"):
-        m = re.search(pat, body, re.S)
-        return _html.unescape(m.group(1).strip()) if m else default
-    title    = grab(r"<h1>([^<]+)</h1>").replace("\xa0", " ")
-    subtitle = grab(r'<div class="card__header">.*?<p>([^<]+)</p>')
-    status   = grab(r'stat__num">([^<]+)<')
-    detail   = grab(r'internal target<br>([^<]+)<')
-    reply    = grab(r'resp__body">([^<]+)<', default=None)
-    badge    = grab(r'class="badge">([^<]+)<')
-    meta     = re.findall(r"<dt>([^<]+)</dt><dd>([^<]+)</dd>", body)
-    print()
-    print("=" * 60)
-    print(f"# {title}\n")
-    print(f"{subtitle}\n")
-    print(f"HTTP {resp.status}  |  {len(body)} bytes\n")
-    print(f"Egress status : {status}")
-    print(f"Detail        : {detail}")
-    if reply:
-        print(f"Target reply  : {reply}")
-    print()
-    for k, v in meta:
-        if k not in ("Status", "Latency", "Content-Type", "Size"):
-            print(f"{k:<13}: {v}")
-    print(f"\n{badge}")
-    print("=" * 60)
-    EOF
+```bash
+sam deploy --stack-name lambda-web-vpc-sam --capabilities CAPABILITY_IAM --region $AWS_REGION --resolve-s3 \
+  --parameter-overrides VpcId=vpc-0123456789abcdef0 VpcSubnetIds=subnet-0123456789abcdef0,subnet-0fedcba9876543210 \
+  InternalTargetUrl=http://10.0.1.25/
+```
 
-### What you'll see
-
-The returned page reports one of three egress states, depending on whether `INTERNAL_TARGET_URL` is set and reachable:
+The target's security group must allow inbound traffic from the connector's security group. The page reports one of three states:
 
 | State | When | What the page shows |
 |---|---|---|
-| **Not configured** | `--internal-target-url` was not passed | Amber status "Not configured" and a prompt to set `INTERNAL_TARGET_URL`. The endpoint itself is working — the egress probe just didn't run. |
-| **Reachable** | Target is set and responded | Green status "Reachable", plus a **Response from private target** panel with the HTTP status, latency, content-type, size, and a snippet of the actual response body (e.g. `Hello from a private VPC resource`). This is the end-to-end egress proof. |
-| **Unreachable** | Target is set but the call failed | Red status "Unreachable" with the reason (for example `timeout (check routing / security groups)`). Almost always a subnet-routing or security-group issue, not a pattern defect — the target's security group must allow inbound from the connector's security group. |
+| **Not configured** | `InternalTargetUrl` is not set | Amber status and a prompt to set `INTERNAL_TARGET_URL`. The endpoint works; the app just doesn't call a target. |
+| **Reachable** | The target responded | Green status with the HTTP status, latency, content type, size and part of the response body. This proves the call went through your VPC. |
+| **Unreachable** | The call failed | Red status with the reason, for example `timeout (check routing / security groups)`. This is almost always subnet routing or a security group rule. |
 
-The invoke script above renders the card's content as readable text in the terminal, so you see the same information without the raw HTML. For a **Reachable** result it prints:
+View the logs:
 
-    ============================================================
-    # Hello from AWS !
-
-    AWS Lambda Web Function with private VPC egress via a network connector
-
-    HTTP 200  |  3749 bytes
-
-    Egress status : Reachable
-    Detail        : HTTP 200 in 7 ms via VPC egress
-    Target reply  : Hello from a private VPC resource
-
-    App          : lambda-web-function-vpc
-    Egress       : VPC network connector (ENIs in your subnets)
-    Listening on : 0.0.0.0:3000
-
-    ⚡ Private resource reached through your VPC
-    ============================================================
-
-The colors described above (amber/green/red) are CSS styling visible only when the HTML is rendered in a browser; the terminal shows the same states as the text labels above.
-
-## Deploying new code (new revisions)
-
-Revisions are immutable. Upload a new `.zip` to S3 and deploy again to create a new revision. Pin `CodeVersionId` to the new S3 object version for reproducibility.
+```bash
+aws logs tail /aws/lambda/web/lambda-web-vpc-sam --region $AWS_REGION --follow
+```
 
 ## Production hardening
 
-This pattern is a working baseline. The security-critical pieces (`IamAuth` on the endpoint, a scoped code-bucket policy, and VPC egress through a network connector) are built in. It also sets conservative endpoint throttling/scaling caps by default (see below). The following are still left to the adopter because the right value is workload-specific — set them when you take this to production:
-
-- **Endpoint throttling and scaling caps (`ThrottleConfig.RateLimit`, `ScalingConfig.MaxEnvironments`).** By default an endpoint is bounded only by your account's regional quotas, which are shared across every endpoint in the account. A traffic spike or a runaway client can therefore consume account-wide capacity before anything throttles at this endpoint. This template sets `RateLimit: 100` (requests/sec) and `MaxEnvironments: 10` on `MyWebFunctionEndpoint` as a conservative starting point — combined with `MaxConcurrencyPerEnvironment: 64`, that caps the endpoint at 640 concurrent in-flight requests. Tune both from your actual expected peak RPS and concurrency; `RateLimit` only accepts 0, 100–1000 in steps of 100, or 2000–10000 in steps of 1000.
-- **Security group egress scoping.** When you don't bring your own security group, the stack creates an egress-only group that allows all outbound traffic (`0.0.0.0/0`). For production, scope egress to only the destinations your function actually calls — the private CIDRs, prefix lists, and ports of your internal targets — so the connector ENIs follow least-privilege. Bring your own tightened security group via `--security-groups` (or the `VpcSecurityGroupIds` parameter).
-- **Dedicate the code bucket.** The stack attaches an `AWS::S3::BucketPolicy` to `CodeBucket`, which **replaces the entire bucket policy**. The bucket lives outside the stack, so pointing `--bucket` at an existing shared bucket overwrites its policy (and removes it on `sam delete`). Use a bucket dedicated to this pattern, or let the Quick start `deploy.sh` create one.
-- **CloudWatch Logs retention.** Lambda auto-creates the Web Function's log groups with **no expiration**: `/aws/lambda/web/<function-name>` and a Regional `/aws/lambda/web/<function-name>.local` companion. For cost and governance, create `AWS::Logs::LogGroup` resources for both with an explicit `RetentionInDays` (e.g. 30 or 90 days); `AWSLambdaBasicExecutionRole` already permits writing to them.
-- **Graceful shutdown (`SIGTERM`).** This stateless sample has nothing to flush on shutdown, so it registers no `SIGTERM` handler. A real application should handle `SIGTERM` to drain in-flight requests and close connections (databases, caches) cleanly before the execution environment is removed.
-- **Customer-managed KMS key.** The revision encrypts code and environment variables with an AWS-owned key by default. Compliance-driven workloads can supply a customer-managed key via the revision's `KmsKeyArn`.
-
-These are intentionally *not* baked into the baseline so the pattern stays generic; add the ones your workload needs.
+* **Endpoint caps.** The template sets `ScalingConfig.MaxEnvironments: 10` and `ThrottleConfig.RateLimit: 100` (requests per second). With `MaxConcurrencyPerEnvironment: 64`, that caps the endpoint at 640 in-flight requests, so a traffic spike can't use account-wide capacity first. Tune both for your peak load. `RateLimit` accepts 0, 100 to 1000 in steps of 100, or 2000 to 10000 in steps of 1000.
+* **Security group egress.** The created security group allows all outbound traffic. For production, pass your own `VpcSecurityGroupId` that allows only the CIDRs, prefix lists and ports your function calls.
+* **Log retention.** Lambda creates the log groups `/aws/lambda/web/<stack-name>` and `/aws/lambda/web/<stack-name>.local` with no expiration. Add `AWS::Logs::LogGroup` resources with `RetentionInDays` for both.
+* **Graceful shutdown.** The sample is stateless and registers no `SIGTERM` handler. A real application should handle `SIGTERM` to finish in-flight requests and close connections.
+* **Customer managed KMS key.** Lambda encrypts the code and environment variables with an AWS owned key. Set `KmsKeyArn` on the web function to use your own key.
 
 ## Cleanup
 
-    export AWS_REGION=us-east-1                      # the Region you deployed to
-    export STACK_NAME=lambdawebfunction-vpc          # deploy.sh default
-    export CODE_BUCKET="${STACK_NAME}-code-$(aws sts get-caller-identity --query Account --output text)-${AWS_REGION}"   # deploy.sh default; set your own if you passed --bucket
-
-    sam delete --stack-name "${STACK_NAME}" --region "${AWS_REGION}"
-
-Deleting the stack removes the Web Function, its revisions and endpoint, and the network connector (including all its versions). It does **not** remove the code bucket, which lives outside the stack. The bucket is versioned, so `aws s3 rm` would only add a delete marker and every earlier `app.zip` version would stay and keep billing ([Deleting object versions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html)).
-
-If the bucket is dedicated to this pattern (for example, the one `./deploy.sh` created), remove every object version and delete marker, then delete the bucket:
-
-    aws s3api list-object-versions --bucket "${CODE_BUCKET}" --region "${AWS_REGION}" \
-      --query '[Versions,DeleteMarkers][][].[Key,VersionId]' --output text \
-      | while read -r key version; do
-          aws s3api delete-object --bucket "${CODE_BUCKET}" --region "${AWS_REGION}" \
-            --key "$key" --version-id "$version"
-        done
-    aws s3 rb "s3://${CODE_BUCKET}" --region "${AWS_REGION}"
-
-If you brought a shared bucket, don't delete it. Remove only the `${CODE_KEY}` versions instead.
+1. Delete the stack. This removes the web function with its revision and endpoint, the network connector and its network interfaces, the security group, the roles and the code bucket stack:
+    ```bash
+    sam delete --stack-name lambda-web-vpc-sam --region $AWS_REGION --no-prompts
+    ```
+1. Delete the log groups the runtime created:
+    ```bash
+    aws logs delete-log-group --log-group-name /aws/lambda/web/lambda-web-vpc-sam --region $AWS_REGION
+    aws logs delete-log-group --log-group-name /aws/lambda/web/lambda-web-vpc-sam.local --region $AWS_REGION
+    ```
 
 ----
 Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
