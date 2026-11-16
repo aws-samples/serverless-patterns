@@ -7,10 +7,11 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway REST API endpoint that connects directly to Amazon CloudWatch Logs using an AWS service integration. No Lambda function is required.",
+      "This pattern creates an Amazon API Gateway REST API endpoint that connects directly to Amazon CloudWatch Logs using an AWS service integration, with no Lambda function.",
       "The API exposes two POST methods. 'POST /putLog' maps to the CloudWatch Logs PutLogEvents action to put a log event into a log stream, and 'POST /getLog' maps to the GetLogEvents action to read log events back from the stream.",
-      "API Gateway assumes an AWS IAM role that allows GetLogEvents and PutLogEvents on a single log stream. Mapping templates fix the log group and log stream, escape the message, and transform the JSON body (ts and message) into the request format expected by the CloudWatch Logs API.",
+      "API Gateway assumes an AWS IAM role that allows GetLogEvents and PutLogEvents on a log stream. The log group and log stream are fixed in the template, so callers cannot access other logs. Mapping templates encode the timestamp and message from the request body as valid JSON before calling the CloudWatch Logs API.",
       "This is useful for browser or mobile clients, IoT devices, or third-party systems that need to write to or read from CloudWatch Logs over plain HTTPS without bundling the AWS SDK or signing requests.",
+      "This sample API has no authorization, so use it only for testing and add an authorizer before any other use.",
       "Review the Amazon API Gateway and Amazon CloudWatch Logs quotas for the limits that apply when working with this pattern."
     ]
   },

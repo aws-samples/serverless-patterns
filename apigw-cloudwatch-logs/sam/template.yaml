@@ -3,21 +3,18 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   apigw-cloudwatch-logs
 
-  Amazon API Gateway REST API that acts as a proxy to Amazon CloudWatch Logs
-  using a direct AWS service integration (no Lambda function). Clients call the
-  API over HTTPS to put log events into, and get log events from, one fixed
-  CloudWatch Logs log stream.
+  Creates an Amazon API Gateway REST API that calls Amazon CloudWatch Logs
+  directly. POST /putLog writes a log event to a log stream and
+  POST /getLog reads the events back.
 
 Resources:
   # CloudWatch Logs log group that the API writes to and reads from.
-  # The name includes the stack name so that two stacks can deploy side by side.
   MyLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub '/apigw-cloudwatch-logs/${AWS::StackName}'
+      LogGroupName: my-cw-log-group
       RetentionInDays: 7
 
-  # The only log stream the API can access
   MyLogStream:
     Type: AWS::Logs::LogStream
     Properties:
@@ -25,7 +22,6 @@ Resources:
       LogStreamName: log-stream-1
 
   # IAM role assumed by API Gateway to call the CloudWatch Logs API.
-  # Scoped to the single log stream above.
   ApiGatewayCloudWatchLogsRole:
     Type: AWS::IAM::Role
     Properties:
@@ -47,127 +43,94 @@ Resources:
                   - logs:PutLogEvents
                 Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${MyLogGroup}:log-stream:${MyLogStream}'
 
-  # REST API
+
+  # This sample API has no authorization. Add an authorizer before you use it beyond testing.
   ProxyApi:
-    Type: AWS::ApiGateway::RestApi
+    Type: AWS::Serverless::Api
     Properties:
       Name: !Sub '${AWS::StackName}-cloudwatch-logs-proxy'
-      Description: REST API that proxies requests to Amazon CloudWatch Logs
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
-
-  # /getLog resource
-  GetLogResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref ProxyApi
-      ParentId: !GetAtt ProxyApi.RootResourceId
-      PathPart: getLog
-
-  # /putLog resource
-  PutLogResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref ProxyApi
-      ParentId: !GetAtt ProxyApi.RootResourceId
-      PathPart: putLog
-
-  # POST /getLog -> CloudWatch Logs GetLogEvents
-  GetLogMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ProxyApi
-      ResourceId: !Ref GetLogResource
-      HttpMethod: POST
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS
-        IntegrationHttpMethod: POST
-        Credentials: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
-        Uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:logs:action/GetLogEvents'
-        PassthroughBehavior: NEVER
-        RequestParameters:
-          integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
-          integration.request.header.X-Amz-Target: "'Logs_20140328.GetLogEvents'"
-        # The log group and stream are fixed in the template. The caller cannot choose them.
-        RequestTemplates:
-          application/json: !Sub |
-            {
-              "logGroupName": "${MyLogGroup}",
-              "logStreamName": "${MyLogStream}"
-            }
-        IntegrationResponses:
-          - StatusCode: '200'
-          - StatusCode: '400'
-            SelectionPattern: '4\d{2}'
-          - StatusCode: '500'
-            SelectionPattern: '5\d{2}'
-      MethodResponses:
-        - StatusCode: '200'
-        - StatusCode: '400'
-        - StatusCode: '500'
-
-  # POST /putLog -> CloudWatch Logs PutLogEvents
-  PutLogMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ProxyApi
-      ResourceId: !Ref PutLogResource
-      HttpMethod: POST
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS
-        IntegrationHttpMethod: POST
-        Credentials: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
-        Uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:logs:action/PutLogEvents'
-        PassthroughBehavior: NEVER
-        RequestParameters:
-          integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
-          integration.request.header.X-Amz-Target: "'Logs_20140328.PutLogEvents'"
-        # The log group and stream are fixed in the template. The caller supplies only ts and message.
-        # escapeJavaScript prevents a crafted message from breaking the JSON payload.
-        # The replaceAll call undoes the \' escape, which is not valid JSON.
-        RequestTemplates:
-          application/json: !Sub |
-            #set($inputRoot = $input.path('$'))
-            {
-              "logGroupName": "${MyLogGroup}",
-              "logStreamName": "${MyLogStream}",
-              "logEvents": [
-                {
-                  "timestamp": $inputRoot.ts,
-                  "message": "$util.escapeJavaScript($inputRoot.message).replaceAll("\\'","'")"
-                }
-              ]
-            }
-        IntegrationResponses:
-          - StatusCode: '200'
-          - StatusCode: '400'
-            SelectionPattern: '4\d{2}'
-          - StatusCode: '500'
-            SelectionPattern: '5\d{2}'
-      MethodResponses:
-        - StatusCode: '200'
-        - StatusCode: '400'
-        - StatusCode: '500'
-
-  # Deployment
-  ApiDeployment:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-      - GetLogMethod
-      - PutLogMethod
-    Properties:
-      RestApiId: !Ref ProxyApi
-
-  # Stage
-  ApiStage:
-    Type: AWS::ApiGateway::Stage
-    Properties:
       StageName: s1
-      RestApiId: !Ref ProxyApi
-      DeploymentId: !Ref ApiDeployment
+      EndpointConfiguration:
+        Type: REGIONAL
+      DefinitionBody:
+        openapi: '3.0.1'
+        info:
+          title: !Sub '${AWS::StackName}-cloudwatch-logs-proxy'
+          version: '1.0'
+        paths:
+          # POST /putLog -> CloudWatch Logs PutLogEvents
+          /putLog:
+            post:
+              responses:
+                '200':
+                  description: Log event accepted
+                '400':
+                  description: Bad request
+                '500':
+                  description: Server error
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:logs:action/PutLogEvents'
+                credentials: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
+                passthroughBehavior: never
+                requestParameters:
+                  integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+                  integration.request.header.X-Amz-Target: "'Logs_20140328.PutLogEvents'"
+                # The log group and stream are fixed in the template. The caller supplies only ts and message.
+                # $input.json returns each value as valid JSON, so a crafted ts or message
+                # cannot break out of the JSON payload sent to CloudWatch Logs.
+                requestTemplates:
+                  application/json: !Sub |
+                    {
+                      "logGroupName": "${MyLogGroup}",
+                      "logStreamName": "${MyLogStream}",
+                      "logEvents": [
+                        {
+                          "timestamp": $input.json('$.ts'),
+                          "message": $input.json('$.message')
+                        }
+                      ]
+                    }
+                responses:
+                  default:
+                    statusCode: '200'
+                  '4\d{2}':
+                    statusCode: '400'
+                  '5\d{2}':
+                    statusCode: '500'
+          # POST /getLog -> CloudWatch Logs GetLogEvents
+          /getLog:
+            post:
+              responses:
+                '200':
+                  description: Log events returned
+                '400':
+                  description: Bad request
+                '500':
+                  description: Server error
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:logs:action/GetLogEvents'
+                credentials: !GetAtt ApiGatewayCloudWatchLogsRole.Arn
+                passthroughBehavior: never
+                requestParameters:
+                  integration.request.header.Content-Type: "'application/x-amz-json-1.1'"
+                  integration.request.header.X-Amz-Target: "'Logs_20140328.GetLogEvents'"
+                requestTemplates:
+                  application/json: !Sub |
+                    {
+                      "logGroupName": "${MyLogGroup}",
+                      "logStreamName": "${MyLogStream}"
+                    }
+                responses:
+                  default:
+                    statusCode: '200'
+                  '4\d{2}':
+                    statusCode: '400'
+                  '5\d{2}':
+                    statusCode: '500'
 
 Outputs:
   ApiBaseUrl:
