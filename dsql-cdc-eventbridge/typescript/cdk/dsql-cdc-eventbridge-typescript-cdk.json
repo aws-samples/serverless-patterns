@@ -14,8 +14,8 @@
     },
     "gitHub": {
         "template": {
-            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/y/typescript/cdk",
-            "templateURL": "serverless-patterns/y/typescript/cdk",
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dsql-cdc-eventbridge/typescript/cdk",
+            "templateURL": "serverless-patterns/dsql-cdc-eventbridge/typescript/cdk",
             "projectFolder": "dsql-cdc-eventbridge-fanout-cdk",
             "templateFile": "cdk/lib/dsql-cdc-eventbridge-fanout-stack.ts"
         }
@@ -34,7 +34,7 @@
     },
     "deploy": {
         "text": [
-            "<code>cd y/typescript/cdk/cdk</code>",
+            "<code>cd dsql-cdc-eventbridge/typescript/cdk/cdk</code>",
             "<code>npm install</code>",
             "<code>npm run build</code>",
             "<code>npx cdk deploy --parameters DsqlClusterId=your-cluster-id</code>"

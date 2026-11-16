@@ -14,8 +14,8 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/y/typescript/cdk",
-      "templateURL": "serverless-patterns/y/typescript/cdk",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/dsql-cdc-eventbridge/typescript/cdk",
+      "templateURL": "serverless-patterns/dsql-cdc-eventbridge/typescript/cdk",
       "projectFolder": "dsql-cdc-eventbridge-fanout-cdk",
       "templateFile": "cdk/lib/dsql-cdc-eventbridge-fanout-stack.ts"
     }
@@ -35,7 +35,7 @@
   "deploy": {
     "text": [
       "<code>git clone https://github.com/aws-samples/serverless-patterns</code>",
-      "<code>cd serverless-patterns/y/typescript/cdk/cdk</code>",
+      "<code>cd serverless-patterns/dsql-cdc-eventbridge/typescript/cdk/cdk</code>",
       "Create an Amazon Aurora DSQL cluster in the Region you deploy to and wait until it is ACTIVE; Docker or Finch must be running. See the GitHub repo for the commands.",
       "<code>npm install</code>",
       "<code>npm run build</code>",
