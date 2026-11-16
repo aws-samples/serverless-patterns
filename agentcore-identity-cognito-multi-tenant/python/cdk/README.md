@@ -25,7 +25,7 @@ Important: this application uses various AWS services and there are costs associ
 
     ```shell
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/agentcore-identity-cognito-multi-tenant-cdk
+    cd serverless-patterns/agentcore-identity-cognito-multi-tenant/python/cdk
     ```
 
 2. Create and activate a Python virtual environment:
