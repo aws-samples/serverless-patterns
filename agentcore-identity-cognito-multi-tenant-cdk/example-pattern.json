@@ -1,6 +1,6 @@
 {
   "title": "Multi-tenant Amazon Bedrock AgentCore Runtime with Amazon Cognito",
-  "description": "Authenticate an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito and enforce per-tenant data isolation using Amazon Bedrock AgentCore Identity inbound JWT authorization.",
+  "description": "Authenticate an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito and enforce per-tenant data isolation using Amazon Bedrock AgentCore Identity JWT authorization.",
   "language": "Python",
   "level": "300",
   "framework": "AWS CDK",

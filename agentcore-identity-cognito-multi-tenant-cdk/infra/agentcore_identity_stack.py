@@ -185,7 +185,7 @@ class AgentCoreIdentityStack(Stack):
                                 "bedrock:InvokeModelWithResponseStream",
                             ],
                             resources=[
-                                "arn:aws:bedrock:*::foundation-model/*",
+                                f"arn:{self.partition}:bedrock:*::foundation-model/*",
                                 f"arn:{self.partition}:bedrock:{self.region}:{self.account}:inference-profile/*",
                             ],
                         ),
