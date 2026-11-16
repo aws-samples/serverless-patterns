@@ -4,7 +4,7 @@ This pattern demonstrates multi-tenant authentication and tenant isolation for a
 
 Amazon Bedrock AgentCore Identity validates inbound Cognito JWTs at the runtime edge via a [custom JWT authorizer](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html). The agent then derives the caller's tenant from the validated token claims and can only ever read that tenant's partition in Amazon DynamoDB. Because the tenant is fixed from the token and not from the prompt, a user cannot coax the agent into reading another tenant's data.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/agentcore-identity-cognito-multi-tenant-cdk).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/agentcore-identity-cognito-multi-tenant-cdk-python).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
