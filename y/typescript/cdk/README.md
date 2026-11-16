@@ -2,7 +2,7 @@
 
 This pattern deploys an event-driven pipeline that captures real-time database changes from Amazon Aurora DSQL using Change Data Capture (CDC), streams them through Amazon Kinesis Data Streams, processes them with AWS Lambda, and publishes typed events to an Amazon EventBridge custom event bus for downstream consumption.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dsql-cdc-eventbridge-fanout-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/y-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. Amazon Aurora DSQL and Amazon Kinesis Data Streams bill while they exist, so run the Cleanup section when you are done. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -47,7 +47,7 @@ Important: this application uses various AWS services and there are costs associ
 
     ```bash
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/dsql-cdc-eventbridge-fanout-cdk
+    cd serverless-patterns/y/typescript/cdk
     ```
 
 2. Create an Amazon Aurora DSQL cluster (if you don't have one) in the Region you deploy to, and wait until it is ACTIVE:
@@ -155,7 +155,7 @@ Add Amazon EventBridge rules and targets to route CDC events to any consumer:
 
 > **Warning:** This deletes the stack with its stream in Amazon Kinesis Data Streams, CDC stream and AWS Lambda log groups, and the Amazon Aurora DSQL cluster with all its data.
 
-In a new shell, set `AWS_REGION` and `CLUSTER_ID` again and change to the `cdk` folder (`cd serverless-patterns/dsql-cdc-eventbridge-fanout-cdk/cdk`) first.
+In a new shell, set `AWS_REGION` and `CLUSTER_ID` again and change to the `cdk` folder (`cd serverless-patterns/y/typescript/cdk/cdk`) first.
 
 1. Delete the temporary rule and queue from the Testing section. Do this first: an Amazon EventBridge event bus cannot be deleted while it has rules ([API reference](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DeleteEventBus.html)), so `cdk destroy` would fail.
 
