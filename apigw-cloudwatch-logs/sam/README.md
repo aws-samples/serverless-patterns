@@ -113,6 +113,8 @@ GET_LOG_URL=$(aws cloudformation describe-stacks --stack-name STACK_NAME \
       -d '{}'
     ```
 
+    New events can take a few seconds to become readable. If `events` is empty, wait a few seconds and run the command again.
+
     Expected output: HTTP 200 with a JSON body that contains the events you put, along with `nextBackwardToken` and `nextForwardToken`:
 
     ```json
