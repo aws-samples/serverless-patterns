@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Serverless patterns - AWS Lambda Web Function with private VPC egress through a
+  Lambda network connector (SAM).
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: >
+      The VPC that the subnets belong to. Used to create an egress-only security group
+      for the connector network interfaces when you don't bring your own.
+  VpcSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: >
+      Exactly two private subnet IDs in different Availability Zones, where Lambda
+      creates network interfaces for VPC egress. The subnets must reach the resources
+      your app calls, and reach AWS services (through a NAT gateway or VPC endpoints)
+      for anything outside the VPC.
+  VpcSecurityGroupId:
+    Type: String
+    Default: ''
+    AllowedPattern: '^(sg-[0-9a-f]+)?$'
+    ConstraintDescription: Must be a security group ID (sg-...) or empty.
+    Description: >
+      Optional. A security group ID for the network interfaces, in the same VPC as the
+      subnets. Leave blank to have the stack create an egress-only security group.
+  NetworkProtocol:
+    Type: String
+    Default: IPv4
+    AllowedValues:
+      - IPv4
+      - DualStack
+    Description: Network protocol for the connector network interfaces.
+  InternalTargetUrl:
+    Type: String
+    Default: ''
+    Description: >
+      Optional. A private HTTP endpoint inside your VPC (for example an internal ALB, or
+      a service on EC2 or ECS) that the sample app calls to show VPC egress. Leave blank
+      to deploy without a target (the page shows "Not configured").
+
+Conditions:
+  # True when no security group IDs were supplied, so the stack creates one.
+  CreateSecurityGroup: !Equals [!Ref VpcSecurityGroupId, '']
+  # True when a private target URL was supplied, so it is passed to the app.
+  HasInternalTarget: !Not [!Equals [!Ref InternalTargetUrl, '']]
+
+Resources:
+  # Egress-only security group for the connector network interfaces, created only
+  # when you don't bring your own. Allows all outbound traffic and no inbound.
+  ConnectorSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateSecurityGroup
+    Properties:
+      GroupDescription: !Sub Egress security group for ${AWS::StackName} web function connector
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic
+
+  # AWS::Serverless::NetworkConnector expands into AWS::Lambda::NetworkConnector
+  # plus an operator role (NetworkConnectorOperatorRole) with the AWS managed
+  # AWSLambdaNetworkConnectorOperatorPolicy, which Lambda assumes to manage the
+  # network interfaces in your subnets. ComputeTypes: [WebFunction] lets web
+  # functions use the connector (the default is MicroVm).
+  NetworkConnector:
+    Type: AWS::Serverless::NetworkConnector
+    Properties:
+      Name: !Sub ${AWS::StackName}-connector
+      ComputeTypes:
+        - WebFunction
+      # SAM needs literal lists here; a !Ref to a list parameter is rejected by the
+      # transform. To use more subnets or security groups, add items to these lists.
+      VpcConfig:
+        SubnetIds:
+          - !Select [0, !Ref VpcSubnetIds]
+          - !Select [1, !Ref VpcSubnetIds]
+        SecurityGroupIds:
+          - !If [CreateSecurityGroup, !Ref ConnectorSecurityGroup, !Ref VpcSecurityGroupId]
+        NetworkProtocol: !Ref NetworkProtocol
+
+  # AWS::Serverless::WebFunction expands into AWS::Lambda::WebFunction, an immutable
+  # AWS::Lambda::WebFunctionRevision (code + configuration) and an
+  # AWS::Lambda::WebFunctionEndpoint routed 100% to that revision, plus a logs-only
+  # execution role because ExecutionRoleArn is not set.
+  WebFunction:
+    Type: AWS::Serverless::WebFunction
+    Properties:
+      Runtime: nodejs24.x
+      # Local path: `sam build` packages src/ and `sam deploy` uploads it to a
+      # versioned, Lambda-readable bucket in a <stack>-<hash>-WebFunctionCode
+      # stack that SAM CLI creates and `sam delete` removes. Needs SAM CLI
+      # 1.171.0 or later.
+      CodeUri: src/
+      Timeout: 30
+      MaxConcurrencyPerEnvironment: 64
+      # IamAuth: Lambda returns 403 to any request that is not SigV4-signed.
+      AuthType: IamAuth
+      # A revision that uses a network connector supports only HomeRegion endpoints.
+      EndpointType: HomeRegion
+      # The version-qualified connector ARN pins each revision to one connector version.
+      EgressNetworkConnectorArn: !GetAtt NetworkConnector.LatestVersionArn
+      # Conservative caps so a spike or a runaway client can't use account-wide
+      # capacity before this endpoint throttles. Tune for your workload.
+      ScalingConfig:
+        MaxEnvironments: 10
+      ThrottleConfig:
+        RateLimit: 100
+      EnvironmentVariables: !If
+        - HasInternalTarget
+        - INTERNAL_TARGET_URL: !Ref InternalTargetUrl
+        - !Ref AWS::NoValue
+      LoggingConfig:
+        LogGroup: !Sub /aws/lambda/web/${AWS::StackName}
+
+Outputs:
+  WebFunctionEndpointDomain:
+    Description: HTTPS domain of the endpoint (IamAuth, requests must be SigV4-signed)
+    Value: !GetAtt WebFunctionEndpoint.DomainName
+  WebFunctionArn:
+    Description: ARN of the Lambda Web Function
+    Value: !GetAtt WebFunction.FunctionArn
+  NetworkConnectorArn:
+    Description: ARN of the network connector
+    Value: !GetAtt NetworkConnector.Arn
+  NetworkConnectorLatestVersionArn:
+    Description: Version-qualified network connector ARN used by the revision
+    Value: !GetAtt NetworkConnector.LatestVersionArn
+  LogGroupName:
+    Description: CloudWatch Logs group the web function writes to
+    Value: !Sub /aws/lambda/web/${AWS::StackName}

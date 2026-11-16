@@ -1,0 +1,60 @@
+{
+  "title": "AWS Lambda Web Function with private VPC egress",
+  "description": "Run a Lambda Web Function that reaches private resources in your VPC through a Lambda network connector",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys a Node.js HTTP server as an AWS Lambda Web Function with private egress into your VPC. An <code>AWS::Serverless::NetworkConnector</code> creates network interfaces in two of your subnets, and the function's revision references the connector's version-qualified ARN, so outbound calls go through your VPC.",
+      "The endpoint uses <code>IamAuth</code>, so only SigV4-signed requests reach the code. A revision that uses a network connector supports only <code>HomeRegion</code> endpoints.",
+      "The sample app can call an optional private URL, <code>INTERNAL_TARGET_URL</code>, and shows whether it was reachable through the VPC."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions.html"
+      },
+      {
+        "text": "Configuring networking for Lambda Web Functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-networking.html"
+      },
+      {
+        "text": "AWS SAM AWS::Serverless::WebFunction resource",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-webfunction.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam build</code>",
+      "<code>sam deploy --guided</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>. See the GitHub repo for removing the log groups."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shekhar Shrinivasan",
+      "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
+      "bio": "Senior Technical Consultant (TAM)",
+      "linkedin": "shekhar-shrinivasan"
+    }
+  ]
+}
