@@ -14,7 +14,7 @@ Important: this application uses various AWS services and there are costs associ
 * Latest [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js](https://nodejs.org/en/download/) 24 (matches the `nodejs24.x` runtime)
-* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
+* [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed, **version 1.171.0 or later** (`sam --version`).
 
 ## Deployment Instructions
 
@@ -26,30 +26,10 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd lambda-web-webhooks/nodejs/sam
     ```
-1. Create the code bucket (one time per account and Region). `AWS::Lambda::WebFunctionRevision` requires a **versioning-enabled** bucket, and the bucket policy must let the Lambda service read the code:
+1. Build the application. `CodeUri` is the local `src/` directory, so the AWS SAM CLI installs the production dependencies and packages them with the code:
     ```bash
     export AWS_REGION=<< AWS Region >>
-    export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    export BUCKET=lambda-web-sam-$ACCOUNT_ID-$AWS_REGION
-
-    aws s3 mb s3://$BUCKET --region $AWS_REGION
-    aws s3api put-bucket-versioning --bucket $BUCKET \
-      --versioning-configuration Status=Enabled --region $AWS_REGION
-    aws s3api put-bucket-policy --bucket $BUCKET --region $AWS_REGION --policy "{
-      \"Version\": \"2012-10-17\",
-      \"Statement\": [{
-        \"Effect\": \"Allow\",
-        \"Principal\": {\"Service\": \"lambda.amazonaws.com\"},
-        \"Action\": [\"s3:GetObject\", \"s3:GetObjectVersion\"],
-        \"Resource\": \"arn:aws:s3:::$BUCKET/*\",
-        \"Condition\": {\"StringEquals\": {\"aws:SourceAccount\": \"$ACCOUNT_ID\"}}
-      }]
-    }"
-    ```
-1. Install production dependencies, package the application and upload it. `node_modules` must be inside the zip because there is no build step at deploy time:
-    ```bash
-    (cd src && npm install --omit=dev && zip -qr ../function.zip index.js lib package.json node_modules)
-    aws s3 cp function.zip s3://$BUCKET/lambda-web-webhooks-sam/function.zip --region $AWS_REGION
+    sam build
     ```
 1. Generate the webhook secrets. The template has no defaults and requires at least 16 characters; for Stripe, use the `whsec_...` value the Stripe dashboard shows once you register the endpoint (a generated one is fine for the test walkthrough):
     ```bash
@@ -65,13 +45,13 @@ Important: this application uses various AWS services and there are costs associ
       --region $AWS_REGION \
       --resolve-s3 \
       --parameter-overrides \
-        CodeBucket=$BUCKET \
-        CodeKey=lambda-web-webhooks-sam/function.zip \
         StripeWebhookSecret=$STRIPE_WEBHOOK_SECRET \
         GitHubWebhookSecret=$GITHUB_WEBHOOK_SECRET \
         GenericWebhookSecret=$GENERIC_WEBHOOK_SECRET \
         EnableTestEndpoint=true
     ```
+    The AWS SAM CLI uploads the Web Function code to a bucket it creates in a separate `lambda-web-webhooks-sam-<hash>-WebFunctionCode` stack. That bucket is versioning-enabled and carries a policy letting `lambda.amazonaws.com` read the code, which `AWS::Lambda::WebFunctionRevision` requires. The packaged template imports the bucket name, so CloudFormation will not delete the bucket while a revision still reads from it.
+
     Once you have run `sam deploy` once and saved arguments to a configuration file (`samconfig.toml`), you can use `sam deploy` in future to use these defaults.
 1. Note the `EndpointDomainName` output. Configure your provider's webhook URL as `https://<EndpointDomainName>/webhooks/stripe` (or `/github`, `/generic`).
 
@@ -95,7 +75,7 @@ Key runtime constraints:
 * The entry point is `index.js` at the zip root, with `lib/` and `node_modules` next to it.
 * Bind the host and port from `AWS_LAMBDA_HTTP_ENDPOINT`. A hardcoded port that does not match it fails the readiness probe.
 
-To deploy a code change, upload the zip under a **new key** (for example `function-v2.zip`) and deploy again with the new `CodeKey`. CloudFormation only creates a new revision when the revision's properties change, so re-deploying with an unchanged key reports "No changes to deploy".
+To deploy a code change, run `sam build && sam deploy` again. Each upload pins a new object version in the code bucket, so CloudFormation creates a new revision every time the code changes.
 
 ## Testing
 
@@ -164,19 +144,9 @@ aws logs tail /aws/lambda/web/lambda-web-webhooks-sam --region $AWS_REGION --fol
 
 ## Cleanup
 
-1. Delete the stack. This also deletes the DynamoDB table **and all stored events**:
+1. Delete the stack. This also deletes the DynamoDB table **and all stored events**, then empties the code bucket and deletes the `WebFunctionCode` stack that holds it:
     ```bash
     sam delete --stack-name lambda-web-webhooks-sam --region $AWS_REGION
-    ```
-1. Empty and delete the code bucket. Versioning is enabled, so every object version and delete marker must be removed first:
-    ```bash
-    aws s3api list-object-versions --bucket $BUCKET --region $AWS_REGION \
-      --query '[Versions,DeleteMarkers][][].[Key,VersionId]' --output text \
-      | while read -r key version; do
-          aws s3api delete-object --bucket $BUCKET --region $AWS_REGION \
-            --key "$key" --version-id "$version"
-        done
-    aws s3 rb s3://$BUCKET --region $AWS_REGION
     ```
 
 ----

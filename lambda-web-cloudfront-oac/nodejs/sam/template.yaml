@@ -6,18 +6,6 @@ Description: >
   CloudFront signs every origin request through an OAC of type lambda, and a
   resource policy lets exactly one distribution invoke the endpoint.
 
-Parameters:
-  CodeBucket:
-    Type: String
-    Description: >
-      Name of an existing, versioning-enabled S3 bucket in this Region that
-      holds function.zip. Its bucket policy must grant lambda.amazonaws.com
-      s3:GetObject and s3:GetObjectVersion. See the README for the setup.
-  CodeKey:
-    Type: String
-    Default: lambda-web-cloudfront-oac-sam/function.zip
-    Description: S3 key of the uploaded function.zip.
-
 Resources:
   # One AWS::Serverless::WebFunction expands into AWS::Lambda::WebFunction,
   # an immutable AWS::Lambda::WebFunctionRevision (code + configuration) and
@@ -31,9 +19,11 @@ Resources:
       # is also used for the OAC, the distribution comment and the log group.
       FunctionName: !Ref AWS::StackName
       Runtime: nodejs24.x
-      CodeUri:
-        Bucket: !Ref CodeBucket
-        Key: !Ref CodeKey
+      # Local path: `sam build` packages src/ and `sam deploy` uploads it to a
+      # versioned, Lambda-readable bucket in a <stack>-<hash>-WebFunctionCode
+      # stack that SAM CLI creates and `sam delete` removes. Needs SAM CLI
+      # 1.171.0 or later.
+      CodeUri: src/
       Timeout: 30
       # IamAuth from creation: Lambda returns 403 to any request that is not
       # SigV4-signed, before the application code runs. The endpoint is never
