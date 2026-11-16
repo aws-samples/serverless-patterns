@@ -81,13 +81,32 @@ route() {
 }
 
 # Delete revisions whose description starts with the prefix, except the one to keep.
-# A revision that an endpoint still routes to cannot be deleted, so that error is ignored.
+# Only packages of successfully deleted revisions can be tagged for S3 expiration.
 delete_revisions() {
-  local prefix="$1" keep="${2:-}" id
+  local prefix="$1" keep="${2:-}" id code bucket key version
   for id in $(aws lambda-web list-web-function-revisions --function-name "$FUNCTION" \
       --query "revisions[?starts_with(description, '$prefix')].revisionId" --output text); do
     [[ "$id" == "$keep" ]] && continue
-    aws lambda-web delete-web-function-revision --function-name "$FUNCTION" --revision-id "$id" >/dev/null 2>&1 || true
+    if ! code="$(aws lambda-web get-web-function-revision --function-name "$FUNCTION" --revision-id "$id" \
+        --query 'buildConfig.codeConfig.s3Object.[bucket,key,versionId]' --output text)"; then
+      echo "Could not read the code location for revision $id; leaving its package untagged" >&2
+      continue
+    fi
+    read -r bucket key version <<< "$code"
+    # Do not tag any production package, or a version outside this pull request's key.
+    if [[ "$bucket" != "$BUCKET" || "$key" != "previews/${prefix% }/app.zip" || -z "$version" || "$version" == None ]]; then
+      echo "Could not confirm the preview package for revision $id; leaving it untagged" >&2
+      continue
+    fi
+    if aws lambda-web delete-web-function-revision --function-name "$FUNCTION" --revision-id "$id" >/dev/null 2>&1; then
+      if ! aws s3api put-object-tagging --bucket "$BUCKET" --key "$key" --version-id "$version" \
+          --tagging 'TagSet=[{Key=retired,Value=true}]' >/dev/null; then
+        echo "Could not mark code for deleted revision $id for expiration; check the S3 version manually" >&2
+      fi
+    else
+      # Lambda refuses to delete a revision still routed by an endpoint. Keep its code.
+      echo "Revision $id is still in use or could not be deleted; leaving its package untagged" >&2
+    fi
   done
 }
 

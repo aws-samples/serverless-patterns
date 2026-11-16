@@ -39,6 +39,19 @@ Resources:
     Properties:
       VersioningConfiguration:
         Status: Enabled
+      # Only code from deleted preview revisions is eligible. Expiring any object version still
+      # referenced by a Web Function revision would permanently fail that revision.
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireRetiredPreviewCode
+            Status: Enabled
+            Prefix: previews/
+            TagFilters:
+              - Key: retired
+                Value: 'true'
+            ExpirationInDays: 30
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -169,6 +182,8 @@ Resources:
                   - s3:PutObject
                   - s3:GetObject
                   - s3:GetObjectVersion
+                  - s3:PutObjectTagging
+                  - s3:PutObjectVersionTagging
                 Resource: !Sub '${CodeBucket.Arn}/previews/*'
               - Sid: CreatePreviewRevisionsAndEndpoints
                 Effect: Allow
