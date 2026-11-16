@@ -4,8 +4,6 @@ using Amazon.CDK.AWS.S3;
 using Amazon.CDK.AWS.S3.Deployment;
 using Constructs;
 using System.IO;
-using System;
-using System.Security.Cryptography;
 
 namespace Cdk
 {
@@ -13,15 +11,19 @@ namespace Cdk
     {
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            // 1. Generate a new 2048 bit RSA key
-            var rsa = new RSACryptoServiceProvider(2048);
+            // 1. Read the public key (PEM, X.509 SubjectPublicKeyInfo) that you generated locally.
+            // The private key stays on your machine and is never part of the stack.
+            var publicKeyFile = this.Node.TryGetContext("publicKeyFile") as string ?? "public_key.pem";
+            if (!File.Exists(publicKeyFile))
+            {
+                throw new FileNotFoundException($"Public key file '{publicKeyFile}' not found. Generate a key pair as described in the README, or pass -c publicKeyFile=<path>.");
+            }
 
-            // Private key format: PKCS#1
-            var publicPrivateKeyPEM = rsa.ExportRSAPrivateKeyPem();
-            
-            // Public key format: X.509 SubjectPublicKeyInfo
-            var publicOnlyKeyPEM = rsa.ExportSubjectPublicKeyInfoPem(); 
-
+            var publicOnlyKeyPEM = File.ReadAllText(publicKeyFile).Trim();
+            if (!publicOnlyKeyPEM.StartsWith("-----BEGIN PUBLIC KEY-----"))
+            {
+                throw new InvalidDataException($"'{publicKeyFile}' is not a PEM public key. Pass the public key file, never the private key.");
+            }
 
 
             // 2. Create S3 bucket
@@ -89,7 +91,6 @@ namespace Cdk
 
             new CfnOutput(this, "RESOURCE_URL", new CfnOutputProps { Value = pdfFileUrl });
             new CfnOutput(this, "CLOUDFRONT_PUBLIC_KEY_ID", new CfnOutputProps { Value = publicKeyConstruct.PublicKeyId });
-            new CfnOutput(this, "PRIVATE_KEY", new CfnOutputProps { Value = publicPrivateKeyPEM });
         }
     }
 }

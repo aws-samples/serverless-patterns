@@ -18,6 +18,7 @@
   },
   "deploy": {
     "text": [
+      "Generate a key pair. The stack uses only the public key, and the private key stays on your machine: <code>openssl genrsa -out private_key.pem 2048</code> then <code>openssl rsa -pubout -in private_key.pem -out public_key.pem</code>.",
       "cdk deploy"
     ]
   },
@@ -28,7 +29,8 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cdk destroy</code>."
+      "Delete the stack: <code>cdk destroy</code>.",
+      "Delete the local key pair: <code>rm private_key.pem public_key.pem</code>."
     ]
   },
   "authors": [
