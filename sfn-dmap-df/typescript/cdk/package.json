@@ -14,7 +14,7 @@
     "@aws/durable-execution-sdk-js-testing": "^1.0.0",
     "@types/jest": "^30",
     "@types/node": "^24.10.1",
-    "aws-cdk": "2.1108.0",
+    "aws-cdk": "^2.1148.1",
     "esbuild": "^0.28.1",
     "jest": "^30",
     "ts-jest": "^29",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@aws/durable-execution-sdk-js": "^1.0.0",
-    "aws-cdk-lib": "^2.240.0",
-    "constructs": "^10.5.0"
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1"
   }
 }

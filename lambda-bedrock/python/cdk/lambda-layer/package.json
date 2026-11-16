@@ -17,9 +17,9 @@
     "typescript": "~5.1.6"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.185.0",
+    "aws-cdk-lib": "^2.277.0",
     "cdk": "^2.100.0",
-    "constructs": "^10.0.0",
+    "constructs": "^10.8.1",
     "source-map-support": "^0.5.16"
   }
 }
