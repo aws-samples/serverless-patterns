@@ -46,7 +46,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "Delete the stack: <code>sam delete</code>. See the GitHub repo for removing the log groups."
     ]
   },
   "authors": [
