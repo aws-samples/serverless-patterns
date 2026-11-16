@@ -1,5 +1,5 @@
 {
-  "title": "Streaming AI agent chat with AWS Lambda Web Functions and AgentCore Runtime",
+  "title": "Streaming AI agent chat with AWS Lambda Web Functions and Amazon Bedrock AgentCore Runtime",
   "description": "Serve a chat UI from an AWS Lambda Web Function behind Amazon CloudFront and stream a Strands agent's answer from AgentCore Runtime token by token.",
   "language": "Node.js",
   "level": "300",
@@ -16,11 +16,7 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-web-agentcore/nodejs/terraform",
-      "patternPath": "lambda-web-agentcore/nodejs/terraform",
-      "templateURL": "serverless-patterns/lambda-web-agentcore/nodejs/terraform",
-      "projectFolder": "lambda-web-agentcore/nodejs/terraform",
-      "templateFile": "main.tf"
+      "templateFile": "webapp.tf"
     }
   },
   "resources": {
