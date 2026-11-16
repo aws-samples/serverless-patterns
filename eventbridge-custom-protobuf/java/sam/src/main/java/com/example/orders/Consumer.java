@@ -5,6 +5,7 @@ package com.example.orders;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class Consumer implements RequestHandler<Object, Map<String, Object>> {
         }
         if (data instanceof String s) {
             try {
-                return MAPPER.readValue(s, Map.class);
+                return MAPPER.readValue(s, new TypeReference<Map<String, Object>>() {});
             } catch (Exception e) {
                 throw new IllegalArgumentException("Data was a string but not JSON: " + s, e);
             }
