@@ -35,8 +35,8 @@
   },
   "deploy": {
     "text": [
-      "Owner account: sam deploy --parameter-overrides Role=Owner SharePrincipal=<OU_OR_ACCOUNT_ID>",
-      "Consumer account: sam deploy --capabilities CAPABILITY_IAM --parameter-overrides Role=Consumer SharedBusArn=<BUS_ARN>"
+      "Owner account: sam deploy --stack-name xacct-bus-owner --resolve-s3 --parameter-overrides Role=Owner SharePrincipal=<CONSUMER_ACCOUNT_ID>",
+      "Consumer account: sam deploy --stack-name xacct-bus-consumer --resolve-s3 --capabilities CAPABILITY_IAM --parameter-overrides Role=Consumer SharedBusArn=<BUS_ARN>"
     ]
   },
   "testing": {
