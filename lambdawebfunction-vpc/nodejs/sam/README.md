@@ -33,7 +33,7 @@ A Lambda Web Function uses a three-part resource model — a **Web Function** (c
 ## Deployment Instructions
 
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/lambdawebfunction-vpc-sam
+    cd serverless-patterns/lambdawebfunction-vpc/nodejs/sam
 
 ### Quick start (recommended)
 
