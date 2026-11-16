@@ -1,0 +1,49 @@
+{
+  "title": "Amazon DynamoDB Stream to AWS Step Functions",
+  "description": "Invoke a Step Functions workflow from a DynamoDB stream",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to invoke an AWS Step Functions state machine from DynamoDB Stream without using Lambda. ",
+      "This pattern deploys one Step Functions workflow, one DynamoDB table with a stream enabled and one EventBridge Pipe connection."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Pipes - connects sources to targets. Pipes are intended for point-to-point integrations between supported sources and targets, with support for advanced transformations and enrichment.",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: aws cloudformation delete-stack --stack-name STACK_NAME ."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sai Katakam",
+      "bio": "AWS Cloud Consultant",
+      "linkedin": "sai-krishna-82741b54"
+    }
+  ]
+}

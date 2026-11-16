@@ -1,0 +1,56 @@
+{
+  "title": "Create Amazon EventBridge schedules using Amazon DynamoDB Streams",
+  "description": "An event-driven pattern that creates three EventBridge schedules for every user inserted into a DynamoDB table.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "EventBridge schedules with DynamoDB and EventBridge Pipes",
+    "text": [
+      "When a new record is inserted into the DynamoDB database an event is raised to downstream consumers. EventBridge Pipes is used to connect DynamoDB stream to Amazon EventBridge.",
+      "The DynamoDB event is transformed into a <code>NewUserCreated</code> event. The schedule creator (Lambda function) consumes this event and creates three schedules for the new user.",
+      "Each schedule will trigger the <code>Email Service</code>, 2 minutes, 24 hours and 1 week after the user signs up.",
+      "After each schedule is triggered, EventBridge Scheduler deletes the schedule (as the <code>ActionAfterCompletion</code> is set to <code>DELETE</code>)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/src/schedule-creator/index.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Automatically delete schedules upon completion with Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/automatically-delete-schedules-upon-completion-with-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "EventBridge Visuals",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm run build",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
+    }
+  ]
+}

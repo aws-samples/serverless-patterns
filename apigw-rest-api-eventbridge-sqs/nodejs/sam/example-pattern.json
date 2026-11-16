@@ -1,0 +1,53 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon EventBridge with payload composition and Amazon SQS target",
+  "description": "Create an API Gateway that sends events to EventBridge and enriches the event in the integration request.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The APIGW payload is sent to EventBridge as a custom event payload. In the integration request, a custom payload is created and passed to EventBridge that targets an SQS queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Daniele Frasca",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg"
+    }
+  ]
+}

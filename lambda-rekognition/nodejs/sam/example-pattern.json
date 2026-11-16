@@ -1,0 +1,55 @@
+{
+  "title": "AWS Lambda to Amazon Rekognition",
+  "description": "Create a Lambda function that uses Amazon Rekognition.",
+  "language": "Node.js",
+  "level": "100",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses an EventBridge event rule to trigger a Lambda Function. The Lambda runs an image analysis on the image specified in the incoming event.",
+      "Lambda uses Amazon Rekognition to run an analysis on that image. The image analysis used for demo is text recognition."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Creating a serverless face blurring service for photos in Amazon S3",
+        "link": "https://aws.amazon.com/blogs/compute/creating-a-serverless-face-blurring-service-for-photos-in-amazon-s3/"
+      },
+      {
+        "text": "Using Amazon Rekognition in web apps",
+        "link": "https://github.com/aws-samples/happy-path"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Use the AWS CLI to invoke the Lambda function. The function name is in the outputs of the AWS SAM deployment (the key is QueuePublisherFunction):",
+      "1. Invoke the Lambda function to publish a message to the SQS queue: <code>aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME outfile.txt</code>.",
+      "2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs: <code>aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "contributors": [
+    "content/contributors/jyoti-rathi.json"
+  ]
+}

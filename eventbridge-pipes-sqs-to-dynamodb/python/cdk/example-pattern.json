@@ -1,0 +1,67 @@
+{
+  "title": "Amazon SQS to Amazon DynamoDB via Amazon EventBridge Pipes using CDK/Python",
+  "description": "Send messages from an SQS queue to a DynamoDB table via API Gateway using EventBridge Pipes. Implemented with CDK/Python.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Messages sent to the Amazon SQS queue are polled by Amazon EventBridge Pipe.",
+      "Amazon EventBridge Pipe processes the messages and sends them to the Amazon API Gateway endpoint.",
+      "Amazon API Gateway transforms the message and writes the data to the Amazon DynamoDB table using direct integration."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "eventbridge_pipes_sqs_to_dynamodb/eventbridge_pipes_sqs_to_dynamodb.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon SQS Developer Guide",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "AWS CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes CDK v2 Python Reference",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_pipes/CfnPipe.html"
+      },
+      {
+        "text": "Amazon API Gateway DynamoDB Integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-overview-developer-experience.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Michele Scarimbolo",
+      "bio": "Technical Account Manager at AWS. Serverless specialist and enthusiast.",
+      "image": "https://avatars.githubusercontent.com/u/229997073",
+      "linkedin": "michele-scarimbolo"
+    }
+  ]
+}

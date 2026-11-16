@@ -1,0 +1,62 @@
+{
+  "title": "Amazon API Gateway direct integration with Amazon DynamoDB bulk put items",
+  "description": "An Amazon API Gateway REST API starts and monitors a bulk put items operation that loads Amazon S3 files into Amazon DynamoDB, with no AWS Lambda function in the request path.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "apigw-dynamodb-bulk-put",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon API Gateway REST API with AWS Identity and Access Management (IAM) authorization calls the Amazon DynamoDB `StartBulkPutItems` and `DescribeBulkOperation` APIs directly, through an AWS service integration and mapping templates. `POST /operations` starts a bulk put of the data files under an Amazon S3 prefix into a table, and `GET /operations/{operationId}` returns the status.",
+      "A record in the input file can carry its own condition expression. DynamoDB skips a record whose condition fails and lists it in a report in the S3 bucket. No AWS Lambda function is in the request path."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/apigw-dynamodb-bulk-put-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with bulk put items in Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BulkPutItems.HowItWorks.html"
+      },
+      {
+        "text": "StartBulkPutItems in the Amazon DynamoDB API reference",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_StartBulkPutItems.html"
+      },
+      {
+        "text": "Set up an Amazon API Gateway REST API as an Amazon DynamoDB proxy",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-as-dynamodb-proxy.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk bootstrap</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}

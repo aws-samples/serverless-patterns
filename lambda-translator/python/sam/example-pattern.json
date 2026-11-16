@@ -1,0 +1,49 @@
+{
+  "title": "AWS Lambda to Amazon Translate",
+  "description": "Create a Lambda function that calls Translate",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to deploy a SAM template that builds a Lambda function which calls Amazon Translate for text translation."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Using AWS Lambda and Amazon Translate for text translation",
+        "link": "https://aws.amazon.com/blogs/machine-learning/translating-documents-with-amazon-translate-aws-lambda-and-the-new-batch-translate-api/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack:  <code>sam delete --stack-name {StackName}</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abilashkumar P C",
+      "bio": "Cloud Support Engineer II @ AWS",
+      "image": "https://drive.google.com/file/d/1bxOh_WBw8J_xEqvT-qRezH8WXqSBPI24/view?usp=sharing"
+    }
+  ]
+}

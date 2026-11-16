@@ -1,0 +1,44 @@
+{
+  "title": "AWS Lambda Secrets Manager Extension",
+  "description": "Lambda function that uses the Secrets Manager Lambda Extension.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use a Lambda function to retrieve secrets using the Secrets Manager Lambda extension in the us-east-1 region. Other regions may be used by swapping the Secrets Manager layer in the template.yaml file."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tim Pugh",
+      "bio": "I'm a Serverless Cloud Engineer specializing in serverless event driven systems at AWS and an avid backpacker.",
+      "image": "https://media-exp1.licdn.com/dms/image/C5603AQE_pcOIRvZiZw/profile-displayphoto-shrink_800_800/0/1599620216972?e=1671667200&v=beta&t=c9jJCkwElOTcMvmOmKeSnbfb7VhdR2Skt2EfoAD1yAw"
+    }
+  ]
+}

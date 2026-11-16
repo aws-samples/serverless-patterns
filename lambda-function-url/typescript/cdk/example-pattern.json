@@ -1,0 +1,58 @@
+{
+  "title": "AWS Lambda function with a function URL",
+  "description": "Create Lambda function with a URL",
+  "language": "TypeScript",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a Lambda Function URL for a Lambda function. You can use Function URLs to create a a dedicated HTTP(S) endpoint for your Lambda function. Use the FunctionEndpointURL when testing your Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Creating and managing Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html"
+      },
+      {
+        "text": "Announcing AWS Lambda Function URLs: Built-in HTTPS Endpoints for Single-Function Microservices",
+        "link": "https://aws.amazon.com/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Marcia Villalba",
+      "bio": "Senior Developer Advocate",
+      "image": "link-to-your-photo.jpg",
+      "linkedin": "linked-in-ID",
+      "twitter": "mavi888uy"
+    }
+  ]
+}

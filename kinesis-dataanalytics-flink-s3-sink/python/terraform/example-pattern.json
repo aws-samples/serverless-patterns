@@ -1,0 +1,52 @@
+{
+  "title": "Managed Service for Apache Flink writing stream data to Amazon S3",
+  "description": "Transform incoming stream data and deliver the transformed data to S3 destination as a Sink",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Apache Flink application that has a Kinesis Data Stream as a source and an Amazon S3 bucket as a sink.",
+      "Managed Service for Apache Flink handles core capabilities like provisioning compute resources, parallel computation, automatic scaling, and application backups (implemented as checkpoints and snapshots)."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Managed Service for Apache Flink for Apache Flink",
+        "link": "https://docs.aws.amazon.com/kinesisanalytics/latest/java/what-is.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>terraform destroy</code>",
+      "<code>terraform show</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Naresh Rajaram",
+      "bio": "Cloud Infrastructure Architect, AWS",
+      "linkedin": "naresh-rajaram-25bb106"
+    }
+  ]
+}

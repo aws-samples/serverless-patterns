@@ -1,0 +1,61 @@
+{
+  "title": "AWS Lambda polling Amazon SQS",
+  "description": "Create a Lambda function that polls an SQS queue",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys deploys a Lambda function, an SQS queue and an EventBridge rule.",
+      "The Lambda function is used control how many jobs to submit to a downstream service for each incoming message in an Amazon SQS queue. We may need to control the number of concurrent job executions due to a business requirement or due to scalability limitation of the downstream service. We are controlling the max number of concurrent executions by using a SQS queue. An Amazon EventBridge rule triggers an AWS Lambda function every 2 minutes to pick messages from SQS queue, one by one, until until we hit the max executions of our downstream service.",
+      "This does not use the SQS trigger for Lambda because the purpose is to slow down the creation of new executions. Whereas the Amazon SQS trigger would push messages to the AWS Lambda function more quickly."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "sqs_lambda_eb_cdk/sqs_lambda_eb_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS CDK for Python workshop.",
+        "link": "https://cdkworkshop.com/30-python.html"
+      },
+      {
+        "text": "Choosing between messaging services for serverless applications.",
+        "link": "https://aws.amazon.com/blogs/compute/choosing-between-messaging-services-for-serverless-applications/"
+      },
+      {
+        "text": "Configuring a queue to trigger an AWS Lambda function",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-lambda-function-trigger.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Use the AWS CLI to send a message to the SQS queue and observe the event delivered to the Lambda function:",
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "1. Send several SQS messages by running this command multiple times: <code>aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body \"Test message\"</code>",
+      "2. Retrieve the logs from the Lambda function: <code>aws logs describe-log-streams --log-group-name '/aws/lambda/ENTER_YOUR_FUNCTION_NAME' --query logStreams[*].logStreamName</code>."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/corneliu-croitoru.json"
+  ]
+}

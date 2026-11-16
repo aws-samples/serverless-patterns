@@ -1,0 +1,57 @@
+{
+  "title": "Application Load Balancer with multiple AWS Lambda functions as a target",
+  "description": "Create an Application Load Balancer with Lambda functions as targets",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to create an Application Load Balancer with path-based routing along with associated listener and target as AWS Lambda. Implemented in AWS CDK .NET."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/AlbPathBasedRouteLambdaCdk/AlbPathBasedRouteLambdaCdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html"
+      },
+      {
+        "text": "ALB path-based routing",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pushparaju Thangavel",
+      "bio": "Pushparaju is a Cloud Infrastructure Architect with Amazon Web Services",
+      "image": "./Pushparaju.jpeg",
+      "linkedin": "pushparaju-thangavel"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "lambda-web-sse-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time metrics dashboard using Server-Sent Events on AWS Lambda Web Functions",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "deploy": "aws lambda-web deploy --name lambda-web-sse-dashboard --code . --timeout-seconds 900",
+    "deploy:global": "aws lambda-web deploy --name lambda-web-sse-dashboard --endpoint-name global --endpoint-type MultiRegion --regions us-east-1,eu-west-2 --code . --timeout-seconds 900"
+  },
+  "license": "MIT-0"
+}

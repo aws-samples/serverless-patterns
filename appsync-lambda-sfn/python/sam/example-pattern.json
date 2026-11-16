@@ -1,0 +1,59 @@
+{
+  "title": "Invoke an AWS Step Functions workflow from Appsync",
+  "description": "Invoke a Step Functions workflow through a lambda resolver from Appsync",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to Invoke a Step Functions workflow, using Appsync and a Lambda resolver.",
+      "This pattern deploys an Appsync API, a Lambda resolver, a DynamoDB and a Step Functions workflow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Appsync - Accelerate application development with serverless GraphQL and Pub/Sub APIs",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "AWS Step functions- Visual workflows for modern applications",
+        "link": "https://aws.amazon.com/step-functions"
+      },
+      {
+        "text": "Amazon DynamoDB - Fast, flexible NoSQL database service for single-digit millisecond performance at any scale",
+        "link": "https://aws.amazon.com/dynamodb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rosius Ndimofor",
+      "bio": "AWS Serverless Hero with a high affinity for building fullstack serverless apps.",
+      "image": "https://rosius.s3.us-east-2.amazonaws.com/ro.jpeg",
+      "linkedin": "rosius",
+      "twitter": "atehrosius"
+    }
+  ]
+}

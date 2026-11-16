@@ -21,9 +21,9 @@ Important: this application uses various AWS services and there are costs associ
     ```
 1. Change directory to the pattern directory:
     ```
-    cd _patterns-model
+    cd serverless-patterns/{family}/{language}/{framework}
     ```
-1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
+1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file:
     ```
     sam deploy --guided
     ```

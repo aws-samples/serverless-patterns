@@ -1,0 +1,65 @@
+{
+  "title": "Stream Amazon Bedrock completions via AWS AppSync subscriptions",
+  "description": "Stream Anthropic Claude responses from Amazon Bedrock to clients with AppSync subscriptions.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern takes a prompt from the ask mutation and sends it to Anthropic Claude Haiku 5.5 in Amazon Bedrock from a Lambda resolver, using the ConverseStream API.",
+      "As each part of the response arrives, the function calls the send mutation, and clients receive the parts through an AppSync subscription for the corresponding chat ID."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/backend-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppSync subscriptions",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/aws-appsync-real-time-data.html"
+      },
+      {
+        "text": "Amazon Bedrock - Generative AI",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "AppSync Lambda Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-lambda-resolvers-js.html"
+      },
+      {
+        "text": "AppSync Local Resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-local-resolvers-js.html"
+      },
+      {
+        "text": "Amazon Bedrock ConverseStream API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm run deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "<code>npm run test</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Gabriele Biagini",
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": "gbiagini97"
+    }
+  ]
+}

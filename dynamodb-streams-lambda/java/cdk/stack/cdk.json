@@ -1,0 +1,7 @@
+{
+  "app": "gradle -q :stack:run",
+
+  "context": {
+
+  }
+}

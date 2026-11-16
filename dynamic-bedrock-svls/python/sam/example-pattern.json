@@ -1,0 +1,57 @@
+{
+  "title": "Dynamic Amazon Bedrock model selection with Amazon API Gateway",
+  "description": "Generates image or text responses using Amazon Bedrock models with API Gateway and Lambda integrations",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a REST API that has <code>/image</code> and <code>/text</code> resources. Both resources integrate with a Lambda function over proxy integration.",
+      "The <code>/image</code> POST endpoint generates an image using StabilityAI Stable Diffusion XL model.",
+      "The <code>/text/{model}</code> POST method with the required prompt generates a text output using various Bedrock models offered by Anthropic, AI21 labs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-bedrock-is-now-generally-available-build-and-scale-generative-ai-applications-with-foundation-models/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "bio": "Cloud Engineer @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4",
+      "linkedin": "abha-tripathi-344a0a146"
+    },
+    {
+      "name": "Sushir V R",
+      "bio": "Cloud Engineer @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/42473846?s=400&u=4c7b19858e4ec3d9ae24e379c35848219ee57a86&v=4",
+      "linkedin": "sushirvr"
+    }
+  ]
+}

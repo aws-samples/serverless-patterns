@@ -1,0 +1,64 @@
+{
+  "title": "REST API with Amazon API Gateway, Amazon RDS and AWS Lambda with SnapStart",
+  "description": "A pattern to show how to use Lambda SnapStart with relational databases.",
+  "language": "Java",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "CDK creates all the infrastructure we need for the pattern, include the VPC, subnets, security groups,secrets and the DB.",
+      "The DB setup Lambda function is executed once to create the database table with a given structure.",
+      "This REST API is implemented with the Micronaut framework. Credentials for the DB are passed as environment variables to the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "infrastructure/cdk/src/main/java/com/unicorn/UnicornStoreStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda SnapStart Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      },
+      {
+        "text": "re:Invent Video - AWS Lambda SnapStart (SVS320)",
+        "link": "https://www.youtube.com/watch?v=ZbnAithBNYY"
+      },
+      {
+        "text": "Micronaut",
+        "link": "https://micronaut.io/"
+      },
+      {
+        "text": "Micronaut CRaC Reference",
+        "link": "https://micronaut-projects.github.io/micronaut-crac/latest/guide/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mark Sailes",
+      "bio": "Mark is a specialist solutions architect working at AWS. His primary focus is improving the developer experience of builders using Java on AWS Lambda.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/mark-sailes.jpg",
+      "linkedin": "mark-sailes",
+      "twitter": "MarkSailes3"
+    }
+  ]
+}

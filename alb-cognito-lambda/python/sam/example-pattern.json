@@ -1,0 +1,56 @@
+{
+  "title": "ALB, Amazon Cognito and AWS Lambda integration",
+  "description": "Create an ALB, Cognito and Lambda integration to fetch regional metrics",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern explains how to deploy a SAM application that integrates an Application Load Balancer, Cognito and Lambda to fetch Lambda regional metrics.",
+      "We will be deploying an Application Load Balancer in front of the Lambda function. Access to the Lambda function is given after authenticating user via AWS Cognito",
+      "Once the authentication is successful, the user is redirected to an HTML page which will display list of Lambda's regional metrics."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Authenticate users using an Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html"
+      },
+      {
+        "text": "Using AWS Lambda with an Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-alb.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jainam Shah",
+      "bio": "Technical Account Manager @ AWS",
+      "image": "https://drive.google.com/file/d/19NrbeT5LdQRAqnOGdEXsPZKvWph3Ba8U/view?usp=sharing",
+      "linkedin": "jainamshah92",
+      "twitter": "imJshah92"
+    }
+  ]
+}

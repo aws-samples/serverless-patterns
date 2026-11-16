@@ -1,0 +1,50 @@
+{
+  "title": "Resizing images uploaded to Amazon S3 with AWS Lambda (Python)",
+  "description": "Create an AWS Lambda function that resizes images uploaded to Amazon S3.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A Lambda function consumes events from an Amazon S3 bucket. The Lambda code checks the uploaded file is an image, creates a thumbnail version of the image, then uploads the thumbnail to the destination bucket.",
+      "This pattern deploys a Lambda function and two S3 buckets."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Process S3 events with Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the application: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Seshu Brahma",
+      "bio": "SDE for AWS Lambda",
+      "image": "https://i.postimg.cc/ZR0MyrTN/seshub-photo.jpg",
+      "linkedin": "seshu-brahma"
+    }
+  ]
+}

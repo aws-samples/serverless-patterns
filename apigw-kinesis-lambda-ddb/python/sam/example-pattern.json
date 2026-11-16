@@ -1,0 +1,60 @@
+{
+  "title": "Amazon API Gateway to Amazon Kinesis Data Stream to AWS Lambda to Amazon DynamoDB",
+  "description": "This pattern deploy an AWS SAM application with Amazon API Gateway, Amazon Kinesis Data Stream, AWS Lambda, and Amazon DynamoDB.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST API with route /prod/submit/{streamName}/{eventId} configured with basic authentication.",
+      "On receiving a request, API Gateway invokes a Lambda authorizer which validates the request by checking basic auth credentials from AWS Secrets Manager and returns a policy informing API Gateway to accept or deny the request.",
+      "When the request is accepted, API Gateway sends the message payload to Kinesis Data Stream. This pattern is useful in cases of large payloads since Kinesis Data Stream can support up to 1MB payload size. ",
+      "Lambda process messages from the Kinesis Data Streams. Lambda uses a SQS queue as Dead Letter Queue to send the messages in case of continued failures to process the messages.",
+      "Lambda saves the received messages into a DynamoDB table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda authorizers",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+      },
+      {
+        "text": "Dead Letter Queues",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-deadletterqueue.html"
+      },
+      {
+        "text": "Amazon Kinesis Data Streams",
+        "link": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ravi Kiran Ganji",
+      "bio": "I am a Senior Cloud Application Architect at AWS Professional Services, and Serverless Enthusiast.",
+      "linkedin": "ravi-kiran-ganji"
+    }
+  ]
+}

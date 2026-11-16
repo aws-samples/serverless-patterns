@@ -1,0 +1,53 @@
+{
+  "title": "AWS AppSync to AWS Lambda",
+  "description": "Create an AppSync API with a direct Lambda resolver",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys an AppSync API and a Lambda function. The Lambda function is added as a data source for the API and the API uses it as a direct Lambda resolver.",
+      "On querying the AppSync API, AppSync invokes the Lambda function and provides default payload to your Lambda function as well as a default translation from a Lambda function's response to a GraphQL type."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/main.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Introducing Direct Lambda Resolvers",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-direct-lambda/"
+      },
+      {
+        "text": "Direct Lambda Resolvers mapping template reference",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-mapping-template-reference-lambda.html#direct-lambda-resolvers"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy",
+      "See the GitHub repo for detailed instructions"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "To delete the stack, run: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ami-patel.json"
+  ]
+}

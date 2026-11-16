@@ -1,0 +1,56 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon SQS to AWS Lambda to Amazon Bedrock",
+  "description": "Query Amazon Bedrock asynchronously.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API that integrates with an Amazon SQS queue. AWS Lambda function consumes the messages from the SQS, calls a model in Amazon Bedrock."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Build an API Gateway REST API with AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "Bedrock",
+        "link": "https://aws.amazon.com/bedrock"
+      },
+      {
+        "text": "API Gateway websocket",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Uma Ramadoss",
+      "bio": "Specialist Solutions Architect, AWS",
+      "linkedin": "uma-ramadoss"
+    }
+  ]
+}

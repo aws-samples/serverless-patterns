@@ -1,0 +1,44 @@
+{
+  "title": "Amazon DynamoDB Stream to AWS Lambda using CDK in Kotlin",
+  "description": "Create an AWS Lambda function that receives DynamoDB change items.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application demonstrates how to establish an Amazon DynamoDB table stream, an AWS Lambda function, and the minimal IAM permissions needed for the application to function properly.",
+      "When items are inserted or updated in a DynamoDB table, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream. The function is invoked with a payload containing the contents of the table item that changed.",
+      "The application was made using Kotlin for both the CDK and Lambda code."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "stack/src/main/kotlin/org/myorg/example/MyStack.kt"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sidharta Rezende",
+      "bio": "Sidharta Rezende is a Senior Cloud Application Architect at Amazon Web Services, based in Brazil",
+      "image": "https://avatars.githubusercontent.com/u/41924052?s=96&v=4",
+      "linkedin": "sidharta-rezende",
+      "twitter": "SidhLongbirds"
+    }
+  ]
+}

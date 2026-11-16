@@ -1,0 +1,60 @@
+{
+  "title": "Synchronous REST API with AWS Lambda SnapStart",
+  "description": "This pattern demonstrates how to create a synchronous REST API using API Gateway, AWS Lambda and DynamoDB.",
+  "language": "Java",
+  "level": "400",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern is built using <a href='https://spring.io/projects/spring-boot' target='_blank'>Spring Boot 3</a> and leverages the <a href='https://github.com/awslabs/aws-serverless-java-container' target='_blank'>AWS Serverless Java Container</a> for seamless integration with AWS Lambda.",
+      "This pattern also demonstrates the usage of <a href='https://aws.amazon.com/blogs/compute/reducing-java-cold-starts-on-aws-lambda-functions-with-snapstart/' target='_blank'>SnapStart</a> to improve startup performance."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Replatforming Guide",
+        "link": "https://serverlessland.com/content/service/lambda/paved-path/java-replatforming/introduction"
+      },
+      {
+        "text": "AWS Serverless Java Container",
+        "link": "https://github.com/awslabs/aws-serverless-java-container/"
+      },
+      {
+        "text": "Lambda SnapStart",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --stack-name unicorn-store --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mark Sailes",
+      "bio": "Mark is a specialist solutions architect working at AWS. His primary focus is improving the developer experience of builders using Java on AWS Lambda.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/mark-sailes.jpg",
+      "linkedin": "mark-sailes",
+      "twitter": "MarkSailes3"
+    }
+  ]
+}

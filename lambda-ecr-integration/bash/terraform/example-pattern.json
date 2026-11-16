@@ -1,0 +1,51 @@
+{
+  "title": "AWS Lambda to Amazon Elastic Container Service",
+  "description": "Terraform IaC template to provision Amazon Elastic Container Registry (ECR) resources to integrate with AWS Lambda.",
+  "language": "Bash",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern involves the provisioning of Amazon Elastic Container Registry (ECR) and the creation of a container. It also includes the configuration of AWS Lambda to invoke the container. Within the created container, there is an illustrative bash script, demonstrating how to modernize existing bash code with minimal changes."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with Lambda container images",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/images-create.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nitin Jain",
+      "bio": "Sr. Solution Architect, AWS",
+      "linkedin": "annjay"
+    }
+  ]
+}

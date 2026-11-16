@@ -1,0 +1,59 @@
+{
+  "title": "AWS S3 Trigger to AWS Lambda to AWS Glue workflow",
+  "description": "S3 bucket trigger invokes a Lambda function on file upload, which starts a Glue workflow with file key and bucket parameters.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "For cases where we need to process files using Glue jobs, we can use Glue Workflows to orchestrate our Glue jobs and Glue crawlers.",
+      "S3 trigger is set up to trigger the Lambda on file upload event. To be able to trigger a Glue workflow with certain parameters, we use AWS Lambda to start glue workflows with parameters."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "test": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Glue - What is AWS Glue?",
+        "link": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+      },
+      {
+        "text": "AWS boto3 library for Python- Glue",
+        "link": "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/glue.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init && terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ananth Tirumanur",
+      "bio": "AWS Data Architect | Demonstrated leadership in Data related Technical Programs. 16 years of Proficiency in data management, analytics and visualization, data flow, data integrity, data automation and data science.",
+      "image": "https://avatars.githubusercontent.com/u/105808773?v=4",
+      "linkedin": "ananthtirumanur",
+      "twitter": "akrish82"
+    }
+  ]
+}

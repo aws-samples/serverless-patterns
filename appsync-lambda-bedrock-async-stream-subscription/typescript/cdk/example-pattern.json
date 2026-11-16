@@ -1,0 +1,50 @@
+{
+  "title": "Amazon Bedrock calls via AWS AppSync & AWS Lambda streaming for long tasks",
+  "description": "Asynchronous streaming pattern using AWS AppSync subscriptions with Lambda to stream Amazon Bedrock responses to clients via WebSocket.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The pattern implements an asynchronous streaming architecture.",
+      "Client initiates a WebSocket subscription and makes a request to AWS AppSync. AppSync invokes Lambda function in event mode, enabling asynchronous processing.",
+      "Lambda function streams responses from Amazon Bedrock using ConverseStream. Lambda function sends updates via mutations to AppSync. Updates are delivered to client through WebSocket subscription."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/appsync-lambda-bedrock-async-stream-subscription-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync JavaScript resolver and function reference for Amazon Bedrock runtime",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/resolver-reference-bedrock-js.html#long-running-invocations"
+      },
+      {
+        "text": "Bedrock ConverseStream API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ConverseStream.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --all</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/kaustav-dey.json"
+  ]
+}

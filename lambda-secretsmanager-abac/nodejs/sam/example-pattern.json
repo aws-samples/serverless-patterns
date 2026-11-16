@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda Secrets Manager with ABAC",
+  "description": "Use attribute-based access control (ABAC) to control access to a secret stored in Secrets Manager.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern, we explore the use of <a href='https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_attribute-based-access-control.html'>attribute-based access control</a> (ABAC) to enable access to a secret in <a href='https://aws.amazon.com/secrets-manager/'>AWS Secrets Manager</a> by an <a href='https://aws.amazon.com/lambda/'>AWS Lambda</a> function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Securely retrieving secrets with AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/securely-retrieving-secrets-with-aws-lambda/"
+      },
+      {
+        "text": "Use AWS Secrets Manager secrets in AWS Lambda functions",
+        "link": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Josh Kahn",
+      "bio": "Josh is the Tech Leader for Serverless at AWS and a Principal Solutions Architect.",
+      "image": "/assets/images/resources/contributors/joshhahn.jpg",
+      "twitter": "joshuaakahn"
+    }
+  ]
+}

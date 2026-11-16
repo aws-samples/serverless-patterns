@@ -1,0 +1,42 @@
+{
+  "title": "AWS Lambda to AWS Secrets Manager",
+  "description": "Create an AWS Lambda function inside private subnet and access AWS Secrets Manager privately.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application demonstrates how to establish an AWS Lambda function inside a private subnet of a VPC and access AWS Secrets Manager privately using VPC endpoints."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pankaj Rawat",
+      "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "image": "https://rawatpankaj.com/images/pic.jpeg",
+      "linkedin": "pankaj-rawat-14568765",
+      "twitter": "pankajrawat333"
+    }
+  ]
+}

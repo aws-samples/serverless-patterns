@@ -1,0 +1,61 @@
+{
+  "title": "AWS Lambda to Amazon EventBridge to Amazon SNS",
+  "description": "Route events from EventBridge to multiple SNS topics.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The AWS SAM template deploys three EventBridge Buses, six EventBridge Rules (2 per bus),  four SNS Topics, three SQS queues and a Lambda function.  The lambda function is an event generator which sends events to EventBridge Buses that trigger appropriate Rules sending the payload to the appropriate SNS Topic. SQS queues are attached to the Rules as Dead Letter Queues. Appropriate permissions are granted to EventBridge to trigger the SNS Topics and the Lambda function to put events in the EventBridge.",
+      "Consider this example: countries report cross-border transactions to their respective central banks. For simplicity, transactions originate from bank branches or ATM (automatic teller machines) as sub-domains (source) from all banks. For simplicity we use three EventBridge Buses - (bluebank, redbank and greenbank). The 'DetailType' is filtering for 'transaction type' and the 'Detail' section filters the 'Yes/No' reportable field.  Based on these combinations, events trigger different rules and send transaction payloads to SNS Topics of the ReserveBank and/or the Transaction Warehouses of the respective bank's SNS topics."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Permissions for Amazon EventBridge event buses",
+        "link": "https://docs.amazonaws.cn/en_us/eventbridge/latest/userguide/eb-event-bus-perms.html#eb-event-bus-example-policy-cross-account"
+      },
+      {
+        "text": "Content filtering in Amazon EventBridge event patterns",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns-content-based-filtering.html"
+      },
+      {
+        "text": "Integrating Amazon EventBridge into your serverless applications",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-amazon-eventbridge-into-your-serverless-applications/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/sylvester-kachi.json"
+  ]
+}

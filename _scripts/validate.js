@@ -1,0 +1,293 @@
+// Validates example-pattern.json files against the Serverless Land pattern schema
+// (pattern-schema.mjs, copied from serverless-land — don't edit it here).
+//
+// Locally:
+//   cd _scripts && npm i
+//   cd .. && node _scripts/validate.js path/to/example-pattern.json [more files...]
+//
+// In CI, the files come from the ADDED_FILES and MODIFIED_FILES env vars
+// (comma-separated, relative to the repo root). When GH_AUTOMATION is true, the
+// script also comments on and labels the pull request (needs TOKEN, PR_NUMBER,
+// ACTOR and GITHUB_REPOSITORY).
+//
+// It also scans pattern folders for admin-equivalent IAM grants (see check-iam.js), and
+// checks the folder path (see check-folder.js). In CI, the IAM scan covers every pattern
+// folder with an added or modified file (the nearest folder above the file that holds an
+// example-pattern.json), so a template-only change is scanned too. The schema check covers
+// only changed example-pattern.json files, and only folders whose example-pattern.json the
+// pull request adds must be nested; local runs check `yaml` only.
+//
+// In GitHub Actions (GITHUB_ACTIONS=true) it also prints each problem as an ::error
+// annotation and writes a summary table to GITHUB_STEP_SUMMARY (see annotate.js), so the
+// reason for a failure shows on the pull request without a comment.
+//
+// Exits non-zero if any file fails validation, any pattern has a broad IAM grant,
+// or any folder path breaks the folder rules.
+const fs = require('fs');
+const path = require('path');
+const { findPatternIam, formatIamFinding } = require('./check-iam');
+const { checkPatternFolder, findPatternDir } = require('./check-folder');
+const { errorCommand, summaryMarkdown } = require('./annotate');
+
+const PATTERN_FILE = 'example-pattern.json';
+const repoRoot = path.join(__dirname, '..');
+
+const cliFiles = process.argv.slice(2);
+const isLocalRun = cliFiles.length > 0;
+// GH_AUTOMATION defaults to true for CI runs (existing behaviour) and false for local runs.
+const githubAutomation = process.env.GH_AUTOMATION ? process.env.GH_AUTOMATION === 'true' : !isLocalRun;
+
+const splitList = (value) => (value ? value.split(',').map((f) => f.trim()).filter(Boolean) : []);
+
+// Local paths are relative to the current directory; CI paths are relative to the repo root.
+const changedFiles = isLocalRun
+  ? []
+  : [...new Set([...splitList(process.env.ADDED_FILES), ...splitList(process.env.MODIFIED_FILES)])];
+const patternFiles = isLocalRun
+  ? cliFiles.map((f) => path.resolve(f))
+  : changedFiles.filter((f) => path.basename(f) === PATTERN_FILE).map((f) => path.join(repoRoot, f));
+
+// Pattern folders to scan for IAM grants: every folder with a changed file in CI.
+const iamDirs = isLocalRun
+  ? [...new Set(patternFiles.map((file) => path.dirname(file)))]
+  : [...new Set(changedFiles.map((f) => findPatternDir(f, repoRoot)).filter(Boolean))];
+
+// Folders whose example-pattern.json is new in this pull request. A moved folder counts as new.
+const newPatternDirs = new Set(
+  isLocalRun
+    ? []
+    : splitList(process.env.ADDED_FILES)
+        .filter((f) => path.basename(f) === PATTERN_FILE)
+        .map((f) => path.dirname(path.join(repoRoot, f)))
+);
+
+let github;
+const getGitHub = () => {
+  if (!github) {
+    const { Octokit } = require('@octokit/rest');
+    const [owner, repo] = (process.env.GITHUB_REPOSITORY || '').split('/');
+    github = {
+      octokit: new Octokit({ auth: process.env.TOKEN }),
+      issue: { owner, repo, issue_number: process.env.PR_NUMBER },
+    };
+  }
+  return github;
+};
+
+const addLabels = (labels) => {
+  const { octokit, issue } = getGitHub();
+  return octokit.rest.issues.addLabels({ ...issue, labels });
+};
+
+const comment = (body) => {
+  const { octokit, issue } = getGitHub();
+  return octokit.rest.issues.createComment({ ...issue, body });
+};
+
+const removeLabel = async (name) => {
+  const { octokit, issue } = getGitHub();
+  try {
+    await octokit.rest.issues.removeLabel({ ...issue, name });
+  } catch (error) {
+    // The label isn't on the PR. That's fine.
+  }
+};
+
+// Zod reports a missing field as "expected string, received undefined". Say it plainly.
+const formatIssue = (issue) => {
+  const where = issue.path.length ? issue.path.join('.') : '(file)';
+  const message =
+    issue.code === 'invalid_type' && /received undefined/.test(issue.message) ? 'is required' : issue.message;
+  return `\`${where}\`: ${message}`;
+};
+
+// Returns { parsed, errors } for one file. errors is an array of strings.
+const validateFile = (schema, file) => {
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  } catch (error) {
+    return { errors: [`Could not read ${PATTERN_FILE} as JSON: ${error.message}`] };
+  }
+  const result = schema.safeParse(parsed);
+  return { parsed, errors: result.success ? [] : result.error.issues.map(formatIssue) };
+};
+
+const reportMissingFile = async () => {
+  await addLabels(['missing-example-pattern-file']);
+  await comment(
+    `@${process.env.ACTOR} looks like you are missing the example-pattern.json file in your pattern. \n\n` +
+      `You can [find the example-pattern template here](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json). \n\n` +
+      `The file is used on ServerlessLand and is required. Once the file is added we can review the pattern. \n\n`
+  );
+};
+
+const reportErrors = async (failures) => {
+  const sections = failures.map(({ file, errors }) => {
+    const list = errors.map((error, index) => `${index + 1}. ${error}`).join('\n');
+    return `**${path.relative(repoRoot, file)}**\n\n${list}`;
+  });
+  if (!githubAutomation) return;
+  await comment(
+    `@${process.env.ACTOR} your 'example-pattern.json' is missing some key fields, please review below and address any errors you have \n\n` +
+      `${sections.join('\n\n')} \n\n` +
+      `_If you need any help, take a look at the [example-pattern file](https://github.com/aws-samples/serverless-patterns/blob/main/_pattern-model/example-pattern.json)._ \n\n` +
+      `Make the changes, and push your changes back to this pull request. When all automated checks are successful, the Serverless DA team will process your pull request. \n\n`
+  );
+  await addLabels(['invalid-example-pattern-file', 'requested-changes']);
+  console.info('Errors found: Added comments back to the pull request requesting changes');
+};
+
+const reportIamFindings = async (iamFailures) => {
+  if (!githubAutomation) return;
+  const sections = iamFailures.map(({ dir, findings }) => {
+    const list = findings.map((finding, index) => `${index + 1}. ${finding}`).join('\n');
+    return `**${path.relative(repoRoot, dir)}**\n\n${list}`;
+  });
+  await comment(
+    `@${process.env.ACTOR} this pattern grants admin-equivalent IAM permissions. Please replace them with the specific actions and resources the pattern uses \n\n` +
+      `${sections.join('\n\n')} \n\n` +
+      `_Use [SAM policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html) or name each action and resource. If a role has to create other roles, require a [permissions boundary](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html)._ \n\n`
+  );
+  await addLabels(['broad-iam-permissions', 'requested-changes']);
+  console.info('Broad IAM found: Added comments back to the pull request requesting changes');
+};
+
+const reportFolderProblems = async (folderFailures) => {
+  if (!githubAutomation) return;
+  const sections = folderFailures.map(({ dir, problems }) => {
+    const list = problems.map((problem, index) => `${index + 1}. ${problem}`).join('\n');
+    return `**${path.relative(repoRoot, dir)}**\n\n${list}`;
+  });
+  await comment(
+    `@${process.env.ACTOR} please move this pattern to a folder that follows the [folder structure](https://github.com/aws-samples/serverless-patterns/blob/main/PUBLISHING.md#folder-structure) \n\n` +
+      `${sections.join('\n\n')} \n\n`
+  );
+  await addLabels(['requested-changes']);
+  console.info('Folder problems found: Added comments back to the pull request requesting changes');
+};
+
+const reportSuccess = async (parsedPatterns) => {
+  if (!githubAutomation) return;
+  try {
+    await addLabels(['valid-example-pattern-file']);
+    const { octokit, issue } = getGitHub();
+    const pullRequestInfo = await octokit.rest.pulls.get({
+      owner: issue.owner,
+      repo: issue.repo,
+      pull_number: issue.issue_number,
+    });
+    const forkOwner = pullRequestInfo.data.head.repo.full_name;
+    const forkRepo = pullRequestInfo.data.head.ref;
+    const forkURL = `https://github.com/${forkOwner}/tree/${forkRepo}`;
+    for (const parsedJSON of parsedPatterns) {
+      await comment(
+        `Valid pattern file found. \n\n` +
+          `Reviewer you can view the [pattern file here](https://beta.serverlessland.com/patterns/sandbox?repo=${encodeURIComponent(forkURL)}&pattern=${encodeURIComponent(JSON.stringify(parsedJSON))}) \n\n`
+      );
+    }
+  } catch (error) {
+    console.info(`Failed generating preview. Error - ${error.message}`);
+  }
+  await removeLabel('requested-changes');
+  await removeLabel('missing-example-pattern-file');
+};
+
+// In GitHub Actions, print an ::error annotation per problem and add a job summary.
+const reportToActions = (failures, iamFailures, folderFailures) => {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  const rel = (p) => path.relative(repoRoot, p);
+  const problems = [
+    ...failures.flatMap(({ file, errors }) =>
+      errors.map((message) => ({ pattern: rel(path.dirname(file)), check: 'Pattern file', file: rel(file), message }))
+    ),
+    ...iamFailures.flatMap(({ dir, iamFindings }) =>
+      iamFindings.map((finding) => ({
+        pattern: rel(dir),
+        check: 'Broad IAM',
+        file: finding.file,
+        line: finding.line,
+        message: `${finding.message}: \`${finding.text.slice(0, 120)}\``,
+      }))
+    ),
+    ...folderFailures.flatMap(({ dir, problems: list }) =>
+      list.map((message) => ({ pattern: rel(dir), check: 'Folder structure', file: rel(path.join(dir, PATTERN_FILE)), message }))
+    ),
+  ];
+  problems.forEach((problem) => console.log(errorCommand(problem)));
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summaryMarkdown(problems));
+};
+
+const main = async () => {
+  if (patternFiles.length === 0 && iamDirs.length === 0) {
+    console.info('No pattern files changed, nothing to validate.');
+    reportToActions([], [], []);
+    if (githubAutomation) await reportMissingFile();
+    return;
+  }
+
+  const { createPatternSchema } = await import('./pattern-schema.mjs');
+  // patternArch isn't checked here: Serverless Land adds and checks it on import.
+  const schema = createPatternSchema();
+
+  const failures = [];
+  const parsedPatterns = [];
+  for (const file of patternFiles) {
+    const { parsed, errors } = validateFile(schema, file);
+    const name = path.relative(process.cwd(), file);
+    if (errors.length) {
+      failures.push({ file, errors });
+      console.error(`✘ ${name}`);
+      errors.forEach((error, index) => console.error(`  ${index + 1}. ${error}`));
+    } else {
+      parsedPatterns.push(parsed);
+      console.info(`✔ ${name}`);
+    }
+  }
+
+  const iamFailures = [];
+  for (const dir of iamDirs) {
+    if (!fs.existsSync(dir)) continue;
+    const iamFindings = findPatternIam(dir, repoRoot);
+    const findings = iamFindings.map(formatIamFinding);
+    const name = path.relative(process.cwd(), dir) || '.';
+    if (findings.length) {
+      iamFailures.push({ dir, findings, iamFindings });
+      console.error(`✘ ${name}: broad IAM permissions`);
+      findings.forEach((finding, index) => console.error(`  ${index + 1}. ${finding.replace(/`/g, '')}`));
+    } else {
+      console.info(`✔ ${name}: no admin-equivalent IAM grants`);
+    }
+  }
+
+  const folderFailures = [];
+  for (const dir of [...new Set(patternFiles.map((file) => path.dirname(file)))]) {
+    const problems = checkPatternFolder(path.relative(repoRoot, dir), repoRoot, { isNew: newPatternDirs.has(dir) });
+    const name = path.relative(process.cwd(), dir) || '.';
+    if (problems.length) {
+      folderFailures.push({ dir, problems });
+      console.error(`✘ ${name}: folder structure`);
+      problems.forEach((problem, index) => console.error(`  ${index + 1}. ${problem.replace(/`/g, '')}`));
+    } else {
+      console.info(`✔ ${name}: folder structure`);
+    }
+  }
+
+  reportToActions(failures, iamFailures, folderFailures);
+  if (failures.length) await reportErrors(failures);
+  if (iamFailures.length) await reportIamFindings(iamFailures);
+  if (folderFailures.length) await reportFolderProblems(folderFailures);
+  if (failures.length || iamFailures.length || folderFailures.length) {
+    process.exitCode = 1;
+    return;
+  }
+
+  await reportSuccess(parsedPatterns);
+  console.info('Everything OK with pattern');
+};
+
+main().catch((error) => {
+  console.error(error);
+  console.error(`Failed to process the ${PATTERN_FILE} file.`);
+  process.exitCode = 1;
+});

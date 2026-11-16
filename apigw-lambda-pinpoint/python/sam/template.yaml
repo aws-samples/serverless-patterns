@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: (uksb-1tthgi812) (tag:apigw-lambda-pinpoint)
+
+Parameters:
+  OriginationIdentityArn:
+    Type: String
+    AllowedPattern: '^arn:aws[a-z-]*:sms-voice:[a-z0-9-]+:[0-9]{12}:(phone-number|pool|sender-id)/.+$'
+    Description: >-
+      ARN of the AWS End User Messaging SMS phone number, pool or sender ID to send from,
+      for example arn:aws:sms-voice:us-east-1:111122223333:phone-number/phone-abc123
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: SMSApigw
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+
+  SmsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: SmsFunction
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.14
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          ORIGINATION_IDENTITY: !Ref OriginationIdentityArn
+      Events:
+        ApiPOSTsendmessage:
+          Type: Api
+          Properties:
+            Path: /send_message
+            Method: POST
+            RestApiId: !Ref Api
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - mobiletargeting:PhoneNumberValidate
+              Resource: !Sub arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:phone/number/validate
+            - Effect: Allow
+              Action:
+                - sms-voice:SendTextMessage
+              Resource:
+                - !Ref OriginationIdentityArn
+                # Checked when the account has a default configuration set or protect configuration
+                - !Sub arn:${AWS::Partition}:sms-voice:${AWS::Region}:${AWS::AccountId}:configuration-set/*
+                - !Sub arn:${AWS::Partition}:sms-voice:${AWS::Region}:${AWS::AccountId}:protect-configuration/*
+
+Outputs:
+  SendMessageUrl:
+    Description: URL of the POST /send_message endpoint (requires SigV4-signed requests)
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/send_message
+  SmsFunctionName:
+    Description: Lambda function that validates the number and sends the SMS
+    Value: !Ref SmsFunction

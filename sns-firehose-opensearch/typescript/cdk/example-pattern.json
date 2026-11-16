@@ -1,0 +1,53 @@
+{
+  "title": "Deliver messages to Amazon OpenSearch via Amazon SNS and Amazon Kinesis",
+  "description": "This pattern deploys infrastructure that utilizes Amazon Data Firehose to deliver messages sent to an SNS topic to Amazon OpenSearch.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Messages are sent to an SNS topic, and SNS fans out the messages to a Amazon Data Firehose delivery stream. Firehose then streams and delivers the messages to OpenSearch, where the streaming data is loaded and indexed for analysis and searching. Additionally, failed data is backed up using an S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/sns-firehose-opensearch-cdk-typescript-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Fanout to Amazon Data Firehose delivery streams",
+        "link": "https://docs.amazonaws.cn/en_us/sns/latest/dg/sns-firehose-as-subscriber.html"
+      },
+      {
+        "text": "Introducing message archiving and analytics for Amazon SNS",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-message-archiving-and-analytics-for-amazon-sns/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Leon Wang",
+      "bio": "I am a Cloud Support Engineer at AWS who loves coding",
+      "image": "https://drive.google.com/file/d/1cPkmsCOQBFdmv5_70AfyDvTDxBRX-doQ/view?usp=sharing",
+      "linkedin": "leon-wang-23a6988a"
+    }
+  ]
+}

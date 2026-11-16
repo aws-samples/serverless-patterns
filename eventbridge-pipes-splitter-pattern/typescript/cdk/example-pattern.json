@@ -1,0 +1,62 @@
+{
+  "title": "Amazon DynamoDB Stream to Amazon EventBridge using Splitter pattern",
+  "description": "This pattern takes a change data capture event from DynamoDB and splits it into multiple events into EventBridge.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern takes a change data capture event from DynamoDB and splits into multiple events for EventBridge.",
+      "<h5>How the pattern works</h5>",
+      "<ul style=\"list-style-type: none;\"><li>1. New order is created in DynamoDB table.</li><li>2. EventBridge Pipes listens to event, and forwards to enricher.</li><li>3. Enricher (Lambda function) takes event and splits it for EventBridge (target).</li><li>4. EventBridge raises split events for downstream consumers..</li></ul>"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda using mutual TLS",
+  "description": "Create an Amazon API Gateway REST API that invokes an AWS Lambda function with mutual TLS",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway HTTP API authenticated by mutual TLS and an AWS Lambda function."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "Introducing mutual TLS authentication for Amazon API Gateway",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-mutual-tls-authentication-for-amazon-api-gateway/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See GitHub repo"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>npx cdk destroy --app 'ts-node .'</code>",
+      "2. Confirm the removal and wait for the resource deletion to complete."
+    ]
+  },
+  "contributors": [
+    "content/contributors/sudheer-yalamanchili.json"
+  ]
+}

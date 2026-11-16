@@ -1,0 +1,53 @@
+{
+  "title": "AWS Lambda to Amazon Comprehend",
+  "description": "Create a Lambda function that uses Amazon Comprehend for sentiment analysis.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to deploy a SAM template that builds a Lambda function which triggers Comprehend for sentiment analysis."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Using AWS Lambda and Amazon Comprehend for sentiment analysis",
+        "link": "https://aws.amazon.com/blogs/compute/using-aws-lambda-and-amazon-comprehend-for-sentiment-analysis/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Use the AWS CLI to invoke the Lambda function. The function name is in the outputs of the AWS SAM deployment (the key is QueuePublisherFunction):",
+      "1. Invoke the Lambda function to publish a message to the SQS queue: <code>aws lambda invoke --function-name ENTER_YOUR_FUNCTION_NAME outfile.txt</code>.",
+      "2. Retrieve the message from the SQS queue, using the queue URL from the AWS SAM deployment outputs: <code>aws sqs receive-message --queue-url ENTER_YOUR_QUEUE_URL</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tommy Whelan",
+      "bio": "Data/ ML Engineer @ AWS",
+      "image": "https://phonetool.amazon.com/users/whelat"
+    }
+  ]
+}

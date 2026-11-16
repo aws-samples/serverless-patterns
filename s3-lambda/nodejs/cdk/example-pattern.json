@@ -1,0 +1,56 @@
+{
+  "title": "Amazon S3 to AWS Lambda",
+  "description": "Create a Lambda function that resizes images uploaded to S3.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK stack deploys a Lambda function, a S3 bucket, and the minimum IAM resources required to run the application.",
+      "When items are written in the S3 bucket, the changes are sent to a stream. This pattern configures a Lambda function to poll this stream, and log some information to CloudWatch. The function is invoked with a payload containing the information of the event."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/s3-to-lambda-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Using AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Blog Series: Building scalable serverless applications with Amazon S3 and AWS Lambda.",
+        "link": "https://aws.amazon.com/blogs/compute/building-scalable-serverless-applications-with-amazon-s3-and-aws-lambda/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/mario-fonteles.json"
+  ]
+}

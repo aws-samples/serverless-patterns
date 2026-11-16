@@ -1,0 +1,58 @@
+{
+  "title": "Amazon Aurora DSQL CDC to Amazon EventBridge",
+  "description": "Stream real-time database changes from Amazon Aurora DSQL via CDC through Amazon Kinesis and AWS Lambda to Amazon EventBridge",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Aurora DSQL captures committed row-level changes (INSERT, UPDATE, DELETE) and streams them as JSON records to Amazon Kinesis Data Streams.",
+      "AWS Lambda consumes the stream, classifies each CDC event by operation type, and publishes typed events to an Amazon EventBridge custom event bus.",
+      "Add Amazon EventBridge rules and targets to route events to any downstream consumer such as Amazon SQS, AWS Step Functions, or Amazon SNS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/dsql-cdc-eventbridge-fanout-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Aurora DSQL CDC documentation",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/cdc-streams.html"
+      },
+      {
+        "text": "Amazon EventBridge content-based filtering",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd dsql-cdc-eventbridge/typescript/cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk deploy --parameters DsqlClusterId=your-cluster-id</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Insert data into your Amazon Aurora DSQL cluster to generate CDC events.",
+      "Add an Amazon EventBridge rule on the dsql-cdc-events bus to verify events arrive."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}

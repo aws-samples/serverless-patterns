@@ -1,0 +1,40 @@
+{
+  "title": "AWS Lambda Secrets Manager top-level await + SDKv3",
+  "description": "Lambda function retrieving a secret from Secrets Manager using top-level await using AWS SDK for JavaScript v3.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern stores a secret in Secrets Manager. A Node.js Lambda function uses top-level await and the AWS SDK for Javascript v3 to read the secret in the init phase, outside the handler."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/julian-wood.json"
+  ]
+}

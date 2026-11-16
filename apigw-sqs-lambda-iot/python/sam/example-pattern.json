@@ -1,0 +1,51 @@
+{
+  "title": "Asynchronous message processing with AWS Lambda and IoT Core",
+  "description": "API Gateway REST API integration with SQS, Lambda, and IoT",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      " ",
+      "A POST request to API Gateway will create a message onto a SQS queue. Lambda picks up the message uses the topic in the request body to send message to the IOT Data API endpoint"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon API Gateway - Rest API to AWS Services",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abdul Waheed",
+      "bio": "Solutions Architect @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/15647692?v=4",
+      "twitter": "waheed2"
+    }
+  ]
+}

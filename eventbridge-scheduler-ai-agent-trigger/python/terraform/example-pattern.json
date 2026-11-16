@@ -1,0 +1,55 @@
+{
+  "title": "Invoke AI Agent with Amazon EventBridge Scheduler",
+  "description": "Create a EventBridge scheduler which invokes an Amazon Bedrock Agent.",
+  "language": "Python",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to invoke an Amazon Bedrock AI Agent on a recurring schedule using Amazon EventBridge Scheduler. An orchestrator AWS Lambda function, invoked by the scheduler, sends a task payload to the Amazon Bedrock Agent, which processes the input, generates an execution summary, and persists the result to an Amazon DynamoDB table. The pattern includes retry logic, a dead-letter queue for failed invocations, and least-privilege IAM policies scoped to the agent alias ARN."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Invoke a Lambda function on a schedule",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-eventbridge-scheduler.html"
+      },
+      {
+        "text": "Allow users to view information about and invoke an agent",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/security_iam_id-based-policy-examples-agent.html#security_iam_id-based-policy-examples-perform-actions-agent"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajil Paloth",
+      "bio": "ProServe Delivery Consultant at AWS",
+      "image": "https://i.ibb.co/r2TsqGf6/Passport-size.jpg",
+      "linkedin": "paloth"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "title": "Amazon EventBridge CloudEvents Input Transformer to AWS Lambda",
+  "description": "Use an EventBridge input transformer to convert events to CloudEvents format and send them to a Lambda function.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "EventBridge events are converted to CloudEvents using an input transformer in a rule on a custom event bus. A Lambda function is configured as a target for that rule. The Lambda function uses the CloudEvents TypeScript SDK to deserialize and validate incoming CloudEvents."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/eb-lambda-cloudevents-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Input Transformation Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-transform-target-input.html"
+      },
+      {
+        "text": "CloudEvents Specification",
+        "link": "https://cloudevents.io/"
+      },
+      {
+        "text": "Cloudformation API for EventBridge",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_Events.html"
+      },
+      {
+        "text": "EventBridge Visuals",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge"
+      },
+      {
+        "text": "Learn more about event-driven architecture",
+        "link": "https://serverlessland.com/event-driven-architecture"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Michael Gasch",
+      "bio": "Senior Product Manager Technical for Amazon EventBridge.",
+      "image": "https://avatars.githubusercontent.com/u/15986659",
+      "linkedin": "michael-gasch-10603298"
+    }
+  ]
+}

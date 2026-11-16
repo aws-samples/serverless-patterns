@@ -1,0 +1,63 @@
+{
+  "title": "Amazon Kinesis to AWS Lambda using REST API",
+  "description": "REST API that executes a PutRecords API call to a Kinesis Data stream. The stream is then consumed by a Lambda function.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern will deploy a Amazon API Gateway endpoint that integrates with Amazon Kinesis. The records from the Kinesis stream are processed by a Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Tutorial: Create a REST API as an Amazon Kinesis proxy in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html"
+      },
+      {
+        "text": "Kinesis Data Stream PutRecord API",
+        "link": "https://docs.aws.amazon.com/kinesis/latest/APIReference/API_PutRecord.html"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon Kinesis",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vijay Konade",
+      "bio": "Cloud Support Engineer @ AWS",
+      "image": "img/vijay.png",
+      "linkedin": "vijay-konade-14427479"
+    },
+    {
+      "name": "Thi Nguyen",
+      "bio": "Solutions Architect @ AWS",
+      "image": "https://drive.google.com/file/d/188LpzUvUmHt1o7vzbwKw32S-fYabL-qY/view?usp=sharing",
+      "linkedin": "ndthi"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "lambda-web-dynamodb-api-sam",
+  "version": "1.0.0",
+  "description": "Express.js CRUD API on AWS Lambda Web Functions backed by Amazon DynamoDB",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0",
+    "express": "^5.0.0"
+  },
+  "license": "MIT-0"
+}

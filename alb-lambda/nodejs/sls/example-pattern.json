@@ -1,0 +1,54 @@
+{
+  "title": "Application Load Balancer with AWS Lambda as a target",
+  "description": "Create an Application Load Balancer with Lambda as target",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "Serverless Framework",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create an Application Load Balancer with a target AWS Lambda function.",
+      "When the load balancer endpoint is hit in the browser, if the specified URL (`/hello`) path matches, it triggers the Lambda function and the file (hello) is downloaded in your local system with the output from Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using AWS Lambda with an Application Load Balancer",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-alb.html"
+      },
+      {
+        "text": "Lambda functions as targets - Elastic Load Balancing",
+        "link": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "serverless deploy --verbose"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "serverless remove --verbose"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anjali Modi",
+      "bio": "Anjali Modi is a Software Engineer working for developing Serverless solutions at Distinction-Dev, India",
+      "image": "https://1.gravatar.com/avatar/51f84b006e95184c3943b4d5e17b1ac3",
+      "linkedin": "anjali-modi-068045119"
+    }
+  ]
+}

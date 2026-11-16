@@ -2,15 +2,22 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless patterns - Service to Service description
 
-# Comment on each global 
+# Comment on each global
 Globals:
-
+  Function:
+    Runtime: nodejs24.x
+    Timeout: 10
 
 # Comment each resource section to explain usage
 Resources:
-
+  ExampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
 
 # List all common outputs for usage
 Outputs:
-
-
+  ExampleFunctionName:
+    Description: Lambda function name
+    Value: !Ref ExampleFunction

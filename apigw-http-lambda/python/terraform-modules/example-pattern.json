@@ -1,0 +1,77 @@
+{
+  "title": "Amazon API Gateway (HTTP) to AWS Lambda",
+  "description": "This pattern creates an Amazon API Gateway (HTTP) and an AWS Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway (HTTP) with a default route and basic CORS configuration.",
+      "The default route is integrated with an AWS Lambda function written in Python.",
+      "The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "text": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "text": "Terraform Amazon API Gateway v2 (HTTP/Websocket) module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2"
+      },
+      {
+        "text": "Terraform Amazon API Gateway v2 (HTTP/Websocket) examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples"
+      },
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "linkedin": "antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

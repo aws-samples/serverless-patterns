@@ -1,0 +1,48 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda to Amazon EFS",
+  "description": "Attach, configure and access Amazon EFS from AWS Lambda function.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern outlines a solution on accessing the Elastic File System (EFS) from an AWS Lambda. An ideal use case to connect to EFS from AWS Lambda is to process files shared across multiple components of the application. When a upstream components writes data to a file and a backend task needs to process the data for downstream component, utilizing a file storage with AWS Lambda yields desired results. EFS is a serverless, no maintenance file system that can be accessed from various AWS resources. "
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pankaj Rawat",
+      "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+      "linkedin": "pankaj-rawat-14568765",
+      "twitter": "pankajrawat333"
+    },
+    {
+      "name": "Vijai Anand Ramalingam",
+      "bio": "Vijai Anand Ramalingam ia an Application Developer - ISV at Amazon Web Services",
+      "image": "https://avatars.githubusercontent.com/u/83067978?v=4",
+      "linkedin": "vijai-anand-ramalingam-77439736"
+    }
+  ]
+}

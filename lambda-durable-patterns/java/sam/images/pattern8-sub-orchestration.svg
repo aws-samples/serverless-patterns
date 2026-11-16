@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 580" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad8" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad8" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow8" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow8" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="580" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad8)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad8)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 8: Sub-Orchestration</text>
+  <text x="310" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="330" y="36" fill="#D5DBDB" font-size="14">Child workflow contexts with isolated operation namespaces</text>
+
+  <!-- Main context label -->
+  <rect x="30" y="68" width="140" height="22" fill="#232F3E" rx="4"/>
+  <text x="45" y="83" fill="#FF9900" font-size="10" font-weight="bold">Main Context</text>
+
+  <!-- Step 1: Validate Order -->
+  <rect x="30" y="95" width="140" height="55" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow8)"/>
+  <rect x="30" y="95" width="140" height="22" fill="#1B660F" rx="6"/>
+  <rect x="30" y="109" width="140" height="8" fill="#1B660F"/>
+  <text x="50" y="110" fill="#FFF" font-size="9" font-weight="bold">validate-order</text>
+  <text x="43" y="128" fill="#16191F" font-size="8">Verify order details</text>
+  <text x="43" y="140" fill="#16191F" font-size="8">Check inventory exists</text>
+
+  <!-- Arrow down to parallel -->
+  <line x1="100" y1="150" x2="100" y2="172" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+  <!-- CONCURRENT section (Payment + Inventory) -->
+  <rect x="30" y="177" width="700" height="155" fill="#FFF" stroke="#3F8624" stroke-width="2" rx="8" filter="url(#shadow8)"/>
+  <rect x="30" y="177" width="700" height="26" fill="#3F8624" rx="8"/>
+  <rect x="30" y="195" width="700" height="8" fill="#3F8624"/>
+  <text x="50" y="195" fill="#FFF" font-size="10" font-weight="bold">CONCURRENT: allOf() barrier - both must complete</text>
+
+  <!-- Payment Sub-Workflow -->
+  <rect x="50" y="212" width="380" height="105" fill="#FFF" stroke="#FF9900" stroke-width="1.5" rx="6"/>
+  <rect x="50" y="212" width="380" height="22" fill="#FF9900" rx="6"/>
+  <rect x="50" y="226" width="380" height="8" fill="#FF9900"/>
+  <text x="65" y="228" fill="#FFF" font-size="9" font-weight="bold">Payment Sub-Workflow (child context: "payment")</text>
+
+  <rect x="65" y="242" width="75" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="70" y="258" fill="#16191F" font-size="7">authorize-card</text>
+
+  <text x="143" y="258" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="153" y="242" width="55" height="28" fill="#FFF3E0" stroke="#FF9900" stroke-width="0.5" rx="3"/>
+  <text x="159" y="254" fill="#FF9900" font-size="7">wait 2s</text>
+  <text x="159" y="264" fill="#FF9900" font-size="6">SUSPEND</text>
+
+  <text x="211" y="258" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="220" y="242" width="72" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="227" y="258" fill="#16191F" font-size="7">fraud-check</text>
+
+  <text x="295" y="258" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="305" y="242" width="80" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="310" y="258" fill="#16191F" font-size="7">capture-payment</text>
+
+  <rect x="65" y="280" width="350" height="16" fill="#EBF5FB" rx="2"/>
+  <text x="75" y="291" fill="#3498DB" font-size="7">Isolated namespace: payment.authorize-card, payment.fraud-check, ...</text>
+
+  <!-- Inventory Sub-Workflow -->
+  <rect x="450" y="212" width="260" height="105" fill="#FFF" stroke="#FF9900" stroke-width="1.5" rx="6"/>
+  <rect x="450" y="212" width="260" height="22" fill="#FF9900" rx="6"/>
+  <rect x="450" y="226" width="260" height="8" fill="#FF9900"/>
+  <text x="465" y="228" fill="#FFF" font-size="9" font-weight="bold">Inventory Sub-Workflow ("inventory")</text>
+
+  <rect x="465" y="242" width="95" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="470" y="258" fill="#16191F" font-size="7">check-availability</text>
+
+  <text x="563" y="258" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="573" y="242" width="80" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="579" y="258" fill="#16191F" font-size="7">reserve-stock</text>
+
+  <rect x="465" y="280" width="225" height="16" fill="#EBF5FB" rx="2"/>
+  <text x="475" y="291" fill="#3498DB" font-size="7">Isolated: inventory.check-availability, inventory.reserve-stock</text>
+
+  <!-- Barrier indicator -->
+  <rect x="730" y="177" width="4" height="155" fill="#FF9900"/>
+  <text x="740" y="260" fill="#FF9900" font-size="9" font-weight="bold" transform="rotate(90, 740, 260)">BARRIER</text>
+
+  <!-- Arrow down to Shipping -->
+  <line x1="380" y1="332" x2="380" y2="350" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow8)"/>
+  <text x="390" y="345" fill="#687078" font-size="8">sequential</text>
+
+  <!-- Shipping Sub-Workflow -->
+  <rect x="130" y="355" width="500" height="75" fill="#FFF" stroke="#FF9900" stroke-width="1.5" rx="6" filter="url(#shadow8)"/>
+  <rect x="130" y="355" width="500" height="22" fill="#FF9900" rx="6"/>
+  <rect x="130" y="369" width="500" height="8" fill="#FF9900"/>
+  <text x="145" y="371" fill="#FFF" font-size="9" font-weight="bold">Shipping Sub-Workflow (child context: "shipping")</text>
+
+  <rect x="150" y="385" width="80" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="158" y="401" fill="#16191F" font-size="7">create-label</text>
+
+  <text x="234" y="401" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="245" y="385" width="95" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="252" y="401" fill="#16191F" font-size="7">schedule-pickup</text>
+
+  <text x="344" y="401" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="355" y="385" width="100" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="360" y="401" fill="#16191F" font-size="7">generate-tracking</text>
+
+  <rect x="475" y="385" width="140" height="28" fill="#EBF5FB" stroke="#3498DB" stroke-width="0.5" rx="3"/>
+  <text x="482" y="401" fill="#3498DB" font-size="7">Isolated: shipping.*</text>
+
+  <!-- Arrow to Notification -->
+  <line x1="630" y1="392" x2="660" y2="392" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+  <!-- Notification Sub-Workflow -->
+  <rect x="665" y="355" width="380" height="75" fill="#FFF" stroke="#FF9900" stroke-width="1.5" rx="6" filter="url(#shadow8)"/>
+  <rect x="665" y="355" width="380" height="22" fill="#FF9900" rx="6"/>
+  <rect x="665" y="369" width="380" height="8" fill="#FF9900"/>
+  <text x="680" y="371" fill="#FFF" font-size="9" font-weight="bold">Notification Sub-Workflow (child context: "notification")</text>
+
+  <rect x="685" y="385" width="105" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="691" y="401" fill="#16191F" font-size="7">send-confirmation</text>
+
+  <text x="794" y="401" fill="#545B64" font-size="8">&#x2192;</text>
+
+  <rect x="805" y="385" width="130" height="28" fill="url(#stepGrad8)" stroke="#D5DBDB" stroke-width="0.5" rx="3"/>
+  <text x="811" y="401" fill="#16191F" font-size="7">send-shipping-notification</text>
+
+  <rect x="950" y="385" width="80" height="28" fill="#EBF5FB" stroke="#3498DB" stroke-width="0.5" rx="3"/>
+  <text x="955" y="401" fill="#3498DB" font-size="7">notification.*</text>
+
+  <!-- Arrow to FULFILLED -->
+  <line x1="855" y1="430" x2="855" y2="450" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow8)"/>
+
+  <!-- FULFILLED badge -->
+  <rect x="810" y="455" width="100" height="28" fill="#E8F5E9" stroke="#1B660F" stroke-width="1.5" rx="14"/>
+  <text x="828" y="473" fill="#1B660F" font-size="11" font-weight="bold">FULFILLED</text>
+
+  <!-- Key Concept Box -->
+  <rect x="30" y="495" width="1040" height="70" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow8)"/>
+  <rect x="30" y="495" width="1040" height="26" fill="#232F3E" rx="6"/>
+  <rect x="30" y="513" width="1040" height="8" fill="#232F3E"/>
+  <text x="50" y="513" fill="#FF9900" font-size="11" font-weight="bold">Key Concept: Isolated Child Contexts</text>
+
+  <text x="50" y="538" fill="#16191F" font-size="10">Each child workflow runs in its own context with namespaced operations (e.g., "payment.authorize-card"). This prevents</text>
+  <text x="50" y="553" fill="#16191F" font-size="10">step name collisions and enables independent checkpointing. allOf() waits for all concurrent children before proceeding.</text>
+</svg>

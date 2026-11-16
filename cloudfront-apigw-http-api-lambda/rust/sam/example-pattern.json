@@ -1,0 +1,55 @@
+{
+  "title": "Amazon CloudFront to Amazon API Gateway to AWS Lambda",
+  "description": "CloudFront to API Gateway HTTP API to Lambda",
+  "language": "Rust",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon Cloudfront distribution on front of an Amazon API Gateway HTTP API and an AWS Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>sam delete</code>",
+      "2. See additional notes in the repo."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Daniele Frasca",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

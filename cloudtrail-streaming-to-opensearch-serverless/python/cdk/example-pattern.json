@@ -1,0 +1,56 @@
+{
+  "title": "Amazon CloudTrail to AWS Lambda to Amazon OpenSearch",
+  "description": "Create an OpenSearch cluster in VPC that receives CloudTrail CloudWatch Logs from Lambda.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project contains a sample AWS CDK template to create Amazon CloudTrail, a CloudWatch Logs Group, AWS Lambda function and Amazon OpenSearch serverless collection.",
+      "The EventBridge rule publishes matched events to CloudWatch Logs from CloudTrail.",
+      "The Lambda function indexes those logs to Amazon OpenSearch which can be further viewed from the Amazon OpenSearch dashboard."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "stacks/opensearch_serverless_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Ingesting data into Amazon OpenSearch Serverless collections",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-clients.html"
+      },
+      {
+        "text": "Fine-grained access control in Amazon OpenSearch Service",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rupesh Tiwari",
+      "bio": "Senior Solutions Architect at AWS Global Financial Services.",
+      "image": "https://avatars.githubusercontent.com/u/330383?v=4",
+      "twitter": "rupeshtiwari"
+    }
+  ]
+}

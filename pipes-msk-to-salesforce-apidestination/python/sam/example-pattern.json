@@ -1,0 +1,68 @@
+{
+  "title": "Amazon MSK to Salesforce using Amazon EventBridge Pipes and API Destination",
+  "description": "Send events from MSK to Salesforce using EventBridge Pipes and API Destinations",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows how to use EventBridge Pipes to send MSK payload data to Salesforce using API Destinations.",
+      "The pattern uses an MSK cluster as a source to EventBridge Pipes, a Lambda function to base64 decode the payload and transform data to adhere to the Salesforce schema, and API Destinations as a target to send the payload to Salesforce.",
+      "The use case shown here is to create leads in Salesforce using the payload from MSK."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "EventBridge Pipes re:Invent video",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      },
+      {
+        "text": "API Destinations documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html"
+      },
+      {
+        "text": "Subscribe to platform events with Salesforce Flows",
+        "link": "https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_subscribe_flow.htm"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Aniket Bulbule",
+      "bio": "Partner Solutions Architect @AWS, Serverless & EDA Enthusiast",
+      "image": "https://drive.google.com/file/d/1g5X8juFALsl44ZACvcZSKGmCVUS4IKqi/view?usp=sharing"
+    },
+    {
+      "name": "Anup Rajpara",
+      "bio": "Anup is passionate about serverless & event-driven architectures.",
+      "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
+      "linkedin": "anup-rajpara-developer"
+    }
+  ]
+}

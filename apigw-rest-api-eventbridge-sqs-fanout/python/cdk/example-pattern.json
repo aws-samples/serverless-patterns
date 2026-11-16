@@ -1,0 +1,64 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon EventBridge to Amazon SQS fanout",
+  "description": "Routes from Amazon API Gateway REST API to SQS via EventBridge.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API gateway REST API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge.",
+      "A rule evaluates whether the event should be sent to two distinct SQS queues.",
+      "This fanout pattern uses EventBridge with SQS targets."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/app.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Build an API Gateway REST API with AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+      },
+      {
+        "text": "Amazon EventBridge PutEvents",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
+      },
+      {
+        "text": "Amazon EventBridge Targets",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-targets.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cd cdk",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Patrick Meiler",
+      "bio": "Solutions Architect, AWS",
+      "linkedin": "patrickmeiler"
+    }
+  ]
+}

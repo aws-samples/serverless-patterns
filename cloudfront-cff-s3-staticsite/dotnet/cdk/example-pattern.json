@@ -1,0 +1,59 @@
+{
+  "title": "Amazon CloudFront to Amazon S3",
+  "description": "CloudFront to S3 to serve a static site",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how can you deploy a MKDOCS site to S3 with CloudFront.",
+      "CloudFront executes a function when receiving a request from the viewer and appends index.html to each request for proper routing.",
+      "S3 hosts the HTML files generated from the MKDOCS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/Mdsite/MdsiteStack.cs"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "CloudFront",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+      },
+      {
+        "text": "Simple Storage Service - S3",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "You can test the solution by accessing the CloudFront distribution domain using a web browser."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "In the source folder, from the command line enter:",
+      "<code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "srcsakthivel",
+      "twitter": "srcsakthivel"
+    }
+  ]
+}

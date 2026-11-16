@@ -1,0 +1,64 @@
+{
+  "title": "Notify AWS AppSync subscribers",
+  "description": "Notify AWS AppSync subscribers of external database updates.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In working with AppSync, one of the common patterns is publishing “out-of-band” database updates to subscribers. An “out-of-band” update occurs when some system alters data independent of an AppSync mutation.",
+      "This pattern shows how to notify AWS AppSync subscribers of external database updates that aren't performed by client-side mutations.",
+      "The demonstration of this pattern consists of 3 parts - see the repo for more details."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "1-http/template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Notify AWS AppSync subscribers of external database updates not performed by client-side mutations",
+        "link": "https://aws.amazon.com/premiumsupport/knowledge-center/appsync-notify-subscribers-real-time/"
+      },
+      {
+        "text": "Simplify out of band AWS AppSync real-time subscriptions with Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/mobile/appsync-eventbridge/"
+      },
+      {
+        "text": "Using multiple authorization types with AWS AppSync GraphQL APIs",
+        "link": "https://aws.amazon.com/blogs/mobile/using-multiple-authorization-types-with-aws-appsync-graphql-apis/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy -g --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Andrii Sorochan",
+      "bio": "Andrii is Developer from Ukraine",
+      "image": "https://avatars.githubusercontent.com/u/14042193?s=400&u=2235702adbb77bb75e67ecbc850a17863eca3687&v=4",
+      "twitter": "s_andriy_"
+    }
+  ]
+}

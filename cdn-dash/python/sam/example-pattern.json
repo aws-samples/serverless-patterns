@@ -1,0 +1,55 @@
+{
+  "title": "Custom metrics for Amazon API Gateway",
+  "description": "Generates custom metrics for all custom domains in a given region",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Lambda function that scans the custom domain names and their API mappings in a region. The function then creates a custom metrics namespace in CloudWatch metrics for 200, 4xx and 5xx errors. The metric data points get populated for the requests that comes in to the APIs/CDN post creation of the custom namespace."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Publish Custom Metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "bio": "Cloud Engineer @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4",
+      "linkedin": "abha-tripathi-344a0a146"
+    },
+    {
+      "name": "Sushir V R",
+      "bio": "Cloud Engineer @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/42473846?s=400&u=4c7b19858e4ec3d9ae24e379c35848219ee57a86&v=4",
+      "linkedin": "sushirvr"
+    }
+  ]
+}

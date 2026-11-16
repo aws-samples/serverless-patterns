@@ -1,0 +1,48 @@
+{
+  "title": "AWS Lambda with Amazon Bedrock response streaming",
+  "description": "Create a Lambda function that invokes a Bedrock model with response streaming.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to write a Lambda function that exposes a function URL, uses the Bedrock InvokeModelWithResponseStreamCommand API, and streams the response back to the API client."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configuring a Lambda function to stream responses",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModelWithResponseStream API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy -g"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/heeki-park.json"
+  ]
+}

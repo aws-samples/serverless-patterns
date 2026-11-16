@@ -1,0 +1,57 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda to Amazon Bedrock",
+  "description": "Make a request to Bedrock via API Gateway using Java and CDK",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon API Gateway receives the HTTP POST request containing the prompt.",
+      "AWS Lambda is triggered by API Gateway, this function sends the prompt to Amazon Bedrock with the Converse API in the AWS SDK for Java. It calls Anthropic Claude Haiku 5.5 through the global cross-Region inference profile, with a fixed output token limit for simplicity.",
+      "Based on the given prompt, Anthropic Claude Haiku 5.5 in Amazon Bedrock generates the content and returns the response to Lambda.",
+      "Lambda processes the Bedrock output and sends it back to the user via the API Gateway."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "infrastructure/src/main/java/com/example/InfrastructureApp.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock Model Access",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html"
+      },
+      {
+        "text": "Carry out a conversation with the Converse API operations",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Grzegorz Kozub",
+      "bio": "Cloud Application Architect working at AWS Professional Services.",
+      "image": "https://drive.google.com/file/d/1eo1_Zx4gIgmQO1cupdfUJbkxjEpC7NYJ/view?usp=sharing",
+      "linkedin": "kozubgrzegorz",
+      "twitter": "kozubg"
+    }
+  ]
+}

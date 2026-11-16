@@ -1,0 +1,63 @@
+{
+  "title": "AppConfig Feature Flag",
+  "description": "Read the status from Appconfig Application using Lambda Extension",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to implement a feture flag into AppConfig using AWS CDK.",
+      "Also how to use of AppConfig Lambda Extension to retrieve the status of a Feature Flag."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/app-config-feature-flag-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppConfig",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html"
+      },
+      {
+        "text": "AppConfig Feature Flags",
+        "link": "https://aws.amazon.com/blogs/mt/using-aws-appconfig-feature-flags/"
+      },
+      {
+        "text": "AppConfig Lambda Extension",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.html"
+      },
+      {
+        "text": "AppConfig region specific Lambda Extension versions",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions-versions.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all --parameters appConfigExtensionArn='AppConfig Extension version ARN'"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destory --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusisast.",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "linkedin": "pubudusj",
+      "twitter": "pubudusj"
+    }
+  ]
+}

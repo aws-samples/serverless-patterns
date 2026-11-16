@@ -1,0 +1,71 @@
+{
+  "title": "Invoke an AWS Step Functions workflow from AWS Lambda",
+  "description": "The pattern creates a Lambda function, and a Step Functions workflow, a Log group and the IAM resources required to run the application.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A Lambda function uses the AWS SDK to asyncronously invoke the Step Functionsworkflow, passing the event body. The Step Functionsworkflow showcasing the different States."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "text": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "text": "Terraform AWS Step Functions module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-step-functions/"
+      },
+      {
+        "text": "Terraform AWS Step Functions examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-step-functions//tree/master/examples"
+      },
+      {
+        "text": "AWS Step Functions Developer Guide",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "linkedin": "antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

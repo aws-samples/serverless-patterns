@@ -1,0 +1,58 @@
+{
+  "title": "AI data analyst with Amazon Bedrock and Amazon Bedrock AgentCore Code Interpreter",
+  "description": "Amazon API Gateway + AWS Lambda + Amazon Bedrock generates Python code from questions, Amazon Bedrock AgentCore Code Interpreter executes it safely.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "apigw-lambda-bedrock-code-interpreter",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A user submits a data analysis question in natural language via the Amazon API Gateway REST API.",
+      "The AWS Lambda function sends the question to Amazon Bedrock, which generates Python code to answer it.",
+      "The generated code is executed in Amazon Bedrock AgentCore Code Interpreter — a sandboxed environment with no access to the host system.",
+      "Results are returned to the user along with the generated code for transparency."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/apigw-lambda-bedrock-code-interpreter-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock AgentCore Code Interpreter documentation",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/code-interpreter.html"
+      },
+      {
+        "text": "Amazon Bedrock InvokeModel API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}

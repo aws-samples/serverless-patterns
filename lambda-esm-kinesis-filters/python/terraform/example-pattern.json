@@ -1,0 +1,52 @@
+{
+  "title": "AWS Lambda from Amazon Kinesis Data Stream",
+  "description": "Filter Kinesis Data Stream events so only a subset is sent to a Lambda function for processing, using Event Source Mapping.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a new Amazon Kinesis Data Stream with two AWS Lambda functions that subscribe to the stream with different filter settings.",
+      "This way it demonstrate how various filtering settings affect which Amazon Kinesis Data Stream events are sent to each AWS Lambda function for processing."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Event Source Mapping for Lambda from Amazon Kinesis Data Stream (Terraform)",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>terraform destroy</code>",
+      "<code>terraform show</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Naresh Rajaram",
+      "bio": "Cloud Infrastructure Architect, AWS",
+      "linkedin": "naresh-rajaram-25bb106"
+    }
+  ]
+}

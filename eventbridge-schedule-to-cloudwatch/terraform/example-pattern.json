@@ -1,0 +1,54 @@
+{
+  "title": "Amazon EventBridge Scheduler to Amazon CloudWatch",
+  "description": "Use EventBridge Scheduler to insert custom metric data into CloudWatch on a schedule",
+  "language": "Integration",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon EventBridge Scheduler to publish your own metrics to CloudWatch on a schedule. This pattern leverages templated targets with EventBridge Scheduler to talk directly to CloudWatch using the PutEvents API operation.",
+      "This pattern deploys an EventBridge Schedule and the required IAM resource for Scheduler to interact with CloudWatch."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/scheduler.html"
+      },
+      {
+        "text": "Publish custom metrics to Amazon CloudWatch",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ian Lodge",
+      "bio": "Ian is a Solutions Architect at Amazon Web Services based in the US.",
+      "image": "https://avatars.githubusercontent.com/u/135351711?v=4",
+      "linkedin": "ian-lodge"
+    }
+  ]
+}

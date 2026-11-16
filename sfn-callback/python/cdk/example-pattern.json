@@ -1,0 +1,54 @@
+{
+  "title": "AWS Step Functions to Amazon SQS with callback",
+  "description": "Create an AWS Step Functions workflow with a callback.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Step Functions workflow has one task which will send a message to the SQS queue and waits for a token to be sent back.",
+      "The message contains the input of the task and a token. The Lambda function is used to call to Step Functions API with the token.",
+      "Between the SQS queue and the Lambda function, there could an external service that consumes the message from the SQS queue and calls the Lambda function with the token."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "step_function_callback/step_function_callback_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Integrating AWS Step Functions callbacks and external systems",
+        "link": "https://aws.amazon.com/blogs/compute/integrating-aws-step-functions-callbacks-and-external-systems/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/corneliu-croitoru.json"
+  ]
+}

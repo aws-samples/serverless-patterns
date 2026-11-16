@@ -1,0 +1,52 @@
+{
+  "title": "AWS AppSync to Amazon Bedrock",
+  "description": "Create a AppSync API to interact with Bedrock models.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "In this pattern the end user is able to provide a prompt that will be used to invoke an Amazon Bedrock model using an AppSync JS resolver."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/backend-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AppSync HTTP resolvers",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/tutorial-http-resolvers.html"
+      },
+      {
+        "text": "Amazon Bedrock - Generative AI",
+        "link": "https://aws.amazon.com/bedrock/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm run deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "<code>npm run test</code>"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Gabriele Biagini",
+      "bio": "Solutions Architect @ AWS",
+      "linkedin": "gbiagini97"
+    }
+  ]
+}

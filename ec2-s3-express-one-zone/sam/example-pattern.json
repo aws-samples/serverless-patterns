@@ -1,0 +1,56 @@
+{
+  "title": "Amazon EC2 to Amazon S3 Express One Zone directory bucket",
+  "description": "SAM Template that creates an EC2 Instance, an Amazon S3 Express One Zone directory bucket, and required IAM Role to access the bucket from the instance.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "S3 Express One Zone is the first S3 storage class that gives you the option to co-locate high-performance object storage and AWS compute resources, such as Amazon Elastic Compute Cloud, Amazon Elastic Kubernetes Service, and Amazon Elastic Container Service, within a single Availability Zone.",
+      "This pattern provisions both the Amazon EC2 instance and the S3 Express One Zone Directory bucket within same Availability Zone. It performs read and write opertations from the directory bucket from within the EC2 instance and outside.",
+      "Access to the directory bucket from the EC2 instance is provided through IAM Role associated with the instance profile."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon S3 Express One Zone User Guide",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-one-zone.html"
+      },
+      {
+        "text": "AWS CLI Command Refernece",
+        "link": "https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 bucket content: <code>aws s3 rm s3://{BucketExpressOneZoneName} --recursive</code> --region {my-region}",
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

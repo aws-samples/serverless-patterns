@@ -1,0 +1,65 @@
+{
+  "title": "Amazon API Gateway REST API to AWS Lambda function and AWS Translate and Amazon Polly",
+  "description": "Creates an Amazon API Gateway REST API and an AWS Lambda function that calls AWS Translate and Amazon Polly.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "API Gateway REST API is integrated to AWS Lambda function which calls AWS Translate and Amazon Polly services."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Serverless Application Model",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html"
+      },
+      {
+        "text": "Amazon Translate",
+        "link": "https://aws.amazon.com/translate/"
+      },
+      {
+        "text": "Amazon Translate Languages",
+        "link": "https://docs.aws.amazon.com/translate/latest/dg/pairs.html"
+      },
+      {
+        "text": "Amazon Polly",
+        "link": "https://aws.amazon.com/polly/"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://aws.amazon.com/s3/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sudheer Yalamanchili",
+      "bio": "Sudheer is a Cloud Application Architect at AWS ProServ.",
+      "image": "./sudheer.jpg",
+      "linkedin": "sudheeryalamanchili"
+    }
+  ]
+}

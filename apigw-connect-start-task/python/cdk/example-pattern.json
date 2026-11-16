@@ -1,0 +1,58 @@
+{
+  "title": "Amazon API Gateway REST API to Amazon Connect Task",
+  "description": "Create an API Gateway REST API that integrates with an Amazon Connect Task.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project demonstrates integration with Amazon Connect by invoking API Gateway endpoints. Many Amazon Connect customers want to invoke ad-hoc tasks for their agents. These contact center agents can then perform subsequent tasks based on the actions listed."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk_apigw_connect_start_task/cdk_apigw_connect_start_task_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Solutions Construct for Amazon Connect",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_connect/README.html"
+      },
+      {
+        "text": "AWS Solutions construct for API Gateway",
+        "link": "https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_apigatewayv2.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing notes."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sai Kotagiri",
+      "bio": "Sai Kotagiri is a Partner Solutions Architect at Amazon Web Services based in New York metropolitan area. Sai has over 20 years of experience focusing on digital transformation and IT strategy",
+      "image": "link-to-your-photo.jpg",
+      "linkedin": "sai-diwakar-kotagiri-1251928"
+    }
+  ]
+}

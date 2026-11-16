@@ -1,0 +1,56 @@
+{
+  "title": "Sends events from Amazon DynamoDB Streams to Amazon SQS using Amazon EventBridge Pipes",
+  "description": "Serverless pattern that sends events from DynamoDB Stream to SQS using EventBridge Pipes. Implemented with serverless framework",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "Serverless Framework",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This serverless pattern demonstrates how to send events from DynamoDB Stream to SQS using EventBridge Pipes.",
+      "Filters are configured on the pipe and matched events are enriched using AWS Lambda. The Lambda function logs information about the event before sending the event to the pipe target (SQS queue).",
+      "Filters and enrichment stages are optional and can be configured."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "AWS EventBridge Pipes",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      },
+      {
+        "text": "serverless-pipes - Serverless Framework plugin",
+        "link": "https://www.npmjs.com/package/serverless-pipes"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "serverless deploy --verbose"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>serverless remove --verbose</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anjali Modi",
+      "bio": "Anjali Modi is a Senior Software Engineer, passionate for developing Serverless solutions at Distinction-Dev, India",
+      "image": "https://en.gravatar.com/userimage/147444966/1aad7adb8eca7d94a2f25dbe079bec81.jpeg?size=256",
+      "linkedin": "anjali-modi-068045119"
+    }
+  ]
+}

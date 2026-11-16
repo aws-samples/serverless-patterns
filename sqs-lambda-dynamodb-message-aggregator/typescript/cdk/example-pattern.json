@@ -1,0 +1,52 @@
+{
+  "title": "Message Aggregator with Amazon SQS, AWS Lambda and Amazon DynamoDB",
+  "description": "Creates a Lambda function that groups and tracks messages using DynamoDB. Once messages are aggregated a new message is raised on a destination SQS queue.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project demonstrate how to create a Message Aggregator pattern using Amazon SQS, AWS Lambda and Amazon DynamoDB.",
+      "The solution creates a source and a destination SQS Queue and a Lambda function that keeps track of the messages by leveraging a DynamoDB Table.",
+      "This architecture is an implementation of the Integration pattern: Message Aggregator explained in the Integration Patterns book."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/src-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Message Aggregator Pattern",
+        "link": "https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Raffaele Garofalo (Raf)",
+      "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Community).",
+      "image": "https://avatars.githubusercontent.com/raffaeu",
+      "linkedin": "raffaeu",
+      "twitter": "raffaeu"
+    }
+  ]
+}

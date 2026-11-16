@@ -1,0 +1,21 @@
+{
+  "name": "lambda-cloudwatch-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "lambda-cloudwatch-cdk": "bin/lambda-cloudwatch-cdk.js"
+  },
+  "scripts": {
+    "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
+    "cdk": "cdk",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.1143.0",
+    "jest": "^26.4.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.1144.0",
+    "aws-cdk-lib": "^2.271.0",
+    "constructs": "^10.0.0"
+  }
+}

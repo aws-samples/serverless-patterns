@@ -1,0 +1,62 @@
+{
+  "title": "Amazon Data Firehose data transformation with AWS Lambda",
+  "description": "Transform incoming source data and deliver the transformed data to S3.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to transform streaming data received by Amazon Data Firehose using AWS Lambda before delivering the transformed data to Amazon S3.",
+      "To transform incoming source data, Amazon Data Firehose invokes the specified Lambda function asynchronously with each buffered batch using the AWS Lambda synchronous invocation mode. The transformed data is sent from Lambda to Amazon Data Firehose. Amazon Data Firehose then sends it to the destination S3 bucket when the specified destination buffering size or buffering interval is reached, whichever happens first."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/firehose-lambda-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Data Firehose Data Transformation",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/data-transformation.html"
+      },
+      {
+        "text": "Using AWS Lambda with Amazon Data Firehose",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/services-kinesisfirehose.html"
+      },
+      {
+        "text": "Ingesting enriched IoT data into Amazon S3 using Amazon Data Firehose",
+        "link": "https://aws.amazon.com/blogs/iot/ingesting-enriched-iot-data-into-amazon-s3-using-amazon-kinesis-data-firehose/"
+      },
+      {
+        "text": "Capture clickstream data using AWS serverless services",
+        "link": "https://aws.amazon.com/blogs/industries/capture-clickstream-data-using-aws-serverless-services/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Edward Schaefer",
+      "bio": "Solutions Architect @ Amazon Web Services",
+      "image": "https://d2siip5gg18ho0.cloudfront.net/images/schaeedw-photo-centered_250x250.jpg",
+      "linkedin": "ejschaefer"
+    }
+  ]
+}

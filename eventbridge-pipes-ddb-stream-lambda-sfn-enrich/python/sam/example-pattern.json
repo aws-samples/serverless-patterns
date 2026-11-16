@@ -1,0 +1,53 @@
+{
+  "title": "Amazon DynamoDB Stream to AWS Lambda with Step FunctionsEvent Enrichment",
+  "description": "This pattern triggers a Lambda function from a DynamoDB Stream with Step functions enrichment in between them using EventBridge Pipes.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "DynamoDB Streams events are sent to Step Functionsworkflow, the workflow enriches the event and forwards them onto the Lambda function"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sayan Moitra",
+      "bio": "Sayan is a Solutions Architect at Amazon Web Services based in India.",
+      "image": "./smoitra.png",
+      "linkedin": "sayanmoitra"
+    }
+  ]
+}

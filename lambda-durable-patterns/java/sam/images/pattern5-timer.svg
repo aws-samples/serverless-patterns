@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="Amazon Ember, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#232F3E"/>
+      <stop offset="100%" style="stop-color:#37475A"/>
+    </linearGradient>
+    <linearGradient id="stepGrad5" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#F7F7F7"/>
+    </linearGradient>
+    <filter id="shadow5" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrow5" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="520" fill="#FAFAFA" rx="8"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1100" height="56" fill="url(#headerGrad5)" rx="8"/>
+  <rect x="0" y="28" width="1100" height="28" fill="url(#headerGrad5)"/>
+  <text x="24" y="36" fill="#FFFFFF" font-size="18" font-weight="bold">Pattern 5: Timer / Scheduled Delays</text>
+  <text x="340" y="36" fill="#FF9900" font-size="18" font-weight="bold"> | </text>
+  <text x="360" y="36" fill="#D5DBDB" font-size="14">Durable waits with zero compute charges</text>
+
+  <!-- Main flow timeline -->
+  <!-- Step 1: Create Task -->
+  <rect x="30" y="80" width="130" height="65" fill="url(#stepGrad5)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow5)"/>
+  <rect x="30" y="80" width="130" height="22" fill="#1B660F" rx="6"/>
+  <rect x="30" y="94" width="130" height="8" fill="#1B660F"/>
+  <text x="52" y="95" fill="#FFF" font-size="10" font-weight="bold">create-task</text>
+  <text x="43" y="114" fill="#16191F" font-size="9">Create escalation task</text>
+  <text x="43" y="127" fill="#16191F" font-size="9">Record creation time</text>
+
+  <!-- Arrow -->
+  <line x1="160" y1="112" x2="185" y2="112" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- Step 2: Send Initial Notification -->
+  <rect x="190" y="80" width="140" height="65" fill="url(#stepGrad5)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow5)"/>
+  <rect x="190" y="80" width="140" height="22" fill="#1B660F" rx="6"/>
+  <rect x="190" y="94" width="140" height="8" fill="#1B660F"/>
+  <text x="200" y="95" fill="#FFF" font-size="9" font-weight="bold">send-initial-notification</text>
+  <text x="203" y="114" fill="#16191F" font-size="9">Notify assignee</text>
+  <text x="203" y="127" fill="#16191F" font-size="9">Start escalation timer</text>
+
+  <!-- Arrow to wait 30s -->
+  <line x1="330" y1="112" x2="355" y2="112" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- WAIT 30s -->
+  <rect x="360" y="90" width="100" height="45" fill="#FFF3E0" stroke="#FF9900" stroke-width="2" rx="6"/>
+  <text x="377" y="109" fill="#FF9900" font-size="10" font-weight="bold">SUSPENDED</text>
+  <text x="384" y="124" fill="#FF9900" font-size="9">wait(30s)</text>
+
+  <!-- Arrow -->
+  <line x1="460" y1="112" x2="485" y2="112" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- Step 3: Send First Reminder -->
+  <rect x="490" y="80" width="140" height="65" fill="url(#stepGrad5)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow5)"/>
+  <rect x="490" y="80" width="140" height="22" fill="#1B660F" rx="6"/>
+  <rect x="490" y="94" width="140" height="8" fill="#1B660F"/>
+  <text x="502" y="95" fill="#FFF" font-size="9" font-weight="bold">send-first-reminder</text>
+  <text x="503" y="114" fill="#16191F" font-size="9">Remind assignee</text>
+  <text x="503" y="127" fill="#16191F" font-size="9">Warning: escalation soon</text>
+
+  <!-- Arrow to wait 60s -->
+  <line x1="630" y1="112" x2="655" y2="112" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- WAIT 60s -->
+  <rect x="660" y="90" width="100" height="45" fill="#FFF3E0" stroke="#FF9900" stroke-width="2" rx="6"/>
+  <text x="677" y="109" fill="#FF9900" font-size="10" font-weight="bold">SUSPENDED</text>
+  <text x="684" y="124" fill="#FF9900" font-size="9">wait(60s)</text>
+
+  <!-- Arrow -->
+  <line x1="760" y1="112" x2="785" y2="112" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- Step 4: Escalate to Manager -->
+  <rect x="790" y="80" width="140" height="65" fill="url(#stepGrad5)" stroke="#D5DBDB" stroke-width="1.5" rx="6" filter="url(#shadow5)"/>
+  <rect x="790" y="80" width="140" height="22" fill="#1B660F" rx="6"/>
+  <rect x="790" y="94" width="140" height="8" fill="#1B660F"/>
+  <text x="800" y="95" fill="#FFF" font-size="9" font-weight="bold">escalate-to-manager</text>
+  <text x="803" y="114" fill="#16191F" font-size="9">Notify manager</text>
+  <text x="803" y="127" fill="#16191F" font-size="9">Mark as escalated</text>
+
+  <!-- Arrow down to parallel section -->
+  <line x1="860" y1="145" x2="860" y2="170" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- Parallel section -->
+  <rect x="700" y="175" width="370" height="80" fill="#FFF" stroke="#3F8624" stroke-width="2" rx="8" filter="url(#shadow5)"/>
+  <rect x="700" y="175" width="370" height="24" fill="#3F8624" rx="8"/>
+  <rect x="700" y="191" width="370" height="8" fill="#3F8624"/>
+  <text x="720" y="192" fill="#FFF" font-size="10" font-weight="bold">Parallel: waitAsync(5s) + stepAsync(final-processing)</text>
+
+  <rect x="720" y="210" width="130" height="32" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="4"/>
+  <text x="740" y="231" fill="#FF9900" font-size="9">waitAsync(5s)</text>
+
+  <rect x="870" y="210" width="180" height="32" fill="url(#stepGrad5)" stroke="#D5DBDB" stroke-width="1" rx="4"/>
+  <text x="888" y="231" fill="#16191F" font-size="9">stepAsync: final-processing</text>
+
+  <!-- Arrow to ESCALATED -->
+  <line x1="885" y1="255" x2="885" y2="275" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrow5)"/>
+
+  <!-- ESCALATED badge -->
+  <rect x="840" y="280" width="100" height="28" fill="#FFF3E0" stroke="#FF9900" stroke-width="1.5" rx="14"/>
+  <text x="856" y="298" fill="#FF9900" font-size="11" font-weight="bold">ESCALATED</text>
+
+  <!-- Key Concept Box -->
+  <rect x="30" y="330" width="1040" height="170" fill="#FFF" stroke="#D5DBDB" stroke-width="1" rx="6" filter="url(#shadow5)"/>
+  <rect x="30" y="330" width="1040" height="30" fill="#232F3E" rx="6"/>
+  <rect x="30" y="348" width="1040" height="12" fill="#232F3E"/>
+  <text x="50" y="350" fill="#FF9900" font-size="12" font-weight="bold">Key Concept: Zero-Cost Durable Timers</text>
+
+  <text x="50" y="380" fill="#16191F" font-size="11">During wait() periods, the execution is fully suspended. No Lambda compute is consumed.</text>
+  <text x="50" y="398" fill="#16191F" font-size="11">The function resumes precisely when the timer fires - whether 30 seconds or 30 days later.</text>
+
+  <!-- Timeline showing cost -->
+  <text x="50" y="425" fill="#232F3E" font-size="10" font-weight="bold">Execution Timeline:</text>
+
+  <rect x="50" y="435" width="60" height="16" fill="#1B660F" rx="2"/>
+  <text x="56" y="447" fill="#FFF" font-size="7">~100ms</text>
+
+  <rect x="110" y="435" width="150" height="16" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="2"/>
+  <text x="145" y="447" fill="#FF9900" font-size="7" font-weight="bold">wait(30s) - $0</text>
+
+  <rect x="260" y="435" width="60" height="16" fill="#1B660F" rx="2"/>
+  <text x="266" y="447" fill="#FFF" font-size="7">~100ms</text>
+
+  <rect x="320" y="435" width="220" height="16" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="2"/>
+  <text x="385" y="447" fill="#FF9900" font-size="7" font-weight="bold">wait(60s) - $0</text>
+
+  <rect x="540" y="435" width="60" height="16" fill="#1B660F" rx="2"/>
+  <text x="546" y="447" fill="#FFF" font-size="7">~100ms</text>
+
+  <rect x="600" y="435" width="100" height="16" fill="#FFF3E0" stroke="#FF9900" stroke-width="1" rx="2"/>
+  <text x="617" y="447" fill="#FF9900" font-size="7" font-weight="bold">wait(5s) - $0</text>
+
+  <rect x="700" y="435" width="60" height="16" fill="#1B660F" rx="2"/>
+  <text x="706" y="447" fill="#FFF" font-size="7">~100ms</text>
+
+  <!-- Total cost summary -->
+  <text x="50" y="475" fill="#687078" font-size="10" font-style="italic">Total billed compute: ~400ms | Total elapsed time: ~95 seconds | Cost savings vs continuous execution: 99.6%</text>
+
+  <!-- Zero compute callout -->
+  <rect x="800" y="460" width="260" height="22" fill="#E8F5E9" stroke="#1B660F" stroke-width="1" rx="4"/>
+  <text x="815" y="475" fill="#1B660F" font-size="9" font-weight="bold">Zero compute charges during all wait() periods</text>
+</svg>

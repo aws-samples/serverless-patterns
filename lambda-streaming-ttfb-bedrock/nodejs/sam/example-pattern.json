@@ -1,0 +1,54 @@
+{
+  "title": "Streaming response with Amazon Bedrock and AWS Lambda function URLs",
+  "description": "Create an LLM streaming response API with Lambda Function URLs.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an Lambda Function URL streaming ability and Bedrock runtime `InvokeModelWithResponseStreamCommand` to build an LLM response streaming API.",
+      "This pattern deploys a Lambda Function. Since Bedrock access is limited to certain Regions, user must set BEDROCK_AWS_ACCESS_KEY_ID and BEDROCK_AWS_SECRET_ACCESS_KEY environment variables for the Lambda Function to allow request across Regions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing AWS Lambda response streaming",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-aws-lambda-response-streaming/"
+      },
+      {
+        "text": "Configure Lambda Function Response Streaming",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ian Chenyang Zhao",
+      "bio": "https://github.com/randomradio",
+      "image": "https://media.licdn.com/media/AAYQAQSOAAgAAQAAAAAAAB-zrMZEDXI2T62PSuT6kpB6qg.png",
+      "linkedin": "ianchenyangzhao"
+    }
+  ]
+}

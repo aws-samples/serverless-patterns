@@ -1,0 +1,55 @@
+{
+  "title": "Amazon CloudFront to AWS Lambda Function URL",
+  "description": "CloudFront to Lambda URL",
+  "language": "Rust",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon CloudFront distribution on front of an AWS Lambda function URL."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. In the source folder, from the command line enter:",
+      "<code>sam delete</code>",
+      "2. See additional notes in the repo."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Daniele Frasca",
+      "bio": "I am Daniele Frasca serverless enthusiast. I build and architect serverless applications at scale.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-daniele-frasca.jpg",
+      "linkedin": "daniele-frasca",
+      "twitter": "dfrasca80"
+    }
+  ]
+}

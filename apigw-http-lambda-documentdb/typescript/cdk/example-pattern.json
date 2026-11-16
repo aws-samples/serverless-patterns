@@ -1,0 +1,53 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda to Amazon DocumentDB ",
+  "description": "Create an Amazon API Gateway HTTP API to invoke a Lambda function to read and write to DocumentDB.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This AWS CDK stack deploys an API Gateway HTTP API that integrates with a Lambda function and a DocumentDB cluster. The Lambda function is configured to use a customer VPC to connect to the DocumentDB cluster. The Lambda function implements CRUD operations on the database."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/apigw-http-lambda-documentdb-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "DocumentDB documentation",
+        "link": "https://docs.aws.amazon.com/documentdb/latest/developerguide/"
+      },
+      {
+        "text": "Lambda documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joachim Aumann",
+      "bio": "I am a Sr. Solutions Architect working at AWS",
+      "image": "./joaumann.jpg",
+      "linkedin": "joachim-aumann"
+    }
+  ]
+}

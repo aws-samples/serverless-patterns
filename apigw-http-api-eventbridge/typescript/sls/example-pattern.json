@@ -1,0 +1,56 @@
+{
+  "title": "Amazon API Gateway HTTP API to Amazon EventBridge",
+  "description": "Create an HTTP API endpoint that directly integrates with Amazon EventBridge",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "Serverless Framework",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Storage first integrations",
+        "link": "https://aws.amazon.com/blogs/compute/building-storage-first-applications-with-http-apis-service-integrations/"
+      },
+      {
+        "text": "Serverless Framework documentation",
+        "link": "https://www.serverless.com/framework/docs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "serverless deploy --verbose"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing in the README.md file in the repo"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>serverless remove --verbose</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dmitry Gulin",
+      "bio": "Dmitry is a modernization architect for Professional Services at Amazon Web Services based in the US.",
+      "image": "https://www.gravatar.com/avatar/223055bd132d244f6a96c3aef7453a5a?s=200"
+    }
+  ]
+}

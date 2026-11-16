@@ -1,0 +1,53 @@
+{
+  "title": "Amazon S3 to Amazon SQS to AWS Lambda",
+  "description": "Create a Lambda function that resizes images uploaded to S3 via SQS.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template contains all the information to deploy AWS resources(one S3 bucket, one SQS queue and one Lambda function) and also the permission required by these service to communicate.",
+      "You will be able to create and delete the CloudFormation stack using the CLI commands.",
+      "The S3 will send notifications to an SQS queue when .png objects are deleted. The SQS will trigger and invoke a Lambda function which will display the object deleted as events.",
+      "This is fully functional example implemented in Java 25."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Building resilient serverless patterns by combining messaging services",
+        "link": "https://aws.amazon.com/blogs/compute/building-resilient-no-code-serverless-patterns-by-combining-messaging-services/"
+      },
+      {
+        "text": "S3-to-Lambda serverless applications",
+        "link": "https://github.com/aws-samples/s3-to-lambda-patterns"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided --capabilities CAPABILITY_IAM"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/razvan-minciuna.json"
+  ]
+}

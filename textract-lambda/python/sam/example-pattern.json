@@ -1,0 +1,63 @@
+{
+  "title": "Automatic Text Detection with Amazon Textract",
+  "description": "An event-driven workflow to automatically detect and store text found within pdf files by leveraging Amazon Textract, AWS Lambda, and Amazon DynamoDB.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to deliver an event-driven architecture to detect text within pdf files, while storing the results in Amazon DynamoDB.",
+      "Upon an object creation in the S3 bucket, a Lambda function is invoked, which initiates Amazon Textracts's DetectDocumentText function. Textract returns the results to the Lambda function which stores this information in the DynamoDB table.",
+      "This pattern deploys 1 S3 bucket, 1 Lambda Function, and 1 DynamoDB Table."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Simple Storage Service (S3)",
+        "link": "https://aws.amazon.com/s3/"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon Textract",
+        "link": "https://aws.amazon.com/textract/"
+      },
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://aws.amazon.com/dynamodb/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: sam delete"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jack Le Bon",
+      "bio": "AWS Solutions Architect",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-jack-le-bon.jpg",
+      "linkedin": "jack-le-bon"
+    }
+  ]
+}

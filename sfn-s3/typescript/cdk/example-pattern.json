@@ -1,0 +1,48 @@
+{
+  "title": "AWS Step Functions to Amazon S3 in CDK",
+  "description": "Create a Step Functions workflow that puts the object to an S3 bucket.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Step Functions workflow that publishes a file to an S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/sfn-s3-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Harshitha Shashidhar",
+      "bio": "Harshitha Shashidhar is an Cloud Application architect who loves to build the serverless applications at scale.",
+      "image": "../assets/images/resources/harshihs.jpg"
+    }
+  ]
+}

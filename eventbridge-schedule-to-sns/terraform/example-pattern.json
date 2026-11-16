@@ -1,0 +1,55 @@
+{
+  "title": "Amazon EventBridge Scheduler to send messages to Amazon SNS",
+  "description": "Simple pattern that publishes a message to an SNS topic every 5 minutes",
+  "language": "Integration",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample pattern demonstrates how to send a message to an Amazon SNS topic every 5 minutes using EventBridge Scheduler and deployed using the AWS CDK for Python."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Getting started with Amazon SNS",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-getting-started.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Makendran G",
+      "bio": "Cloud Support Engineer @ AWS",
+      "image": "https://drive.google.com/file/d/1mUObnbmn52UWL-Zn39EpgpneiBNv3LCN/view?usp=sharing",
+      "linkedin": "makendran",
+      "twitter": "MakendranG"
+    }
+  ]
+}

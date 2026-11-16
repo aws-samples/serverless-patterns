@@ -1,0 +1,41 @@
+{
+  "title": "AWS Lambda to Amazon SNS",
+  "description": "Publish events to a SNS topic.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Serverless Framework",
+  "introBox": {
+    "headline": "Create a Lambda function that sends events to a SNS topic.",
+    "text": [
+      "The Serverless template deploys a SNS topic and a Lambda function that has permission to publish events to the topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {},
+  "deploy": {
+    "text": [
+      "serverless deploy --verbose"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>serverless remove --verbose</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alex Nelson",
+      "bio": "Senior Solutions Architect, AWS"
+    }
+  ]
+}

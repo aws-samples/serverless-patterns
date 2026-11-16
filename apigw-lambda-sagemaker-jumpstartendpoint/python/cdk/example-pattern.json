@@ -1,0 +1,54 @@
+{
+  "title": "Amazon SageMaker endpoint via Amazon API Gateway and AWS Lambda",
+  "description": "Deploys a SageMaker Jumpstart model endpoint and an API Gateway endpoint.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The model deployed in this pattern can be changed by modifying the MODEL_ID attribute in app.py file.",
+      "The API Gateway is protected using an API Key. To query the API Gateway endpoint, x-api-key header needs to be added to the HTTP request."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "stack/ApigwLambdaSagemakerJumpstartendpointStack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Zero-shot prompting for the Flan-T5 foundation model in Amazon SageMaker JumpStart",
+        "link": "https://aws.amazon.com/blogs/machine-learning/zero-shot-prompting-for-the-flan-t5-foundation-model-in-amazon-sagemaker-jumpstart/"
+      },
+      {
+        "text": "Instruction fine-tuning for FLAN T5 XL with Amazon SageMaker Jumpstart",
+        "link": "https://aws.amazon.com/blogs/machine-learning/instruction-fine-tuning-for-flan-t5-xl-with-amazon-sagemaker-jumpstart/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kaustav Dey",
+      "bio": "Solution Architect at AWS",
+      "image": "https://avatars.githubusercontent.com/u/13236519",
+      "linkedin": "kaustavbecs"
+    }
+  ]
+}

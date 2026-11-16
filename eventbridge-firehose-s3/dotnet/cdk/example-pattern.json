@@ -1,0 +1,62 @@
+{
+  "title": "Amazon EventBridge to Amazon Data Firehose Delivery Stream to Amazon S3",
+  "description": "Apply Firehose DynamicPartitioningConfiguration to parse the input message to extract department value to use it to create S3 partition",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When a user sends a message to an EventBridge bus, the message is routed by an EventBridge rule based on 'DetailType'.",
+      "The 'Detail' field value from the message is sent to Firehose delivery stream.",
+      "Once the message reaches the Firehose delivery stream, it is processed by JsonParsingEngine to read the 'Department' field value, this value used for the S3 prefix.",
+      "After message processing, the message is delivred to an S3 bucket by following calculated S3 prefix based on 'Department' field value."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Data Firehose Delivery Stream",
+        "link": "https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html"
+      },
+      {
+        "text": "Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-get-started.html"
+      },
+      {
+        "text": "Amazon S3",
+        "link": "https://aws.amazon.com/s3/?nc=sn&loc=0"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy EventBridgeFirehoseS3Stack"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send message to EventBridge by using command at project root level - aws events put-events --entries file://SampleEvent.json",
+      "Navigate to S3 bucket created by CDK and confirm message has saved at path {department}/{event message file}",
+      "Please note: Firehose delivery stream buffer is configured for 60secs (default time), so please wait for 1-2 mins after event send command to get the message in S3 bucket"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: cdk destroy EventBridgeFirehoseS3Stack",
+      "Confirm the stack has been deleted: aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'EventBridgeFirehoseS3Stack')].StackStatus\""
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vikramsinha Patil",
+      "bio": "Cloud Application Architect at AWS",
+      "linkedin": "vikramsinha-patil-834a4b2b"
+    }
+  ]
+}

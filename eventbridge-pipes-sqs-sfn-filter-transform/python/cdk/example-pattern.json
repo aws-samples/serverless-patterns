@@ -1,0 +1,51 @@
+{
+  "title": "Amazon SQS to AWS Step Functions via Amazon EventBridge Pipes filter",
+  "description": "Amazon EventBridge Pipe that filters and transforms messages from Amazon SQS to AWS Step Functions.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The pattern will create an Amazon SQS queue, an AWS Step Functions workflow and an Amazon EventBridge Pipe.",
+      "Sending messages to the Amazon SQS queue triggers the pipe to start the AWS Step Functions workflow execution.",
+      "SQS messages are filtered and transformed before sending to Step Functions."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/cdkstack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Eventbridge Pipes filter and transformation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manikandan Karimanal",
+      "bio": "Solution Architect at AWS",
+      "image": "https://drive.google.com/file/d/16r4jGGMpPhu4Igez-lzstIe-L5nJVMxf/view",
+      "linkedin": "manikandanks"
+    }
+  ]
+}

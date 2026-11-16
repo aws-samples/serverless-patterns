@@ -1,0 +1,79 @@
+{
+  "title": "Amazon SQS Queue to AWS Lambda",
+  "description": "This pattern creates an Amazon SQS Queue, AWS Lambda function and setup event sourcing from the Queue to the Lambda function.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform (with modules)",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon SQS Queue, AWS Lambda function and setup event sourcing from the Queue to the Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Terraform AWS Lambda module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda"
+      },
+      {
+        "text": "Terraform AWS Lambda examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples"
+      },
+      {
+        "text": "Terraform AWS Lambda event source mapping examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-lambda/tree/master/examples/event-source-mapping"
+      },
+      {
+        "text": "Terraform AWS SQS module",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-sqs"
+      },
+      {
+        "text": "Terraform AWS SQS examples",
+        "link": "https://github.com/terraform-aws-modules/terraform-aws-sqs/tree/master/examples"
+      },
+      {
+        "text": "Lambda event source mappings",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+      },
+      {
+        "text": "Amazon SQS Developer Guide",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+      },
+      {
+        "text": "AWS Lambda Developer Guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform apply --auto-approve"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anton Babenko",
+      "bio": "AWS Hero, Terraform influencer, maintainer of Terraform AWS Modules, creator of serverless.tf, weekly.tf, modules.tf, and some more.",
+      "image": "https://avatars.githubusercontent.com/u/393243",
+      "linkedin": "antonbabenko",
+      "twitter": "antonbabenko"
+    }
+  ]
+}

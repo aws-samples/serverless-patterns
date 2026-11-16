@@ -1,0 +1,53 @@
+{
+  "title": "AWS Step Functions to Amazon SQS",
+  "description": "Create an AWS Step Functions workflow to integrate with Amazon SQS.",
+  "language": "Python",
+  "level": "100",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK application deploys a Step Functions workflow, that takes in a payload and sends part of it to an Amazon SQS. In this pattern, the state machine does not wait for a callback from the queue. The application contains the minimum IAM resources required to run the workflow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "sfn_sqs_cdk/sfn_sqs_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Synchronous Express Workflows for AWS Step Functions",
+        "link": "https://aws.amazon.com/blogs/compute/new-synchronous-express-workflows-for-aws-step-functions/"
+      },
+      {
+        "text": "Contact form processing with Synchronous Express Workflows",
+        "link": "https://github.com/aws-samples/contact-form-processing-with-synchronous-express-workflows"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>npx cdk destroy</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. You see a message confirming DELETE_COMPLETE."
+    ]
+  },
+  "contributors": [
+    "content/contributors/revanth-anireddy.json"
+  ]
+}

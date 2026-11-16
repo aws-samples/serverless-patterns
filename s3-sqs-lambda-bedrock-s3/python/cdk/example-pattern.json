@@ -1,0 +1,59 @@
+{
+  "title": "GenAI conversation summarization using Amazon S3, Amazon SQS, AWS Lambda, and Amazon Bedrock",
+  "description": "Summarize a conversation transcription using Amazon S3 events, Amazon SQS, AWS Lambda and Amazon Bedrock. Ideal for conversation summaries.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon S3 bucket that sends 'OBJECT_CREATED' events to an SQS queue.",
+      "An AWS Lambda function receives the messages from the queue and invokes Amazon Bedrock to extract a summary and sentiment from the file.",
+      "The result is stored in a different S3 bucket for consumption.",
+      "This setup is particularly useful for obtaining a summary of conversations between customers and support associates."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "s3_sqs_lambda_bedrock_s3_cdk_python/s3_sqs_lambda_bedrock_s3_cdk_python_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with the AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+      },
+      {
+        "text": "Using an amazon S3 trigger to invoke a Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Amazon Bedrock: Text summarization",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-evaluation-tasks-text-summary.html"
+      },
+      {
+        "text": "Create summaries of recordings using generative AI with Amazon Bedrock and Amazon Transcribe",
+        "link": "https://aws.amazon.com/blogs/machine-learning/create-summaries-of-recordings-using-generative-ai-with-amazon-bedrock-and-amazon-transcribe/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/dinesh-balaaji-prabakaran.json"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "title": "Amazon CloudWatch Logs Subscription to AWS Lambda",
+  "description": "Create a CloudWatch Logs subscription to a Lambda function",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a log subscription in Cloudwath Logs, Lambda as a log receiver.",
+      "Using filter rules, we can control the logs that sends to Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/cloudwatch-logs-subscription-lambda-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CloudWatch Log subscription",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html"
+      },
+      {
+        "text": "CloudWatch subscription filters for Lambda",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html#LambdaFunctionExample"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --all"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --all</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "linkedin": "pubudusj",
+      "twitter": "pubudusj"
+    }
+  ]
+}

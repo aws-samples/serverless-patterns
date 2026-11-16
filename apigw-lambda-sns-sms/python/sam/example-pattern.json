@@ -1,0 +1,54 @@
+{
+  "title": "Amazon SNS SMS via Amazon API Gateway and AWS Lambda",
+  "description": "Validate phone number and send SMS from SNS via API Gateway and Lambda",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern shows an example how a phone number can be validated and how a SMS message can be send using SNS APIs via API Gateway and Lambda deployed using AWS SAM."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Publish Message SNS",
+        "link": "https://docs.aws.amazon.com/sns/latest/api/API_Publish.html"
+      },
+      {
+        "text": "Phone number validate",
+        "link": "https://docs.aws.amazon.com/pinpoint/latest/apireference/phone-number-validate.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sahil Malhotra",
+      "bio": "Serverless enthusiast",
+      "image": "https://drive.google.com/file/d/1h1WM-m_gKNdeEKsBLcy3byJun2R6d28o/view",
+      "linkedin": "smalhotraa",
+      "twitter": "twitterhandle"
+    }
+  ]
+}

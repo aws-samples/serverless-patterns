@@ -1,0 +1,53 @@
+{
+  "title": "Content-based message router with Amazon SNS and Amazon SQS filters",
+  "description": "Create an SNS topic that filters content using a set of SQS queues based on configurable critiria.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This CDK project showcases the creation of a message content-based routing pattern using Amazon SNS and Amazon SQS.",
+      "The stackconfiguration.json file dynamically defines the number of queues and filters, allowing easy adaptation for specific requirements.",
+      "The architecture follows the Content-based message router integration pattern as described in the Integration Patterns book.",
+      "Content can be filtered based on attributes or message body, providing complete flexibility."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/src-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon SNS subscription filter policies",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-subscription-filter-policies.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Raffaele Garofalo (Raf)",
+      "bio": "Raffaele Garofalo (Raf) is a Senior Solutions Architect at AWS and member of the AWS Serverless TFC (Technical Field Communities).",
+      "image": "https://avatars.githubusercontent.com/raffaeu",
+      "linkedin": "raffaeu",
+      "twitter": "raffaeu"
+    }
+  ]
+}

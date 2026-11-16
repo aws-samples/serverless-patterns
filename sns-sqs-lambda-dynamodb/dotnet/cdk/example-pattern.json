@@ -1,0 +1,43 @@
+{
+  "title": "Serverless Data Enrichment Pipeline with Persistence",
+  "description": "This pattern helps you deploy a CDK stack with SNS, SQS, Lambda and DynamoDB. ",
+  "language": ".NET",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The pattern uses these AWS services to create a serverless data enrichment pipeline with persistence of data in SQS. The Lambda functions are used to consume data from SQS queues, perform enrichment, and update DynamoDB tables. The enriched data is further sent to another SQS queue.",
+      "Data Pipeline Stack #1, relay the raw message from SNS to DynamoDB.",
+      "Data Pipeline Stack #2, relay the enrich message from SNS and route it to DynamoDB & SQS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/Datapipeline/CrossStackProp.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "srcsakthivel",
+      "twitter": "srcsakthivel"
+    }
+  ]
+}

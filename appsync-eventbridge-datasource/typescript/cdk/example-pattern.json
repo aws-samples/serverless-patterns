@@ -1,0 +1,54 @@
+{
+  "title": "Appsync to Amazon EventBridge using Appsync Datasource",
+  "description": "This pattern connects AppSync to EventBridge directly using AppSync Datasource",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to integrate Amazon EventBridge with AWS Appsync.",
+      "AWS AppSync can publish events to EventBridge as a datasource. It uses resolver functions for the requests and responses to create the custom events.",
+      "This pattern deploys one AWS Appsync API, one custom EventBus, and one AppSync Javascript resolver function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/appsync-eventbridge-datasource-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "AWS AppSync GraphQL APIs Supports JavaScript Resolvers",
+        "link": "https://aws.amazon.com/blogs/aws/aws-appsync-graphql-apis-supports-javascript-resolvers/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shankar Srinivasan",
+      "bio": "I am a Cloud Application Architect at AWS. I specialize in architecting and developing serverless, event-driven solutions on AWS.",
+      "linkedin": "shankar-srinivasan-3863a110"
+    }
+  ]
+}

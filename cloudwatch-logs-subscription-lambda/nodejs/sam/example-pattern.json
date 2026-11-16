@@ -1,0 +1,51 @@
+{
+  "title": "Amazon CloudWatch Logs Subscription to AWS Lambda with AWS SAM",
+  "description": "Create a CloudWatch Logs Subscription Filter to Lambda function with SAM",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a Subscription Filter in Cloudwath Logs with Lambda as a log receiver.",
+      "The AWS SAM template deploys the resources and the IAM permissions required to run the application."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "CloudWatch Logs Subscription Filters",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Omar Rosadio",
+      "bio": "Cloud Engineer / AWS Community Builder in Serverless category.",
+      "image": "https://avatars.githubusercontent.com/u/10565035",
+      "linkedin": "omaralonsorosadioportilla",
+      "twitter": "omarrosadio"
+    }
+  ]
+}

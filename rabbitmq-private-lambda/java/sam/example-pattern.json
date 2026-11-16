@@ -1,0 +1,63 @@
+{
+  "title": "AWS Lambda function subscribed to an Amazon MQ - RabbitMQ in private subnets (Java)",
+  "description": "Creates a Lambda function that uses a private Amazon MQ (RabbitMQ) as an event source.",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides a Lambda function along with an Event Source Mapping to an Amazon MQ (RabbitMQ) queue.",
+      "The CloudFormation template provided in this pattern installs an Amazon MQ (RabbitMQ) Cluster in private subnets in a VPC.",
+      "For detailed deployment instructions instructions see the README.md"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "rabbitmq_consumer_dynamo_sam/template_original.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configuring Amazon MQ event source for Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/process-mq-messages-with-lambda.html"
+      },
+      {
+        "text": "Using Lambda with Amazon MQ",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html"
+      },
+      {
+        "text": "Amazon MQ resource type reference",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/AWS_AmazonMQ.html"
+      },
+      {
+        "text": "HTTP API Reference",
+        "link": "https://www.rabbitmq.com/docs/http-api-reference"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the template: <code>sam delete</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/indranil-banerjee.json",
+    "content/contributors/arghya-banerjee.json",
+    "content/contributors/kunal-ghosh.json",
+    "content/contributors/angelo-spagnolo.json",
+    "content/contributors/vinayak-datar.json",
+    "content/contributors/greg-medard.json"
+  ]
+}

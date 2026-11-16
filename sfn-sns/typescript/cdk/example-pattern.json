@@ -1,0 +1,59 @@
+{
+  "title": "AWS Step Functions to Amazon SNS",
+  "description": "Creates a Step Functions workflow that waits before sending an SNS message.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Step Functions receive an execution using the `start-execution` api command with the the message {\"waitMilliseconds\" : <time-in-milliseconds>} in the input payload.",
+      "First the state machine calls a Lambda function to convert milliseconds to seconds.",
+      "The state machine will then enter a \"Wait\" state based on the configuration.",
+      "After the wait is complete a message is sent to SNS."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/sfn-sns-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with the AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+      },
+      {
+        "text": "Setup SNS topic",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html"
+      },
+      {
+        "text": "Call Amazon SNS with AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sns.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abdullah Bashatah",
+      "bio": "Cloud Support Engineer @ AWS.",
+      "linkedin": "abdullah-bashatah-92429aba"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "title": "AWS Step Functions to AWS Lambda or Amazon ECS",
+  "description": "Create a Step Functions workflow to invoke either a Lambda function or ECS Fargate task.",
+  "language": "Python",
+  "level": "400",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When a new file is uploaded to the S3 Bucket, the Step Functions workflow is invoked to process the file. Based on the file type, the Step Functions workflow will invoke either the Lambda function for image jobs or the Fargate task for video jobs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": []
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Eric Johnson",
+      "bio": "Eric Johnson is a Principal Developer Advocate for Serverless Applications at Amazon Web Services and is based in Northern Colorado. Eric is a fanatic about serverless and enjoys helping developers understand how serverless technologies introduce a major paradigm shift in how they approach building and running applications at massive scale with minimal administration overhead. Prior to this, Eric has worked as a developer, solutions architect and AWS Evangelist for an AWS partner company.",
+      "image": "https://serverlessland.com/assets/images/resources/ericdj.jpg",
+      "linkedin": "singledigit",
+      "twitter": "edjgeek"
+    }
+  ]
+}

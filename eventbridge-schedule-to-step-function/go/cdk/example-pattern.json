@@ -1,0 +1,61 @@
+{
+  "title": "Amazon EventBridge schedule triggers Step Functionswith CDK Go",
+  "description": "EventBridge Scheduler that triggers a new Step Functionsexecution every hour.",
+  "language": "Go",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Pattern that starts an execution of a Step Functionsstate machine at the beginning of every hour using EventBridge Scheduler with CDK/Go."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/main.go"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      },
+      {
+        "text": "Scheduler Documentation for CDK v2 Go",
+        "link": "https://pkg.go.dev/github.com/aws/aws-cdk-go/awscdk/awsscheduler"
+      },
+      {
+        "text": "Working with the AWS CDK in Go",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-go.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "André Stoll",
+      "bio": "André is a Solutions Architect at Amazon Web Services based in Switzerland.",
+      "image": "https://user-images.githubusercontent.com/44157083/231747014-89cb4bc7-d977-45c8-be01-007831d346ad.jpeg",
+      "linkedin": "andre-stoll"
+    }
+  ]
+}

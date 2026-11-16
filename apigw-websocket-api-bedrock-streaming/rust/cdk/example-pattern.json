@@ -1,0 +1,62 @@
+{
+  "title": "Streaming Amazon Bedrock response with Amazon API Gateway",
+  "description": "Stream an Amazon Bedrock LLM response with API Gateway WebSocket API and AWS Lambda function .",
+  "language": "Rust",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern establishes a WebSocket connection to Amazon API Gateway. When requests are made to this API, API Gateway routes them to an AWS Lambda function.",
+      "The Lambda function then initiates a streaming request to Amazon Bedrock using the ConverseStream API. This allows the response from the LLM in Bedrock to start streaming back to the Lambda function as soon as generation begins, without waiting for the entire response to be ready."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/bedrock-streamer-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with WebSocket APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+      },
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/bedrock/"
+      },
+      {
+        "text": "Cloud Development Kit",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/home.html"
+      },
+      {
+        "text": "AWS SDK for Rust",
+        "link": "https://aws.amazon.com/sdk-for-rust/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Phil Callister",
+      "bio": "I'm an Enterprise Solutions Architect at AWS, with a focus on Financial Services. As a passionate builder, I enjoy helping customers create innovative solutions to achieve their business objectives.",
+      "image": "https://media.licdn.com/dms/image/v2/D5603AQHElNV-QFIGQw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1725218566874?e=1735171200&v=beta&t=gr82L1aMjvNX8CZn1Nitg3fViTUYoPK_xnXNc8CdohQ",
+      "linkedin": "philcallister"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "title": "Amazon API Gateway HTTP API to AWS Lambda to RDS Proxy",
+  "description": "Create an HTTP API endpoint that calls a Lambda function to RDS Proxy.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Sets up an API Gateway HTTP API endpoint with an AWS Lambda function as an integration. The Lambda function integrates with RDS Proxy to query the RDS Aurora (MySQL) relational database."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Storage first integrations",
+        "link": "https://aws.amazon.com/blogs/compute/building-storage-first-applications-with-http-apis-service-integrations/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing in the README.md file in the repo"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/pankaj-agrawal.json"
+  ]
+}

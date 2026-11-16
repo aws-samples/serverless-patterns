@@ -1,0 +1,72 @@
+{
+  "title": "Amazon EventBridge pipes targets IoT Core topic",
+  "description": "Create an EventBridge pipe that publishes data to an IoT Core topic",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use an Amazon EventBridge pipe to publish data to an AWS IoT Core Topic. This pattern leverages the native integration between the following services: DynamoDB streams, EventBridge pipes, API Gateway, and IoT Core.",
+      "This pattern deploys one DynamoDB table, one EventBridge pipe, and one API Gateway REST API."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Pipes Documentation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-source.html"
+      },
+      {
+        "text": "CloudFormation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs"
+      },
+      {
+        "text": "AWS IoT HTTPS",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/http.html"
+      },
+      {
+        "text": "AWS Solutions Constructs for API Gateway integration to IoT Core",
+        "link": "https://github.com/awslabs/aws-solutions-constructs/tree/58e726ff2050a4d6ff4734a6b556e1f81d97e9aa/source/patterns/%40aws-solutions-constructs/aws-apigateway-iot"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Mohamad Soufan",
+      "bio": "Mohamad is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Networking. (Majd's twin brother)",
+      "image": "https://pbs.twimg.com/profile_images/1467593280896450562/jRZ4fMWb_400x400.jpg",
+      "twitter": "MohamadSoufan4"
+    },
+    {
+      "name": "Majd Soufan",
+      "bio": "Majd is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Database. (Mohamad's twin brother)",
+      "image": "https://pbs.twimg.com/profile_images/1467263476473090048/JmklQbC8_400x400.jpg",
+      "twitter": "Majd95RF"
+    }
+  ]
+}

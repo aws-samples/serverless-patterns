@@ -1,0 +1,54 @@
+{
+  "title": "Amazon Reshift Data API with Amazon API Gateway and AWS Lambda",
+  "description": "Access data from Redshift with API Gateway, Lambda and Redshift Data API",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates  how to expose data from Redshift through API using API Gateway, Lambda and Redshift Data API.",
+      "Implemented in CDK."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "apigw_lambda_redshiftdataapi_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Redshift Data API",
+        "link": "https://docs.aws.amazon.com/redshift/latest/mgmt/data-api.html"
+      },
+      {
+        "text": "API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk deploy --app \"python3 apigw_lambda_redshiftdataapi_stack.py\"</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Muthu Kumar",
+      "bio": "AWS Solutions Architect. Serverless advocate and enthusiast.",
+      "image": "https://avatars.githubusercontent.com/u/51725180",
+      "linkedin": "klmuthu"
+    }
+  ]
+}

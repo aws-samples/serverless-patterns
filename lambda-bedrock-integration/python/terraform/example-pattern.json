@@ -1,0 +1,57 @@
+{
+  "title": "Integrate AWS Lambda with Amazon Bedrock",
+  "description": "Deploy a Lambda function that sends prompts to Anthropic Claude in Amazon Bedrock with the Converse API.",
+  "language": "Python",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern builds a container image, pushes it to Amazon ECR and deploys it as an AWS Lambda function in your VPC.",
+      "The function sends the prompt it receives to Anthropic Claude Haiku 5.5 with the Amazon Bedrock Converse API, through the global cross-Region inference profile, and returns the answer.",
+      "Set the bedrock_foundation_model variable to use another model that has a global inference profile."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Set up the Amazon Bedrock API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/api-setup.html"
+      },
+      {
+        "text": "Carry out a conversation with the Converse API operations",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy",
+      "terraform show"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nitin Jain",
+      "bio": "Sr. Solution Architect, AWS",
+      "linkedin": "annjay"
+    }
+  ]
+}

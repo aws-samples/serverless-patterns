@@ -1,0 +1,7 @@
+{
+  "orderId": "ORD-TEST-001",
+  "customerId": "CUST-001",
+  "customerEmail": "test@example.com",
+  "totalAmount": 299.99,
+  "shippingAddress": "123 Main St, Seattle, WA 98101"
+}

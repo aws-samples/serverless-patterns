@@ -1,0 +1,54 @@
+{
+  "title": "ActiveMQ to AWS Lambda",
+  "description": "ActiveMQ broker with Lambda as an event source",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template deploys a new ActiveMQ Broker and uses it as an event source for AWS Lambda. The Lambda function employs the OpenWire protocol to establish a connection with ActiveMQ.",
+      "Lambda uses Openwire protocol to connect with ActiveMQ"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using Amazon MQ as an event source for AWS Lambda",
+        "link": "https://aws.amazon.com/blogs/compute/using-amazon-mq-as-an-event-source-for-aws-lambda/"
+      },
+      {
+        "text": "Using Lambda with Amazon MQ",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pushparaju Thangavel",
+      "bio": "Pushparaju is a Cloud Infrastructure Architect with Amazon Web Services",
+      "image": "./Pushparaju.jpeg",
+      "linkedin": "pushparaju-thangavel"
+    }
+  ]
+}

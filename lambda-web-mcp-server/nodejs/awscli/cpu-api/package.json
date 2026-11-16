@@ -1,0 +1,12 @@
+{
+  "name": "lambda-web-mcp-server-cpu-api",
+  "version": "1.0.0",
+  "description": "HTTP API that streams CPU work progress, protected by IamAuth on AWS Lambda Web Functions",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "license": "MIT-0"
+}

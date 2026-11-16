@@ -1,0 +1,56 @@
+{
+  "title": "AWS Lambda with alias and version",
+  "description": "Create a lambda function with an alias and a version",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates a Lambda function with an alias 'dev' associated with the latest version of the function.",
+      "The inline code is written in the template. For every update on the CloudFormation stack: the function's code and the version description need to be updated to trigger the changeset and create a new version."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda function versions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html"
+      },
+      {
+        "text": "Lambda function aliases",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Go to the function and run it.",
+      "To create a new version, you need to UPDATE the stack with: a change in the function's code and a new version description",
+      "Then upon update, the alias 'dev' will be associated with the latest version"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alice Goumain",
+      "bio": "Cloud Support Engineer in Serverless @ AWS",
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "linkedin": "alice-goumain"
+    }
+  ]
+}

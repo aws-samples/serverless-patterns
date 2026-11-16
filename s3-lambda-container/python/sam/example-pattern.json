@@ -1,0 +1,55 @@
+{
+  "title": "Deploy AWS Lambda functions with container image",
+  "description": "This sample project demonstrates how to deploy an AWS Lambda function with a container image that gets triggered when a new object is created in an Amazon S3 bucket",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When a file is uploaded to a specific Amazon S3 bucket. The create object event from S3 triggers the AWS Lambda function. The Lambda function uses a container image instead of a zip file. The function reads the content of the file uploaded into the S3 bucket."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with Lambda container images",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/images-create.html"
+      },
+      {
+        "text": "Deploy Python Lambda functions with container images",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/python-image.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "bash build.sh",
+      "sam deploy -g"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the Amazon S3 email bucket content: <code>aws s3 rm s3://{SampleFunction} --recursive --region {your-region}</code>",
+      "Delete the resources deployed to your AWS account via AWS SAM: <code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

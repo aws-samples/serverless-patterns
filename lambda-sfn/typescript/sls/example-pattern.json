@@ -1,0 +1,58 @@
+{
+  "title": "AWS Lambda to AWS Step Functions",
+  "description": "Invoke an AWS Step Functions workflow from AWS Lambda, with logging enabled",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "Serverless Framework",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Serverless Framework template deploys a Lambda function, a Step Functions Express workflow, a Log group and the IAM resources required to run the application. A Lambda function uses the AWS SDK to asyncronously invoke the Express workflow, passing the event body as a string. The Express Workflow results are logged in Amazon CloudWatch Logs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Tutorial: Using AWS Lambda with Amazon S3",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Blog Series: Building scalable serverless applications with Amazon S3 and AWS Lambda.",
+        "link": "https://aws.amazon.com/blogs/compute/building-scalable-serverless-applications-with-amazon-s3-and-aws-lambda/"
+      },
+      {
+        "text": "Serverless Framework documentation",
+        "link": "https://www.serverless.com/framework/docs"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "serverless deploy --verbose"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Run the following Lambda CLI invoke command to invoke the function. Note, you must edit the {LambdaProxyArn} placeholder with the ARN of the deployed Lambda function. This is provided in the stack outputs.",
+      "<code>aws lambda invoke --function-name {LambdaProxyArn} --invocation-type Event --payload '{ \"IsHelloWorldExample\": \"Hello\" }' response.json --cli-binary-format raw-in-base64-out</code>"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>serverless remove --verbose</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/dmitry-gulin.json"
+  ]
+}

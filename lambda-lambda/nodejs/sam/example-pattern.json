@@ -1,0 +1,54 @@
+{
+  "title": "AWS Lambda to AWS Lambda",
+  "description": "Create Lambda function that asychronously sends invocation results to another Lambda function.",
+  "language": "Node.js",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This template deploys Lambda function that aynchronously sends its invocation results to another Lambda function. In this example, Lambda event destinations is used to send the invocation results on failure.",
+      "The event destination section of the <code>AWS::Serverless::Function</code>  also sets up the required permissions for downstream Lambda invocatipon to invoke a specific function."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Introducing AWS Lambda Destinations",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-aws-lambda-destinations/"
+      },
+      {
+        "text": "Controls for Managing Events in Serverless Applications - AWS Online Tech Talks",
+        "link": "https://www.youtube.com/watch?v=rMXQGKAiBqI"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/benjamin-smith.json"
+  ]
+}

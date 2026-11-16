@@ -1,0 +1,50 @@
+{
+  "title": "Amazon DynamoDB Streams to AWS Lambda to Amazon DynamoDB",
+  "description": "Copy data from source to target DynamoDB tables.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon DynamoDB is being used by thousands of customers globally to build the mission-critical business applications due to various benefits such as scalability, reliability, low latency, high durability etc.",
+      "While leveraging a DynamoDB database, customers come across many scenarios where they want to copy data from one DynamoDB table to another at near real-time. This pattern addresses that use-case.",
+      "You'll learn how you can leverage .NET based CDK application along-with Lambda function and DynamoDB streams to move data between source and target DynamoDB tables."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pankaj Rawat",
+      "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+      "linkedin": "pankaj-rawat-14568765",
+      "twitter": "pankajrawat333"
+    },
+    {
+      "name": "Vijai Anand Ramalingam",
+      "bio": "Vijai Anand Ramalingam ia an Application Developer - ISV at Amazon Web Services",
+      "image": "https://avatars.githubusercontent.com/u/83067978?v=4",
+      "linkedin": "vijai-anand-ramalingam-77439736"
+    }
+  ]
+}

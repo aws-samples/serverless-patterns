@@ -1,0 +1,53 @@
+{
+  "title": "Amazon S3 to AWS Lambda to Amazon Polly",
+  "description": "Automating Text-to-Speech with Lambda and S3 Triggers",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern provides an AWS Cloud Development Kit (AWS CDK) template that deploys a Lambda function triggered by the creation of an S3 object. The Lambda function starts an Amazon Polly task and stores the generated results in another S3 bucket. The deployment includes one Lambda function and two S3 buckets."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "pattern/amazon_polly_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using an Amazon S3 trigger to invoke a Lambda function",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html"
+      },
+      {
+        "text": "Guidelines and quotas - Amazon Polly",
+        "link": "https://docs.aws.amazon.com/polly/latest/dg/limits.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kranthi Kiran A",
+      "bio": "Kranthi is an Associate Cloud Developer with Amazon Web Services",
+      "image": "https://media.licdn.com/dms/image/C5603AQGMzL2iVESvpA/profile-displayphoto-shrink_400_400/0/1662286284377?e=1691020800&v=beta&t=p7litfMASeNBNU-Xeb7bpl5WD8KoWrlVd3Azl3_q1bg",
+      "linkedin": "akkiran003"
+    }
+  ]
+}

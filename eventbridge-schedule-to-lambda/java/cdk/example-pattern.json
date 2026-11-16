@@ -1,0 +1,50 @@
+{
+  "title": "Amazon EventBridge Schedule to AWS Lambda",
+  "description": "Creates an EventBridge schedule to run a Lambda every 5 minutes",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This project demonstrates how to use Amazon EventBridge Scheduler with Lambda to invoke a function on a schedule. This pattern uses the rate type schedule to run the Lambda function every 5 minutes.",
+      "This deploys one EventBridge rate based schedule and one Java 25 based Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/main/java/com/myorg/CdkSchedulerStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Scheduler Types",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kurt Tometich",
+      "bio": "Kurt is a Sr. Solutions Architect based in Colorado who enjoys building lean, mean serverless solutions.",
+      "image": "https://drive.google.com/uc?export=view&id=16K9snJRzXYTI7O0nYbzrKVYP58xOxciB",
+      "linkedin": "kurt-tometich"
+    }
+  ]
+}

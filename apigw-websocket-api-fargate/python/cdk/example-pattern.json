@@ -1,0 +1,54 @@
+{
+  "title": "WebSocket API integration with ALB and Amazon ECS",
+  "description": "Creates a WebSocket API and integrates with ECS Fargate using ALB.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project integrates a WebSocket API with ALB and Amazon ECS Fargate.",
+      "A WebSocket client connects to the API endpoint url using the default route. Using http integration, API Gateway communicates with ALB which invokes a Fargate task. The Fargate task running FASTAPI framework receives the POST request and communicates back to API Gateway using the connectionId in the request context."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "apigw_websocket_fargate_cdk/apigw_websocket_fargate_cdk_stack.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with WebSocket APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+      },
+      {
+        "text": "Amazon ECS",
+        "link": "https://docs.aws.amazon.com/ecs/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Rajesh Sitaraman",
+      "bio": "Cloud Application Architect @ AWS.",
+      "linkedin": "rajesh.sitaraman",
+      "twitter": "rjesh"
+    }
+  ]
+}

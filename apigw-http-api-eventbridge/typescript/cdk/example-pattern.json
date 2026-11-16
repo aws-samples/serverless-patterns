@@ -1,0 +1,47 @@
+{
+  "title": "Amazon API Gateway HTTP API to Amazon EventBridge",
+  "description": "Create an HTTP API endpoint that directly integrates with Amazon EventBridge",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The CDK project creates an Amazon API Gateway HTTP API endpoint. The endpoint uses service integrations to directly connect to Amazon EventBridge. An EventBridge rule sends all events to CloudWatch Logs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/api-eventbridge-stack.ts"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Storage first integrations",
+        "link": "https://aws.amazon.com/blogs/compute/building-storage-first-applications-with-http-apis-service-integrations/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See testing instructions in the README.md file in the repo"
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/hugo-sterin.json"
+  ]
+}

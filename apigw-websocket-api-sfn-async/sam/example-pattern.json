@@ -1,0 +1,56 @@
+{
+  "title": "Amazon API Gateway WebSocket API to AWS Step Functions Express (Asynchronous Execution)",
+  "description": "Start Step Functions Express Workflow asynchronous execution via WebSocket API",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses Amazon API Gateway WebSocket API and AWS Service integration type with AWS Step Functions workflow as a business logics implementation.",
+      "This approach simplifies architecture by eliminating need to use additional compute components such as AWS Lambda."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Working with WebSocket APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api.html"
+      },
+      {
+        "text": "Extended examples of this pattern implementation",
+        "link": "https://github.com/aws-samples/serverless-samples/tree/main/apigw-ws-integrations"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack: <code>sam delete --stack-name STACK_NAME</code>.",
+      "2. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Giedrius Praspaliauskas",
+      "bio": "Giedrius is a senior solutions architect focusing on serverless at Amazon Web Services based in the US.",
+      "linkedin": "gpraspaliauskas"
+    }
+  ]
+}

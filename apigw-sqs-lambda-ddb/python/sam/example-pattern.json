@@ -1,0 +1,59 @@
+{
+  "title": "Amazon API Gateway to Amazon SQS to AWS Lambda",
+  "description": "This pattern shows how to deploy an AWS SAM application with Amazon API Gateway, Amazon SQS, AWS Lambda, and Amazon DynamoDB.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When an HTTP POST request is made to the API Gateway endpoint, API Gateway authorizes the request by checking Basic auth credentials for valid credentials. To do this, API Gateway calls a Lambda authorizer function that validates the request and returns whether the request is valid or not.",
+      "When the request is accepted, API Gateway forwards the message payload to an SQS queue.",
+      "A new message in the queue triggers a Lambda function. The function consumes events from the queue and inserts the payload into an Amazon DynamoDB table.",
+      "If there is any problem processing the message in the function, SQS has a DLQ (dead letter queue) configured, to which problematic messages are sent."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Authorizers",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+      },
+      {
+        "text": "Amazon SQS dead-letter queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      },
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ravi Kiran Ganji",
+      "bio": "I am a Senior Cloud Application Architect at AWS Professional Services, and Serverless Enthusiast.",
+      "linkedin": "ravi-kiran-ganji"
+    }
+  ]
+}

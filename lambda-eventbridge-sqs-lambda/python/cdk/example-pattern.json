@@ -1,0 +1,56 @@
+{
+  "title": "Create and route events using AWS Lambda, Amazon EventBridge, Amazon SQS",
+  "description": "The pattern sends custom events to EventBridge, routes them using content-based rules to rate-controlled SQS queues and Lambda functions",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This patterns shows CDK deployment for using AWS Lambda, Amazon EventBridge, Amazon SQS to generate and process events."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "app.py"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Reducing custom code by using advanced rules in Amazon EventBridge",
+        "link": "https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/"
+      },
+      {
+        "text": "Use Amazon EventBridge to Build Decoupled, Event-Driven Architectures",
+        "link": "https://serverlessland.com/learn/eventbridge"
+      },
+      {
+        "text": "Configuring maximum concurrency for Amazon SQS event sources",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anagh Lal",
+      "bio": "Anagh Lal is a Senior Solutions Architect at AWS",
+      "linkedin": "anagh-lal-58b7151"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "title": "Amazon SNS to Amazon SQS fanout pattern",
+  "description": "Fanout pattern using Amazon SNS and Amazon SQS. Subscription filters are used to route SNS topics to the the correct SQS queue.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Three SQS queues subscribe to the SNS topic. The topic routing logic is defined through the subscription filter policy.",
+      "The <strong>AllMetricsSqsQueue</strong> queue receives all the messages. The <strong>TemperatureSqsQueue</strong> queue receives <i>Temperature</i> messages and the <strong>HumiditySqsQueue</strong> queue receives <i>Humidity</i> messages."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Common Amazon SNS scenarios",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-common-scenarios.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

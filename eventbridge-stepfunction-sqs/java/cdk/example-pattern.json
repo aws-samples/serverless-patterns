@@ -1,0 +1,53 @@
+{
+  "title": "Amazon EventBridge to AWS Step Functions with Amazon SQS failure",
+  "description": "Step Functions workflow to send failure events to SQS",
+  "language": "Java",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon EventBridge event bus and a AWS Step Functions workflow. The AWS Step Functions workflow executes a Lambda function for business workflow. In this case, invoking the Lambda function results in a 500 error and a message is put onto the SQS queue."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "infrastructure/src/main/java/com/myorg/CdkInfraStack.java"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting started with the AWS CDK",
+        "link": "https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html"
+      },
+      {
+        "text": "Call Amazon SQS with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-sqs.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Dinesh Balaaji Prabakaran",
+      "bio": "I am a Senior Technical Account Manager with AWS, I specialize in architecting and developing serverless, event-driven solutions on AWS. AWS Storage Technical Field Community member.",
+      "image": "https://avatars.githubusercontent.com/u/43818089?s=400&u=8a1e4fabab318016c485049108a2012b760e9ff7&v=4",
+      "linkedin": "pdineshbalaaji"
+    }
+  ]
+}

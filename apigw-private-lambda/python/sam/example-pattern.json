@@ -1,0 +1,57 @@
+{
+  "title": "Amazon API Gateway private API to AWS Lambda",
+  "description": "Create an private API Gateway integrated with Lambda",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway private API with a Lambda integration.",
+      "The AWS Lambda function is written in Python 3.14. The function returns a small message and a status code to the caller.",
+      "The private API can only be invoked from the VPC endpoint defined in its resource policy"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "How to invoke a private API",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-api-test-invoke-url.html"
+      },
+      {
+        "text": "Create an interface VPC endpoint for API Gateway execute-api",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html#apigateway-private-api-create-interface-vpc-endpoint"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "To create the private API you need to already have in your environment : a VPC with an internet gateway, a public subnet with a NAT and an EC2 instance, a Security Group that allows port 443 from anywhere, a VPC Endpoint for execute-api associated with the private subnet, the security group and with Private DNS names ENABLED",
+      "To be able to invoke a private API you need to : Log into an instance that is in the same VPC and subnet as your VPC Endpoint and in the same security group or which security group is allowed to make requests to the Enpoint's security group",
+      "On the instance, open a terminal and execute the curl command with the API URL"
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alice Goumain",
+      "bio": "Cloud Support Engineer for Serverless @ AWS",
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "linkedin": "alice-goumain"
+    }
+  ]
+}

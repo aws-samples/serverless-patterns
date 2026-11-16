@@ -1,0 +1,31 @@
+{
+  "name": "sqs-lambda-dynamo",
+  "version": "0.1.0",
+  "bin": {
+    "sqs-lambda-dynamo": "bin/sqs-lambda-dynamo.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.130",
+    "@types/jest": "^29.5.8",
+    "@types/node": "20.9.0",
+    "aws-cdk": "^2.1148.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "~5.2.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.473.0",
+    "@aws-sdk/client-lambda": "^3.473.0",
+    "@aws-sdk/client-sqs": "^3.473.0",
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1",
+    "source-map-support": "^0.5.21"
+  }
+}

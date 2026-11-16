@@ -1,0 +1,54 @@
+{
+  "title": "Amazon API Gateway to Amazon Kinesis",
+  "description": "Amazon API Gateway proxy for an Amazon Kinesis Data Stream",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API and an Amazon Kinesis Data Stream. The API Gateway endpoint uses a service integration to directly connect to Kinesis Data streams.",
+      "The gateway exposes the GetRecords or PutRecords (including PutRecord) action in Kinesis."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Create a REST API as an Amazon Kinesis proxy in API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html"
+      },
+      {
+        "text": "Kinesis Data Stream API Actions List",
+        "link": "https://docs.aws.amazon.com/kinesis/latest/APIReference/API_Operations.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Vaidehi Patel",
+      "bio": "I'm a Solutions Architect at Amazon Web Services based in Dallas,TX. I'm a serverless enthusiast, I like to build and architect serverless applications",
+      "image": "https://avatars.githubusercontent.com/u/23283229?v=4",
+      "linkedin": "vaidehi-patel08"
+    }
+  ]
+}

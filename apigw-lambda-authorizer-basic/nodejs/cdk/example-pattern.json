@@ -1,0 +1,49 @@
+{
+  "title": "Amazon API Gateway AWS Lambda authorizer for basic HTTP authentication",
+  "description": "API Gateway REST API protected by a Lambda Authorizer supporting basic HTTP authentication.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The Lambda authorizer decodes the credentials provided in the Authorization header. If authorized a policy is returned giving permissions to invoke the downstream Lambda function. If the user is not found a policy is returned denying access to the downstream Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/basic-authorizer-construct.js"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Basic access authentication",
+        "link": "https://en.wikipedia.org/wiki/Basic_access_authentication"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Thiago Pádua",
+      "bio": "Senior Partner Solutions Architect, Serverless at Amazon Web Services (AWS)",
+      "image": "https://cdn.tgpadua.host/tgpadua.jpg",
+      "linkedin": "thiagopadua"
+    }
+  ]
+}

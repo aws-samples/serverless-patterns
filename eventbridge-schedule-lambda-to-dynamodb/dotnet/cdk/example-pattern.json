@@ -1,0 +1,48 @@
+{
+  "title": "Amazon EventBridge to AWS Lambda to Amazon DynamoDB",
+  "description": "This AWS CDK application demonstrates how to Schedule AWS Lambda to add items to DynamoDB.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses .NET as a programming language to create the entire AWS CDK stack."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pankaj Rawat",
+      "bio": "Pankaj Rawat is a Lead Consultant at Amazon Web Services.",
+      "image": "https://avatars.githubusercontent.com/u/21244341?s=96&v=4",
+      "linkedin": "pankaj-rawat-14568765",
+      "twitter": "pankajrawat333"
+    },
+    {
+      "name": "Vijai Anand Ramalingam",
+      "bio": "Vijai Anand Ramalingam ia an Application Developer - ISV at Amazon Web Services",
+      "image": "https://avatars.githubusercontent.com/u/83067978?v=4",
+      "linkedin": "vijai-anand-ramalingam-77439736"
+    }
+  ]
+}

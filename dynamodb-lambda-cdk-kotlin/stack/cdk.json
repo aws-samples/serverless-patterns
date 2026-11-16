@@ -1,7 +1,0 @@
-{
-  "app": "../gradlew :stack:run",
-
-  "context": {
-
-  }
-}

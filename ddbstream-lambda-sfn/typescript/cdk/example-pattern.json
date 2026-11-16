@@ -1,0 +1,65 @@
+{
+  "title": "Amazon DynamoDB Stream to AWS Step Functions Trigger",
+  "description": "Trigger AWS Step Functions workflows in response to changes in DynamoDB tables using a CDK construct that connects DynamoDB and Step Functions.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to automatically trigger AWS Step Functions workflows in response to changes in DynamoDB tables.",
+      "The CDK construct 'DynamoWorkflowTrigger' connects DynamoDB and Step Functions by allowing you to define event handlers that monitor specific changes in your DynamoDB tables.",
+      "It leverages Lambda functions to evaluate conditions and start Step Functions state machines with inputs derived from the DynamoDB events.",
+      "The pattern includes features like dead letter queues, VPC support, custom security groups, and fine-grained event filtering."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "src/lib/ddbstream-lambda-sfn-example-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS DynamoDB Streams Documentation",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+      },
+      {
+        "text": "AWS Step Functions Documentation",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS CDK Documentation",
+        "link": "https://docs.aws.amazon.com/cdk/latest/guide/home.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Avnish Kumar",
+      "bio": "Senior Software Engineer, Amazon Web Services",
+      "image": "https://i.postimg.cc/W1SVxLxR/avnish-profile.jpg",
+      "linkedin": "avnish-kumar-40a54328"
+    },
+    {
+      "name": "Saptarshi Banerjee",
+      "bio": "Senior Solutions Architect, Amazon Web Services",
+      "linkedin": "saptarshi-banerjee-83472679"
+    }
+  ]
+}

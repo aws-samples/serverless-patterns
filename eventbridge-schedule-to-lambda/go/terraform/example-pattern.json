@@ -1,0 +1,48 @@
+{
+  "title": "Amazon EventBridge Scheduler to AWS Lambda",
+  "description": "Creates an EventBridge schedule to invoke a Go based Lambda function every 5 minutes",
+  "language": "Go",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates how to invoke a Go based Lambda function using EventBridge Scheduler and deployed with Terraform."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Getting Started with EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/getting-started.html"
+      },
+      {
+        "text": "Building Lambda functions with Go",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-golang.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>"
+    ]
+  },
+  "contributors": [
+    "content/contributors/tadhg-obrien.json"
+  ]
+}

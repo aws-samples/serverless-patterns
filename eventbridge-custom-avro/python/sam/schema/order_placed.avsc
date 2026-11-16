@@ -1,0 +1,32 @@
+{
+  "type": "record",
+  "name": "OrderPlaced",
+  "namespace": "com.example.orders",
+  "doc": "A rich domain event emitted when a customer places an order.",
+  "fields": [
+    { "name": "orderId", "type": "string", "doc": "Unique order identifier." },
+    { "name": "customerId", "type": "string", "doc": "Identifier of the customer who placed the order." },
+    { "name": "amount", "type": "double", "doc": "Total order amount in the given currency." },
+    { "name": "currency", "type": "string", "doc": "ISO 4217 currency code, e.g. USD." },
+    {
+      "name": "items",
+      "doc": "Line items on the order.",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderItem",
+          "fields": [
+            { "name": "sku", "type": "string", "doc": "Stock keeping unit." },
+            { "name": "qty", "type": "int", "doc": "Quantity ordered." }
+          ]
+        }
+      }
+    },
+    {
+      "name": "placedAt",
+      "doc": "When the order was placed (milliseconds since epoch).",
+      "type": { "type": "long", "logicalType": "timestamp-millis" }
+    }
+  ]
+}

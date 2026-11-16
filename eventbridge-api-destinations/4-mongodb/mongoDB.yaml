@@ -5,14 +5,14 @@ Description: Create an API destination in EventBridge - open API using MongoDB.c
 Parameters:
   MyMongoDBURL:
     Type: String
-    Default: '<<ENTER YOUR UNIQUE URL HERE>>'
+    Description: MongoDB API endpoint URL
   MyAPIKeyName:
     Type: String
-    Default: '<<Enter your APIKeyName>>'
+    Description: Name of the API key header, for example api-key
   MyAPIKeyValue:
     NoEcho: True
     Type: String
-    Default: '<<Enter your APIKeyValue>>' 
+    Description: MongoDB API key
 
 Resources:
   MyEventBus:

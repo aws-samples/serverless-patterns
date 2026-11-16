@@ -1,0 +1,51 @@
+{
+  "title": "Amazon API Gateway REST edge-optimized API to AWS Lambda",
+  "description": "Create an edge-optimized API to AWS Lambda.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway REST Edge-Optimized API with a Lambda integration.",
+      "The AWS Lambda function is written in Python 3.14. The function returns a small message and a status code to the caller."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Edge-optimized API endpoints",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html#api-gateway-api-endpoint-types-edge-optimized"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Once the application is deployed, click on the API URL provided as output.",
+      "You can also make the request from Postman or from a terminal using the curl command."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>aws cloudformation delete-stack --stack-name STACK_NAME</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alice Goumain",
+      "bio": "Cloud Support Engineer at AWS",
+      "image": "https://media.licdn.com/dms/image/C4E03AQFu1xnGt76xzg/profile-displayphoto-shrink_800_800/0/1662636936708?e=1686182400&v=beta&t=9RZra4EtrGWhcWVYZZtP_W9yrUR_XZ9ued70sTnkCgg",
+      "linkedin": "alice-goumain"
+    }
+  ]
+}

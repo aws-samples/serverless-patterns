@@ -1,0 +1,3 @@
+{"Item":{"id":{"S":"item-1"},"name":{"S":"Widget A"},"price":{"N":"9.99"}}}
+{"Item":{"id":{"S":"item-2"},"name":{"S":"Widget B"},"price":{"N":"14.99"}},"ConditionExpression":"attribute_not_exists(id)"}
+{"Item":{"id":{"S":"item-3"},"name":{"S":"Widget C"},"price":{"N":"4.99"}},"ConditionExpression":"attribute_exists(id)"}

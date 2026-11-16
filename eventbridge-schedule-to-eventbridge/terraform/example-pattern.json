@@ -1,0 +1,49 @@
+{
+  "title": "Amazon EventBridge Scheduler to Amazon EventBridge",
+  "description": "Use EventBridge Scheduler to send custom events to EventBridge on a schedule",
+  "language": "Integration",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project shows how to use Amazon EventBridge Scheduler to send custom events to Amazon EventBridge on a schedule. This pattern uses templated targets with EventBridge Scheduler to talk directly to EventBridge using the PutEvents API operation.",
+      "The pattern is deployed using Terraform to create the EventBridge Scheduler, EventBridge bus and rules, as well as the IAM resources required for Scheduler to interact with EventBridge and CloudWatch."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon EventBridge Scheduler",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/scheduler.html"
+      },
+      {
+        "text": "Send custom events to Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>terraform destroy</code>."
+    ]
+  },
+  "contributors": [
+    "content/contributors/ian-lodge.json"
+  ]
+}

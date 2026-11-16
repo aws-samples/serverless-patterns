@@ -1,0 +1,60 @@
+{
+  "title": "Amazon API Gateway HTTP API to AWS Lambda",
+  "description": "Creates an Amazon API Gateway HTTP API and an AWS Lambda function",
+  "language": "Python",
+  "level": "100",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an Amazon API Gateway HTTP API with a default route and basic CORS configuration.",
+      "The default route is integrated with an AWS Lambda function written in Python.",
+      "The function logs the incoming API event (v2) and context object to an Amazon CloudWatch Logs log group and returns basic information about the event to the caller."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "AWS Lambda - the Basics",
+        "link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/aws-lambdathe-basics.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Carlos Bauer",
+      "bio": "I am a Technical Account Manager at AWS"
+    }
+  ]
+}

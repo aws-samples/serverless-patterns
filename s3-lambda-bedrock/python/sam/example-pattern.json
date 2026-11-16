@@ -1,0 +1,53 @@
+{
+  "title": "Amazon S3 to AWS Lambda to Amazon Bedrock",
+  "description": "Generate vector embeddings for the documents uploaded to S3",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an S3 bucket with event notification enabled to invoke a function when there is a new object. The Lambda function is integrated with Bedrock Titan Embedding Model.",
+      "When there is a new object in the S3 bucket, the S3 put request creates an event to the Lambda function that extracts the content from the object and calls Bedrock Titan Embedding Model.",
+      "The function returns the vector embeddings of the document as JSON."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Bedrock",
+        "link": "https://aws.amazon.com/blogs/aws/amazon-bedrock-is-now-generally-available-build-and-scale-generative-ai-applications-with-foundation-models/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abdul Waheed",
+      "bio": "Solutions Architect @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/15647692?v=4",
+      "linkedin": "linked-in-ID",
+      "twitter": "waheed2"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda using OpenAPI",
+  "description": "Create a Lambda backed REST API using OpenAPI specification, with Lambda Powertools",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This Terraform application deploys a Lambda backed Amazon API Gateway REST API using OpenAPI specification. OpenAPI specification YAML is included in the project which defines CRUD endpoints and their Lambda integrations. In addition, as a best practice Lambda Powertools have been incorporated as a layer which provides a structured logging mechanism via Cloudwatch Logs and enchanced end-to-end tracing of the incoming requests via AWS X-Ray."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "infra/main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Powertools for TypeScript",
+        "link": "https://docs.powertools.aws.dev/lambda/typescript/latest/"
+      },
+      {
+        "text": "Integrating X-Ray SDK in Lambda using Powertools",
+        "link": "https://docs.aws.amazon.com/powertools/typescript/latest/features/tracer/"
+      },
+      {
+        "text": "Configuring REST API using OpenAPI",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-import-api.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform -chdir=infra init",
+      "terraform -chdir=infra apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>terraform -chdir=infra destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Damodar Shenvi Wagle",
+      "bio": "Damodar Shenvi Wagle is a Senior Cloud Application Architect at AWS Professional Services.",
+      "image": "https://drive.google.com/file/d/1o-NvTy-Ock12bKOLoMiwyolqizNNMhv8/view?usp=sharing",
+      "linkedin": "damodar-shenvi-wagle-72375548"
+    }
+  ]
+}

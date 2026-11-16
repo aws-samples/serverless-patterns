@@ -1,0 +1,53 @@
+{
+  "title": "AWS AppSync query to Amazon Kendra",
+  "description": "Integrate AppSync, Lambda, and Kendra.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern demonstrates the integration of AppSync, Lambda and Kendra."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync - Accelerate application development with serverless GraphQL and Pub/Sub APIs.",
+        "link": "https://aws.amazon.com/appsync/"
+      },
+      {
+        "text": "Amazon Kendra - Intelligent enterprise search service that helps you search across different content repositories with built-in connectors",
+        "link": "https://aws.amazon.com/pm/kendra/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sayan Moitra",
+      "bio": "Sayan is a Solutions Architect at Amazon Web Services based in India.",
+      "image": "./smoitra.png",
+      "linkedin": "sayanmoitra"
+    }
+  ]
+}

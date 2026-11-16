@@ -1,0 +1,57 @@
+{
+  "title": "Live Streaming on AWS for SRT/Zixi/RIST/RTP FEC input sources",
+  "description": "Creates a live streaming stack using MediaConnect, MediaLive and MediaPackage.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The solution configures AWS Elemental MediaLive with one of three encoding profiles: HD-1080p, HD-720p and SD-540p.",
+      "AWS Elemental MediaPackage ingests the MediaLive Output and package the Live stream into HLS,DASH and CMAF."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/streaming_stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Live Streaming on AWS with Amazon S3",
+        "link": "https://github.com/aws-solutions/live-streaming-on-aws-with-amazon-s3"
+      },
+      {
+        "text": "Live Streaming on AWS",
+        "link": "https://github.com/aws-solutions/live-stream-on-aws"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Corneliu Croitoru",
+      "bio": "Developer at heart, in 2018 joined AWS as a Solution Architect and in 2021 joined EMEA Prototyping Team. Now he is building, jointly with customers, the most exciting and innovative prototypes on AWS. Specialized on Serverless/Edge Services/Media Streaming.",
+      "image": "https://serverlessland.com/assets/images/resources/contributors/ext-corneliu-croitoru.jpg",
+      "linkedin": "corneliucroitoru",
+      "twitter": "cornel_croi"
+    }
+  ]
+}

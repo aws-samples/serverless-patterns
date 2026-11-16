@@ -1,0 +1,59 @@
+{
+  "title": "AWS IoT Core to Amazon S3",
+  "description": "Push events from IoT Core to Amazon S3.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "When message events are sent to a subscribed IoT topic, this event is pushed to S3.",
+      "Please refer to the GitHub repo for the event flow."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS IoT SQL reference",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-sql-reference.html?icmpid=docs_iot_console"
+      },
+      {
+        "text": "AWS IoT rule actions",
+        "link": "https://docs.aws.amazon.com/iot/latest/developerguide/iot-rule-actions.html"
+      },
+      {
+        "text": "CloudFormation - AWS::IoT::TopicRule",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iot-topicrule.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Biswanath Mukherjee",
+      "bio": "I am a Sr. Solutions Architect working at AWS India.",
+      "image": "https://d1rwvjey2iif32.cloudfront.net",
+      "linkedin": "biswanathmukherjee"
+    }
+  ]
+}

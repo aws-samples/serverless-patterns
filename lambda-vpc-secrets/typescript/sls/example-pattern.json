@@ -1,0 +1,59 @@
+{
+  "title": "AWS Lambda function in a VPC",
+  "description": "Create a Lambda Function in a VPC with secure access to Secrets Manager.",
+  "language": "TypeScript",
+  "level": "200",
+  "framework": "Serverless Framework",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create a Lambda function in a VPC and only granting access to Secrets Manager via a VPC endpoint."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "serverless.yml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configuring a Lambda function to access resources in a VPC",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html"
+      },
+      {
+        "text": "Access an AWS service using an interface VPC endpoint",
+        "link": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
+      },
+      {
+        "text": "AWS VPC Configuration with Serverless Framework",
+        "link": "https://www.serverless.com/framework/docs/providers/aws/guide/functions#vpc-configuration"
+      },
+      {
+        "text": "Three ways to use AWS services from a Lambda in a VPC",
+        "link": "https://www.alexdebrie.com/posts/aws-lambda-vpc/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sls deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sls remove</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Wayne Greeley",
+      "bio": "AWS Community Builder"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "title": "Amazon DynamoDB streams with Amazon API Gateway and AWS Lambda",
+  "description": "Saves items to DynamoDB through API Gateway. DynamoDB streams are then used to listen to new items and trigger downstream Lambda function",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon API Gateway, AWS Lambda, Amazon DynamoDB and Kinesis together. When an HTTP POST request is made to the Amazon API Gateway endpoint, the AWS Lambda function is invoked and inserts an item into the Amazon DynamoDB table, then an event will be pushed into Kinesis and trigger a Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "API Gateway to trigger Lambda and save to DynamoDB",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html"
+      },
+      {
+        "text": "DynamoDB to Kinesis",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/kds.html"
+      },
+      {
+        "text": "Kinesis to Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Thi Nguyen",
+      "bio": "Solutions Architect @ AWS",
+      "image": "https://drive.google.com/file/d/188LpzUvUmHt1o7vzbwKw32S-fYabL-qY/view?usp=sharing",
+      "linkedin": "ndthi"
+    },
+    {
+      "name": "Vijay Konade",
+      "bio": "Cloud Support Eng @ AWS",
+      "image": "vijay.png",
+      "linkedin": "vijay-konade-14427479"
+    }
+  ]
+}

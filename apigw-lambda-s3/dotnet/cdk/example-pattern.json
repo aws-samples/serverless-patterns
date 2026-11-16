@@ -1,0 +1,59 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda to Amazon S3",
+  "description": "Create an API Gateway API that fetches a presigned URL from S3 via Lambda.",
+  "language": ".NET",
+  "level": "200",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern helps you to deploy a CDK stack with API Gateway, Lambda, and S3 bucket. For an HTTP GET request with the query string of an object key to the APIGateway Endpoint backed by AWS Lambda Function will generate the PresignedURL for the object available in the S3 Bucket."
+    ],
+    "test": ""
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/src/Cdk/CdkStack.cs"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html"
+      },
+      {
+        "text": "Working with AWS Lambda proxy integrations for HTTP APIs",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html"
+      },
+      {
+        "text": "Lambda Function Handler",
+        "link": "https://docs.aws.amazon.com/whitepapers/latest/serverless-architectures-lambda/the-handler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "See the GitHub repo for detailed deployment instructions."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sakthivel Chellapparimanam",
+      "bio": "AWS - Cloud Application Architect",
+      "linkedin": "srcsakthivel",
+      "twitter": "srcsakthivel"
+    }
+  ]
+}

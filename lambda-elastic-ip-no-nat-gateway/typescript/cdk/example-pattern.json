@@ -1,0 +1,55 @@
+{
+  "title": "AWS Lambda using Elastic IP without NAT Gateway",
+  "description": "Create a Lambda function with public Elastic IP without provisioning NAT Gateway",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to create an AWS Lambda function with a public Elastic IP without provisioning a NAT Gateway. This approach saves costs in a non-production environment."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Generate a static outbound IP address using a Lambda function, Amazon VPC, and a serverless architecture",
+        "link": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/generate-a-static-outbound-ip-address-using-a-lambda-function-amazon-vpc-and-a-serverless-architecture.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Majd Soufan",
+      "bio": "Majd is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Database. (Mohamad's twin brother)",
+      "image": "https://pbs.twimg.com/profile_images/1467263476473090048/JmklQbC8_400x400.jpg",
+      "twitter": "Majd95RF"
+    },
+    {
+      "name": "Mohamad Soufan",
+      "bio": "Mohamad is an AWS 5x Certified Cloud Enthusiast who love building solutions with focus on Serverless and Networking. (Majd's twin brother)",
+      "image": "https://pbs.twimg.com/profile_images/1467593280896450562/jRZ4fMWb_400x400.jpg",
+      "twitter": "MohamadSoufan4"
+    }
+  ]
+}

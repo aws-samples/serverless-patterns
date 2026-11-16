@@ -1,0 +1,54 @@
+{
+  "title": "Amazon API Gateway to Amazon Comprehend",
+  "description": "Create a REST API that acts as a proxy to Amazon Comprehend DetectSentiment API operation.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project demonstrates how to use Amazon API Gateway REST API as a proxy to Amazon Comprehend DetectSentiment API.",
+      "Use this solution to expose other Comprehend API operations with minimal effort."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Comprehend - DetectSentiment",
+        "link": "https://docs.aws.amazon.com/comprehend/latest/APIReference/API_DetectSentiment.html"
+      },
+      {
+        "text": "Tutorial: Build an API Gateway REST API with AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Saborni Bhattacharya",
+      "bio": "I am Saborni working as a Cloud Engineer at AWS SE Serverless.",
+      "image": "https://drive.google.com/file/d/1AZFquOkafEQRUlrT4hKOtIbt4Cq66SHd/view?usp=sharing",
+      "linkedin": "saborni-bhattacharya-5b523812a"
+    }
+  ]
+}

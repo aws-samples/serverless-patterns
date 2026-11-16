@@ -1,0 +1,53 @@
+{
+  "title": "Amazon EventBridge Scheduler to start and stop EC2 instances",
+  "description": "Simple pattern that starts and stops given EC2 instances based on time of day, timezone and days of week",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Creates a schedule that turns on instances at 7:00am and turns them off at 18:00pm Monday to Friday using Europe/London timezone.",
+      "Example uses <a href='https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-targets-universal.html'>universal targets</a> with EventBridge Scheduler to talk to the EC2 directly."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/schedule-ec2-instances-start-and-stop-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
+    }
+  ]
+}

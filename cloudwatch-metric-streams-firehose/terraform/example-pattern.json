@@ -1,0 +1,59 @@
+{
+  "title": "Amazon CloudWatch Metric Streams to Amazon Data Firehose",
+  "description": "Create CloudWatch Metric stream using Amazon Data Firehose and save them in Amazon S3",
+  "language": "Integration",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern sets up Amazon CloudWatch Metric stream and associates that with Amazon Data Firehose. Through this setup you can continuously stream metrics to a destination of choice with near-real-time delivery and low latency. There are various destinations supported, which include Amazon Simple Storage Service (S3) and several third party provider destinations like Datadog, NewRelic, Splunk and Sumo Logic, but in this pattern we use S3. This setup also provides capability to stream all CloudWatch metrics, or use filters to stream only specified metrics. Each of the metric streams can include up to 1000 filters that can either include or exclude namespaces or specific metrics. Another limitation for a single metric stream is it can either include or exclude the metrics, but not both. If any new metrics are added matching the filters in place, an existing metric stream will automatically include them."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Use metric streams to continually stream CloudWatch Metrics",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Metric-Streams.html"
+      },
+      {
+        "text": "Amazon Data Firehose - Streaming Data Pipeline",
+        "link": "https://aws.amazon.com/firehose/"
+      },
+      {
+        "text": "Amazon S3 - Cloud Object Storage",
+        "link": "https://aws.amazon.com/s3/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "terraform init",
+      "terraform plan",
+      "terraform apply"
+    ]
+  },
+  "testing": {
+    "text": [
+      "In the same account and region, launch an EC2 instance. You should be able to see metrics arrive n S3 bucket in few minutes."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "terraform destroy"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Kiran Ramamurthy",
+      "bio": "I am a Senior Partner Solutions Architect for Enterprise Transformation. I work predominantly with partners and specialize in migrations and modernization.",
+      "image": "n/a",
+      "linkedin": "kiran-ramamurthy-a96341b"
+    }
+  ]
+}

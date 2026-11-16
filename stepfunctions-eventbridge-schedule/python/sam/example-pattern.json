@@ -1,0 +1,54 @@
+{
+  "title": "AWS Step Functions to Amazon EventBridge Scheduler with AWS SAM & Python",
+  "description": "Simple pattern that creates a EventBridge Scheduler one time schedule using Step Functions SDK integration",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Creates a one time schedule in EventBridge Scheduler when the Step Functions execution runs."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Introducing Amazon EventBridge Scheduler",
+        "link": "https://aws.amazon.com/blogs/compute/introducing-amazon-eventbridge-scheduler/"
+      },
+      {
+        "text": "Amazon EventBridge Scheduler Docs",
+        "link": "https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Pubudu Jayawardana",
+      "bio": "AWS Community Builder in Serverless category. Serverless advocate and enthusiast.",
+      "image": "https://avatars.githubusercontent.com/u/1263087",
+      "linkedin": "pubudusj",
+      "twitter": "pubudusj"
+    }
+  ]
+}

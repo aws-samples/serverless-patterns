@@ -1,0 +1,60 @@
+{
+  "title": "Amazon EventBridge Pipes with suffix filtering",
+  "description": "Trigger EventBridge events from DynamoDB changes using EventBridge Pipes and suffix filtering.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern uses EventBridge Pipes to connect a DynamoDB stream (new and old images) directly into an EventBridge bus with custom source and detail-type. Only items that match the suffix rule (.png images) are forwarded to the bus."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "EventBridge Visuals",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge"
+      },
+      {
+        "text": "Suffix filtering",
+        "link": "https://serverlessland.com/serverless/visuals/eventbridge/suffix-filtering"
+      },
+      {
+        "text": "Cloudformation API for Pipes",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-pipes-pipe.html"
+      },
+      {
+        "text": "Video explaining EventBridge Pipes",
+        "link": "https://www.youtube.com/watch?v=xXGXCOc3cBs&t=1037s"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Deploy the stack: <code>sam deploy</code>."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README in the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "David Boyne",
+      "bio": "Senior Developer Advocate at AWS focusing on EDA and Serverless.",
+      "image": "../assets/images/resources/dboyne.png"
+    }
+  ]
+}

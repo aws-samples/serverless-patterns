@@ -1,0 +1,62 @@
+{
+  "title": "Amazon SQS to Amazon CloudWatch Log group via Amazon EventBridge Pipes",
+  "description": "Amazon SQS to Amazon CloudWatch Log group via Amazon EventBridge Pipes filter and transformation",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This sample project shows how to use Amazon EventBridge Pipes to connect an Amazon SQS queue with an Amazon CloudWatch Log group. The pipe will apply a filter and transformation before sending the message to the CloudWatch Log group.",
+      "This pattern deploys one SQS queue, one EventBridge Pipe, and a CloudWatch Log group"
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Configuring a queue to use with EventBridge Pipes",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-sqs.html#pipes-sqs-configure-queue"
+      },
+      {
+        "text": "Amazon EventBridge Pipes filtering",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-filtering.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes input transformation",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-input-transformation.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes targets",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Anup Rajpara",
+      "bio": "Anup is passionate about serverless & event-driven architectures.",
+      "image": "https://drive.google.com/file/d/1MqpPNLCqbU4kvvtTspNXZBqD99aVIJI9/view?usp=sharing",
+      "linkedin": "anup-rajpara-developer"
+    }
+  ]
+}

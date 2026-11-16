@@ -1,0 +1,12 @@
+{
+    "name": "alb-lambda-pulumi-ts",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/node": "^24"
+    },
+    "dependencies": {
+        "@pulumi/pulumi": "^3.0.0",
+        "@pulumi/aws": "^7.0.0",
+        "@pulumi/awsx": "^3.0.0"
+    }
+}

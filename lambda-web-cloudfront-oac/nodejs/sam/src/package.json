@@ -1,0 +1,12 @@
+{
+  "name": "lambda-web-cloudfront-oac",
+  "version": "1.0.0",
+  "description": "Lambda Web Function reachable only through a CloudFront distribution (Origin Access Control)",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "license": "MIT-0"
+}

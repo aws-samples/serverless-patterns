@@ -1,0 +1,47 @@
+{
+  "title": "React to Amazon S3 notifications with Amazon EventBridge",
+  "description": "Deploys an S3 bucket that publishes events to Amazon EventBridge.",
+  "language": "Python",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern configures an Amazon S3 bucket to send events to Amazon EventBridge.",
+      "An EventBridge rule is configured to trigger a AWS Step Functions workflow. The workflow is triggered when a file is uploaded to the S3 bucket.",
+      "The AWS Step Functions workflow calls the Lambda function to identify objects uploaded to the S3 bucket then raises an SNS topic to notify consumers."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "deploy": {
+    "text": [
+      "sam deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Abha Tripathi",
+      "bio": "Cloud Engineer @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/36122588?s=400&u=209552eb3fa55e5c4176e54a24a7737ce899083b&v=4"
+    },
+    {
+      "name": "Sushir V R",
+      "bio": "Cloud Engineer @ AWS",
+      "image": "https://avatars.githubusercontent.com/u/42473846?s=400&u=4c7b19858e4ec3d9ae24e379c35848219ee57a86&v=4"
+    }
+  ]
+}

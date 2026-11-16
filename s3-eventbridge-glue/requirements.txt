@@ -1,3 +1,0 @@
-aws-cdk-lib>=2.145.0
-constructs>=10.0.0,<11.0.0
-aws-cdk.aws-glue-alpha>=2.144.0a0
