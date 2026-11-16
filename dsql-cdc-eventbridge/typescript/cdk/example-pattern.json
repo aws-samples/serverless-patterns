@@ -45,7 +45,7 @@
   "testing": {
     "text": [
       "Connect to your Amazon Aurora DSQL cluster with psql and insert, update and delete a row to generate CDC events.",
-      "Add a temporary Amazon EventBridge rule with an Amazon SQS queue target on the dsql-cdc-events bus and read the events. See the GitHub repo for the exact commands."
+      "Add a temporary Amazon EventBridge rule with an Amazon SQS queue target on the event bus named in the EventBusName stack output and read the events. See the GitHub repo for the exact commands."
     ]
   },
   "cleanup": {

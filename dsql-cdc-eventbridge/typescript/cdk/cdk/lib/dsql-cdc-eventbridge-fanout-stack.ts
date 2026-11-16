@@ -41,7 +41,6 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     // Aurora DSQL CDC guidance: on-demand mode and a 10 MiB maximum record size.
     // A CDC record larger than the stream's maximum record size leaves the CDC stream impaired.
     const cdcStream = new kinesis.Stream(this, 'CdcStream', {
-      streamName: `dsql-cdc-${cdk.Names.uniqueId(this).slice(-8).toLowerCase()}`,
       streamMode: kinesis.StreamMode.ON_DEMAND,
       retentionPeriod: cdk.Duration.hours(24),
       encryption: kinesis.StreamEncryption.MANAGED,
@@ -84,11 +83,11 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     //    (No CFN resource type for DSQL streams yet - use SDK)
     // =========================================================
     const streamManagerFn = new lambda.Function(this, 'CdcStreamManagerFn', {
-      runtime: lambda.Runtime.PYTHON_3_12,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'handler.on_event',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambdas/cdc-stream-manager'), {
         bundling: {
-          image: lambda.Runtime.PYTHON_3_12.bundlingImage,
+          image: lambda.Runtime.PYTHON_3_14.bundlingImage,
           command: [
             'bash', '-c',
             'pip install -r requirements.txt -t /asset-output && cp handler.py /asset-output/',
@@ -147,7 +146,8 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     // 4. Amazon EventBridge Custom Event Bus
     // =========================================================
     const cdcEventBus = new events.EventBus(this, 'CdcEventBus', {
-      eventBusName: 'dsql-cdc-events',
+      // Derived from the stack name so that two stacks in one account and Region don't collide
+      eventBusName: `${this.stackName}-cdc-events`,
     });
 
     // =========================================================
@@ -155,7 +155,7 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     // =========================================================
     const processorLogs = logGroup('CdcProcessorLogs');
     const cdcProcessorFn = new lambda.Function(this, 'CdcProcessorFn', {
-      runtime: lambda.Runtime.PYTHON_3_12,
+      runtime: lambda.Runtime.PYTHON_3_14,
       handler: 'handler.lambda_handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambdas/cdc-processor')),
       timeout: cdk.Duration.seconds(60),
@@ -187,6 +187,11 @@ export class DsqlCdcEventbridgeFanoutStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'KinesisStreamArn', {
       value: cdcStream.streamArn,
       description: 'ARN of the stream in Amazon Kinesis Data Streams (CDC target)',
+    });
+
+    new cdk.CfnOutput(this, 'EventBusName', {
+      value: cdcEventBus.eventBusName,
+      description: 'Amazon EventBridge custom event bus name',
     });
 
     new cdk.CfnOutput(this, 'EventBusArn', {

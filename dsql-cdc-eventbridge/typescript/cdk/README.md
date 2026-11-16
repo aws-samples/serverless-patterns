@@ -18,7 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 **How it works:**
 
 1. Amazon Aurora DSQL emits one record per row with a net change per transaction (write-set compaction) to Amazon Kinesis Data Streams. Delivery is at-least-once and unordered, so consumers must de-duplicate and handle out-of-order events (use `txId`, `recordId` and the commit timestamp included in `detail`). `oldImage` contains only the primary-key columns, and only for DELETE events; it is null for INSERT and UPDATE.
-2. AWS Lambda reads the records from Amazon Kinesis Data Streams, parses the CDC payload (Debezium-style op codes), classifies the operation type, and publishes typed events to an Amazon EventBridge custom event bus.
+2. AWS Lambda reads the records from Amazon Kinesis Data Streams, parses the CDC payload (Debezium-style op codes), classifies the operation type, and publishes typed events to an Amazon EventBridge custom event bus. If any `PutEvents` entry fails, the function fails the batch and AWS Lambda retries the whole batch, so the bus can receive the same change more than once and out of order. Make consumers idempotent: `txId` and `recordId` together identify one change.
 3. Amazon EventBridge receives events with source `dsql.cdc` and detail-type `INSERT`, `UPDATE`, or `DELETE`. The `detail` holds `tableName`, `operation`, `newImage`, `oldImage`, `txId`, `recordId`, `timestamp` (commit time in milliseconds), `commitTimestampNs` (commit time in nanoseconds, as a string) and `sequenceNumber`. Add your own rules and targets to route events to any downstream consumer.
 
 ## Requirements
@@ -26,7 +26,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-- [Node.js 22+](https://nodejs.org/) with npm
+- [Node.js](https://nodejs.org/) with npm
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed, and the account and Region [bootstrapped for CDK](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`cdk bootstrap`)
 - Docker running (or Finch with `CDK_DOCKER=finch`): CDK builds the Python dependencies of the custom resource in a container
 - A PostgreSQL client (`psql`) to run the SQL in the Testing section
@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 - Records larger than 9 MiB are split into chunked and fragment records. The processor publishes `full` records only and logs the others, so those rows are not delivered to the event bus. An Amazon EventBridge `PutEvents` entry must be smaller than 1 MB ([API reference](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html)), so this pattern does not handle rows of that size.
 - The Amazon Kinesis Data Streams event source has no on-failure destination: a batch that still fails after 3 retries is discarded. Add an `onFailure` destination, for example an Amazon SQS queue, before you use this beyond a demo.
 - The stack keeps the AWS Lambda logs for one week. `cdk destroy` removes the log groups, the stream in Amazon Kinesis Data Streams and the CDC stream, except that the log group of the custom resource provider can reappear (Cleanup step 4).
-- Deployed and tested in `us-west-2` only.
+- Deployed and tested in `us-west-2` and `us-east-1`.
 
 ## Deployment
 
@@ -71,18 +71,20 @@ Important: this application uses various AWS services and there are costs associ
 
 If you opened a new shell, set `AWS_REGION` and `CLUSTER_ID` again first (`aws dsql list-clusters` shows the identifiers).
 
-1. Create a temporary rule on the custom event bus that sends every CDC event to a temporary Amazon SQS queue:
+1. Create a temporary rule on the custom event bus that sends every CDC event to a temporary Amazon SQS queue. The bus name is in the `EventBusName` stack output:
 
     ```bash
+    export EVENT_BUS_NAME=$(aws cloudformation describe-stacks --stack-name DsqlCdcEventbridgeFanoutStack \
+      --query "Stacks[0].Outputs[?OutputKey=='EventBusName'].OutputValue" --output text)
     ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    RULE_ARN=$(aws events put-rule --name dsql-cdc-test --event-bus-name dsql-cdc-events \
+    RULE_ARN=$(aws events put-rule --name dsql-cdc-test --event-bus-name $EVENT_BUS_NAME \
       --event-pattern '{"source": ["dsql.cdc"]}' --query RuleArn --output text)
     cat > /tmp/queue-attributes.json <<EOF
     {"Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:$AWS_REGION:$ACCOUNT_ID:dsql-cdc-test\",\"Condition\":{\"ArnEquals\":{\"aws:SourceArn\":\"$RULE_ARN\"}}}]}"}
     EOF
     export QUEUE_URL=$(aws sqs create-queue --queue-name dsql-cdc-test \
       --attributes file:///tmp/queue-attributes.json --query QueueUrl --output text)
-    aws events put-targets --rule dsql-cdc-test --event-bus-name dsql-cdc-events \
+    aws events put-targets --rule dsql-cdc-test --event-bus-name $EVENT_BUS_NAME \
       --targets "Id=1,Arn=arn:aws:sqs:$AWS_REGION:$ACCOUNT_ID:dsql-cdc-test"
     ```
 
@@ -160,8 +162,10 @@ In a new shell, set `AWS_REGION` and `CLUSTER_ID` again and change to the `cdk` 
 1. Delete the temporary rule and queue from the Testing section. Do this first: an Amazon EventBridge event bus cannot be deleted while it has rules ([API reference](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DeleteEventBus.html)), so `cdk destroy` would fail.
 
     ```bash
-    aws events remove-targets --rule dsql-cdc-test --event-bus-name dsql-cdc-events --ids 1
-    aws events delete-rule --name dsql-cdc-test --event-bus-name dsql-cdc-events
+    EVENT_BUS_NAME=$(aws cloudformation describe-stacks --stack-name DsqlCdcEventbridgeFanoutStack \
+      --query "Stacks[0].Outputs[?OutputKey=='EventBusName'].OutputValue" --output text)
+    aws events remove-targets --rule dsql-cdc-test --event-bus-name $EVENT_BUS_NAME --ids 1
+    aws events delete-rule --name dsql-cdc-test --event-bus-name $EVENT_BUS_NAME
     QUEUE_URL=$(aws sqs get-queue-url --queue-name dsql-cdc-test --query QueueUrl --output text)
     aws sqs delete-queue --queue-url $QUEUE_URL
     rm /tmp/queue-attributes.json
