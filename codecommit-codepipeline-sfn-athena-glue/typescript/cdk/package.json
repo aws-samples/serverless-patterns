@@ -9,15 +9,15 @@
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "@types/node": "10.17.27",
-    "aws-cdk": "2.80.0",
+    "aws-cdk": "^2.1148.1",
     "ts-jest": "^26.2.0",
     "ts-node": "^9.0.0",
     "typescript": "~3.9.7"
   },
   "dependencies": {
     "@aws-cdk/aws-glue-alpha": "^2.15.0-alpha.0",
-    "aws-cdk-lib": "^2.185.0",
-    "constructs": "^10.0.0",
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1",
     "source-map-support": "^0.5.16"
   }
 }

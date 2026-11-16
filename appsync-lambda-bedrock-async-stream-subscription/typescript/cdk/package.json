@@ -14,7 +14,7 @@
   "devDependencies": {
     "@types/cookie": "^0.6.0",
     "@types/node": "^20.7.1",
-    "aws-cdk": "^2.99.1",
+    "aws-cdk": "^2.1148.1",
     "cookie": "^1.0.2",
     "esbuild": "^0.28.1",
     "ts-node": "^10.9.1",
@@ -24,8 +24,8 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.496.0",
     "aws-amplify": "^6.0.12",
-    "aws-cdk-lib": "^2.185.0",
-    "constructs": "^10.0.0",
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1",
     "cookie": "^1.0.2",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
