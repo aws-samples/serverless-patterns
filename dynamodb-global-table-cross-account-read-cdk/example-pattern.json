@@ -15,12 +15,12 @@
   },
   "gitHub": {
     "template": {
-      "templateFile": "lib/dynamodb-cross-account-replication-stack.ts"
+      "templateFile": "lib/dynamodb-global-table-cross-account-read-stack.ts"
     }
   },
   "resources": {
     "bullets": [
-      { "text": "Amazon DynamoDB global tables now support replication across AWS accounts", "link": "https://aws.amazon.com/blogs/database/amazon-dynamodb-global-tables-now-support-replication-across-aws-accounts/" },
+      { "text": "IAM tutorial: Delegate access across AWS accounts using IAM roles", "link": "https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html" },
       { "text": "DynamoDB Global Tables Documentation", "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html" }
     ]
   },

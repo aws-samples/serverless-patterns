@@ -3,7 +3,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
-export class DynamodbCrossAccountReplicationStack extends cdk.Stack {
+export class DynamodbGlobalTableCrossAccountReadStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 

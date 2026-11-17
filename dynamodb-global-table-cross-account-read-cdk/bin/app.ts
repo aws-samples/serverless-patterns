@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { DynamodbCrossAccountReplicationStack } from '../lib/dynamodb-cross-account-replication-stack';
+import { DynamodbGlobalTableCrossAccountReadStack } from '../lib/dynamodb-global-table-cross-account-read-stack';
 
 const app = new cdk.App();
 
@@ -12,6 +12,6 @@ if (!account) {
   throw new Error('CDK_DEFAULT_ACCOUNT is required. Run: export CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)');
 }
 
-new DynamodbCrossAccountReplicationStack(app, 'DynamodbCrossAccountReplicationStack', {
+new DynamodbGlobalTableCrossAccountReadStack(app, 'DynamodbGlobalTableCrossAccountReadStack', {
   env: { account, region },
 });

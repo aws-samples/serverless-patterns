@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon DynamoDB Global Table (same-account, multi-region) and an AWS Identity and Access Management (IAM) role that grants a separate AWS account read-only access to the table in both regions.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-cross-account-replication-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/dynamodb-global-table-cross-account-read-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -50,7 +50,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Clone and navigate to the pattern:
     ```bash
-    cd serverless-patterns/dynamodb-cross-account-replication-cdk
+    cd serverless-patterns/dynamodb-global-table-cross-account-read-cdk
     npm install
     ```
 2. Deploy with the reader account ID, an external ID of your choice (at least 8 characters), and the replica region:
@@ -65,7 +65,7 @@ Important: this application uses various AWS services and there are costs associ
 ```bash
 # Write an item to the source table
 aws dynamodb put-item --table-name $(aws cloudformation describe-stacks \
-  --stack-name DynamodbCrossAccountReplicationStack \
+  --stack-name DynamodbGlobalTableCrossAccountReadStack \
   --query 'Stacks[0].Outputs[?OutputKey==`TableName`].OutputValue' --output text) \
   --item '{"PK":{"S":"user#123"},"SK":{"S":"profile"},"name":{"S":"test"}}'
 
