@@ -1,6 +1,6 @@
 # Amazon Bedrock AgentCore Memory record streaming to Amazon Kinesis Data Streams
 
-This pattern turns on record streaming for an Amazon Bedrock AgentCore Memory with built-in semantic and user-preference strategies. Amazon Bedrock AgentCore Memory publishes a lifecycle event to Amazon Kinesis Data Streams each time it creates, updates or deletes a long-term memory record. A short AWS Lambda function reads those events through a filtered event source mapping and keeps an Amazon DynamoDB table of memory records in sync, including deletions.
+This pattern turns on record streaming for an Amazon Bedrock AgentCore Memory with built-in semantic and user-preference strategies. Amazon Bedrock AgentCore Memory publishes a lifecycle event to Amazon Kinesis Data Streams each time it creates, updates or deletes a long-term memory record. A short AWS Lambda function reads those events through a filtered event source mapping and keeps an Amazon DynamoDB table of memory records in sync, including deletions. If the function still fails on a record after its retries, the event source mapping sends metadata about the failed batch to an Amazon Simple Queue Service (Amazon SQS) queue.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/agentcore-memory-kinesis-typescript-cdk
 
@@ -30,6 +30,9 @@ Amazon Kinesis Data Streams (1 shard, encrypted with an AWS KMS key)
         |  event source mapping filter on memoryStreamEvent.eventType
         v
 AWS Lambda  --->  Amazon DynamoDB (key: memoryRecordId, index: actorId)
+        |  on failure after retries (batch metadata only)
+        v
+Amazon SQS queue (14 days retention)
 ```
 
 ## How it works
@@ -38,6 +41,7 @@ AWS Lambda  --->  Amazon DynamoDB (key: memoryRecordId, index: actorId)
 2. The memory has a stream delivery resource that points at the Kinesis stream. For each record that is created, updated or deleted, AgentCore Memory assumes the memory execution role and puts an event on the stream. With `FULL_CONTENT` the event includes `memoryRecordText`.
 3. The event source mapping filters on `memoryStreamEvent.eventType`. This keeps the `StreamingEnabled` validation event, which AgentCore Memory publishes when streaming is enabled and which has no record ID, away from the function.
 4. The function upserts an item for created and updated events, and deletes the item for deleted events. It parses the actor ID from the namespace, because only created and updated events carry a namespace. The table key is `memoryRecordId` because deleted events carry only `memoryId` and `memoryRecordId`.
+5. The function reports the sequence number of a record it cannot process, so Lambda retries from that record, up to 3 times. After that Lambda discards the records and continues with the shard. The event source mapping has an Amazon SQS queue as its on-failure destination, so the discarded batch leaves a message in the queue. The message holds metadata only (the stream ARN, the shard ID and the start and end sequence numbers of the batch, per the [on-failure destination page](https://docs.aws.amazon.com/lambda/latest/dg/kinesis-on-failure-destination.html)), not the records. Use the sequence numbers to read the records from the stream before they expire. The CDK adds `sqs:SendMessage`, `sqs:GetQueueAttributes` and `sqs:GetQueueUrl` on the queue to the function role.
 
 The memory execution role comes from the `aws-cdk-lib/aws-bedrockagentcore` Memory construct. Its trust policy has `aws:SourceAccount` and `aws:SourceArn` conditions. Its permissions policy allows `kinesis:ListShards`, `kinesis:PutRecord`, `kinesis:PutRecords` and `kinesis:DescribeStream` on this stream, and `kms:Encrypt`, `kms:ReEncrypt*` and `kms:GenerateDataKey*` on the stream key.
 
@@ -48,7 +52,8 @@ The memory execution role comes from the `aws-cdk-lib/aws-bedrockagentcore` Memo
 * The documentation does not state a partition key or an ordering guarantee for the events that AgentCore Memory publishes (in the test runs the partition key was `<memory ID>#<memory record ID>`). The function applies each event as it arrives, so a `MemoryRecordDeleted` event processed before its created event, or an older update that arrives after a newer one, can leave a stale item in the table. Treat the table as eventually consistent.
 * The function reads the actor ID from the default built-in namespace `/strategies/{memoryStrategyId}/actors/{actorId}`; a record in another namespace layout is stored with the actor ID `unknown`.
 * Long-term memory consolidation can also delete records, so `MemoryRecordDeleted` events can arrive without a delete call from you (see [Stream event types](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-record-streaming.html#memory-record-streaming-event-types)).
-* The event source mapping retries from a failing record onward up to 3 times and then discards the records, because it has no on-failure destination (this keeps the pattern at four services; the AWS KMS key only encrypts the stream).
+* The event source mapping retries from a failing record onward up to 3 times and then discards the records. The Amazon SQS on-failure destination only records which batch was discarded; it does not hold the records and it does not replay them. The pattern uses five services (Amazon Bedrock AgentCore Memory, Amazon Kinesis Data Streams, AWS Lambda, Amazon DynamoDB and Amazon SQS) plus an AWS KMS key that encrypts the stream.
+* The queue has no encryption setting in the template. In the test run `get-queue-attributes` returned `SqsManagedSseEnabled` `true`, so Amazon SQS server-side encryption with Amazon SQS managed keys was on. The messages hold stream and shard identifiers, not memory text.
 * The Lambda function uses the `nodejs24.x` runtime and the AWS SDK for JavaScript v3 that the runtime provides.
 
 ## Deployment Instructions
@@ -75,7 +80,7 @@ The memory execution role comes from the `aws-cdk-lib/aws-bedrockagentcore` Memo
     npx cdk deploy
     ```
 
-5. Note the stack outputs: `MemoryId`, `MemoryArn`, `StreamName`, `TableName`, `FunctionName` and `ProjectorLogGroupName`.
+5. Note the stack outputs: `MemoryId`, `MemoryArn`, `StreamName`, `TableName`, `FunctionName`, `FailedRecordsQueueUrl` and `ProjectorLogGroupName`.
 
 ## Testing
 
@@ -86,6 +91,7 @@ STACK=AgentcoreMemoryKinesisStack
 out() { aws cloudformation describe-stacks --stack-name "$STACK" --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
 MEMORY_ID=$(out MemoryId); MEMORY_ARN=$(out MemoryArn); STREAM=$(out StreamName)
 TABLE=$(out TableName); FUNCTION=$(out FunctionName); LOG_GROUP=$(out ProjectorLogGroupName)
+QUEUE_URL=$(out FailedRecordsQueueUrl)
 ```
 
 1. Check that the event source mapping is enabled. Expected: `Enabled`.
@@ -126,14 +132,25 @@ TABLE=$(out TableName); FUNCTION=$(out FunctionName); LOG_GROUP=$(out ProjectorL
     aws cloudwatch list-metrics --namespace AWS/Bedrock-AgentCore
     ```
 
-6. If items do not appear, read the function logs:
+6. Check the on-failure destination. A record that matches the filter but that the function cannot store makes it fail. This record has `eventType` `MemoryRecordCreated` but no `memoryRecordId`, which is the table key, so the function cannot store it and reports the record as failed:
+    ```bash
+    aws kinesis put-record --stream-name "$STREAM" --partition-key poison --cli-binary-format raw-in-base64-out \
+      --data '{"memoryStreamEvent":{"eventType":"MemoryRecordCreated","memoryId":"poison-test"}}'
+    ```
+   Note the `SequenceNumber` in the output. The function is invoked 4 times (the first call and 3 retries). Then Lambda sends one message to the queue (about 4 seconds in the test run). Read it with long polling:
+    ```bash
+    aws sqs receive-message --queue-url "$QUEUE_URL" --wait-time-seconds 10 --max-number-of-messages 1 --query 'Messages[0].Body' --output text
+    ```
+   Expected: a JSON document with `requestContext.condition` set to `RetryAttemptsExhausted`, `requestContext.approximateInvokeCount` 4, and `KinesisBatchInfo` with `shardId`, `startSequenceNumber` and `endSequenceNumber` (both equal to the `SequenceNumber` you noted), `batchSize` 1 and `streamArn`. The message does not contain the record. To read the record, use the stream name, the `shardId` and the `startSequenceNumber` from the message with `aws kinesis get-shard-iterator` and `aws kinesis get-records`. In the test run this returned the record that had been sent, and its `Data` value is base64.
+
+7. If items do not appear, read the function logs:
     ```bash
     aws logs tail "$LOG_GROUP" --since 30m
     ```
 
 ## Cleanup
 
-1. Delete the stack. This deletes the memory and its records, the Kinesis stream, the DynamoDB table with its items, the function log group and schedules the AWS KMS key for deletion:
+1. Delete the stack. This deletes the memory and its records, the Kinesis stream, the DynamoDB table with its items, the Amazon SQS queue, the function log group and schedules the AWS KMS key for deletion:
     ```bash
     npx cdk destroy
     ```

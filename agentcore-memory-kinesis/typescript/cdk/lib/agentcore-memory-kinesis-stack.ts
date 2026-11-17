@@ -9,6 +9,7 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as eventsources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class AgentcoreMemoryKinesisStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -80,6 +81,12 @@ export class AgentcoreMemoryKinesisStack extends cdk.Stack {
       resources: [table.tableArn],
     }));
 
+    // A record that exhausts its retries is dropped from the shard. The on-failure destination keeps the batch metadata
+    // (stream ARN, shard ID, sequence numbers) so the dropped records can be read back from the stream before it expires.
+    const failedRecords = new sqs.Queue(this, 'ProjectorFailedRecords', {
+      retentionPeriod: cdk.Duration.days(14),
+    });
+
     // The payload is nested under memoryStreamEvent, so a top-level eventType filter would drop everything.
     // The StreamingEnabled validation event has no memoryRecordId and is filtered out here.
     projector.addEventSource(new eventsources.KinesisEventSource(stream, {
@@ -87,6 +94,7 @@ export class AgentcoreMemoryKinesisStack extends cdk.Stack {
       batchSize: 10,
       retryAttempts: 3,
       reportBatchItemFailures: true,
+      onFailure: new eventsources.SqsDlq(failedRecords),
       filters: [lambda.FilterCriteria.filter({
         data: {
           memoryStreamEvent: {
@@ -101,6 +109,7 @@ export class AgentcoreMemoryKinesisStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'StreamName', { value: stream.streamName });
     new cdk.CfnOutput(this, 'TableName', { value: table.tableName });
     new cdk.CfnOutput(this, 'FunctionName', { value: projector.functionName });
+    new cdk.CfnOutput(this, 'FailedRecordsQueueUrl', { value: failedRecords.queueUrl });
     new cdk.CfnOutput(this, 'ProjectorLogGroupName', { value: logGroup.logGroupName });
   }
 }
