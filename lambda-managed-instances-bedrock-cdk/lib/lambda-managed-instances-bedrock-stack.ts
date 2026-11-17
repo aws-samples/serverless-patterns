@@ -71,6 +71,10 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
       subnets: vpc.privateSubnets,
       securityGroups: [securityGroup],
       architectures: [lambda.Architecture.ARM_64],
+      logGroup: new logs.LogGroup(this, "CapacityProviderLogGroup", {
+        retention: logs.RetentionDays.TWO_WEEKS,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }),
     });
 
     capacityProvider.addFunction(fn);
