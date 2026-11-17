@@ -1,6 +1,6 @@
-# Lambda Durable Execution with Java SDK
+# AWS Lambda Durable Execution with Java SDK
 
-This pattern deploys a Lambda durable function written in Java that orchestrates a multi-step order processing workflow with automatic checkpointing and failure recovery.
+This pattern deploys an AWS Lambda durable function written in Java that orchestrates a multi-step order processing workflow with automatic checkpointing and failure recovery.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-execution-java-cdk
 
@@ -110,6 +110,8 @@ If the function is interrupted at any point, it replays from the beginning but s
      "trackingNumber": "TRACK-i9j0k1l2"
    }
    ```
+
+   The values of `reservationId`, `paymentId` and `trackingNumber` are random and differ on each run.
 
 4. Monitor the durable execution in the Lambda console under the **Durable executions** tab.
 
