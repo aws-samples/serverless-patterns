@@ -7,9 +7,7 @@ export class ApigwSqsMsgFilteringCdkStack extends cdk.Stack {
     super(scope, id, props);
 
     // Create custom sqs queue
-    const sqsQueue = new cdk.aws_sqs.Queue(this, 'apigwSqs-queue', {
-      queueName: 'MyQueueName',
-    });
+    const sqsQueue = new cdk.aws_sqs.Queue(this, 'apigwSqs-queue');
 
     // Create custom api gateway
     const apiGateway = new cdk.aws_apigateway.RestApi(this, 'apigwSqs-restApi', {

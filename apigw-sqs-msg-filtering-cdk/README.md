@@ -7,7 +7,7 @@ However, SQS has a message size limit of 1MiB. When you are in control of the cl
 
 But sometimes you provide only the API endpoint to other parties to send their messages to (e.g. as a webhook), so you need a way to control the payload size before sending the messages to SQS. This is where VTL comes into play.
 
-The [Velocity Template Language](https://velocity.apache.org/), or short VTL, is used in AWS API Gateway to transform your method request and your integration response. This allows you directly filter the messahe body and only send what is need to SQS. 
+The [Velocity Template Language](https://velocity.apache.org/), or short VTL, is used in Amazon API Gateway to transform your method request and your integration response. This allows you directly filter the message body and only send what is need to SQS. 
 This pattern demonstrates message filtering using VTL in an API Gateway REST API.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sqs-msg-filtering-cdk
@@ -33,7 +33,7 @@ git clone https://github.com/aws-samples/serverless-patterns
 2. Change directory to the pattern directory:
 
 ```
-cd apigw-sqs-msg-filtering-cdk/cdk
+cd serverless-patterns/apigw-sqs-msg-filtering-cdk/cdk
 ```
 
 3. Install dependencies
@@ -62,7 +62,7 @@ cdk deploy
 
 ## Testing
 
-Run the following command to send a POST request to the REST API endpoint that will then send the filtered message to the SQS queue. Run the commands from the `apigw-sqs-msg-filtering-cdk` folder.
+Run the following command to send a POST request to the REST API endpoint that will then send the filtered message to the SQS queue. Run the commands from the `cdk` folder.
 
 ```bash
 export API_GATEWAY_SQS_RESOURCE_ENDPOINT=$(aws cloudformation describe-stacks --stack-name ApigwSqsMsgFilteringCdkStack --query 'Stacks[0].Outputs[?OutputKey==`ApiGatewaySqsResourceEndpoint`].OutputValue' --output text)

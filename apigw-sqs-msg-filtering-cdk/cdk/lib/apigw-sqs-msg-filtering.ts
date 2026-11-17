@@ -1,5 +1,6 @@
 
 import {
+    Stack,
     aws_apigateway as apigw,
     aws_sqs as sqs,
     aws_iam as iam,
@@ -44,7 +45,7 @@ export class ApiGwSqsConstruct extends Construct {
         // ApiGw-SQS Integration
         const apiGwSqsIntegration = new apigw.AwsIntegration({
             service: 'sqs',
-            path: `${process.env.CDK_DEFAULT_ACCOUNT}/${this.customQueue.queueName}`,
+            path: `${Stack.of(this).account}/${this.customQueue.queueName}`,
             integrationHttpMethod: 'POST',
             options: {
                 credentialsRole: sqsIntegrationRole,
@@ -63,9 +64,11 @@ export class ApiGwSqsConstruct extends Construct {
                     },
                     {
                         statusCode: '400',
+                        selectionPattern: '4\\d{2}',
                     },
                     {
                         statusCode: '500',
+                        selectionPattern: '5\\d{2}',
                     }
                 ]
             },
