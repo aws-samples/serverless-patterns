@@ -159,6 +159,13 @@ export class S3SfnBatchOperationsStack extends cdk.Stack {
       subject: 'S3 Batch Operations workflow error',
       message: sfn.TaskInput.fromText('{% "The workflow could not run the job: " & $states.input.Error & " " & $states.input.Cause %}'),
     });
+    // A transient Amazon SNS error should not fail a run after the job has ended. States.TaskFailed also
+    // matches permanent errors, so those come first with no retry (the first matching entry wins).
+    [notifySuccess, notifyJobFailure, notifyError].forEach((task) =>
+      task
+        .addRetry({ errors: ['States.Permissions', 'SNS.NotFoundException', 'SNS.InvalidParameterException'], maxAttempts: 0 })
+        .addRetry({ errors: ['States.TaskFailed'], interval: cdk.Duration.seconds(2), maxAttempts: 3, backoffRate: 2 }),
+    );
     createJob.addCatch(notifyError, { errors: ['States.ALL'] });
     describeJob.addCatch(notifyError, { errors: ['States.ALL'] });
 
@@ -202,11 +209,6 @@ export class S3SfnBatchOperationsStack extends cdk.Stack {
       logs: { destination: logGroup, level: sfn.LogLevel.ERROR, includeExecutionData: false },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
-    stateMachine.addToRolePolicy(new iam.PolicyStatement({
-      // Documented for jobs that use an S3 generated manifest
-      actions: ['s3:PutInventoryConfiguration'],
-      resources: [sourceBucket.bucketArn],
-    }));
     // The role is passed to S3 with PassedToService s3.amazonaws.com, not the batchoperations principal
     // that the job role trusts (a sandbox run with the batchoperations value was denied at CreateJob).
     stateMachine.addToRolePolicy(new iam.PolicyStatement({
