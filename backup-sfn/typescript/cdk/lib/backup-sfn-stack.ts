@@ -92,8 +92,7 @@ export class BackupSfnStack extends Stack {
         iamResources: ['*'],
         resultPath: sfn.JsonPath.DISCARD,
       });
-      task.addRetry({ errors: ['Backup.InvalidParameterValueException', 'Backup.InvalidRequestException',
-        'Backup.MissingParameterValueException', 'Backup.ResourceNotFoundException', 'States.Permissions'], maxAttempts: 0 });
+      // Only this transient error is retried. Any other error is not retried and goes to the Catch.
       task.addRetry({ errors: ['Backup.ServiceUnavailableException'], interval: Duration.seconds(2), maxAttempts: 3 });
       task.addCatch(notRecorded, { resultPath: '$.putError' });
       return task;
@@ -136,7 +135,7 @@ export class BackupSfnStack extends Stack {
       iamResources: [this.formatArn({ service: 'dynamodb', resource: 'table', resourceName: 'awsbackup-restore-test-*' })],
       resultPath: '$.scan',
     });
-    scan.addRetry({ errors: ['DynamoDb.ResourceNotFoundException', 'DynamoDb.AccessDeniedException', 'States.Permissions'], maxAttempts: 0 });
+    // Only transient errors are retried. Any other error (for example a missing table) goes to the Catch.
     scan.addRetry({ errors: ['DynamoDb.ProvisionedThroughputExceededException', 'DynamoDb.RequestLimitExceeded',
       'DynamoDb.ThrottlingException', 'DynamoDb.InternalServerError'], interval: Duration.seconds(2), maxAttempts: 3 });
     scan.addCatch(scanFailed, { resultPath: '$.error' });

@@ -54,19 +54,11 @@ The workflow:
 1. One of four task states calls `backup:PutRestoreValidationResult`. **An execution writes at most one result**: the [documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing-validation.html) says that once a validation status is set it cannot be changed, so there is no `VALIDATING` write first and no branch that writes twice. If the write itself fails, the execution ends in a `Fail` state (`ValidationNotRecorded`) and does not try another write. EventBridge delivers events at least once, so a duplicate event would start a second execution that tries to write again. Because a status cannot be changed once set, treat a `ValidationNotRecorded` execution for a restore job that already has a result as expected.
 1. When a verdict (success or failure) has been recorded, the execution ends in `Succeed`. An execution in `FAILED` status therefore means "no verdict could be recorded", which is the status to alarm on.
 
-Retries are limited to transient errors: `Backup.ServiceUnavailableException` for the `PutRestoreValidationResult` call, and throttling, request limit and internal server errors for the DynamoDB `Scan`. Permanent errors, such as an unknown restore job or a missing table, have a retry entry with zero attempts ahead of the transient entry and go straight to the next step.
+Retries are limited to transient errors: `Backup.ServiceUnavailableException` for the `PutRestoreValidationResult` call, and throttling, request limit and internal server errors for the DynamoDB `Scan`. Any other error, such as an unknown restore job or a missing table, is not retried and goes straight to the next step.
 
 The fields that the workflow and the rule use in the `Restore Job State Change` event (`detail.status`, `detail.resourceType`, `detail.restoreTestingPlanArn`, `detail.restoreJobId` and `detail.createdResourceArn`) were checked against the events of a real restore test job. In the events captured in testing, these fields were present from the `PENDING` state on, except `createdResourceArn` (and `completionDate`), which first appear with `COMPLETED`.
 
 The item count check is deliberately simple. It shows the wiring; replace it with your own checks (for example a read of a known key). A count over a table larger than one Scan page is only a lower bound, which is enough for a minimum-size check.
-
-## Why this pattern
-
-AWS Backup restore testing restores a recovery point on a schedule and deletes the restored resource afterwards. Validating the restored data is optional and is something you supply: the [documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html) says that validation can be run programmatically but not from the AWS Backup console. The [validation example in the AWS Backup documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing-validation.html) uses an AWS Lambda function and notes that `PutRestoreValidationResult` is not available through the Lambda SDK, so a Lambda layer with a newer SDK is needed.
-
-This pattern takes a different route. The workflow calls Amazon DynamoDB and AWS Backup directly through [AWS SDK service integrations](https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html), so the synthesized template contains no Lambda function and no custom resources. The check (the item count of the restored table) decides the verdict that is written back to the originating service.
-
-The closest pattern in this repository is [securityhub-finding-sfn-remediation-cdk](../../../securityhub-finding-sfn-remediation-cdk), which also starts a Step Functions workflow from an EventBridge event but remediates AWS Security Hub findings with AWS Lambda functions. This pattern reports a validation verdict to AWS Backup and has no Lambda function.
 
 ## Important Notes
 
@@ -84,10 +76,6 @@ The closest pattern in this repository is [securityhub-finding-sfn-remediation-c
 * All demo resources use `DESTROY` removal policies and the table has no deletion protection, so `cdk destroy` removes them, with one exception: **a backup vault that contains recovery points cannot be deleted**, so delete the recovery points first (see Cleanup).
 * AWS Backup deletes the restored table by name once the validation result is set or the validation window ends. The [restore testing documentation](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html) says that restores of DynamoDB do not support tag-on-restore, so AWS Backup deletes the table by name and the table does not carry the `awsbackup-restore-test` tag.
 * The service-linked role `AWSServiceRoleForBackupRestoreTesting` is not part of the stack and stays after `cdk destroy`.
-
-### Cost
-
-Nothing in this pattern bills by the hour. AWS Backup charges for each restore test, for backup storage and for the restored data, DynamoDB charges for the table, and Step Functions charges per state transition. See [AWS Backup pricing](https://aws.amazon.com/backup/pricing/). The restore test runs at every schedule match (daily with the cron used in Deployment Instructions) for as long as the stack exists and an eligible recovery point is in the vault. The on-demand recovery point in Testing expires after one day, so later runs have nothing to restore. Run the cleanup steps when you are done.
 
 ## Deployment Instructions
 
@@ -116,7 +104,7 @@ Nothing in this pattern bills by the hour. AWS Backup charges for each restore t
 
 All commands run from the pattern directory and assume that you deployed the stack with the name `BackupSfnRestoreValidationStack` to the Region that your AWS CLI uses.
 
-Plan for up to two hours of wall-clock time for the first real result: the 30 minutes until the cron time, then a random start of up to 1 hour inside the start window, then a restore of a tiny table (minutes), then the event, which AWS Backup emits on a best-effort basis. In two test runs the restore job started within 26 minutes after the cron time and the restore took about 5 minutes. In the second run the `COMPLETED` event reached EventBridge about 4 minutes after the job completed, and the workflow recorded the result in the same second. Steps 4 and 5 give an immediate check of the wiring while you wait.
+Plan for up to two hours of wall-clock time for the first real result: the 30 minutes until the cron time, then a random start of up to 1 hour inside the start window, then a restore of a tiny table (minutes), then the event, which AWS Backup emits on a best-effort basis. In three test runs the restore job started within 26 minutes after the cron time and the restore took about 5 minutes. The `COMPLETED` event reached EventBridge about 4 minutes after the job completed in the second run and about 30 seconds after in the third, and the workflow recorded the result in the same second in both. Step 4 gives an immediate check of the wiring while you wait.
 
 1. Read the stack outputs into variables:
     ```bash
@@ -144,24 +132,18 @@ Plan for up to two hours of wall-clock time for the first real result: the 30 mi
     aws stepfunctions get-execution-history --execution-arn $EX --query "events[?type=='TaskFailed'].taskFailedEventDetails.{resource:resource,error:error}"
     ```
     The history shows two failed tasks: the `scan` call (the table does not exist) and the `putRestoreValidationResult` call (the job does not exist). A rejection of the job ID by AWS Backup shows that the state machine reached the API with permission to call it. An `AccessDenied` error on the second call would mean the role is missing the permission.
-1. Start the workflow with an event that has no restore job ID. Expected: status `FAILED` and error `InvalidEvent`:
+1. Wait for the restore test, then list the restore jobs of the plan. Expected: no jobs until the plan starts one, then `status` is `PENDING`, `RUNNING` and `COMPLETED`. `validation` is `null` until the workflow has written its result. It changes to `SUCCESSFUL` after the job completed (about 30 seconds in one test run and about 4 minutes in another), so run the command again until the newest job (the one with the latest `created` value) shows a `validation` other than `null`:
     ```bash
-    EX=$(aws stepfunctions start-execution --state-machine-arn $SM --input '{"detail":{}}' --query executionArn --output text)
-    sleep 10
-    aws stepfunctions describe-execution --execution-arn $EX --query '{status:status,error:error}'
+    aws backup list-restore-jobs --by-restore-testing-plan-arn $PLAN_ARN --output json \
+      --query "RestoreJobs[].{id:RestoreJobId,created:CreationDate,status:Status,validation:ValidationStatus,table:CreatedResourceArn}"
     ```
-1. Wait for the restore test, then list the restore jobs of the plan. Expected: no jobs until the plan starts one, then `PENDING`, `RUNNING` and `COMPLETED` (`validation` prints `None` until the workflow has written its result), and a few minutes later (about 4 minutes in test runs) a `ValidationStatus` of `SUCCESSFUL`:
-    ```bash
-    aws backup list-restore-jobs --by-restore-testing-plan-arn $PLAN_ARN \
-      --query "RestoreJobs[].{id:RestoreJobId,status:Status,validation:ValidationStatus,table:CreatedResourceArn}"
-    ```
-1. Read the validation result from AWS Backup, not from the state machine. Expected: `status` is `COMPLETED`, `validation` is `SUCCESSFUL` and the message reads `Restored table awsbackup-restore-test-... holds at least 3 items.`:
+1. Read the validation result from AWS Backup, not from the state machine. Run this command once step 5 shows a `validation` for the newest job. Before the workflow writes its result, only `status` has a value (`COMPLETED`) and `validation`, `message` and `deletion` are `null`. Expected: `validation` is `SUCCESSFUL` and `message` reads `Restored table awsbackup-restore-test-... holds at least 3 items.`:
     ```bash
     RJ=$(aws backup list-restore-jobs --by-restore-testing-plan-arn $PLAN_ARN --query "sort_by(RestoreJobs,&CreationDate)[-1].RestoreJobId" --output text)
-    aws backup describe-restore-job --restore-job-id $RJ \
+    aws backup describe-restore-job --restore-job-id $RJ --output json \
       --query '{status:Status,validation:ValidationStatus,message:ValidationStatusMessage,deletion:DeletionStatus}'
     ```
-1. Check the workflow execution that recorded it. Expected: one `SUCCEEDED` execution that started in the same minute as the `COMPLETED` event, next to the two `FAILED` executions from the wiring checks in steps 4 and 5. The log group (name in the `StateMachineLogGroup` output) holds the execution events, including the `Count` that the scan returned:
+1. Check the workflow execution that recorded it. Expected: one `SUCCEEDED` execution that started in the same minute as the `COMPLETED` event, next to the `FAILED` execution from the wiring check in step 4. The log group (name in the `StateMachineLogGroup` output) holds the execution events, including the `Count` that the scan returned:
     ```bash
     aws stepfunctions list-executions --state-machine-arn $SM --query "executions[].{name:name,status:status}"
     ```
@@ -169,11 +151,11 @@ Plan for up to two hours of wall-clock time for the first real result: the 30 mi
     ```bash
     for i in 1 2 3; do aws dynamodb delete-item --table-name $TABLE --key "{\"pk\":{\"S\":\"item-$i\"}}"; done
     ```
-    When that restore test has run, repeat step 7. Expected: `ValidationStatus` is `FAILED` and the message reads `Restored table awsbackup-restore-test-... holds fewer than 3 items.`
+    When that restore test has run, repeat steps 5 and 6. Expected: `validation` is `FAILED` and `message` reads `Restored table awsbackup-restore-test-... holds fewer than 3 items.`
 
 ## Cleanup
 
-1. Read the values that the next steps use. Skip this if you are still in the shell from Testing. In a new shell, do it before `cdk destroy`, because the stack outputs are gone afterwards:
+1. Read the values that the next steps use. Run these commands every time, even if the variables from Testing are still set, and run them before `cdk destroy`, because the stack outputs are gone afterwards:
     ```bash
     out() { aws cloudformation describe-stacks --stack-name BackupSfnRestoreValidationStack --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
     VAULT=$(out VaultName); PLAN_ARN=$(out RestoreTestingPlanArn)
@@ -183,7 +165,7 @@ Plan for up to two hours of wall-clock time for the first real result: the 30 mi
     aws backup list-restore-jobs --by-restore-testing-plan-arn $PLAN_ARN --query "RestoreJobs[].{id:RestoreJobId,status:Status,deletion:DeletionStatus}"
     aws dynamodb list-tables --query "TableNames[?starts_with(@, 'awsbackup-restore-test-')]"
     ```
-1. Delete the recovery points in the vault. The stack cannot delete a vault that still holds them. Deletion is asynchronous, so run the `list-recovery-points-by-backup-vault` command from this loop again and continue when it returns nothing:
+1. Delete the recovery points in the vault. The stack cannot delete a vault that still holds them.
     ```bash
     for RP in $(aws backup list-recovery-points-by-backup-vault --backup-vault-name $VAULT --query "RecoveryPoints[].RecoveryPointArn" --output text); do
       aws backup delete-recovery-point --backup-vault-name $VAULT --recovery-point-arn $RP
