@@ -58,14 +58,20 @@ export class EventbridgeCloudtrailDataplaneStack extends cdk.Stack {
       retentionPeriod: cdk.Duration.days(14),
     });
 
+    // Explicit log group so the retention and removal are part of the stack
+    const processorLogGroup = new logs.LogGroup(this, 'EventProcessorLogGroup', {
+      retention: logs.RetentionDays.ONE_WEEK,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // Lambda function to process CloudTrail events
     const processor = new lambda.Function(this, 'EventProcessor', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src'),
       timeout: cdk.Duration.seconds(10),
       loggingFormat: lambda.LoggingFormat.JSON,
-      logRetention: logs.RetentionDays.ONE_WEEK,
+      logGroup: processorLogGroup,
       retryAttempts: 2,
       onFailure: new destinations.SqsDestination(dlq),
     });
@@ -87,6 +93,7 @@ export class EventbridgeCloudtrailDataplaneStack extends cdk.Stack {
     }));
 
     new cdk.CfnOutput(this, 'ProcessorFunctionName', { value: processor.functionName });
+    new cdk.CfnOutput(this, 'ProcessorLogGroupName', { value: processorLogGroup.logGroupName });
     new cdk.CfnOutput(this, 'TrailBucketName', { value: trailBucket.bucketName });
     new cdk.CfnOutput(this, 'RuleName', { value: rule.ruleName });
   }

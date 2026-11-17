@@ -12,7 +12,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
-* [Node.js 20+](https://nodejs.org/en/download/) installed
+* [Node.js 22 or later](https://nodejs.org/en/download/) installed (required by the AWS CDK CLI)
 
 ## Deployment Instructions
 
@@ -46,9 +46,9 @@ The check puts one event, then polls the function log group every 10 seconds and
 
 ```bash
 STACK=EventbridgeCloudtrailDataplaneStack
-FN=$(aws cloudformation describe-stacks --stack-name $STACK \
-  --query 'Stacks[0].Outputs[?OutputKey==`ProcessorFunctionName`].OutputValue' --output text)
-[ -n "$FN" ] || { echo "FAIL: stack output not found (check the CLI Region)"; exit 1; }
+LG=$(aws cloudformation describe-stacks --stack-name $STACK \
+  --query 'Stacks[0].Outputs[?OutputKey==`ProcessorLogGroupName`].OutputValue' --output text)
+[ -n "$LG" ] || { echo "FAIL: stack output not found (check the CLI Region)"; exit 1; }
 START=$(( $(date +%s) * 1000 ))
 
 # Put a test event to the default event bus
@@ -57,7 +57,7 @@ aws events put-events --entries '[{"Source":"test.app","DetailType":"TestEvent",
 # Poll the function log group (30 tries x 10 s = 5 minutes); exit non-zero if no record appears
 N=0
 for i in $(seq 1 30); do
-  N=$(aws logs filter-log-events --log-group-name "/aws/lambda/$FN" \
+  N=$(aws logs filter-log-events --log-group-name "$LG" \
     --filter-pattern '"EventBridge data plane API call detected"' \
     --start-time "$START" --query 'events[].eventId' --output text | wc -w | tr -d ' ')
   [ "$N" -gt 0 ] && break
