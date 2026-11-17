@@ -90,7 +90,7 @@ Two details are easy to get wrong here. A managed domain authorizes every reques
 
 ```bash
 git clone https://github.com/aws-samples/serverless-patterns
-cd serverless-patterns/eventbridge-firehose-opensearch/typescript/cdk
+cd serverless-patterns/eventbridge-firehose-opensearch/typescript/cdk/cdk
 npm install
 cdk deploy -c dashboardAccessIp=$(curl -s https://checkip.amazonaws.com)/32
 ```
@@ -265,7 +265,7 @@ These are deliberate omissions to keep the pattern minimal.
 ## Cleanup
 
 ```bash
-cd cdk
+cd serverless-patterns/eventbridge-firehose-opensearch/typescript/cdk/cdk
 cdk destroy
 ```
 
