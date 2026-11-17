@@ -9,7 +9,7 @@ import { Construct } from 'constructs';
 
 const DB_NAME = 'appdb';
 
-// Idempotent schema and seed row. Each entry is one RDS Data API call, run in order.
+// Idempotent schema and seed row. Each entry is one Amazon RDS Data API call, run in order.
 const SCHEMA_SQL = [
   'CREATE TABLE IF NOT EXISTS inventory (sku text PRIMARY KEY, stock integer NOT NULL CHECK (stock >= 0))',
   'CREATE TABLE IF NOT EXISTS orders (id text PRIMARY KEY, sku text NOT NULL REFERENCES inventory (sku), quantity integer NOT NULL CHECK (quantity > 0))',
@@ -150,6 +150,15 @@ export class SfnAuroraDataApiStack extends cdk.Stack {
       assign: { failureError: '{% $states.errorOutput.Error %}', failureCause: '{% $states.errorOutput.Cause %}' },
     };
     [insertOrder, decrementStock, insertAudit, commit].forEach((state) => state.addCatch(rollback, rollBackOnError));
+
+    // A failed rollback goes to the same Fail state: failureError keeps the original error and the rollback error is
+    // appended to failureCause, so the Fail state reports both. The expression reads the failureCause set before this state.
+    rollback.addCatch(rejected, {
+      errors: [sfn.Errors.ALL],
+      assign: {
+        failureCause: "{% $failureCause & ' (RollbackTransaction failed: ' & $states.errorOutput.Error & ')' %}",
+      },
+    });
 
     const stockUnavailable = sfn.Pass.jsonata(this, 'StockUnavailable', {
       assign: {

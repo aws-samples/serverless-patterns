@@ -28,7 +28,7 @@ Execution input {"sku": "SKU-100", "quantity": 2}
 AWS Step Functions (Standard, JSONata)
   EnsureSchema -> BeginTransaction -> InsertOrder -> DecrementStock -> StockReserved? -> InsertAudit -> CommitTransaction -> OrderCommitted
   (any error in InsertOrder, DecrementStock, InsertAudit or CommitTransaction, or no stock, goes to:)
-  RollbackTransaction -> OrderRolledBack (Fail state with error and cause)
+  RollbackTransaction -> OrderRolledBack (Fail state with error and cause; a failed rollback also goes here)
       |
       | AWS SDK integration (IAM)
       v
@@ -42,13 +42,13 @@ Amazon RDS Data API --> Amazon Aurora Serverless v2 PostgreSQL (private isolated
 2. BeginTransaction returns a transaction id, stored in a workflow variable.
 3. InsertOrder, DecrementStock and InsertAudit pass that id and use named SQL parameters. DecrementStock only updates a row when `stock >= quantity`; StockReserved reads the update count and treats zero rows as "not enough stock".
 4. CommitTransaction ends the execution in OrderCommitted.
-5. A statement error, or zero updated rows, goes to RollbackTransaction with the same transaction id and ends in the OrderRolledBack Fail state with the error and cause.
+5. A statement error, or zero updated rows, goes to RollbackTransaction with the same transaction id and ends in the OrderRolledBack Fail state with the error and cause. If the rollback fails too, its error name is appended to the cause.
 
 ## Important Notes
 
 * The Data API ends a transaction that no call uses for three minutes and caps it at one hour, according to the [BeginTransaction](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_BeginTransaction.html) reference (not tested here). The state machine does not roll back when an execution is stopped or times out outside a Catch; the Data API does it after the idle period, and row locks stay held until then.
 * The cluster scales to 0 ACUs and pauses after 5 minutes without connections. AWS documents about 15 seconds to resume, longer after a day paused ([auto-pause](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2-auto-pause.html)). The first call after a pause fails with `RdsData.DatabaseResumingException` ("is resuming after being auto-paused"), so the first database calls retry that error up to 6 times; in a test the first execution after a pause succeeded after the retry and took 17 seconds, and later executions took about 1.5 seconds. Failed statements are never retried.
-* The stock check reads `NumberOfRecordsUpdated` with `$exists`, so a response without that field counts as zero rows. If RollbackTransaction itself fails (for example the transaction already expired, or a Commit that succeeded only lost its response), the execution fails with that error instead of the original one, and you should check the table state (by design; a failing CommitTransaction was not tested). After a failed PostgreSQL statement (Testing step 4) the Data API still accepted the rollback, so `error` and `cause` hold the database error.
+* The stock check reads `NumberOfRecordsUpdated` with `$exists`, so a response without that field counts as zero rows. If RollbackTransaction itself fails (for example the transaction already expired, or a Commit that succeeded only lost its response), a Catch on that state sends the execution to the OrderRolledBack Fail state with the original `error` and a `cause` that ends with ` (RollbackTransaction failed: <error name>)`, and you should check the table state (the Catch on RollbackTransaction was checked with a mocked error in the Step Functions TestState API; a real failing rollback and a failing CommitTransaction were not provoked against a cluster). After a failed PostgreSQL statement (Testing step 4) the Data API still accepted the rollback, so `error` and `cause` hold the database error.
 * The cluster has the Data API HTTP endpoint enabled, and its security group has no inbound rule. Access to the database goes through IAM (`rds-data` actions plus `secretsmanager:GetSecretValue`), not through the network. The state machine connects as the master user `postgres`, whose generated credentials are in the secret and are not rotated; use a scoped database user and rotation for anything real.
 * The workflow does not validate its input: send `sku` (a string) and `quantity` (an integer) as in the Testing examples. The order id is the execution name, which is a UUID unless you pass `--name`.
 * EnsureSchema runs on every execution so that nobody runs DDL by hand. That is acceptable for a demo that runs one execution at a time; use a migration tool for a real schema.
