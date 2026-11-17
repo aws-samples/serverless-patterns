@@ -149,7 +149,7 @@ Workflow errors are logged to the log group named in the `StateMachineLogGroupNa
 
 ## Cleanup
 
-1. Delete the stack (in a new terminal, run Deployment step 4 first: step 2 needs its variables, and the stack outputs are gone after the destroy). This also deletes the custom bus, the archive with every event in it, the queue with its messages, the topic and its subscription, and the log group. If an execution is still in its 10 minute wait, the state machine finishes deleting at that execution's next state transition:
+1. Delete the stack (in a new terminal, run Deployment step 4 first: step 2 needs its variables, and the stack outputs are gone after the destroy). This also deletes the custom bus, the archive with every event in it, the queue with its messages, the start-rule dead-letter queue, the topic and its subscription, and the log group. If an execution is still in its 10 minute wait, the state machine finishes deleting at that execution's next state transition:
     ```bash
     npx cdk destroy
     ```

@@ -90,8 +90,12 @@ export class EventbridgeArchiveReplaySfnStack extends cdk.Stack {
       topic,
       subject: 'EventBridge replay result',
       message: sfn.TaskInput.fromText(MESSAGE),
+      taskTimeout: sfn.Timeout.duration(cdk.Duration.seconds(30)),
       outputs: { replayName: '{% $replayName %}', replayState: '{% $replayState %}', messageId: '{% $states.result.MessageId %}' },
     });
+    // PublishResult is the Catch target of the other tasks, so a transient error here would drop the result.
+    // Named errors only: States.ALL would also retry permanent errors such as an expression or permission error.
+    publish.addRetry({ errors: ['States.Timeout', 'SNS.InternalErrorException'], interval: cdk.Duration.seconds(5), maxAttempts: 3 });
     const done = new sfn.Choice(this, 'ReplayCompleted?', { queryLanguage: sfn.QueryLanguage.JSONATA })
       .when(sfn.Condition.jsonata("{% $replayState = 'COMPLETED' %}"), sfn.Succeed.jsonata(this, 'Completed'))
       .otherwise(sfn.Fail.jsonata(this, 'ReplayNotCompleted', { error: 'ReplayNotCompleted', cause: 'The replay did not reach COMPLETED. See the Amazon SNS message.' }));
