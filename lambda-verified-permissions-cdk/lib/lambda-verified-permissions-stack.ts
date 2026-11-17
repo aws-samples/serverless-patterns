@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as verifiedpermissions from 'aws-cdk-lib/aws-verifiedpermissions';
 import { Construct } from 'constructs';
 
@@ -78,7 +79,11 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
         // Principal that owns the demo documents, e.g. -c ownerPrincipal=arn
         DEMO_OWNER_PRINCIPAL: this.node.tryGetContext('ownerPrincipal') ?? ''
       },
-      timeout: cdk.Duration.seconds(10)
+      timeout: cdk.Duration.seconds(10),
+      logGroup: new logs.LogGroup(this, 'AuthorizerFnLogs', {
+        retention: logs.RetentionDays.ONE_WEEK,
+        removalPolicy: cdk.RemovalPolicy.DESTROY
+      })
     });
 
     authFn.addToRolePolicy(new iam.PolicyStatement({

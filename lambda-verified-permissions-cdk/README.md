@@ -56,6 +56,8 @@ For example: `cdk deploy -c ownerPrincipal="$CALLER" -c adminPrincipals="$CALLER
 
 The Lambda Function URL uses `AWS_IAM` authentication, so requests must be signed with [SigV4](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-signing.html). The simplest way is `curl` with `--aws-sigv4`. Set `AWS_REGION` to the Region you deployed to.
 
+The calling principal also needs both `lambda:InvokeFunctionUrl` and `lambda:InvokeFunction` on the function, through its own identity-based policy or, within the same account, through the function's resource-based policy. Without them the request is rejected with `403 Forbidden`. This stack does not add either permission, so check this first if you sign requests with a second, scoped-down principal to compare reader and admin results. See [Control access to Lambda function URLs](https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html).
+
 ```bash
 FUNCTION_URL=$(aws cloudformation describe-stacks \
   --stack-name LambdaVerifiedPermissionsStack \
