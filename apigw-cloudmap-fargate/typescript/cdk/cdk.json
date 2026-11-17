@@ -1,1 +1,1 @@
-{ "app": "node build/bin/app.js" }
+{ "app": "npx ts-node --prefer-ts-exts bin/app.ts" }

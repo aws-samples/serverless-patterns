@@ -50,10 +50,9 @@ The one non-obvious setting is the record type. The AWS CDK default for a Fargat
     cd serverless-patterns/apigw-cloudmap-fargate/typescript/cdk
     ```
 
-2. Install dependencies and build:
+2. Install dependencies:
     ```bash
     npm install
-    npm run build
     ```
 
 3. Bootstrap CDK once per account and Region, then deploy:
@@ -111,7 +110,7 @@ The one non-obvious setting is the record type. The AWS CDK default for a Fargat
 
 ## Cleanup
 
-1. Delete the stack. This deletes the VPC with its NAT gateway, the VPC link, the service and the log group with its logs. The README creates nothing outside the stack, and the CDK bootstrap resources stay:
+1. Delete the stack. This deletes the VPC with its NAT gateway, the VPC link, the service and the log group with its logs. The Testing steps create nothing outside the stack (the scale-out in step 6 changes the service, which the stack owns), and the CDK bootstrap resources stay:
     ```bash
     npx cdk destroy
     ```
