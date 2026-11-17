@@ -18,7 +18,7 @@
     "headline": "How it works",
     "text": [
       "This pattern deploys an Amazon API Gateway REST API that invokes an AWS Step Functions Express Workflow synchronously with StartSyncExecution.",
-      "The Express Workflow uses native AWS Step Functions service integrations to call Amazon Athena. Because Express Workflows do not support the .sync (RUN_JOB) pattern, AthenaStartQueryExecution runs with the REQUEST_RESPONSE pattern, a Wait/Choice loop polls GetQueryExecution until the query succeeds, then AthenaGetQueryResults reads the rows. A final Pass state shapes the response.",
+      "The Express Workflow uses native AWS Step Functions service integrations to call Amazon Athena. Because Express Workflows do not support the .sync (RUN_JOB) pattern, AthenaStartQueryExecution runs with the REQUEST_RESPONSE pattern, a Wait/Choice loop polls GetQueryExecution until the query succeeds (at most 10 polls, then StopQueryExecution and a Fail state, so the workflow ends before the Amazon API Gateway integration timeout), then AthenaGetQueryResults reads the rows. A final Pass state shapes the response.",
       "Amazon Athena queries an AWS Glue external table over a sample CSV dataset in Amazon S3 and writes results to a separate Amazon S3 prefix pinned by an Amazon Athena workgroup.",
       "The result rows are returned to the caller in a single synchronous request/response. There are no AWS Lambda functions in the request path (the stack deploys two small AWS CDK helper functions at deploy time, to seed the sample data and to empty the bucket on stack deletion)."
     ]

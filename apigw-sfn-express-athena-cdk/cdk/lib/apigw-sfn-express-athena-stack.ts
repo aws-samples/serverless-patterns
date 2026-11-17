@@ -36,6 +36,17 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     const dataPrefix = 'data/';
     const resultsPrefix = 'athena-results/';
 
+    // Amazon API Gateway integration timeout. 29 seconds is the default and the
+    // maximum for a REST API without a quota increase (Regional and private
+    // APIs can raise it through Service Quotas, see the README). The workflow
+    // below is bounded to finish before this.
+    const integrationTimeout = Duration.seconds(29);
+    // Poll budget. Each poll is a 2 second Wait plus the GetQueryExecution call,
+    // so 10 polls end the workflow a few seconds inside the integration
+    // timeout (about 25 seconds at the caller in the test run in the README).
+    // Raise the integration timeout before raising this number.
+    const maxPolls = 10;
+
     // ---------------------------------------------------------------------
     // Amazon S3 bucket: sample dataset (data/) + Athena query results
     // (athena-results/). Encrypted with S3-managed keys, TLS enforced,
@@ -169,6 +180,9 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     // Express workflows do NOT support the '.sync' (RUN_JOB) Athena
     // integration, so we start the query, then poll its status in a
     // Wait/Choice loop until it reaches SUCCEEDED before fetching results.
+    // The loop is bounded (maxPolls) so the workflow gives up, stops the
+    // Athena query and fails a few seconds BEFORE the API Gateway integration
+    // timeout. One limit then decides what the caller sees.
     // All native Step Functions service integrations -> no AWS Lambda in the
     // request path.
     // ---------------------------------------------------------------------
@@ -231,7 +245,7 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     getResults.addRetry({ ...athenaRetry });
 
     // Failure states. An execution that ends in a Fail state has status FAILED,
-    // which the StepFunctionsRestApi response template maps to HTTP 500 with the
+    // which the default response template of the Step Functions integration maps to HTTP 500 with the
     // "error" and "cause" values in the body.
     //
     // From CheckQueryState when Athena reports FAILED or CANCELLED. The Athena
@@ -247,10 +261,41 @@ export class ApigwSfnExpressAthenaStack extends Stack {
       error: 'AthenaQueryFailed',
       cause: 'The Athena query failed or was cancelled without a reported reason.',
     });
+    // Poll budget exhausted: stop the Athena scan so it does not keep running
+    // after the caller is gone, then fail with a clear error. The stop task
+    // uses the same workgroup-scoped IAM as the other Athena calls (see the
+    // role policy below). If the stop request itself errors (for example the
+    // query finished in the meantime) the workflow still ends in this Fail state.
+    const queryTimedOut = new sfn.Fail(this, 'QueryTimedOut', {
+      error: 'AthenaQueryTimeout',
+      cause: 'The Athena query did not finish in time. A request to stop it was sent.',
+    });
+    const stopQuery = new tasks.CallAwsService(this, 'StopAthenaQuery', {
+      service: 'athena',
+      action: 'stopQueryExecution',
+      parameters: {
+        QueryExecutionId: sfn.JsonPath.stringAt(
+          '$.queryExecution.QueryExecutionId',
+        ),
+      },
+      iamResources: [workgroupArn],
+      resultPath: sfn.JsonPath.DISCARD,
+    });
+    stopQuery.addCatch(queryTimedOut, { errors: ['States.ALL'], resultPath: sfn.JsonPath.DISCARD });
+    stopQuery.next(queryTimedOut);
+
     // From the addCatch handlers below, which put the caught error under $.error.
     const taskFailed = new sfn.Fail(this, 'TaskFailed', {
       errorPath: '$.error.Error',
       causePath: '$.error.Cause',
+    });
+
+    // Count one poll, keeping only the fields later states need.
+    const countPoll = new sfn.Pass(this, 'CountPoll', {
+      parameters: {
+        'queryExecution.$': '$.queryExecution',
+        'attempt.$': 'States.MathAdd($.attempt, 1)',
+      },
     });
 
     // Shape the response: return only the Athena result rows to the caller.
@@ -284,23 +329,30 @@ export class ApigwSfnExpressAthenaStack extends Stack {
         ),
         queryFailedNoReason,
       )
-      .otherwise(waitForQuery);
+      .when(
+        sfn.Condition.numberGreaterThanEquals('$.attempt', maxPolls),
+        stopQuery,
+      )
+      .otherwise(countPoll);
 
     startQuery.addCatch(taskFailed, { errors: ['States.ALL'], resultPath: '$.error' });
     getQueryExecution.addCatch(taskFailed, { errors: ['States.ALL'], resultPath: '$.error' });
     getResults.addCatch(taskFailed, { errors: ['States.ALL'], resultPath: '$.error' });
 
-    // Amazon API Gateway's StepFunctionsRestApi integration wraps the request
+    // Amazon API Gateway's Step Functions integration wraps the request
     // body under a "body" key (input shape: {body, querystring, path}). Lift
     // the caller's queryString to the top level so the query task can read it.
+    // 'attempt' counts completed polls and is checked by CheckQueryState.
     const extractInput = new sfn.Pass(this, 'ExtractInput', {
       parameters: {
         'queryString.$': '$.body.queryString',
+        attempt: 0,
       },
     });
 
     const definition = extractInput
       .next(startQuery)
+      .next(countPoll)
       .next(waitForQuery)
       .next(getQueryExecution)
       .next(checkQueryState);
@@ -314,11 +366,9 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     const stateMachine = new sfn.StateMachine(this, 'AthenaExpressStateMachine', {
       definitionBody: sfn.DefinitionBody.fromChainable(definition),
       stateMachineType: sfn.StateMachineType.EXPRESS,
-      // Note: the REST API below is edge-optimized, where the integration
-      // timeout is 29 seconds and cannot be raised. A query that takes longer
-      // than about 29 seconds gets a 504 at the caller while the execution keeps
-      // running (up to this timeout) and the Athena query is not stopped. See
-      // the README.
+      // Backstop only. The bounded poll loop normally ends the execution a few
+      // seconds inside the 29 second API Gateway integration timeout. See the
+      // README.
       timeout: Duration.seconds(60),
       tracingEnabled: true,
       logs: {
@@ -375,15 +425,18 @@ export class ApigwSfnExpressAthenaStack extends Stack {
 
     // ---------------------------------------------------------------------
     // Amazon API Gateway (REST) -> StartSyncExecution on the Express state
-    // machine. StepFunctionsRestApi wires the AWS service integration and
-    // grants the API role sync-execution permission on THIS state machine.
+    // machine. StepFunctionsIntegration.startExecution wires the AWS service
+    // integration and grants the API role sync-execution permission on THIS
+    // state machine. RestApi is used instead of StepFunctionsRestApi because
+    // only the integration options expose the integration timeout.
+    // The API is Regional: callers sign with SigV4 and the backend is a service
+    // integration, so the CloudFront hop of an edge-optimized endpoint adds
+    // nothing, and a Regional API can raise the timeout via a quota increase.
     // The request body is passed to Amazon Athena as SQL, so the method requires
     // AWS IAM (SigV4) authorization and the stage caps the request rate.
     // ---------------------------------------------------------------------
-    const api = new apigw.StepFunctionsRestApi(this, 'AthenaQueryApi', {
-      stateMachine,
-      // Express + StartSyncExecution: request/response in one HTTP call.
-      useDefaultMethodResponses: true,
+    const api = new apigw.RestApi(this, 'AthenaQueryApi', {
+      endpointConfiguration: { types: [apigw.EndpointType.REGIONAL] },
       defaultMethodOptions: {
         authorizationType: apigw.AuthorizationType.IAM,
       },
@@ -395,6 +448,16 @@ export class ApigwSfnExpressAthenaStack extends Stack {
         throttlingBurstLimit: 10,
       },
     });
+    api.root.addMethod(
+      'ANY',
+      // Express + StartSyncExecution: request/response in one HTTP call.
+      apigw.StepFunctionsIntegration.startExecution(stateMachine, {
+        timeout: integrationTimeout,
+        path: true,
+        querystring: true,
+        useDefaultMethodResponses: true,
+      }),
+    );
 
     new CfnOutput(this, 'ApiEndpoint', {
       value: api.url,
