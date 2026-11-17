@@ -10,13 +10,19 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // Explicit log group for the handler, removed together with the stack
+    const eventFnLogGroup = new logs.LogGroup(this, 'EventHandlerLogGroup', {
+      retention: logs.RetentionDays.ONE_WEEK,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // Lambda handler for event processing
     const eventFn = new lambda.Function(this, 'EventHandlerFn', {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src')),
       timeout: cdk.Duration.seconds(10),
-      logRetention: logs.RetentionDays.ONE_WEEK,
+      logGroup: eventFnLogGroup,
     });
 
     // Service role AppSync Events assumes to invoke the Lambda data source
@@ -55,7 +61,8 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
     });
 
     // Lambda data source configured on the Events API. The OnPublish handler
-    // references this data source by name; the ARN lives here, not inline.
+    // references this data source by name (through its Name attribute, which
+    // also gives CloudFormation the creation order); the ARN lives here.
     const lambdaDataSource = new appsync.CfnDataSource(this, 'LambdaDataSource', {
       apiId: api.attrApiId,
       name: 'LambdaEventHandler',
@@ -69,7 +76,7 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
     // Channel namespace with a Direct Lambda OnPublish interceptor. Every event
     // published to this namespace is sent to the Lambda (REQUEST_RESPONSE) for
     // validation/enrichment before AppSync broadcasts it to subscribers.
-    const notificationsChannel = new appsync.CfnChannelNamespace(this, 'NotificationsChannel', {
+    new appsync.CfnChannelNamespace(this, 'NotificationsChannel', {
       apiId: api.attrApiId,
       name: 'notifications',
       publishAuthModes: [{ authType: 'API_KEY' }],
@@ -78,7 +85,7 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
         onPublish: {
           behavior: 'DIRECT',
           integration: {
-            dataSourceName: lambdaDataSource.name,
+            dataSourceName: lambdaDataSource.attrName,
             lambdaConfig: {
               invokeType: 'REQUEST_RESPONSE',
             },
@@ -86,8 +93,6 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
         },
       },
     });
-    // dataSourceName is a string reference, so enforce creation ordering explicitly.
-    notificationsChannel.addDependency(lambdaDataSource);
 
     // Second channel namespace
     new appsync.CfnChannelNamespace(this, 'AlertsChannel', {
@@ -102,5 +107,6 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'ApiId', { value: api.attrApiId });
     new cdk.CfnOutput(this, 'ApiKeyValue', { value: apiKey.attrApiKey });
     new cdk.CfnOutput(this, 'FunctionName', { value: eventFn.functionName });
+    new cdk.CfnOutput(this, 'LogGroupName', { value: eventFnLogGroup.logGroupName });
   }
 }
