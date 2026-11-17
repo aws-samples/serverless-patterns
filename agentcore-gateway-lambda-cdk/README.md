@@ -1,6 +1,6 @@
-# Amazon Bedrock AgentCore Gateway with Lambda tools
+# Amazon Bedrock AgentCore Gateway with AWS Lambda tools
 
-This pattern deploys an Amazon Bedrock AgentCore Gateway that exposes Lambda functions as MCP (Model Context Protocol) tools. Any MCP-compatible client can discover and invoke the tools via the Gateway's MCP endpoint.
+This pattern deploys an Amazon Bedrock AgentCore Gateway that exposes AWS Lambda functions as MCP (Model Context Protocol) tools. Any MCP-compatible client can discover and invoke the tools via the Gateway's MCP endpoint.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/agentcore-gateway-lambda-cdk
 
@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node.js 22+](https://nodejs.org/en/download/) installed
 * [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
-* [Python 3.9+](https://www.python.org/downloads/) with `boto3` installed (for testing)
+* [Python 3.9+](https://www.python.org/downloads/) installed, with the test dependencies installed by `python3 -m pip install boto3 botocore` (for testing)
 
 ## Architecture
 
@@ -32,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
 1. The AgentCore Gateway is created with MCP protocol and IAM authentication.
 2. A Lambda function is registered as a Gateway target with inline tool definitions (get_weather, get_time).
 3. MCP clients send `tools/list` to discover available tools and `tools/call` to invoke them.
-4. The Gateway routes tool calls to the Lambda function, passing the tool arguments. The Lambda returns MCP-formatted content responses.
+4. The Gateway routes tool calls to the Lambda function, passing the tool arguments as the event and the invoked tool name (`<target name>___<tool name>`, for example `city-tools___get_time`) in `context.clientContext.custom.bedrockAgentCoreToolName`. The function branches on the tool name and returns an MCP `content` item with the result as JSON text.
 
 ## Deployment Instructions
 
@@ -47,12 +47,17 @@ Important: this application uses various AWS services and there are costs associ
     npm install
     ```
 
-3. Deploy the stack:
+3. If this is the first time you deploy CDK stacks into this AWS account and Region, [bootstrap](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) the environment:
+    ```bash
+    cdk bootstrap
+    ```
+
+4. Deploy the stack:
     ```bash
     cdk deploy
     ```
 
-4. Note the outputs printed after deployment. You will need `GatewayUrl` for testing.
+5. Note the outputs printed after deployment. You will need `GatewayUrl` for testing.
     Example output:
     ```
     Outputs:
@@ -64,7 +69,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Testing
 
-The Gateway uses IAM authentication, so requests must be signed with SigV4. Replace `<GatewayUrl>` with the `GatewayUrl` value from the deploy output, and `<your-region>` with your deployment region (e.g. `us-east-1`).
+The Gateway uses IAM authentication, so requests must be signed with SigV4, and the calling identity needs the `bedrock-agentcore:InvokeGateway` permission on the gateway ARN (`arn:aws:bedrock-agentcore:<your-region>:<account-id>:gateway/<GatewayId>`, using the `GatewayId` deploy output); without it the signed request is denied ([IAM-based inbound authorization](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-inbound-auth.html#gateway-inbound-auth-iam)). Any IAM principal in the account whose identity-based policy allows that action can call the gateway. To narrow that down, attach a [resource-based policy](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/resource-based-policies.html) to the gateway; an explicit deny in either kind of policy takes precedence. Replace `<GatewayUrl>` with the `GatewayUrl` value from the deploy output, and `<your-region>` with your deployment region (e.g. `us-east-1`).
 
 1. List available tools:
     ```python
@@ -103,6 +108,11 @@ The Gateway uses IAM authentication, so requests must be signed with SigV4. Repl
                                       headers=dict(req.headers), method="POST")
     resp = urllib.request.urlopen(http_req, timeout=30)
     print(json.dumps(json.loads(resp.read()), indent=2))
+    ```
+
+3. Call the other tool by running the code from step 2 again with `"name": "city-tools___get_time"`. The `text` value in the result holds only the city and the UTC time, with no weather values:
+    ```json
+    {"city":"Tokyo","utcTime":"2026-11-16T13:49:08.564Z"}
     ```
 
 ## Cleanup

@@ -2,6 +2,7 @@ import * as cdk from "aws-cdk-lib";
 import * as agentcore from "aws-cdk-lib/aws-bedrockagentcore";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as logs from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
 
 export class AgentcoreGatewayLambdaStack extends cdk.Stack {
@@ -16,6 +17,11 @@ export class AgentcoreGatewayLambdaStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       memorySize: 256,
       description: "AgentCore Gateway Lambda tool target",
+      // Function log group with one week retention, removed on cdk destroy
+      logGroup: new logs.LogGroup(this, "ToolFnLogs", {
+        retention: logs.RetentionDays.ONE_WEEK,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }),
     });
 
     // The gateway name is known at synth time, so the role can be scoped to it
@@ -47,7 +53,7 @@ export class AgentcoreGatewayLambdaStack extends cdk.Stack {
       description: "MCP Gateway exposing Lambda tools",
     });
 
-    // Gateway target — Lambda with inline tool definitions
+    // Gateway target - Lambda with inline tool definitions
     const target = new agentcore.CfnGatewayTarget(this, "ToolTarget", {
       gatewayIdentifier: gateway.attrGatewayIdentifier,
       name: "city-tools",
