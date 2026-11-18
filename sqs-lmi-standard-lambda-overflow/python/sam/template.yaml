@@ -222,6 +222,7 @@ Resources:
   LmiWorkerFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${AWS::StackName}-lmi-worker'
       CodeUri: src/
       Handler: worker.lambda_handler
       Description: Baseline SQS worker on Lambda Managed Instances.
@@ -246,6 +247,8 @@ Resources:
             QueueName: !GetAtt WorkQueue.QueueName
         - DynamoDBCrudPolicy:
             TableName: !Ref IdempotencyTable
+      LoggingConfig:
+        LogGroup: !Ref LmiWorkerLogGroup
       Tags:
         Pattern: sqs-lmi-standard-lambda-overflow
 
@@ -273,6 +276,7 @@ Resources:
   BurstWorkerFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${AWS::StackName}-burst-worker'
       CodeUri: src/
       Handler: worker.lambda_handler
       Description: On-demand Standard Lambda worker that absorbs temporary overflow.
@@ -290,6 +294,8 @@ Resources:
             QueueName: !GetAtt WorkQueue.QueueName
         - DynamoDBCrudPolicy:
             TableName: !Ref IdempotencyTable
+      LoggingConfig:
+        LogGroup: !Ref BurstWorkerLogGroup
       Tags:
         Pattern: sqs-lmi-standard-lambda-overflow
 
@@ -323,6 +329,7 @@ Resources:
   SpillControllerFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${AWS::StackName}-spill-controller'
       CodeUri: src/
       Handler: spill_controller.lambda_handler
       Description: Polls live queue depth and enables or disables the burst mapping.
@@ -365,6 +372,34 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: rate(1 minute)
+      LoggingConfig:
+        LogGroup: !Ref SpillControllerLogGroup
+
+  # ---------------------------------------------------------------------------
+  # Log groups: bounded retention so stacks don't leave indefinite logs behind.
+  # DeletionPolicy: Delete removes the groups when sam delete runs.
+  # ---------------------------------------------------------------------------
+
+  LmiWorkerLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-lmi-worker'
+      RetentionInDays: 14
+
+  BurstWorkerLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-burst-worker'
+      RetentionInDays: 14
+
+  SpillControllerLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-spill-controller'
+      RetentionInDays: 14
 
   # ---------------------------------------------------------------------------
   # Dashboard: produces the traffic-curve graphs for the two load-test scenarios.

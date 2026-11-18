@@ -274,6 +274,14 @@ The **Work completed per tier** widget is the graph to take to the customer, but
 
 A 90-second spike. The burst tier engages and drains the backlog; LMI barely moves, because the spike is over before its scaler has completed a cycle. This is the common case for the "usually steady, surprises sometimes" workload, and it is the case that justifies the burst tier existing at all.
 
+### Scenario 3 — sustained burst with Poisson arrivals: judge the controller
+
+```bash
+./scripts/run_scenarios.sh "$STACK" 3
+```
+
+The same sustained-burst shape as scenario 1, but arrivals are Poisson-distributed rather than metered at a fixed rate. This is the scenario to use when evaluating the controller: the randomness in inter-arrival times produces the depth noise a real workload generates, so you can see whether the dead-band and trend-window parameters prevent the valve from flapping on a dip. Watch `depthTrendPerSecond` in the controller logs alongside the **Backlog and spill thresholds** widget.
+
 ### Watch the controller's reasoning
 
 Every poll logs its decision as JSON, including the case where it deliberately does nothing — so at the default interval there are six lines a minute, each with the depth it saw:

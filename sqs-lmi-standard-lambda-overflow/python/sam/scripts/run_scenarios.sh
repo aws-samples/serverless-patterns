@@ -17,7 +17,7 @@
 
 set -euo pipefail
 
-STACK_NAME="${1:?usage: run_scenarios.sh <stack-name> [0|1|2]}"
+STACK_NAME="${1:?usage: run_scenarios.sh <stack-name> [0|1|2|3]}"
 SCENARIO="${2:-1}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

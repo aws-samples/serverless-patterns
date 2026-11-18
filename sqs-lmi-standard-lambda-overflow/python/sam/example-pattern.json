@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lmi-standard-lambda-overflow-sam",
-      "templateURL": "serverless-patterns/sqs-lmi-standard-lambda-overflow-sam",
-      "projectFolder": "sqs-lmi-standard-lambda-overflow-sam",
       "templateFile": "template.yaml"
     }
   },
@@ -63,6 +60,11 @@
       "name": "Mitesh Purohit",
       "bio": "Sr Solution Architect, AWS",
       "linkedin": "mitup"
-    }
+    },
+    {
+    "name": "Brian Krygsman",
+    "bio": "Worldwide Sr. Serverless Specialist Solutions Architect",
+    "linkedin": "brian-krygsman"
+}
   ]
 }
