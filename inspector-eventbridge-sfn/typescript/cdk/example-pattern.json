@@ -4,7 +4,6 @@
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
-  "patternType": "Standalone",
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -60,53 +59,5 @@
       "linkedin": "",
       "twitter": ""
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 15,
-      "y": 50,
-      "service": "inspector",
-      "label": "Amazon Inspector"
-    },
-    "icon2": {
-      "x": 40,
-      "y": 50,
-      "service": "eventbridge",
-      "label": "Amazon EventBridge"
-    },
-    "icon3": {
-      "x": 65,
-      "y": 50,
-      "service": "stepfunctions",
-      "label": "AWS Step Functions"
-    },
-    "icon4": {
-      "x": 90,
-      "y": 30,
-      "service": "ecr",
-      "label": "Amazon ECR"
-    },
-    "icon5": {
-      "x": 90,
-      "y": 70,
-      "service": "sns",
-      "label": "Amazon SNS"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3"
-    },
-    "line3": {
-      "from": "icon3",
-      "to": "icon4"
-    },
-    "line4": {
-      "from": "icon3",
-      "to": "icon5"
-    }
-  }
+  ]
 }
