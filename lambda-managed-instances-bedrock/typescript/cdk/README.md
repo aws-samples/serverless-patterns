@@ -70,8 +70,11 @@ This pattern adds Bedrock integration to demonstrate a real-world use case beyon
 Invoke the function:
 
 ```bash
+ALIAS_ARN=$(aws cloudformation describe-stacks --stack-name LambdaManagedInstancesBedrockStack \
+  --query "Stacks[0].Outputs[?OutputKey=='AliasArn'].OutputValue" --output text)
+
 aws lambda invoke \
-  --function-name managed-instances-bedrock-cdk --qualifier prod \
+  --function-name "$ALIAS_ARN" \
   --payload '{"prompt":"Explain Lambda Managed Instances in 3 sentences"}' \
   --cli-binary-format raw-in-base64-out \
   output.json && cat output.json | python3 -m json.tool

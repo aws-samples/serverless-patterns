@@ -15,10 +15,7 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
     const baseModelId = "anthropic.claude-sonnet-4-6";
     const inferenceProfileId = `us.${baseModelId}`;
 
-    const functionName = "managed-instances-bedrock-cdk";
-
     const logGroup = new logs.LogGroup(this, "LogGroup", {
-      logGroupName: `/aws/lambda/${functionName}`,
       retention: logs.RetentionDays.TWO_WEEKS,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -30,7 +27,6 @@ export class LambdaManagedInstancesBedrockStack extends cdk.Stack {
       timeout: cdk.Duration.minutes(5),
       memorySize: 2048, // Managed Instances require >= 2048 MB
       architecture: lambda.Architecture.ARM_64,
-      functionName,
       description: "Bedrock invocation on Lambda Managed Instances (EC2-backed)",
       loggingFormat: lambda.LoggingFormat.JSON,
       logGroup,
