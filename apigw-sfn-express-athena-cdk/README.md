@@ -74,7 +74,7 @@ The Amazon API Gateway method uses AWS IAM authorization, so requests must be si
     ```
 2. Change directory to the pattern directory:
     ```
-    cd apigw-sfn-express-athena-cdk/cdk
+    cd serverless-patterns/apigw-sfn-express-athena-cdk/cdk
     ```
 3. Install dependencies:
     ```
@@ -129,9 +129,8 @@ If a query fails (for example a syntax error or an unknown table), the call retu
 
 ## Cleanup
 
-1. Delete the stack:
+1. From the `serverless-patterns/apigw-sfn-express-athena-cdk/cdk` directory, delete the stack:
     ```
-    cd apigw-sfn-express-athena-cdk/cdk
     npx cdk destroy
     ```
 
