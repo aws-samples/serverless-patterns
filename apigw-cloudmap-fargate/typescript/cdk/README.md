@@ -20,12 +20,6 @@ Important: this application uses various AWS services and there are costs associ
 
 Deployed and tested in us-west-2 and eu-central-1: the [VPC link V2 documentation](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-vpc-links-v2.html) lists every Availability Zone ID of both Regions as supported. A VPC link V2 supports only the zone IDs listed there (in us-east-1 the list leaves out use1-az3), and the stack does not pin Availability Zones. Check which zone IDs your account maps to with `aws ec2 describe-availability-zones --query 'AvailabilityZones[].[ZoneName,ZoneId]' --output text`.
 
-## Architecture
-
-![A signed client request reaches an Amazon API Gateway HTTP API, which finds the AWS Fargate task through AWS Cloud Map and reaches it over a VPC link V2 in private subnets.](images/architecture.png)
-
-Numbers 1 to 4 match the steps under How it works. The dashed path is the image pull and the container logs: they leave the private subnets through the NAT gateway and the internet gateway because the stack creates no VPC endpoints.
-
 ## How it works
 
 1. The Amazon ECS service has a service registry entry that points at an AWS Cloud Map service with `SRV` records, the task's container name and container port. For each running task, Amazon ECS registers an instance with the task's private IP address and port and reports the container health check result to AWS Cloud Map. According to the [Amazon ECS documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html), an instance is `UNHEALTHY` until the container health check returns a value, then `HEALTHY`.
