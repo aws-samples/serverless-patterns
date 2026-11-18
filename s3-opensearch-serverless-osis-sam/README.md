@@ -46,7 +46,7 @@ Important: this application uses various AWS services and there are costs associ
     * Enter a stack name
     * Enter the desired AWS Region
     * Enter the ARN identified in the previous step in the `AccessARN` parameter
-    * Enter the `DeploymentName` parameter (up to 28 characters without spaces; "a-z", "0-9", or "-")
+    * Enter the `DeploymentName` parameter (3 to 28 characters, starting with a letter; "a-z", "0-9", or "-")
     * Allow SAM CLI to create IAM roles with the required permissions.
 
     Once you have run `sam deploy --guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
