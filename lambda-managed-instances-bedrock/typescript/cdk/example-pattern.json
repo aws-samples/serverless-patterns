@@ -14,8 +14,8 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-bedrock-cdk",
-      "templateURL": "serverless-patterns/lambda-managed-instances-bedrock-cdk",
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-managed-instances-bedrock/typescript/cdk",
+      "templateURL": "serverless-patterns/lambda-managed-instances-bedrock/typescript/cdk",
       "projectFolder": "lambda-managed-instances-bedrock-cdk",
       "templateFile": "lib/lambda-managed-instances-bedrock-stack.ts"
     }
