@@ -13,7 +13,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [Node and NPM](https://nodejs.org/en/download/) installed
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
-- [Java 17+](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html) installed
+- [Java](https://docs.aws.amazon.com/corretto/) installed
 - [Apache Maven](https://maven.apache.org/install.html) installed
 
 ## Deployment Instructions
@@ -44,7 +44,7 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
-This pattern uses the [AWS Lambda Durable Execution SDK for Java](https://github.com/aws/aws-durable-execution-sdk-java/) (GA April 2026) to build a resilient order processing workflow.
+This pattern uses the [AWS Lambda Durable Execution SDK for Java](https://github.com/aws/aws-durable-execution-sdk-java/) to build a resilient order processing workflow.
 
 The Java function extends `DurableHandler<Map, Map>` and uses `DurableContext` to:
 

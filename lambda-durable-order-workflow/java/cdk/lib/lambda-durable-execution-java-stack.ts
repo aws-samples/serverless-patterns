@@ -13,7 +13,7 @@ export class LambdaDurableExecutionJavaStack extends cdk.Stack {
     });
 
     const fn = new lambda.Function(this, "DurableOrderProcessorFn", {
-      runtime: lambda.Runtime.JAVA_17,
+      runtime: lambda.Runtime.JAVA_25,
       handler: "com.example.OrderProcessor::handleRequest",
       code: lambda.Code.fromAsset("src/target/lambda-durable-execution-java-1.0.0.jar"),
       timeout: cdk.Duration.minutes(15),
