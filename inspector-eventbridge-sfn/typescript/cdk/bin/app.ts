@@ -11,7 +11,7 @@ new InspectorSfnEcrQuarantineStack(app, 'InspectorSfnEcrQuarantineStack', {
   // The stack is environment-agnostic. It reads no hardcoded account/region;
   // resource ARNs are built from Aws.ACCOUNT_ID / Aws.REGION at synth time.
   description:
-    'Auto-quarantine vulnerable Amazon ECR images: Amazon Inspector finding -> Amazon EventBridge -> AWS Step Functions -> Amazon ECR re-tag + Amazon SNS notify',
+    'Tag vulnerable Amazon ECR images: Amazon Inspector finding -> Amazon EventBridge -> AWS Step Functions -> Amazon ECR tag + Amazon SNS notify',
 });
 
 app.synth();

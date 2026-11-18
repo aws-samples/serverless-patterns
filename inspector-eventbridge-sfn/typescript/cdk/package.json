@@ -2,7 +2,7 @@
   "name": "inspector-sfn-ecr-quarantine-cdk",
   "version": "0.1.0",
   "bin": {
-    "cdk": "bin/app.ts"
+    "inspector-eventbridge-sfn": "bin/app.js"
   },
   "scripts": {
     "build": "tsc",

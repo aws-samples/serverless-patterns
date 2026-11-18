@@ -1,6 +1,8 @@
-# Auto-quarantine vulnerable Amazon ECR images with Amazon Inspector, Amazon EventBridge, and AWS Step Functions
+# Tag vulnerable Amazon ECR images with Amazon Inspector, Amazon EventBridge, and AWS Step Functions
 
-This pattern automatically quarantines a vulnerable container image the moment Amazon Inspector raises a HIGH or CRITICAL finding on it. An Amazon Inspector finding on an Amazon ECR container image is routed by Amazon EventBridge to an AWS Step Functions workflow that re-tags the offending image with a per-image `quarantine-<digest>` tag and sends an Amazon SNS notification.
+This pattern tags a vulnerable container image as soon as Amazon Inspector raises a HIGH or CRITICAL finding on it. An Amazon Inspector finding on an Amazon ECR container image is routed by Amazon EventBridge to an AWS Step Functions workflow that adds a per-image `quarantine-<digest>` tag to the image and sends an Amazon SNS notification.
+
+The tag is a marker only. It doesn't stop anyone pulling or deploying the image. To block the image, add a check on the `quarantine-` tag prefix to your deployment pipeline or admission controller.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/inspector-eventbridge-sfn-typescript-cdk
 
@@ -39,13 +41,13 @@ The happy path through the state machine is `GetImageManifest` → `ApplyQuarant
 
 ## Design decisions
 
-- **How the image is quarantined (no AWS Lambda function required).** A container image in Amazon ECR is content-addressed by its digest; a tag is a named pointer to a manifest. To mark an existing image without rebuilding or copying layers, the workflow calls `ecr:BatchGetImage` to read the manifest by digest, then `ecr:PutImage` to write the **same** manifest bytes back under a new tag, forwarding the `ImageManifestMediaType` that `ecr:BatchGetImage` returned. Both calls are available as AWS Step Functions optimized AWS SDK service integrations, so the entire remediation runs from the state machine with no AWS Lambda function.
-- **Tag mutability.** The demo Amazon ECR repository uses the default MUTABLE tags. The quarantine tag is unique to each image (`quarantine-<digest hex>`), so the workflow never moves an existing tag. This pattern was not tested against a repository with IMMUTABLE tags.
-- **One tag per image.** A tag in an Amazon ECR repository points at exactly one image, so a fixed `quarantine` tag would move from one image to the next. The tag is derived from the image digest (`quarantine-<sha256 hex>`), so every quarantined image keeps its own marker that downstream Amazon ECR lifecycle policies or deployment admission controllers can key off by the `quarantine-` prefix.
+- **How the image is tagged (no AWS Lambda function required).** A container image in Amazon ECR is content-addressed by its digest; a tag is a named pointer to a manifest. To mark an existing image without rebuilding or copying layers, the workflow calls `ecr:BatchGetImage` to read the manifest by digest, then `ecr:PutImage` to write the **same** manifest bytes back under a new tag, forwarding the `ImageManifestMediaType` that `ecr:BatchGetImage` returned. Both calls are available as AWS Step Functions optimized AWS SDK service integrations, so the whole workflow runs from the state machine with no AWS Lambda function.
+- **Tag mutability.** The demo Amazon ECR repository uses the default MUTABLE tags. The `quarantine-` tag is unique to each image (`quarantine-<digest hex>`), so the workflow never moves an existing tag. This pattern was not tested against a repository with IMMUTABLE tags.
+- **One tag per image.** A tag in an Amazon ECR repository points at exactly one image, so a fixed `quarantine` tag would move from one image to the next. The tag is derived from the image digest (`quarantine-<sha256 hex>`), so every tagged image keeps its own marker that downstream Amazon ECR lifecycle policies or deployment admission controllers can key off by the `quarantine-` prefix.
 - **Repeat findings.** Amazon Inspector raises one finding per vulnerability per image and emits another event whenever a finding changes state, so one image can start many executions. The first execution applies the tag. Later ones call `ecr:PutImage` with an identical manifest and tag, which returns `ImageAlreadyExistsException`; the workflow catches `Ecr.ImageAlreadyExistsException` ahead of the generic catch and ends in `AlreadyQuarantined` without sending another email. Only transient errors (`Ecr.ServerException`, `Ecr.ThrottlingException`, `States.Timeout`) are retried.
 - **Rule scope.** The Amazon EventBridge rule matches only findings with `status` `ACTIVE` (so findings that move to `CLOSED` or `SUPPRESSED` do not start the workflow) on images in the demo repository, because the state machine role only has Amazon ECR permissions on that repository.
 - **Image deleted before the workflow runs.** `ecr:BatchGetImage` returns HTTP 200 with an empty `images` list in that case. A Choice state (`HasImageManifest`) checks for the manifest and routes the missing case to the failure notification.
-- **Rebuild/patch branch.** A documented extension point (`RebuildBranchHint`) is included where a real deployment would kick off a patched-image rebuild (for example, an AWS CodeBuild project). It is intentionally a no-op so the pattern stays focused on the quarantine headline.
+- **Rebuild/patch branch.** A documented extension point (`RebuildBranchHint`) is included where a real deployment would kick off a patched-image rebuild (for example, an AWS CodeBuild project). It is intentionally a no-op so the pattern stays focused on tagging.
 
 ## Requirements
 
@@ -104,7 +106,7 @@ The headline of this pattern is that a HIGH/CRITICAL Amazon Inspector finding on
     aws ecr describe-images --repository-name <RepositoryName> \
       --query 'imageDetails[].imageTags'
     ```
-    You should see the `quarantine-` tag in the tag list, and you will receive an Amazon SNS email confirming the quarantine with the repository, digest, and severity.
+    You should see the `quarantine-` tag in the tag list, and you will receive an Amazon SNS email with the repository, digest, severity and tag.
 
 ## Cleanup
 

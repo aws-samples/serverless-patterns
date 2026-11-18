@@ -19,14 +19,15 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as kms from 'aws-cdk-lib/aws-kms';
 
 /**
- * Inspector -> EventBridge -> Step Functions -> ECR quarantine + SNS.
+ * Inspector -> EventBridge -> Step Functions -> ECR image tag + SNS.
  *
  * When Amazon Inspector raises a HIGH or CRITICAL finding on an Amazon ECR
  * container image, Amazon EventBridge routes the finding to an AWS Step
- * Functions STANDARD workflow that QUARANTINES the offending image by applying
- * a per-image `quarantine-<digest>` tag to it, then sends an Amazon SNS notification.
+ * Functions STANDARD workflow that TAGS the offending image with a per-image
+ * `quarantine-<digest>` tag, then sends an Amazon SNS notification. The tag is a
+ * marker only; it doesn't block pulls or deployments of the image.
  *
- * How the ECR "quarantine tag" is implemented (verified against the ECR API):
+ * How the ECR tag is implemented (verified against the ECR API):
  *   An OCI/Docker image in Amazon ECR is identified by its content-addressable
  *   digest (imageHash, e.g. sha256:...). A "tag" is just a named pointer to a
  *   manifest. To add a tag to an EXISTING image WITHOUT rebuilding or copying
@@ -37,16 +38,16 @@ import * as kms from 'aws-cdk-lib/aws-kms';
  *                             pure control-plane call; no layers are moved.
  *   Both calls are available as Step Functions optimized AWS SDK service
  *   integrations (arn:aws:states:::aws-sdk:ecr:batchGetImage / :putImage), so
- *   the whole quarantine action runs from the state machine with no AWS
+ *   the whole tagging step runs from the state machine with no AWS
  *   Lambda function.
  *
  *   The tag is derived from the image digest (`quarantine-<sha256 hex>`), so
- *   each quarantined image gets its own marker and a tag never moves from one
+ *   each tagged image gets its own marker and a tag never moves from one
  *   image to another. Because Amazon Inspector emits one event per finding (and
  *   another on each state change), the same image can start several executions;
  *   a repeat PutImage with the identical manifest and tag fails with
  *   ImageAlreadyExistsException, which the workflow treats as "already
- *   quarantined".
+ *   tagged".
  *
  *   Note on tag mutability: the demo repository is created with MUTABLE tags so
  *   the PutImage re-tag can succeed. PutImageTagMutability is a REPOSITORY-level
@@ -62,7 +63,7 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
 
     // ---------------------------------------------------------------------
     // Demo target: an Amazon ECR repository.
-    // Tags are MUTABLE so the quarantine re-tag (PutImage) can succeed.
+    // Tags are MUTABLE so the re-tag (PutImage) can succeed.
     // scanOnPush requests a scan on push; enhanced scanning by Amazon
     // Inspector must additionally be ENABLED AT THE ACCOUNT LEVEL (see README).
     // ---------------------------------------------------------------------
@@ -74,12 +75,12 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     });
 
     // ---------------------------------------------------------------------
-    // Amazon SNS topic for quarantine notifications.
+    // Amazon SNS topic for image tag notifications.
     // Encrypted at rest with the AWS-managed KMS key for Amazon SNS
     // (alias/aws/sns) - no extra cost and no customer key to manage.
     // ---------------------------------------------------------------------
     const topic = new sns.Topic(this, 'QuarantineTopic', {
-      displayName: 'ECR image quarantine notifications',
+      displayName: 'ECR vulnerable image notifications',
       masterKey: kms.Alias.fromAliasName(this, 'SnsManagedKey', 'alias/aws/sns'),
     });
 
@@ -120,10 +121,10 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
       resultPath: '$.manifest',
     });
 
-    // 2) Re-tag the SAME manifest under a per-image quarantine tag (PutImage).
+    // 2) Re-tag the SAME manifest under a per-image `quarantine-` tag (PutImage).
     //    ImageManifest and ImageManifestMediaType are returned by BatchGetImage
     //    above. The tag is derived from the digest (sha256:<hex> -> hex) so every
-    //    quarantined image keeps its own tag.
+    //    tagged image keeps its own tag.
     const digestHex = sfn.JsonPath.arrayGetItem(
       sfn.JsonPath.stringSplit(
         sfn.JsonPath.stringAt(
@@ -171,9 +172,9 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     // 3) Success notification via Amazon SNS.
     const notifyQuarantined = new tasks.SnsPublish(this, 'NotifyQuarantined', {
       topic,
-      subject: 'ECR image quarantined',
+      subject: 'ECR image tagged as vulnerable',
       message: sfn.TaskInput.fromObject({
-        status: 'QUARANTINED',
+        status: 'TAGGED',
         repository: sfn.JsonPath.stringAt(
           '$.detail.resources[0].details.awsEcrContainerImage.repositoryName',
         ),
@@ -186,24 +187,24 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
       }),
     });
 
-    // 4) Failure notification path (Catch target for the quarantine steps).
+    // 4) Failure notification path (Catch target for the tagging steps).
     const notifyFailure = new tasks.SnsPublish(this, 'NotifyFailure', {
       topic,
-      subject: 'ECR image quarantine FAILED',
+      subject: 'ECR image tagging FAILED',
       message: sfn.TaskInput.fromObject({
-        status: 'QUARANTINE_FAILED',
+        status: 'TAGGING_FAILED',
         severity: sfn.JsonPath.stringAt('$.detail.severity'),
         error: sfn.JsonPath.stringAt('$.error'),
         detail: sfn.JsonPath.stringAt('$.detail'),
       }),
     });
     const fail = new sfn.Fail(this, 'QuarantineFailed', {
-      cause: 'ECR image quarantine failed. See the Amazon SNS failure notification.',
+      cause: 'Tagging the ECR image failed. See the Amazon SNS failure notification.',
       error: 'QuarantineError',
     });
     notifyFailure.next(fail);
 
-    // 5) Optional rebuild/patch branch placeholder. This pattern quarantines;
+    // 5) Optional rebuild/patch branch placeholder. This pattern only tags;
     //    a real deployment would trigger a CI rebuild here (e.g. start a
     //    CodeBuild project or notify a pipeline). Kept as a documented no-op
     //    so the composition stays focused on the remediation headline.
@@ -253,7 +254,7 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     // Ecr.ImageAlreadyExistsException. Treat that as success. This Catch is
     // added BEFORE the States.ALL one so it is evaluated first.
     const alreadyQuarantined = new sfn.Pass(this, 'AlreadyQuarantined', {
-      comment: 'Image already carries its quarantine tag; nothing to do.',
+      comment: 'Image already carries its quarantine- tag; nothing to do.',
     });
     applyQuarantineTag.addCatch(alreadyQuarantined, {
       errors: ['Ecr.ImageAlreadyExistsException'],
@@ -263,7 +264,7 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
 
     // Severity Choice: act only on HIGH/CRITICAL; otherwise skip.
     const skip = new sfn.Pass(this, 'SkipLowSeverity', {
-      comment: 'Severity below HIGH - no quarantine action taken.',
+      comment: 'Severity below HIGH - image not tagged.',
     });
 
     const definition = new sfn.Choice(this, 'IsHighOrCritical')
@@ -306,7 +307,7 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     // ---------------------------------------------------------------------
     const rule = new events.Rule(this, 'InspectorEcrFindingRule', {
       description:
-        'Route ACTIVE HIGH/CRITICAL Amazon Inspector findings on container images in the demo Amazon ECR repository to the quarantine workflow',
+        'Route ACTIVE HIGH/CRITICAL Amazon Inspector findings on container images in the demo Amazon ECR repository to the tagging workflow',
       eventPattern: {
         source: ['aws.inspector2'],
         detailType: ['Inspector2 Finding'],
@@ -354,7 +355,7 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     new CfnOutput(this, 'StateMachineArn', { value: stateMachine.stateMachineArn });
     new CfnOutput(this, 'SnsTopicArn', {
       value: topic.topicArn,
-      description: 'Subscribe to this topic to receive quarantine notifications',
+      description: 'Subscribe to this topic to receive vulnerable image notifications',
     });
   }
 }
