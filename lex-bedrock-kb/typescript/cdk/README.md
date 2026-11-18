@@ -9,9 +9,9 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. Use version 2. Every command in this README exists in version 2.31.3 and later.
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured (version 2).
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
+* [Node.js](https://nodejs.org/en/download/) and npm installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap`)
 * Access in the target Region to the two Amazon Bedrock models used by the stack (see [Models and Regions](#supported-regions)).
 * Permission for the identity that calls the bot to run `lex:RecognizeText` on the bot alias.
