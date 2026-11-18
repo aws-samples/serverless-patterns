@@ -39,7 +39,7 @@ replayed events (carry replay-name, not archived again) --> OrdersRule --> queue
 3. The alarm sums `FailedInvocations` (namespace `AWS/Events`, dimensions `EventBusName` and `RuleName`) over 60 seconds and goes to ALARM at 1 or more. Missing data counts as not breaching.
 4. After the queue policy is fixed and the failures stop, the alarm returns to OK. A rule on the default bus matches only `previousState` ALARM and `state` OK for this alarm and starts the state machine, so INSUFFICIENT_DATA to OK is ignored. The rule has a dead-letter queue and 3 retries.
 5. The state machine reads the alarm history (`cloudwatch:DescribeAlarmHistory`) and takes the newest transition into ALARM at or before the OK event as the outage start, because the OK event does not carry it. If none is found, it publishes that and ends in a Fail state.
-6. It waits 10 minutes, the delay the EventBridge documentation recommends before a replay. It then calls `eventbridge:StartReplay` from 5 minutes before the outage start to 2 minutes after the OK event, with `Destination.FilterArns` set to `OrdersRule` only. The replay name is `sfn-replay-` plus the outage start in epoch seconds, so a second execution for the same outage gets `ResourceAlreadyExistsException` and ends without a second replay.
+6. It waits 10 minutes, the delay the EventBridge documentation recommends before a replay. It then calls `eventbridge:StartReplay` from 5 minutes before the outage start to 2 minutes after the OK event, with `Destination.FilterArns` set to `OrdersRule` only. The replay name is the stack name, then `-replay-` and the outage start in epoch seconds, so a second execution for the same outage gets `ResourceAlreadyExistsException` and ends without a second replay.
 7. It polls `eventbridge:DescribeReplay` every 30 seconds, at most 60 times, until the state is not STARTING, RUNNING or CANCELLING. Task errors go to the same result step.
 8. It publishes the replay state and window to the Amazon SNS topic. Apart from the duplicate-run path in step 6, which succeeds without publishing, the execution succeeds only when the replay state is COMPLETED.
 
@@ -128,7 +128,7 @@ aws cloudwatch describe-alarms --alarm-names "$ALARM" --query 'MetricAlarms[0].S
 aws stepfunctions list-executions --state-machine-arn "$SM" --max-results 5 --query 'executions[].[name,status]' --output text
 ```
 
-**6. When the execution is no longer RUNNING**, read its output and the replay. Expected: status `SUCCEEDED` with an output like `{"replayName":"sfn-replay-...","replayState":"COMPLETED","messageId":"..."}`, then a replay `COMPLETED` whose window starts 5 minutes before the alarm entered ALARM and ends 2 minutes after the OK, with the `OrdersRule` ARN as the filter. The Amazon SNS message carries the same result (the tests read it through a queue subscription instead of email).
+**6. When the execution is no longer RUNNING**, read its output and the replay. Expected: status `SUCCEEDED` with an output like `{"replayName":"EventbridgeArchiveReplaySfnStack-replay-...","replayState":"COMPLETED","messageId":"..."}`, then a replay `COMPLETED` whose window starts 5 minutes before the alarm entered ALARM and ends 2 minutes after the OK, with the `OrdersRule` ARN as the filter. The Amazon SNS message carries the same result (the tests read it through a queue subscription instead of email).
 
 ```bash
 EXEC=$(aws stepfunctions list-executions --state-machine-arn "$SM" --max-results 1 --query 'executions[0].executionArn' --output text)
@@ -137,7 +137,7 @@ REPLAY=$(aws stepfunctions describe-execution --execution-arn "$EXEC" --query ou
 aws events describe-replay --replay-name "$REPLAY" --query '[State,EventStartTime,EventEndTime,Destination.FilterArns[0]]' --output text
 ```
 
-**7. Read the queue.** Expected: bodies for `seq` 1, 2 and 3, each with `"replay-name":"sfn-replay-..."`, although the queue was empty before the replay. One call can return fewer than three messages, and the messages it returns stay hidden for 30 seconds, so the loop reads three times. If fewer than three bodies appear, run it again.
+**7. Read the queue.** Expected: bodies for `seq` 1, 2 and 3, each with `"replay-name":"EventbridgeArchiveReplaySfnStack-replay-..."`, although the queue was empty before the replay. One call can return fewer than three messages, and the messages it returns stay hidden for 30 seconds, so the loop reads three times. If fewer than three bodies appear, run it again.
 
 ```bash
 for i in 1 2 3; do

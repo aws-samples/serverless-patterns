@@ -10,14 +10,11 @@ import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 
-const REPLAY_PREFIX = 'sfn-replay';
 const LOOKBACK_MS = 5 * 60 * 1000; // failures start before the alarm reaches ALARM
 const END_MARGIN_MS = 2 * 60 * 1000; // covers late metric data after the OK transition
 const ARCHIVE_DELAY = cdk.Duration.minutes(10); // EventBridge recommends waiting 10 minutes before a replay
 const POLL_INTERVAL = cdk.Duration.seconds(30);
 const MAX_POLLS = 60;
-// One name per outage: the second at which the alarm entered ALARM.
-const REPLAY_NAME = `{% '${REPLAY_PREFIX}-' & $string($floor($alarmMs / 1000)) %}`;
 // Newest transition into ALARM at or before the OK event. Timestamps are read as epoch seconds or ISO 8601.
 const ALARM_START_MS = `{% ($ms := function($t) { $type($t) = 'number' ? $t * 1000 : $toMillis($t) };
   $up := $states.result.AlarmHistoryItems[$contains(HistorySummary, 'to ALARM') and $ms(Timestamp) <= $okMs];
@@ -29,6 +26,13 @@ const TRANSIENT = ['States.Timeout', 'EventBridge.InternalException', 'EventBrid
 export class EventbridgeArchiveReplaySfnStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    // Replay names start with the stack name, so two stacks in one account don't share names.
+    // One name per outage: the prefix plus the second at which the alarm entered ALARM.
+    // A replay name has at most 64 characters: up to 40 of the stack name, '-replay-' and 10 digits.
+    // shortcut: stacks whose names share the first 40 characters share the prefix; give them shorter names if that matters.
+    const replayPrefix = `${this.stackName.slice(0, 40)}-replay`;
+    const replayName = `{% '${replayPrefix}-' & $string($floor($alarmMs / 1000)) %}`;
 
     // Custom bus, archive and the rule whose target is made to fail
     const bus = new events.EventBus(this, 'Bus');
@@ -77,7 +81,7 @@ export class EventbridgeArchiveReplaySfnStack extends cdk.Stack {
 
     // Workflow: find outage window -> wait for archive -> StartReplay -> poll DescribeReplay -> SNS
     const topic = new sns.Topic(this, 'ResultTopic', { enforceSSL: true });
-    const replayArn = this.formatArn({ service: 'events', resource: 'replay', resourceName: `${REPLAY_PREFIX}-*` });
+    const replayArn = this.formatArn({ service: 'events', resource: 'replay', resourceName: `${replayPrefix}-*` });
     const errorToResult = {
       errors: ['States.ALL'],
       assign: {
@@ -128,7 +132,7 @@ export class EventbridgeArchiveReplaySfnStack extends cdk.Stack {
       service: 'eventbridge',
       action: 'startReplay',
       parameters: {
-        ReplayName: REPLAY_NAME,
+        ReplayName: replayName,
         EventSourceArn: archive.archiveArn,
         // Only the failing rule receives the replayed events
         Destination: { Arn: bus.eventBusArn, FilterArns: [ordersRule.ruleArn] },
@@ -139,7 +143,7 @@ export class EventbridgeArchiveReplaySfnStack extends cdk.Stack {
       iamAction: 'events:StartReplay',
       iamResources: [archive.archiveArn, bus.eventBusArn, replayArn],
       taskTimeout: sfn.Timeout.duration(cdk.Duration.seconds(30)),
-      assign: { replayName: REPLAY_NAME },
+      assign: { replayName },
     });
     // Permanent errors first, with no retry; a second run for the same outage hits ResourceAlreadyExists
     startReplay.addRetry({
