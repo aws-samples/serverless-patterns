@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon Bedrock AgentCore Gateway that exposes AWS Lambda functions as MCP (Model Context Protocol) tools. Any MCP-compatible client can discover and invoke the tools via the Gateway's MCP endpoint.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/agentcore-gateway-lambda-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/agentcore-gateway-lambda-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Clone the repository:
     ```bash
     git clone https://github.com/aws-samples/serverless-patterns
-    cd serverless-patterns/agentcore-gateway-lambda-cdk
+    cd serverless-patterns/agentcore-gateway-lambda/typescript/cdk
     ```
 
 2. Install dependencies:
