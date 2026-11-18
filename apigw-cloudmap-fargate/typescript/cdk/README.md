@@ -9,10 +9,10 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2 installed and configured. The Testing commands use `aws configure export-credentials` and `aws logs tail`. Your principal needs `execute-api:Invoke` on the API, read access to the services named in the Testing commands, and `ecs:UpdateService` for step 6.
-* [curl](https://curl.se/) 7.75 or later, for the `--aws-sigv4` option, and bash or zsh
-* [Node.js 22 or later](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) and an account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) for it
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured. The Testing commands use `aws configure export-credentials` and `aws logs tail`. Your principal needs `execute-api:Invoke` on the API, read access to the services named in the Testing commands, and `ecs:UpdateService` for step 6.
+* [curl](https://curl.se/) with the `--aws-sigv4` option, and bash or zsh
+* [Node.js](https://nodejs.org/en/download/) installed
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) and an account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) for it
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 * The stack deploys to the Region that the CDK resolves from your environment. Run the Testing commands in that Region, for example `export AWS_REGION=us-west-2` (and `AWS_PROFILE` if you use a named profile).
 
