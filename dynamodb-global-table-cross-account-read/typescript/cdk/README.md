@@ -10,7 +10,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
-* [Node.js](https://nodejs.org/en/download/) 20.x or later
+* [Node.js](https://nodejs.org/en/download/) installed
 * Two AWS accounts (one owns the table, the other reads from it)
 * CDK bootstrapped in the deployment account/region (`cdk bootstrap`)
 
@@ -48,8 +48,9 @@ Important: this application uses various AWS services and there are costs associ
 
 ## Deployment Instructions
 
-1. Clone and navigate to the pattern:
+1. Clone the repository, navigate to the pattern and install dependencies:
     ```bash
+    git clone https://github.com/aws-samples/serverless-patterns
     cd serverless-patterns/dynamodb-global-table-cross-account-read/typescript/cdk
     npm install
     ```
