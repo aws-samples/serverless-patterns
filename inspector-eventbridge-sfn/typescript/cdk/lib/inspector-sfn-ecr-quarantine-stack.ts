@@ -67,10 +67,6 @@ export class InspectorSfnEcrQuarantineStack extends Stack {
     // Inspector must additionally be ENABLED AT THE ACCOUNT LEVEL (see README).
     // ---------------------------------------------------------------------
     const repository = new ecr.Repository(this, 'DemoRepository', {
-      // A static, lowercase, valid ECR repository name. Aws.STACK_NAME cannot be
-      // used here: it is an unresolved CloudFormation token at synth time and
-      // fails ECR's synth-time repositoryName validation.
-      repositoryName: 'inspector-quarantine-demo',
       imageTagMutability: ecr.TagMutability.MUTABLE,
       imageScanOnPush: true,
       emptyOnDelete: true, // allow the repo (and its images) to be removed on cleanup

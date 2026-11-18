@@ -15,7 +15,7 @@
   },
   "gitHub": {
     "template": {
-      "templateFile": "cdk/lib/inspector-sfn-ecr-quarantine-stack.ts"
+      "templateFile": "lib/inspector-sfn-ecr-quarantine-stack.ts"
     }
   },
   "resources": {
@@ -36,7 +36,7 @@
   },
   "deploy": {
     "text": [
-      "<code>cd inspector-eventbridge-sfn/typescript/cdk/cdk</code>",
+      "<code>cd serverless-patterns/inspector-eventbridge-sfn/typescript/cdk</code>",
       "<code>npm install</code>",
       "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once",
       "<code>npx cdk deploy</code>"
@@ -49,8 +49,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cd inspector-eventbridge-sfn/typescript/cdk/cdk</code>",
-      "<code>npx cdk destroy</code>."
+      "Delete the stack: <code>npx cdk destroy</code>."
     ]
   },
   "authors": [

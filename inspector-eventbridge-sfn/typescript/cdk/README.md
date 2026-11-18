@@ -52,8 +52,8 @@ The happy path through the state machine is `GetImageManifest` → `ApplyQuarant
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 - [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Node.js 22 or later](https://nodejs.org/en/download/) installed (see the [AWS CDK prerequisites](https://docs.aws.amazon.com/cdk/v2/guide/prerequisites.html))
-- [AWS Cloud Development Kit (AWS CDK) v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
+- [Node.js](https://nodejs.org/en/download/) installed (see the [AWS CDK prerequisites](https://docs.aws.amazon.com/cdk/v2/guide/prerequisites.html))
+- [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
 - **Amazon Inspector enhanced scanning for Amazon ECR must be enabled at the account level.** Enable it in the [Amazon Inspector console](https://console.aws.amazon.com/inspector/v2/home) (Account management → Activate → enable ECR scanning), or with `aws inspector2 enable --resource-types ECR`. Without this, no findings are generated and the workflow is never triggered.
 
 ## Deployment Instructions
@@ -64,7 +64,7 @@ The happy path through the state machine is `GetImageManifest` → `ApplyQuarant
     ```
 2. Change directory to the pattern directory:
     ```
-    cd inspector-eventbridge-sfn/typescript/cdk/cdk
+    cd serverless-patterns/inspector-eventbridge-sfn/typescript/cdk
     ```
 3. Install dependencies:
     ```
@@ -110,7 +110,6 @@ The headline of this pattern is that a HIGH/CRITICAL Amazon Inspector finding on
 
 1. Delete the stack. The demo Amazon ECR repository is created with `RemovalPolicy.DESTROY` and `emptyOnDelete`, so the repository **and any images you pushed into it (including the vulnerable test image) will be permanently deleted**:
     ```
-    cd inspector-eventbridge-sfn/typescript/cdk/cdk
     npx cdk destroy
     ```
 2. Optionally, disable Amazon Inspector ECR enhanced scanning if you enabled it only for this test:
