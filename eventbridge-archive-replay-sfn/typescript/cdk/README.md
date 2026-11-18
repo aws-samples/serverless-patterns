@@ -9,10 +9,10 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2 installed and configured (commands written against 2.31.3)
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-* [Node.js 22 or later](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) bootstrapped in the target account and Region (`npx cdk bootstrap`)
+* [Node.js](https://nodejs.org/en/download/) installed
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) bootstrapped in the target account and Region (`npx cdk bootstrap`)
 
 ## Supported Regions
 
