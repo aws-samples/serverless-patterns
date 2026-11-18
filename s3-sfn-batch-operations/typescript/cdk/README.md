@@ -11,8 +11,8 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-* [Node.js 22 or later](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) available through `npx` (installed by `npm install` below)
+* [Node.js](https://nodejs.org/en/download/) installed
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) available through `npx` (installed by `npm install` below)
 
 ## Supported Regions
 
@@ -89,7 +89,7 @@ The stack outputs `StateMachineArn`, `StateMachineLogGroupName`, `SourceBucketNa
 
 ## Testing
 
-Commands use the AWS CLI v2 (tested with 2.31.3). The Expected results were observed in us-west-2.
+Commands use AWS CLI version 2. The Expected results were observed in us-west-2.
 
 1. Define the helpers and the variables. Run this block again in every new terminal:
     ```bash
