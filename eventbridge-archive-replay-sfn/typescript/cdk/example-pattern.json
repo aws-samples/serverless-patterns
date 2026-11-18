@@ -7,8 +7,8 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "A custom Amazon EventBridge bus archives its events. A rule on the bus has a target that fails, and an Amazon CloudWatch alarm watches the FailedInvocations metric of that rule.",
-      "When the alarm goes from ALARM to OK, a rule on the default bus starts an AWS Step Functions workflow. It reads the alarm history for the outage start, waits for the archive, calls StartReplay with the failing rule as the only destination filter, and polls DescribeReplay.",
+      "A custom Amazon EventBridge bus archives its events. A rule on the bus has a target that fails, and an Amazon CloudWatch alarm watches the `FailedInvocations` metric of that rule.",
+      "When the alarm goes from ALARM to OK, a rule on the default bus starts an AWS Step Functions workflow. It reads the alarm history for the outage start, waits for the archive, calls `StartReplay` with the failing rule as the only destination filter, and polls `DescribeReplay`.",
       "The workflow publishes the replay result to Amazon Simple Notification Service. It uses AWS SDK integrations only, so the template contains no AWS Lambda function."
     ]
   },
