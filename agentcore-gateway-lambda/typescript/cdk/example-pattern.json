@@ -4,10 +4,6 @@
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
-  "services": {
-    "from": "bedrockagentcore",
-    "to": "lambda"
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
@@ -22,20 +18,35 @@
   },
   "resources": {
     "bullets": [
-      { "text": "Amazon Bedrock AgentCore Gateway", "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-building.html" },
-      { "text": "Model Context Protocol (MCP)", "link": "https://modelcontextprotocol.io/" },
-      { "text": "Run custom MCP proxies on AgentCore Runtime", "link": "https://aws.amazon.com/blogs/machine-learning/run-custom-mcp-proxies-serverless-on-amazon-bedrock-agentcore-runtime/" }
+      {
+        "text": "Amazon Bedrock AgentCore Gateway",
+        "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/gateway-building.html"
+      },
+      {
+        "text": "Model Context Protocol (MCP)",
+        "link": "https://modelcontextprotocol.io/"
+      },
+      {
+        "text": "Run custom MCP proxies on AgentCore Runtime",
+        "link": "https://aws.amazon.com/blogs/machine-learning/run-custom-mcp-proxies-serverless-on-amazon-bedrock-agentcore-runtime/"
+      }
     ]
   },
   "deploy": {
-    "text": ["cdk deploy"],
+    "text": [
+      "cdk deploy"
+    ],
     "file": "lib/agentcore-gateway-lambda-stack.ts"
   },
   "testing": {
-    "text": ["See the README for testing instructions."]
+    "text": [
+      "See the README for testing instructions."
+    ]
   },
   "cleanup": {
-    "text": ["cdk destroy"]
+    "text": [
+      "cdk destroy"
+    ]
   },
   "authors": [
     {
