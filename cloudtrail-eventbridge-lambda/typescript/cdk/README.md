@@ -39,7 +39,7 @@ Important: this application uses various AWS services and there are costs associ
 - A Lambda function processes the events, logging the caller identity, source IP, event bus, and entry count
 - This enables security teams to audit who is putting events to which bus
 
-EventBridge rules are region-local. The trail is multi-region, but the rule in this stack only matches events in the region where it is deployed, so deploy it in each region you want to alert in.
+The trail and the rule are both in the Region you deploy to. The trail logs PutEvents data events for every event bus in that Region, and nothing in other Regions. To alert in another Region, deploy the stack there too.
 
 ## Testing
 

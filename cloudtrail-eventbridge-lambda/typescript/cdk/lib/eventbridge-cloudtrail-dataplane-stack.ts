@@ -33,10 +33,13 @@ export class EventbridgeCloudtrailDataplaneStack extends cdk.Stack {
       serverAccessLogsPrefix: 'trail-bucket-logs/',
     });
 
-    // CloudTrail trail with data events for EventBridge
+    // Single-Region CloudTrail trail with data events for EventBridge. The rule
+    // below only sees events in this Region, so the trail logs only this Region.
+    // It logs no management events, so global service events are off too.
     const trail = new cloudtrail.Trail(this, 'EventBridgeDataPlaneTrail', {
       bucket: trailBucket,
-      isMultiRegionTrail: true,
+      isMultiRegionTrail: false,
+      includeGlobalServiceEvents: false,
     });
 
     // Enable EventBridge data plane events logging using advanced event selectors.
