@@ -8,7 +8,7 @@
     "headline": "How it works",
     "text": [
       "An AWS Step Functions state machine opens a transaction with the Amazon RDS Data API, runs three SQL statements (insert an order, decrement stock with a guard, insert an audit row) with the same transaction id, and commits.",
-      "A statement error, or zero updated rows, calls RollbackTransaction and ends the execution in a Fail state, so none of the statements stay visible in the Amazon Aurora Serverless v2 database. No AWS Lambda function is in the request path."
+      "A statement error, or zero updated rows, calls `RollbackTransaction` and ends the execution in a Fail state, so none of the statements stay visible in the Amazon Aurora Serverless v2 database. No AWS Lambda function is in the request path."
     ]
   },
   "gitHub": {
