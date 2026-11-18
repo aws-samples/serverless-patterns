@@ -54,8 +54,10 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
       },
     });
 
-    // API key with 365-day expiry
-    const apiKey = new appsync.CfnApiKey(this, 'EventsApiKey', {
+    // API key with 365-day expiry. The key value is not a stack output
+    // (CloudFormation does not redact outputs); the README reads it with
+    // aws appsync list-api-keys.
+    new appsync.CfnApiKey(this, 'EventsApiKey', {
       apiId: api.attrApiId,
       expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
     });
@@ -105,7 +107,6 @@ export class AppsyncEventsLambdaStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'HttpEndpoint', { value: cdk.Fn.getAtt(api.logicalId, 'Dns.Http').toString() });
     new cdk.CfnOutput(this, 'RealtimeEndpoint', { value: cdk.Fn.getAtt(api.logicalId, 'Dns.Realtime').toString() });
     new cdk.CfnOutput(this, 'ApiId', { value: api.attrApiId });
-    new cdk.CfnOutput(this, 'ApiKeyValue', { value: apiKey.attrApiKey });
     new cdk.CfnOutput(this, 'FunctionName', { value: eventFn.functionName });
     new cdk.CfnOutput(this, 'LogGroupName', { value: eventFnLogGroup.logGroupName });
   }

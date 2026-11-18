@@ -54,10 +54,11 @@ Only the `notifications` channel namespace has the OnPublish interceptor. An eve
 
 1. Open a subscriber first. In the AWS AppSync console, open the API named `AppsyncEventsLambdaStack-EventsApi`, choose the **Pub/Sub Editor** tab, choose **Connect** in the **Subscribe** section, enter `/notifications/*` as the channel, and choose **Subscribe**.
 
-2. Publish an event (replace the values from the `cdk deploy` output):
+2. Read the API key with the AWS CLI and publish an event (replace `<ApiId>` and `<HttpEndpoint>` with the values from the `cdk deploy` output). The stack does not output the key value, because AWS CloudFormation does not redact stack outputs:
    ```bash
+   API_KEY=$(aws appsync list-api-keys --api-id <ApiId> --query "apiKeys[0].id" --output text)
    curl -X POST "https://<HttpEndpoint>/event" \
-     -H "x-api-key: <ApiKeyValue>" \
+     -H "x-api-key: $API_KEY" \
      -H "Content-Type: application/json" \
      -d '{"channel":"notifications/general","events":["{\"message\":\"Hello from CDK\"}"]}'
    ```
@@ -74,6 +75,14 @@ Only the `notifications` channel namespace has the OnPublish interceptor. An eve
 
 ## Cleanup
 
-```bash
-cdk destroy
-```
+1. Note the `ApiId` value from the `cdk deploy` output before you delete the stack; the outputs are deleted with it.
+
+2. Delete the stack:
+   ```bash
+   cdk destroy
+   ```
+
+3. Delete the Amazon CloudWatch Logs log group that AWS AppSync creates for the API when it receives requests. AWS AppSync creates it outside the stack, so `cdk destroy` does not remove it:
+   ```bash
+   aws logs delete-log-group --log-group-name /aws/appsync/apis/<ApiId>
+   ```
