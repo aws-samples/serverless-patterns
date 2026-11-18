@@ -2,7 +2,7 @@
 
 This pattern turns files uploaded to Amazon Simple Storage Service (Amazon S3) into structured JSON using Amazon Bedrock Data Automation (BDA) and AWS Lambda, with no machine-learning code. Drop a document into the `input/` prefix of the bucket and Bedrock Data Automation writes the extracted result to the `output/` prefix. A one-page sample invoice, `sample-invoice.pdf`, is included so that you can run the pattern end to end straight after deployment.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-bedrock-data-automation-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/s3-bedrock-data-automation-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -38,7 +38,7 @@ The AWS Serverless Application Model (AWS SAM) template deploys these resources,
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/s3-bedrock-data-automation-sam
+    cd serverless-patterns/s3-bedrock-data-automation/python/sam
     ```
 1. From the command line, build the function package and use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yaml file. The build step installs the exact AWS SDK for Python (Boto3) version that the function pins in `src/requirements.txt`:
     ```

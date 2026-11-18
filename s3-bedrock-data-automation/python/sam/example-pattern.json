@@ -4,6 +4,7 @@
     "language": "Python",
     "level": "200",
     "framework": "AWS SAM",
+    "patternGroup": "s3-bedrock-data-automation",
     "patternArch": {
         "icon1": { "x": 20, "y": 50, "service": "s3", "label": "Amazon S3 (input + output)" },
         "icon2": { "x": 50, "y": 50, "service": "lambda", "label": "AWS Lambda (starts BDA job)" },
