@@ -2,7 +2,7 @@
 
 This pattern deploys an AWS Lambda durable function written in Java that orchestrates a multi-step order processing workflow with automatic checkpointing and failure recovery.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-execution-java-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-durable-order-workflow-java-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -24,7 +24,7 @@ Important: this application uses various AWS services and there are costs associ
    ```
 2. Change directory to the pattern directory:
    ```bash
-   cd serverless-patterns/lambda-durable-execution-java-cdk
+   cd serverless-patterns/lambda-durable-order-workflow/java/cdk
    ```
 3. Build the Java Lambda function:
    ```bash
