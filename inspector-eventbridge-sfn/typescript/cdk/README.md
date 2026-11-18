@@ -2,7 +2,7 @@
 
 This pattern automatically quarantines a vulnerable container image the moment Amazon Inspector raises a HIGH or CRITICAL finding on it. An Amazon Inspector finding on an Amazon ECR container image is routed by Amazon EventBridge to an AWS Step Functions workflow that re-tags the offending image with a per-image `quarantine-<digest>` tag and sends an Amazon SNS notification.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/inspector-sfn-ecr-quarantine-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/inspector-eventbridge-sfn-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -64,7 +64,7 @@ The happy path through the state machine is `GetImageManifest` → `ApplyQuarant
     ```
 2. Change directory to the pattern directory:
     ```
-    cd inspector-sfn-ecr-quarantine-cdk/cdk
+    cd inspector-eventbridge-sfn/typescript/cdk/cdk
     ```
 3. Install dependencies:
     ```
@@ -110,7 +110,7 @@ The headline of this pattern is that a HIGH/CRITICAL Amazon Inspector finding on
 
 1. Delete the stack. The demo Amazon ECR repository is created with `RemovalPolicy.DESTROY` and `emptyOnDelete`, so the repository **and any images you pushed into it (including the vulnerable test image) will be permanently deleted**:
     ```
-    cd inspector-sfn-ecr-quarantine-cdk/cdk
+    cd inspector-eventbridge-sfn/typescript/cdk/cdk
     npx cdk destroy
     ```
 2. Optionally, disable Amazon Inspector ECR enhanced scanning if you enabled it only for this test:

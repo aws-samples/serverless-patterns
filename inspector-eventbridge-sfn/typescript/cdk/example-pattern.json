@@ -36,7 +36,7 @@
   },
   "deploy": {
     "text": [
-      "<code>cd inspector-sfn-ecr-quarantine-cdk/cdk</code>",
+      "<code>cd inspector-eventbridge-sfn/typescript/cdk/cdk</code>",
       "<code>npm install</code>",
       "If this account and Region have never been used with the AWS CDK, run <code>npx cdk bootstrap</code> once",
       "<code>npx cdk deploy</code>"
@@ -49,7 +49,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cd inspector-sfn-ecr-quarantine-cdk/cdk</code>",
+      "Delete the stack: <code>cd inspector-eventbridge-sfn/typescript/cdk/cdk</code>",
       "<code>npx cdk destroy</code>."
     ]
   },
