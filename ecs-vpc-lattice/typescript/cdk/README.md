@@ -2,7 +2,7 @@
 
 This pattern deploys an Amazon ECS on AWS Fargate service that uses the built-in blue/green deployment strategy with Amazon VPC Lattice as the traffic layer. An AWS Lambda lifecycle hook tests the new (green) revision through a VPC Lattice test listener rule before production traffic shifts, and Amazon CloudWatch alarms roll the deployment back automatically.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/ecs-vpc-lattice-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -11,7 +11,7 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. Use a recent version, because the Amazon ECS service deployment commands used in Testing are new.
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
+* [Node.js](https://nodejs.org/en/download/) and npm installed
 * [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) installed and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html)
 
 ## Deployment Instructions
