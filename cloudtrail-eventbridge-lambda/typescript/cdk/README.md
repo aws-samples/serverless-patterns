@@ -2,7 +2,7 @@
 
 This pattern enables CloudTrail data plane logging for Amazon EventBridge and triggers a Lambda function when PutEvents API calls are detected, providing security and operational visibility into event bus activity.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-cloudtrail-dataplane-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/cloudtrail-eventbridge-lambda-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -18,7 +18,7 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Clone and navigate to the pattern:
     ```
-    cd serverless-patterns/eventbridge-cloudtrail-dataplane-cdk
+    cd serverless-patterns/cloudtrail-eventbridge-lambda/typescript/cdk
     npm install
     ```
 2. Bootstrap CDK (first-time CDK users only):
