@@ -11,14 +11,14 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js](https://nodejs.org/en/download/) 22 or later and npm installed
-* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK) v2, and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap` once per account and Region)
-* `curl` and `jq` 1.6 or later for the Testing section
+* [Node.js](https://nodejs.org/en/download/) and npm installed
+* [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) (AWS CDK), and the target account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap` once per account and Region)
+* `curl` and `jq` for the Testing section
 * AWS CloudFormation creates the policies with the CDK deployment role. Policy creation [calls the gateway to validate the actions](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy-permissions.html), so a custom CloudFormation execution role needs `bedrock-agentcore:InvokeGateway` on the gateway, as that page states. The deployment of this pattern used the default CDK roles.
 
 ## Supported Regions
 
-The stack has no Region-specific values and was deployed and tested in US West (Oregon) (`us-west-2`) and Europe (Frankfurt) (`eu-central-1`). Before you use another Region, check that the [AgentCore supported Regions page](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html) lists AgentCore Gateway and Policy there and that AWS Lambda offers the Node.js 24 runtime.
+The stack has no Region-specific values and was deployed and tested in US West (Oregon) (`us-west-2`) and Europe (Frankfurt) (`eu-central-1`). Before you use another Region, check that the [AgentCore supported Regions page](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-regions.html) lists AgentCore Gateway and Policy there and that AWS Lambda offers the Node.js runtime the stack uses.
 
 ## Architecture
 
