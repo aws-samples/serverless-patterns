@@ -15,8 +15,8 @@ Important: this application uses various AWS services and there are costs associ
 1. A pull request is opened or updated. The `Preview` workflow assumes the `PreviewDeployRole` with GitHub OpenID Connect (OIDC), so the repository stores no AWS keys.
 1. The workflow zips `src/`, uploads it to the versioned Amazon S3 bucket under `previews/`, and creates a Web Function revision that runs with the `PreviewExecutionRole`.
 1. It points the `pr-<number>` endpoint at the new revision, creating the endpoint on the first push, and comments the endpoint URL on the pull request. Every later push updates the same endpoint, so the URL does not change.
-1. When the pull request is closed, the workflow deletes the endpoint and its revisions.
-1. A push to `main` runs the `Production` workflow, which deploys a new revision to the `prod` endpoint with the `ProductionDeployRole` and the `ProductionExecutionRole`.
+1. When the pull request is closed, the workflow deletes the endpoint.
+1. A push to `main` runs the `Production` workflow, which deploys a new revision to the `prod` endpoint with the `ProductionDeployRole` and the `ProductionExecutionRole`, and then deletes the preview revisions that no endpoint routes to.
 
 ## Requirements
 
@@ -100,8 +100,8 @@ The `prod` endpoint and every `pr-<number>` endpoint therefore use `Disabled`, a
 
 * **Nine previews at a time.** A Web Function can have up to 10 endpoints, and `prod` uses one. When a tenth preview is requested, the script prints the `ServiceQuotaExceededException` error and asks you to close a pull request or run `scripts/deploy.sh delete-preview <number>`.
 * **Preview capacity.** Each preview endpoint is limited to 2 execution environments and 100 requests per second, so a preview cannot use the capacity of production.
-* **Revisions.** Lambda keeps up to 50 revisions per Web Function and automatically deletes the oldest ones that no endpoint routes to. The script also deletes a preview's previous revision after each push, and all of its revisions when the pull request closes.
-* **Code package lifecycle.** Every Web Function revision is pinned to an exact S3 object version. [Deleting a version still used by a revision permanently fails that revision](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-code-s3.html). The bucket therefore expires only preview packages tagged `retired=true`, and the deploy script tags a version only after its revision is successfully deleted. Amazon S3 permanently deletes a tagged version 30 days after it becomes noncurrent. A tagged current version, such as the last package of a closed pull request, first gets a delete marker 30 days after upload. Production packages remain untouched so retained revisions can be used for rollback. If a revision could not be deleted, or Lambda already removed it automatically, its package is kept; an upload that fails before a revision is created may also need manual cleanup after you confirm no revision uses that version.
+* **Revisions.** Each push to a pull request adds a revision. Lambda uses 50 revisions per Web Function as its automatic cleanup target and deletes the oldest revisions that no endpoint routes to, which can include older production revisions that you keep for rollback ([Revisions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-revisions.html)). After each deployment, the `Production` workflow therefore runs `scripts/deploy.sh cleanup`, which deletes the preview revisions that no endpoint routes to: the replaced revisions of open pull requests and all revisions of closed ones. It skips revisions created in the last 60 minutes, so it does not delete a revision that a running preview deployment is about to route, and it fails the workflow step if it cannot read, delete or mark a preview revision. Until the next push to `main`, preview revisions count toward the 50.
+* **Code package lifecycle.** Every Web Function revision is pinned to an exact S3 object version. [Deleting a version still used by a revision permanently fails that revision](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-code-s3.html). The bucket therefore expires only preview packages tagged `retired=true`, and `scripts/deploy.sh cleanup` tags a version only after it deletes the revision. Amazon S3 permanently deletes a tagged version 30 days after it becomes noncurrent. A tagged current version, such as the last package of a closed pull request, first gets a delete marker 30 days after upload. Production packages remain untouched so retained revisions can be used for rollback. If a revision could not be deleted, or Lambda already removed it automatically, its package is kept; an upload that fails before a revision is created may also need manual cleanup after you confirm no revision uses that version.
 
 ### What each workflow is allowed to do
 
@@ -110,20 +110,24 @@ The deploy roles trust only GitHub OIDC tokens whose subject starts with your re
 | Permission | `PreviewDeployRole` | `ProductionDeployRole` |
 |---|---|---|
 | Change and delete endpoints | `pr-*` only | `prod` only, no delete |
+| Delete revisions | No | Yes |
 | Create the Web Function | No | Yes |
 | Pass an execution role | `PreviewExecutionRole` only | `ProductionExecutionRole` only |
 | Upload code to the bucket | `previews/*` only | `production/*` only |
+| Tag code for expiration | No | `previews/*` only |
 
 Because each Web Function endpoint has its own Amazon Resource Name (ARN), IAM can scope endpoint actions to `endpoint/pr-*`, so a pull request cannot change or delete the production endpoint. Preview revisions run with a separate execution role, so code that nobody has merged yet never runs with production permissions.
+
+Revision deletion cannot be scoped the same way. `DeleteWebFunctionRevision` authorizes on the revision ARN, which ends in an opaque revision ID, and supports only the `aws:ResourceTag` condition key ([Actions, resources, and condition keys for AWS Lambda](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awslambda.html)). A policy that let pull requests delete their own revisions would also let them delete the production revisions that you keep for rollback. Only the production role can delete revisions, and `scripts/deploy.sh cleanup` deletes a revision only if it runs with the `PreviewExecutionRole` and its code is a `previews/` package in the code bucket.
 
 ### Files
 
 | File | Purpose |
 |---|---|
 | `template.yaml` | Code bucket, execution roles, log groups, GitHub OIDC provider and deploy roles |
-| `scripts/deploy.sh` | Packages `src/`, uploads it and creates revisions and endpoints |
+| `scripts/deploy.sh` | Packages `src/`, uploads it, creates revisions and endpoints, and deletes unused preview revisions |
 | `.github/workflows/preview.yml` | Deploys, updates and deletes previews, and comments the URL |
-| `.github/workflows/production.yml` | Deploys `main` to the `prod` endpoint |
+| `.github/workflows/production.yml` | Deploys `main` to the `prod` endpoint and deletes unused preview revisions |
 | `src/index.js` | A zero-dependency Node.js HTTP server |
 
 ## Testing
@@ -167,7 +171,16 @@ Because each Web Function endpoint has its own Amazon Resource Name (ARN), IAM c
     ```bash
     AWS_REGION=us-east-1 scripts/deploy.sh delete-preview 1
     ```
-1. If you connected a GitHub repository, open a pull request from a branch in that repository. When the `Preview` workflow finishes, it comments the preview URL on the pull request. Push another commit: the comment shows the new commit and the URL stays the same. Merge or close the pull request: the workflow deletes the preview and changes the comment to "Preview deleted.", and a merge also runs the `Production` workflow.
+1. Delete the preview revisions that no endpoint routes to, as the `Production` workflow does after each deployment. `MIN_AGE_MINUTES=0` includes the revision that you just created; the workflow skips revisions from the last 60 minutes:
+    ```bash
+    MIN_AGE_MINUTES=0 AWS_REGION=us-east-1 scripts/deploy.sh cleanup
+    ```
+    Example output:
+    ```
+    Deleted revision rev-rj8b5 (pr-1 7255bd8d68d662f5185a8efe009f742100b4fcd5)
+    Preview revisions deleted: 1, still routed: 0, newer than 0 minutes: 0, failed: 0
+    ```
+1. If you connected a GitHub repository, open a pull request from a branch in that repository. When the `Preview` workflow finishes, it comments the preview URL on the pull request. Push another commit: the comment shows the new commit and the URL stays the same. Merge or close the pull request: the workflow deletes the preview and changes the comment to "Preview deleted.", and a merge also runs the `Production` workflow, which deploys `main` and deletes the unused preview revisions that are more than 60 minutes old.
 
 ## Cleanup
 

@@ -3,10 +3,12 @@
 #
 #   scripts/deploy.sh production               Deploy to the prod endpoint (creates the function the first time)
 #   scripts/deploy.sh preview <pr-number>      Deploy to the pr-<number> endpoint, creating it if needed
-#   scripts/deploy.sh delete-preview <pr-number>  Delete the pr-<number> endpoint and its revisions
+#   scripts/deploy.sh delete-preview <pr-number>  Delete the pr-<number> endpoint
+#   scripts/deploy.sh cleanup                  Delete the preview revisions that no endpoint routes to
 #   scripts/deploy.sh destroy                  Delete the Web Function and empty the code bucket, before sam delete
 #
-# Environment: STACK_NAME (default lambda-web-pr-previews), GIT_SHA (default: git rev-parse HEAD).
+# Environment: STACK_NAME (default lambda-web-pr-previews), GIT_SHA (default: git rev-parse HEAD),
+# MIN_AGE_MINUTES (cleanup leaves revisions newer than this, default 60).
 # Uses the AWS Region from your AWS CLI configuration or AWS_REGION. Needs AWS CLI 2.37.13 or later.
 set -euo pipefail
 
@@ -16,12 +18,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="$SCRIPT_DIR/../src"
 BUILD_DIR="$SCRIPT_DIR/../build"
 
-usage() { sed -n '2,10p' "$0" >&2; exit 2; }
+usage() { sed -n '2,12p' "$0" >&2; exit 2; }
 [[ $# -ge 1 ]] || usage
 COMMAND="$1"
 PR="${2:-}"
 case "$COMMAND" in
   production|destroy) ;;
+  cleanup) [[ "${MIN_AGE_MINUTES:-60}" =~ ^[0-9]+$ ]] || { echo "MIN_AGE_MINUTES must be a whole number" >&2; exit 2; } ;;
   preview|delete-preview) [[ "$PR" =~ ^[0-9]+$ ]] || { echo "Pull request number must be numeric" >&2; exit 2; } ;;
   *) usage ;;
 esac
@@ -80,34 +83,66 @@ route() {
   aws lambda-web wait web-function-endpoint-updated --function-name "$FUNCTION" --endpoint-name "$1"
 }
 
-# Delete revisions whose description starts with the prefix, except the one to keep.
-# Only packages of successfully deleted revisions can be tagged for S3 expiration.
-delete_revisions() {
-  local prefix="$1" keep="${2:-}" id code bucket key version
-  for id in $(aws lambda-web list-web-function-revisions --function-name "$FUNCTION" \
-      --query "revisions[?starts_with(description, '$prefix')].revisionId" --output text); do
-    [[ "$id" == "$keep" ]] && continue
-    if ! code="$(aws lambda-web get-web-function-revision --function-name "$FUNCTION" --revision-id "$id" \
-        --query 'buildConfig.codeConfig.s3Object.[bucket,key,versionId]' --output text)"; then
-      echo "Could not read the code location for revision $id; leaving its package untagged" >&2
+# Delete the preview revisions that no endpoint routes to, and mark their code for S3 expiration.
+# Runs with the production deploy role. IAM cannot limit revision deletion to preview revisions, so
+# the pull request role cannot delete revisions at all. This deletes a revision only if it runs with
+# the preview execution role and its code is a pull request package in the code bucket.
+cleanup_previews() {
+  local min_age="${MIN_AGE_MINUTES:-60}" preview_role cutoff ids id info role bucket key version created description error
+  local deleted=0 routed=0 recent=0 failed=0
+  local utc_time='^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|\+00:00)$'
+  preview_role="$(output PreviewExecutionRoleArn)"
+  # A preview deploy routes its new revision only after it is Active, so leave recent revisions alone.
+  cutoff="$(date -u -d "-$min_age minutes" +%Y%m%d%H%M%S 2>/dev/null || date -u -v-"$min_age"M +%Y%m%d%H%M%S)"
+  ids="$(aws lambda-web list-web-function-revisions --function-name "$FUNCTION" \
+    --query "revisions[?starts_with(description || '', 'pr-')].revisionId" --output text)"
+  for id in $ids; do
+    # TZ=UTC makes the AWS CLI print createdAt in UTC.
+    if ! info="$(TZ=UTC aws lambda-web get-web-function-revision --function-name "$FUNCTION" --revision-id "$id" --output text \
+        --query '[serviceConfig.executionRoleArn,buildConfig.codeConfig.s3Object.bucket,buildConfig.codeConfig.s3Object.key,buildConfig.codeConfig.s3Object.versionId,createdAt,description]')"; then
+      echo "Could not read revision $id; leaving it" >&2
+      failed=$((failed + 1))
       continue
     fi
-    read -r bucket key version <<< "$code"
-    # Do not tag any production package, or a version outside this pull request's key.
-    if [[ "$bucket" != "$BUCKET" || "$key" != "previews/${prefix% }/app.zip" || -z "$version" || "$version" == None ]]; then
-      echo "Could not confirm the preview package for revision $id; leaving it untagged" >&2
+    read -r role bucket key version created description <<< "$info"
+    if [[ "$role" != "$preview_role" || "$bucket" != "$BUCKET" || ! "$key" =~ ^previews/pr-[0-9]+/app\.zip$ || -z "$version" || "$version" == None ]]; then
+      echo "Revision $id is not a preview revision of this stack; leaving it" >&2
       continue
     fi
-    if aws lambda-web delete-web-function-revision --function-name "$FUNCTION" --revision-id "$id" >/dev/null 2>&1; then
-      if ! aws s3api put-object-tagging --bucket "$BUCKET" --key "$key" --version-id "$version" \
-          --tagging 'TagSet=[{Key=retired,Value=true}]' >/dev/null; then
-        echo "Could not mark code for deleted revision $id for expiration; check the S3 version manually" >&2
+    if [[ ! "$created" =~ $utc_time ]]; then
+      echo "Could not read the creation time of revision $id ($created); leaving it" >&2
+      failed=$((failed + 1))
+      continue
+    fi
+    # Compare YYYYMMDDHHMMSS of createdAt, for example 2026-11-18T12:52:07.685734+00:00, with the cutoff.
+    created="${created//[^0-9]/}"
+    if (( 10#${created:0:14} >= 10#$cutoff )); then
+      recent=$((recent + 1))
+      continue
+    fi
+    if ! error="$(aws lambda-web delete-web-function-revision --function-name "$FUNCTION" --revision-id "$id" 2>&1 >/dev/null)"; then
+      # Lambda refuses to delete a revision that an endpoint routes to: the preview of an open pull request.
+      if [[ "$error" == *ConflictException* ]]; then
+        routed=$((routed + 1))
+      else
+        echo "Could not delete revision $id: $error" >&2
+        failed=$((failed + 1))
       fi
-    else
-      # Lambda refuses to delete a revision still routed by an endpoint. Keep its code.
-      echo "Revision $id is still in use or could not be deleted; leaving its package untagged" >&2
+      continue
+    fi
+    deleted=$((deleted + 1))
+    echo "Deleted revision $id ($description)"
+    if ! aws s3api put-object-tagging --bucket "$BUCKET" --key "$key" --version-id "$version" \
+        --tagging 'TagSet=[{Key=retired,Value=true}]' >/dev/null; then
+      echo "Could not mark the code of revision $id for expiration; check the S3 version manually" >&2
+      failed=$((failed + 1))
     fi
   done
+  echo "Preview revisions deleted: $deleted, still routed: $routed, newer than $min_age minutes: $recent, failed: $failed"
+  # Fail the workflow step, so a revision that cleanup could not handle does not go unnoticed.
+  if (( failed > 0 )); then
+    exit 1
+  fi
 }
 
 publish_url() {
@@ -146,7 +181,6 @@ case "$COMMAND" in
     REVISION="$(create_revision "$ENDPOINT $GIT_SHA" "previews/$ENDPOINT/app.zip" "$(output PreviewExecutionRoleArn)")"
     if endpoint_exists "$ENDPOINT"; then
       route "$ENDPOINT" "$REVISION"
-      delete_revisions "$ENDPOINT " "$REVISION"
     else
       # Each preview endpoint is capped at 2 execution environments and 100 requests per second.
       if ! aws lambda-web create-web-function-endpoint --function-name "$FUNCTION" --endpoint-name "$ENDPOINT" \
@@ -157,7 +191,6 @@ case "$COMMAND" in
         if grep -q ServiceQuotaExceededException "$BUILD_DIR/error.txt"; then
           echo "A Web Function has at most 10 endpoints: prod and 9 previews. Close a pull request or run scripts/deploy.sh delete-preview <number>." >&2
         fi
-        delete_revisions "$ENDPOINT "
         exit 1
       fi
       aws lambda-web wait web-function-endpoint-active --function-name "$FUNCTION" --endpoint-name "$ENDPOINT"
@@ -173,8 +206,12 @@ case "$COMMAND" in
     fi
     aws lambda-web delete-web-function-endpoint --function-name "$FUNCTION" --endpoint-name "$ENDPOINT" >/dev/null
     aws lambda-web wait web-function-endpoint-deleted --function-name "$FUNCTION" --endpoint-name "$ENDPOINT"
-    delete_revisions "$ENDPOINT "
+    # This role cannot delete revisions. The next scripts/deploy.sh cleanup deletes this preview's revisions.
     echo "Deleted preview $ENDPOINT"
+    ;;
+
+  cleanup)
+    cleanup_previews
     ;;
 
   destroy)

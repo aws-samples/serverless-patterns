@@ -151,7 +151,8 @@ Resources:
 
   # Assumed by the workflow that runs for pull requests. GitHub does not give OIDC tokens to pull
   # requests from forks, so only branches in your repository can deploy previews. The role can
-  # change only pr-* endpoints, so a pull request cannot touch the production endpoint.
+  # change only pr-* endpoints and cannot delete revisions, so a pull request cannot touch the
+  # production endpoint or the production revisions that you keep for rollback.
   PreviewDeployRole:
     Type: AWS::IAM::Role
     Condition: HasRepository
@@ -182,8 +183,6 @@ Resources:
                   - s3:PutObject
                   - s3:GetObject
                   - s3:GetObjectVersion
-                  - s3:PutObjectTagging
-                  - s3:PutObjectVersionTagging
                 Resource: !Sub '${CodeBucket.Arn}/previews/*'
               - Sid: CreatePreviewRevisionsAndEndpoints
                 Effect: Allow
@@ -191,8 +190,6 @@ Resources:
                   - lambda:GetWebFunction
                   - lambda:CreateWebFunctionRevision
                   - lambda:CreateWebFunctionEndpoint
-                  - lambda:ListWebFunctionEndpoints
-                  - lambda:ListWebFunctionRevisions
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}'
               - Sid: ManagePreviewEndpointsOnly
                 Effect: Allow
@@ -201,11 +198,12 @@ Resources:
                   - lambda:UpdateWebFunctionEndpoint
                   - lambda:DeleteWebFunctionEndpoint
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/endpoint/pr-*'
-              - Sid: ManageRevisions
+              # The revision waiter reads the new revision. There is no delete: revision IDs are opaque
+              # and DeleteWebFunctionRevision supports only the aws:ResourceTag condition key, so IAM
+              # cannot limit it to preview revisions. The Production workflow deletes them instead.
+              - Sid: ReadRevisions
                 Effect: Allow
-                Action:
-                  - lambda:GetWebFunctionRevision
-                  - lambda:DeleteWebFunctionRevision
+                Action: lambda:GetWebFunctionRevision
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/revision/*'
               - Sid: PassPreviewRoleOnly
                 Effect: Allow
@@ -215,7 +213,8 @@ Resources:
                   StringEquals:
                     iam:PassedToService: lambda.amazonaws.com
 
-  # Assumed by the workflow that runs on pushes to main. It deploys the production endpoint.
+  # Assumed by the workflow that runs on pushes to main. It deploys the production endpoint and then
+  # deletes the preview revisions that no endpoint routes to.
   ProductionDeployRole:
     Type: AWS::IAM::Role
     Condition: HasRepository
@@ -247,13 +246,19 @@ Resources:
                   - s3:GetObject
                   - s3:GetObjectVersion
                 Resource: !Sub '${CodeBucket.Arn}/production/*'
+              # Marks the code of deleted preview revisions for the ExpireRetiredPreviewCode rule.
+              - Sid: MarkRetiredPreviewCode
+                Effect: Allow
+                Action:
+                  - s3:PutObjectTagging
+                  - s3:PutObjectVersionTagging
+                Resource: !Sub '${CodeBucket.Arn}/previews/*'
               - Sid: CreateFunctionAndRevisions
                 Effect: Allow
                 Action:
                   - lambda:GetWebFunction
                   - lambda:CreateWebFunction
                   - lambda:CreateWebFunctionRevision
-                  - lambda:ListWebFunctionEndpoints
                   - lambda:ListWebFunctionRevisions
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}'
               - Sid: ManageProductionEndpoint
@@ -262,9 +267,14 @@ Resources:
                   - lambda:GetWebFunctionEndpoint
                   - lambda:UpdateWebFunctionEndpoint
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/endpoint/prod'
-              - Sid: ReadRevisions
+              # IAM cannot limit DeleteWebFunctionRevision to preview revisions, so only this role, which
+              # only main can use, deletes revisions. deploy.sh cleanup deletes a revision only if it runs
+              # with the PreviewExecutionRole and its code is a previews/ package.
+              - Sid: ReadAndDeleteRevisions
                 Effect: Allow
-                Action: lambda:GetWebFunctionRevision
+                Action:
+                  - lambda:GetWebFunctionRevision
+                  - lambda:DeleteWebFunctionRevision
                 Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-${AWS::Region}/revision/*'
               - Sid: PassProductionRoleOnly
                 Effect: Allow
