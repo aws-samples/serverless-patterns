@@ -1,7 +1,7 @@
 {
   "title": "Amazon S3 to Amazon OpenSearch Serverless with OpenSearch Ingestion",
   "description": "Ingest JSON objects from Amazon S3 into Amazon OpenSearch Serverless using an Amazon OpenSearch Ingestion (OSIS) pipeline.",
-  "language": "YAML",
+  "language": "Integration",
   "level": "300",
   "framework": "AWS SAM",
   "introBox": {
@@ -15,9 +15,6 @@
   },
   "gitHub": {
     "template": {
-      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-opensearch-serverless-osis-sam",
-      "templateURL": "serverless-patterns/s3-opensearch-serverless-osis-sam",
-      "projectFolder": "s3-opensearch-serverless-osis-sam",
       "templateFile": "template.yaml"
     }
   },
