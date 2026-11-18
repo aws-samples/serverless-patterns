@@ -8,9 +8,9 @@
     "headline": "How it works",
     "text": [
       "Amazon Bedrock AgentCore Memory extracts long-term records with the built-in semantic and user-preference strategies and publishes a created, updated or deleted event for each record to Amazon Kinesis Data Streams.",
-      "An AWS Lambda event source mapping filters on the documented event types and skips the StreamingEnabled validation event.",
+      "An AWS Lambda event source mapping filters on the documented event types and skips the `StreamingEnabled` validation event.",
       "The AWS Lambda function upserts or deletes an Amazon DynamoDB item keyed by memory record ID, so deletions reach the table even though deleted events carry no actor or namespace. If the function still fails on a record after its retries, the event source mapping sends metadata about the failed batch to an Amazon Simple Queue Service (Amazon SQS) queue.",
-      "The stream uses the FULL_CONTENT level, so the extracted memory text, which can include personal information from conversations, is copied into the stream and the Amazon DynamoDB table. Use METADATA_ONLY if you don't need the text."
+      "The stream uses the `FULL_CONTENT` level, so the extracted memory text, which can include personal information from conversations, is copied into the stream and the Amazon DynamoDB table. Use `METADATA_ONLY` if you don't need the text."
     ]
   },
   "gitHub": {
