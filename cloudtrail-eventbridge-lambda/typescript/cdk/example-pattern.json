@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern enables CloudTrail data plane logging for Amazon EventBridge (launched May 2026).",
+      "This pattern enables CloudTrail data event logging for Amazon EventBridge event buses.",
       "CloudTrail captures PutEvents API calls and delivers them as events to EventBridge.",
       "An EventBridge rule matches these CloudTrail events and triggers a Lambda function for alerting.",
       "This provides visibility into who is putting events, from where, and how many, which is essential for security auditing."
@@ -20,13 +20,31 @@
   },
   "resources": {
     "bullets": [
-      { "text": "EventBridge Data Plane CloudTrail Logging", "link": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-eventbridge-data-aws-cloudtrail/" },
-      { "text": "CloudTrail Data Events", "link": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html" }
+      {
+        "text": "EventBridge Data Plane CloudTrail Logging",
+        "link": "https://aws.amazon.com/about-aws/whats-new/2026/05/amazon-eventbridge-data-aws-cloudtrail/"
+      },
+      {
+        "text": "CloudTrail Data Events",
+        "link": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html"
+      }
     ]
   },
-  "deploy": { "text": ["cdk deploy"] },
-  "testing": { "text": ["See the README for testing instructions."] },
-  "cleanup": { "text": ["cdk destroy"] },
+  "deploy": {
+    "text": [
+      "cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "cdk destroy"
+    ]
+  },
   "authors": [
     {
       "name": "Nithin Chandran R",
