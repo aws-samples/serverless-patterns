@@ -9,7 +9,7 @@
     "text": [
       "This pattern deploys a Lambda function on Managed Instances (EC2-backed compute) that invokes Amazon Bedrock (Claude) for text generation.",
       "Lambda Managed Instances provide EC2 flexibility (Graviton, GPU, specialized hardware) with serverless operational simplicity — AWS handles provisioning, scaling, and maintenance.",
-      "The function runs on dedicated EC2 capacity in your VPC via a CapacityProvider, enabling access to EC2 pricing models (Savings Plans, Reserved Instances) while maintaining the Lambda programming model."
+      "The function runs on dedicated EC2 capacity in your VPC via a `CapacityProvider`, enabling access to EC2 pricing models (Savings Plans, Reserved Instances) while maintaining the Lambda programming model."
     ]
   },
   "gitHub": {
