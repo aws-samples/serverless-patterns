@@ -66,7 +66,7 @@ export class EventbridgeCloudtrailDataplaneStack extends cdk.Stack {
 
     // Lambda function to process CloudTrail events
     const processor = new lambda.Function(this, 'EventProcessor', {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src'),
       timeout: cdk.Duration.seconds(10),

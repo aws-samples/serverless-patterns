@@ -12,12 +12,13 @@ Important: this application uses various AWS services and there are costs associ
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed
-* [Node.js 22 or later](https://nodejs.org/en/download/) installed (required by the AWS CDK CLI)
+* [Node.js](https://nodejs.org/en/download/) installed
 
 ## Deployment Instructions
 
-1. Clone and navigate to the pattern:
+1. Clone the repository, navigate to the pattern and install dependencies:
     ```
+    git clone https://github.com/aws-samples/serverless-patterns
     cd serverless-patterns/cloudtrail-eventbridge-lambda/typescript/cdk
     npm install
     ```
@@ -33,7 +34,7 @@ Important: this application uses various AWS services and there are costs associ
 ## How it works
 
 - A CloudTrail trail is created with data event logging enabled for EventBridge event buses (`AWS::Events::EventBus`)
-- EventBridge data plane API calls (PutEvents) are now logged to CloudTrail (new May 2026 feature)
+- EventBridge data plane API calls (PutEvents) are now logged to CloudTrail
 - An EventBridge rule captures these CloudTrail events matching `aws.events` source with `PutEvents` event name
 - A Lambda function processes the events, logging the caller identity, source IP, event bus, and entry count
 - This enables security teams to audit who is putting events to which bus
