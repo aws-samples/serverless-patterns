@@ -45,7 +45,7 @@ Important: this application uses various AWS services and there are costs associ
 The stack creates the following resources:
 
 * **Amazon ECS**: a Fargate service with `deploymentStrategy: BLUE_GREEN` running the public `busybox` image from Amazon ECR Public (nothing to build). The container serves `{"version":"<appVersion>"}` on port 8080, where `appVersion` comes from CDK context (default `v1`).
-* **Amazon VPC Lattice**: a service network associated with the VPC, one service with an HTTP listener on port 80, two IP target groups (blue and green) and two listener rules. The test rule matches the header `x-environment: test`; the production rule matches every other request. Both rules start at blue 100 / green 0.
+* **Amazon VPC Lattice**: a service network associated with the VPC, one service with an HTTP listener on port 80, two IP target groups (blue and green) and two listener rules. The test rule matches the header `x-environment: test`; the production rule matches every other request. Both rules start at blue 100 / green 0. The service network and the service use auth type `NONE`, so any client in the associated VPC can call the service. For production, use auth type `AWS_IAM` with an auth policy.
 * **AWS Lambda**: a lifecycle hook (`lambda/hook.js`) in the stack's private isolated subnets, with no NAT gateway. It runs at the `POST_TEST_TRAFFIC_SHIFT` stage.
 * **Amazon CloudWatch**: one alarm per Availability Zone on the `HTTPCode_5XX_Count` metric of the VPC Lattice service (VPC Lattice publishes its service metrics per Availability Zone, and an alarm only matches an exact set of dimensions). ECS watches the alarms during the deployment and rolls back if one fires.
 
@@ -58,9 +58,7 @@ When you run `npx cdk deploy -c appVersion=v2` (with the same `--parameters` opt
 1. At `POST_TEST_TRAFFIC_SHIFT`, ECS invokes the hook Lambda. ECS passes `hookDetails` (the VPC Lattice service URL and the expected version, set in the service configuration) in the event. The function sends `GET` with the `x-environment: test` header to the VPC Lattice DNS name from inside the VPC. If it receives HTTP 200 and the expected version, it returns `{"hookStatus":"SUCCEEDED"}`. Otherwise (after five attempts) it returns `FAILED` with a reason and ECS rolls back.
 1. ECS edits the weights of the **production** listener rule (100% to green), waits for the bake time, then stops the blue tasks. If one of the CloudWatch alarms fires during the deployment, ECS rolls back to blue.
 
-### What is new compared with the ALB-based design
-
-ECS blue/green with a Lambda lifecycle hook that tests the green revision through a test listener is already shown publicly with an Application Load Balancer, for example in [aws-reinvent-trivia-game](https://github.com/aws-samples/aws-reinvent-trivia-game/blob/master/trivia-backend/cdk/ecs-service-blue-green.ts). This pattern does not change that idea. What it adds is the VPC Lattice wiring, announced on 2026-10-02 ([What's New](https://aws.amazon.com/about-aws/whats-new/2026/10/amazon-ecs-vpc-lattice-blue-green-deployments)):
+### Differences from a blue/green setup with an Application Load Balancer
 
 * The two listeners and target groups of the ALB design are replaced by one VPC Lattice listener with a **test rule** (header match) and a **production rule**, and by two VPC Lattice IP target groups that ECS registers tasks into.
 * The service is configured through `vpcLatticeConfigurations` with an `advancedConfiguration` (alternate target group, production and test listener rule ARNs) and an ECS infrastructure role, instead of `loadBalancers`.
