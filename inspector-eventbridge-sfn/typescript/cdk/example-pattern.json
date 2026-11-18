@@ -9,7 +9,7 @@
     "text": [
       "This pattern tags a vulnerable container image as soon as Amazon Inspector raises a HIGH or CRITICAL finding on it. The tag is a marker only: it doesn't stop anyone pulling or deploying the image.",
       "An Amazon Inspector finding on an Amazon ECR container image is routed by an Amazon EventBridge rule (source aws.inspector2, detail-type Inspector2 Finding, filtered to ACTIVE HIGH/CRITICAL findings on images in the demo repository) to an AWS Step Functions STANDARD workflow.",
-      "The workflow reads the image manifest by digest with ecr:BatchGetImage and writes the same manifest back under a per-image quarantine-<digest> tag with ecr:PutImage - a pure control-plane re-tag that needs no AWS Lambda function - then publishes an Amazon SNS notification. Retry and Catch drive a failure-notification path, and repeat findings for an already tagged image end without another email."
+      "The workflow reads the image manifest by digest with `ecr:BatchGetImage` and writes the same manifest back under a per-image `quarantine-<digest>` tag with `ecr:PutImage` - a pure control-plane re-tag that needs no AWS Lambda function - then publishes an Amazon SNS notification. Retry and Catch drive a failure-notification path, and repeat findings for an already tagged image end without another email."
     ]
   },
   "gitHub": {
