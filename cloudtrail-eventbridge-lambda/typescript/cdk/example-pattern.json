@@ -7,7 +7,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern enables CloudTrail data event logging for Amazon EventBridge event buses.",
+      "This pattern creates a single-Region CloudTrail trail that logs data events for the Amazon EventBridge event buses in the Region you deploy to.",
       "CloudTrail captures PutEvents API calls and delivers them as events to EventBridge.",
       "An EventBridge rule matches these CloudTrail events and triggers a Lambda function for alerting.",
       "This provides visibility into who is putting events, from where, and how many, which is essential for security auditing."
