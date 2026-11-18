@@ -11,7 +11,7 @@ export class AgentcoreGatewayLambdaStack extends cdk.Stack {
 
     // Lambda tool handler
     const toolFn = new lambda.Function(this, "ToolFn", {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("src/tool-lambda"),
       timeout: cdk.Duration.seconds(30),

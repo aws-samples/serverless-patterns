@@ -11,9 +11,9 @@ Important: this application uses various AWS services and there are costs associ
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-* [Node.js 22+](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
-* [Python 3.9+](https://www.python.org/downloads/) installed, with the test dependencies installed by `python3 -m pip install boto3 botocore` (for testing)
+* [Node.js](https://nodejs.org/en/download/) installed
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
+* [Python](https://www.python.org/downloads/) installed, with the test dependencies installed by `python3 -m pip install boto3 botocore` (for testing)
 
 ## Architecture
 
