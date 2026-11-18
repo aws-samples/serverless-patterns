@@ -9,8 +9,9 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Node.js 22+](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
+* [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Node.js](https://nodejs.org/en/download/) installed
+* [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
 
 ## How it works
 
@@ -33,6 +34,8 @@ The pattern includes four policies demonstrating different authorization pattern
 ## Deployment
 
 ```bash
+git clone https://github.com/aws-samples/serverless-patterns
+cd serverless-patterns/lambda-verified-permissions/typescript/cdk
 cd src && npm install && cd ..
 npm install
 cdk deploy

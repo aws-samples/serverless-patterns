@@ -69,7 +69,7 @@ export class LambdaVerifiedPermissionsStack extends cdk.Stack {
     });
 
     const authFn = new lambda.Function(this, 'AuthorizerFn', {
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('src'),
       environment: {
