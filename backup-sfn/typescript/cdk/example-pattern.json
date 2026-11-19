@@ -7,9 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an AWS Backup restore testing plan for an Amazon DynamoDB table and an AWS Step Functions workflow that validates every restored copy. AWS Backup restores the latest recovery point on a schedule, and validating the restored data is left to you.",
-      "When the restore job completes, an Amazon EventBridge rule starts the state machine. The state machine takes the restored table name from the event, counts the items with a dynamodb:Scan SDK integration (Select COUNT, Limit 3) and chooses a verdict. It then calls the AWS Backup PutRestoreValidationResult API once with SUCCESSFUL or FAILED, so the result appears on the restore job.",
-      "The AWS Backup documentation shows this validation with an AWS Lambda function and notes that PutRestoreValidationResult is not available through the Lambda SDK. Here the workflow uses AWS SDK service integrations, and the synthesized template contains no Lambda function."
+      "This pattern deploys an AWS Backup restore testing plan for an Amazon DynamoDB table and an AWS Step Functions workflow that validates each restored copy. AWS Backup restores the latest recovery point on a schedule, and checking the restored data is left to you.",
+      "When the restore job completes, an Amazon EventBridge rule starts the state machine. It takes the restored table name from the event, counts the items with a `dynamodb:Scan` SDK integration (`Select` `COUNT`, `Limit` 3) and calls the AWS Backup `PutRestoreValidationResult` API once with `SUCCESSFUL` or `FAILED`, so the result appears on the restore job. There's no AWS Lambda function.",
+      "The plan runs every day at the cron time while the stack exists. Each run restores the latest recovery point from the last day, so after the one-off backup in the README expires, the plan finds nothing to restore."
     ]
   },
   "gitHub": {
