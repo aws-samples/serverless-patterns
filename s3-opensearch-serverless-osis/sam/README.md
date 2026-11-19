@@ -8,6 +8,8 @@ Learn more about this pattern at Serverless Land Patterns: https://serverlesslan
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
+Cost: the OpenSearch Ingestion pipeline runs at least 1 Ingestion OCU, billed per hour while the pipeline is running (about $0.24 an hour in US East (N. Virginia)). Stop the pipeline when you're not using it, see [Stop the pipeline when idle](#stop-the-pipeline-when-idle). The collection is in a collection group with a minimum of 0 OCUs, so it scales to zero and stops billing for compute after 10 minutes with no requests. Storage is billed while the collection exists. See [Amazon OpenSearch Service pricing](https://aws.amazon.com/opensearch-service/pricing/).
+
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
@@ -84,6 +86,22 @@ A sample newline-delimited JSON (JSON Lines) file, `sample.json`, is included in
     ```
     GET s3-logs/_search
     ```
+
+## Stop the pipeline when idle
+
+A stopped pipeline isn't charged for Ingestion OCU hours, and S3 notifications wait in the SQS queue for up to 4 days. The collection scales to zero by itself, so it needs no step. See [Managing Amazon OpenSearch Ingestion pipeline costs](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/pipeline--stop-start.html).
+
+1. Stop the pipeline. Replace the pipeline name (the `DeploymentName` parameter) and region with your values:
+    ```bash
+    aws osis stop-pipeline --pipeline-name <DeploymentName> --region <your-region>
+    ```
+
+1. Start it again when you want to ingest more files:
+    ```bash
+    aws osis start-pipeline --pipeline-name <DeploymentName> --region <your-region>
+    ```
+
+The first request to the collection after it scales to zero takes 10 to 30 seconds while capacity comes back.
 
 ## Cleanup
 

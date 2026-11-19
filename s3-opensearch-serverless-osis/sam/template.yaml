@@ -187,18 +187,38 @@ Resources:
                 Resource: !GetAtt IngestQueue.Arn
 
   # ---------------------------------------------------------------------------
+  # NextGen collection group with a minimum of 0 OCUs for indexing and search,
+  # so the collection scales to zero (and stops billing for compute) after
+  # 10 minutes with no requests. The maximums cap the cost while it is active.
+  # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-scale-to-zero.html
+  # ---------------------------------------------------------------------------
+  CollectionGroup:
+    Type: AWS::OpenSearchServerless::CollectionGroup
+    Properties:
+      Name: !Ref DeploymentName
+      Generation: NEXTGEN
+      StandbyReplicas: ENABLED
+      CapacityLimits:
+        MinIndexingCapacityInOcu: 0
+        MinSearchCapacityInOcu: 0
+        MaxIndexingCapacityInOcu: 4
+        MaxSearchCapacityInOcu: 4
+
+  # ---------------------------------------------------------------------------
   # OpenSearch Serverless collection and its required security policies.
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-opensearchserverless-collection.html
   # ---------------------------------------------------------------------------
   OpenSearchServerless:
     Type: AWS::OpenSearchServerless::Collection
     DependsOn:
+      - CollectionGroup
       - EncryptionPolicy
       - NetworkPolicy
       - AccessPolicy
     Properties:
       Name: !Ref DeploymentName
       Type: SEARCH
+      CollectionGroupName: !Ref DeploymentName
 
   EncryptionPolicy:
     Type: AWS::OpenSearchServerless::SecurityPolicy
