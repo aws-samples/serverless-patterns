@@ -237,7 +237,7 @@ The key is read once per execution environment and kept for its lifetime, so rot
 
 ## Notes
 
-* The function uses only the AWS SDK for Python (Boto3) that ships with the Python 3.13 managed runtime, so there is no `requirements.txt` and no build step.
+* The function uses only the AWS SDK for Python (Boto3) that ships with the Lambda Python runtime, so there is no `requirements.txt` and no build step.
 * Amazon S3 Vectors allows up to 40 KB of metadata per vector, so a very long answer cannot be cached as metadata. See [Limitations and restrictions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html). The answer, prompt, model, timestamp and epoch are declared as non-filterable metadata keys so that they do not consume the smaller filterable metadata budget.
 * Semantic caching serves an answer that was written for a similar prompt, not the same prompt. It suits FAQ and support assistants, documentation question answering and other repetitive traffic. It does not suit answers that must be exact, fresh or specific to one user unless you also namespace entries per user, invalidate aggressively or verify equivalence before serving.
 * The negation parity guard covers ASCII English negation words, because the tokenizer keeps only ASCII letters. It does not catch opposites such as "cheapest" and "most expensive". For high stakes content, raise the threshold or verify a borderline candidate before serving it.
