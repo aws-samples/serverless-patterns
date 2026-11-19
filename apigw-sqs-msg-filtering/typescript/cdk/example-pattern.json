@@ -1,13 +1,15 @@
 {
   "title": "Amazon API Gateway to Amazon SQS with message filtering",
-  "description": "Simple pattern that sends a messsage directly to an SQS queue via an API Gateway endpoint and uses VTL to transform (e.g. filter) the message body.",
-  "language": "Node.js",
+  "description": "An Amazon API Gateway REST API sends messages straight to an Amazon SQS queue and uses a VTL mapping template to remove part of the message body first.",
+  "language": "TypeScript",
   "level": "200",
   "framework": "AWS CDK",
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern will create an API Gateway Rest API, an SQS Queue and the correct VTL integration mapping template to filter out parts of the message body."
+      "An Amazon API Gateway REST API has a `POST /sqs` method with a direct AWS service integration to Amazon SQS `SendMessage`. There is no AWS Lambda function in the request path.",
+      "A VTL mapping template on the integration request removes the `notNeededElement` object from the message body before it reaches the queue. It also passes through optional `delaySeconds` and `messageAttributes`. Use this when other parties call your API, for example as a webhook, and you want to keep message size under the SQS limit.",
+      "The API uses no authorization, so anyone with the URL can send messages. Add IAM authorization, an API key or a Lambda authorizer before you use it for real traffic."
     ]
   },
   "gitHub": {
@@ -33,7 +35,9 @@
   },
   "deploy": {
     "text": [
-      "Deploy the stack: <code>cdk deploy</code> or <code>npm run deploy</code>"
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>cdk deploy</code>"
     ]
   },
   "testing": {
@@ -42,7 +46,9 @@
     ]
   },
   "cleanup": {
-    "text": ["Delete the stack: <code>cdk destroy</code>."]
+    "text": [
+      "<code>cdk destroy</code>"
+    ]
   },
   "authors": [
     {
