@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a6b7b"/>
+    </marker>
+    <marker id="arrowCtl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c7511f"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="760" fill="#ffffff"/>
+
+  <text x="40" y="46" font-size="24" font-weight="600" fill="#16191f">Overflow from Lambda Managed Instances to Standard Lambda</text>
+  <text x="40" y="72" font-size="14" fill="#5a6b7b">One queue keeps LMI saturated so its scaler still gets a signal. The burst tier is opened on the control plane, not in the data path.</text>
+
+  <!-- ================= CONTROL PLANE ================= -->
+  <rect x="700" y="100" width="540" height="230" rx="10" fill="#fdf3ee" stroke="#c7511f" stroke-width="1.5" stroke-dasharray="7 4"/>
+  <text x="720" y="126" font-size="13" font-weight="700" fill="#c7511f" letter-spacing="1">CONTROL PLANE — never touches a workload message</text>
+
+  <!-- live depth poll -->
+  <rect x="722" y="142" width="228" height="90" rx="7" fill="#ffffff" stroke="#c7511f" stroke-width="1.5"/>
+  <text x="736" y="163" font-size="12.5" font-weight="700" fill="#16191f">Live depth poll (dead band)</text>
+  <text x="736" y="184" font-size="12" fill="#c0392b">▲ open  &#8805; 1800 visible · at once</text>
+  <text x="736" y="203" font-size="12" fill="#1e8449">▼ close &#8804;  450 visible · 30s flat/falling</text>
+  <text x="736" y="222" font-size="11.5" fill="#5a6b7b">no alarm: metric publish lag was 2m 15s</text>
+
+  <!-- schedule -->
+  <rect x="722" y="248" width="228" height="64" rx="7" fill="#ffffff" stroke="#c7511f" stroke-width="1.5"/>
+  <text x="736" y="269" font-size="12.5" font-weight="700" fill="#16191f">EventBridge</text>
+  <text x="736" y="287" font-size="11.5" fill="#5a6b7b">rate(1 min) — EventBridge's floor</text>
+  <text x="736" y="303" font-size="11.5" fill="#5a6b7b">controller then loops every 10s</text>
+
+  <!-- controller -->
+  <rect x="982" y="180" width="238" height="132" rx="7" fill="#ffffff" stroke="#c7511f" stroke-width="1.8"/>
+  <text x="996" y="202" font-size="12.5" font-weight="700" fill="#16191f">SpillControllerFunction</text>
+  <text x="996" y="222" font-size="11.5" fill="#5a6b7b">UpdateEventSourceMapping</text>
+  <text x="996" y="238" font-size="11.5" fill="#5a6b7b">(Enabled: true / false)</text>
+  <text x="996" y="262" font-size="11.5" fill="#16191f">· dead band → hold</text>
+  <text x="996" y="279" font-size="11.5" fill="#16191f">· 300s minimum dwell</text>
+  <text x="996" y="296" font-size="11.5" fill="#16191f">· converges, so overlaps are safe</text>
+
+  <path d="M 950 187 L 982 210" stroke="#c7511f" stroke-width="1.6" fill="none" marker-end="url(#arrowCtl)"/>
+  <path d="M 950 280 L 982 262" stroke="#c7511f" stroke-width="1.6" fill="none" marker-end="url(#arrowCtl)"/>
+  <path d="M 836 232 L 836 248" stroke="#c7511f" stroke-width="1.6" fill="none" marker-end="url(#arrowCtl)"/>
+
+  <!-- ================= DATA PLANE ================= -->
+  <!-- producer -->
+  <rect x="40" y="252" width="120" height="66" rx="7" fill="#ffffff" stroke="#5a6b7b" stroke-width="1.5"/>
+  <text x="100" y="282" font-size="13" font-weight="700" fill="#16191f" text-anchor="middle">Producer</text>
+  <text x="100" y="301" font-size="11.5" fill="#5a6b7b" text-anchor="middle">steady + surprises</text>
+
+  <!-- queue -->
+  <rect x="216" y="238" width="196" height="94" rx="7" fill="#eef6fc" stroke="#2e6da4" stroke-width="2"/>
+  <text x="314" y="262" font-size="13.5" font-weight="700" fill="#16191f" text-anchor="middle">WorkQueue</text>
+  <text x="314" y="281" font-size="11.5" fill="#5a6b7b" text-anchor="middle">one Amazon SQS queue</text>
+  <text x="314" y="299" font-size="11.5" fill="#5a6b7b" text-anchor="middle">VisibilityTimeout 180s</text>
+  <text x="314" y="317" font-size="11.5" fill="#5a6b7b" text-anchor="middle">maxReceiveCount 5</text>
+
+  <path d="M 160 285 L 216 285" stroke="#5a6b7b" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- depth signal to alarms -->
+  <path d="M 314 238 L 314 96 L 690 96 L 690 187 L 722 187" stroke="#c7511f" stroke-width="1.6" fill="none" stroke-dasharray="5 3" marker-end="url(#arrowCtl)"/>
+  <text x="330" y="90" font-size="11.5" fill="#c7511f">GetQueueAttributes — live queue state, read every 10s</text>
+
+  <!-- LMI branch -->
+  <rect x="470" y="118" width="212" height="164" rx="8" fill="#eaf4ea" stroke="#1e8449" stroke-width="2"/>
+  <text x="576" y="142" font-size="13.5" font-weight="700" fill="#16191f" text-anchor="middle">LmiWorkerFunction</text>
+  <text x="576" y="160" font-size="11.5" font-weight="600" fill="#1e8449" text-anchor="middle">Lambda Managed Instances</text>
+  <text x="486" y="182" font-size="11.5" fill="#16191f">min 3 envs × 10 = 30 concurrency</text>
+  <text x="486" y="200" font-size="11.5" fill="#16191f">ScalingMode: Auto (~2× / 5 min)</text>
+  <text x="486" y="218" font-size="11.5" fill="#16191f">MaxVCpuCount 64 → 640 max</text>
+  <text x="486" y="236" font-size="11.5" fill="#16191f">no cold starts · EC2 SP / RI</text>
+  <text x="486" y="258" font-size="11.5" fill="#5a6b7b">ESM: always on, 64 pollers</text>
+  <text x="486" y="274" font-size="11.5" fill="#5a6b7b">throttles here are the scale signal</text>
+
+  <!-- burst branch -->
+  <rect x="470" y="368" width="212" height="152" rx="8" fill="#fff6e8" stroke="#d68910" stroke-width="2"/>
+  <text x="576" y="392" font-size="13.5" font-weight="700" fill="#16191f" text-anchor="middle">BurstWorkerFunction</text>
+  <text x="576" y="410" font-size="11.5" font-weight="600" fill="#b9770e" text-anchor="middle">Standard Lambda, on demand</text>
+  <text x="486" y="432" font-size="11.5" fill="#16191f">scales 1000 envs per 10s</text>
+  <text x="486" y="450" font-size="11.5" fill="#16191f">MaximumConcurrency 540</text>
+  <text x="486" y="468" font-size="11.5" fill="#16191f">pay per millisecond</text>
+  <text x="486" y="490" font-size="11.5" fill="#5a6b7b">ESM: Enabled false at deploy</text>
+  <text x="486" y="506" font-size="11.5" fill="#5a6b7b">zero cost at steady state</text>
+
+  <path d="M 412 268 L 440 268 L 440 200 L 470 200" stroke="#1e8449" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 412 302 L 440 302 L 440 440 L 470 440" stroke="#d68910" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+
+  <!-- controller toggles burst ESM -->
+  <path d="M 1101 312 L 1101 440 L 682 440" stroke="#c7511f" stroke-width="1.8" fill="none" marker-end="url(#arrowCtl)"/>
+  <text x="700" y="432" font-size="11.5" fill="#c7511f">toggles this mapping</text>
+
+  <!-- shared handler / downstream -->
+  <rect x="216" y="560" width="466" height="42" rx="7" fill="#f4f6f8" stroke="#5a6b7b" stroke-width="1.3" stroke-dasharray="5 3"/>
+  <text x="449" y="586" font-size="12.5" font-weight="600" fill="#16191f" text-anchor="middle">both tiers run the identical handler — the only difference is a COMPUTE_TIER label</text>
+  <path d="M 520 282 L 520 344 L 455 344 L 455 560" stroke="#1e8449" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 620 520 L 620 560" stroke="#d68910" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <rect x="722" y="560" width="200" height="72" rx="7" fill="#ffffff" stroke="#5a6b7b" stroke-width="1.5"/>
+  <text x="822" y="583" font-size="12.5" font-weight="700" fill="#16191f" text-anchor="middle">IdempotencyTable</text>
+  <text x="822" y="601" font-size="11.5" fill="#5a6b7b" text-anchor="middle">DynamoDB, two-phase</text>
+  <text x="822" y="618" font-size="11.5" fill="#5a6b7b" text-anchor="middle">IN_PROGRESS → DONE</text>
+
+  <rect x="962" y="560" width="258" height="72" rx="7" fill="#ffffff" stroke="#5a6b7b" stroke-width="1.5"/>
+  <text x="1091" y="583" font-size="12.5" font-weight="700" fill="#16191f" text-anchor="middle">WorkDeadLetterQueue</text>
+  <text x="1091" y="601" font-size="11.5" fill="#5a6b7b" text-anchor="middle">poison messages exit fast so they</text>
+  <text x="1091" y="618" font-size="11.5" fill="#5a6b7b" text-anchor="middle">do not inflate the depth signal</text>
+
+  <path d="M 682 581 L 722 581" stroke="#5a6b7b" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 412 332 L 412 646 L 1091 646 L 1091 632" stroke="#5a6b7b" stroke-width="1.4" fill="none" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+
+  <!-- ================= FOOTER NOTE ================= -->
+  <rect x="40" y="660" width="1180" height="72" rx="8" fill="#fdf3ee" stroke="#c7511f" stroke-width="1.5"/>
+  <text x="58" y="683" font-size="13" font-weight="700" fill="#c7511f">Why one queue, and not a router in front of two queues</text>
+  <text x="58" y="703" font-size="12" fill="#16191f">LMI does not scale on queue depth. Its scaler reacts to the CPU utilization and multi-concurrency saturation of its own execution environments.</text>
+  <text x="58" y="722" font-size="12" fill="#16191f">Rate-limiting LMI's input would cap its CPU, silence its scaler, and leave the burst tier carrying the load forever — the relief valve welded open.</text>
+
+  <!-- legend -->
+  <text x="40" y="352" font-size="11.5" font-weight="700" fill="#5a6b7b">SQS visibility timeout keeps</text>
+  <text x="40" y="368" font-size="11.5" fill="#5a6b7b">the two consumers from</text>
+  <text x="40" y="384" font-size="11.5" fill="#5a6b7b">receiving the same message.</text>
+  <text x="40" y="418" font-size="11.5" font-weight="700" fill="#c7511f">Reaction time ≈ 42s (measured)</text>
+  <text x="40" y="434" font-size="11.5" fill="#5a6b7b">34s to detect — the poll interval,</text>
+  <text x="40" y="450" font-size="11.5" fill="#5a6b7b">plus a ~9s blind window, plus the</text>
+  <text x="40" y="466" font-size="11.5" fill="#5a6b7b">approximate counter catching up.</text>
+  <text x="40" y="482" font-size="11.5" fill="#5a6b7b">Then 8s to the first burst invoke.</text>
+  <text x="40" y="498" font-size="11.5" fill="#5a6b7b">The backlog absorbs the burst.</text>
+</svg>
