@@ -1,0 +1,71 @@
+{
+  "title": "AWS AppSync to AWS Step Functions workflow catalog via Amazon EventBridge",
+  "description": "A GraphQL front door that lets teams opt a Step Functions workflow in by tagging it, then any authorized caller triggers it by name and tracks it to completion.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern puts a single AWS AppSync GraphQL API in front of your teams' Step Functions workflows. A workflow owner opts a Standard state machine in by tagging it 'workflowType'; a discovery Lambda (driven by CloudTrail events via Amazon EventBridge) registers it in a DynamoDB catalog, and an admin activates it by publishing a versioned JSON Schema input contract.",
+      "An authorized caller invokes the requestWorkflow mutation; a request-handler Lambda validates the caller and parameters, records the execution in a DynamoDB tracker, and publishes a 'Workflow Requested' event to a custom EventBridge bus. A trigger Lambda starts the state machine (StartExecution scoped by the workflowType tag). Step Functions status-change events update the tracker, and a scheduled reconciler Lambda repairs any dropped events. Callers poll getWorkflowExecution / listWorkflowExecutions. Authorization is IAM by default, with optional Amazon Cognito user-pool auth and per-workflow allowedCallers."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/workflow-catalog-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Build a GraphQL API with AWS AppSync",
+        "link": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
+      },
+      {
+        "text": "Amazon EventBridge event bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-bus.html"
+      },
+      {
+        "text": "AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+      },
+      {
+        "text": "AWS Lambda",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+      },
+      {
+        "text": "Amazon DynamoDB",
+        "link": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+      },
+      {
+        "text": "Amazon SQS dead-letter queues",
+        "link": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "From the pattern directory, install dependencies: <code>npm install</code>",
+      "Bootstrap the account/Region if needed: <code>npx cdk bootstrap</code>",
+      "Build the Lambda bundle and deploy: <code>npm run deploy</code> (wraps cdk deploy; use this instead of a bare cdk deploy so the GraphQL schema and Lambda dependency are bundled)"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See this pattern's README (Register a workflow / Test end to end) for how to register a workflow and confirm it runs."
+    ]
+  },
+  "cleanup": {
+    "text": ["Delete the stack: <code>npx cdk destroy</code>."]
+  },
+  "authors": [
+    {
+      "name": ["Mia Alarcon Chong", "Meghana Srinivas"],
+      "image": "",
+      "bio": "ProServe Delivery Consultants at Amazon Web Services",
+      "linkedin": ["mialarcon", "meghana-srinivas-2837b918b"],
+      "twitter": ""
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+type WorkflowRequest {
+  executionId: ID!
+  workflowType: String!
+  status: String!
+  requestedAt: AWSDateTime!
+}
+
+type WorkflowExecution {
+  executionId: ID!
+  workflowType: String!
+  requestPayload: AWSJSON!
+  status: String!
+  requestedAt: AWSDateTime!
+  startedAt: AWSDateTime
+  finishedAt: AWSDateTime
+  executionArn: String
+  output: AWSJSON
+  error: String
+  cause: String
+  requesterSubject: String
+  requesterPrincipal: String
+}
+
+type WorkflowRegistration {
+  workflowType: String!
+  stateMachineArn: String!
+  stateMachineType: String!
+  enabled: Boolean!
+  contractStatus: String!
+  schemaVersion: String
+  schemaHash: String
+  schemaSource: String!
+  inputSchema: AWSJSON
+  inferredInputSchema: AWSJSON
+  requiredParameters: [String!]!
+  allowedCallers: [String!]
+  updatedAt: AWSDateTime
+  contractUpdatedAt: AWSDateTime
+}
+
+type WorkflowExecutionConnection {
+  items: [WorkflowExecution!]!
+  nextToken: String
+}
+
+type WorkflowRegistrationConnection {
+  items: [WorkflowRegistration!]!
+  nextToken: String
+}
+
+type Query {
+  getWorkflowRegistration(workflowType: String!): WorkflowRegistration
+  listWorkflowRegistrations(
+    limit: Int
+    nextToken: String
+  ): WorkflowRegistrationConnection!
+  getWorkflowExecution(executionId: ID!): WorkflowExecution
+  listWorkflowExecutions(
+    workflowType: String!
+    limit: Int
+    nextToken: String
+  ): WorkflowExecutionConnection!
+  listWorkflowExecutionsByType(
+    workflowType: String!
+    limit: Int
+    nextToken: String
+  ): WorkflowExecutionConnection!
+}
+
+type Mutation {
+  registerWorkflowContract(
+    workflowType: String!
+    stateMachineArn: String
+    schemaVersion: String!
+    inputSchema: AWSJSON!
+    allowedCallers: [String!]
+  ): WorkflowRegistration!
+
+  requestWorkflow(
+    workflowType: String!
+    parameters: AWSJSON!
+    clientRequestToken: String!
+  ): WorkflowRequest!
+
+  cancelWorkflowExecution(executionId: ID!): WorkflowExecution!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}
