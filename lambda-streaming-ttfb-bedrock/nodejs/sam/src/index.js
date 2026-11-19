@@ -37,7 +37,7 @@ exports.handler = awslambda.streamifyResponse(
             maxTokens = 2500,
             temperature = .7,
             topP = 1,
-            anthropicVersion = "bedrock-2023-05-31"
+            anthropicVersion = "bedrock-2023-05-31",
             modelId = 'anthropic.claude-3-haiku-20240307-v1:0',
             contentType = 'application/json',
             accept = '*/*';
@@ -63,7 +63,7 @@ exports.handler = awslambda.streamifyResponse(
                     }
                 ],
                 temperature,
-                top_p: topP
+                top_p: topP,
                 anthropic_version: anthropicVersion,
             };
 
