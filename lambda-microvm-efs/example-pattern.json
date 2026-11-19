@@ -1,0 +1,71 @@
+{
+  "title": "AWS Lambda MicroVMs with Amazon EFS",
+  "description": "Mount an Amazon EFS file system inside a Lambda MicroVM as a shared POSIX file tree over NFS, reachable through a VPC egress network connector.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern runs a containerized application inside an AWS Lambda MicroVM — a Firecracker-isolated, snapshot-resumable serverless compute environment — and mounts an Amazon EFS file system as a local POSIX file tree over NFS 4.1. Because EFS is a genuinely shared file system, many MicroVMs mount it concurrently and see each other's writes immediately, and the data outlives every MicroVM that touched it. There is no export step and no sync window: a second MicroVM reads the bytes a first one wrote because it is the same file system, not a copy.",
+      "The file system lives in your VPC rather than on a public endpoint, so the MicroVM reaches the mount target over a VPC egress network connector that provisions elastic network interfaces. The mount itself happens at run time inside the MicroVM's /run lifecycle hook — the network path and execution-role credentials only exist once the MicroVM is running, so they cannot be baked into the image snapshot. An NFS session also cannot survive a snapshot, so the pattern unmounts in /suspend and re-mounts in /resume.",
+      "The image must be built with AdditionalOsCapabilities: [ALL]; without it the container cannot call mount(2) at all. The included app also exposes a throughput endpoint that reads from EFS with parallel O_DIRECT streams, because EFS traffic is governed by the MicroVM's egress bandwidth allocation rather than by the documented request/response figures for the managed HTTPS endpoint.",
+      "CloudFormation provisions the EFS file system, mount target and access point, the VPC egress connector, all IAM roles, and the MicroVM image (AWS::Lambda::MicrovmImage). The MicroVM itself is launched afterwards with the included run.sh helper, since RunMicrovm is a runtime API rather than a CloudFormation resource."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-microvm-efs",
+      "templateURL": "serverless-patterns/lambda-microvm-efs",
+      "projectFolder": "lambda-microvm-efs",
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs",
+        "link": "https://docs.aws.amazon.com/lambda/"
+      },
+      {
+        "text": "Amazon EFS",
+        "link": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
+      },
+      {
+        "text": "Mounting EFS with amazon-efs-utils",
+        "link": "https://docs.aws.amazon.com/efs/latest/ug/efs-mount-helper.html"
+      },
+      {
+        "text": "EFS access points",
+        "link": "https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html"
+      },
+      {
+        "text": "AWS::Lambda::MicrovmImage CloudFormation resource",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "./src/run.sh package <artifact-bucket>",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the README for full testing instructions (run.sh run / run.sh prove / run.sh bench)."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "see the README Cleanup section"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Ben Freiberg",
+      "image": "https://serverlessland.com/assets/images/contributors/ben-freiberg.jpg",
+      "linkedin": "benfreiberg"
+    }
+  ]
+}
