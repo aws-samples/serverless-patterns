@@ -1,0 +1,67 @@
+{
+  "title": "Human in the Loop with AWS Lambda durable functions",
+  "description": "Demonstrates how to integrate human review and approval processes into workflows using AWS Lambda durable functions. The workflow sends email notifications via Amazon SNS and suspends execution — without compute charges — until a reviewer approves or rejects via a secure callback link.",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "A document submission triggers an AWS Lambda durable function that validates the input and sends a formatted approval email via Amazon SNS.",
+      "The workflow suspends using waitForCallback(), incurring no compute charges while waiting. The reviewer receives an email with approve and reject links routed through Amazon API Gateway.",
+      "A GET request renders a confirmation page to prevent email prefetchers from silently triggering approvals. The reviewer submits a POST to confirm the decision.",
+      "The callback handler enforces single-use by atomically marking the Amazon DynamoDB token as consumed, then resumes the durable execution with the approval result.",
+      "This pattern deploys one AWS Lambda durable function, one AWS Lambda callback handler, one Amazon API Gateway REST API, one Amazon DynamoDB table, and one Amazon SNS topic."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-functions-human-in-the-loop",
+      "templateURL": "serverless-patterns/lambda-durable-functions-human-in-the-loop",
+      "projectFolder": "lambda-durable-functions-human-in-the-loop/hitl-lambda-durable-function-cdk",
+      "templateFile": "lib/hitl-lambda-durable-function-cdk-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "AWS Durable Execution SDK Developer Guide",
+        "link": "https://docs.aws.amazon.com/durable-execution/"
+      },
+      {
+        "text": "Callback operation — AWS Durable Execution SDK",
+        "link": "https://docs.aws.amazon.com/durable-execution/sdk-reference/operations/callback/"
+      },
+      {
+        "text": "Idempotency and retries — AWS Lambda durable functions",
+        "link": "https://docs.aws.amazon.com/durable-execution/patterns/best-practices/idempotency/"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "cdk deploy --context Email=your-email@example.com"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cdk destroy --context Email=your-email@example.com</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Tafadzwa Chigumira",
+      "bio": "Solutions Architect at AWS",
+      "linkedin": "tafadzwachigumira"
+    }
+  ]
+}

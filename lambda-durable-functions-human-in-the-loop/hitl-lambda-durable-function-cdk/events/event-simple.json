@@ -1,0 +1,28 @@
+{
+  "submissionId": "DOC-2026-001235",
+  "submissionType": "expense_report",
+  "submitter": {
+    "name": "Bob Smith",
+    "email": "bob.smith@example.com",
+    "department": "Sales",
+    "employeeId": "EMP-9012"
+  },
+  "document": {
+    "title": "Client Lunch Meeting",
+    "amount": 125.50,
+    "currency": "USD",
+    "category": "Meals & Entertainment",
+    "description": "Lunch meeting with potential client to discuss Q2 partnership opportunities",
+    "items": [
+      {
+        "description": "Restaurant bill",
+        "amount": 125.50,
+        "date": "2026-02-10"
+      }
+    ],
+    "attachments": [
+      "s3://expense-receipts/2026/bob-smith/lunch-receipt.pdf"
+    ]
+  },
+  "submittedAt": "2026-02-13T16:45:00Z"
+}
