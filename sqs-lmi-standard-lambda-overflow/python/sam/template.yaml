@@ -6,7 +6,7 @@ Description: >
 
 Globals:
   Function:
-    Runtime: python3.13
+    Runtime: python3.14
     Architectures:
       - arm64
     Timeout: 30
@@ -221,6 +221,14 @@ Resources:
 
   LmiWorkerFunction:
     Type: AWS::Serverless::Function
+    # cfn-lint's bundled resource spec may not include the Arn attribute of
+    # AWS::Lambda::CapacityProvider yet, so it reports E1010 on the GetAtt below.
+    # The attribute exists and deploys fine; suppress that one check here only.
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E1010
     Properties:
       FunctionName: !Sub '${AWS::StackName}-lmi-worker'
       CodeUri: src/

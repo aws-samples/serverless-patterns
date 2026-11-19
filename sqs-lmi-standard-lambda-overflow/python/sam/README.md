@@ -2,6 +2,8 @@
 
 This pattern runs a steady Amazon SQS workload on AWS Lambda Managed Instances (LMI) for a cost-optimized, predictable compute baseline, and opens a Standard Lambda burst tier on the **same queue** when the backlog shows that LMI cannot keep up. The baseline is a reservable EC2 footprint. The burst tier costs nothing until it is needed, scales instantly when it is, and closes again once LMI has scaled up to carry the load itself.
 
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sqs-lmi-standard-lambda-overflow-python-sam
+
 Important: this application uses AWS services that can incur charges. You are responsible for the costs incurred in your account. No warranty is implied in this example.
 
 ## The constraint that shapes the design
@@ -173,7 +175,7 @@ The function is deliberately 128 MB: it sleeps, makes two API calls, and compare
 
 * An AWS account and permissions to create Lambda, SQS, DynamoDB, CloudWatch, EventBridge, IAM, and Lambda Managed Instances resources.
 * AWS CLI installed and configured.
-* AWS SAM CLI 1.158.0 or later. Earlier versions do not recognise `AWS::Serverless::CapacityProvider` or the `FunctionScalingConfig` and `CapacityProviderConfig` properties of `AWS::Serverless::Function`.
+* AWS SAM CLI, in a version that recognises `AWS::Serverless::CapacityProvider` and the `FunctionScalingConfig` and `CapacityProviderConfig` properties of `AWS::Serverless::Function`. Older versions don't.
 * Python 3 with boto3 available, for the load-generator scripts.
 * A VPC with at least two private subnets and a security group for the LMI capacity provider.
 * Egress from those subnets to SQS, DynamoDB, CloudWatch Logs, and CloudWatch. Use NAT gateways or interface VPC endpoints according to your cost and security requirements.
@@ -185,7 +187,7 @@ The function is deliberately 128 MB: it sleeps, makes two API calls, and compare
 
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns.git
-   cd serverless-patterns/sqs-lmi-standard-lambda-overflow-sam
+   cd serverless-patterns/sqs-lmi-standard-lambda-overflow/python/sam
    ```
 
 2. Validate and build:
