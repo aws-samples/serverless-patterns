@@ -7,12 +7,9 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern creates an Amazon API Gateway REST API endpoint that connects directly to Amazon CloudWatch Logs using an AWS service integration, with no Lambda function.",
-      "The API exposes two POST methods. 'POST /putLog' maps to the CloudWatch Logs PutLogEvents action to put a log event into a log stream, and 'POST /getLog' maps to the GetLogEvents action to read log events back from the stream.",
-      "API Gateway assumes an AWS IAM role that allows GetLogEvents and PutLogEvents on a log stream. The log group and log stream are fixed in the template, so callers cannot access other logs. Mapping templates encode the timestamp and message from the request body as valid JSON before calling the CloudWatch Logs API.",
-      "This is useful for browser or mobile clients, IoT devices, or third-party systems that need to write to or read from CloudWatch Logs over plain HTTPS without bundling the AWS SDK or signing requests.",
-      "This sample API has no authorization, so use it only for testing and add an authorizer before any other use.",
-      "Review the Amazon API Gateway and Amazon CloudWatch Logs quotas for the limits that apply when working with this pattern."
+      "This pattern creates an Amazon API Gateway REST API that calls Amazon CloudWatch Logs directly through an AWS service integration, with no AWS Lambda function. `POST /putLog` maps to the `PutLogEvents` action and writes an event to a log stream, and `POST /getLog` maps to `GetLogEvents` and reads the events back.",
+      "API Gateway assumes an IAM role that allows only `logs:PutLogEvents` and `logs:GetLogEvents` on the one log stream the stack creates. The log group and stream are fixed in the mapping templates, so callers can't reach other logs, and the templates encode the caller's `ts` and `message` with `$input.json`, so a crafted value can't break the JSON request.",
+      "The API has no authorization, so anyone with the URL can write to and read the log stream. Use it for testing, and add IAM authorization, an Amazon Cognito user pool or a Lambda authorizer before any other use."
     ]
   },
   "gitHub": {
@@ -46,17 +43,17 @@
   },
   "deploy": {
     "text": [
-      "sam deploy --guided"
+      "<code>sam deploy --guided</code>"
     ]
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Send <code>POST</code> requests with a <code>ts</code> and <code>message</code> to the <code>PutLogUrl</code> output, then read them back from <code>GetLogUrl</code>. See the README in the GitHub repo for the commands."
     ]
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>sam delete</code>."
+      "<code>sam delete</code>"
     ]
   },
   "authors": [
