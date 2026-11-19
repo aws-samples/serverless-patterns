@@ -182,7 +182,7 @@ Resources:
   SamStepFunctionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambda/
+      CodeUri: src/
       Handler: app.lambda_handler
       Role: !GetAtt lambdaStepFunctionRole.Arn
       Runtime: python3.14
