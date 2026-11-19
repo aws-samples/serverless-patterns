@@ -1,0 +1,102 @@
+{
+    "title": "Human-in-the-loop AI review with AWS Lambda durable functions",
+    "description": "Orchestrate a Spring AI agent on Bedrock AgentCore from a Java Lambda durable function, pausing for human approval.",
+    "language": "Java",
+    "level": "300",
+    "framework": "AWS SAM",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "This pattern shows how to pause a long-running Java workflow for human approval of an AI agent's work. An AWS Lambda durable function orchestrates a Spring AI agent hosted on Amazon Bedrock AgentCore Runtime, suspending mid-workflow until a person approves or rejects the agent's draft.",
+            "The workflow runs three durable operations. First, a step invokes the Spring AI agent on AgentCore, which reads a document and drafts a summary highlighting key points and open concerns. Second, waitForCallback creates a callback and suspends the execution. At this point the function stops running entirely: no compute is billed while it waits, and it can stay suspended for up to the configured seven-day execution timeout. Third, once a decision arrives through SendDurableExecutionCallbackSuccess, Lambda starts a fresh invocation, replays the handler from the top while skipping the already-completed step, and resumes at the callback with the reviewer's decision. Approved documents go back to the agent for a final polish, reusing the same AgentCore session so the agent still has the earlier turn in context. Rejected ones skip that step entirely.",
+            "There is no database in this pattern, and that is the point: Lambda checkpoints step results, the pending callback and the handler's return value into storage the service manages, so the workflow's state is readable with get-durable-execution and get-durable-execution-history rather than from a table you provision. Submission and approval are both driven from the AWS CLI, which keeps the example focused on the durable execution model itself.",
+            "The agent is an ordinary Spring Boot application. The community spring-ai-agentcore-runtime-starter auto-configures the POST /invocations and GET /ping endpoints that AgentCore Runtime requires, so the agent code is a single method annotated with @AgentCoreInvocation that calls Amazon Bedrock through Spring AI's Converse integration. Because AgentCore hosts source code directly only for Python and Node, the Java agent ships as an ARM64 container image built by an included script and passed to the stack as a parameter.",
+            "Together these pieces show the durability model that makes agentic workflows practical: expensive, slow agent calls are checkpointed so they are never repeated on failure or replay, and the workflow can wait days for a human without holding an execution open or paying for idle time. The pattern deploys one Lambda durable function and one AgentCore runtime."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/lambda-durable-agentcore-springai-sam-java",
+            "templateURL": "serverless-patterns/lambda-durable-agentcore-springai-sam-java",
+            "projectFolder": "lambda-durable-agentcore-springai-sam-java",
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "bullets": [
+            {
+                "text": "AWS Lambda durable functions",
+                "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+            },
+            {
+                "text": "AWS Durable Execution SDK for Java",
+                "link": "https://docs.aws.amazon.com/durable-execution/sdk-reference/languages/java/"
+            },
+            {
+                "text": "Host an agent with Amazon Bedrock AgentCore Runtime",
+                "link": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agents-tools-runtime.html"
+            },
+            {
+                "text": "Callback operations for human-in-the-loop workflows",
+                "link": "https://docs.aws.amazon.com/durable-execution/sdk-reference/operations/callback/"
+            },
+            {
+                "text": "Spring AI reference documentation",
+                "link": "https://docs.spring.io/spring-ai/reference/"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "./scripts/build-agent-image.sh",
+            "sam build && sam deploy --guided"
+        ]
+    },
+    "testing": {
+        "text": [
+            "See the GitHub repo for detailed testing instructions."
+        ]
+    },
+    "cleanup": {
+        "text": [
+            "Delete the stack: <code>sam delete</code>."
+        ]
+    },
+    "authors": [
+        {
+            "name": "Paras Jain",
+            "image": "https://avatars.githubusercontent.com/u/583119?v=4",
+            "bio": "Paras is a Technical Account Manager with AWS based out of Herndon, Virginia, USA. He is a member of Serverless Technical Field community",
+            "linkedin": "parasjain01",
+            "twitter": "parasjain01"
+        }
+    ],
+    "patternArch": {
+        "icon1": {
+            "x": 20,
+            "y": 50,
+            "service": "lambda",
+            "label": "Durable function"
+        },
+        "icon2": {
+            "x": 50,
+            "y": 50,
+            "service": "bedrock",
+            "label": "AgentCore Runtime"
+        },
+        "icon3": {
+            "x": 80,
+            "y": 50,
+            "service": "bedrock",
+            "label": "Bedrock model"
+        },
+        "line1": {
+            "from": "icon1",
+            "to": "icon2"
+        },
+        "line2": {
+            "from": "icon2",
+            "to": "icon3"
+        }
+    }
+}
