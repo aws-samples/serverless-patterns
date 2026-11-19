@@ -12,7 +12,7 @@ Resources:
   MyLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: my-cw-log-group
+      LogGroupName: !Sub '${AWS::StackName}-logs'
       RetentionInDays: 7
 
   MyLogStream:

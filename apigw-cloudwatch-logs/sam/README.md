@@ -58,7 +58,7 @@ Amazon CloudWatch Logs
 
 This pattern deploys an API Gateway REST API that talks directly to the Amazon CloudWatch Logs API.
 
-* A CloudWatch Logs log group (`my-cw-log-group`) and a log stream (`log-stream-1`) are created.
+* A CloudWatch Logs log group named after the stack (`<stack name>-logs`) and a log stream (`log-stream-1`) are created.
 * An IAM role is created that API Gateway assumes. It allows `logs:GetLogEvents` and `logs:PutLogEvents` on the created log stream above, and includes `apigateway.amazonaws.com` in its trust relationship.
 * `POST /putLog` uses an `AWS` service integration to call the CloudWatch Logs `PutLogEvents` action. It sets the `X-Amz-Target: Logs_20140328.PutLogEvents` and `Content-Type: application/x-amz-json-1.1` headers and uses a mapping template to build the request from the client body. The template builds the JSON with `$input.json`, which encodes each value as valid JSON.
 * `POST /getLog` uses an `AWS` service integration to call the CloudWatch Logs `GetLogEvents` action, setting `X-Amz-Target: Logs_20140328.GetLogEvents`.
@@ -145,7 +145,7 @@ GET_LOG_URL=$(aws cloudformation describe-stacks --stack-name STACK_NAME \
     }
     ```
 
-4. Verify in the console. Navigate to CloudWatch Logs in the AWS Console and confirm that the log group `my-cw-log-group`, the `log-stream-1` log stream and the log events exist.
+4. Verify in the console. Navigate to CloudWatch Logs in the AWS Console and confirm that the log group from the `LogGroupName` output, the `log-stream-1` log stream and the log events exist.
 
 The timestamp (`ts`) must be in UNIX epoch time with milliseconds. CloudWatch Logs rejects events whose timestamp is more than 14 days in the past or more than 2 hours in the future. Rejected events are reported in a `rejectedLogEventsInfo` field (for example `tooOldLogEventEndIndex`) instead of being stored. See [InputLogEvent](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_InputLogEvent.html) and [PutLogEvents](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html) for more detail.
 
@@ -162,6 +162,6 @@ Replace `STACK_NAME` in the commands below with the stack name you chose during 
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
