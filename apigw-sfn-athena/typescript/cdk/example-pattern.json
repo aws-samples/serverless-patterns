@@ -1,26 +1,15 @@
 {
   "title": "Amazon API Gateway to AWS Step Functions Express to Amazon Athena",
-  "description": "Run an Amazon Athena query via an AWS Step Functions Express Workflow and return the rows in one synchronous Amazon API Gateway call, with no AWS Lambda in the request path.",
+  "description": "Run an Amazon Athena query through an AWS Step Functions Express Workflow and return the rows in one synchronous Amazon API Gateway call, with no Lambda function.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
-  "services": {
-    "from": {
-      "serviceName": "Amazon API Gateway",
-      "serviceURL": "/api-gateway/"
-    },
-    "to": {
-      "serviceName": "AWS Step Functions",
-      "serviceURL": "/step-functions/"
-    }
-  },
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern deploys an Amazon API Gateway REST API that invokes an AWS Step Functions Express Workflow synchronously with StartSyncExecution.",
-      "The Express Workflow uses native AWS Step Functions service integrations to call Amazon Athena. Because Express Workflows do not support the .sync (RUN_JOB) pattern, AthenaStartQueryExecution runs with the REQUEST_RESPONSE pattern, a Wait/Choice loop polls GetQueryExecution until the query succeeds (at most 10 polls, then StopQueryExecution and a Fail state, so the workflow ends before the Amazon API Gateway integration timeout), then AthenaGetQueryResults reads the rows. A final Pass state shapes the response.",
-      "Amazon Athena queries an AWS Glue external table over a sample CSV dataset in Amazon S3 and writes results to a separate Amazon S3 prefix pinned by an Amazon Athena workgroup.",
-      "The result rows are returned to the caller in a single synchronous request/response. There are no AWS Lambda functions in the request path (the stack deploys two small AWS CDK helper functions at deploy time, to seed the sample data and to empty the bucket on stack deletion)."
+      "This pattern runs an Amazon Athena query and returns its rows in one synchronous Amazon API Gateway request. The REST API starts an AWS Step Functions Express Workflow with `StartSyncExecution`, and the workflow calls Athena through native service integrations, so there's no AWS Lambda function in the request path.",
+      "Express Workflows don't support the `.sync` integration pattern, so the workflow starts the query with `StartQueryExecution` and polls `GetQueryExecution` in a `Wait` and `Choice` loop. When the query succeeds, `GetQueryResults` reads the rows, which must fit in the 256 KiB Step Functions payload. After 10 polls the workflow calls `StopQueryExecution` and fails, so the caller gets an HTTP 500 before the 29-second integration timeout.",
+      "The method uses IAM authorization, because the caller's SQL goes straight to Athena, and the stage is throttled to 5 requests per second. Athena reads a sample CSV file through an AWS Glue table and writes results to an Amazon S3 prefix set by its workgroup."
     ]
   },
   "gitHub": {
@@ -49,7 +38,7 @@
   },
   "testing": {
     "text": [
-      "See the GitHub repo for detailed testing instructions."
+      "Send a SigV4-signed <code>POST</code> with a <code>queryString</code> to the <code>ApiEndpoint</code> output, for example with <code>curl --aws-sigv4</code>. See the README in the GitHub repo for the commands."
     ]
   },
   "cleanup": {
@@ -66,47 +55,5 @@
       "linkedin": "",
       "twitter": ""
     }
-  ],
-  "patternArch": {
-    "icon1": {
-      "x": 15,
-      "y": 50,
-      "service": "apigw",
-      "label": "Amazon API Gateway (REST)"
-    },
-    "icon2": {
-      "x": 45,
-      "y": 50,
-      "service": "sfn",
-      "label": "AWS Step Functions Express"
-    },
-    "icon3": {
-      "x": 70,
-      "y": 50,
-      "service": "athena",
-      "label": "Amazon Athena"
-    },
-    "icon4": {
-      "x": 90,
-      "y": 50,
-      "service": "s3",
-      "label": "Amazon S3"
-    },
-    "line1": {
-      "from": "icon1",
-      "to": "icon2",
-      "label": "StartSyncExecution"
-    },
-    "line2": {
-      "from": "icon2",
-      "to": "icon3",
-      "label": "Start query + poll"
-    },
-    "line3": {
-      "from": "icon3",
-      "to": "icon4",
-      "label": "Read data / write results"
-    }
-  },
-  "patternType": "Serverless"
+  ]
 }
