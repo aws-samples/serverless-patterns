@@ -4,7 +4,7 @@ Run an Amazon Athena query and return its rows in a single synchronous Amazon AP
 
 This pattern is implemented with the AWS Cloud Development Kit (AWS CDK) in TypeScript.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sfn-express-athena-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sfn-athena-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -74,7 +74,7 @@ The Amazon API Gateway method uses AWS IAM authorization, so requests must be si
     ```
 2. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/apigw-sfn-express-athena-cdk/cdk
+    cd serverless-patterns/apigw-sfn-athena/typescript/cdk/cdk
     ```
 3. Install dependencies:
     ```
@@ -129,7 +129,7 @@ If a query fails (for example a syntax error or an unknown table), the call retu
 
 ## Cleanup
 
-1. From the `serverless-patterns/apigw-sfn-express-athena-cdk/cdk` directory, delete the stack:
+1. From the `serverless-patterns/apigw-sfn-athena/typescript/cdk/cdk` directory, delete the stack:
     ```
     npx cdk destroy
     ```

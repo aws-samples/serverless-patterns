@@ -42,7 +42,7 @@
   },
   "deploy": {
     "text": [
-      "<code>cd apigw-sfn-express-athena-cdk/cdk</code>",
+      "<code>cd apigw-sfn-athena/typescript/cdk/cdk</code>",
       "<code>npm install</code>",
       "<code>npx cdk deploy</code>"
     ]
@@ -54,7 +54,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the stack: <code>cd apigw-sfn-express-athena-cdk/cdk</code> then <code>npx cdk destroy</code>.",
+      "Delete the stack: <code>cd apigw-sfn-athena/typescript/cdk/cdk</code> then <code>npx cdk destroy</code>.",
       "Warning: this deletes the Amazon S3 bucket and all sample data and Amazon Athena query results."
     ]
   },
