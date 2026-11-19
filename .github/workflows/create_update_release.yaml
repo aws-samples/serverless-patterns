@@ -65,11 +65,14 @@ jobs:
           # ancestor folder containing an example-pattern.json (any depth).
           # Removed patterns are left out. Their zips are not deleted here:
           # a moved pattern can keep its zip name. The cleanup job removes
-          # zips that no pattern has.
+          # zips that no pattern has. Top-level folders starting with _ (the
+          # contributor template, scripts) are not patterns and get no zip,
+          # the same as in the cleanup job.
           : > changed_folders.txt
           if [ -s changed_files.txt ]; then
             while IFS= read -r file; do
               [ -n "$file" ] || continue
+              case "$file" in _*) continue ;; esac
               dir=$(dirname "$file")
               while [ "$dir" != "." ] && [ "$dir" != "/" ] && [ ! -f "$dir/example-pattern.json" ]; do
                 dir=$(dirname "$dir")
