@@ -13,13 +13,13 @@
     "destroy": "cdk destroy"
   },
   "devDependencies": {
-    "@types/node": "20.14.9",
-    "aws-cdk": "2.1145.0",
-    "ts-node": "10.9.2",
-    "typescript": "5.5.3"
+    "@types/node": "^24",
+    "aws-cdk": "^2.1149.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.273.0",
-    "constructs": "10.8.1"
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1"
   }
 }

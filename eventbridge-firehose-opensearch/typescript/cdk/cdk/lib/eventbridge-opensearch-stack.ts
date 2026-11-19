@@ -92,7 +92,9 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
     // Transform is on by default; it is what makes the data pleasant to query.
     const enableTransform = this.node.tryGetContext('enableTransform') !== 'false';
 
-    const domainName = 'event-monitor';
+    // Domain names are 3 to 28 lowercase characters. Deriving the name from
+    // the stack name lets a second stack deploy alongside this one.
+    const domainName = `${this.stackName.toLowerCase().replace(/[^a-z0-9-]/g, '-').slice(0, 21)}-events`;
     const indexName = 'events';
 
     // The domain ARN is built by hand rather than read off the Domain
@@ -109,9 +111,7 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
     // -------------------------------------------------------------------
     // 1. EventBridge custom bus
     // -------------------------------------------------------------------
-    const eventBus = new events.EventBus(this, 'EventMonitorBus', {
-      eventBusName: 'event-monitor-bus',
-    });
+    const eventBus = new events.EventBus(this, 'EventMonitorBus');
 
     // -------------------------------------------------------------------
     // 2. S3 backup bucket
@@ -219,8 +219,7 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
 
     if (enableTransform) {
       transformFn = new lambda.Function(this, 'TransformFunction', {
-        functionName: 'event-monitor-transform',
-        runtime: lambda.Runtime.PYTHON_3_12,
+        runtime: lambda.Runtime.PYTHON_3_14,
         handler: 'handler.handler',
         code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'src', 'transform')),
         // Firehose gives a transform 60s before it counts as a failure.
@@ -314,10 +313,7 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
     // implement IDestination, and the only one shipped is S3. OpenSearch
     // has to be configured through CfnDeliveryStream.
     // -------------------------------------------------------------------
-    const deliveryStreamName = 'event-monitor-stream';
-
     const cfnStream = new firehose.CfnDeliveryStream(this, 'EventDeliveryStream', {
-      deliveryStreamName,
       deliveryStreamType: 'DirectPut',
       amazonopensearchserviceDestinationConfiguration: {
         // Combined with OneDay rotation this yields events-YYYY-MM-DD.
@@ -400,7 +396,6 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
 
     const rule = new events.Rule(this, 'CatchAllRule', {
       eventBus,
-      ruleName: 'event-monitor-catch-all',
       description: 'Captures every event on the bus and streams it to OpenSearch via Data Firehose',
       // Every event carries a source, so an empty prefix matches all of
       // them. An empty event pattern is rejected by EventBridge.
@@ -454,7 +449,7 @@ export class EventBridgeOpenSearchStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, 'DeliveryStreamName', {
-      value: deliveryStreamName,
+      value: cfnStream.ref,
       description: 'Firehose delivery stream carrying events to OpenSearch',
     });
 

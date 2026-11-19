@@ -19,7 +19,7 @@ Amazon Data Firehose  ──────► Transform Lambda (flattens the envel
     └──────► S3 bucket              all documents + delivery failures
 ```
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-firehose-opensearch-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -36,7 +36,7 @@ Because the rule is a catch-all, you get this for every event on the bus without
 
 ## How it works
 
-1. A producer calls `PutEvents` on the `event-monitor-bus` custom bus.
+1. A producer calls `PutEvents` on the stack's custom bus (`EventBusName` in the stack outputs).
 2. A catch-all rule matches the event. The pattern is `{"source": [{"prefix": ""}]}` — every EventBridge event carries a `source`, so an empty prefix matches all of them. An entirely empty pattern is rejected by EventBridge.
 3. The rule's IAM role calls `firehose:PutRecord` on the delivery stream.
 4. Firehose buffers for **60 seconds or 1 MB**, whichever comes first. This is the minimum Firehose allows and it defines the latency of the pattern.
@@ -82,7 +82,7 @@ Two details are easy to get wrong here. A managed domain authorizes every reques
 
 - [AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) with sufficient permissions
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cli.html) installed and configured
-- [Node.js 22+](https://nodejs.org/en/download/) and npm
+- [Node.js](https://nodejs.org/en/download/) and npm
 - [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) (`npm i -g aws-cdk`), bootstrapped in the target account and Region (`cdk bootstrap aws://ACCOUNT-ID/REGION`)
 - Your public IP, to reach OpenSearch Dashboards: `curl -s https://checkip.amazonaws.com`
 
@@ -110,14 +110,17 @@ Changing the allowed CIDRs later is cheap. It updates only the domain access pol
 
 ## Testing
 
-Emit a test event onto the bus:
+Emit a test event onto the bus. The bus name comes from the stack outputs:
 
 ```bash
+BUS=$(aws cloudformation describe-stacks --stack-name EventMonitorStack \
+  --query "Stacks[0].Outputs[?OutputKey=='EventBusName'].OutputValue" --output text)
+
 aws events put-events --entries '[{
   "Source": "demo.test",
   "DetailType": "TestEvent",
   "Detail": "{\"message\": \"Hello OpenSearch\", \"claimId\": \"CLM-001\"}",
-  "EventBusName": "event-monitor-bus"
+  "EventBusName": "'"$BUS"'"
 }]'
 ```
 
@@ -153,7 +156,7 @@ aws logs tail "<FirehoseLogGroup>" --since 15m
 | `AccessDeniedException` on the domain | Domain access policy missing the Firehose role, or the role lacks the `es:Describe*` actions |
 | Records in S3 under `errors/` but nothing in OpenSearch | Mapping conflict, usually a field indexed as two different types across events |
 | Nothing anywhere, `FailedEntryCount: 0` on `put-events` | Rule not matching, or the rule's target role lacks `firehose:PutRecord` |
-| Transform errors | Check the `event-monitor-transform` Lambda log group |
+| Transform errors | Check the log group of the stack's `TransformFunction` Lambda function |
 
 ## Setting up OpenSearch Dashboards
 
