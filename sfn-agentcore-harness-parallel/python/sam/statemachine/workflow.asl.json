@@ -221,6 +221,16 @@
         }
       },
       "Output": "{% $states.input %}",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "Next": "NotifyReady"
     },
     "NotifyReady": {
@@ -232,6 +242,16 @@
         "Message": "{% 'Document: ' & $states.input.documentKey & '\\n\\nSUMMARY\\n' & $states.input.summary & '\\n\\nRISKS\\n' & $states.input.risks & '\\n\\nACTION ITEMS\\n' & $states.input.actions %}"
       },
       "Output": "{% { 'documentKey': $states.input.documentKey } %}",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "End": true
     },
     "AnalysisFailed": {
