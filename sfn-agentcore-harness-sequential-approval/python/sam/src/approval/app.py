@@ -11,6 +11,7 @@ trusted after the sign-in succeeds and the group check passes.
 import base64
 import html
 import json
+import logging
 import os
 import urllib.error
 import urllib.parse
@@ -23,6 +24,9 @@ CLIENT_ID = os.environ["CLIENT_ID"]
 COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]  # https://<prefix>.auth.<region>.amazoncognito.com
 CALLBACK_URL = os.environ["CALLBACK_URL"]
 APPROVER_GROUP = os.environ["APPROVER_GROUP"]
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 cognito = boto3.client("cognito-idp")
 sfn = boto3.client("stepfunctions")
@@ -83,20 +87,27 @@ def handler(event, context):
     # The workflow made the token URL-safe (+ -> -, / -> _, = -> .). Undo that.
     task_token = safe_token.translate(str.maketrans("-_.", "+/="))
     if not code or action not in ("approve", "reject") or not task_token:
+        # Log only which part is missing. Never log the authorization code or the task token.
+        logger.warning("400 invalid link: code_present=%s action_valid=%s token_present=%s",
+                       bool(code), action in ("approve", "reject"), bool(task_token))
         return _page(400, "This link is not valid.")
 
     try:
         claims = _id_token_claims(code)
-    except (urllib.error.HTTPError, KeyError, ValueError):
+    except (urllib.error.HTTPError, KeyError, ValueError) as err:
+        status = err.code if isinstance(err, urllib.error.HTTPError) else None
+        logger.warning("401 sign-in failed: %s http_status=%s", type(err).__name__, status)
         return _page(401, "Sign-in failed. Open the link from the email again.")
 
     if APPROVER_GROUP not in claims.get("cognito:groups", []):
+        logger.warning("403 user %s is not in the %s group", claims.get("sub"), APPROVER_GROUP)
         return _page(403, "Your user is not allowed to approve requests.")
 
     decision = {"decision": "approved" if action == "approve" else "rejected",
                 "approver": claims.get("email", claims["sub"])}
     try:
         sfn.send_task_success(taskToken=task_token, output=json.dumps(decision))
-    except (sfn.exceptions.TaskDoesNotExist, sfn.exceptions.TaskTimedOut, sfn.exceptions.InvalidToken):
+    except (sfn.exceptions.TaskDoesNotExist, sfn.exceptions.TaskTimedOut, sfn.exceptions.InvalidToken) as err:
+        logger.warning("410 task no longer waiting: %s", type(err).__name__)
         return _page(410, "This request is no longer waiting for a decision.")
     return _page(200, f"Recorded: {decision['decision']}.")

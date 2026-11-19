@@ -118,6 +118,16 @@
         "TimeoutSeconds": 120
       },
       "Output": "{% $merge([$states.input, { 'report': $states.result.Output.Message.Content[0].Text, 'reportStop': $states.result.StopReason }]) %}",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "BedrockAgentCore.ThrottlingException"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "Catch": [
         {
           "ErrorEquals": [
@@ -187,6 +197,16 @@
         }
       },
       "Output": "{% { 'decision': $states.input.decision, 'approver': $states.input.approver } %}",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "End": true
     },
     "AnalysisFailed": {
