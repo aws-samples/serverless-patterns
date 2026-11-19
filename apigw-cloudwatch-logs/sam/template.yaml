@@ -5,7 +5,7 @@ Description: >
 
   Creates an Amazon API Gateway REST API that calls Amazon CloudWatch Logs
   directly. POST /putLog writes a log event to a log stream and
-  POST /getLog reads the events back.
+  POST /getLog reads the events back. (uksb-1tthgi812) (tag:apigw-cloudwatch-logs-sam)
 
 Resources:
   # CloudWatch Logs log group that the API writes to and reads from.
