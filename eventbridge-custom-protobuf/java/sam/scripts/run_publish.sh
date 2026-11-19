@@ -11,7 +11,7 @@
 # Stack name and region default to the values `sam deploy --guided` saved in
 # samconfig.toml, so after a guided deploy no arguments are needed.
 #
-# Requires: the stack already deployed with `sam deploy`, a JDK 21+, and Maven.
+# Requires: the stack already deployed with `sam deploy`, a JDK matching the Lambda runtime, and Maven.
 # The publisher is run from the shaded jar (built with `mvn clean package` if not
 # already present; the build also runs protoc to generate the Protobuf classes).
 set -euo pipefail

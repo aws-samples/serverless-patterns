@@ -13,10 +13,10 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. Use a **non-production** account. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources: an Amazon EventBridge custom event bus (EventsV2) + subscriber, an AWS Glue registry/schema, an AWS Lambda function, an Amazon CloudWatch Logs log group, an AWS Identity and Access Management (IAM) role, and an Amazon SQS queue.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2.37.3 or later installed and configured (earlier versions lack the `aws eventsv2` command)
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured, in a version that has the `aws eventsv2` command
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* JDK 21 and Apache Maven installed (the consumer runs on the `java21` AWS Lambda runtime; the publisher and tests build and run locally). The build downloads a matching `protoc` automatically — no separate protoc install needed.
+* A JDK in the same Java version as the consumer's AWS Lambda runtime, and Apache Maven, installed (the publisher and tests build and run locally). The build downloads a matching `protoc` automatically — no separate protoc install needed.
 * The new Amazon EventBridge custom event bus (`eventsv2`) available in your Region — confirm with `aws eventsv2 list-event-buses`
 
 ## Deployment Instructions
@@ -29,7 +29,7 @@ Important: this application uses various AWS services and there are costs associ
     ```
     cd serverless-patterns/eventbridge-custom-protobuf/java/sam
     ```
-1. Build the AWS Lambda consumer. `sam build` runs Maven (including protoc codegen) for the Java consumer. If you build without a local JDK 21 / Maven, use `sam build --use-container` (needs Docker); it builds in the AWS Lambda `java21` image.
+1. Build the AWS Lambda consumer. `sam build` runs Maven (including protoc codegen) for the Java consumer. If you build without a local JDK and Maven, use `sam build --use-container` (needs Docker); it builds in the AWS SAM build image for the function's runtime.
     ```
     sam build
     ```

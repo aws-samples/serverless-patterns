@@ -85,7 +85,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${AppName}-consumer"
       Handler: com.example.orders.Consumer::handleRequest
-      Runtime: java21
+      Runtime: java25
       CodeUri: ./
       Timeout: 30
       MemorySize: 512
