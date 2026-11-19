@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda function that consumes from self-managed Apache Kafka, SASL/OAUTHBEARER with an Amazon Cognito client-credentials token (OAUTHBEARER_AUTH).
+  The client EC2 instance writes template.yaml from this file, filling the
+  placeholders with this environment's values.
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+
+Resources:
+  LambdaKafkaConsumerNodejsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: kafka_event_consumer_function
+      Handler: app.lambdaHandler
+      Runtime: NODE_VERSION
+      Architectures:
+        - x86_64
+      FunctionName: !Sub "${SamplePrefix}-sam-consumer"
+      # SAM names the role after the SAM stack; the client instance's IAM role
+      # allows execution roles by path, with this permissions boundary.
+      RolePath: !Sub "/${SamplePrefix}-lambda/"
+      PermissionsBoundary: !Ref RoleBoundaryArn
+      MemorySize: 512
+      # Write to a log group with a retention period, so a forgotten deployment
+      # doesn't keep its logs forever.
+      LoggingConfig:
+        LogGroup: !Ref ConsumerLogGroup
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          # The consumer writes each message's fields + Kafka metadata to this table
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
+      Events:
+        SelfManagedKafkaEvent:
+          Type: SelfManagedKafka # More info about SelfManagedKafka Event https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-selfmanagedkafka.html
+          Properties:
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 10
+            ConsumerGroupId: !Ref ConsumerGroupId
+            # Provisioned mode: one poller is plenty for this sample.
+            ProvisionedPollerConfig:
+              MinimumPollers: 1
+              MaximumPollers: 1
+            Topics:
+              - !Ref KafkaTopic
+            KafkaBootstrapServers:
+              - !Ref KafkaBootstrapServer1
+              - !Ref KafkaBootstrapServer2
+              - !Ref KafkaBootstrapServer3
+            SourceAccessConfigurations:
+              # The brokers live on private IPs inside the VPC, so the event source
+              # mapping attaches ENIs to these subnets to reach them.
+              - Type: VPC_SUBNET
+                URI: !Sub "subnet:${PrivateSubnetOne}"
+              - Type: VPC_SUBNET
+                URI: !Sub "subnet:${PrivateSubnetTwo}"
+              - Type: VPC_SUBNET
+                URI: !Sub "subnet:${PrivateSubnetThree}"
+              - Type: VPC_SECURITY_GROUP
+                URI: !Sub "security_group:${SecurityGroupId}"
+              # SASL/OAUTHBEARER with the Cognito client-credentials grant. The
+              # secret holds oauthClientId, oauthClientSecret and
+              # oauthTokenEndpointUrl; the poller fetches and refreshes the token.
+              - Type: OAUTHBEARER_AUTH
+                URI: !Ref OAuthSecretArn
+              - Type: OAUTHBEARER_SCOPE
+                URI: !Ref OAuthScope
+              # The brokers use a self-signed certificate; this secret's
+              # "certificate" field holds its PEM.
+              - Type: SERVER_ROOT_CA_CERTIFICATE
+                URI: !Ref BrokerCASecretArn
+      # SAM adds secretsmanager:GetSecretValue for both secrets and the ENI
+      # permissions for the VPC entries.
+      Policies:
+      - DynamoDBWritePolicy:
+          TableName: !Ref MessagesTable
+
+  ConsumerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${SamplePrefix}-sam-consumer"
+      RetentionInDays: 7
+
+  MessagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDBTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: topicPartition
+          AttributeType: S
+        - AttributeName: offset
+          AttributeType: N
+      KeySchema:
+        - AttributeName: topicPartition
+          KeyType: HASH
+        - AttributeName: offset
+          KeyType: RANGE
+Parameters:
+  KafkaTopic:
+    Type: String
+    Description: Enter the name of the Kafka Topic the Lambda function will consume from
+    Default: KAFKA_TOPIC
+  KafkaBootstrapServer1:
+    Type: String
+    Description: First Kafka broker bootstrap endpoint (host:port)
+    Default: BOOTSTRAP_SERVER_1
+  KafkaBootstrapServer2:
+    Type: String
+    Description: Second Kafka broker bootstrap endpoint (host:port)
+    Default: BOOTSTRAP_SERVER_2
+  KafkaBootstrapServer3:
+    Type: String
+    Description: Third Kafka broker bootstrap endpoint (host:port)
+    Default: BOOTSTRAP_SERVER_3
+  PrivateSubnetOne:
+    Type: String
+    Description: First private subnet ID for the Lambda event source mapping ENIs
+    Default: SUBNET_1
+  PrivateSubnetTwo:
+    Type: String
+    Description: Second private subnet ID for the Lambda event source mapping ENIs
+    Default: SUBNET_2
+  PrivateSubnetThree:
+    Type: String
+    Description: Third private subnet ID for the Lambda event source mapping ENIs
+    Default: SUBNET_3
+  SecurityGroupId:
+    Type: String
+    Description: Security group ID for the Lambda event source mapping ENIs
+    Default: LAMBDA_SG
+  DynamoDBTableName:
+    Type: String
+    Description: >
+      DynamoDB table the consumer writes to. A parameter rather than a !Ref to the
+      table so that `sam local invoke` sees the real name too.
+    Default: MESSAGES_TABLE_NAME
+  ConsumerGroupId:
+    Type: String
+    Description: Kafka consumer group the event source mapping joins
+    Default: lambda-oauth-consumer
+  OAuthSecretArn:
+    Type: String
+    Description: Secrets Manager ARN of the poller's OAuth client-credentials secret
+    Default: OAUTH_SECRET_ARN
+  OAuthScope:
+    Type: String
+    Description: OAuth scope the poller requests (must be allowed on the poller app client)
+    Default: OAUTH_SCOPE
+  BrokerCASecretArn:
+    Type: String
+    Description: Secrets Manager ARN of the secret holding the brokers' CA certificate PEM
+    Default: BROKER_CA_SECRET_ARN
+  SamplePrefix:
+    Type: String
+    Description: >
+      Name prefix from the main stack. The client instance's IAM role only allows
+      functions, log groups and execution role paths that start with it.
+    Default: SAMPLE_PREFIX
+  RoleBoundaryArn:
+    Type: String
+    Description: Permissions boundary the client instance's IAM role requires on the execution roles it creates
+    Default: ROLE_BOUNDARY_ARN
+Outputs:
+  LambdaKafkaConsumerNodejsFunction:
+    Description: "Kafka consumer Lambda function ARN"
+    Value: !GetAtt LambdaKafkaConsumerNodejsFunction.Arn
+  ConsumerLogGroupName:
+    Description: "Amazon CloudWatch Logs log group the consumer writes to"
+    Value: !Ref ConsumerLogGroup
+  MessagesTableName:
+    Description: "DynamoDB table the consumer writes to"
+    Value: !Ref MessagesTable
