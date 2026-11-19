@@ -1,0 +1,59 @@
+{
+  "title": "Amazon S3 to Amazon OpenSearch Serverless with OpenSearch Ingestion",
+  "description": "Ingest JSON objects from Amazon S3 into Amazon OpenSearch Serverless using an Amazon OpenSearch Ingestion (OSIS) pipeline.",
+  "language": "Integration",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern indexes JSON Lines files from Amazon S3 into an Amazon OpenSearch Serverless collection with an Amazon OpenSearch Ingestion pipeline. The source bucket sends `s3:ObjectCreated` notifications to an Amazon SQS queue. The pipeline polls the queue, reads each new object, parses every line into a document with `parse_json`, and writes it to the `s3-logs` index. Documents that fail to index go to a separate dead-letter S3 bucket, so they don't trigger the pipeline again. The template needs no application code.",
+      "Cost: the pipeline bills for at least 1 Ingestion OCU per hour while it runs, so stop it with `aws osis stop-pipeline` when you're not using it. The collection is in a collection group with a minimum of 0 OCUs, so it scales to zero and stops billing for compute after 10 minutes with no requests. The network policy allows public access for the demo; use a VPC endpoint for production."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Using an OpenSearch Ingestion pipeline with Amazon S3",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/configure-client-s3.html"
+      },
+      {
+        "text": "Ingesting data into Amazon OpenSearch Serverless collections",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-clients.html"
+      },
+      {
+        "text": "Amazon OpenSearch Ingestion",
+        "link": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ingestion.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam deploy --capabilities CAPABILITY_NAMED_IAM --guided</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Empty both S3 buckets, then delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sudhansu",
+      "image": "https://drive.google.com/file/d/1uTQ3MbFvziRfBPWHsVsD5vbVyGuFO665/view?usp=sharing",
+      "bio": "Serverless builder contributing to Serverless Land patterns.",
+      "linkedin": "sudhansu-mohapatra-83a51811a",
+      "twitter": ""
+    }
+  ]
+}
