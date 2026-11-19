@@ -2,7 +2,7 @@
 
 This pattern publishes a rich domain event, Avro-encoded, to an Amazon EventBridge custom event bus (the `eventsv2` API) using `PutRawEvents` with an AWS Glue Schema Registry. EventBridge decodes the Avro server-side and delivers the event as JSON to an AWS Lambda subscriber, which logs it to Amazon CloudWatch, showing the event survives the round trip intact.
 
-The publisher uses the AWS SDK for JavaScript v3 (`@aws-sdk/client-eventbridgev2` and `@aws-sdk/client-glue`) and the [`avsc`](https://www.npmjs.com/package/avsc) library for Avro encoding. The consumer Lambda runs on the Node.js 24 runtime, bundled by AWS SAM with esbuild.
+The publisher uses the AWS SDK for JavaScript v3 (`@aws-sdk/client-eventbridgev2` and `@aws-sdk/client-glue`) and the [`avsc`](https://www.npmjs.com/package/avsc) library for Avro encoding. The consumer Lambda runs on the Node.js runtime, bundled by AWS SAM with esbuild.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/eventbridge-custom-avro-typescript-sam
 
@@ -11,10 +11,10 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources: an EventsV2 event bus and subscriber, a Glue registry and schema, a Lambda function, an IAM role, and an SQS queue. Use a non-production account.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) v2 installed and configured
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
-* [Node.js](https://nodejs.org/) 20 or later (the publisher and the tests run locally; the Lambda runs on `nodejs24.x`)
+* [Node.js](https://nodejs.org/) installed (the publisher and the tests run locally)
 * The new custom event bus (`eventsv2`) available in your Region. Confirm with `aws eventsv2 list-event-buses`.
 
 ## Deployment Instructions
