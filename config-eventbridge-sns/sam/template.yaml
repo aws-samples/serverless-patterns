@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Serverless patterns - AWS Config to Amazon EventBridge to Amazon SNS.
+  When AWS Config reports a resource as NON_COMPLIANT, EventBridge routes the
+  compliance-change event to an SNS topic that emails subscribers. No Lambda -
+  this is a pure service-to-service integration.
+
+Parameters:
+  EmailAddress:
+    Type: String
+    Description: Email address that will receive AWS Config non-compliance notifications.
+    # Basic sanity check so a typo fails at deploy time rather than silently
+    # creating a subscription that can never be confirmed.
+    AllowedPattern: '[^@]+@[^@]+\.[^@]+'
+    ConstraintDescription: Must be a valid email address (e.g. you@example.com).
+
+  RuleName:
+    Type: String
+    Default: config-noncompliant-to-sns
+    Description: >-
+      Fixed name for the EventBridge rule. Naming the rule ourselves lets the
+      topic policy reference the rule's ARN as a constructed string instead of
+      via !GetAtt, which is what breaks the circular dependency (see the topic
+      policy comment below).
+
+Resources:
+  # Customer managed KMS key that encrypts the SNS topic at rest.
+  #
+  # WHY not the free AWS managed key (alias/aws/sns): its key policy can't be
+  # edited and doesn't allow EventBridge to use it, so every publish would fail
+  # and no email would arrive - with no deploy error to warn you.
+  ComplianceTopicKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Encrypts the AWS Config non-compliance SNS topic.
+      EnableKeyRotation: true
+      # Shortest allowed waiting period, so cleanup after testing is quick.
+      PendingWindowInDays: 7
+      KeyPolicy:
+        Version: '2012-10-17'
+        # In a key policy, Resource '*' means "this KMS key" only - not every
+        # resource. It's the required form for key policy statements.
+        Statement:
+          # The default key policy statement that AWS applies to new keys. It
+          # gives no one access on its own; it lets IAM policies in this account
+          # grant access. Removing or narrowing it risks locking the key.
+          - Sid: EnableIamPermissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: '*'
+          # Lets EventBridge get a data key when it publishes to the topic.
+          # WHY no aws:SourceAccount / aws:SourceArn conditions: Amazon SNS
+          # doesn't support them in the key policy for EventBridge-to-encrypted
+          # topics, and adding them breaks delivery. Who can publish is still
+          # restricted by the topic policy below, which does use both conditions.
+          - Sid: AllowEventBridgeToUseKey
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
+
+  # SNS topic. Intentionally NOT given an explicit TopicName so CloudFormation
+  # generates a unique physical name - two stacks (or a redeploy after a failed
+  # rollback) then can't collide on a hardcoded name.
+  ComplianceTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: AWS Config Non-Compliance Alerts
+      KmsMasterKeyId: !Ref ComplianceTopicKey
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref EmailAddress
+
+  # EventBridge rule on the default event bus. We filter on the exact Config
+  # compliance-change shape and only NON_COMPLIANT results, so subscribers are
+  # paged on real drift and not on every routine COMPLIANT re-evaluation (which
+  # would train them to ignore the emails).
+  ComplianceRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Ref RuleName
+      Description: Forward AWS Config NON_COMPLIANT compliance-change events to SNS.
+      EventPattern:
+        source:
+          - aws.config
+        detail-type:
+          - Config Rules Compliance Change
+        detail:
+          newEvaluationResult:
+            complianceType:
+              - NON_COMPLIANT
+      State: ENABLED
+      Targets:
+        # Reference the topic with !Ref (its ARN). This is the only dependency
+        # edge to the topic; the topic does not depend back on the rule, so no
+        # cycle forms here.
+        - Arn: !Ref ComplianceTopic
+          Id: ComplianceTopicTarget
+
+  # Topic policy that lets EventBridge publish to the topic.
+  #
+  # WHY the SourceArn is a built string and not !GetAtt ComplianceRule.Arn:
+  # a topic policy attaches to (depends on) the topic, the rule targets (depends
+  # on) the topic, and if the policy also did !GetAtt on the rule we'd get the
+  # cycle topic -> policy -> rule -> topic that CloudFormation refuses to deploy.
+  # Because we own the rule's name (RuleName), we can reconstruct its ARN from
+  # pseudo-parameters as a plain string, giving us tight scoping with no
+  # resource-level dependency on the rule.
+  #
+  # WHY aws:SourceAccount: it is the primary guard and requires no rule
+  # dependency at all - it confines publishers to EventBridge acting on behalf
+  # of THIS account, blocking the cross-account "confused deputy" case even if
+  # the ARN condition were ever relaxed.
+  ComplianceTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref ComplianceTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowEventBridgePublish
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref ComplianceTopic
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnEquals:
+                # Constructed from pseudo-params + the fixed RuleName - no !GetAtt,
+                # so this does not create a dependency on the rule resource.
+                aws:SourceArn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/${RuleName}
+
+Outputs:
+  ComplianceTopicArn:
+    Description: ARN of the SNS topic that receives non-compliance notifications.
+    Value: !Ref ComplianceTopic
+
+  ComplianceRuleName:
+    Description: Name of the EventBridge rule (used when sending a test event).
+    Value: !Ref ComplianceRule
+
+  ComplianceRuleArn:
+    Description: ARN of the EventBridge rule.
+    Value: !GetAtt ComplianceRule.Arn
+
+  ComplianceTopicKeyArn:
+    Description: ARN of the KMS key that encrypts the SNS topic.
+    Value: !GetAtt ComplianceTopicKey.Arn

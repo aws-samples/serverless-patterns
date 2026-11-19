@@ -1,0 +1,75 @@
+{
+  "title": "AWS Config to Amazon EventBridge to Amazon SNS",
+  "description": "Send an email through Amazon SNS whenever AWS Config marks a resource as non-compliant, using an Amazon EventBridge rule and no Lambda function.",
+  "language": "Integration",
+  "level": "100",
+  "framework": "AWS SAM",
+  "patternGroup": "config-eventbridge-sns",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern sends an email notification whenever AWS Config reports that a resource has become non-compliant. It's a simple, event-driven way to tell a team about configuration drift as soon as it happens, without polling the AWS Config console or building a custom notification service.",
+      "AWS Config evaluates your resources against Config rules. When a resource's compliance state changes, Config publishes a 'Config Rules Compliance Change' event to the default Amazon EventBridge event bus. An EventBridge rule matches events where source is 'aws.config', detail-type is 'Config Rules Compliance Change' and detail.newEvaluationResult.complianceType is 'NON_COMPLIANT'. Filtering on the new compliance result means subscribers are only notified about real drift, not about resources that are evaluated again and stay compliant.",
+      "The rule's target is an Amazon SNS topic with an email subscription. A topic policy allows the EventBridge service principal to publish to the topic. The policy is scoped with aws:SourceAccount and with the ARN of this rule, so no other account or rule can use the topic. The rule has a fixed name, so its ARN is built from pseudo parameters instead of referencing the rule resource. This avoids a circular dependency between the topic, its policy and the rule.",
+      "There is no AWS Lambda function. The pattern is a direct service-to-service integration, so there is no code to maintain or patch. It works with any AWS Config rule, managed or custom, that is active in the account and Region. You can change the event pattern to notify on specific rules or resource types, or add more targets to the rule.",
+      "The topic is encrypted at rest with a customer managed AWS KMS key that has automatic rotation turned on. The AWS managed key for SNS can't be used, because EventBridge isn't allowed to use it and publishes to the topic would fail. The key policy lets EventBridge use the key when it publishes.",
+      "This pattern deploys one Amazon SNS topic with an email subscription, one SNS topic policy, one AWS KMS key and one Amazon EventBridge rule. It doesn't enable AWS Config. An active Config recorder is needed for events to flow."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Monitoring AWS Config with Amazon EventBridge",
+        "link": "https://docs.aws.amazon.com/config/latest/developerguide/monitor-config-with-cloudwatchevents.html"
+      },
+      {
+        "text": "Amazon EventBridge rules",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
+      },
+      {
+        "text": "Resource-based policies for Amazon EventBridge targets, including Amazon SNS",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html"
+      },
+      {
+        "text": "Encrypting Amazon SNS topics that receive events from AWS services",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-key-management.html"
+      },
+      {
+        "text": "Amazon SNS email notifications",
+        "link": "https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "Confirm the SNS email subscription first. Check the rule's filter with <code>aws events test-event-pattern</code> and the included event.json. To test end to end, add the ec2-volume-inuse-check AWS Config rule and create an unattached Amazon EBS volume. See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "From the pattern directory, delete the stack: <code>sam delete</code>.",
+      "If you set up an AWS Config recorder, Config rule or test resources for testing, delete them separately. They aren't part of the stack and can incur ongoing cost."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Joe Georgekutty Chalangady",
+      "image": "https://avatars.githubusercontent.com/u/162122577?v=4",
+      "bio": "Joe is an Associate Solutions Architect at AWS, focused on cloud governance and working with UK central government customers.",
+      "linkedin": "joechalangady"
+    }
+  ]
+}

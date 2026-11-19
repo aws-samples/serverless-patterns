@@ -1,0 +1,31 @@
+# Local deploy settings. samconfig.toml holds your stack name, Region,
+# AWS profile and parameter values (including the notification email).
+samconfig.toml
+samconfig.yaml
+
+# SAM build and packaging output
+.aws-sam/
+packaged*.yaml
+packaged*.yml
+
+# Credentials and local environment files - never commit these
+.env
+.env.*
+*.pem
+*.key
+.aws/
+
+# Local security-scanner state (Holmes, ProtoShield)
+.holmes/
+.protoshield/
+
+# Logs and scratch output
+*.log
+out.json
+*out.yml
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
