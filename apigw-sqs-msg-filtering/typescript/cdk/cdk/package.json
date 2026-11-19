@@ -1,8 +1,8 @@
 {
-  "name": "cdk",
+  "name": "apigw-sqs-msg-filtering-cdk",
   "version": "0.1.0",
   "bin": {
-    "cdk": "bin/cdk.js"
+    "apigw-sqs-msg-filtering-cdk": "bin/apigw-sqs-msg-filtering-cdk.js"
   },
   "scripts": {
     "build": "tsc",
@@ -11,16 +11,16 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/node": "22.7.9",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
-    "aws-cdk": "2.1021.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.15",
+    "aws-cdk": "^2.1149.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.6.3"
+    "typescript": "~5.9.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.205.0",
-    "constructs": "^10.0.0"
+    "aws-cdk-lib": "^2.277.0",
+    "constructs": "^10.8.1"
   }
 }

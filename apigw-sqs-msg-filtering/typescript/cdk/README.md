@@ -7,7 +7,7 @@ However, SQS has a message size limit of 1MiB. When you are in control of the cl
 
 But sometimes you provide only the API endpoint to other parties to send their messages to (e.g. as a webhook), so you need a way to control the payload size before sending the messages to SQS. This is where VTL comes into play.
 
-The [Velocity Template Language](https://velocity.apache.org/), or short VTL, is used in Amazon API Gateway to transform your method request and your integration response. This allows you directly filter the message body and only send what is need to SQS. 
+The [Velocity Template Language](https://velocity.apache.org/), or short VTL, is used in Amazon API Gateway to transform your method request and your integration response. This allows you to filter the message body directly and only send what is needed to SQS. 
 This pattern demonstrates message filtering using VTL in an API Gateway REST API.
 
 Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/apigw-sqs-msg-filtering-typescript-cdk
@@ -72,7 +72,7 @@ curl --location --request POST $API_GATEWAY_SQS_RESOURCE_ENDPOINT \
 -d @../test/test-payload.json
 ```
 
-To check and receive messages in the queue, it can be done in the AWS console or by running the following command. Note, replace {MyQueueUrl} placeholder in the command with the endpoint that has been deployed. The endpoint can be found in the CloudFormation stack output.
+To check and receive messages in the queue, use the AWS console or run the following commands. They read the queue URL from the stack outputs.
 
 ```bash
 export SQS_QUEUE_URL=$(aws cloudformation describe-stacks --stack-name ApigwSqsMsgFilteringCdkStack --query 'Stacks[0].Outputs[?OutputKey==`SqsQueueUrl`].OutputValue' --output text)
