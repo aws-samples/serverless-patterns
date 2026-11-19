@@ -1,0 +1,64 @@
+{
+  "title": "AWS Step Functions release gate with AWS CodeBuild and AWS CloudFormation change sets",
+  "description": "AWS Step Functions runs an AWS CodeBuild policy check, creates an AWS CloudFormation change set, waits for an Amazon SNS approval, then executes or deletes it.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An AWS Step Functions Standard workflow starts an AWS CodeBuild project with the optimized startBuild.sync integration. The build checks the AWS CloudFormation template and fails the execution before any change set exists if the template breaks the policy.",
+      "The workflow then creates an AWS CloudFormation change set through the AWS SDK integration and polls describeChangeSet. A change set without changes ends the execution cleanly.",
+      "The workflow publishes the task token and the list of changes to an Amazon SNS topic and waits. send-task-success runs executeChangeSet and the workflow polls the change set ExecutionStatus and then describeStacks. send-task-failure or a timeout deletes the change set.",
+      "The synthesized template contains no AWS Lambda function."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/sfn-codebuild-release-gate-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Manage AWS CodeBuild builds with Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-codebuild.html"
+      },
+      {
+        "text": "Update AWS CloudFormation stacks using change sets",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html"
+      },
+      {
+        "text": "Wait for a callback with the task token",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code> (once, if the account and Region have never used the AWS CDK)",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>aws cloudformation delete-stack --stack-name release-gate-demo-app</code>",
+      "<code>aws cloudformation wait stack-delete-complete --stack-name release-gate-demo-app</code>",
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
