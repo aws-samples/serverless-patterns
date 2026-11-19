@@ -7,15 +7,15 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "This pattern secures an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito acting as the OAuth 2.0 / JWT identity provider.",
-      "Two Cognito groups represent two tenants. AgentCore Identity validates the inbound Cognito JWT via a custom JWT authorizer before the request reaches the agent.",
-      "The agent resolves the caller's tenant from the validated 'cognito:groups' claim and exposes a DynamoDB tool bound to that tenant. It queries a single table partitioned by tenant_id.",
-      "Because the tenant is fixed from the token and not the prompt, the agent can only ever read the caller's tenant data - providing prompt-injection-resistant multi-tenant isolation."
+      "This pattern secures an Amazon Bedrock AgentCore Runtime agent with Amazon Cognito as the OAuth 2.0 / JWT identity provider.",
+      "Two Cognito groups represent two tenants. AgentCore Identity validates the inbound Cognito JWT with a custom JWT authorizer before the request reaches the agent.",
+      "The agent reads the caller's tenant from the validated `cognito:groups` claim and gives the model one Amazon DynamoDB tool bound to that tenant. The tool queries a single table partitioned by `tenant_id`.",
+      "Because the tenant comes from the token and not the prompt, the agent can only read the caller's own tenant data, even if a prompt asks for another tenant's."
     ]
   },
   "gitHub": {
     "template": {
-      "templateFile": "app.py"
+      "templateFile": "infra/agentcore_identity_stack.py"
     }
   },
   "resources": {
