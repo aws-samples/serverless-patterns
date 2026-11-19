@@ -4,7 +4,7 @@ This pattern deploys an AWS AppSync Events API with a **Direct Lambda OnPublish 
 
 Use cases: payload validation, PII redaction, event enrichment with external data, rate limiting per publisher, and schema enforcement before delivery.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-events-lambda-cdk
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/appsync-events-lambda-typescript-cdk
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details.
 
@@ -30,7 +30,7 @@ Important: this application uses various AWS services and there are costs associ
 1. Clone the repository and navigate to the pattern directory:
    ```bash
    git clone https://github.com/aws-samples/serverless-patterns
-   cd serverless-patterns/appsync-events-lambda-cdk
+   cd serverless-patterns/appsync-events-lambda/typescript/cdk
    ```
 
 2. Install dependencies:
