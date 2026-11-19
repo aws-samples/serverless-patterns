@@ -2,7 +2,7 @@
 
 This pattern runs a job on an AWS Lambda MicroVM from an AWS Step Functions workflow, using the Step Functions AWS SDK integration for Lambda MicroVMs. The workflow starts the MicroVM, waits for the job inside it to report its result through a task token, and always terminates the MicroVM afterwards, whether the job succeeds, fails, stops sending heartbeats or runs out of time. No AWS Lambda function sits in between.
 
-Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/sfn-lambda-microvms-callback-python-sam
+Learn more about this pattern at Serverless Land Patterns: https://serverlessland.com/patterns/lambda-microvms-sfn-callback-python-sam
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -22,7 +22,7 @@ The AWS SAM template deploys these resources, and the flow between them is:
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The AWS Identity and Access Management (AWS IAM) user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured, recent enough to include the `aws lambda-microvms` commands (tested with 2.35.21)
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured, recent enough to include the `aws lambda-microvms` commands
 * [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed
 * `zip` on your `PATH`
@@ -36,12 +36,12 @@ The AWS SAM template deploys these resources, and the flow between them is:
     ```
 1. Change directory to the pattern directory:
     ```
-    cd serverless-patterns/sfn-lambda-microvms-callback/python/sam
+    cd serverless-patterns/lambda-microvms-sfn-callback/python/sam
     ```
 1. Set your Region and a name for a new Amazon S3 bucket that holds the worker code. The MicroVM image is built from this zip, so it must exist before you deploy:
     ```
     export AWS_REGION=us-east-1
-    export ARTIFACT_BUCKET=sfn-microvms-callback-artifacts-$(aws sts get-caller-identity --query Account --output text)
+    export ARTIFACT_BUCKET=sfn-microvms-callback-artifacts-$(aws sts get-caller-identity --query Account --output text)-$AWS_REGION
     ```
 1. Create the bucket, then zip and upload the worker (a `Dockerfile` and `app.py` at the root of the zip):
     ```

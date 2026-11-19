@@ -4,7 +4,7 @@
     "language": "Python",
     "level": "300",
     "framework": "AWS SAM",
-    "patternGroup": "sfn-lambda-microvms-callback",
+    "patternGroup": "lambda-microvms-sfn-callback",
     "services": {
         "from": "sfn",
         "to": "lambda-microvms"
@@ -22,7 +22,7 @@
     },
     "gitHub": {
         "template": {
-            "patternPath": "sfn-lambda-microvms-callback/python/sam",
+            "patternPath": "lambda-microvms-sfn-callback/python/sam",
             "templateFile": "template.yaml"
         }
     },

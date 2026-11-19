@@ -4,7 +4,7 @@
     "language": "Python",
     "level": "300",
     "framework": "AWS SAM",
-    "patternGroup": "sfn-lambda-microvms-callback",
+    "patternGroup": "lambda-microvms-sfn-callback",
     "introBox": {
         "headline": "How it works",
         "text": [
