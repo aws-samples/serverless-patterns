@@ -4,7 +4,7 @@ This pattern demonstrates multi-tenant authentication and tenant isolation for a
 
 Amazon Bedrock AgentCore Identity validates inbound Cognito JWTs at the runtime edge via a [custom JWT authorizer](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/inbound-jwt-authorizer.html). The agent then derives the caller's tenant from the validated token claims and can only ever read that tenant's partition in Amazon DynamoDB. Because the tenant is fixed from the token and not from the prompt, a user cannot coax the agent into reading another tenant's data.
 
-Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/agentcore-identity-cognito-multi-tenant-cdk-python).
+Learn more about this pattern at [Serverless Land Patterns](https://serverlessland.com/patterns/agentcore-identity-cognito-multi-tenant-python-cdk).
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -15,7 +15,7 @@ Important: this application uses various AWS services and there are costs associ
 - [Git Installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/cli.html) installed and configured
 - [Docker](https://docs.docker.com/get-docker/) installed and running
-- [Python 3.14](https://www.python.org/downloads/) installed
+- [Python](https://www.python.org/downloads/) installed
 - Access to an Amazon Bedrock foundation model enabled in your region (the agent uses the default [Strands Agents](https://strandsagents.com/) model on Amazon Bedrock)
 - [jq](https://jqlang.org/download/) installed (used by `test/get_token.sh` to extract the access token)
 
