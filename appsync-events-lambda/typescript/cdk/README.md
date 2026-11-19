@@ -1,6 +1,6 @@
 # AWS AppSync Events - In-Flight Event Interception with AWS Lambda
 
-This pattern deploys an AWS AppSync Events API with a **Direct Lambda OnPublish interceptor** - an AWS Lambda function that intercepts, validates, and enriches events in-flight before they reach subscribers. Unlike the existing `appsync-events-bedrock-cdk` and `appsync-events-lambda-agentcore-cdk` patterns (which use Lambda as a *publisher*), this pattern uses Lambda as a real-time event *processor* wired directly into the AppSync channel namespace.
+This pattern deploys an AWS AppSync Events API with a **Direct Lambda OnPublish interceptor** - an AWS Lambda function that intercepts, validates, and enriches events in-flight before they reach subscribers. Other AWS AppSync Events patterns use Lambda as a *publisher*. This pattern uses Lambda as a real-time event *processor* wired directly into the AppSync channel namespace.
 
 Use cases: payload validation, PII redaction, event enrichment with external data, rate limiting per publisher, and schema enforcement before delivery.
 
@@ -11,8 +11,8 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
-* [Node.js 22+](https://nodejs.org/en/download/) installed
-* [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html) installed
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
+* [Node.js](https://nodejs.org/en/download/) installed. `npm install` installs the AWS CDK CLI used by the `npx cdk` commands below.
 
 ## Architecture
 
@@ -40,12 +40,12 @@ Important: this application uses various AWS services and there are costs associ
 
 3. Bootstrap CDK (one-time per account/region):
    ```bash
-   cdk bootstrap
+   npx cdk bootstrap
    ```
 
 4. Deploy the stack:
    ```bash
-   cdk deploy
+   npx cdk deploy
    ```
 
 ## Testing
@@ -79,7 +79,7 @@ Only the `notifications` channel namespace has the OnPublish interceptor. An eve
 
 2. Delete the stack:
    ```bash
-   cdk destroy
+   npx cdk destroy
    ```
 
 3. Delete the Amazon CloudWatch Logs log group that AWS AppSync creates for the API when it receives requests. AWS AppSync creates it outside the stack, so `cdk destroy` does not remove it:
