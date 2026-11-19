@@ -8,7 +8,7 @@
   "introBox": {
     "headline": "How it works",
     "text": [
-      "An Amazon API Gateway HTTP API with AWS Identity and Access Management (IAM) authorization uses a VPC link V2 and an AWS Cloud Map service as its private integration target. API Gateway looks up the IP address and port of the healthy instances with DiscoverInstances and distributes requests across them.",
+      "An Amazon API Gateway HTTP API with AWS Identity and Access Management (IAM) authorization uses a VPC link V2 and an AWS Cloud Map service as its private integration target. API Gateway looks up the IP address and port of the healthy instances with `DiscoverInstances` and distributes requests across them.",
       "The Amazon ECS service registers each AWS Fargate task in AWS Cloud Map with an SRV record, which carries the port that an A record does not. No load balancer sits between API Gateway and the tasks."
     ]
   },
