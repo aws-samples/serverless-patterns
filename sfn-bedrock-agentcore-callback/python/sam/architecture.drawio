@@ -1,0 +1,81 @@
+<mxfile host="drawio" type="device">
+  <diagram id="sfn-bedrock-agentcore-callback" name="Architecture">
+    <mxGraphModel dx="1100" dy="560" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="480" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- AWS Cloud boundary -->
+        <mxCell id="cloud" value="AWS Cloud" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=0;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#232F3E;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="20" width="790" height="440" as="geometry" />
+        </mxCell>
+
+        <!-- AWS Step Functions group -->
+        <mxCell id="sfnGroup" value="AWS Step Functions" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;strokeColor=#E7157B;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontStyle=1;fontColor=#E7157B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="210" y="55" width="240" height="380" as="geometry" />
+        </mxCell>
+
+        <!-- Amazon Bedrock AgentCore group -->
+        <mxCell id="acGroup" value="Amazon Bedrock AgentCore" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;strokeColor=#01A88D;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontStyle=1;fontColor=#01A88D;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="530" y="55" width="220" height="380" as="geometry" />
+        </mxCell>
+
+        <!-- Caller -->
+        <mxCell id="caller" value="Caller" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.client;" vertex="1" parent="1">
+          <mxGeometry x="50" y="211" width="60" height="58" as="geometry" />
+        </mxCell>
+
+        <!-- Request Response state machine -->
+        <mxCell id="rr" value="Request Response&lt;br&gt;state machine" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.step_functions;" vertex="1" parent="1">
+          <mxGeometry x="291" y="95" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- Callback state machine -->
+        <mxCell id="cb" value="Callback&lt;br&gt;state machine" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.step_functions;" vertex="1" parent="1">
+          <mxGeometry x="291" y="295" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- AgentCore Runtime agent -->
+        <mxCell id="agent" value="AgentCore Runtime&lt;br&gt;agent" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock_agentcore;" vertex="1" parent="1">
+          <mxGeometry x="641" y="195" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- Amazon Bedrock model -->
+        <mxCell id="model" value="Amazon Bedrock&lt;br&gt;model" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" vertex="1" parent="1">
+          <mxGeometry x="831" y="195" width="78" height="78" as="geometry" />
+        </mxCell>
+
+        <!-- 1: caller starts either state machine -->
+        <mxCell id="e1a" value="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="caller" target="rr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1b" value="1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="caller" target="cb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 2: InvokeAgentRuntime (Request Response waits for the response) -->
+        <mxCell id="e2a" value="2" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="rr" target="agent">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- 2: InvokeAgentRuntime with the task token -->
+        <mxCell id="e2b" value="2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;" edge="1" parent="1" source="cb" target="agent">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="560" y="318" /><mxPoint x="560" y="242" /></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 3: agent calls the model -->
+        <mxCell id="e3" value="3" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="agent" target="model">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 4: SendTaskSuccess or SendTaskFailure resumes the callback state machine -->
+        <mxCell id="e4" value="4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;strokeColor=#545B64;strokeWidth=2;dashed=1;fontSize=12;fontStyle=1;labelBackgroundColor=#ffffff;rounded=0;exitX=0;exitY=0.9;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="agent" target="cb">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="585" y="265" /><mxPoint x="585" y="353" /></Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

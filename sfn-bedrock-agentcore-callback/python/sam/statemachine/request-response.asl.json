@@ -1,0 +1,23 @@
+{
+  "Comment": "Invoke an AgentCore Runtime agent with the Request Response pattern",
+  "StartAt": "InvokeAgentRuntime",
+  "States": {
+    "InvokeAgentRuntime": {
+      "Type": "Task",
+      "Arguments": {
+        "AgentRuntimeArn": "${AgentRuntimeArn}",
+        "Accept": "application/json",
+        "Payload": {
+          "prompt": "{% $states.input.prompt %}"
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:bedrockagentcore:invokeAgentRuntime",
+      "Output": "{% $parse($states.result.Response) %}",
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
+    }
+  },
+  "QueryLanguage": "JSONata"
+}
