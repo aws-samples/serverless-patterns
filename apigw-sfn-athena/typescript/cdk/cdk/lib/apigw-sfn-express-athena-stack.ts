@@ -36,6 +36,12 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     const dataPrefix = 'data/';
     const resultsPrefix = 'athena-results/';
 
+    // Names come from the stack name, so a second stack in the same account and
+    // Region gets its own database and workgroup. Glue database names used by
+    // Athena take lowercase letters, numbers and underscores only.
+    const databaseName = `${this.stackName.toLowerCase().replace(/[^a-z0-9_]/g, '_')}_orders`;
+    const workgroupName = `${this.stackName}-workgroup`;
+
     // Amazon API Gateway integration timeout. 29 seconds is the default and the
     // maximum for a REST API without a quota increase (Regional and private
     // APIs can raise it through Service Quotas, see the README). The workflow
@@ -90,6 +96,9 @@ export class ApigwSfnExpressAthenaStack extends Stack {
         },
         physicalResourceId: cr.PhysicalResourceId.of(`${dataPrefix}orders.csv`),
       },
+      // PutObject is in the SDK that ships with the Lambda runtime, so there is
+      // no need to download the latest SDK at deploy time.
+      installLatestAwsSdk: false,
       policy: cr.AwsCustomResourcePolicy.fromStatements([
         new iam.PolicyStatement({
           actions: ['s3:PutObject'],
@@ -106,14 +115,14 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     const glueDb = new glue.CfnDatabase(this, 'GlueDatabase', {
       catalogId: Aws.ACCOUNT_ID,
       databaseInput: {
-        name: `orders_db_${Aws.ACCOUNT_ID}`,
+        name: databaseName,
         description: 'Sample database for the apigw-sfn-express-athena pattern',
       },
     });
 
     const glueTable = new glue.CfnTable(this, 'GlueTable', {
       catalogId: Aws.ACCOUNT_ID,
-      databaseName: `orders_db_${Aws.ACCOUNT_ID}`,
+      databaseName: databaseName,
       tableInput: {
         name: 'orders',
         description: 'Sample orders table backed by CSV in Amazon S3',
@@ -147,13 +156,12 @@ export class ApigwSfnExpressAthenaStack extends Stack {
         },
       },
     });
-    glueTable.addDependency(glueDb);
+    glueTable.addResourceDependency(glueDb);
 
     // ---------------------------------------------------------------------
     // Amazon Athena workgroup with the results location pinned to the
     // athena-results/ prefix and results encrypted with SSE-S3.
     // ---------------------------------------------------------------------
-    const workgroupName = `apigw-sfn-express-athena-${Aws.ACCOUNT_ID}`;
     new athena.CfnWorkGroup(this, 'AthenaWorkgroup', {
       name: workgroupName,
       recursiveDeleteOption: true,
@@ -170,8 +178,8 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     // ARN helpers scoped to THIS account/region (no hardcoded account IDs).
     const workgroupArn = `arn:${Aws.PARTITION}:athena:${Aws.REGION}:${Aws.ACCOUNT_ID}:workgroup/${workgroupName}`;
     const catalogArn = `arn:${Aws.PARTITION}:glue:${Aws.REGION}:${Aws.ACCOUNT_ID}:catalog`;
-    const databaseArn = `arn:${Aws.PARTITION}:glue:${Aws.REGION}:${Aws.ACCOUNT_ID}:database/orders_db_${Aws.ACCOUNT_ID}`;
-    const tableArn = `arn:${Aws.PARTITION}:glue:${Aws.REGION}:${Aws.ACCOUNT_ID}:table/orders_db_${Aws.ACCOUNT_ID}/orders`;
+    const databaseArn = `arn:${Aws.PARTITION}:glue:${Aws.REGION}:${Aws.ACCOUNT_ID}:database/${databaseName}`;
+    const tableArn = `arn:${Aws.PARTITION}:glue:${Aws.REGION}:${Aws.ACCOUNT_ID}:table/${databaseName}/orders`;
 
     // ---------------------------------------------------------------------
     // Step Functions EXPRESS state machine.
@@ -193,7 +201,7 @@ export class ApigwSfnExpressAthenaStack extends Stack {
       queryString: sfn.JsonPath.stringAt('$.queryString'),
       workGroup: workgroupName,
       queryExecutionContext: {
-        databaseName: `orders_db_${Aws.ACCOUNT_ID}`,
+        databaseName: databaseName,
       },
       resultPath: '$.queryExecution',
     });
@@ -466,7 +474,7 @@ export class ApigwSfnExpressAthenaStack extends Stack {
     new CfnOutput(this, 'DataBucketName', { value: dataBucket.bucketName });
     new CfnOutput(this, 'AthenaWorkgroupName', { value: workgroupName });
     new CfnOutput(this, 'GlueDatabaseName', {
-      value: `orders_db_${Aws.ACCOUNT_ID}`,
+      value: databaseName,
     });
   }
 }

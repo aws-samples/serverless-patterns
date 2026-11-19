@@ -59,12 +59,11 @@ The Amazon API Gateway method uses AWS IAM authorization, so requests must be si
 ## Requirements
 
 * [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in. The IAM user that you use must have sufficient permissions to make necessary AWS service calls and manage AWS resources.
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) version 2 installed and configured
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured
 * [curl](https://curl.se/) 7.75.0 or newer, used to send the SigV4-signed test request
 * [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
-* [Node.js 18+](https://nodejs.org/en/download/) installed
-* [AWS Cloud Development Kit (AWS CDK) v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) installed
-* An AWS account bootstrapped for the AWS CDK (`cdk bootstrap`)
+* [Node.js](https://nodejs.org/en/download/) installed. `npm install` installs the AWS CDK CLI used by the `npx cdk` commands.
+* An AWS account bootstrapped for the AWS CDK (`npx cdk bootstrap`)
 
 ## Deployment Instructions
 
@@ -84,7 +83,7 @@ The Amazon API Gateway method uses AWS IAM authorization, so requests must be si
     ```
     npx cdk deploy
     ```
-5. Note the `ApiEndpoint` value from the stack outputs. You will use it for testing. The stack also outputs `DataBucketName`, `AthenaWorkgroupName` and `GlueDatabaseName`, which are useful for looking at the sample data and query results in the Amazon Athena console.
+5. Note the `ApiEndpoint` value from the stack outputs. You will use it for testing. The stack also outputs `DataBucketName`, `AthenaWorkgroupName` and `GlueDatabaseName`, which are useful for looking at the sample data and query results in the Amazon Athena console. The workgroup and database names come from the stack name, so you can deploy a second copy with another stack name.
 
 ## Testing
 
