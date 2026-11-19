@@ -124,7 +124,7 @@ Resources:
   PipelineRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${DeploymentName}-pipeline"
+      RoleName: !Sub "${DeploymentName}-pipeline-${AWS::Region}"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -237,7 +237,7 @@ Resources:
       Type: data
       Description: Data access policy for the pipeline role and the console principal.
       Policy: !Sub >-
-        [{"Description":"Pipeline role","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:CreateIndex","aoss:UpdateIndex","aoss:DescribeIndex","aoss:WriteDocument"]}],"Principal":["arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline"]},{"Description":"Console principal","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:*"]},{"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],"Principal":["${AccessARN}"]}]
+        [{"Description":"Pipeline role","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:CreateIndex","aoss:UpdateIndex","aoss:DescribeIndex","aoss:WriteDocument"]}],"Principal":["arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${DeploymentName}-pipeline-${AWS::Region}"]},{"Description":"Console principal","Rules":[{"ResourceType":"index","Resource":["index/${DeploymentName}/*"],"Permission":["aoss:*"]},{"ResourceType":"collection","Resource":["collection/${DeploymentName}"],"Permission":["aoss:*"]}],"Principal":["${AccessARN}"]}]
 
   # ---------------------------------------------------------------------------
   # CloudWatch log group for pipeline audit logs.
