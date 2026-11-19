@@ -22,7 +22,7 @@ jobs:
   production:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install AWS CLI 2.37.13 or later
         run: |
@@ -31,7 +31,7 @@ jobs:
           sudo /tmp/aws/install --update
           aws --version
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_PRODUCTION_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
