@@ -258,11 +258,21 @@
             "S": "{% $states.input.approver %}"
           },
           "explanation": {
-            "S": "{% $string($states.input.explanation) %}"
+            "S": "{% $exists($states.input.explanation) ? $string($states.input.explanation) : 'none' %}"
           }
         }
       },
       "Output": "{% { 'route': $states.input.route, 'decision': $states.input.decision, 'approver': $states.input.approver } %}",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
       "End": true
     },
     "DecisionTimedOut": {
