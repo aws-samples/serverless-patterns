@@ -1,0 +1,62 @@
+{
+  "title": "Session routing to AWS Lambda MicroVMs with Amazon CloudFront, Lambda@Edge and Amazon DynamoDB",
+  "description": "Route each request to its own per-session AWS Lambda MicroVM. A session id in the path or query selects the VM; Lambda@Edge routes and a control-plane Lambda launches it.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "patternGroup": "cloudfront-lambda-edge-microvms-dynamodb",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern gives every session its own AWS Lambda MicroVM behind a single Amazon CloudFront URL. A request carries its session id in the path (/s/{sessionId}/...) or, as a fallback, the query string (?session={sessionId}). An Amazon DynamoDB table maps each session id to the MicroVM currently serving it (endpoint, auth token, state).",
+      "A Lambda@Edge origin-request function runs on the default behavior. It reads the session record from DynamoDB: if the MicroVM is usable it rewrites the origin to the VM endpoint (and the Host header, which does not auto-follow), attaches the proxy auth token, and forwards the stripped path on port 8080. If not, it 307-redirects to a regional control-plane Lambda that launches the MicroVM (or attaches to the running one), then bounces the viewer back to retry.",
+      "The control plane uses a conditional DynamoDB write as a launch lock, so concurrent first requests for a session start one MicroVM, not several. The app inside each MicroVM is a Node.js hello-world that returns its own session id, so /s/A and /s/B land on two different MicroVMs. There is no authentication (the session id is the only key), so this is a demo, not a production design."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/microvm-edge-sessions-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs documentation",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html"
+      },
+      {
+        "text": "Lambda@Edge documentation",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html"
+      },
+      {
+        "text": "Restrict access to an AWS Lambda function URL origin (CloudFront Origin Access Control)",
+        "link": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-lambda.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "npm install",
+      "npx cdk deploy"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Open <code>https://&lt;distribution&gt;.cloudfront.net/s/session-a/</code> and <code>/s/session-b/</code> (for example with <code>curl -sL</code>) and confirm each response comes from a different MicroVM. See the README for the full steps."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>npx cdk destroy</code>.",
+      "CloudFront takes a few hours to delete the Lambda@Edge replicas, so the first destroy usually ends in DELETE_FAILED on the edge function. Wait a few hours and run <code>npx cdk destroy</code> again."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alexis Philippart de Foy",
+      "image": "https://serverlessland.com/assets/images/contributors/alexis-philippart-de-foy.jpg",
+      "bio": "I am a Startup Solutions Architect, Serverless Enthusiast and former startup founder.",
+      "linkedin": "apdf"
+    }
+  ]
+}
