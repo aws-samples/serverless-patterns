@@ -1,0 +1,47 @@
+# Deploys the main branch to the production endpoint, then deletes unused preview revisions.
+name: Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  STACK_NAME: ${{ vars.STACK_NAME || 'lambda-web-pr-previews' }}
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install AWS CLI 2.37.13 or later
+        run: |
+          curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+          unzip -q /tmp/awscliv2.zip -d /tmp
+          sudo /tmp/aws/install --update
+          aws --version
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_PRODUCTION_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy production
+        env:
+          GIT_SHA: ${{ github.sha }}
+        run: scripts/deploy.sh production
+
+      # The pull request role cannot delete revisions, so this deletes the revisions that updated
+      # and closed pull requests left behind. Revisions that an endpoint routes to stay.
+      - name: Delete unused preview revisions
+        run: scripts/deploy.sh cleanup
