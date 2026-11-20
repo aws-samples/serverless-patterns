@@ -1,0 +1,74 @@
+{
+  "title": "Serverless semantic cache for Amazon Bedrock using Amazon S3 Vectors",
+  "description": "Cache Amazon Bedrock answers by meaning: AWS Lambda checks Amazon S3 Vectors for a similar prompt and skips the model on a hit.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "patternGroup": "bedrock-semantic-cache-s3vectors",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern puts an AWS Lambda function in front of Amazon Bedrock and returns a cached answer when a new prompt means the same as one that was already answered, so repeats and paraphrases skip the model call. The function embeds the prompt with Amazon Titan Text Embeddings V2 and queries an Amazon S3 Vectors index for the 5 nearest stored prompts. The cached answer lives in the vector metadata, so there's no separate database and nothing runs between requests.",
+      "A candidate is a hit only if its cosine similarity is at or above the threshold (0.85 by default), it's younger than the TTL, it carries the current cache epoch, and it has the same negation as the prompt, so \"is X\" doesn't return the answer for \"is not X\". On a miss the function calls the model with the Converse API and stores the embedding and answer. Calling `{\"action\":\"invalidate\"}` bumps the epoch in AWS Systems Manager Parameter Store, which turns every earlier entry into a miss.",
+      "The function URL uses the `AWS_IAM` auth type. Every caller shares one cache, so don't use it for answers that are specific to one user. Amazon Bedrock's native prompt caching matches an exact prompt prefix instead, and the two work together."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "headline": "Additional resources",
+    "bullets": [
+      {
+        "text": "Working with S3 Vectors and vector buckets",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html"
+      },
+      {
+        "text": "Amazon S3 Vectors limitations and restrictions",
+        "link": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors-limitations.html"
+      },
+      {
+        "text": "Amazon Titan Text Embeddings models",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html"
+      },
+      {
+        "text": "Amazon Bedrock prompt caching (native, prefix based), which complements this pattern",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html"
+      },
+      {
+        "text": "Control access to Lambda function URLs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam deploy --guided</code>"
+    ]
+  },
+  "testing": {
+    "headline": "Testing",
+    "text": [
+      "See the GitHub repo for detailed testing instructions: a miss, an exact repeat hit, a semantic hit, the negation guard, and force invalidation. Set <code>REGION</code> to the Region you deployed to, because every command passes <code>--region $REGION</code>."
+    ]
+  },
+  "cleanup": {
+    "headline": "Cleanup",
+    "text": [
+      "1. Delete the stack with AWS SAM: <code>sam delete --stack-name STACK_NAME --region $REGION</code>. Enter <code>y</code> at each confirmation prompt. This also removes the Amazon S3 Vectors index and vector bucket, the epoch parameter and the log group.",
+      "2. Confirm with <code>aws cloudformation list-stacks --region $REGION --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>.",
+      "3. If you created the optional API key parameter, delete it: <code>aws ssm delete-parameter --name /semantic-cache/api-key --region $REGION</code>, then delete the local <code>response.json</code> written during testing. The shared AWS SAM CLI artifacts bucket is left in place."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Manish S",
+      "image": "",
+      "bio": "AWS Support Engineer, trying to build things",
+      "linkedin": "manish-s-84199221b",
+      "twitter": ""
+    }
+  ]
+}
