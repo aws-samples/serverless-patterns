@@ -1,0 +1,2 @@
+-r ../after/requirements.txt
+pytest>=8.0
