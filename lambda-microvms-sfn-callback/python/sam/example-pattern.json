@@ -1,0 +1,73 @@
+{
+    "title": "AWS Step Functions to AWS Lambda MicroVMs with a task token callback",
+    "description": "Run a job on an AWS Lambda MicroVM from AWS Step Functions, get its result with a task token callback, and always terminate the MicroVM.",
+    "language": "Python",
+    "level": "300",
+    "framework": "AWS SAM",
+    "patternGroup": "lambda-microvms-sfn-callback",
+    "introBox": {
+        "headline": "How it works",
+        "text": [
+            "AWS Lambda MicroVMs run long or stateful work, for up to eight hours, in a Firecracker-isolated environment built from your own image. A MicroVM isn't invoked and doesn't return a response: it runs, and bills, until it's terminated or reaches its maximum duration. This pattern uses an AWS Step Functions workflow to get the job's result back and to make sure the MicroVM always stops, with no AWS Lambda function in between.",
+            "The workflow starts the MicroVM with `RunMicrovm` through the AWS SDK integration and passes the execution input as the job in the run hook payload, with the execution ARN as the idempotency token. The next step stores its task token in an Amazon DynamoDB table under the MicroVM ID and waits with `.waitForTaskToken`. The worker reads the token, sends `SendTaskHeartbeat` every 20 seconds, and finishes with `SendTaskSuccess` or `SendTaskFailure`.",
+            "The workflow calls `TerminateMicrovm` on every path: success, a reported failure, missed heartbeats or the maximum duration. The maximum duration is also set on the MicroVM, so the platform stops it if someone stops the execution by hand. Replace the example job, which counts prime numbers, with your own batch job, data processing step or agent run."
+        ]
+    },
+    "gitHub": {
+        "template": {
+            "templateFile": "template.yaml"
+        }
+    },
+    "resources": {
+        "headline": "Additional resources",
+        "bullets": [
+            {
+                "text": "AWS SDK service integrations in Step Functions",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html"
+            },
+            {
+                "text": "Wait for a callback with a task token",
+                "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-to-resource.html#connect-wait-token"
+            },
+            {
+                "text": "AWS::Lambda::MicrovmImage CloudFormation resource",
+                "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html"
+            },
+            {
+                "text": "AWS CLI reference for Lambda MicroVMs RunMicrovm",
+                "link": "https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda-microvms/run-microvm.html"
+            }
+        ]
+    },
+    "deploy": {
+        "text": [
+            "1. Set your Region and a name for a new Amazon S3 bucket that holds the worker code: <code>export AWS_REGION=us-east-1</code> and <code>export ARTIFACT_BUCKET=sfn-microvms-callback-artifacts-$(aws sts get-caller-identity --query Account --output text)-$AWS_REGION</code>",
+            "2. Create the bucket, then zip and upload the worker: <code>aws s3 mb s3://$ARTIFACT_BUCKET --region $AWS_REGION</code>, <code>(cd src/worker && zip -j ../../worker.zip Dockerfile app.py)</code>, then <code>aws s3 cp worker.zip s3://$ARTIFACT_BUCKET/worker.zip --region $AWS_REGION</code>",
+            "3. Deploy the stack and enter the artifact bucket name for <code>ArtifactBucket</code> when prompted: <code>sam deploy --guided</code>"
+        ]
+    },
+    "testing": {
+        "headline": "Testing",
+        "text": [
+            "Start executions with a successful job, a failing job and a hung job, then confirm each MicroVM is terminated. See the README for detailed instructions."
+        ]
+    },
+    "cleanup": {
+        "headline": "Cleanup",
+        "text": [
+            "1. Delete the stack: <code>sam delete --stack-name STACK_NAME --region $AWS_REGION</code>. Enter <code>y</code> at each confirmation prompt.",
+            "2. Delete the artifact bucket and the local zip: <code>aws s3 rb s3://$ARTIFACT_BUCKET --force --region $AWS_REGION</code>, then <code>rm worker.zip</code>.",
+            "3. Confirm the stack has been deleted: <code>aws cloudformation list-stacks --region $AWS_REGION --query \"StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus\"</code>"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Manish S",
+            "image": "",
+            "bio": "AWS Support Engineer, trying to build things",
+            "linkedin": "manish-s-84199221b",
+            "twitter": "",
+            "github": "manishh-13"
+        }
+    ]
+}
