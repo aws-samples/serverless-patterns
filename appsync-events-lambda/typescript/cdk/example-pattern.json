@@ -1,0 +1,56 @@
+{
+  "title": "AWS AppSync Events with an AWS Lambda OnPublish handler",
+  "description": "Validate and enrich events in an AWS Lambda function before AWS AppSync Events delivers them to WebSocket subscribers.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern deploys an AWS AppSync Events API with a direct Lambda integration on the `notifications` channel namespace. Every event published to a `notifications/...` channel goes to an AWS Lambda function (`REQUEST_RESPONSE`) before AppSync broadcasts it to WebSocket subscribers. The function adds `processedAt`, `enriched` and `messageId` fields, and returns an error for a payload that isn't a JSON object.",
+      "Use the same hook to validate payloads, redact personal data or add data from another source. A second namespace, `alerts`, has no handler, so you can compare intercepted and plain delivery.",
+      "Publishers and subscribers authenticate with an API key that the stack creates with a 365-day expiry. The stack doesn't output the key, so read it with `aws appsync list-api-keys`."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/appsync-events-lambda-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS AppSync Events",
+        "link": "https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-welcome.html"
+      },
+      {
+        "text": "Direct Lambda integration for AWS AppSync Events",
+        "link": "https://docs.aws.amazon.com/appsync/latest/eventapi/writing-event-handlers.html#direct-lambda-integration"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Subscribe to <code>/notifications/*</code> in the Pub/Sub Editor of the AWS AppSync console, then publish an event to <code>notifications/general</code> with the HTTP endpoint and the API key. The event arrives with the fields the function added. See the README in the GitHub repo for the commands."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>",
+      "Delete the log group that AWS AppSync creates outside the stack: <code>aws logs delete-log-group --log-group-name /aws/appsync/apis/&lt;ApiId&gt;</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
