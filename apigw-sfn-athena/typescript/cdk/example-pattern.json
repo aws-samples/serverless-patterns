@@ -1,0 +1,59 @@
+{
+  "title": "Amazon API Gateway to AWS Step Functions Express to Amazon Athena",
+  "description": "Run an Amazon Athena query through an AWS Step Functions Express Workflow and return the rows in one synchronous Amazon API Gateway call, with no Lambda function.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern runs an Amazon Athena query and returns its rows in one synchronous Amazon API Gateway request. The REST API starts an AWS Step Functions Express Workflow with `StartSyncExecution`, and the workflow calls Athena through native service integrations, so there's no AWS Lambda function in the request path.",
+      "Express Workflows don't support the `.sync` integration pattern, so the workflow starts the query with `StartQueryExecution` and polls `GetQueryExecution` in a `Wait` and `Choice` loop. When the query succeeds, `GetQueryResults` reads the rows, which must fit in the 256 KiB Step Functions payload. After 10 polls the workflow calls `StopQueryExecution` and fails, so the caller gets an HTTP 500 before the 29-second integration timeout.",
+      "The method uses IAM authorization, because the caller's SQL goes straight to Athena, and the stage is throttled to 5 requests per second. Athena reads a sample CSV file through an AWS Glue table and writes results to an Amazon S3 prefix set by its workgroup."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "cdk/lib/apigw-sfn-express-athena-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Call Amazon Athena with AWS Step Functions",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/connect-athena.html"
+      },
+      {
+        "text": "Synchronous Express Workflows",
+        "link": "https://docs.aws.amazon.com/step-functions/latest/dg/express-synchronous.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>cd apigw-sfn-athena/typescript/cdk/cdk</code>",
+      "<code>npm install</code>",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send a SigV4-signed <code>POST</code> with a <code>queryString</code> to the <code>ApiEndpoint</code> output, for example with <code>curl --aws-sigv4</code>. See the README in the GitHub repo for the commands."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>cd apigw-sfn-athena/typescript/cdk/cdk</code> then <code>npx cdk destroy</code>.",
+      "Warning: this deletes the Amazon S3 bucket and all sample data and Amazon Athena query results."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://avatars.githubusercontent.com/NithinChandranR-AWS",
+      "bio": "Cloud Support / Serverless enthusiast building serverless patterns.",
+      "linkedin": "",
+      "twitter": ""
+    }
+  ]
+}
