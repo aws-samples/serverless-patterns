@@ -1,0 +1,67 @@
+{
+  "title": "Amazon API Gateway to Amazon CloudWatch Logs",
+  "description": "Create a REST API that proxies requests directly to Amazon CloudWatch Logs to put and get log events, without a Lambda function.",
+  "language": "Integration",
+  "level": "200",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern creates an Amazon API Gateway REST API that calls Amazon CloudWatch Logs directly through an AWS service integration, with no AWS Lambda function. `POST /putLog` maps to the `PutLogEvents` action and writes an event to a log stream, and `POST /getLog` maps to `GetLogEvents` and reads the events back.",
+      "API Gateway assumes an IAM role that allows only `logs:PutLogEvents` and `logs:GetLogEvents` on the one log stream the stack creates. The log group and stream are fixed in the mapping templates, so callers can't reach other logs, and the templates encode the caller's `ts` and `message` with `$input.json`, so a crafted value can't break the JSON request.",
+      "The API has no authorization, so anyone with the URL can write to and read the log stream. Use it for testing, and add IAM authorization, an Amazon Cognito user pool or a Lambda authorizer before any other use."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Tutorial: Create a REST API with an AWS integration",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-aws-proxy.html"
+      },
+      {
+        "text": "Amazon CloudWatch Logs API Reference - PutLogEvents",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html"
+      },
+      {
+        "text": "Amazon CloudWatch Logs API Reference - GetLogEvents",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_GetLogEvents.html"
+      },
+      {
+        "text": "Amazon API Gateway Quotas",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html"
+      },
+      {
+        "text": "Amazon CloudWatch Logs Quotas",
+        "link": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>sam deploy --guided</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "Send <code>POST</code> requests with a <code>ts</code> and <code>message</code> to the <code>PutLogUrl</code> output, then read them back from <code>GetLogUrl</code>. See the README in the GitHub repo for the commands."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>sam delete</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Sphoorti Poojary",
+      "bio": "Sphoorti is a Technical Account Manager at Amazon Web Services. She helps customers build and operate serverless applications on AWS.",
+      "image": "https://avatars.githubusercontent.com/u/44513369?v=4",
+      "linkedin": "sphoorti-poojary"
+    }
+  ]
+}
