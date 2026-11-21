@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: >
+  (tag:eventbridge-schedule-group-tagging-sam)
+  Organize Amazon EventBridge Scheduler schedules into a tagged schedule group
+  that targets an Amazon SQS queue, demonstrating tagging and schedule-naming
+  best practices.
+
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    Description: Environment value applied as a tag on the schedule group and used as the schedule name prefix.
+  Owner:
+    Type: String
+    Default: payments-team
+    Description: Owning team applied as the "owner" tag on the schedule group.
+  CostCenter:
+    Type: String
+    Default: cc-1234
+    Description: Cost allocation value applied as the "cost-center" tag on the schedule group.
+  Application:
+    Type: String
+    Default: payments
+    Description: Application name applied as the "application" tag and used as part of the schedule name prefix.
+
+Resources:
+
+  # The benign target. One SQS queue both schedules send to.
+  TargetQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: schedule-group-tagging-target
+
+  # The organization unit. Tags are applied to the GROUP (not individual
+  # schedules) and are set AT CREATION TIME so no untagged window exists.
+  # Deleting this group cascades to every schedule it contains.
+  WorkloadScheduleGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: !Sub '${Application}-${Environment}'
+      Tags:
+        - Key: environment
+          Value: !Ref Environment
+        - Key: owner
+          Value: !Ref Owner
+        - Key: cost-center
+          Value: !Ref CostCenter
+        - Key: application
+          Value: !Ref Application
+
+  # Least-privilege role the scheduler assumes to call the target. Scoped to
+  # sqs:SendMessage on the single queue ARN, trusted only by the scheduler
+  # service. The repo's check-iam.js rejects wildcard actions/resources.
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: SendToTargetQueue
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt TargetQueue.Arn
+
+  # First schedule inside the group. The name uses an intentional,
+  # prefix-friendly convention (<application>-<environment>-<task>) so it can
+  # be sliced with the NamePrefix parameter of ListSchedules/ListScheduleGroups
+  # — the native partial-match lever that exact-match tag search cannot provide.
+  InvoiceSweepSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      GroupName: !Ref WorkloadScheduleGroup
+      Name: !Sub '${Application}-${Environment}-invoice-sweep'
+      Description: Enqueues the invoice sweep task.
+      ScheduleExpression: 'rate(5 minutes)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt TargetQueue.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        Input: '{"task": "invoice-sweep"}'
+
+  # Second schedule inside the SAME group, same naming convention. Both inherit
+  # the group's organizational context and tags.
+  LedgerRollupSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      GroupName: !Ref WorkloadScheduleGroup
+      Name: !Sub '${Application}-${Environment}-ledger-rollup'
+      Description: Enqueues the ledger rollup task.
+      ScheduleExpression: 'rate(10 minutes)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt TargetQueue.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        Input: '{"task": "ledger-rollup"}'
+
+Outputs:
+  ScheduleGroupName:
+    Description: Name of the tagged EventBridge Scheduler schedule group.
+    Value: !Ref WorkloadScheduleGroup
+  ScheduleGroupArn:
+    Description: ARN of the schedule group (use with list-tags-for-resource).
+    Value: !GetAtt WorkloadScheduleGroup.Arn
+  TargetQueueUrl:
+    Description: URL of the target SQS queue.
+    Value: !Ref TargetQueue
+  SchedulerRoleArn:
+    Description: ARN of the least-privilege scheduler execution role.
+    Value: !GetAtt SchedulerRole.Arn
+  ScheduleNamePrefix:
+    Description: Prefix for filtering schedules via ListSchedules NamePrefix.
+    Value: !Sub '${Application}-${Environment}-'
