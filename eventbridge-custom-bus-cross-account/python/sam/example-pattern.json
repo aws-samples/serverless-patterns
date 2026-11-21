@@ -1,6 +1,6 @@
 {
   "title": "Amazon EventBridge custom event bus cross-account sharing with AWS Resource Access Manager",
-  "description": "Share one Amazon EventBridge custom event bus across accounts with AWS RAM. A consumer account subscribes and delivers events to an AWS Lambda function.",
+  "description": "Share one Amazon EventBridge custom event bus across accounts with AWS Resource Access Manager (AWS RAM). A consumer account subscribes and delivers events to an AWS Lambda function.",
   "language": "Python",
   "level": "200",
   "framework": "AWS SAM",
@@ -35,8 +35,13 @@
   },
   "deploy": {
     "text": [
+<<<<<<< Updated upstream
       "Owner account: sam deploy --stack-name xacct-bus-owner --resolve-s3 --parameter-overrides Role=Owner SharePrincipal=<CONSUMER_ACCOUNT_ID>",
       "Consumer account: sam deploy --stack-name xacct-bus-consumer --resolve-s3 --capabilities CAPABILITY_IAM --parameter-overrides Role=Consumer SharedBusArn=<BUS_ARN>"
+=======
+      "Owner account: sam deploy --profile <owner_profile> --parameter-overrides Role=Owner SharePrincipal=<OU_OR_ACCOUNT_ID>",
+      "Consumer account: sam deploy --profile <consumer_profile> --capabilities CAPABILITY_IAM --parameter-overrides Role=Consumer SharedBusArn=<BUS_ARN>"
+>>>>>>> Stashed changes
     ]
   },
   "testing": {
@@ -46,7 +51,7 @@
   },
   "cleanup": {
     "text": [
-      "Delete the consumer stack first, then the owner stack: <code>sam delete</code> in each account."
+      "Delete the consumer stack first, then the owner stack: <code>sam delete --stack-name <stack_name> --profile <profile_value></code> in each account."
     ]
   },
   "authors": [

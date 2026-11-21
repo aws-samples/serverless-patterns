@@ -1,4 +1,4 @@
-# Amazon EventBridge custom event bus cross-account sharing with AWS RAM
+# Amazon EventBridge custom event bus cross-account sharing with AWS Resource Access Manager (AWS RAM)
 
 This pattern shows how to run one Amazon EventBridge custom event bus in an owner account and share it with other accounts in your AWS Organizations organization using AWS Resource Access Manager (AWS RAM). A consumer account creates its own subscriber on the shared bus and delivers matching events to an AWS Lambda function, with an Amazon SQS dead-letter queue for failed deliveries.
 
@@ -33,12 +33,12 @@ These examples deploy to the us-west-2 Region. Change the value of `--region` in
     ```
     sam deploy --stack-name xacct-bus-owner --profile <owner-profile> --region us-west-2 \
     --resolve-s3 --no-confirm-changeset \
-    --parameter-overrides Role=Owner EventBusName=cross-account-orders SharePrincipal=<CONSUMER_ACCOUNT_ID>
+    --parameter-overrides Role=Owner SharePrincipal=<CONSUMER_ACCOUNT_ID_OR_OU_ARN>
     ```
 1. Deploy the **consumer** side using the consumer account's credentials, passing the `BusArn` from the previous step. Allows SAM to create IAM roles.
     ```
     sam deploy --stack-name xacct-bus-consumer --profile <consumer-profile> --region us-west-2 \
-    --capabilities CAPABILITY_IAM \
+    --resolve-s3 --no-confirm-changeset --capabilities CAPABILITY_IAM \
     --parameter-overrides Role=Consumer SharedBusArn=<BUS_ARN_FROM_OWNER_OUTPUT>
     ```
 1. Note the outputs from each deployment. They contain the bus ARN, the consumer Lambda function name, and the subscriber ARN used for testing.
