@@ -7,7 +7,7 @@ Resources:
     Type: AWS::Serverless::Function
     Description: Lambda Function that will trigger Destination Function onSuccess or onFailure
     Properties:
-      CodeUri: ProducerFunction/
+      CodeUri: producerFunction/
       Handler: app.handler
       Runtime: nodejs24.x
       Timeout: 3

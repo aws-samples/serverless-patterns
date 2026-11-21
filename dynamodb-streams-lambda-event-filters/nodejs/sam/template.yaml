@@ -12,7 +12,7 @@ Resources:
   putItemTriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
+      CodeUri: src/
       Handler: dynamodb-insert-trigger.putItemTriggerHandler
       Runtime: nodejs24.x
       Architectures:
@@ -39,7 +39,7 @@ Resources:
   deleteItemTriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
+      CodeUri: src/
       Handler: dynamodb-delete-trigger.deleteItemTriggerHandler
       Runtime: nodejs24.x
       Architectures:
