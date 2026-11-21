@@ -15,7 +15,7 @@ Resources:
     Properties:
       CodeUri: src/
       Runtime: nodejs24.x
-      Handler: app.lambdaHandler
+      Handler: app.handler
       Tracing: Active
       Events:
         Stream:
