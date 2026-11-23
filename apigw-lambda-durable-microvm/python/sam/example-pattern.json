@@ -1,0 +1,64 @@
+{
+  "title": "Amazon API Gateway to AWS Lambda durable function to AWS Lambda MicroVM",
+  "description": "Run one job per ephemeral MicroVM: API Gateway starts a durable function that boots a MicroVM, suspends until it calls back, then terminates it.",
+  "language": "Python",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "POST /jobs on API Gateway invokes a Lambda function that starts a Lambda durable function asynchronously through its alias, using the job id as the durable execution name. The durable function creates a callback and, in a durable step, calls RunMicrovm on an AWS Lambda MicroVM image the stack built, passing the command and the callback coordinates in runHookPayload. It then suspends on the callback with no compute billed.",
+      "The MicroVM resumes from its Firecracker snapshot, runs the command, and POSTs the result to /callback on the same API. That handler calls SendDurableExecutionCallbackSuccess or SendDurableExecutionCallbackFailure, the durable function resumes, terminates the MicroVM in a final step, and records the result. GET /jobs/{jobId} reads it back from GetDurableExecution, so no database is needed. The MicroVM's maximumDurationInSeconds equals the durable execution timeout, so a hung VM is always torn down.",
+      "IAM is least privilege: the API function may only invoke, list and send callbacks to the orchestrator; the orchestrator may run and terminate MicroVMs and pass one execution role; the image build role may read one S3 key; the MicroVM execution role may write logs. SAM attaches AWSLambdaBasicDurableExecutionRolePolicy for checkpointing."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms.html"
+      },
+      {
+        "text": "Lambda durable functions: callbacks",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html"
+      },
+      {
+        "text": "RunMicrovm API reference",
+        "link": "https://docs.aws.amazon.com/lambda/latest/microvm-api/API_RunMicrovm.html"
+      },
+      {
+        "text": "AWS::Lambda::MicrovmImage CloudFormation resource",
+        "link": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-microvmimage.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "sam build",
+      "sam deploy --guided"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the stack: <code>sam delete</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Jay Colodner",
+      "image": "",
+      "bio": "Technical Account Manager at AWS.",
+      "linkedin": "jordan-colodner-8b71881b8"
+    }
+  ]
+}
