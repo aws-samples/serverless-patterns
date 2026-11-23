@@ -1,0 +1,67 @@
+{
+  "title": "Roll out Amazon Bedrock model settings with AWS AppConfig and AWS Lambda",
+  "description": "AWS AppConfig rolls out Amazon Bedrock model and prompt settings to an AWS Lambda function gradually and rolls back on an Amazon CloudWatch alarm.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An AWS AppConfig AI model invocation configuration profile holds the Amazon Bedrock model ID, inference parameters and system prompt. AWS AppConfig validates every version against the AI model invocation schema.",
+      "An AWS Lambda function reads the deployed configuration through the AWS AppConfig Agent Lambda extension and maps it onto an Amazon Bedrock Converse request.",
+      "A new version is rolled out with a gradual deployment strategy. An Amazon CloudWatch alarm on the function's errors is an environment monitor, so AWS AppConfig rolls a bad version back automatically.",
+      "The function role may invoke only two Amazon Nova models, so calls with a version that names another model fail, and those errors during the rollout trigger the rollback."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/appconfig-ai-model-lambda-bedrock-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Creating an AI model invocation configuration profile in AWS AppConfig",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-creating-ai-model-configuration.html"
+      },
+      {
+        "text": "Monitoring deployments for automatic rollback",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/monitoring-deployments.html"
+      },
+      {
+        "text": "Using AWS AppConfig Agent with AWS Lambda",
+        "link": "https://docs.aws.amazon.com/appconfig/latest/userguide/appconfig-integration-lambda-extensions.html"
+      },
+      {
+        "text": "Amazon Bedrock Converse API",
+        "link": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npx cdk bootstrap</code> (once per account and Region)",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Delete the hosted configuration versions created during testing (see the README).",
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
