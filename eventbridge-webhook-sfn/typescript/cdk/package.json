@@ -1,0 +1,19 @@
+{
+  "name": "eventbridge-webhook-sfn-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.278.0",
+    "constructs": "^10.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "aws-cdk": "^2.1149.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  }
+}

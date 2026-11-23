@@ -1,0 +1,62 @@
+{
+  "title": "Amazon EventBridge Webhook Events to AWS Step Functions and Amazon DynamoDB",
+  "description": "Receive HMAC-signed webhooks on a URL that Amazon EventBridge hosts and verifies, and store each known event once in Amazon DynamoDB with AWS Step Functions.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "An Amazon EventBridge webhook event source gives a third-party provider an HTTPS URL. EventBridge checks the HMAC-SHA256 signature and timestamp of each request with a secret it keeps in AWS Secrets Manager, drops repeats of the same content within 5 minutes, and puts the request body on an EventBridge Custom Event Bus.",
+      "A subscriber on the bus starts an AWS Step Functions workflow for each batch of events. For each event, known types are written to Amazon DynamoDB with a condition on the event id, so a later copy is reported as a duplicate and does not overwrite the item. Other types are skipped.",
+      "No Amazon API Gateway, function URL or AWS Lambda function is in the template."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/eventbridge-webhook-sfn-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Webhook Events for a Custom Event Bus",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-webhook-sources.html"
+      },
+      {
+        "text": "Securing a webhook event source",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-webhook-auth.html"
+      },
+      {
+        "text": "Step Functions state machine target for a Custom Event Bus subscriber",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-custom-bus-target-sfn.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk bootstrap</code> (once per account and Region)",
+      "<code>npx cdk deploy</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
