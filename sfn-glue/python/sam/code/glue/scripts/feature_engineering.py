@@ -28,9 +28,9 @@ if __name__ == "__main__":
     config_path = getResolvedOptions(sys.argv, ['config_path'])["config_path"]
     logger.warning(config_path)
     config = load_config(config_path)
-    logger.warning("config: %s".format(config))
+    logger.warning("config: %s", config)
     last_update = datetime.strptime(config['last_update'], "%Y-%m-%d-%H-%M-%S")
-    logger.warning("last update: %s".format(last_update))
+    logger.warning("last update: %s", last_update)
     bucket = config['bucket']
     prefix = config['prefix']
 
