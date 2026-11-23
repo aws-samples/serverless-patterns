@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Cross-account Amazon EventBridge custom event bus sharing with AWS RAM. Deploy this one
-  template once per account. Role=Owner creates the custom event bus and shares it via AWS RAM.
-  Role=Consumer creates a Lambda target, an SQS dead-letter queue, the delivery role, and the
+  Cross-account Amazon EventBridge custom event bus sharing with AWS Resource Access Manager (AWS RAM). 
+  Deploy this one template once per account. Role=Owner creates the custom event bus and shares it via 
+  AWS RAM. Role=Consumer creates a Lambda target, an SQS dead-letter queue, the delivery role, and the
   subscriber on the shared bus. Publish with the AWS CLI; verify in the consumer Lambda's logs.
 
 Parameters:
@@ -72,9 +72,12 @@ Resources:
       Handler: index.handler
       Timeout: 30
       InlineCode: |
-        import json
+        import json, logging
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+
         def handler(event, context):
-            print("Received event:", json.dumps(event))
+            print("Received event: %s", json.dumps(event))
             return {"ok": True}
 
   DeadLetterQueue:
