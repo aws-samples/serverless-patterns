@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@aws-lambda-powertools/batch": "^2",
+    "@aws-lambda-powertools/logger": "^2",
+    "@aws-lambda-powertools/metrics": "^2",
+    "@aws-lambda-powertools/tracer": "^2",
+    "@aws-sdk/client-dynamodb": "3.1157.0",
+    "@aws-sdk/client-sqs": "3.1157.0",
+    "@aws-sdk/lib-dynamodb": "3.1157.0",
+    "express": "5.3.0",
+    "serverless-http": "4.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
