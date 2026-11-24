@@ -1,0 +1,14 @@
+node_modules/
+dist/
+cdk.out/
+*.log
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# serverless-patterns submission staging (derived; copy into your fork)
+appsync-eventbridge-sfn/
