@@ -1,0 +1,64 @@
+{
+  "title": "AWS IAM Identity Center change ledger with Amazon EventBridge, AWS Lambda and Amazon DynamoDB",
+  "description": "Record AWS IAM Identity Center user, group and membership changes in an Amazon DynamoDB ledger with Amazon EventBridge and an idempotent AWS Lambda function.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "AWS IAM Identity Center Identity Store sends user, group and group membership change events to the default Amazon EventBridge bus. The rule lists the eight detail-types, because AWS CloudTrail also delivers Identity Store API calls with the same event source.",
+      "The events carry IDs only. The AWS Lambda function reads the current user and group attributes with the Identity Store DescribeUser and DescribeGroup APIs and skips the calls for deleted resources.",
+      "The function writes one row per event to Amazon DynamoDB with a conditional write on the EventBridge event ID, so an event delivered twice produces one row. An Amazon SQS dead-letter queue receives events that cannot be delivered or processed."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/identitystore-eventbridge-lambda-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "IAM Identity Center event notifications",
+        "link": "https://docs.aws.amazon.com/singlesignon/latest/userguide/event-notifications.html"
+      },
+      {
+        "text": "Set up event notifications",
+        "link": "https://docs.aws.amazon.com/singlesignon/latest/userguide/setup-event-notifications.html"
+      },
+      {
+        "text": "Identity Store API Reference: DescribeUser",
+        "link": "https://docs.aws.amazon.com/singlesignon/latest/IdentityStoreAPIReference/API_DescribeUser.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>IDENTITY_STORE_ID=$(aws sso-admin list-instances --no-paginate --query 'Instances[0].IdentityStoreId' --output text)</code>",
+      "<code>npx cdk bootstrap -c identityStoreId=$IDENTITY_STORE_ID</code> (once per account and Region)",
+      "<code>npx cdk deploy -c identityStoreId=$IDENTITY_STORE_ID</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>IDENTITY_STORE_ID=$(aws sso-admin list-instances --no-paginate --query 'Instances[0].IdentityStoreId' --output text)</code>",
+      "<code>npx cdk destroy -c identityStoreId=$IDENTITY_STORE_ID</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "image": "https://github.com/NithinChandranR-AWS.png",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
