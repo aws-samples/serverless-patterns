@@ -1,0 +1,5 @@
+{
+  "stackName": "release-gate-demo-app",
+  "changeSetType": "CREATE",
+  "templateBody": "{\"Resources\":{\"Queue\":{\"Type\":\"AWS::SQS::Queue\",\"DeletionPolicy\":\"Delete\",\"Properties\":{\"VisibilityTimeout\":30}}}}"
+}
