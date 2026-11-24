@@ -1,0 +1,10 @@
+*.swp
+__pycache__
+.venv
+*.egg-info
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+# Files created by samples/generate.py
+samples/output
