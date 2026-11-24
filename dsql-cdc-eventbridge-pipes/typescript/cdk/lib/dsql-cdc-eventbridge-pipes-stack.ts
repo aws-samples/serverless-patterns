@@ -82,7 +82,7 @@ export class DsqlCdcEventbridgePipesStack extends cdk.Stack {
             }),
             new iam.PolicyStatement({ actions: ['events:PutEvents'], resources: [bus.eventBusArn] }),
             new iam.PolicyStatement({ actions: ['sqs:SendMessage'], resources: [pipeDlq.queueArn] }),
-            // The permission pipe logging needs is not documented; every observed run had this statement (spike X5 tests removing it)
+            // Lets the pipe write its error logs to its own log group
             new iam.PolicyStatement({
               actions: ['logs:CreateLogStream', 'logs:PutLogEvents'],
               resources: [pipeLogs.logGroupArn],
@@ -105,7 +105,7 @@ export class DsqlCdcEventbridgePipesStack extends cdk.Stack {
           onPartialBatchItemFailure: 'AUTOMATIC_BISECT', // halve a failing batch until the one bad record is left
           deadLetterConfig: { arn: pipeDlq.queueArn },
         },
-        // Keep complete records only: chunked and fragment records (rows over 9 MiB) are dropped
+        // Keep complete records only: chunked and fragment records (records whose JSON is larger than 9 MiB) are dropped
         filterCriteria: { filters: [{ pattern: JSON.stringify({ data: { type: ['full'] } }) }] },
       },
       target: bus.eventBusArn,

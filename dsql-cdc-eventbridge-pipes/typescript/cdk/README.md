@@ -9,15 +9,11 @@ Important: this application uses various AWS services and there are costs associ
 ## Requirements
 
 - [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and log in.
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) 2.34.46 or later, installed and configured (the release that added `aws dsql get-stream`, see the [changelog](https://github.com/aws/aws-cli/blob/v2/CHANGELOG.rst))
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) installed and configured. The tests use `aws dsql get-stream`; if your AWS CLI does not have that command, update it.
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 - [Node.js](https://nodejs.org/) with npm
 - [AWS CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) with your account and Region [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) (`npx cdk bootstrap`). The commands use `npx cdk`, so no global install is needed.
 - `psql` (a PostgreSQL client) and `jq`
-
-## Architecture
-
-![Amazon Aurora DSQL change records go through Amazon Kinesis Data Streams and an Amazon EventBridge pipe to a custom event bus, three rules and three Amazon SQS queues, with two dead-letter queues](images/architecture.png)
 
 ## How it works
 
@@ -26,7 +22,7 @@ Important: this application uses various AWS services and there are costs associ
 
     | Setting | Value | Why |
     |---|---|---|
-    | Filter | `{"data":{"type":["full"]}}` | Keeps complete records. Chunked and fragment records (rows over 9 MiB) and payloads that are not JSON are dropped: no event, no dead-letter message. |
+    | Filter | `{"data":{"type":["full"]}}` | Keeps complete records. Chunked and fragment records (records whose JSON is larger than 9 MiB) and payloads that are not JSON are dropped: no event, no dead-letter message. |
     | Event type | `DetailType: $.data.op` | The record's operation code becomes the event type: `c` (insert), `u` (update) or `d` (delete). A pipe cannot translate the codes. |
     | Batch | 10 records | The most an event bus accepts in one request. Each record becomes one event. |
     | Retries and age | 3 retries, 1 hour | The pipe default is unlimited retries. |
@@ -36,7 +32,7 @@ Important: this application uses various AWS services and there are costs associ
 
 3. The input template turns the record into the event `detail`: `tableName`, `operation`, `newImage`, `oldImage`, `txId`, `recordId`, `timestamp` (commit time in milliseconds) and `commitTimestampNs` (commit time in nanoseconds, as a string).
 4. Three rules on the custom event bus pick the events up: one sends every change to the audit queue, one sends inserts (`c`) to the validation queue and one sends deletes (`d`) to the alerts queue. An update reaches the audit queue only. Each rule target retries 3 times within 1 hour and then moves the event to the rule-target dead-letter queue. To go further, add rules that target AWS Step Functions or Amazon SNS; the stack does not deploy them.
-5. A message in the pipe dead-letter queue means the record never became an event. A message in the rule-target dead-letter queue means the event exists and the audit queue has it, but one consumer did not get it.
+5. A message in the pipe dead-letter queue means the record never became an event. A message in the rule-target dead-letter queue means the event reached the bus but one rule target did not accept it; the message attributes name the rule and the target.
 
 ## Important Notes
 
@@ -111,9 +107,9 @@ Important: this application uses various AWS services and there are costs associ
       created_at TIMESTAMP DEFAULT now()
     );
 
-    INSERT INTO orders (customer_name, amount) VALUES ('Acme Corp', 1250.00);
-    UPDATE orders SET amount = 1500.00 WHERE customer_name = 'Acme Corp';
-    DELETE FROM orders WHERE customer_name = 'Acme Corp';
+    INSERT INTO orders (customer_name, amount) VALUES ('AnyCompany', 1250.00);
+    UPDATE orders SET amount = 1500.00 WHERE customer_name = 'AnyCompany';
+    DELETE FROM orders WHERE customer_name = 'AnyCompany';
     ```
 
 4. Read each queue. Expected: `c`, `u` and `d` in the audit queue, `c` in the validation queue and `d` in the alerts queue. Directly after a deployment the first events took 70 to 100 seconds in the test runs (later ones a few seconds), so run the commands again if a queue is empty:
@@ -152,8 +148,8 @@ Important: this application uses various AWS services and there are costs associ
     ```
 
     ```sql
-    INSERT INTO orders (customer_name, amount) VALUES ('Beta Ltd', 5.00);
-    DELETE FROM orders WHERE customer_name = 'Beta Ltd';
+    INSERT INTO orders (customer_name, amount) VALUES ('Example Corp', 5.00);
+    DELETE FROM orders WHERE customer_name = 'Example Corp';
     ```
 
     ```bash
@@ -168,20 +164,22 @@ Important: this application uses various AWS services and there are costs associ
 
 > **Warning:** this deletes the stack with its stream, the queues and their messages, and the Amazon Aurora DSQL cluster with all its data.
 
-1. Delete the stack. This also deletes the CDC stream:
+1. Delete any rules you added to the event bus outside the stack, because an [event bus can't be deleted while it has rules](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DeleteEventBus.html).
+
+2. Delete the stack. This also deletes the CDC stream:
 
     ```bash
     npx cdk destroy
     ```
 
-2. Delete the Amazon Aurora DSQL cluster. A new cluster has deletion protection turned on, so turn it off first. If you used an existing cluster, run `DROP TABLE orders; DROP TABLE big_rows;` in `psql` instead:
+3. Delete the Amazon Aurora DSQL cluster. A new cluster has deletion protection turned on, so turn it off first. If you used an existing cluster, keep it and drop only the tables you created for this test (`orders` and `big_rows`) in `psql` instead:
 
     ```bash
     aws dsql update-cluster --identifier $CLUSTER_ID --no-deletion-protection-enabled
     aws dsql delete-cluster --identifier $CLUSTER_ID
     ```
 
-3. In the test runs the helper function of the custom resource wrote its last log lines after AWS CloudFormation had deleted its log group, and AWS Lambda created the group again without retention. Delete it if it is there:
+4. The helper function of the custom resource can write its last log lines after AWS CloudFormation deleted its log group, and AWS Lambda then creates the group again without retention. Delete it if it is there:
 
     ```bash
     for g in $(aws logs describe-log-groups --log-group-name-prefix DsqlCdcEventbridgePipesStack-CdcStreamCrLogs \

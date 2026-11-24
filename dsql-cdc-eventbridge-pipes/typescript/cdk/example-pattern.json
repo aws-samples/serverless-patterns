@@ -1,6 +1,6 @@
 {
   "title": "Amazon Aurora DSQL CDC to Amazon EventBridge with Amazon EventBridge Pipes",
-  "description": "An Amazon EventBridge pipe filters and reshapes Amazon Aurora DSQL change records from Amazon Kinesis Data Streams. Event bus rules send inserts and deletes to Amazon SQS.",
+  "description": "An Amazon EventBridge pipe filters and reshapes Amazon Aurora DSQL change records from Amazon Kinesis Data Streams. Event bus rules route the changes to Amazon SQS queues.",
   "language": "TypeScript",
   "level": "300",
   "framework": "AWS CDK",
