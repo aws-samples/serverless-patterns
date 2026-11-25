@@ -37,11 +37,11 @@ Important: this application uses various AWS services and there are costs associ
 ## Important Notes
 
 - A pipe cannot target the newer Custom Event Bus type ([Amazon EventBridge Pipes targets](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)). This pattern uses a classic custom event bus, the kind that has rules.
-- The event type is the raw operation code (`c`, `u`, `d`). The AWS Lambda based pattern `dsql-cdc-eventbridge` in this repository uses `INSERT`, `UPDATE` and `DELETE`.
+- The event type is the raw operation code (`c`, `u`, `d`), not a name such as `INSERT`.
 - AWS CloudFormation has no resource type for a CDC stream, so the stack creates it with one `createStream` call through the CDK `AwsCustomResource` ([Aurora DSQL CDC guide](https://docs.aws.amazon.com/aurora-dsql/latest/userguide/cdc-streams.html)). That construct adds a CDK-managed AWS Lambda function that is not in the data path.
 - A record that is not `full` is dropped. A `full` record above 1 MB cannot become an event, because an Amazon EventBridge request is limited to 1 MB: after the retries it ends in the pipe dead-letter queue (step 5).
 - The pipe dead-letter message holds no record, only the shard and the sequence number of the batch. Read the record back within the 24 hour retention of the stream with `aws kinesis get-shard-iterator --shard-iterator-type AT_SEQUENCE_NUMBER` and `aws kinesis get-records`.
-- Deployed and tested in `us-west-2`.
+- Deployed and tested in `us-west-2` and `us-east-1`.
 
 ## Deployment Instructions
 
@@ -60,7 +60,7 @@ Important: this application uses various AWS services and there are costs associ
     aws dsql wait cluster-active --identifier $CLUSTER_ID
     ```
 
-3. Install the dependencies, check the code and deploy (about 2 minutes):
+3. Install the dependencies, check the code and deploy (2 to 3 minutes):
 
     ```bash
     npm install
@@ -112,7 +112,7 @@ Important: this application uses various AWS services and there are costs associ
     DELETE FROM orders WHERE customer_name = 'AnyCompany';
     ```
 
-4. Read each queue. Expected: `c`, `u` and `d` in the audit queue, `c` in the validation queue and `d` in the alerts queue. Directly after a deployment the first events took 70 to 100 seconds in the test runs (later ones a few seconds), so run the commands again if a queue is empty:
+4. Read each queue. Expected: `c`, `u` and `d` in the audit queue, `c` in the validation queue and `d` in the alerts queue. The first events after a deployment can take a minute or two (later ones a few seconds), so run the commands again if a queue is empty:
 
     ```bash
     echo audit;      events "$(out AuditQueueUrl)"
@@ -136,7 +136,7 @@ Important: this application uses various AWS services and there are costs associ
     events "$(out AuditQueueUrl)"
     ```
 
-    Expected: one dead-letter message with `condition` `RetryAttemptsExhausted` and a `KinesisBatchInfo` (shard, sequence numbers; it arrived 4 and 46 seconds after the insert in two runs), a log line `TargetInvocationFailed` with `Total size of the entries in the request is over the limit`, and only the ordinary row (`c`) in the audit queue: the big row made no event and did not hold up the row behind it.
+    Expected: one dead-letter message with `condition` `RetryAttemptsExhausted` and a `KinesisBatchInfo` (shard, sequence numbers), `TargetInvocationFailed` log lines with `Total size of the entries in the request is over the limit`, and only the ordinary row (`c`) in the audit queue: the big row made no event and did not hold up the row behind it.
 
 6. Make a rule target fail: remove the alerts queue policy so that Amazon EventBridge cannot deliver, delete a row, read the rule-target dead-letter queue and restore the policy:
 
@@ -179,7 +179,7 @@ Important: this application uses various AWS services and there are costs associ
     aws dsql delete-cluster --identifier $CLUSTER_ID
     ```
 
-4. The helper function of the custom resource can write its last log lines after AWS CloudFormation deleted its log group, and AWS Lambda then creates the group again without retention. Delete it if it is there:
+4. The helper function of the custom resource writes its last log lines after AWS CloudFormation deletes its log group, so AWS Lambda creates the group again without retention. Delete it:
 
     ```bash
     for g in $(aws logs describe-log-groups --log-group-name-prefix DsqlCdcEventbridgePipesStack-CdcStreamCrLogs \
