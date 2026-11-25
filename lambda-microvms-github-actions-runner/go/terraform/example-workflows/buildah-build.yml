@@ -1,0 +1,31 @@
+name: buildah-build
+# There is no Docker daemon in the MicroVM; the runner image presets buildah,
+# so a plain `buildah bud` needs no extra flags.
+# runs-on must list every label in var.runner_labels.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: [self-hosted, lambda]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Write a tiny Containerfile
+        run: |
+          mkdir -p "$RUNNER_TEMP/hello"
+          cat > "$RUNNER_TEMP/hello/Containerfile" <<'CONTAINERFILE'
+          FROM docker.io/library/alpine:3.20
+          RUN echo "built on a Lambda MicroVM" > /hello.txt
+          CMD ["cat", "/hello.txt"]
+          CONTAINERFILE
+
+      - name: Build with buildah
+        run: |
+          buildah --version
+          buildah bud -t "localhost/hello:${GITHUB_SHA::7}" "$RUNNER_TEMP/hello"
+          buildah images

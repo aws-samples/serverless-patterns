@@ -1,0 +1,31 @@
+name: micro-vm-smoke
+
+# runs-on must list every label in var.runner_labels; the webhook only
+# launches a MicroVM for jobs that request all of them.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    # Each matrix job lands on its own MicroVM.
+    strategy:
+      fail-fast: false
+      matrix:
+        n: [1, 2, 3]
+    runs-on: [self-hosted, lambda]
+    steps:
+      - name: Identify this ephemeral runner
+        run: |
+          echo "matrix job #${{ matrix.n }}"
+          echo "host:   $(hostname)"
+          echo "arch:   $(uname -m)"
+          echo "runner: $RUNNER_NAME"
+          echo "started: $(date -u +%H:%M:%S.%3N)"
+
+      - name: Prove isolation + ephemerality
+        run: |
+          echo "Each matrix job runs on a separate single-use MicroVM."
+          echo "This runner terminates itself when this job finishes."

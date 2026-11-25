@@ -1,0 +1,5 @@
+# Bundled because the Lambda python3.12 runtime's built-in boto3 lags behind
+# and does not include the (new) lambda-microvms service client. Pinned exactly
+# (reproducible package) to a version that includes it (service added by
+# 1.43.108). See terraform packaging (pip install -t).
+boto3==1.44.2
