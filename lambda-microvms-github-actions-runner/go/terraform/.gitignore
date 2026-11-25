@@ -1,0 +1,28 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+*.tfplan
+tfplan
+crash.log
+.terraform.tfstate.lock.info
+override.tf
+*_override.tf
+
+# Build artifacts
+.build/
+dist/
+*.zip
+src/microvm-runner/supervisor/supervisor
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# OS
+.DS_Store

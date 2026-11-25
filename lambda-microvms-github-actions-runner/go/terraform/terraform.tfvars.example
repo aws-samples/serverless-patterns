@@ -1,0 +1,16 @@
+# Copy to terraform.tfvars (gitignored) and fill in:
+#   cp terraform.tfvars.example terraform.tfvars
+
+# Repository-level runners (default): the private repo the runners serve.
+github_owner = "<owner>"
+github_repo  = "<repo>"
+
+# Organization-level runners instead: uncomment, and remove the two lines above.
+# runner_scope = "org"
+# github_org   = "<org>"
+
+# Optional (defaults shown):
+# region                       = "us-east-1"
+# name_prefix                  = "gha-microvm-runner"
+# runner_labels                = ["self-hosted", "lambda"]
+# microvm_max_duration_seconds = 900

@@ -1,0 +1,18 @@
+{
+  "action": "queued",
+  "workflow_job": {
+    "id": 1000000001,
+    "run_id": 2000000001,
+    "name": "example-job",
+    "status": "queued",
+    "labels": ["ubuntu-latest"]
+  },
+  "repository": {
+    "name": "<repo>",
+    "full_name": "<owner>/<repo>",
+    "private": true
+  },
+  "sender": {
+    "login": "<owner>"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "title": "Ephemeral GitHub Actions runners on AWS Lambda MicroVMs with Amazon API Gateway",
+  "description": "Run each GitHub Actions job on its own single-use AWS Lambda MicroVM, launched by a webhook through Amazon API Gateway and AWS Lambda.",
+  "language": "Go",
+  "level": "300",
+  "framework": "Terraform",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "This pattern runs every GitHub Actions job on its own single-use AWS Lambda MicroVM. When a job is queued, GitHub sends a workflow_job webhook to an Amazon API Gateway REST API. An AWS Lambda function verifies the webhook's HMAC signature with a secret stored in AWS Secrets Manager and checks that the job requests all of the configured runner labels. It then calls the GitHub API with a personal access token, also stored in Secrets Manager, to mint a just-in-time (JIT) runner configuration that can register exactly one runner for exactly one job. Finally it calls RunMicrovm to launch a MicroVM from a pre-built snapshot, attaching an outbound-only network configuration and a maximum duration.",
+      "The JIT configuration is larger than the 4096-character run-hook payload limit, so the function writes it to Amazon S3 and passes the MicroVM a presigned GET URL that expires after 60 seconds. Lambda delivers that URL to a small Go supervisor inside the MicroVM through the /run lifecycle hook. The supervisor fetches the configuration over HTTPS, starts the GitHub Actions runner with run.sh --jitconfig, and calls TerminateMicrovm on its own MicroVM as soon as the job ends, whether it passed or failed. The personal access token never enters the MicroVM, and the MicroVM's execution role has no access to S3 or Secrets Manager. It can only terminate runner MicroVMs and write its own logs. Nothing runs between jobs, so the runners scale to zero.",
+      "The runner image is built once by terraform apply. A build script cross-compiles the supervisor for ARM64 and zips it with a Dockerfile. Terraform uploads the zip to S3 and creates the AWS::Lambda::MicrovmImage resource in a one-resource AWS CloudFormation stack, on the Amazon Linux 2023 managed base image with the /ready and /run hooks enabled on port 8080. Lambda runs the Dockerfile, waits for the /ready hook and snapshots the MicroVM, so every job starts from a fully initialized environment. The image bakes in the GitHub Actions runner, verified against a pinned SHA-256 checksum, and buildah configured for the vfs storage driver and chroot isolation, so jobs can build container images without a Docker daemon.",
+      "This pattern deploys Amazon API Gateway, an AWS Lambda function, a Lambda MicroVM image, an Amazon S3 bucket and two AWS Secrets Manager secrets, plus three least-privilege IAM roles and Amazon CloudWatch Logs log groups with a retention period. Two example workflows are included: a three-job smoke test and a buildah image build."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "main.tf",
+      "patternPath": "lambda-microvms-github-actions-runner/go/terraform"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "AWS Lambda MicroVMs developer guide",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-microvms-guide.html"
+      },
+      {
+        "text": "MicroVM images",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/microvms-images.html"
+      },
+      {
+        "text": "Actions, resources, and condition keys for AWS Lambda",
+        "link": "https://docs.aws.amazon.com/service-authorization/latest/reference/list_awslambda.html"
+      },
+      {
+        "text": "GitHub REST API: create configuration for a just-in-time runner",
+        "link": "https://docs.github.com/en/rest/actions/self-hosted-runners#create-configuration-for-a-just-in-time-runner-for-a-repository"
+      },
+      {
+        "text": "Lambda proxy integrations in Amazon API Gateway",
+        "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "Build the MicroVM code artifact: <code>./src/microvm-runner/build.sh</code>",
+      "Deploy: <code>terraform init && terraform apply</code>",
+      "Store the GitHub token and webhook secret, add the GitHub webhook and copy an example workflow, as described in steps 6 to 8 of the README."
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "Remove the webhook from the GitHub repository settings.",
+      "Delete the stack: <code>terraform destroy</code>.",
+      "Delete the image build log group created by Lambda: <code>aws logs delete-log-group --log-group-name /aws/lambda-microvms/&lt;name_prefix&gt;-runner-image</code>."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Frank Peraza",
+      "bio": "Associate Solutions Architect at AWS",
+      "image": "https://avatars.githubusercontent.com/u/213654438?v=4",
+      "github": "frperaza",
+      "linkedin": "frank-peraza"
+    }
+  ]
+}
