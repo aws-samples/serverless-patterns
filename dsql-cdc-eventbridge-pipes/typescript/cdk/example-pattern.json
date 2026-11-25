@@ -1,0 +1,60 @@
+{
+  "title": "Amazon Aurora DSQL CDC to Amazon EventBridge with Amazon EventBridge Pipes",
+  "description": "An Amazon EventBridge pipe filters and reshapes Amazon Aurora DSQL change records from Amazon Kinesis Data Streams. Event bus rules route the changes to Amazon SQS queues.",
+  "language": "TypeScript",
+  "level": "300",
+  "framework": "AWS CDK",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "Amazon Aurora DSQL writes a change record for every committed row change to Amazon Kinesis Data Streams.",
+      "An Amazon EventBridge pipe reads the stream, drops chunked and fragment records, uses the record's operation code (c, u or d) as the event type and puts the reshaped change on an Amazon EventBridge custom event bus.",
+      "Rules on the event bus send every change to an audit queue, inserts to a validation queue and deletes to an alerts queue in Amazon SQS. Dead-letter queues catch records the pipe cannot deliver and events a rule target cannot accept."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "lib/dsql-cdc-eventbridge-pipes-stack.ts"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Amazon Aurora DSQL change data capture",
+        "link": "https://docs.aws.amazon.com/aurora-dsql/latest/userguide/cdc-streams.html"
+      },
+      {
+        "text": "Amazon EventBridge Pipes",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes.html"
+      },
+      {
+        "text": "Amazon EventBridge event patterns",
+        "link": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "<code>npm install</code>",
+      "<code>npm run build</code>",
+      "<code>npx cdk deploy --parameters DsqlClusterId=your-cluster-id</code>"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "<code>npx cdk destroy</code>"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Nithin Chandran R",
+      "bio": "Technical Account Manager at AWS",
+      "linkedin": "nithin-chandran-r"
+    }
+  ]
+}
