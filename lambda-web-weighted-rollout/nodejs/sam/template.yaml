@@ -1,0 +1,277 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Weighted revision rollouts (canary, promote, rollback) for an AWS Lambda Web Function
+  behind Amazon CloudFront with Origin Access Control. Two fixed revision slots (blue and
+  green) share one IamAuth endpoint; stack parameters set each slot's code version and
+  traffic weight.
+
+# How a release works (deploy.sh drives these parameters for you):
+#   1. Live slot serves 100%. The idle slot has weight 0 and receives no traffic.
+#   2. canary: the idle slot gets the new code version (its revision is replaced while it
+#      has no traffic), then a second update gives it a small weight.
+#   3. promote: the canary slot gets 100% and becomes the live slot.
+#   4. rollback: the live slot gets 100% again. The canary revision is kept but unused.
+# A revision is only ever replaced while it has weight 0, so the endpoint never routes
+# to a revision that is being replaced.
+
+Parameters:
+  CodeBucket:
+    Type: String
+    Description: >
+      Versioning-enabled S3 bucket that holds the deployment package. Use a bucket
+      dedicated to this stack: the stack replaces its bucket policy.
+  CodeKey:
+    Type: String
+    Default: web-function/app.zip
+    Description: S3 key of the deployment package. Both slots use this key, pinned to different object versions.
+  BlueCodeVersionId:
+    Type: String
+    MinLength: 1
+    Description: S3 object version of the code in the blue slot.
+  GreenCodeVersionId:
+    Type: String
+    MinLength: 1
+    Description: S3 object version of the code in the green slot.
+  BlueDeployedAt:
+    Type: String
+    Default: unknown
+    Description: UTC time the blue slot's code was uploaded. Set by deploy.sh; shown on the page.
+  GreenDeployedAt:
+    Type: String
+    Default: unknown
+    Description: UTC time the green slot's code was uploaded. Set by deploy.sh; shown on the page.
+  BlueWeight:
+    Type: Number
+    MinValue: 0
+    MaxValue: 100
+    Default: 100
+    Description: Percentage of traffic for the blue slot. BlueWeight + GreenWeight must equal 100.
+  GreenWeight:
+    Type: Number
+    MinValue: 0
+    MaxValue: 100
+    Default: 0
+    Description: Percentage of traffic for the green slot. BlueWeight + GreenWeight must equal 100.
+  LiveSlot:
+    Type: String
+    AllowedValues: [blue, green]
+    Default: blue
+    Description: The slot that holds the current release. The other slot is the canary or idle slot.
+  RollbackAvailable:
+    Type: String
+    AllowedValues: ['yes', 'no']
+    Default: 'no'
+    Description: >
+      Set by deploy.sh. 'yes' means the idle slot still holds the previous release, so
+      deploy.sh rollback can switch back to it.
+
+Conditions:
+  # A revision with weight 0 must be left out of RevisionWeights (each weight is 1-100).
+  BlueOnly: !Equals [!Ref GreenWeight, 0]
+  GreenOnly: !Equals [!Ref BlueWeight, 0]
+
+Resources:
+
+  # Lambda reads the code as the lambda.amazonaws.com service principal. Scoped to this
+  # account and to this stack's Web Function revisions (confused-deputy protection). Uses
+  # the computed function name, not !Ref, to avoid a dependency cycle.
+  CodeBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CodeBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaWebFunctionCodeAccess
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${CodeBucket}/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${AWS::StackName}-web-function/revision/*"
+
+  WebFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # Lambda creates these log groups with no expiration if they don't exist first.
+  WebFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/web/${AWS::StackName}-web-function
+      RetentionInDays: 30
+  WebFunctionLocalLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/web/${AWS::StackName}-web-function.local
+      RetentionInDays: 30
+
+  WebFunction:
+    Type: AWS::Lambda::WebFunction
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-web-function
+      Tags:
+        - Key: pattern
+          Value: lambda-web-weighted-rollout
+
+  # Blue and green slots. Each is an immutable revision pinned to one S3 object version.
+  # Changing a slot's code version replaces its revision; deploy.sh only does that while
+  # the slot has weight 0. REVISION_SLOT and CODE_VERSION_ID let the app report which
+  # revision served each request, because Web Function metrics have no revision dimension.
+  BlueRevision:
+    Type: AWS::Lambda::WebFunctionRevision
+    DependsOn: [CodeBucketPolicy, WebFunctionLogGroup, WebFunctionLocalLogGroup]
+    Properties:
+      FunctionName: !Ref WebFunction
+      Description: Blue slot
+      BuildConfig:
+        CodeConfig:
+          S3Object:
+            Bucket: !Ref CodeBucket
+            Key: !Ref CodeKey
+            VersionId: !Ref BlueCodeVersionId
+        RuntimeConfig:
+          Runtime: nodejs24.x
+      ServiceConfig:
+        ExecutionRoleArn: !GetAtt WebFunctionExecutionRole.Arn
+        TimeoutSeconds: 30
+        EnvironmentVariables:
+          REVISION_SLOT: blue
+          CODE_VERSION_ID: !Ref BlueCodeVersionId
+          DEPLOYED_AT: !Ref BlueDeployedAt
+
+  GreenRevision:
+    Type: AWS::Lambda::WebFunctionRevision
+    DependsOn: [CodeBucketPolicy, WebFunctionLogGroup, WebFunctionLocalLogGroup]
+    Properties:
+      FunctionName: !Ref WebFunction
+      Description: Green slot
+      BuildConfig:
+        CodeConfig:
+          S3Object:
+            Bucket: !Ref CodeBucket
+            Key: !Ref CodeKey
+            VersionId: !Ref GreenCodeVersionId
+        RuntimeConfig:
+          Runtime: nodejs24.x
+      ServiceConfig:
+        ExecutionRoleArn: !GetAtt WebFunctionExecutionRole.Arn
+        TimeoutSeconds: 30
+        EnvironmentVariables:
+          REVISION_SLOT: green
+          CODE_VERSION_ID: !Ref GreenCodeVersionId
+          DEPLOYED_AT: !Ref GreenDeployedAt
+
+  # Disabled auto-deployment: Lambda never moves traffic on its own; RevisionWeights decides.
+  WebFunctionEndpoint:
+    Type: AWS::Lambda::WebFunctionEndpoint
+    Properties:
+      FunctionName: !Ref WebFunction
+      EndpointName: live
+      EndpointType: HomeRegion
+      AuthType: IamAuth
+      RevisionWeights: !If
+        - BlueOnly
+        - - RevisionId: !GetAtt BlueRevision.RevisionId
+            Weight: 100
+        - !If
+          - GreenOnly
+          - - RevisionId: !GetAtt GreenRevision.RevisionId
+              Weight: 100
+          - - RevisionId: !GetAtt BlueRevision.RevisionId
+              Weight: !Ref BlueWeight
+            - RevisionId: !GetAtt GreenRevision.RevisionId
+              Weight: !Ref GreenWeight
+      # Caps so a sample can't consume the account's regional capacity. Tune for your load.
+      ScalingConfig:
+        MaxEnvironments: 10
+      ThrottleConfig:
+        RateLimit: 100
+
+  # For Web Function origins CloudFront requires origin type 'lambda' and 'always-amz-auth'.
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub ${AWS::StackName}-oac
+        OriginAccessControlOriginType: lambda
+        SigningBehavior: always-amz-auth
+        SigningProtocol: sigv4
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Ref AWS::StackName
+        Enabled: true
+        HttpVersion: http2
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: web-function
+            DomainName: !GetAtt WebFunctionEndpoint.DomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: [TLSv1.2]
+        DefaultCacheBehavior:
+          TargetOriginId: web-function
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          # Managed CachingDisabled: every request reaches the endpoint, so you see the
+          # real traffic split. No origin request policy: no viewer headers, cookies or
+          # query strings are forwarded, and Host stays the endpoint domain.
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+        # With the default *.cloudfront.net certificate, CloudFront doesn't enforce a
+        # minimum viewer TLS version. The setting takes effect when you add a custom
+        # domain with an ACM certificate (see Production considerations in the README).
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+
+  # Web Functions don't support AWS::Lambda::Permission. Allow only this distribution.
+  EndpointResourcePolicy:
+    Type: AWS::Lambda::ResourcePolicy
+    Properties:
+      ResourceArn: !GetAtt WebFunction.FunctionArn
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: lambda:InvokeWebFunctionEndpoint
+            Resource: !GetAtt WebFunctionEndpoint.EndpointArn
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+
+Outputs:
+  CloudFrontUrl:
+    Description: Public URL. Refresh it to watch the traffic split.
+    Value: !Sub https://${Distribution.DomainName}
+  WebFunctionEndpointDomain:
+    Description: The endpoint's own domain. Unsigned requests get 403.
+    Value: !GetAtt WebFunctionEndpoint.DomainName
+  BlueRevisionId:
+    Value: !GetAtt BlueRevision.RevisionId
+  GreenRevisionId:
+    Value: !GetAtt GreenRevision.RevisionId
+  LogGroupName:
+    Value: !Ref WebFunctionLogGroup

@@ -1,0 +1,55 @@
+{
+  "title": "Weighted revision rollouts for an AWS Lambda Web Function",
+  "description": "Canary, promote and rollback for a Lambda Web Function behind Amazon CloudFront, using two revision slots and stack-driven revision weights",
+  "language": "Node.js",
+  "level": "300",
+  "framework": "AWS SAM",
+  "introBox": {
+    "headline": "How it works",
+    "text": [
+      "The SAM template declares two fixed Lambda Web Function revisions, blue and green, each pinned to its own S3 object version, and one IamAuth endpoint whose revision weights come from stack parameters. New code always goes into the slot that has no traffic, so the live revision is never replaced mid-rollout and the previous release stays available for rollback.",
+      "A deploy script drives the release: canary uploads new code into the idle slot and gives it a share of traffic, shift changes that share, promote moves all traffic to the canary, and rollback returns traffic to the previous release. Amazon CloudFront with Origin Access Control fronts the endpoint, and the sample page shows which slot served each request and can sample the live traffic split."
+    ]
+  },
+  "gitHub": {
+    "template": {
+      "templateFile": "template.yaml"
+    }
+  },
+  "resources": {
+    "bullets": [
+      {
+        "text": "Lambda Web Functions deployment patterns",
+        "link": "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-deployment.html"
+      },
+      {
+        "text": "AWS SAM RevisionWeights property for Web Functions",
+        "link": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-webfunction-revisionweights.html"
+      }
+    ]
+  },
+  "deploy": {
+    "text": [
+      "./deploy.sh"
+    ]
+  },
+  "testing": {
+    "text": [
+      "See the GitHub repo for detailed testing instructions."
+    ]
+  },
+  "cleanup": {
+    "text": [
+      "See the GitHub repo for detailed cleanup instructions."
+    ]
+  },
+  "authors": [
+    {
+      "name": "Shekhar Shrinivasan",
+      "image": "https://avatars.githubusercontent.com/u/58206425?s=400&u=90899732423049a2e45523f631ab0379330aec62&v=4",
+      "bio": "Senior Technical Consultant (TAM)",
+      "linkedin": "shekhar-shrinivasan",
+      "twitter": ""
+    }
+  ]
+}
