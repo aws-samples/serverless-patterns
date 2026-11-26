@@ -69,7 +69,7 @@ sequenceDiagram
     Agent-->>Fn: draft summary (checkpointed)
     Note over Fn: waitForCallback "await-human-review"<br/>suspended - no compute billed
     Reviewer->> Fn: send-durable-execution-callback-success
-    Note over Fn: replays from the top, <br/>analyze step server from its checkpoint
+    Note over Fn: replays from the top, <br/>analyze step served from its checkpoint
     opt approved
         Fn->>Agent: step "finalize-document"(same session)
         Agent->> Model: Converse
