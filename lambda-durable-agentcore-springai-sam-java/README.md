@@ -264,7 +264,7 @@ Write whatever comments the draft actually warrants - they are passed to the age
 ```bash
 aws lambda send-durable-execution-callback-success \
     --region <your-region> \
-    --callback-id $CALLBACK_ID \
+    --callback-id "$CALLBACK_ID" \
     --cli-binary-format raw-in-base64-out \
     --result '{"decision":"approved","comments":"<your review comments>"}'
 ```
@@ -278,7 +278,7 @@ Reject is also a callback *success* - the decision is data, not a failure. Again
 ```bash
 aws lambda send-durable-execution-callback-success \
     --region <your-region> \
-    --callback-id $CALLBACK_ID \
+    --callback-id "$CALLBACK_ID" \
     --cli-binary-format raw-in-base64-out \
     --result '{"decision":"rejected","comments":"<why you are rejecting it>"}'
 ```
@@ -288,7 +288,7 @@ To abandon a review instead of deciding it, send a failure:
 ```bash
 aws lambda send-durable-execution-callback-failure \
     --region <your-region> \
-    --callback-id $CALLBACK_ID\
+    --callback-id "$CALLBACK_ID" \
     --error ErrorType=ReviewAbandoned,ErrorMessage="No reviewer available"
 ```
 
