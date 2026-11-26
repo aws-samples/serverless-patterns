@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.bedrockagentcore.BedrockAgentCoreClient;
+import software.amazon.awssdk.services.bedrockagentcore.model.BedrockAgentCoreException;
 import software.amazon.awssdk.services.bedrockagentcore.model.InvokeAgentRuntimeRequest;
 import software.amazon.awssdk.services.bedrockagentcore.model.InvokeAgentRuntimeResponse;
 
@@ -75,16 +76,22 @@ public class AgentClient {
             throw new IllegalStateException("Unable to serialize agent request", e);
         }
 
-        ResponseBytes<InvokeAgentRuntimeResponse> response = client.invokeAgentRuntimeAsBytes(
-                InvokeAgentRuntimeRequest.builder()
-                        .agentRuntimeArn(agentRuntimeArn)
-                        .runtimeSessionId(sessionIdFor(documentId))
-                        .contentType("application/json")
-                        .accept("application/json")
-                        .payload(SdkBytes.fromUtf8String(body))
-                        .build());
+        try {
+            ResponseBytes<InvokeAgentRuntimeResponse> response = client.invokeAgentRuntimeAsBytes(
+                    InvokeAgentRuntimeRequest.builder()
+                            .agentRuntimeArn(agentRuntimeArn)
+                            .runtimeSessionId(sessionIdFor(documentId))
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .payload(SdkBytes.fromUtf8String(body))
+                            .build());
 
-        return response.asUtf8String();
+            return response.asUtf8String();
+        } catch (BedrockAgentCoreException e) {
+            // SDK exceptions cannot be reconstructed from durable checkpoints; keep diagnostic data as text.
+            throw new IllegalStateException("AgentCore " + mode + " failed (status " + e.statusCode()
+                    + ", request ID " + e.requestId() + "): " + e.getMessage());
+        }
     }
 
     /**

@@ -26,7 +26,7 @@ Parameters:
   BedrockModelId:
     Type: String
     Default: us.anthropic.claude-sonnet-5
-    Description: Bedrock model (or inference profile) the Spring AI agent calls.
+    Description: Amazon Bedrock model (or inference profile) the Spring AI agent calls.
 
 Resources:
 

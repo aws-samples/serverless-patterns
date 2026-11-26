@@ -1,6 +1,6 @@
 {
   "title": "Human-in-the-loop AI review with AWS Lambda durable functions",
-  "description": "Orchestrate a Spring AI agent on Bedrock AgentCore from a Java Lambda durable function, pausing for human approval.",
+  "description": "Orchestrate a Spring AI agent on Amazon Bedrock AgentCore from a Java AWS Lambda durable function, pausing for human approval.",
   "language": "Java",
   "level": "300",
   "framework": "AWS SAM",

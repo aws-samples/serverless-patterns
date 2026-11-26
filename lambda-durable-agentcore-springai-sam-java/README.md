@@ -4,7 +4,7 @@ This pattern shows how an AWS Lambda durable function written in Java can orches
 
 The durable function asks the agent to draft a summary of a document, then suspends. It resumes only when a human sends a decision, and asks the agent for a final version if the review was approved. While suspended the function consumes no compute and can wait for days.
 
-Learn more about this pattern at Serverless Land Patterns: << Add the live URL here >>
+Learn more about this pattern at Serverless Land Patterns: [https://serverlessland.com/patterns/lambda-durable-agentcore-springai-sam-java](https://serverlessland.com/patterns/lambda-durable-agentcore-springai-sam-java)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -55,24 +55,34 @@ Important: this application uses various AWS services and there are costs associ
 
 ## How it works
 
+```mermaid
+sequenceDiagram
+    actor Submitter
+    actor Reviewer
+    participant Fn as Durable function<br/>(AWS Lambda)
+    participant Agent as Spring AI agent<br/>(Agentcore Runtime)
+    participant Model as Claude<br/>)Amazon Bedrock)
+    
+    Submitter-->>Fn: aws lambda invoke (document)
+    Fn->>Agent: step "analyze-document"
+    Agent->>Model: Converse
+    Agent-->>Fn: draft summary (checkpointed)
+    Note over Fn: waitForcallback "await-human-review"<br/>suspended - no commpute billed
+    Reviewer->> Fn: send-durable-execution-callback-success
+    Note over Fn: replays from the top, <br/>analyze step server from its checkbpoint
+    opt approved
+        Fn->>Agent: step "finalize-document"(same session)
+        Agent->> Model: Converse
+        Agent-->>Fn: final summary (checkpointed)
+    end
 ```
-aws lambda invoke  ──►  ReviewWorkflowFunction (durable)
-                              │
-                              │  step "analyze-document"
-                              │      └──►  AgentCore Runtime
-                              │            (Spring AI agent, ARM64 container)
-                              │
-                              │  waitForCallback "await-human-review"
-                              │
-                              ⋮   ~~ suspended: no compute billed ~~
-                              │
-aws lambda send-durable- ─────┤  resumes with the decision
-execution-callback-success    │
-                              │  step "finalize-document"   (only if approved)
-                              │
-                              ▼
-                          returns ReviewResult
-```
+
+The submitter starts the Lambda workflow through the AWS CLI. Lambda calls the Spring AI
+agent on AgentCore, which uses Amazon Bedrock to draft the summary. Lambda checkpoints the
+draft and suspends at the human review callback. The reviewer reads the draft and sends an
+approval or rejection through the CLI. Approval invokes the agent again to finalize the
+summary; rejection completes without another model call. Lambda manages the checkpoints
+and result, so this pattern needs no database.
 
 The workflow is [`DocumentReviewWorkflow.java`](orchestrator/src/main/java/com/example/durableagent/DocumentReviewWorkflow.java). In Java the durable programming model is based on inheritance rather than annotations: the handler extends `DurableHandler<I, O>` and receives a `DurableContext`.
 
@@ -200,6 +210,25 @@ To confirm the workflow is suspended and waiting rather than still working, chec
 aws lambda get-durable-execution --durable-execution-arn "$ARN" \
     --region <your-region> --query 'Status' --output text
 ```
+
+If the status is `FAILED`, a callback may never have been created. Inspect the
+execution error and history before retrying the callback query:
+
+```bash
+aws lambda get-durable-execution --durable-execution-arn "$ARN" \
+    --region <your-region>
+aws lambda get-durable-execution-history --durable-execution-arn "$ARN" \
+    --region <your-region>
+```
+
+An `AgentCore analyze failed` error includes the service status, request ID and original
+message. Inspect the AgentCore runtime's CloudWatch logs for the corresponding failure;
+check model availability, model access and the runtime role's Bedrock permissions against
+that message. A runtime reaching `READY` confirms startup, but does not prove a model call
+will succeed. The older `Cannot deserialize original exception data` warning is a secondary
+checkpoint error and does not identify the underlying AgentCore failure. After correcting
+the cause and redeploying, start a new execution with a new `--durable-execution-name`;
+existing failed steps retain their checkpointed error.
 
 To read the agent's draft while the execution is suspended, check the function log:
 
