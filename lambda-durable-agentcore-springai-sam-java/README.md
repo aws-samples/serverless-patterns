@@ -60,16 +60,16 @@ sequenceDiagram
     actor Submitter
     actor Reviewer
     participant Fn as Durable function<br/>(AWS Lambda)
-    participant Agent as Spring AI agent<br/>(Agentcore Runtime)
-    participant Model as Claude<br/>)Amazon Bedrock)
+    participant Agent as Spring AI agent<br/>(AgentCore Runtime)
+    participant Model as Claude<br/>(Amazon Bedrock)
     
-    Submitter-->>Fn: aws lambda invoke (document)
+    Submitter->>Fn: aws lambda invoke (document)
     Fn->>Agent: step "analyze-document"
     Agent->>Model: Converse
     Agent-->>Fn: draft summary (checkpointed)
-    Note over Fn: waitForcallback "await-human-review"<br/>suspended - no commpute billed
+    Note over Fn: waitForCallback "await-human-review"<br/>suspended - no compute billed
     Reviewer->> Fn: send-durable-execution-callback-success
-    Note over Fn: replays from the top, <br/>analyze step server from its checkbpoint
+    Note over Fn: replays from the top, <br/>analyze step server from its checkpoint
     opt approved
         Fn->>Agent: step "finalize-document"(same session)
         Agent->> Model: Converse
