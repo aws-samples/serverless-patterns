@@ -1,0 +1,5 @@
+{
+  "documentId": "doc-2026-001",
+  "title": "Q3 Engineering Budget Proposal",
+  "documentText": "Q3 Engineering Budget Proposal\n\nWe propose increasing engineering headcount by 4 full-time equivalents in Q3, at a total cost of 620,000 USD. Two positions are backend engineers for the payments platform, one is a site reliability engineer, and one is a QA automation engineer. The increase is funded by reallocating the unspent Q2 contractor budget of 400,000 USD, with the remaining 220,000 USD drawn from the annual contingency reserve.\n\nThe payments platform has been operating with a two-person on-call rotation since January, which the engineering manager has flagged as a retention risk. The SRE hire is intended to bring the rotation to four people.\n\nApproval is required by August 15 so that recruiting can begin before the Q3 hiring freeze."
+}
