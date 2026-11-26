@@ -87,7 +87,6 @@ AgentImageUri: ${IMAGE_URI}:${TAG}
 Deploy with:
 
   sam deploy --guided --parameter-overrides \\
-      ApproverEmail=you@example.com \\
       AgentImageUri=${IMAGE_URI}:${TAG}
 
 EOF

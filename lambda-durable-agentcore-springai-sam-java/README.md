@@ -16,7 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 * [AWS Serverless Application Model](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) (AWS SAM) installed, **version 1.161.0 or later**
 * [Java 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) and [Apache Maven](https://maven.apache.org/install.html) 3.9 or later
 * [Docker](https://docs.docker.com/get-docker/), [Finch](https://runfinch.com/), nerdctl or Podman, to build the agent container image
-* An Amazon Bedrock model available in the target Region. The default is `us.anthropic.claude-sonnet-5`. Check availability with `aws bedrock get-foundation-model-availability --model-id <id> --region <region>`; if it reports anything other than `AUTHORIZED`, enable it under **Model access** in the Amazon Bedrock console.
+* Access to an Amazon Bedrock model in the target Region. The default is `us.anthropic.claude-opus-4-5-20251101-v1:0`. Test it in **Model catalog → playground** or with a short Converse request before deployment. A catalog listing or `AUTHORIZED` availability status alone does not prove invocation access. Complete any provider or AWS Marketplace activation requirements; some models also require additional account-level access through AWS Sales. See [Bedrock model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html). To use another Converse-compatible text model, override `BedrockModelId` and update the template’s model/inference profile permissions and inference settings as needed.
 
 ## Deployment Instructions
 
@@ -184,42 +184,61 @@ aws lambda invoke \
 
 ### Find the callback ID
 
-Give the workflow a moment first. The agent call takes roughly 10-15 seconds, and the callback only exists once `analyze-document` has finished - so this query returns nothing if you run it immediately. Wait about 30 seconds, and retry if the output is empty.
-
-Run these in the same shell, since `$ARN` is reused by the commands below.
-
-```bash
-ARN=$(aws lambda list-durable-executions-by-function \
-    --function-name <WorkflowFunctionName> \
-    --region <your-region> \
-    --durable-execution-name review-001 \
-    --query 'DurableExecutions[0].DurableExecutionArn' --output text)
-# Note: use the unqualified function name here (no :live suffix).
-# Passing a qualifier together with --durable-execution-name causes an InvalidParameterValueException.
-
-aws lambda get-durable-execution-history \
-    --durable-execution-arn "$ARN" \
-    --region <your-region> \
-    --query 'Events[?EventType==`CallbackStarted`].CallbackStartedDetails.CallbackId' \
-    --output text
-```
-
-To confirm the workflow is suspended and waiting rather than still working, check its status - `RUNNING` with `analyze-document` already succeeded means it is parked at the callback:
+The callback exists only after `analyze-document` succeeds. Wait about 30 seconds,
+then run this in the same shell as the approval commands below. Replace the function
+name and Region placeholders first. Use the unqualified function name (no `:live`):
+combining a qualifier with `--durable-execution-name` causes an
+`InvalidParameterValueException`.
 
 ```bash
-aws lambda get-durable-execution --durable-execution-arn "$ARN" \
-    --region <your-region> --query 'Status' --output text
+find_review_callback() {
+    CALLBACK_ID=""
+    ARN=$(aws lambda list-durable-executions-by-function \
+        --function-name <WorkflowFunctionName> \
+        --region <your-region> \
+        --durable-execution-name review-001 \
+        --query 'DurableExecutions[0].DurableExecutionArn' --output text) || return 1
+
+    if [ -z "$ARN" ] || [ "$ARN" = "None" ]; then
+        echo "Execution not found. Check the AWS account/profile, Region, function and execution name, then retry." >&2
+        return 1
+    fi
+
+    REVIEW_STATUS=$(aws lambda get-durable-execution \
+        --durable-execution-arn "$ARN" --region <your-region> \
+        --query 'Status' --output text) || return 1
+
+    if [ "$REVIEW_STATUS" != "RUNNING" ]; then
+        echo "Execution status: $REVIEW_STATUS. Inspect the result/error below before continuing." >&2
+        aws lambda get-durable-execution \
+            --durable-execution-arn "$ARN" --region <your-region>
+        aws lambda get-durable-execution-history \
+            --durable-execution-arn "$ARN" --region <your-region>
+        return 1
+    fi
+
+    CALLBACK_ID=$(aws lambda get-durable-execution-history \
+        --durable-execution-arn "$ARN" --region <your-region> \
+        --query 'Events[?EventType==`CallbackStarted`].CallbackStartedDetails.CallbackId | [0]' \
+        --output text) || return 1
+
+    if [ -z "$CALLBACK_ID" ] || [ "$CALLBACK_ID" = "None" ]; then
+        CALLBACK_ID=""
+        echo "Execution is running but no callback exists yet. Wait, then run find_review_callback again." >&2
+        return 1
+    fi
+
+    echo "Callback ID: $CALLBACK_ID"
+}
+
+find_review_callback
 ```
 
-If the status is `FAILED`, a callback may never have been created. Inspect the
-execution error and history before retrying the callback query:
-
-```bash
-aws lambda get-durable-execution --durable-execution-arn "$ARN" \
-    --region <your-region>
-aws lambda get-durable-execution-history --durable-execution-arn "$ARN" \
-    --region <your-region>
-```
+Continue to approval or rejection only after this prints a callback ID. If the
+execution is still running without a callback, run `find_review_callback` again
+after a short wait. If it fails, inspect the execution error and AgentCore runtime
+logs instead of repeatedly querying for a callback. `RUNNING` alone does not prove
+the workflow is waiting for a person; the callback must also exist.
 
 An `AgentCore analyze failed` error includes the service status, request ID and original
 message. Inspect the AgentCore runtime's CloudWatch logs for the corresponding failure;

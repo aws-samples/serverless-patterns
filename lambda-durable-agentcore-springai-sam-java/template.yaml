@@ -28,7 +28,7 @@ Parameters:
     # Any Amazon Bedrock Converse-compatible text model can be used, subject to account access
     # and supported inference settings. For another provider or inference profile, also update
     # InvokeBedrockModels resources below to allow its model and inference profile ARNs.
-    Default: us.anthropic.claude-sonnet-5
+    Default: us.anthropic.claude-opus-4-5-20251101-v1:0
     Description: Amazon Bedrock model (or inference profile) the Spring AI agent calls.
 
 Resources:
